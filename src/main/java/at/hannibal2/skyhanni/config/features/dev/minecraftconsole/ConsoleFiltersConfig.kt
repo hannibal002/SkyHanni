@@ -111,4 +111,20 @@ class ConsoleFiltersConfig {
     )
     @ConfigEditorBoolean
     var filterMissingTextureReferences: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Filter Atlas Created",
+        desc = "Filter 'Created: <size> <name>-atlas' messages during texture atlas stitching.",
+    )
+    @ConfigEditorBoolean
+    var filterAtlasCreated: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Filter Existing Team",
+        desc = "Filter 'Requested creation of existing team' warnings.",
+    )
+    @ConfigEditorBoolean
+    var filterExistingTeam: Boolean = true
 }

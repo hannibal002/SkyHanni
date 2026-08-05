@@ -184,6 +184,21 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
             return Filter.Result.DENY
         }
 
+        if (filterConfig.filterAtlasCreated &&
+            formattedMessage.startsWith("Created: ") &&
+            formattedMessage.endsWith("-atlas")
+        ) {
+            filterConsole("texture atlas created")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterExistingTeam &&
+            formattedMessage.startsWith("Requested creation of existing team ")
+        ) {
+            filterConsole("existing team creation")
+            return Filter.Result.DENY
+        }
+
         if (filterScoreboardErrors(event)) return Filter.Result.DENY
 
         if (!config.printUnfilteredDebugs) return Filter.Result.ACCEPT
