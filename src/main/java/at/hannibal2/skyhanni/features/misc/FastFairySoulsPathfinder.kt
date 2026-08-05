@@ -269,7 +269,7 @@ object FastFairySoulsPathfinder {
         "§e[SkyHanni] Calculating Fairy Soul route §b0s".asComponent().send(calculatingMessageId)
 
         pathfindCoroutine.launch {
-            val route = NavigationUtils.getRoute(missingSouls).toMutableList()
+            val route = NavigationUtils.getRouteLocations(missingSouls).toMutableList()
             val duration = calculatingStart.passedSince()
             "§e[SkyHanni] Calculated Fairy Soul route in §b${duration.format(showMilliSeconds = true)}".asComponent()
                 .send(calculatingMessageId)
