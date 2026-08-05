@@ -460,12 +460,13 @@ fun CommentType.findAllStates(comments: List<PrComment>): List<StateComment> = c
     state?.let { StateComment(comment, it) }
 }
 
-fun CommentType.post(prNumber: String, marker: String, body: String, errorMessage: (Int) -> String) {
+fun CommentType.post(prNumber: String, body: String, errorMessage: (Int) -> String) {
     postPrComment(prNumber, "$marker\n$body", errorMessage = errorMessage)
 }
 
-fun CommentType.post(prNumber: String, body: String, errorMessage: (Int) -> String) {
-    post(prNumber, marker, body, errorMessage)
+// Posts under a state marker instead of the plain one, for the modes that announce both directions.
+fun CommentType.postState(prNumber: String, state: String, body: String, errorMessage: (Int) -> String) {
+    postPrComment(prNumber, "${stateMarker(state)}\n$body", errorMessage = errorMessage)
 }
 
 
@@ -1382,7 +1383,7 @@ fun runKeywordLabelMode(prNumber: String) {
         if (posting) {
             val body = if (keywordPresent) buildKeywordLabelAddedComment(entry)
             else buildKeywordLabelRemovedComment(entry)
-            entry.comment.post(prNumber, entry.comment.stateMarker(currentState), body) {
+            entry.comment.postState(prNumber, currentState, body) {
                 "Error: could not post \"${entry.label}\" comment (HTTP $it)"
             }
         }
