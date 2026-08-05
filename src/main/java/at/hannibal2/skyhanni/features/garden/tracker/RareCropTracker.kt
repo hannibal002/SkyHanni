@@ -101,6 +101,14 @@ object RareCropTracker {
         RAREFINDER_CHIP("§9Rarefinder Chip"),
         BURROWING_SPORES("§9Burrowing Spores"),
         WARTY("§5Warty"),
+        // These intentionally do not match drops from pests, since those are not "RARE CROP".
+        COMPOST("§aCompost"),
+        PLANT_MATTER("§aPlant Matter"),
+        DUNG("§aDung"),
+        HONEY_JAR("§aHoney Jar"),
+        // TODO why does this not match?
+        CHEESE_FUEL("§aTasty Cheese"),
+        JELLY("§aJelly"),
         ;
 
         val cleanName = dropName.removeColor()
