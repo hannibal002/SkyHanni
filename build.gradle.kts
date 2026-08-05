@@ -3,7 +3,6 @@ import at.skyhanni.sharedvariables.SHVersionInfo
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
-import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.api.fabricapi.FabricApiExtension
 import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
