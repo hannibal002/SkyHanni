@@ -559,9 +559,9 @@ followed by blank lines, and ends at the first line that does not start with `- 
 Dependencies on `hannibal002/SkyHanni-REPO` are explicitly excluded from the open check, as that repository is considered part of the same
 release unit.
 
-An entry can also fail to resolve, for example a mistyped number or a link into a repository the workflow cannot read. Such an entry
-publishes a failing commit status and is listed in the comment with the line it was read from. The label is not applied, because no
-waiting relation is known to exist.
+An entry can also fail to resolve, for example a mistyped number or a link into a repository the workflow cannot read. In that case the
+comment shows only the broken lines, because the state of the other dependencies says nothing useful while the section itself is broken.
+The commit status fails as well. The label still follows the genuinely open dependencies.
 
 A comment is posted when a PR starts waiting, when the list of open dependencies changes, when an unresolvable entry appears or disappears,
 and when a dependency PR is closed. It names the closed PR if the run was triggered by one, followed by the dependencies that are still

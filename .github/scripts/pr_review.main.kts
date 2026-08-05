@@ -896,18 +896,11 @@ fun getDependencyState(dep: Dependency): DependencyState {
     return if (state == "open") DependencyState.OPEN else DependencyState.CLOSED
 }
 
-// Kept under the 140 character limit the status API enforces on descriptions.
-fun buildDependencyStatusDescription(openCount: Int, unresolvedCount: Int): String {
-    if (openCount == 0 && unresolvedCount == 0) return "All dependency PRs are resolved"
-
-    val parts = mutableListOf<String>()
-    if (openCount > 0) {
-        parts.add("waiting on $openCount open dependency ${if (openCount == 1) "PR" else "PRs"}")
-    }
-    if (unresolvedCount > 0) {
-        parts.add("$unresolvedCount ${if (unresolvedCount == 1) "entry" else "entries"} could not be resolved")
-    }
-    return parts.joinToString(", ").replaceFirstChar { it.uppercase() }
+// Kept under the status API's 140-character limit. An unresolvable entry hides the open count, like the comment.
+fun buildDependencyStatusDescription(openCount: Int, unresolvedCount: Int): String = when {
+    unresolvedCount > 0 -> dependencyUnresolvedTitle(unresolvedCount)
+    openCount > 0 -> "Waiting on $openCount open dependency ${if (openCount == 1) "PR" else "PRs"}"
+    else -> "All dependency PRs are resolved"
 }
 
 fun setDependencyStatus(
@@ -1057,18 +1050,20 @@ val dependencyReEvaluateNote = "You may need to re-evaluate this PR's dependenci
 // Must remain exact, otherwise dependencyStateLines drops the entire comment.
 val dependencyStatePrefix = "This PR is"
 
+// The unresolved comment has no state line, so dependencyStateLines needs this second anchor. Must stay a prefix
+// of dependencyUnresolvedTitle, otherwise a corrected entry never gets announced.
+val dependencyUnresolvedTitlePrefix = "### $warningIcon Could not resolve"
+
+fun dependencyUnresolvedTitle(count: Int): String =
+    "Could not resolve $count dependency ${if (count == 1) "entry" else "entries"}"
+
 // Trigger link format must stay identical when building and recognizing trigger entries.
 fun dependencyTriggerLink(pullNumber: Int): String = "- https://github.com/$repo/pull/$pullNumber"
 
-fun StringBuilder.appendDependencyState(openDependencies: List<Dependency>, hasUnresolved: Boolean) {
+fun StringBuilder.appendDependencyState(openDependencies: List<Dependency>) {
     if (openDependencies.isEmpty()) {
-        // "no longer" needs a state that was left behind, a PR blocked only by an unresolvable entry never waited.
-        if (hasUnresolved) {
-            appendLine("$dependencyStatePrefix not waiting on any open dependency PR.")
-        } else {
-            // Closed does not imply merged.
-            appendLine("$dependencyStatePrefix no longer waiting on any open dependency PRs.")
-        }
+        // Closed does not imply merged.
+        appendLine("$dependencyStatePrefix no longer waiting on any open dependency PRs.")
         return
     }
 
@@ -1084,13 +1079,11 @@ fun StringBuilder.appendDependencyState(openDependencies: List<Dependency>, hasU
 // render as markdown. Everything else, an "@" mention included, is inert there and stays readable as typed.
 fun sanitizeCodeSpan(text: String, maxLen: Int = 300): String = text.take(maxLen).replace("`", "'")
 
-// Below the state line on purpose: dependencyStateLines drops everything above it, hiding it from change detection.
-fun StringBuilder.appendUnresolvedDependencies(unresolvedDependencies: List<Dependency>) {
-    if (unresolvedDependencies.isEmpty()) return
 
+
+fun StringBuilder.appendUnresolvedDependencies(unresolvedDependencies: List<Dependency>) {
+    appendWarningTitle(dependencyUnresolvedTitle(unresolvedDependencies.size))
     appendLine()
-    val word = if (unresolvedDependencies.size == 1) "entry" else "entries"
-    appendLine("$warningIcon The following dependency $word could not be resolved:")
     for (dep in unresolvedDependencies) {
         appendLine("- `${sanitizeCodeSpan(dep.sourceLine)}`")
     }
@@ -1107,6 +1100,12 @@ fun buildDependencyComment(
     openDependencies: List<Dependency>,
     unresolvedDependencies: List<Dependency>,
 ): String = buildString {
+    // A broken section makes the open dependencies irrelevant, only the broken lines are worth showing.
+    if (unresolvedDependencies.isNotEmpty()) {
+        appendUnresolvedDependencies(unresolvedDependencies)
+        return@buildString
+    }
+
     appendLine("### Dependencies")
     appendLine()
 
@@ -1117,8 +1116,7 @@ fun buildDependencyComment(
         appendLine()
     }
 
-    appendDependencyState(openDependencies, unresolvedDependencies.isNotEmpty())
-    appendUnresolvedDependencies(unresolvedDependencies)
+    appendDependencyState(openDependencies)
 
     if (trigger != null && !trigger.merged) {
         appendLine()
@@ -1126,16 +1124,14 @@ fun buildDependencyComment(
     }
 }
 
-
 // Extracts state text and open dependencies to detect changes.
 // Drops the trigger section because its links look identical to open dependencies.
 fun dependencyStateLines(body: String): List<String> = body.lineSequence()
     .map { it.trim() }
     .filter { it.isNotEmpty() }
-    .dropWhile { !it.startsWith(dependencyStatePrefix) }
+    .dropWhile { !it.startsWith(dependencyStatePrefix) && !it.startsWith(dependencyUnresolvedTitlePrefix) }
     .filterNot { it == dependencyReEvaluateNote }
     .toList()
-
 
 fun handleDependencyComment(
     issueNumber: String,
@@ -1177,7 +1173,8 @@ fun handleDependencyComment(
             .takeWhile { !it.startsWith(dependencyStatePrefix) }
             .any { it == dependencyTriggerLink(matchingTrigger.pullNumber) }
 
-    val triggerIsNew = matchingTrigger != null && !triggerAlreadyAnnounced
+    // The unresolved comment never shows the trigger, so without this every closed dependency reposts it.
+    val triggerIsNew = matchingTrigger != null && !triggerAlreadyAnnounced && unresolvedDependencies.isEmpty()
 
     val posting = stateChanged || triggerIsNew
     if (posting) {
