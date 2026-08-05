@@ -54,6 +54,15 @@ val keywordLabels = listOf(
 
 val workflowFailedMarker = "<!-- workflow-failed -->"
 
+// Suggested in every workflow error comment. Declared this early because error() falls back to it, and error()
+// already runs while the environment constants below are still being initialized.
+val defaultErrorFix = "merge the beta branch into this PR."
+
+// Nothing an author can do, so the default suggestion would send them down the wrong path.
+val apiFormatErrorFix = "re-run the workflow. The GitHub API returned a response this script could not read, " +
+    "which is not caused by anything in this pull request."
+
+
 /**
  * Identifies a comment posted by this script, so a later run finds its own previous comment again.
  *
@@ -131,12 +140,12 @@ val gson = Gson()
 
 var errorCommentPosted = false
 
-fun error(message: String, commentError: Boolean = true): Nothing {
+fun error(message: String, commentError: Boolean = true, fix: String = defaultErrorFix): Nothing {
     System.err.println(message)
     if (commentError && !errorCommentPosted) {
         postPrComment(
             prNumber = prNumber,
-            body = buildErrorComment(message),
+            body = buildErrorComment(message, fix),
             commentError = false
         ) { "Error: could not post workflow error as comment (HTTP $it)" }
         errorCommentPosted = true
@@ -144,7 +153,7 @@ fun error(message: String, commentError: Boolean = true): Nothing {
     exitProcess(1)
 }
 
-fun buildErrorComment(message: String): String = buildString {
+fun buildErrorComment(message: String, fix: String): String = buildString {
     appendLine(workflowFailedMarker)
 
     appendLine("❌ Workflow failed ❌")
@@ -159,8 +168,7 @@ fun buildErrorComment(message: String): String = buildString {
     appendLine()
 
     appendLine("Most likely fix:")
-    val theSecretFix = "merge the beta branch into this PR."
-    appendLine(theSecretFix)
+    appendLine(fix)
     appendLine()
 
     appendLine("If the issue persists, please ping a maintainer on [SkyHanni Discord](https://discord.gg/skyhanni-997079228510117908).")
@@ -212,14 +220,16 @@ data class DependencyProblems(
 // The closed pull request that triggered this run, used only when it is a dependency.
 data class DependencyTrigger(val pullNumber: Int, val merged: Boolean)
 
-
-class DependencyCheckException(message: String) : Exception(message)
+// [fix] travels with the exception because the handler that turns it into a comment sits several frames away and
+// cannot tell which kind of failure it is looking at.
+class DependencyCheckException(message: String, val fix: String = defaultErrorFix) : Exception(message)
 
 // PRs whose dependency check could not be completed. Collected instead of aborting, so one unreachable
 // PR cannot stop the remaining ones from getting their label and status updated.
 val failedDependencyChecks = mutableListOf<String>()
 
-fun dependencyError(message: String): Nothing = throw DependencyCheckException(message)
+fun dependencyError(message: String, fix: String = defaultErrorFix): Nothing =
+    throw DependencyCheckException(message, fix)
 
 fun sendGhRequest(request: HttpRequest): Pair<Int, JsonElement> {
     val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
@@ -925,7 +935,16 @@ fun getDependencyState(dep: Dependency): DependencyState {
         dependencyError("Error: unexpected status $status for dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber}")
     }
     val state = (body as? JsonObject)?.get("state")?.takeIf { it.isJsonPrimitive }?.asString
-    return if (state == "open") DependencyState.OPEN else DependencyState.CLOSED
+    // Treating anything unreadable as closed would let the pull request merge, which is the same mistake the 404
+    // handling above used to make. A pull request only ever has these two states.
+    return when (state) {
+        "open" -> DependencyState.OPEN
+        "closed" -> DependencyState.CLOSED
+        else -> dependencyError(
+            "Error: dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber} has no usable state (got: $state)",
+            fix = apiFormatErrorFix,
+        )
+    }
 }
 
 // Kept under the status API's 140-character limit. A problem hides the open count, like the comment.
@@ -1259,7 +1278,7 @@ fun runDependenciesModeForOpenPr(prNum: String?) {
     try {
         checkPrDependencies(num)
     } catch (e: DependencyCheckException) {
-        error(e.message ?: "Error: dependency check failed for PR #$num")
+        error(e.message ?: "Error: dependency check failed for PR #$num", fix = e.fix)
     }
     if (System.getenv("PR_ACTION") == "reopened") {
         val targetPrNum = num.toIntOrNull() ?: return
