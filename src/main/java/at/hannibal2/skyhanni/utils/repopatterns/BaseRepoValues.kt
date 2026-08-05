@@ -27,7 +27,7 @@ interface RepoValue<R, C> : ReadOnlyProperty<Any?, C> {
 abstract class AbstractRepoValue<R, C>(
     override val key: String,
     override val parent: RepoPatternKeyOwner?,
-    override val shares: Boolean
+    override val shares: Boolean,
 ) : RepoValue<R, C> {
 
     /**
@@ -69,7 +69,7 @@ abstract class BaseSingleRepoValue<C>(
     key: String,
     val defaultRaw: String,
     parent: RepoPatternKeyOwner? = null,
-    shares: Boolean = true // Single values usually share their namespace
+    shares: Boolean = true, // Single values usually share their namespace
 ) : AbstractRepoValue<String, C>(key, parent, shares) {
 
     override var isLoadedRemotely = false
@@ -115,7 +115,7 @@ abstract class BaseListRepoValue<C>(
     key: String,
     val defaultRaw: List<String>,
     parent: RepoPatternKeyOwner? = null,
-    shares: Boolean = false // Lists/Arrays own their namespace prefix, so they don't share by default
+    shares: Boolean = false, // Lists/Arrays own their namespace prefix, so they don't share by default
 ) : AbstractRepoValue<List<String>, List<C>>(key, parent, shares) {
 
     override var isLoadedRemotely = false

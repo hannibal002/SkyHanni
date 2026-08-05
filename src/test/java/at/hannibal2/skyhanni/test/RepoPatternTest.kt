@@ -150,7 +150,8 @@ object RepoPatternTest {
 
         val unused = group.getUnusedPatterns()
         val isUnusedWorking =
-            unused.size == 1 && unused[0].pattern() == remoteValue4 && pattern1.pattern() == remoteValue3 && pattern2.pattern() == remoteValue2
+            unused.size == 1 && unused[0].pattern() == remoteValue4 &&
+                pattern1.pattern() == remoteValue3 && pattern2.pattern() == remoteValue2
 
         assert(isUnusedWorking)
     }
@@ -199,7 +200,8 @@ object RepoPatternTest {
 
         val unused = group.getUnusedPatterns()
         val isUnusedWorking =
-            unused.size == 1 && unused[0].pattern() == remoteValue4 && list[0].pattern() == remoteValue3 && list[1].pattern() == remoteValue2
+            unused.size == 1 && unused[0].pattern() == remoteValue4 &&
+                list[0].pattern() == remoteValue3 && list[1].pattern() == remoteValue2
 
         assert(isUnusedWorking)
     }
