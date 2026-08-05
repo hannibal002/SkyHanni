@@ -10,10 +10,32 @@ import kotlin.reflect.KProperty
  * Base interface for all repository values.
  */
 interface RepoValue<R, C> : ReadOnlyProperty<Any?, C> {
-    val key: String
-    val value: C
+    /**
+     * Check whether [value] has been loaded remotely or from the fallback value at [defaultRaw]. In case this is
+     * accessed off-thread there are no guarantees for the correctness of this value in relation to any specific call
+     * to [value].
+     */
     val isLoadedRemotely: Boolean
+
+    /**
+     * Check whether [value] was compiled from a value other than the [defaultRaw]. This is `false` even when
+     * loading remotely if the remote pattern matches the local one.
+     */
     val wasOverridden: Boolean
+
+    /**
+     * Key for this value. Used as an identifier when loading from the repo. Should be consistent across versions.
+     */
+
+    val key: String
+    /**
+     * Should not be accessed directly. Instead, use delegation at one code location and share the regex from there.
+     * ```kt
+     * val actualValue: Pattern by pattern
+     * ```
+     */
+    val value: C
+
     val parent: RepoPatternKeyOwner?
     val shares: Boolean
 
