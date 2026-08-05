@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
-import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
@@ -103,8 +102,6 @@ object GuiRendererHook {
         featureRenderDispatcher: FeatureRenderDispatcher,
         frameNumber: Int,
     ) {
-        SkyHanniRoundedShapeRenderManager.preRenderAtlas()
-
         val renderer = pictureInPictureRenderers[SkyHanniGuiItemRenderState::class.java]
         if (renderer !is SkyHanniPipCoordinatorRenderer) return
 
