@@ -55,7 +55,7 @@ object TestCopyBestiaryValues {
     )
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!DevApi.config.debug.copyBestiaryData) return
         SkyHanniDebugsAndTests.displayLine = null
 
@@ -95,7 +95,7 @@ object TestCopyBestiaryValues {
         for (i in 10..43) {
             val stack = inventoryItems[i] ?: continue
             bestiaryTypePattern.matchMatcher(stack.cleanName) {
-                val lvl = group("lvl").replace(",", "").toInt()
+                val lvl = group("lvl").formatInt()
                 var text = group("text").lowercase().replace(" ", "_")
 
                 val master = text.endsWith("(master)")
@@ -121,7 +121,7 @@ object TestCopyBestiaryValues {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.copyBestiaryData", "dev.debug.copyBestiaryData")
     }
 }
