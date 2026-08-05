@@ -454,8 +454,16 @@ a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with s
 Several GitHub Actions workflows run automatically on pull requests to enforce code quality and keep PR metadata up to date.
 All workflows use `.github/scripts/pr_review.main.kts` as the shared review script, invoked with a `MODE` parameter.
 
-When a PR is updated, any existing comment posted by a workflow is collapsed into a `<details>` spoiler. If issues still exist, a new
-comment is posted at the bottom of the conversation. When all issues are resolved, the label is removed and no new comment is posted.
+When a PR is updated, any existing comment posted by a workflow is collapsed into a `<details>` spoiler. What follows depends on the
+workflow. The Detekt, Build Failure, Merge Conflict and Changelog Check comments only ever announce that something is wrong: a new comment
+is posted while issues still exist, and once everything is resolved the label is removed without a new comment. The Dependency Label and
+Description Keyword Labels comments announce both directions, so they also post when the situation resolves.
+
+Every one of these comments carries an invisible marker that lets a later run recognize its own previous comment. For the two that announce
+both directions the marker also records which direction was announced last, and that record decides whether a new comment is needed. The
+label does not. A label edited by hand therefore no longer influences whether a comment appears. Labels are still read elsewhere: they
+select which PRs get re-evaluated after a dependency PR is closed, and the Merge Conflict workflow skips a PR that already carries its
+label.
 
 Most workflows use a two-workflow split to allow write-operations on fork PRs without granting untrusted code elevated permissions.
 The first workflow is triggered by `pull_request`, runs with limited permissions, and uploads results as an artifact. The second is
@@ -543,6 +551,10 @@ Two dependency formats are supported:
 Dependencies on `hannibal002/SkyHanni-REPO` are explicitly excluded from the open check, as that repository is considered part of the same
 release unit.
 
+A comment is posted when a PR starts waiting, when the list of open dependencies changes, and when a dependency PR is closed. It names the
+closed PR if the run was triggered by one, followed by the dependencies that are still open, or by the note that the PR is no longer waiting
+on any. A run that has nothing new to announce, neither a changed list nor a newly closed dependency, produces no comment.
+
 The check runs on every `opened`, `edited`, `closed`, and `synchronize` event via `pull_request_target`. On `closed`, all open PRs currently
 carrying the label are re-evaluated so the label is removed from dependent PRs when their dependency merges.
 
@@ -554,7 +566,8 @@ Relevant files: `.github/workflows/check_dependencies.yml`, `.github/scripts/pr_
 #### Description Keyword Labels
 
 Some labels are controlled by keywords in the pull request description. Writing the keyword on its own line adds the label, removing
-the line removes it again. Every change posts a comment on the PR explaining what happened.
+the line removes it again. Both directions post a comment on the PR explaining what happened, but only when the state actually changed
+compared to what the last comment announced. Editing the description without touching the keyword line posts nothing.
 
 Supported keywords:
 

@@ -39,9 +39,9 @@ object SkyHanniOutlineHook {
             finishRendering()
         }
 
-        override fun getBuffer(renderType: RenderType): VertexConsumer {
+        override fun getBuffer(renderLayer: RenderType): VertexConsumer {
             beginRendering()
-            val returnVal = super.getBuffer(renderType)
+            val returnVal = super.getBuffer(renderLayer)
             finishRendering()
             return returnVal
         }
@@ -122,10 +122,7 @@ object SkyHanniOutlineHook {
                 "SkyHanni Custom Depth",
                 GpuTexture.USAGE_RENDER_ATTACHMENT or GpuTexture.USAGE_COPY_DST or GpuTexture.USAGE_TEXTURE_BINDING,
                 format,
-                lastWidth,
-                lastHeight,
-                1,
-                1,
+                lastWidth, lastHeight, 1, 1,
             )
             customDepthAttachment = depthAttachment
             customDepthAttachmentView = device.createTextureView(depthAttachment)

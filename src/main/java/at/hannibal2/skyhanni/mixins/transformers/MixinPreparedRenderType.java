@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 //? if >= 26.2 {
 import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
+import at.hannibal2.skyhanni.mixins.hooks.SkyHanniOutlineHook;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.IndexType;

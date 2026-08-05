@@ -68,6 +68,15 @@ object GuiRendererHook {
         chromaBufferSlice?.let { renderPass.setUniform("SkyHanniChromaUniforms", it) } ?: return
     }
 
+    fun insertChromaSetUniform(renderPass: RenderPass, pipeline: RenderPipeline) {
+        if (pipeline != SkyHanniRenderPipeline.CHROMA_TEXT.invoke() &&
+            pipeline != SkyHanniRenderPipeline.CHROMA_STANDARD.invoke()
+        ) return
+
+        if (chromaBufferSlice == null) computeChromaBufferSlice()
+        insertChromaSetUniform(renderPass)
+    }
+
     fun replacePipeline(state: GuiElementRenderState, original: Operation<RenderPipeline>): RenderPipeline {
         if (state is BlitRenderState) {
             val alpha = (state.color() ushr 24) and 0xFF

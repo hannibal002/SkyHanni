@@ -72,17 +72,6 @@ object WorldRenderUtils {
     }
     *///?}
 
-    inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
-        layer: RenderType,
-        crossinline render: (VertexConsumer) -> Unit,
-    ) {
-        //? if >= 26.2 {
-        submitNodeStorage.submitCustomGeometry(matrices, layer) { _, buffer -> render(buffer) }
-        //?} else {
-        /*render(bufferSource.getBuffer(layer))
-        *///?}
-    }
-
     //? if >= 26.2 {
     private fun SkyHanniRenderWorldEvent.submitOrderedText(
         x: Float,
@@ -110,6 +99,17 @@ object WorldRenderUtils {
         )
     }
     //?}
+
+    inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
+        layer: RenderType,
+        crossinline render: (VertexConsumer) -> Unit,
+    ) {
+        //? if >= 26.2 {
+        submitNodeStorage.submitCustomGeometry(matrices, layer) { _, buffer -> render(buffer) }
+        //?} else {
+        /*render(bufferSource.getBuffer(layer))
+        *///?}
+    }
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
