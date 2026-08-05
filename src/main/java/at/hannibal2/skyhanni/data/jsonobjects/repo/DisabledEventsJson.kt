@@ -17,4 +17,5 @@ data class DisabledEventVersionedJson(
     @Expose val name: String,
     @Expose @SerializedName("min_version") val minVersion: ModVersion? = null,
     @Expose @SerializedName("max_version") val maxVersion: ModVersion? = null,
+    @Expose @SerializedName("mc_versions") val mcVersions: Set<String>? = null
 )
