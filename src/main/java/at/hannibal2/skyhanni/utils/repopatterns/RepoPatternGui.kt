@@ -10,9 +10,10 @@ import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 import io.github.notenoughupdates.moulconfig.xml.Bind
+import java.util.regex.Pattern
 
 /**
- * Gui for analyzing [RepoPattern]s
+ * Gui for analyzing [RepoValue]s (including Regex Patterns and Strings)
  */
 class RepoPatternGui private constructor() {
 
@@ -20,13 +21,13 @@ class RepoPatternGui private constructor() {
     companion object {
 
         @HandleEvent
-        fun onCommandRegistration(event: CommandRegistrationEvent) {
+        private fun onCommandRegistration(event: CommandRegistrationEvent) {
 
             /**
              * Open the [RepoPatternGui]
              */
             event.registerBrigadier("shrepopatterns") {
-                description = "See where regexes are loaded from"
+                description = "See where regexes and strings are loaded from"
                 category = CommandCategory.DEVELOPER_TEST
                 simpleCallback {
                     val location = MyResourceLocation("skyhanni", "gui/regexes.xml")
@@ -39,21 +40,26 @@ class RepoPatternGui private constructor() {
     @field:Bind
     var search: String = ""
     private var lastSearch = null as String?
-    private val allKeys = RepoPatternManager.allPatterns
+
+    // Changed from RepoPatternManager.allPatterns to RepoPatternManager.allValues
+    private val allKeys = RepoPatternManager.allValues
         .sortedBy { it.key }
         .map { RepoPatternInfo(it) }
+
     private var searchCache = ObservableList(mutableListOf<RepoPatternInfo>())
 
     class RepoPatternInfo(
-        repoPatternImpl: CommonPatternInfo<*, *>,
+        repoValueImpl: RepoValue<*, *>,
     ) {
 
         @field:Bind
-        val key: StructuredText = repoPatternImpl.key.asStructuredText()
+        val key: StructuredText = repoValueImpl.key.asStructuredText()
 
-        val remoteData = when (repoPatternImpl) {
-            is RepoPatternList -> repoPatternImpl.value.map { it.pattern() }
-            is RepoPattern -> listOf(repoPatternImpl.value.pattern())
+        // Extract value smartly regardless of if it's a List<Pattern>, Pattern, or String
+        val remoteData: List<String> = when (val v = repoValueImpl.value) {
+            is List<*> -> v.map { (it as? Pattern)?.pattern() ?: it.toString() }
+            is Pattern -> listOf(v.pattern())
+            else -> listOf(v.toString())
         }
 
         @field:Bind
@@ -61,11 +67,14 @@ class RepoPatternGui private constructor() {
 
         @field:Bind
         val hoverRegex: List<String> = run {
-            val localPatterns = when (repoPatternImpl) {
-                is RepoPatternList -> repoPatternImpl.defaultPattern
-                is RepoPattern -> listOf(repoPatternImpl.defaultPattern)
+            // Fetch local fallbacks safely from the new base classes
+            val localPatterns: List<String> = when (repoValueImpl) {
+                is BaseSingleRepoValue<*> -> listOf(repoValueImpl.defaultRaw)
+                is BaseListRepoValue<*> -> repoValueImpl.defaultRaw
+                else -> emptyList()
             }
-            if (repoPatternImpl.isLoadedRemotely) {
+
+            if (repoValueImpl.isLoadedRemotely) {
                 listOf(
                     "§aLoaded remotely",
                     "§7Remote:",
@@ -82,8 +91,8 @@ class RepoPatternGui private constructor() {
 
         @field:Bind
         val overriden: StructuredText = (
-            if (repoPatternImpl.wasOverridden) "§9Overriden"
-            else if (repoPatternImpl.isLoadedRemotely) "§aRemote"
+            if (repoValueImpl.wasOverridden) "§9Overriden"
+            else if (repoValueImpl.isLoadedRemotely) "§aRemote"
             else "§cLocal"
             ).asStructuredText()
     }

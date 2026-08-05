@@ -20,18 +20,17 @@ import java.io.File
 import java.util.NavigableMap
 import java.util.TreeMap
 import java.util.regex.Pattern
-import java.util.regex.PatternSyntaxException
 
 /**
- * Manages [RepoPattern]s.
+ * Manages all remote [RepoValue]s.
  */
 @SkyHanniModule
 object RepoPatternManager {
 
-    val allPatterns: Collection<CommonPatternInfo<*, *>> get() = usedKeys.values
+    val allValues: Collection<RepoValue<*, *>> get() = usedKeys.values
 
     /**
-     * Remote loading data that will be used to compile regexes from, once such a regex is needed.
+     * Remote loading data that will be used to compile values from, once such a value is needed.
      */
     private var regexes: RepoPatternDump? = null
 
@@ -45,15 +44,15 @@ object RepoPatternManager {
         )
 
     /**
-     * Map containing the exclusive owner of a regex key
+     * Map containing the exclusive owner of a value key
      */
     private val exclusivity: MutableMap<String, RepoPatternKeyOwner> = mutableMapOf()
 
     /**
-     * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for
+     * Map containing all keys and their repo values. Used for filling in new values after an update, and for
      * checking duplicate registrations.
      */
-    private var usedKeys: NavigableMap<String, CommonPatternInfo<*, *>> = TreeMap()
+    private var usedKeys: NavigableMap<String, RepoValue<*, *>> = TreeMap()
 
     private var wasPreInitialized = false
 
@@ -127,7 +126,6 @@ object RepoPatternManager {
                     )
                 }
             }
-
         }
     }
 
@@ -155,7 +153,6 @@ object RepoPatternManager {
     }
 
     fun loadPatternsFromDump(dump: RepoPatternDump) {
-        regexes = null
         regexes = dump
         reloadPatterns()
     }
@@ -165,72 +162,13 @@ object RepoPatternManager {
         config.forceLocal.afterChange { reloadPatterns() }
     }
 
-    /**
-     * Reload patterns in [usedKeys] from [regexes] or their fallbacks.
-     */
     private fun reloadPatterns() {
-        val remotePatterns = remotePattern
-        for (it in usedKeys.values) {
-            when (it) {
-                is RepoPatternListImpl -> loadArrayPatterns(remotePatterns, it)
-                is RepoPatternImpl -> loadStandalonePattern(remotePatterns, it)
-            }
+        val remoteData = remotePattern
+        val forceLocal = localLoading
 
+        for (repoValue in usedKeys.values) {
+            repoValue.loadFromRemote(remoteData, forceLocal)
         }
-    }
-
-    private fun loadStandalonePattern(remotePatterns: NavigableMap<String, String>, it: RepoPatternImpl) {
-        val remotePattern = remotePatterns[it.key]
-        try {
-            if (remotePattern != null) {
-                it.value = Pattern.compile(remotePattern)
-                it.isLoadedRemotely = true
-                it.wasOverridden = remotePattern != it.defaultPattern
-                return
-            }
-        } catch (e: PatternSyntaxException) {
-            logger.error("Error while loading pattern from repo", e)
-        }
-        it.value = Pattern.compile(it.defaultPattern)
-        it.isLoadedRemotely = false
-        it.wasOverridden = false
-    }
-
-    private fun loadArrayPatterns(remotePatterns: NavigableMap<String, String>, arrayPattern: RepoPatternListImpl) {
-        val prefix = arrayPattern.key + "."
-        val remotePatternList = StringUtils.subMapOfStringsStartingWith(prefix, remotePatterns)
-        val patternMap = remotePatternList.mapNotNull {
-            val index = it.key.removePrefix(prefix).toIntOrNull()
-            if (index == null) null
-            else index to it.value
-        }
-
-        fun setDefaultPatterns() {
-            arrayPattern.value = arrayPattern.defaultPattern.map(Pattern::compile)
-            arrayPattern.isLoadedRemotely = false
-            arrayPattern.wasOverridden = false
-        }
-
-        if (localLoading) {
-            setDefaultPatterns()
-            return
-        }
-
-        if (patternMap.mapTo(mutableSetOf()) { it.first } != patternMap.indices.toSet()) {
-            logger.error("Incorrect index set for $arrayPattern")
-            setDefaultPatterns()
-        }
-
-        val patternStrings = patternMap.sortedBy { it.first }.map { it.second }
-        try {
-            arrayPattern.value = patternStrings.map(Pattern::compile)
-            arrayPattern.isLoadedRemotely = true
-            arrayPattern.wasOverridden = patternStrings != arrayPattern.defaultPattern
-            return
-        } catch (e: PatternSyntaxException) {
-            logger.error("Error while loading pattern from repo", e)
-        }
-        setDefaultPatterns()
     }
 
     private val keyShape = Pattern.compile("^(?:[a-z0-9]+[.-])*[a-z0-9]+$")
@@ -245,7 +183,7 @@ object RepoPatternManager {
     }
 
     /**
-     * Dump all regexes labeled with the label into the file.
+     * Dump all repo values labeled with the label into the file.
      */
     fun dump(sourceLabel: String, file: File) {
         val data =
@@ -264,50 +202,47 @@ object RepoPatternManager {
         wasPreInitialized = true
     }
 
-    fun of(key: String, fallback: String, parentKeyHolder: RepoPatternKeyOwner? = null): RepoPattern {
-        verifyKeyShape(key)
-        if (wasPreInitialized && !config.tolerateLateRegistration) {
-            crash("Illegal late initialization of repo pattern. Repo pattern needs to be created during pre-initialization.")
-        }
-        if (key in usedKeys) {
-            usedKeys[key]?.hasObtainedLock = false
-        }
-        return RepoPatternImpl(fallback, key, parentKeyHolder).also { usedKeys[key] = it }
-    }
+    /**
+     * Universal registration method.
+     * Called automatically by [RepoValue]'s initialization block.
+     */
+    fun register(value: RepoValue<*, *>) {
+        verifyKeyShape(value.key)
 
-    fun ofList(
-        key: String,
-        fallbacks: Array<out String>,
-        parentKeyHolder: RepoPatternKeyOwner? = null,
-    ): RepoPatternList {
-        verifyKeyShape(key)
         if (wasPreInitialized && !config.tolerateLateRegistration) {
-            crash("Illegal late initialization of repo pattern. Repo pattern needs to be created during pre-initialization.")
+            crash("Illegal late initialization of repo value. Repo values need to be created during pre-initialization.")
         }
-        if (key in usedKeys) {
-            usedKeys[key]?.hasObtainedLock = false
-        }
-        StringUtils.subMapOfStringsStartingWith(key, usedKeys).forEach {
-            it.value.hasObtainedLock = false
-        }
-        return RepoPatternListImpl(fallbacks.toList(), key, parentKeyHolder).also { usedKeys[key] = it }
 
+        if (value is AbstractRepoValue<*, *>) {
+            if (value is BaseListRepoValue<*>) {
+                StringUtils.subMapOfStringsStartingWith(value.key, usedKeys).forEach {
+                    (it.value as? AbstractRepoValue<*, *>)?.hasObtainedLock = false
+                }
+            } else {
+                if (value.key in usedKeys) {
+                    (usedKeys[value.key] as? AbstractRepoValue<*, *>)?.hasObtainedLock = false
+                }
+            }
+        }
+
+        usedKeys[value.key] = value
     }
 
     /**
      * The caller must ensure the exclusivity to the [prefix]!
      *
      * @param prefix the prefix to search without the dot at the end (the match includes the .)
-     * @return returns any pattern on the [prefix] key space (including list or any other complex structure, but as a simple pattern
+     * @return returns any unused pattern on the [prefix] key space as a simple [Pattern]
      */
     internal fun getUnusedPatterns(prefix: String): List<Pattern> {
         if (localLoading) return emptyList()
         try {
             verifyKeyShape(prefix)
         } catch (e: IllegalArgumentException) {
-            ErrorManager.logErrorWithData(e, "getUnusedPatterns failed do to invalid key shape", "prefix" to prefix)
+            ErrorManager.logErrorWithData(e, "getUnusedPatterns failed due to invalid key shape", "prefix" to prefix)
             return emptyList()
         }
+
         val prefixWithDot = "$prefix."
         val patterns = StringUtils.subMapOfStringsStartingWith(prefixWithDot, remotePattern)
         val holders = StringUtils.subMapOfStringsStartingWith(prefixWithDot, usedKeys)
@@ -319,12 +254,12 @@ object RepoPatternManager {
             val dot = unused.key.count { it == '.' }
             val possibleConflicts = noShareHolder.filter { it.key < dot }.flatMap { it.value }.toSet()
             var key: String = unused.key.removePrefix(prefixWithDot)
+
             while (key.isNotEmpty()) {
                 if (possibleConflicts.contains(key)) return@filter false
                 key = key.substringBeforeLastOrNull(".") ?: return@filter true
             }
             true
-        }.map { it.value.toPattern() }
+        }.map { Pattern.compile(it.value) }
     }
-
 }
