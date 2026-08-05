@@ -39,6 +39,11 @@ class RepoPatternElement private constructor(
 
         internal fun KtPropertyDelegate.asRepoPatternElement(): RepoPatternElement? {
             val expression = this.expression as? KtDotQualifiedExpression ?: return null
+            val receiverText = expression.receiverExpression.text
+            if (receiverText != "RepoPattern" && !receiverText.endsWith(".RepoPattern")) {
+                return null
+            }
+
             val callExpression = expression.selectorExpression as? KtCallExpression ?: return null
             if (callExpression.valueArguments.size != 2) return null
 
