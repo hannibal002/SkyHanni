@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRoundGradientRec
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRoundRect
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRoundRectOutline
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRoundTexturedRect
-import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniRoundedShapeAtlasKey
 import at.hannibal2.skyhanni.utils.render.states.RoundedRenderStateParams
 import at.hannibal2.skyhanni.utils.render.states.SkyHanniCircleRenderState
 import at.hannibal2.skyhanni.utils.render.states.SkyHanniRadialGradientCircleRenderState
@@ -25,7 +24,6 @@ import org.joml.Matrix3x2f
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.max
-import kotlin.math.roundToInt
 
 @Suppress("TooManyFunctions")
 object ShaderRenderUtils {
@@ -258,9 +256,7 @@ object ShaderRenderUtils {
      * [GuiRenderState] queue, ensuring correct ordering over all other GUI elements.
      */
     fun drawRoundRectDeferred(x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Float = 1f) {
-        if (!tryBlitRoundedRect(x, y, width, height, color, radius, smoothness)) {
-            DrawContextUtils.addGuiElement(buildRoundedRectState(x, y, width, height, color, radius, smoothness))
-        }
+        DrawContextUtils.addGuiElement(buildRoundedRectState(x, y, width, height, color, radius, smoothness))
     }
 
     /**
@@ -280,38 +276,8 @@ object ShaderRenderUtils {
         radius: Int = 10,
         smoothness: Float = 1f,
     ) {
-        if (topColor == bottomColor && tryBlitRoundedRect(x, y, width, height, topColor, radius, smoothness)) return
         DrawContextUtils.addGuiElement(
             buildRoundedRectGradientState(x, y, width, height, topColor, bottomColor, radius, smoothness)
-        )
-    }
-
-    /**
-     * Attempts to blit a solid rounded rect from the atlas. Returns true if the shape was already
-     * cached and the blit was submitted; returns false on a cache miss, leaving the caller to fall
-     * back to a deferred render state submission.
-     *
-     * @param x left edge in logical GUI pixels
-     * @param y top edge in logical GUI pixels
-     * @param width width in logical GUI pixels
-     * @param height height in logical GUI pixels
-     * @param color ARGB packed fill color
-     * @param radius corner radius in logical GUI pixels
-     * @param smoothness edge smoothness in physical pixels
-     */
-    private fun tryBlitRoundedRect(
-        x: Int, y: Int, width: Int, height: Int,
-        color: Int, radius: Int, smoothness: Float,
-    ): Boolean {
-        val scaleFactor = GuiScreenUtils.scaleFactor
-        val matrix = Matrix3x2f(DrawContextUtils.drawContext.pose())
-        val pixelWidth = (width * scaleFactor * matrix.m00()).roundToInt()
-        val pixelHeight = (height * scaleFactor * matrix.m11()).roundToInt()
-        val radiusPixels = (radius * scaleFactor * matrix.m00()).roundToInt()
-        val atlasKey = SkyHanniRoundedShapeAtlasKey.RoundedRect(pixelWidth, pixelHeight, color, radiusPixels, smoothness)
-        val scissor = DrawContextUtils.drawContext.scissorStack.peek()
-        return SkyHanniRoundedShapeRenderManager.submitBlit(
-            atlasKey, DrawContextUtils.drawContext.guiRenderState, matrix, x, y, x + width, y + height, -1, scissor,
         )
     }
 
@@ -375,21 +341,7 @@ object ShaderRenderUtils {
         angle1: Float = 7.0f,
         angle2: Float = 7.0f,
     ) {
-        val guiRenderState = DrawContextUtils.drawContext.guiRenderState
-        // Only full circles (default angles) are atlased; arcs change per-frame and would overflow the atlas.
-        if (angle1 == 7.0f && angle2 == 7.0f) {
-            val scaleFactor = GuiScreenUtils.scaleFactor
-            val matrix = Matrix3x2f(DrawContextUtils.drawContext.pose())
-            val radiusPixels = (radius * scaleFactor * matrix.m00()).roundToInt()
-            val atlasKey = SkyHanniRoundedShapeAtlasKey.Circle(radiusPixels, color.rgb, smoothness, angle1, angle2)
-            val scissor = DrawContextUtils.drawContext.scissorStack.peek()
-            val diameter = radius * 2
-            val blitted = SkyHanniRoundedShapeRenderManager.submitBlit(
-                atlasKey, guiRenderState, matrix, x, y, x + diameter, y + diameter, -1, scissor,
-            )
-            if (blitted) return
-        }
-        guiRenderState.addGuiElement(buildCircleState(x, y, radius, color.rgb, smoothness, angle1, angle2))
+        DrawContextUtils.addGuiElement(buildCircleState(x, y, radius, color.rgb, smoothness, angle1, angle2))
     }
 
     /**

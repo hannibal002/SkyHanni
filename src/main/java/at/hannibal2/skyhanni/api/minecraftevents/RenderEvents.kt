@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
 import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
@@ -38,7 +37,6 @@ object RenderEvents {
     @HandleEvent
     fun onResourcePackReload() {
         SkyHanniItemRenderCoordinator.invalidateAtlas()
-        SkyHanniRoundedShapeRenderManager.invalidateAtlas()
     }
 
     private fun postGui(context: GuiGraphicsExtractor, tick: DeltaTracker) {
