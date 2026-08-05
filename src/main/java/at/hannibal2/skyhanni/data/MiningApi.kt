@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.mining.OreBlock
+import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -374,7 +375,7 @@ object MiningApi {
 
         if (oldState == newState) return
         if (oldBlock == Blocks.AIR || oldBlock == Blocks.BEDROCK) return
-        if (newBlock != Blocks.AIR && newBlock != Blocks.BEDROCK && !OreBlock.isTitanium(newState)) return
+        if (newBlock != Blocks.AIR && newBlock != Blocks.BEDROCK && !isTitanium(newState)) return
 
         val pos = event.location
         if (pickobulusActive && pickobulusWaitingForBlock) {
