@@ -19,10 +19,12 @@ import net.minecraft.client.input.MouseButtonEvent
 class GuiKeyPressEvent(
     val guiContainer: SkyHanniGuiContainer,
     private val keyEvent: KeyEvent?,
-    private val mouseEvent: MouseButtonEvent?
+    private val mouseEvent: MouseButtonEvent?,
 ) : CancellableSkyHanniEvent() {
-    constructor(guiContainer: SkyHanniGuiContainer, keyEvent: KeyEvent) : this(guiContainer, keyEvent = keyEvent, mouseEvent = null)
-    constructor(guiContainer: SkyHanniGuiContainer, mouseEvent: MouseButtonEvent) : this(guiContainer, keyEvent = null, mouseEvent = mouseEvent)
+    constructor(guiContainer: SkyHanniGuiContainer, keyEvent: KeyEvent) :
+        this(guiContainer, keyEvent = keyEvent, mouseEvent = null)
+    constructor(guiContainer: SkyHanniGuiContainer, mouseEvent: MouseButtonEvent) :
+        this(guiContainer, keyEvent = null, mouseEvent = mouseEvent)
 
     fun stackUnderCursor(): SafeItemStack? {
         if (mouseEvent != null) {

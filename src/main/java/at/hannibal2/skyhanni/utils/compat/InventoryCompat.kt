@@ -37,11 +37,13 @@ object InventoryCompat {
         return ReiCompat.getHoveredStackFromRei()
     }
 
+    @Suppress("unused")
     fun stackUnderCursor(keyEvent: KeyEvent): SafeItemStack? {
         return stackUnderCursor()
     }
 
-    fun stackUnderCursor(keyEvent: MouseButtonEvent): SafeItemStack? {
+    @Suppress("unused")
+    fun stackUnderCursor(mouseButtonEvent: MouseButtonEvent): SafeItemStack? {
         return stackUnderCursor()
     }
 
