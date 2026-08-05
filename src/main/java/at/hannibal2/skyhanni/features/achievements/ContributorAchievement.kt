@@ -134,19 +134,18 @@ object ContributorAchievement {
 
     fun onUniqueContributorSeen(profile: GameProfile, username: String) {
         val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
-        if (completed || config.discoverContributorMessage) {
-            val resolvedProfile = ResolvableProfile.createResolved(profile)
-            val sprite = PlayerSprite(resolvedProfile, false)
-            val player = Component.`object`(sprite)
-            ChatUtils.chat {
-                appendWithColor("A wild SkyHanni contributor appears!", ChatFormatting.GOLD)
-                appendWithColor(" (hover)", ChatFormatting.GRAY)
-                hover = componentBuilder {
-                    appendWithColor("You have encountered ", ChatFormatting.GRAY)
-                    append(player)
-                    appendWithColor(" $username", ChatFormatting.AQUA)
-                    appendWithColor(" for the first time!", ChatFormatting.GRAY)
-                }
+        if (!completed && !config.discoverContributorMessage) return
+        val resolvedProfile = ResolvableProfile.createResolved(profile)
+        val sprite = PlayerSprite(resolvedProfile, false)
+        val player = Component.`object`(sprite)
+        ChatUtils.chat {
+            appendWithColor("A wild SkyHanni contributor appears!", ChatFormatting.GOLD)
+            appendWithColor(" (hover)", ChatFormatting.GRAY)
+            hover = componentBuilder {
+                appendWithColor("You have encountered ", ChatFormatting.GRAY)
+                append(player)
+                appendWithColor(" $username", ChatFormatting.AQUA)
+                appendWithColor(" for the first time!", ChatFormatting.GRAY)
             }
         }
     }
