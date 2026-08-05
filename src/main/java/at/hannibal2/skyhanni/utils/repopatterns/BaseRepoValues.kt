@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.StringUtils
+import java.util.NavigableMap
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -15,7 +17,7 @@ interface RepoValue<R, C> : ReadOnlyProperty<Any?, C> {
     val parent: RepoPatternKeyOwner?
     val shares: Boolean
 
-    fun loadFromRemote(remoteData: Map<String, String>, forceLocal: Boolean)
+    fun loadFromRemote(remoteData: NavigableMap<String, String>, forceLocal: Boolean)
     fun dump(): Map<String, String>
 }
 
@@ -82,7 +84,7 @@ abstract class BaseSingleRepoValue<C>(
 
     abstract fun parse(raw: String): C
 
-    override fun loadFromRemote(remoteData: Map<String, String>, forceLocal: Boolean) {
+    override fun loadFromRemote(remoteData: NavigableMap<String, String>, forceLocal: Boolean) {
         val remoteString = remoteData[key]
         if (!forceLocal && remoteString != null) {
             isLoadedRemotely = true
@@ -128,16 +130,16 @@ abstract class BaseListRepoValue<C>(
 
     abstract fun parse(raw: String): C
 
-    override fun loadFromRemote(remoteData: Map<String, String>, forceLocal: Boolean) {
+    override fun loadFromRemote(remoteData: NavigableMap<String, String>, forceLocal: Boolean) {
         val prefix = "$key."
-        val remoteEntries = remoteData.filterKeys { it.startsWith(prefix) }
-        val isPresentRemotely = remoteEntries.isNotEmpty() || remoteData.containsKey(key)
+        val matchingEntries = StringUtils.subMapOfStringsStartingWith(prefix, remoteData)
+        val isPresentRemotely = matchingEntries.isNotEmpty() || remoteData.containsKey(key)
 
         if (!forceLocal && isPresentRemotely) {
             isLoadedRemotely = true
-            val parsedList = remoteEntries.toSortedMap().values.mapNotNull {
-                runCatching { parse(it) }.onFailure { e ->
-                    ErrorManager.logErrorWithData(e, "Failed to parse remote value for list $key", "remote" to it)
+            val parsedList = matchingEntries.values.mapNotNull { rawValue ->
+                runCatching { parse(rawValue) }.onFailure { e ->
+                    ErrorManager.logErrorWithData(e, "Failed to parse remote value for list $key", "remote" to rawValue)
                 }.getOrNull()
             }
             wasOverridden = parsedList.map { it.toString() } != defaultRaw.map { parse(it).toString() }

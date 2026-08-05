@@ -148,7 +148,7 @@ object RepoPatternManager {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         loadPatternsFromDump(event.getConstant<RepoPatternDump>("regexesModern"))
     }
 
@@ -158,7 +158,7 @@ object RepoPatternManager {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad(event: ConfigLoadEvent) {
         config.forceLocal.afterChange { reloadPatterns() }
     }
 
@@ -198,7 +198,7 @@ object RepoPatternManager {
     }
 
     @HandleEvent
-    fun onPreInitFinished(event: PreInitFinishedEvent) {
+    private fun onPreInitFinished(event: PreInitFinishedEvent) {
         wasPreInitialized = true
     }
 
