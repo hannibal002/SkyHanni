@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.submitCustomGeometry
 import net.minecraft.world.phys.AABB
 import java.awt.Color
 
@@ -16,20 +17,21 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         if (queuedLines.isEmpty()) return
 
         val layer = SkyHanniRenderLayers.getLines(!depth)
-        val buf = event.vertexConsumers.getBuffer(layer)
-        val matrix = event.matrices.last()
+        event.submitCustomGeometry(layer) { buf ->
+            val matrix = event.matrices.last()
 
-        // Todo reshape to avoid code duplication
-        for (line in queuedLines) {
-            buf.addVertex(matrix.pose(), line.p1.x.toFloat(), line.p1.y.toFloat(), line.p1.z.toFloat())
-                .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
-                .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
-                .setLineWidth(lineWidth.toFloat())
+            // TODO reshape to avoid code duplication
+            for (line in queuedLines) {
+                buf.addVertex(matrix.pose(), line.p1.x.toFloat(), line.p1.y.toFloat(), line.p1.z.toFloat())
+                    .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
+                    .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
+                    .setLineWidth(lineWidth.toFloat())
 
-            buf.addVertex(matrix.pose(), line.p2.x.toFloat(), line.p2.y.toFloat(), line.p2.z.toFloat())
-                .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
-                .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
-                .setLineWidth(lineWidth.toFloat())
+                buf.addVertex(matrix.pose(), line.p2.x.toFloat(), line.p2.y.toFloat(), line.p2.z.toFloat())
+                    .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
+                    .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
+                    .setLineWidth(lineWidth.toFloat())
+            }
         }
 
         queuedLines.clear()
