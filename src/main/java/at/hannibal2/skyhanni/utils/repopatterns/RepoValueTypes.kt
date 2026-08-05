@@ -3,6 +3,29 @@ package at.hannibal2.skyhanni.utils.repopatterns
 import org.intellij.lang.annotations.Language
 import java.util.regex.Pattern
 
+class RepoPatternList internal constructor(key: String, fallbacks: List<String>, parent: RepoPatternKeyOwner? = null) :
+    BaseListRepoValue<Pattern>(key, fallbacks, parent) {
+    override fun parse(raw: String): Pattern = Pattern.compile(raw)
+}
+
+class RepoInteger private constructor(key: String, fallback: String, parent: RepoPatternKeyOwner? = null) :
+    BaseSingleRepoValue<Int>(key, fallback, parent) {
+
+    override fun parse(raw: String): Int = raw.toInt()
+
+    companion object {
+        /** Factory method for a single String */
+        fun integer(key: String, fallback: Int, parent: RepoPatternKeyOwner? = null): RepoInteger {
+            return RepoInteger(key, fallback.toString(), parent)
+        }
+
+        /** Factory method for a List of Strings */
+        fun list(key: String, vararg fallbacks: Int, parent: RepoPatternKeyOwner? = null): RepoIntegerList {
+            return RepoIntegerList(key, fallbacks.map { it.toString() }, parent)
+        }
+    }
+}
+
 class RepoString private constructor(key: String, fallback: String, parent: RepoPatternKeyOwner? = null) :
     BaseSingleRepoValue<String>(key, fallback, parent) {
 
@@ -61,29 +84,6 @@ class RepoPattern private constructor(key: String, fallback: String, parent: Rep
          */
         fun exclusiveGroup(prefix: String): RepoPatternExclusiveGroupInfo {
             return RepoPatternExclusiveGroupInfo(prefix, null)
-        }
-    }
-}
-
-class RepoPatternList internal constructor(key: String, fallbacks: List<String>, parent: RepoPatternKeyOwner? = null) :
-    BaseListRepoValue<Pattern>(key, fallbacks, parent) {
-    override fun parse(raw: String): Pattern = Pattern.compile(raw)
-}
-
-class RepoInteger private constructor(key: String, fallback: String, parent: RepoPatternKeyOwner? = null) :
-    BaseSingleRepoValue<Int>(key, fallback, parent) {
-
-    override fun parse(raw: String): Int = raw.toInt()
-
-    companion object {
-        /** Factory method for a single String */
-        fun integer(key: String, fallback: Int, parent: RepoPatternKeyOwner? = null): RepoInteger {
-            return RepoInteger(key, fallback.toString(), parent)
-        }
-
-        /** Factory method for a List of Strings */
-        fun list(key: String, vararg fallbacks: Int, parent: RepoPatternKeyOwner? = null): RepoIntegerList {
-            return RepoIntegerList(key, fallbacks.map { it.toString() }, parent)
         }
     }
 }
