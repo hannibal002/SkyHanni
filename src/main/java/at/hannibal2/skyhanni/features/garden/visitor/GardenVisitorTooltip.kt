@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -40,6 +41,8 @@ object GardenVisitorTooltip {
      */
     var lastFullPrice = 0.0
         private set
+
+    private var lastBypassState = false
 
     private val patternGroup = RepoPattern.group("garden.visitor.tooltip")
 
@@ -113,6 +116,13 @@ object GardenVisitorTooltip {
      */
     fun onTooltip(visitor: VisitorApi.Visitor, itemStack: SafeItemStack, toolTip: MutableList<String>) {
         if (itemStack.cleanName != "Accept Offer") return
+
+        // The blocked tooltip looks different, so the cache is invalid after toggling the bypass key.
+        val bypassing = config.rewardWarning.bypassKey.isKeyHeld()
+        if (bypassing != lastBypassState) {
+            lastBypassState = bypassing
+            visitor.lastLore = emptyList()
+        }
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)
