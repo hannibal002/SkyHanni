@@ -134,6 +134,9 @@ object ContributorAchievement {
 
     fun onUniqueContributorSeen(profile: GameProfile) {
         val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
+        // This will show the message even if the config is disabled, but the achievement is completed because
+        // Players were impersonating contributors after people asked who is the contributor here.
+        // And this message is only shown once, so it should be fine.
         if (!completed && !config.discoverContributorMessage) return
         val resolvedProfile = ResolvableProfile.createResolved(profile)
         val sprite = PlayerSprite(resolvedProfile, false)
