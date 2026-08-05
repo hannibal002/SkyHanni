@@ -60,7 +60,7 @@ object GardenVisitorTooltip {
     )
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onVisitorOpen(event: VisitorOpenEvent) {
+    private fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
         val offerItem = visitor.offer?.offerItem ?: return
         val lore = offerItem.getLore()
@@ -135,6 +135,12 @@ object GardenVisitorTooltip {
         lastFullPrice = 0.0
         val foundRewards = mutableListOf<NeuInternalName>()
 
+        // The rendered tooltip can lose its color codes, which breaks amount parsing in the second pass.
+        val requiredAmounts = mutableMapOf<NeuInternalName, Int>()
+        val rewardAmounts = mutableMapOf<NeuInternalName, Int>()
+
+        fun String.removeCharmedSuffix() = removeSuffix(" §d❤")
+
         // First pass: Calculate totals
         for (formattedLine in stack.getLore()) {
             if (formattedLine.contains("Rewards")) {
@@ -152,13 +158,16 @@ object GardenVisitorTooltip {
             val price = VisitorPriceCalculator.calculateItemPrice(internalName, amount)
 
             if (readingShoppingList) {
+                requiredAmounts[internalName] = amount
                 totalPrice += price
                 lastFullPrice += price
             } else {
+                rewardAmounts[internalName] = amount
                 foundRewards.add(internalName)
                 totalPrice -= price
             }
         }
+
 
         if (totalPrice < 0) {
             totalPrice = 0.0
@@ -174,7 +183,7 @@ object GardenVisitorTooltip {
                             append("Found Visitor Reward ")
                             append(reward.displayName)
                             append("!")
-                        }
+                        },
                     )
                 }
             }
@@ -195,6 +204,7 @@ object GardenVisitorTooltip {
                     finalList[index] = "$formattedLine §7(paying §6$pricePerExp §7per)"
                 }
             }
+
 
             copperPattern.matchMatcher(formattedLine) {
                 val copper = group("amount").formatInt()
@@ -221,17 +231,21 @@ object GardenVisitorTooltip {
                 finalList[index] = copperLine
             }
 
+
             if (formattedLine.contains("Rewards")) {
                 readingShoppingList = false
             }
 
             val itemLine = if (readingShoppingList) formattedLine else formattedLine.removeCharmedSuffix()
-            val (itemName, amount) = ItemUtils.readItemAmount(itemLine) ?: continue
+            val (itemName, parsedAmount) = ItemUtils.readItemAmount(itemLine) ?: continue
             val internalName = NeuInternalName.fromItemNameOrNull(itemName.removeColor())
                 ?.replace("◆_", "") ?: continue
 
             // Ignoring custom NEU items
             if (internalName.startsWith("SKYBLOCK_")) continue
+
+            val knownAmounts = if (readingShoppingList) requiredAmounts else rewardAmounts
+            val amount = knownAmounts[internalName] ?: parsedAmount
 
             val price = VisitorPriceCalculator.calculateItemPrice(internalName, amount)
 
@@ -266,7 +280,6 @@ object GardenVisitorTooltip {
         visitor.blockReason = visitor.blockReason()
     }
 
-    private fun String.removeCharmedSuffix() = removeSuffix(" §d❤")
 
     private fun getCropType(internalName: NeuInternalName) =
         CropType.getByNameOrNull(
