@@ -36,15 +36,15 @@ enum class OreBlock(
     val hasInitSound: Boolean = true,
 ) {
     // MITHRIL
-    LOW_TIER_MITHRIL(::isLowTierMithril, { inDwarvenMines || inGlacite }, OreCategory.DWARVEN_METAL),
-    MID_TIER_MITHRIL(::isMidTierMithril, { inDwarvenMines || inCrystalHollows || inGlacite }, OreCategory.DWARVEN_METAL),
-    HIGH_TIER_MITHRIL(::isHighTierMithril, { inDwarvenMines || inCrystalHollows || inGlacite }, OreCategory.DWARVEN_METAL),
+    LOW_TIER_MITHRIL({ isLowTierMithril(it) }, { inDwarvenMines || inGlacite }, OreCategory.DWARVEN_METAL),
+    MID_TIER_MITHRIL({ isMidTierMithril(it) }, { inDwarvenMines || inCrystalHollows || inGlacite }, OreCategory.DWARVEN_METAL),
+    HIGH_TIER_MITHRIL({ isHighTierMithril(it) }, { inDwarvenMines || inCrystalHollows || inGlacite }, OreCategory.DWARVEN_METAL),
 
     // TITANIUM
-    TITANIUM(::isTitanium, { inDwarvenMines || inGlacite }, OreCategory.DWARVEN_METAL),
+    TITANIUM({ isTitanium(it) }, { inDwarvenMines || inGlacite }, OreCategory.DWARVEN_METAL),
 
     // VANILLA ORES
-    STONE(::isStone, { inDwarvenMines }, OreCategory.BLOCK),
+    STONE({ isStone(it) }, { inDwarvenMines }, OreCategory.BLOCK),
     COBBLESTONE(Blocks.COBBLESTONE, { inDwarvenMines }, OreCategory.BLOCK),
     COAL_ORE(Blocks.COAL_ORE, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
     IRON_ORE(Blocks.IRON_ORE, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
@@ -63,7 +63,7 @@ enum class OreBlock(
     QUARTZ_ORE(Blocks.NETHER_QUARTZ_ORE, { inCrystalHollows || inCrimsonIsle }, OreCategory.ORE),
     GLOWSTONE(Blocks.GLOWSTONE, { inCrimsonIsle }, OreCategory.BLOCK),
     MYCELIUM(Blocks.MYCELIUM, { inCrimsonIsle }, OreCategory.BLOCK),
-    RED_SAND(::isRedSand, { inCrimsonIsle }, OreCategory.BLOCK),
+    RED_SAND({ isRedSand(it) }, { inCrimsonIsle }, OreCategory.BLOCK),
     SULPHUR(Blocks.SPONGE, { inCrimsonIsle }, OreCategory.ORE),
 
     // SPIDER'S DEN
@@ -74,9 +74,9 @@ enum class OreBlock(
     OBSIDIAN(Blocks.OBSIDIAN, { inCrystalHollows || inMineshaft || inEnd }, OreCategory.ORE),
 
     // HARD STONE
-    HARD_STONE_HOLLOWS(::isHardStoneHollows, { inCrystalHollows }, OreCategory.BLOCK),
-    HARD_STONE_TUNNELS(::isHardstoneTunnels, { inTunnels }, OreCategory.BLOCK),
-    HARD_STONE_MINESHAFT(::isHardstoneMineshaft, { inMineshaft }, OreCategory.BLOCK),
+    HARD_STONE_HOLLOWS({ isHardStoneHollows(it) }, { inCrystalHollows }, OreCategory.BLOCK),
+    HARD_STONE_TUNNELS({ isHardstoneTunnels(it) }, { inTunnels }, OreCategory.BLOCK),
+    HARD_STONE_MINESHAFT({ isHardstoneMineshaft(it) }, { inMineshaft }, OreCategory.BLOCK),
 
     // DWARVEN BLOCKS
     PURE_COAL(Blocks.COAL_BLOCK, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
@@ -107,12 +107,12 @@ enum class OreBlock(
     PERIDOT(DyeColor.GREEN, { inGlacite }, OreCategory.GEMSTONE),
 
     // GLACIAL
-    LOW_TIER_UMBER(::isLowTierUmber, { inGlacite }, OreCategory.DWARVEN_METAL),
-    MID_TIER_UMBER(::isMidTierUmber, { inGlacite }, OreCategory.DWARVEN_METAL),
-    HIGH_TIER_UMBER(::isHighTierUmber, { inGlacite }, OreCategory.DWARVEN_METAL),
+    LOW_TIER_UMBER({ isLowTierUmber(it) }, { inGlacite }, OreCategory.DWARVEN_METAL),
+    MID_TIER_UMBER({ isMidTierUmber(it) }, { inGlacite }, OreCategory.DWARVEN_METAL),
+    HIGH_TIER_UMBER({ isHighTierUmber(it) }, { inGlacite }, OreCategory.DWARVEN_METAL),
 
-    LOW_TIER_TUNGSTEN_TUNNELS(::isLowTierTungstenTunnels, { inTunnels }, OreCategory.DWARVEN_METAL),
-    LOW_TIER_TUNGSTEN_MINESHAFT(::isLowTierTungstenMineshaft, { inMineshaft }, OreCategory.DWARVEN_METAL),
+    LOW_TIER_TUNGSTEN_TUNNELS({ isLowTierTungstenTunnels(it) }, { inTunnels }, OreCategory.DWARVEN_METAL),
+    LOW_TIER_TUNGSTEN_MINESHAFT({ isLowTierTungstenMineshaft(it) }, { inMineshaft }, OreCategory.DWARVEN_METAL),
     HIGH_TIER_TUNGSTEN(Blocks.CLAY, { inGlacite }, OreCategory.DWARVEN_METAL),
 
     GLACITE(Blocks.PACKED_ICE, { inGlacite }, OreCategory.DWARVEN_METAL),
@@ -142,11 +142,16 @@ enum class OreBlock(
     constructor(gemstoneColor: DyeColor, checkArea: () -> Boolean, category: OreCategory, hasInitSound: Boolean = true) :
         this({ it.isGemstoneWithColor(gemstoneColor) }, checkArea, category, hasInitSound)
 
+    @Suppress("TooManyFunctions")
     companion object {
         fun getByStateOrNull(state: BlockState): OreBlock? = currentAreaOreBlocks.find { it.checkBlock(state) }
 
-        fun getByNameOrNull(string: String) = entries.firstOrNull { it.name == string }
+        fun getByNameOrNull(string: String): OreBlock? = entries.firstOrNull { it.name == string }
 
+        // The enum entries must call these checks through a lambda, never through a method reference.
+        // A method reference to a companion member captures the companion instance when the reference is created,
+        // which happens while the enum entries are being initialized, before the companion instance exists.
+        // A lambda resolves the companion at call time instead, which is safe.
         private fun isLowTierMithril(state: BlockState): Boolean = state.block.equalsOneOf(
             ColoredBlockCompat.GRAY.woolBlock,
             ColoredBlockCompat.CYAN.clayBlock,
