@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun.withErrorHandling
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration
+import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 
 /**
  * Helper class for delaying execution until a specific server time mark.
@@ -22,20 +23,20 @@ object DelayedServerRun {
     private val tasks = mutableListOf<Pair<() -> Any, ServerTimeMark>>()
     private val futureTasks = ConcurrentLinkedQueue<Pair<() -> Any, ServerTimeMark>>()
 
-    fun runDelayed(duration: Duration, run: () -> Unit): ServerTimeMark {
+    fun runDelayed(duration: Duration, label: String? = null, run: () -> Unit): ServerTimeMark {
         val time = ServerTimeMark.now() + duration
-        futureTasks.add(run.withErrorHandling("DelayedServerRun.runDelayed") to time)
+        futureTasks.add(run.withErrorHandling("DelayedServerRun.runDelayed", label) to time)
         return time
     }
 
-    fun <T> runDelayedReturning(duration: Duration, run: () -> T): Pair<ServerTimeMark, () -> T> {
+    fun <T> runDelayedReturning(duration: Duration, label: String? = null, run: () -> T): Pair<ServerTimeMark, () -> T> {
         val time = ServerTimeMark.now() + duration
-        futureTasks.add(run.withErrorHandling("DelayedServerRun.runDelayedReturning") to time)
+        futureTasks.add(run.withErrorHandling("DelayedServerRun.runDelayedReturning", label) to time)
         return time to run
     }
 
-    fun runNextTick(run: () -> Unit) =
-        futureTasks.add(run.withErrorHandling("DelayedServerRun.runNextTick") to ServerTimeMark.farPast())
+    fun runNextTick(label: String? = null, run: () -> Unit) =
+        futureTasks.add(run.withErrorHandling("DelayedServerRun.runNextTick", label) to ServerTimeMark.farPast())
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     private fun onServerTick() {
