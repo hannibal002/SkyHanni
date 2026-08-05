@@ -34,6 +34,8 @@ RepoRules:
         active: true
     RepoPatternPassesShapeRequirement:
         active: true
+    RepoPatternVariableNameStyle:
+        active: true
 
 ImportRules:
     CustomImportOrdering:

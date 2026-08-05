@@ -143,9 +143,6 @@
     <ID>PrivateEventListener:ActiveBossTransparency.kt:ActiveBossTransparency$@HandleEvent fun onMobDeSpawn</ID>
     <ID>PrivateEventListener:ActiveBossTransparency.kt:ActiveBossTransparency$@HandleEvent(onlyOnSkyblock = true) fun onClickEntity</ID>
     <ID>PrivateEventListener:ActualGemstonePowderDisplay.kt:ActualGemstonePowderDisplay$@HandleEvent(priority = HandleEvent.LOW) fun onChat</ID>
-    <ID>PrivateEventListener:AnitaExtraFarmingFortune.kt:AnitaExtraFarmingFortune$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:AnitaExtraFarmingFortune.kt:AnitaExtraFarmingFortune$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:AnitaExtraFarmingFortune.kt:AnitaExtraFarmingFortune$@HandleEvent fun onToolTip</ID>
     <ID>PrivateEventListener:AnitaMedalProfit.kt:AnitaMedalProfit$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:AnitaMedalProfit.kt:AnitaMedalProfit$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:AnitaMedalProfit.kt:AnitaMedalProfit$@HandleEvent fun onInventoryClose</ID>
@@ -209,11 +206,6 @@
     <ID>PrivateEventListener:AttributeOverlay.kt:AttributeOverlay$@HandleEvent fun onRenderItemOverlayPost</ID>
     <ID>PrivateEventListener:AttributeShardOverlay.kt:AttributeShardOverlay$@HandleEvent(InventoryUpdatedEvent::class, onlyOnSkyblock = true) fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:AttributeShardOverlay.kt:AttributeShardOverlay$@HandleEvent(onlyOnSkyblock = true) fun onChestGuiRender</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent(priority = HandleEvent.HIGHEST) fun onShardGain</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent(priority = HandleEvent.LOWEST) fun onNeuRepoReload</ID>
     <ID>PrivateEventListener:AttributesShardsInventory.kt:AttributesShardsInventory$@HandleEvent(onlyOnSkyblock = true) fun onRenderItemTip</ID>
     <ID>PrivateEventListener:AuctionHouseCopyUnderbidPrice.kt:AuctionHouseCopyUnderbidPrice$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:AuctionHouseCopyUnderbidPrice.kt:AuctionHouseCopyUnderbidPrice$@HandleEvent(onlyOnSkyblock = true) fun onInventoryUpdated</ID>
@@ -370,9 +362,6 @@
     <ID>PrivateEventListener:CFApi.kt:CFApi$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:CFBarnManager.kt:CFBarnManager$@HandleEvent(InventoryCloseEvent::class) fun onInventoryClose</ID>
     <ID>PrivateEventListener:CFBarnManager.kt:CFBarnManager$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:CFBlockOpen.kt:CFBlockOpen$@HandleEvent fun onEffectUpdate</ID>
-    <ID>PrivateEventListener:CFBlockOpen.kt:CFBlockOpen$@HandleEvent(onlyOnSkyblock = true) fun onCommandSend</ID>
-    <ID>PrivateEventListener:CFBlockOpen.kt:CFBlockOpen$@HandleEvent(onlyOnSkyblock = true) fun onSlotClick</ID>
     <ID>PrivateEventListener:CFCustomReminder.kt:CFCustomReminder$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:CFCustomReminder.kt:CFCustomReminder$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:CFCustomReminder.kt:CFCustomReminder$@HandleEvent fun onConfigFix</ID>
@@ -451,8 +440,6 @@
     <ID>PrivateEventListener:CakeTracker.kt:CakeTracker$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:CakeTracker.kt:CakeTracker$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
     <ID>PrivateEventListener:Calculator.kt:Calculator$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:CalendarApi.kt:CalendarApi$@HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH) fun onInventoryOpen</ID>
-    <ID>PrivateEventListener:CalendarApi.kt:CalendarApi$@HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOW) fun onInventoryClose</ID>
     <ID>PrivateEventListener:CarnivalAPI.kt:CarnivalAPI$@HandleEvent fun onAreaChange</ID>
     <ID>PrivateEventListener:CarnivalAPI.kt:CarnivalAPI$@HandleEvent(MayorChangeEvent::class, onlyOnIsland = IslandType.HUB) fun onMayorChange</ID>
     <ID>PrivateEventListener:CarnivalFruitDigging.kt:CarnivalFruitDigging$@HandleEvent fun onBlockChange</ID>
@@ -701,9 +688,6 @@
     <ID>PrivateEventListener:CruxTalismanDisplay.kt:CruxTalismanDisplay$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:CruxTalismanDisplay.kt:CruxTalismanDisplay$@HandleEvent fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:CruxTalismanDisplay.kt:CruxTalismanDisplay$@HandleEvent fun onSecondPassed</ID>
-    <ID>PrivateEventListener:CrystalHollowsNamesInCore.kt:CrystalHollowsNamesInCore$@HandleEvent fun onAreaChange</ID>
-    <ID>PrivateEventListener:CrystalHollowsNamesInCore.kt:CrystalHollowsNamesInCore$@HandleEvent fun onRenderWorld</ID>
-    <ID>PrivateEventListener:CrystalHollowsNamesInCore.kt:CrystalHollowsNamesInCore$@HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true) fun onSecondPassed</ID>
     <ID>PrivateEventListener:CrystalHollowsWalls.kt:CrystalHollowsWalls$@HandleEvent fun onRenderWorld</ID>
     <ID>PrivateEventListener:CrystalNucleusApi.kt:CrystalNucleusApi$@HandleEvent fun onIslandChange</ID>
     <ID>PrivateEventListener:CrystalNucleusApi.kt:CrystalNucleusApi$@HandleEvent fun onOwnInventoryItemUpdate</ID>
@@ -829,8 +813,6 @@
     <ID>PrivateEventListener:DefaultConfigFeatures.kt:DefaultConfigFeatures$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:DefaultConfigFeatures.kt:DefaultConfigFeatures$@HandleEvent fun onHypixelJoin</ID>
     <ID>PrivateEventListener:DeferredDrawer.kt:DeferredDrawer$@HandleEvent(priority = 999) fun onRenderWorld</ID>
-    <ID>PrivateEventListener:DelayedRun.kt:DelayedRun$@HandleEvent(priority = HandleEvent.LOWEST) fun onTick</ID>
-    <ID>PrivateEventListener:DelayedServerRun.kt:DelayedServerRun$@HandleEvent(priority = HandleEvent.LOWEST) fun onServerTick</ID>
     <ID>PrivateEventListener:DeployableDisplay.kt:DeployableDisplay$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:DeployableDisplay.kt:DeployableDisplay$@HandleEvent(onlyOnSkyblock = true) fun onEntitySpawn</ID>
     <ID>PrivateEventListener:DeployableDisplay.kt:DeployableDisplay$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
@@ -895,14 +877,6 @@
     <ID>PrivateEventListener:DragonProfitTracker.kt:DragonProfitTracker$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:DragonProfitTracker.kt:DragonProfitTracker$@HandleEvent fun onItemAdd</ID>
     <ID>PrivateEventListener:DragonProfitTracker.kt:DragonProfitTracker$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onScoreboardUpdate</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onTabUpdate</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onTablistChange</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onBlockClick</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:DungeonArchitectFeatures.kt:DungeonArchitectFeatures$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:DungeonBossApi.kt:DungeonBossApi$@HandleEvent fun onDungeonEnd</ID>
     <ID>PrivateEventListener:DungeonBossApi.kt:DungeonBossApi$@HandleEvent fun onWorldChange</ID>
@@ -997,13 +971,6 @@
     <ID>PrivateEventListener:EasterEggWaypoints.kt:EasterEggWaypoints$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:EasterEggWaypoints.kt:EasterEggWaypoints$@HandleEvent fun onRenderWorld</ID>
     <ID>PrivateEventListener:EasterEggWaypoints.kt:EasterEggWaypoints$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun readPestRepellent</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES]) fun readSalts</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onInventoryUpdated</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onTabUpdate</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun readEffects</ID>
     <ID>PrivateEventListener:EggAchievement.kt:EggAchievement$@HandleEvent fun onAchievementRegistration</ID>
     <ID>PrivateEventListener:EggAchievement.kt:EggAchievement$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:ElectionApi.kt:ElectionApi$@HandleEvent fun onConfigLoad</ID>
@@ -1383,15 +1350,6 @@
     <ID>PrivateEventListener:GardenLevelDisplay.kt:GardenLevelDisplay$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:GardenLevelDisplay.kt:GardenLevelDisplay$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:GardenLevelDisplay.kt:GardenLevelDisplay$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onToolTip</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent fun onWidgetUpdate</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(ConfigLoadEvent::class) fun onConfigLoad</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class) fun onChestGuiRender</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class) fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(InventoryCloseEvent::class, onlyOnIsland = IslandType.GARDEN) fun onInventoryClose</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
     <ID>PrivateEventListener:GardenNextPlotPrice.kt:GardenNextPlotPrice$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onToolTip</ID>
     <ID>PrivateEventListener:GardenOptimalAngles.kt:GardenOptimalAngles$@HandleEvent fun onGardenToolChange</ID>
     <ID>PrivateEventListener:GardenOptimalAngles.kt:GardenOptimalAngles$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onGuiOpen</ID>
@@ -1485,20 +1443,6 @@
     <ID>PrivateEventListener:GeyserFishing.kt:GeyserFishing$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onRenderWorld</ID>
     <ID>PrivateEventListener:GeyserFishing.kt:GeyserFishing$@HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true) fun onParticle</ID>
     <ID>PrivateEventListener:GfSKeybind.kt:GfSKeybind$@HandleEvent fun onKey</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onAreaChange</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onIslandChange</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onItemAdd</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onPurseChange</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onSackChange</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onShard</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onSkillExp</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onWidgetUpdate</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent(ConfigLoadEvent::class) fun onConfigLoad</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
     <ID>PrivateEventListener:GiftApi.kt:GiftApi$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:GiftApi.kt:GiftApi$@HandleEvent(onlyOnSkyblock = true) fun onItemInHandChange</ID>
     <ID>PrivateEventListener:GiftCleanDisplay.kt:GiftCleanDisplay$@HandleEvent(onlyOnSkyblock = true) fun onNameTagRender</ID>
@@ -1525,7 +1469,6 @@
     <ID>PrivateEventListener:GraphEditor.kt:GraphEditor$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:GraphEditor.kt:GraphEditor$@HandleEvent fun onPlayerMove</ID>
     <ID>PrivateEventListener:GraphEditor.kt:GraphEditor$@HandleEvent fun onTick</ID>
-    <ID>PrivateEventListener:GraphEditorBugFinder.kt:GraphEditorBugFinder$@HandleEvent fun onRenderWorld</ID>
     <ID>PrivateEventListener:GraphEditorInput.kt:GraphEditorInput$@HandleEvent(onlyOnSkyblock = true) fun onPlayerMove</ID>
     <ID>PrivateEventListener:GraphEditorRenderer.kt:GraphEditorRenderer$@HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:GraphEditorRenderer.kt:GraphEditorRenderer$@HandleEvent(priority = HandleEvent.HIGHEST) fun onRenderWorld</ID>
@@ -1569,12 +1512,6 @@
     <ID>PrivateEventListener:GuiEditManager.kt:GuiEditManager$@HandleEvent fun onKeyPress</ID>
     <ID>PrivateEventListener:GuiEditManager.kt:GuiEditManager$@HandleEvent fun onTick</ID>
     <ID>PrivateEventListener:GuildApi.kt:GuildApi$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onAreaChange</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onArmorChange</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onEntityClick</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onItemInHandChange</ID>
     <ID>PrivateEventListener:HalloweenBasketWaypoints.kt:HalloweenBasketWaypoints$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:HalloweenBasketWaypoints.kt:HalloweenBasketWaypoints$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:HalloweenBasketWaypoints.kt:HalloweenBasketWaypoints$@HandleEvent fun onRenderWorld</ID>
@@ -1622,15 +1559,8 @@
     <ID>PrivateEventListener:HideMobNames.kt:HideMobNames$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:HideMobNames.kt:HideMobNames$@HandleEvent(onlyOnSkyblock = true) fun onCheckRender</ID>
     <ID>PrivateEventListener:HideNotClickableConfig.kt:HideNotClickableConfig.Companion$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:HideNotClickableItems.kt:HideNotClickableItems$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:HideNotClickableItems.kt:HideNotClickableItems$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:HideNotClickableItems.kt:HideNotClickableItems$@HandleEvent fun onSlotClick</ID>
-    <ID>PrivateEventListener:HideNotClickableItems.kt:HideNotClickableItems$@HandleEvent(onlyOnSkyblock = true) fun onForegroundDrawn</ID>
-    <ID>PrivateEventListener:HideNotClickableItems.kt:HideNotClickableItems$@HandleEvent(priority = HandleEvent.LOWEST) fun onTooltip</ID>
     <ID>PrivateEventListener:HideSlayerSpawnParticles.kt:HideSlayerSpawnParticles$@HandleEvent(onlyOnSkyblock = true) fun onEntityHealthUpdate</ID>
     <ID>PrivateEventListener:HideSlayerSpawnParticles.kt:HideSlayerSpawnParticles$@HandleEvent(onlyOnSkyblock = true) fun onParticle</ID>
-    <ID>PrivateEventListener:HideonleafFinder.kt:HideonleafFinder$@HandleEvent(IslandChangeEvent::class) fun onIslandChange</ID>
-    <ID>PrivateEventListener:HideonleafFinder.kt:HideonleafFinder$@HandleEvent(onlyOnIsland = IslandType.GALATEA) fun onKeyPress</ID>
     <ID>PrivateEventListener:HideonleafHighlighter.kt:HideonleafHighlighter$@HandleEvent fun onConfigFixEvent</ID>
     <ID>PrivateEventListener:HideonleafHighlighter.kt:HideonleafHighlighter$@HandleEvent(onlyOnIsland = IslandType.GALATEA) fun onMob</ID>
     <ID>PrivateEventListener:HighHeatSound.kt:HighHeatSound$@HandleEvent fun onPlaySound</ID>
@@ -1730,13 +1660,6 @@
     <ID>PrivateEventListener:HoppityEggsManager.kt:HoppityEggsManager$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
     <ID>PrivateEventListener:HoppityEggsManager.kt:HoppityEggsManager$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:HoppityEggsShared.kt:HoppityEggsShared$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onEggSpawned</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onProfileJoin</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onRabbitFound</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
     <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderTop</ID>
     <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent(onlyOnSkyblock = true) fun onKeyPress</ID>
@@ -1770,7 +1693,6 @@
     <ID>PrivateEventListener:HotxFeatures.kt:HotxFeatures$@HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:HotxFeatures.kt:HotxFeatures$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:HotxFeatures.kt:HotxFeatures$@HandleEvent(onlyOnSkyblock = true) fun onRenderTip</ID>
-    <ID>PrivateEventListener:HuntingBoxValue.kt:HuntingBoxValue$@HandleEvent(onlyOnSkyblock = true) fun onChestGuiRender</ID>
     <ID>PrivateEventListener:HuntingProfitTracker.kt:HuntingProfitTracker$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:HuntingProfitTracker.kt:HuntingProfitTracker$@HandleEvent fun onItemInHandChange</ID>
     <ID>PrivateEventListener:HuntingProfitTracker.kt:HuntingProfitTracker$@HandleEvent fun onRepoReload</ID>
@@ -1847,15 +1769,6 @@
     <ID>PrivateEventListener:IslandDetectionWatcher.kt:IslandDetectionWatcher$@HandleEvent(HypixelJoinEvent::class) fun onHypixelJoin</ID>
     <ID>PrivateEventListener:IslandDetectionWatcher.kt:IslandDetectionWatcher$@HandleEvent(ProfileJoinEvent::class) fun onProfileJoin</ID>
     <ID>PrivateEventListener:IslandDetectionWatcher.kt:IslandDetectionWatcher$@HandleEvent(WorldChangeEvent::class) fun onWorldChange</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent fun onIslandJoin</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent fun onRenderWorld</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent(ScoreboardAreaChangeEvent::class) fun onAreaChange</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent(onlyOnSkyblock = true) fun onPlayerMove</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent(priority = -1) fun onTick</ID>
     <ID>PrivateEventListener:IslandType.kt:IslandType.Companion$@HandleEvent(priority = HIGHEST) fun onRepoReload</ID>
     <ID>PrivateEventListener:IslandTypeTag.kt:IslandTypeTag.Companion$@HandleEvent fun onRepoReload</ID>
     <ID>PrivateEventListener:ItemAbilityCooldown.kt:ItemAbilityCooldown$@HandleEvent fun onActionBarUpdate</ID>
@@ -2008,10 +1921,6 @@
     <ID>PrivateEventListener:LoadoutApi.kt:LoadoutApi$@HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true) fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:LoadoutSlotHighlight.kt:LoadoutSlotHighlight$@HandleEvent(onlyOnSkyblock = true) fun onBackgroundDrawn</ID>
     <ID>PrivateEventListener:LocationFixData.kt:LocationFixData$@HandleEvent(priority = HandleEvent.LOW) fun onRepoReload</ID>
-    <ID>PrivateEventListener:LogBookStats.kt:LogBookStats$@HandleEvent fun onChestGuiRender</ID>
-    <ID>PrivateEventListener:LogBookStats.kt:LogBookStats$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:LogBookStats.kt:LogBookStats$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:LogBookStats.kt:LogBookStats$@HandleEvent fun onProfileChange</ID>
     <ID>PrivateEventListener:LowHealthAlert.kt:LowHealthAlert$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onScoreboardChange</ID>
     <ID>PrivateEventListener:MagicalPowerAchievement.kt:MagicalPowerAchievement$@HandleEvent fun onAchievementRegistration</ID>
     <ID>PrivateEventListener:MagicalPowerAchievement.kt:MagicalPowerAchievement$@HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOW) fun onAccessoryBagUpdate</ID>
@@ -2027,12 +1936,6 @@
     <ID>PrivateEventListener:MarkedPlayerManager.kt:MarkedPlayerManager$@HandleEvent fun onEntityEnterWorld</ID>
     <ID>PrivateEventListener:MarkedPlayerManager.kt:MarkedPlayerManager$@HandleEvent fun onWidgetUpdate</ID>
     <ID>PrivateEventListener:MarkedPlayerManager.kt:MarkedPlayerManager$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:MatriarchHelper.kt:MatriarchHelper$@HandleEvent(GraphAreaChangeEvent::class, onlyOnIsland = IslandType.CRIMSON_ISLE) fun onGraphAreaChange</ID>
-    <ID>PrivateEventListener:MatriarchHelper.kt:MatriarchHelper$@HandleEvent(IslandGraphReloadEvent::class) fun onIslandGraphReload</ID>
-    <ID>PrivateEventListener:MatriarchHelper.kt:MatriarchHelper$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onMobDespawn</ID>
-    <ID>PrivateEventListener:MatriarchHelper.kt:MatriarchHelper$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onMobSpawn</ID>
-    <ID>PrivateEventListener:MatriarchHelper.kt:MatriarchHelper$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onRenderWorld</ID>
-    <ID>PrivateEventListener:MatriarchHelper.kt:MatriarchHelper$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onTick</ID>
     <ID>PrivateEventListener:MaxPurseItems.kt:MaxPurseItems$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:MaxwellApi.kt:MaxwellApi$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:MaxwellApi.kt:MaxwellApi$@HandleEvent fun onRepoReload</ID>
@@ -2050,7 +1953,6 @@
     <ID>PrivateEventListener:MetalDetectorSolver.kt:MetalDetectorSolver$@HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS) fun onRenderWorld</ID>
     <ID>PrivateEventListener:MetalDetectorSolver.kt:MetalDetectorSolver$@HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS) fun onTick</ID>
     <ID>PrivateEventListener:MinecraftCompat.kt:MinecraftCompat$@HandleEvent internal fun onPacketReceived</ID>
-    <ID>PrivateEventListener:MinecraftConsoleFilter.kt:MinecraftConsoleFilter$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:MinecraftData.kt:MinecraftData$@HandleEvent fun onSecondPassed</ID>
     <ID>PrivateEventListener:MinecraftData.kt:MinecraftData$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:MinecraftData.kt:MinecraftData$@HandleEvent(onlyOnSkyblock = true) fun onItemInHandChange</ID>
@@ -2080,18 +1982,6 @@
     <ID>PrivateEventListener:MineshaftWaypoints.kt:MineshaftWaypoints$@HandleEvent fun onRenderWorld</ID>
     <ID>PrivateEventListener:MineshaftWaypoints.kt:MineshaftWaypoints$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:MineshaftWaypoints.kt:MineshaftWaypoints$@HandleEvent(onlyOnIsland = IslandType.MINESHAFT) fun onPacketReceived</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onBlockChange</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onBlockClick</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onIslandChange</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onPlaySound</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onPlayerDeath</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onScoreboardChange</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onTick</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent(ScoreboardAreaChangeEvent::class) fun onAreaChange</ID>
     <ID>PrivateEventListener:MiningCommissionsBlocksColor.kt:MiningCommissionsBlocksColor$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:MiningCommissionsBlocksColor.kt:MiningCommissionsBlocksColor$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:MiningCommissionsBlocksColor.kt:MiningCommissionsBlocksColor$@HandleEvent fun onDebugDataCollect</ID>
@@ -2229,26 +2119,16 @@
     <ID>PrivateEventListener:MythologicalCreatureTracker.kt:MythologicalCreatureTracker$@HandleEvent fun onRepoLoaded</ID>
     <ID>PrivateEventListener:NavigationFeedback.kt:NavigationFeedback$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:NavigationFeedback.kt:NavigationFeedback$@HandleEvent fun onConfigLoad</ID>
-    <ID>PrivateEventListener:NavigationHelper.kt:NavigationHelper$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:NeuItemStackProvider.kt:NeuItemStackProvider.Companion$@HandleEvent(priority = HandleEvent.LOW) fun onNeuRepoReload</ID>
     <ID>PrivateEventListener:NeuItems.kt:NeuItems$@HandleEvent fun onNeuRepoReload</ID>
     <ID>PrivateEventListener:NeuItems.kt:NeuItems$@HandleEvent fun onRepoReload</ID>
     <ID>PrivateEventListener:NewYearCakeReminder.kt:NewYearCakeReminder$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:NewYearCakeReminder.kt:NewYearCakeReminder$@HandleEvent fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:NewYearCakeReminder.kt:NewYearCakeReminder$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
-    <ID>PrivateEventListener:NextJacobContestConfig.kt:NextJacobContestConfig$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:NoBitsWarning.kt:NoBitsWarning$@HandleEvent fun onBitsGain</ID>
     <ID>PrivateEventListener:NoBitsWarning.kt:NoBitsWarning$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:NoBreak.kt:NoBreak$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:NoBreak.kt:NoBreak$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onBlockClick</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onEffectUpdate</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onProfileJoin</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onSecondPassed</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent(onlyOnSkyblock = true) fun onTabUpdate</ID>
     <ID>PrivateEventListener:NotificationManager.kt:NotificationManager$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:NotificationManager.kt:NotificationManager$@HandleEvent fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:NotificationManager.kt:NotificationManager$@HandleEvent fun onKeyPress</ID>
@@ -2547,11 +2427,6 @@
     <ID>PrivateEventListener:ReforgeHelper.kt:ReforgeHelper$@HandleEvent fun onSlotClick</ID>
     <ID>PrivateEventListener:ReforgeHelper.kt:ReforgeHelper$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:ReindrakeWarpHelper.kt:ReindrakeWarpHelper$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:RemainingSlayerKills.kt:RemainingSlayerKills$@HandleEvent fun onSlayerProgressChange</ID>
-    <ID>PrivateEventListener:RemainingSlayerKills.kt:RemainingSlayerKills$@HandleEvent fun onSystemMessage</ID>
-    <ID>PrivateEventListener:RemainingSlayerKills.kt:RemainingSlayerKills$@HandleEvent(GraphAreaChangeEvent::class) fun onAreaChange</ID>
-    <ID>PrivateEventListener:RemainingSlayerKills.kt:RemainingSlayerKills$@HandleEvent(ProfileJoinEvent::class) fun onProfileJoin</ID>
-    <ID>PrivateEventListener:RemainingSlayerKills.kt:RemainingSlayerKills$@HandleEvent(priority = HIGHEST) fun onRepoReload</ID>
     <ID>PrivateEventListener:ReminderHudDisplay.kt:ReminderHudDisplay$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:ReminderHudDisplay.kt:ReminderHudDisplay$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
     <ID>PrivateEventListener:ReminderManager.kt:ReminderManager$@HandleEvent fun onCommandRegistration</ID>
@@ -2802,9 +2677,6 @@
     <ID>PrivateEventListener:SkyHanniDebugsAndTests.kt:SkyHanniDebugsAndTests$@HandleEvent(onlyOnSkyblock = true) fun showItemCategory</ID>
     <ID>PrivateEventListener:SkyHanniDebugsAndTests.kt:SkyHanniDebugsAndTests$@HandleEvent(onlyOnSkyblock = true) fun showItemRarity</ID>
     <ID>PrivateEventListener:SkyHanniDebugsAndTests.kt:SkyHanniDebugsAndTests$@Suppress("LongMethod") @HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:SkyHanniEvents.kt:SkyHanniEvents$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:SkyHanniEvents.kt:SkyHanniEvents$@HandleEvent fun onSecondPassed</ID>
-    <ID>PrivateEventListener:SkyHanniEvents.kt:SkyHanniEvents$@HandleEvent(priority = HandleEvent.HIGHEST) fun onRepoReload</ID>
     <ID>PrivateEventListener:SkyHanniItemRenderCoordinator.kt:SkyHanniItemRenderCoordinator$@HandleEvent fun onDebugDataCollect</ID>
     <ID>PrivateEventListener:SkyHanniMod.kt:SkyHanniMod$@HandleEvent fun onClientShutdown</ID>
     <ID>PrivateEventListener:SkyHanniMod.kt:SkyHanniMod$@HandleEvent fun onCommandRegistration</ID>
@@ -2818,12 +2690,6 @@
     <ID>PrivateEventListener:SkyMartCopperPrice.kt:SkyMartCopperPrice$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:SkyMartCopperPrice.kt:SkyMartCopperPrice$@HandleEvent fun onInventoryClose</ID>
     <ID>PrivateEventListener:SkyMartCopperPrice.kt:SkyMartCopperPrice$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$@HandleEvent fun onBackgroundDrawn</ID>
-    <ID>PrivateEventListener:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$@HandleEvent fun onSlotClick</ID>
-    <ID>PrivateEventListener:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$@HandleEvent fun onTooltip</ID>
     <ID>PrivateEventListener:SkyblockStat.kt:SkyblockStat.Companion$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:SkyblockStat.kt:SkyblockStat.Companion$@HandleEvent fun onResourcePackReload</ID>
     <ID>PrivateEventListener:SkyblockStat.kt:SkyblockStat.Companion$@HandleEvent fun onWidgetUpdate</ID>
@@ -2832,13 +2698,6 @@
     <ID>PrivateEventListener:SkyhanniTimedTracker.kt:SkyhanniTimedTracker.Companion$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:SlayerAchievements.kt:SlayerAchievements$@HandleEvent fun onAchievementRegistration</ID>
     <ID>PrivateEventListener:SlayerAchievements.kt:SlayerAchievements$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent(ConfigLoadEvent::class) fun onConfigLoad</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent(GraphAreaChangeEvent::class, priority = -1) fun onAreaChange</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true) fun onScoreboardChange</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent(onlyOnSkyblock = true) fun onTick</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent(onlyOnSkyblock = true) fun onWidgetUpdate</ID>
     <ID>PrivateEventListener:SlayerBossSpawnSoon.kt:SlayerBossSpawnSoon$@HandleEvent fun onSlayerProgressChange</ID>
     <ID>PrivateEventListener:SlayerCocoonWarning.kt:SlayerCocoonWarning$@HandleEvent fun onChatMessage</ID>
     <ID>PrivateEventListener:SlayerConfig.kt:SlayerConfig.Companion$@HandleEvent fun onConfigFix</ID>
@@ -2949,14 +2808,6 @@
     <ID>PrivateEventListener:SummoningSoulsName.kt:SummoningSoulsName$@HandleEvent fun onRenderWorld</ID>
     <ID>PrivateEventListener:SummoningSoulsName.kt:SummoningSoulsName$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:SummoningSoulsName.kt:SummoningSoulsName$@HandleEvent(SkyHanniTickEvent::class) fun onTick</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onActionBar</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onAreaChanged</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onChat</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onGuiRender</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onInventoryUpdated</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onMobSpawn</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onScoreboardUpdate</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onTick</ID>
     <ID>PrivateEventListener:SuperCraftFeatures.kt:SuperCraftFeatures$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:SuperCraftPresets.kt:SuperCraftPresets$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:SuperCraftPresets.kt:SuperCraftPresets$@HandleEvent(onlyOnSkyblock = true) fun onGuiOpen</ID>
@@ -2974,12 +2825,6 @@
     <ID>PrivateEventListener:SuperpairsClicksAlert.kt:SuperpairsClicksAlert$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onInventoryOpen</ID>
     <ID>PrivateEventListener:SuperpairsClicksAlert.kt:SuperpairsClicksAlert$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:TabComplete.kt:TabComplete$@HandleEvent fun handleTabComplete</ID>
-    <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent fun onTick</ID>
-    <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent(receiveCancelled = true) fun onPacketReceive</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent fun onConfigLoad</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent(onlyOnSkyblock = true) fun onTabListFooterUpdate</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent(onlyOnSkyblock = true) fun onTabListUpdate</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent fun onSkipTablistLine</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent(onlyOnSkyblock = true) fun onRenderOverlayPre</ID>
@@ -3115,23 +2960,8 @@
     <ID>PrivateEventListener:TranslatorCommand.kt:TranslatorCommand$@HandleEvent(priority = HandleEvent.LOWEST) fun onGuildChat</ID>
     <ID>PrivateEventListener:TranslatorCommand.kt:TranslatorCommand$@HandleEvent(priority = HandleEvent.LOWEST) fun onPartyChat</ID>
     <ID>PrivateEventListener:TranslatorCommand.kt:TranslatorCommand$@HandleEvent(priority = HandleEvent.LOWEST) fun onPrivateChat</ID>
-    <ID>PrivateEventListener:TravelingZooPetInCalendar.kt:TravelingZooPetInCalendar$@HandleEvent fun onTooltip</ID>
     <ID>PrivateEventListener:TreeProgressDisplay.kt:TreeProgressDisplay$@HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES]) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:TreeProgressDisplay.kt:TreeProgressDisplay$@OptIn(AllEntitiesGetter::class) @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES]) fun onTick</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent fun onGraphAreaChange</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent fun onTabListUpdate</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, priority = HandleEvent.LOWEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onChat</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onEntityEnterWorld</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onEntityLeaveWorld</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onKeyPress</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onRenderWorld</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onSecondPassed</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onTick</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(priority = HandleEvent.HIGHEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onCheckRender</ID>
     <ID>PrivateEventListener:TrevorTracker.kt:TrevorTracker$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:TrevorTracker.kt:TrevorTracker$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onChat</ID>
     <ID>PrivateEventListener:TrevorTracker.kt:TrevorTracker$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onGuiRenderOverlay</ID>
@@ -3232,12 +3062,6 @@
     <ID>PrivateEventListener:VanquisherWaypointShare.kt:VanquisherWaypointShare$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onVanquisherDeath</ID>
     <ID>PrivateEventListener:VanquisherWaypointShare.kt:VanquisherWaypointShare$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onVanquisherSpawn</ID>
     <ID>PrivateEventListener:VanquisherWaypointShare.kt:VanquisherWaypointShare$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE, receiveCancelled = true) fun onReadChat</ID>
-    <ID>PrivateEventListener:VerminHighlighter.kt:VerminHighlighter$@HandleEvent fun onAreaChange</ID>
-    <ID>PrivateEventListener:VerminHighlighter.kt:VerminHighlighter$@HandleEvent fun onConfigLoad</ID>
-    <ID>PrivateEventListener:VerminHighlighter.kt:VerminHighlighter$@HandleEvent fun onEntityEnterWorld</ID>
-    <ID>PrivateEventListener:VerminHighlighter.kt:VerminHighlighter$@HandleEvent fun onEntityEquipmentChange</ID>
-    <ID>PrivateEventListener:VerminHighlighter.kt:VerminHighlighter$@HandleEvent fun onEntityMaxHealthUpdate</ID>
-    <ID>PrivateEventListener:VerminHighlighter.kt:VerminHighlighter$@HandleEvent fun onItemInHandChange</ID>
     <ID>PrivateEventListener:VerminTracker.kt:VerminTracker$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:VerminTracker.kt:VerminTracker$@HandleEvent fun onIslandChange</ID>
     <ID>PrivateEventListener:VerminTracker.kt:VerminTracker$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onChat</ID>
@@ -3280,7 +3104,6 @@
     <ID>PrivateEventListener:WikiManager.kt:WikiManager$@HandleEvent(onlyOnSkyblock = true) fun onMessageSendToServer</ID>
     <ID>PrivateEventListener:WikiManager.kt:WikiManager$@HandleEvent(priority = HandleEvent.LOW) fun onRepoReload</ID>
     <ID>PrivateEventListener:WikiNpcComparator.kt:WikiNpcComparator$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:WinterApi.kt:WinterApi$@HandleEvent fun onAreaChange</ID>
     <ID>PrivateEventListener:WoodenButtonsHelper.kt:WoodenButtonsHelper$@HandleEvent fun onBlockClick</ID>
     <ID>PrivateEventListener:WoodenButtonsHelper.kt:WoodenButtonsHelper$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:WoodenButtonsHelper.kt:WoodenButtonsHelper$@HandleEvent fun onItemClick</ID>
@@ -3404,6 +3227,72 @@
     <ID>RepoPatternRegexTestMissing:UtilsPatterns.kt:UtilsPatterns$by patternGroup.pattern( "string.playerchat", "(?&lt;important&gt;.*?)(?:§[f7r])*: .*", )</ID>
     <ID>RepoPatternRegexTestMissing:UtilsPatterns.kt:UtilsPatterns$by patternGroup.pattern( "time.amount", "(?:(?&lt;y&gt;\\d+) ?y(?:\\w* ?)?)?(?:(?&lt;d&gt;\\d+) ?d(?:\\w* ?)?)?(?:(?&lt;h&gt;\\d+) ?h(?:\\w* ?)?)?(?:(?&lt;m&gt;\\d+) ?m(?:\\w* ?)?)?(?:(?&lt;s&gt;\\d+) ?s(?:\\w* ?)?)?", )</ID>
     <ID>RepoPatternRegexTestMissing:VisitorListener.kt:VisitorListener$by RepoPattern.pattern( "garden.visitor.offersaccepted", "§7Offers Accepted: §a(?&lt;offersAccepted&gt;\\d+)", )</ID>
+    <ID>RepoPatternVariableNameStyle:BitsApi.kt:BitsApi$by bitsChatGroup.pattern( "boostercookieate", "§eYou consumed a §6Booster Cookie§e!.*", )</ID>
+    <ID>RepoPatternVariableNameStyle:BloodTimer.kt:BloodTimer$by patternGroup.pattern( "moving", "\\[BOSS] The Watcher: Let's see how you can handle this\\.", )</ID>
+    <ID>RepoPatternVariableNameStyle:CFStrayTracker.kt:CFStrayTracker$by CFApi.patternGroup.pattern( "stray.goldenclick", "§7You caught a stray §6§lGolden Rabbit§7! §7You gained §6\\+5 Chocolate §7until the §7end of the SkyBlock year!", )</ID>
+    <ID>RepoPatternVariableNameStyle:CarnivalQuickStart.kt:CarnivalQuickStart$by patternGroup.pattern("npcs.cowboy", "Carnival Cowboy")</ID>
+    <ID>RepoPatternVariableNameStyle:CarnivalQuickStart.kt:CarnivalQuickStart$by patternGroup.pattern("npcs.fisher", "Carnival Fisherman")</ID>
+    <ID>RepoPatternVariableNameStyle:CarnivalQuickStart.kt:CarnivalQuickStart$by patternGroup.pattern("npcs.pirate", "Carnival Pirateman")</ID>
+    <ID>RepoPatternVariableNameStyle:CocoonAPI.kt:CocoonAPI$by patternGroup.pattern( "spawn", "CAUGHT! You cocooned an? (?&lt;name&gt;[\\w ]+)!", )</ID>
+    <ID>RepoPatternVariableNameStyle:ColorfulItemStats.kt:ColorfulItemStats$by group.pattern( "generic-stats-no-color", "(?&lt;stat&gt;[a-zA-Z ]+): (?&lt;bonus&gt;[-+]?[\\d.,%s]+)(?:\\s|$)", )</ID>
+    <ID>RepoPatternVariableNameStyle:CompactJacobClaim.kt:CompactJacobClaim$by patternGroup.pattern( "contest.specific", " {3}» (?&lt;crop&gt;[\\w ]+) Contest on (?&lt;season&gt;[\\w ]+) (?&lt;day&gt;\\d+[stndh]{2,3}), Year (?&lt;year&gt;\\d+)", )</ID>
+    <ID>RepoPatternVariableNameStyle:CropFeverTracker.kt:CropFeverTracker$by patternGroup.pattern( "drop", "^(?&lt;rarity&gt;[\\w ]+)! You dropped (?&lt;amount&gt;\\d+)x (?&lt;crop&gt;[\\w ]+)!", )</ID>
+    <ID>RepoPatternVariableNameStyle:CropFeverTracker.kt:CropFeverTracker$by patternGroup.pattern( "end", "^GONE! Your CROP FEVER has been cured!", )</ID>
+    <ID>RepoPatternVariableNameStyle:CropFeverTracker.kt:CropFeverTracker$by patternGroup.pattern( "start", "^WOAH! You caught a case of the CROP FEVER for 60 seconds!", )</ID>
+    <ID>RepoPatternVariableNameStyle:CrystalNucleusChatFilter.kt:CrystalNucleusChatFilter$by patternGroup.pattern( "npc.keeper", "§e\\[NPC\\] §6Keeper of (?&lt;keepertype&gt;.*)§f: §r(?&lt;message&gt;.*)", )</ID>
+    <ID>RepoPatternVariableNameStyle:CurrentEquipmentApi.kt:CurrentEquipmentApi$by repoGroup.pattern( "chat.equip", "§aYou equipped a (?&lt;item&gt;.+)§r§a!", )</ID>
+    <ID>RepoPatternVariableNameStyle:DraconicSacrificeTracker.kt:DraconicSacrificeTracker$by patternGroup.pattern( "bonus", "§c§lBONUS LOOT! §r§eYou also received §r(?:§\\w(?&lt;amount&gt;\\d+)?x)?(?: §r)?(?&lt;item&gt;.*) §r§efrom your sacrifice!", )</ID>
+    <ID>RepoPatternVariableNameStyle:DraconicSacrificeTracker.kt:DraconicSacrificeTracker$by patternGroup.pattern( "sacrifice", "§c§lSACRIFICE! §r§eYou turned §r(?&lt;item&gt;.*) §r§einto §r§d(?&lt;amount&gt;\\d+) Dragon Essence§r§e!", )</ID>
+    <ID>RepoPatternVariableNameStyle:DragonFightAPI.kt:DragonFightAPI$by group.pattern( "chat.death", "§r§f {27}§r§6§l(?&lt;type&gt;.*) DOWN!§r", )</ID>
+    <ID>RepoPatternVariableNameStyle:DungeonApi.kt:DungeonApi$by patternGroup.pattern( "completecolorless", "\\s+(?:Master Mode )?The Catacombs - (?:Floor [IV]{1,3}|Entrance)", )</ID>
+    <ID>RepoPatternVariableNameStyle:DungeonApi.kt:DungeonApi$by patternGroup.pattern( "unique-class-bonus", "^Your (?&lt;class&gt;[A-Za-z]+) stats are doubled because you are the only player using this class!$", )</ID>
+    <ID>RepoPatternVariableNameStyle:DungeonCreationCooldown.kt:DungeonCreationCooldown$by RepoPattern.group("dungeon.join").pattern( "dungeon.join", ".*\n§r(?&lt;player&gt;.*)§r§f §r§eentered §r(?:.*)?The Catacombs§r§e,.*\n.*", )</ID>
+    <ID>RepoPatternVariableNameStyle:EffectApi.kt:EffectApi$by patternGroup.pattern( "chat.effects-hint", " Press TAB or type /effects to view your active effects!", )</ID>
+    <ID>RepoPatternVariableNameStyle:EnderNodeTracker.kt:EnderNodeTracker$by patternGroup.pattern( "multi", "§5§lENDER NODE! §r§fYou found §r§8(?&lt;amount&gt;\\d+)x §r(?&lt;name&gt;.*)§r§f!", )</ID>
+    <ID>RepoPatternVariableNameStyle:EnderNodeTracker.kt:EnderNodeTracker$by patternGroup.pattern( "one", "§5§lENDER NODE! §r§fYou found §r(?:§8§r)?(?&lt;name&gt;.*)§r§f!", )</ID>
+    <ID>RepoPatternVariableNameStyle:FishingApi.kt:FishingApi$by RepoPattern.pattern( "fishing.trophyfishing.armor", "(?&lt;tier&gt;BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)", )</ID>
+    <ID>RepoPatternVariableNameStyle:FishingApi.kt:FishingApi$by RepoPattern.pattern( "fishing.trophyfishing.emberarmor", "EMBER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)", )</ID>
+    <ID>RepoPatternVariableNameStyle:GardenBurrowingSporesNotifier.kt:GardenBurrowingSporesNotifier$by patternGroup.pattern( "drop", "§6§lVERY RARE CROP! (?:§.)*§9Burrowing Spores", )</ID>
+    <ID>RepoPatternVariableNameStyle:HoppityCollectionStats.kt:HoppityCollectionStats$by RepoPattern.pattern( "rabbit.requirement.factory", "§6Factory Milestones§7.", )</ID>
+    <ID>RepoPatternVariableNameStyle:HoppityCollectionStats.kt:HoppityCollectionStats$by RepoPattern.pattern( "rabbit.requirement.shop", "§6Shop Milestones§7.", )</ID>
+    <ID>RepoPatternVariableNameStyle:HoppityCollectionStats.kt:HoppityCollectionStats$by RepoPattern.pattern( "rabbit.requirement.stray", "(?:§.)+Obtained by finding a §6Golden Stray", )</ID>
+    <ID>RepoPatternVariableNameStyle:HoppityCollectionStats.kt:HoppityCollectionStats$by patternGroup.pattern( "rabbit.requirement.location", "Find 15 unique egg locations in (?:the )?(?&lt;location&gt;.*)\\..*", )</ID>
+    <ID>RepoPatternVariableNameStyle:HoppityCollectionStats.kt:HoppityCollectionStats$by patternGroup.pattern( "rabbit.requirement.met", "§a✔ §7Requirement", )</ID>
+    <ID>RepoPatternVariableNameStyle:HoppityCollectionStats.kt:HoppityCollectionStats$by patternGroup.pattern( "rabbit.requirement.notmet", "§c✖ §7Requirement.*", )</ID>
+    <ID>RepoPatternVariableNameStyle:HoppityCollectionStats.kt:HoppityCollectionStats$by patternGroup.pattern( "rabbit.requirement.notmet.amount", "§c✖ §7Requirement §e(?&lt;acquired&gt;[\\d,]+)§7/§a(?&lt;required&gt;[\\d,]+)", )</ID>
+    <ID>RepoPatternVariableNameStyle:HoppityEggsManager.kt:HoppityEggsManager$by CFApi.patternGroup.pattern( "egg.notevent", "§cThis only works during Hoppity's Hunt!", )</ID>
+    <ID>RepoPatternVariableNameStyle:HoppityEggsManager.kt:HoppityEggsManager$by CFApi.patternGroup.pattern( "hoppity.visitor.accepted", "\\[NPC\\] Hoppity: Simply exquisite.+" )</ID>
+    <ID>RepoPatternVariableNameStyle:HoppityEggsManager.kt:HoppityEggsManager$by CFApi.patternGroup.pattern( "rabbit.duplicate", "§7§lDUPLICATE RABBIT! §6\\+(?&lt;amount&gt;[\\d,]+) Chocolate", )</ID>
+    <ID>RepoPatternVariableNameStyle:HoppityEggsManager.kt:HoppityEggsManager$by CFApi.patternGroup.pattern( "rabbit.found.new", "§d§lNEW RABBIT! (?:(?:§6\\+(?&lt;chocolate&gt;.*) Chocolate §7and )?§6\\+(?&lt;perSecond&gt;.*)x Chocolate §7per second!|(?&lt;other&gt;.*))", )</ID>
+    <ID>RepoPatternVariableNameStyle:HoppityLiveDisplay.kt:HoppityLiveDisplay$by CFApi.patternGroup.pattern( "cf.inventory", "(?:\\(\\d*\\/\\d*\\) )?Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones|Rabbit Hitman", )</ID>
+    <ID>RepoPatternVariableNameStyle:InstanceChestAPI.kt:InstanceChestAPI$by patternGroup.pattern( "kuudrachest", "(?&lt;chestname&gt;§.(?:Free|Paid))(?: Chest)?", )</ID>
+    <ID>RepoPatternVariableNameStyle:InstanceChestAPI.kt:InstanceChestAPI$by patternGroup.pattern( "runname", ".*Catacombs - Flo.*|Kuudra - .*", )</ID>
+    <ID>RepoPatternVariableNameStyle:InstanceChestProfit.kt:InstanceChestProfit$by patternGroup.pattern( "alreadyopened", "§aAlready opened!", )</ID>
+    <ID>RepoPatternVariableNameStyle:InstanceChestProfit.kt:InstanceChestProfit$by patternGroup.pattern( "bookcolorfixnew", "(?&lt;item&gt;.+)(?:§.)+", )</ID>
+    <ID>RepoPatternVariableNameStyle:InstanceChestProfit.kt:InstanceChestProfit$by patternGroup.pattern( "croesuscost", "§6(?&lt;amount&gt;.*) Coins|§aFREE", )</ID>
+    <ID>RepoPatternVariableNameStyle:InstanceChestProfit.kt:InstanceChestProfit$by patternGroup.pattern( "dungeonchestkey", "§9Dungeon Chest Key", )</ID>
+    <ID>RepoPatternVariableNameStyle:InstanceChestProfit.kt:InstanceChestProfit$by patternGroup.pattern( "kuudrachestkey", "§.(?:\\w+ )?Kuudra Key", )</ID>
+    <ID>RepoPatternVariableNameStyle:MarkedPlayerManager.kt:MarkedPlayerManager$by patternGroup.pattern( "tabplayername-no-color", "\\[(?&lt;level&gt;.*)] (?&lt;name&gt;[A-z0-9_]+)(?&lt;symbol&gt;.*)?", )</ID>
+    <ID>RepoPatternVariableNameStyle:MaxwellApi.kt:MaxwellApi$by patternGroup.pattern( "stack.accessorybag", "§.Accessory Bag", )</ID>
+    <ID>RepoPatternVariableNameStyle:MiningNotifications.kt:MiningNotifications$by patternGroup.pattern( "goblin.diamondspawn", "§6A §r§bDiamond Goblin §r§6has spawned!", )</ID>
+    <ID>RepoPatternVariableNameStyle:MiningNotifications.kt:MiningNotifications$by patternGroup.pattern( "goblin.goldspawn", "§6A Golden Goblin has spawned!", )</ID>
+    <ID>RepoPatternVariableNameStyle:MiningNotifications.kt:MiningNotifications$by patternGroup.pattern( "mineshaft.spawn", "§5§lWOW! §r§aYou found a §r§bGlacite Mineshaft §r§aportal!", )</ID>
+    <ID>RepoPatternVariableNameStyle:MiningNotifications.kt:MiningNotifications$by patternGroup.pattern( "scrapdrop", "§6§lEXCAVATOR! §r§fYou found a §r§9Suspicious Scrap§r§f!", )</ID>
+    <ID>RepoPatternVariableNameStyle:MobFilter.kt:MobFilter$by patternGroup.pattern( "filter.dojo", "^(?:(?&lt;points&gt;\\d+) pts|(?&lt;empty&gt;\\w+))$", )</ID>
+    <ID>RepoPatternVariableNameStyle:MobFilter.kt:MobFilter$by patternGroup.pattern( "filter.summon", "^(?&lt;owner&gt;\\w+)'s (?&lt;name&gt;.*) \\d+.*", )</ID>
+    <ID>RepoPatternVariableNameStyle:MobFilter.kt:MobFilter$by patternGroup.pattern( "pattern.shiny", "SHINY PIG", )</ID>
+    <ID>RepoPatternVariableNameStyle:NeuItems.kt:NeuItems$by patternGroup.pattern( "pet-level", "(?i)(?:§.)+\\[lvl (?:\\d+➡\\d+|\\{lvl})\\] ", )</ID>
+    <ID>RepoPatternVariableNameStyle:PowderMiningChatFilter.kt:PowderMiningChatFilter$by patternGroup.pattern( "reward.generic", " {4}(?&lt;reward&gt;§.+?[^§]*)(?: §r§8x(?&lt;amount&gt;[\\d,]+))?\$", )</ID>
+    <ID>RepoPatternVariableNameStyle:SirihHelper.kt:SirihHelper$by RepoPattern.pattern( "crimson.sirih.helper.colorless", "\\[NPC] Sirih:(?: ✆)? Oink.", )</ID>
+    <ID>RepoPatternVariableNameStyle:SnakeGame.kt:SnakeGame$by RepoPattern.pattern( "abiphone.snake.name", "Snake|Eat 8 apples to win!" )</ID>
+    <ID>RepoPatternVariableNameStyle:SunGeckoHelper.kt:SunGeckoHelper$by patternGroup.pattern( "actionbar", "(?&lt;firstHalf&gt;§[ac]\\[.*) §e§lx(?&lt;combo&gt;\\d+) (?&lt;secondHalf&gt;§[ac].*)]", )</ID>
+    <ID>RepoPatternVariableNameStyle:SunGeckoHelper.kt:SunGeckoHelper$by patternGroup.pattern( "chatline", "§6§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", )</ID>
+    <ID>RepoPatternVariableNameStyle:SunGeckoHelper.kt:SunGeckoHelper$by patternGroup.pattern( "modifiers", "(?:§.)* {27}§r§c§lACTIVE MODIFIERS!", )</ID>
+    <ID>RepoPatternVariableNameStyle:SuperCraftingInventory.kt:SuperCraftingInventory$by craftingPatternGroup.pattern( "crafting.count", ".*Crafting (?&lt;count&gt;[0-9,]+) item.*", )</ID>
+    <ID>RepoPatternVariableNameStyle:TrevorFeatures.kt:TrevorFeatures$by patternGroup.pattern( "above", "The target is around (?&lt;height&gt;.*) blocks above, at a (?&lt;angle&gt;.*) degrees angle!", )</ID>
+    <ID>RepoPatternVariableNameStyle:TrevorFeatures.kt:TrevorFeatures$by patternGroup.pattern( "at", "You are at the exact height!", )</ID>
+    <ID>RepoPatternVariableNameStyle:TrevorFeatures.kt:TrevorFeatures$by patternGroup.pattern( "below", "The target is around (?&lt;height&gt;.*) blocks below, at a (?&lt;angle&gt;.*) degrees angle!", )</ID>
+    <ID>RepoPatternVariableNameStyle:ViewRecipeCommand.kt:ViewRecipeCommand$by RepoPattern.pattern( "commands.viewrecipe", "/viewrecipe (?&lt;item&gt;.*)", )</ID>
     <ID>ReturnCount:ArachneChatMessageHider.kt:ArachneChatMessageHider$private fun shouldHide: Boolean</ID>
     <ID>ReturnCount:BingoNextStepHelper.kt:BingoNextStepHelper$private fun readDescription: NextStep?</ID>
     <ID>ReturnCount:BroodmotherFeatures.kt:BroodmotherFeatures$private fun onStageUpdate</ID>
@@ -3647,7 +3536,6 @@
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt:VisitorRewardWarning$visitor.totalPrice!!</ID>
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt:VisitorRewardWarning$visitor.totalReward!!</ID>
     <ID>UnsafeCallOnNullableType:WorldRenderUtils.kt:WorldRenderUtils$it.name!!</ID>
-    <ID>UnusedParameter:ChromaFontManager.kt:text: String</ID>
     <ID>UnusedParameter:CropType.kt:CropType.Companion$pos: LorenzVec</ID>
     <ID>UnusedParameter:MobUtils.kt:MobUtils$partialTicks: Float</ID>
     <ID>UnusedParameter:ModernIslandExceptions.kt:ModernIslandExceptions$armorStand: ArmorStand?</ID>

@@ -21,6 +21,7 @@ class RepoRuleSetProvider : RuleSetProvider {
                 RuleName("RepoPatternRegexTestMissing") to { config -> RepoPatternRegexTestMissing(config, context) },
                 RuleName("RepoPatternUnnamedGroup") to { config -> RepoPatternUnnamedGroup(config, context) },
                 RuleName("RepoPatternPassesShapeRequirement") to { config -> RepoPatternPassesShapeRequirement(config, context) },
+                RuleName("RepoPatternVariableNameStyle") to { config -> RepoPatternVariableNameStyle(config, context) },
             ),
         )
     }
