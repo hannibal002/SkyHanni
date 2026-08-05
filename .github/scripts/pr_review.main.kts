@@ -1088,7 +1088,7 @@ fun StringBuilder.appendUnresolvedDependencies(unresolvedDependencies: List<Depe
         appendLine("- `${sanitizeCodeSpan(dep.sourceLine)}`")
     }
     appendLine()
-    appendLine("This blocks the pull request. Check the number and the link for a typo.")
+    appendLine("This blocks the pull request. Check the number or the link for a typo.")
     append(
         "If the entry points at a pull request in a repository this bot cannot read, remove it from the section " +
             "and mention it in the What section instead.",
