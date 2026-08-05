@@ -23,7 +23,6 @@ import net.minecraft.client.renderer.SubmitNodeStorage
 /*import net.minecraft.client.renderer.MultiBufferSource
 *///?}
 
-
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,
     private val textureView: GpuTextureView,
