@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
-import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.resources.language.I18n
@@ -139,7 +138,7 @@ object InventoryUtils {
     }
 
     fun isSlotInPlayerInventory(itemStack: SafeItemStack): Boolean {
-        val slotUnderMouse = slotUnderCursor() ?: return false
+        val slotUnderMouse = InventoryCompat.slotUnderCursor() ?: return false
         return slotUnderMouse.container is Inventory && slotUnderMouse.item == itemStack
     }
 

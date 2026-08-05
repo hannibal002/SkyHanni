@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import java.net.URLEncoder
 
 @SkyHanniModule
@@ -29,19 +28,19 @@ object WikiManager {
     private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(6, "commands.useFandomWiki", "commands.fandomWiki.enabled")
         // Apparently the above got changed again at some point but never got a migration
         event.move(123, "commands.betterWiki.useFandom", "commands.betterWiki.useIndependent")
 
-        event.move(136, "commands.betterWiki.sbGuide", "commands.betterWiki.skyblockGuide", { element ->
+        event.move(136, "commands.betterWiki.sbGuide", "commands.betterWiki.skyblockGuide") { element ->
             config.enabled = true
             return@move element
-        })
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onMessageSendToServer(event: MessageSendToServerEvent) {
+    private fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!isEnabled()) return
         val message = event.message.lowercase()
         if (!(message.startsWith("/wiki"))) return
@@ -67,8 +66,8 @@ object WikiManager {
     }
 
     @HandleEvent(GuiKeyPressEvent::class, onlyOnSkyblock = true)
-    fun onKeybind() {
-        val stack = stackUnderCursor() ?: return
+    private fun onGuiKeyPress(event: GuiKeyPressEvent) {
+        val stack = event.stackUnderCursor() ?: return
 
         if (!config.wikiKeybind.isKeyHeld()) return
         wikiTheItem(stack, config.menuOpenWiki)
@@ -137,7 +136,7 @@ object WikiManager {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shindependentwiki") {
             aliases = listOf("shunofficialwiki", "shfandomwiki")
             description = "Searches the independent wiki with SkyHanni's own method."
@@ -163,7 +162,7 @@ object WikiManager {
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         data = event.getConstant<WikiJson>("misc/Wiki")
     }
 

@@ -44,7 +44,6 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhite
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
@@ -159,7 +158,7 @@ object InstanceChestProfit {
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.enabled && !config.croesusAllChestsOverlay && !config.croesusHighlight) return
 
         if (isInCroesusMenu() && (config.croesusAllChestsOverlay || config.croesusHighlight)) {
@@ -179,7 +178,7 @@ object InstanceChestProfit {
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST, onlyOnSkyblock = true)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         val slot = slotToHighlight?.first
         if (isInCroesusMenu() && slot != null && config.croesusHighlight) {
             event.container.slots[slot].highlight(LorenzColor.GREEN)
@@ -187,7 +186,7 @@ object InstanceChestProfit {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderItemTip(event: RenderItemTipEvent) {
+    private fun onRenderItemTip(event: RenderItemTipEvent) {
         val slots = slotsWithFavorites
         if (isInCroesusMenu()) {
             slots.forEach {
@@ -199,11 +198,11 @@ object InstanceChestProfit {
         }
     }
 
-    @HandleEvent(GuiKeyPressEvent::class)
-    fun onGuiKeyPress() {
+    @HandleEvent
+    private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.keybind.isKeyHeld()) return
         val favoriteItems = profileStorage?.instanceChestFavoriteItems ?: mutableListOf()
-        stackUnderCursor()?.getInternalNameOrNull()?.let {
+        event.stackUnderCursor()?.getInternalNameOrNull()?.let {
             if (favoriteItems.contains(it)) {
                 favoriteItems.remove(it)
                 ChatUtils.chat("Removed ${it.repoItemName}§e from Favorites List.")
@@ -216,7 +215,7 @@ object InstanceChestProfit {
     }
 
     @HandleEvent(InventoryCloseEvent::class)
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         alreadyProcessedChests.clear()
         croesusDisplayList.clear()
         slotsWithFavorites.clear()
@@ -432,7 +431,7 @@ object InstanceChestProfit {
             } ?: 0.0
 
     @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    fun onChestGuiRender() {
+    private fun onChestGuiRender() {
         if (config.enabled && InventoryUtils.inInventory())
             if (isInstanceChestGUI()) {
                 chestDisplay?.let {
@@ -448,12 +447,12 @@ object InstanceChestProfit {
     }
 
     @HandleEvent(DungeonEnterEvent::class)
-    fun onDungeonEnter() {
+    private fun onDungeonEnter() {
         chestProfits.clear()
     }
 
     @HandleEvent(KuudraEnterEvent::class)
-    fun onKuudraEnter() {
+    private fun onKuudraEnter() {
         chestProfits.clear()
     }
 }

@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.client.input.KeyEvent
+import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ContainerInput
@@ -20,22 +22,33 @@ fun LocalPlayer.getItemOnCursor(): SafeItemStack? {
     return stack
 }
 
-fun stackUnderCursor(): SafeItemStack? {
-    val screen = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return null
-    val stack = screen.hoveredSlot?.item
-    if (stack != null) return stack
-    return ReiCompat.getHoveredStackFromRei()
-}
-
-fun slotUnderCursor(): Slot? {
-    val screen = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return null
-    return screen.hoveredSlot
-}
-
 val ContainerScreen.container: AbstractContainerMenu
     get() = this.menu
 
 object InventoryCompat {
+
+    /**
+     * Use [at.hannibal2.skyhanni.events.GuiKeyPressEvent.stackUnderCursor] instead of this method
+     */
+    fun stackUnderCursor(): SafeItemStack? {
+        val screen = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return null
+        val stack = screen.hoveredSlot?.item
+        if (stack != null) return stack
+        return ReiCompat.getHoveredStackFromRei()
+    }
+
+    fun stackUnderCursor(keyEvent: KeyEvent): SafeItemStack? {
+        return stackUnderCursor()
+    }
+
+    fun stackUnderCursor(keyEvent: MouseButtonEvent): SafeItemStack? {
+        return stackUnderCursor()
+    }
+
+    fun slotUnderCursor(): Slot? {
+        val screen = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return null
+        return screen.hoveredSlot
+    }
 
     /**
      * Internal method, not meant to be called directly. Prefer [InventoryUtils.clickSlot].
