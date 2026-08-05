@@ -250,7 +250,7 @@ object SpiderDenRelicPathfinder {
 
         val currentIsland = SkyBlockUtils.currentIsland
         relicPathFindConfig.launch {
-            val route = NavigationUtils.getRoute(missingRelics).toMutableList()
+            val route = NavigationUtils.getRouteLocations(missingRelics).toMutableList()
 
             val duration = calculatingStart.passedSince().format(showMilliSeconds = true)
             "§e[SkyHanni] Calculated Relic route in §b$duration".asComponent().send(calculatingMessageId)
