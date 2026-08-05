@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class SlayerSwapReminderConfig {
+class SwapReminderConfig {
 
     @Expose
     @ConfigOption(
