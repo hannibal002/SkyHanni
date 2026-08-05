@@ -48,7 +48,7 @@ object SpiritBearAlert {
         if (event.mob.name != "Spirit Bear") return
 
         event.mob.highlight(LorenzColor.RED.toColor())
-        TitleManager.sendTitle(titleText = "§c§lSpirit Bear Spawn!", duration = 3.seconds)
+        TitleManager.sendTitle(titleText = "§c§lSpirit Bear Spawned!", duration = 3.seconds)
         ChatUtils.chat("SpiritBearAlert Activated")
     }
 }
