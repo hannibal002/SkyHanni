@@ -776,6 +776,9 @@ class ProfileSpecificStorage(
         // todo when we're fully 1.21, change ForagingTrackerLegacy to ForagingTracker
         @Expose
         var trackerData: ForagingTrackerLegacy.BucketData = ForagingTrackerLegacy.BucketData()
+
+        @Expose
+        var honeyhiveRemindTime: SimpleTimeMark = farPast()
     }
 
     // - mining

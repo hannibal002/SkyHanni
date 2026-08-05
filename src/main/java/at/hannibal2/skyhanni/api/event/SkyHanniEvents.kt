@@ -99,6 +99,13 @@ object SkyHanniEvents {
 
     private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
         val options = method.getAnnotation(HandleEvent::class.java) ?: return null
+        if (!method.declaringClass.isAnnotationPresent(SkyHanniModule::class.java)) {
+            ErrorManager.crashInDevEnv(
+                "Function ${method.fullyQualifiedName} must be declared directly inside a class " +
+                    "annotated with @SkyHanniModule because it is annotated with @HandleEvent",
+            )
+            return null
+        }
         return when (method.parameterCount) {
             0 -> handleZeroParameterMethod(method, options)
             1 -> handleSingleParameterMethod(method, options)
@@ -160,7 +167,7 @@ object SkyHanniEvents {
     // This is marked highest priority to let it
     // disable other RepositoryReloadEvent listeners before they happen
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         val version = SkyHanniMod.modVersion
 
@@ -177,7 +184,7 @@ object SkyHanniEvents {
     val seconds = listOf(10, 60, 60 * 5)
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed(event: SecondPassedEvent) {
         try {
             val list = handlers.values.toMutableList()
 
@@ -213,7 +220,7 @@ object SkyHanniEvents {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Events")
         event.addIrrelevant {
             add("- <event name> (<total invoke count> invokes per second: <last 10s, 60s, 5m, total>)")
