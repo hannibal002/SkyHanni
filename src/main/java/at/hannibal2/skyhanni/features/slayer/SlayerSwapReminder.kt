@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerSwapReminder {
 
-    private val config get() = SlayerApi.config.slayerSwapReminder
+    private val config get() = SlayerApi.config.SwapReminder
 
     private var hasRemindedForCurrentBoss = false
 
@@ -42,7 +42,6 @@ object SlayerSwapReminder {
         TitleManager.sendTitle(
             titleText = formattedTitle,
             duration = 2.seconds,
-            addType = TitleManager.TitleAddType.FORCE_FIRST
         )
 
         if (config.playSound) {
