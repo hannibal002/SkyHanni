@@ -170,6 +170,20 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
             return Filter.Result.DENY
         }
 
+        if (filterConfig.filterUnknownPassengers &&
+            formattedMessage == "Received passengers for unknown entity"
+        ) {
+            filterConsole("unknown entity passengers")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterMissingTextureReferences &&
+            formattedMessage.startsWith("Missing texture references in model ")
+        ) {
+            filterConsole("missing texture references")
+            return Filter.Result.DENY
+        }
+
         if (filterScoreboardErrors(event)) return Filter.Result.DENY
 
         if (!config.printUnfilteredDebugs) return Filter.Result.ACCEPT

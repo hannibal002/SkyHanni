@@ -95,4 +95,20 @@ class ConsoleFiltersConfig {
     @ConfigOption(name = "Filter Unknown Team Packet", desc = "Filter 'Received packet for unknown team' warnings during server changes.")
     @ConfigEditorBoolean
     var filterUnknownTeam: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Filter Unknown Passengers",
+        desc = "Filter 'Received passengers for unknown entity' warnings.",
+    )
+    @ConfigEditorBoolean
+    var filterUnknownPassengers: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Filter Missing Texture References",
+        desc = "Filter 'Missing texture references in model' warnings from Hypixel resource packs.",
+    )
+    @ConfigEditorBoolean
+    var filterMissingTextureReferences: Boolean = true
 }
