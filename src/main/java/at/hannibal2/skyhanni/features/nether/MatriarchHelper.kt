@@ -41,7 +41,7 @@ object MatriarchHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     private fun onMobSpawn(event: MobEvent.Spawn.Special) {
-        if (!isHeavyPearl(event)) return
+        if (!event.isHeavyPearl()) return
         val node = IslandGraphs.findClosestNode(event.mob.baseEntity.getLorenzVec().up(1.2), { true })
         if (node == null) {
             ErrorManager.logErrorStateWithData(
@@ -64,11 +64,11 @@ object MatriarchHelper {
         }
     }
 
-    private fun isHeavyPearl(event: MobEvent) = isEnabled() && event.mob.name == "Heavy Pearl"
+    private fun MobEvent.isHeavyPearl() = isEnabled() && mob.name == "Heavy Pearl"
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     private fun onMobDespawn(event: MobEvent.DeSpawn.Special) {
-        if (!isHeavyPearl(event)) return
+        if (!event.isHeavyPearl()) return
         pearlList.removeIf { it.first == event.mob }
     }
 
@@ -79,9 +79,9 @@ object MatriarchHelper {
 
     private fun accessPearls(): List<LorenzVec> {
         if (config.useShortestDistance) {
-            val path = tspCache ?: NavigationUtils.getRoute(
+            val path = tspCache ?: NavigationUtils.getRouteLocations(
                 pearlList.map { it.second },
-                maxIterations = 5,
+                maxIterations = 5
             ).also {
                 val pearls = path.size
                 if (pearls != lastTspPearls) {

@@ -399,8 +399,7 @@ object IslandGraphs {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        val graph = currentIslandGraph
-        if (graph == null) return
+        val graph = currentIslandGraph ?: return
         hasMoved = true
 
         if (event.distance > FAST_MOVEMENT_THRESHOLD) {
