@@ -150,47 +150,54 @@ class ModuleProcessor(
         }
 
         if (isDirty) {
+            val event = skyHanniEvent ?: return symbol
             for (function in symbol.getDeclaredFunctions()) {
                 val handleEvent = function.annotations.find { it.getQualifiedName() == HANDLE_EVENT } ?: continue
-
-                val event = skyHanniEvent ?: return symbol
-                val eventParameterType = function.extensionReceiver?.resolve()
-                    ?: function.parameters.firstOrNull()?.type?.resolve()
-                val parameterCount = function.parameters.size + if (function.extensionReceiver != null) 1 else 0
-                val hasPrimaryFunction = function.simpleName.asString() in primaryFunctionNames
-                val hasExplicitEventSpec = handleEvent.hasExplicitEventSpec() == true
-                val name = (function.qualifiedName ?: function.simpleName).asString()
-
-                when (parameterCount) {
-                    0 -> if (!hasPrimaryFunction && !hasExplicitEventSpec) {
-                        logger.error(
-                            "Function $name must have an event parameter, a primary function " +
-                                "name, or an explicit event specification because it is " +
-                                "annotated with @HandleEvent",
-                            function,
-                        )
-                    }
-
-                    1 -> if (eventParameterType == null || !event.isAssignableFrom(eventParameterType)) {
-                        logger.error(
-                            "Function $name must have an event assignable from SkyHanniEvent " +
-                                "because it is annotated with @HandleEvent",
-                            function,
-                        )
-                    }
-
-                    else -> logger.error(
-                        "Function $name has too many parameters. It must have exactly one " +
-                            "event parameter, or be parameterless with a primary function " +
-                            "name or an explicit event specification because it is annotated " +
-                            "with @HandleEvent",
-                        function,
-                    )
-                }
+                validateHandleEvent(function, primaryFunctionNames, handleEvent, event)
             }
         }
-
         return symbol
+    }
+
+    private fun validateHandleEvent(
+        function: KSFunctionDeclaration,
+        primaryFunctionNames: Set<String>,
+        handleEvent: KSAnnotation,
+        event: KSType,
+    ) {
+        val eventParameterType = function.extensionReceiver?.resolve()
+            ?: function.parameters.firstOrNull()?.type?.resolve()
+        val parameterCount = function.parameters.size + if (function.extensionReceiver != null) 1 else 0
+        val hasPrimaryFunction = function.simpleName.asString() in primaryFunctionNames
+        val hasExplicitEventSpec = handleEvent.hasExplicitEventSpec()
+        val name = (function.qualifiedName ?: function.simpleName).asString()
+
+        when (parameterCount) {
+            0 -> if (!hasPrimaryFunction && !hasExplicitEventSpec) {
+                logger.error(
+                    "Function $name must have an event parameter, a primary function " +
+                        "name, or an explicit event specification because it is " +
+                        "annotated with @HandleEvent",
+                    function,
+                )
+            }
+
+            1 -> if (eventParameterType == null || !event.isAssignableFrom(eventParameterType)) {
+                logger.error(
+                    "Function $name must have an event assignable from SkyHanniEvent " +
+                        "because it is annotated with @HandleEvent",
+                    function,
+                )
+            }
+
+            else -> logger.error(
+                "Function $name has too many parameters. It must have exactly one " +
+                    "event parameter, or be parameterless with a primary function " +
+                    "name or an explicit event specification because it is annotated " +
+                    "with @HandleEvent",
+                function,
+            )
+        }
     }
 
     private fun KSAnnotation.getQualifiedName(): String? =
