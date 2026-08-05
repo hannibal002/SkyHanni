@@ -87,12 +87,12 @@ class SkyblockGuideHighlightFeature private constructor(
         }
 
         @HandleEvent
-        fun onInventoryClose(event: InventoryCloseEvent) {
+        private fun onInventoryClose(event: InventoryCloseEvent) {
             close()
         }
 
         @HandleEvent
-        fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
             if (!isEnabled()) return
             val current = activeObject ?: return
             if (!missing.contains(event.slotId)) return
@@ -100,7 +100,7 @@ class SkyblockGuideHighlightFeature private constructor(
         }
 
         @HandleEvent
-        fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
             if (!isEnabled()) return
             if (activeObject == null) return
 
@@ -110,7 +110,7 @@ class SkyblockGuideHighlightFeature private constructor(
         }
 
         @HandleEvent
-        fun onTooltip(event: ToolTipTextEvent) {
+        private fun onTooltip(event: ToolTipTextEvent) {
             if (!isEnabled()) return
             event.slot ?: return
             val current = activeObject ?: return
@@ -119,7 +119,7 @@ class SkyblockGuideHighlightFeature private constructor(
         }
 
         @HandleEvent
-        fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             if (!isEnabled()) return
             val current =
                 objectList.firstOrNull { it.config.invoke() && it.inventoryPattern.matches(event.inventoryName) }
@@ -277,18 +277,18 @@ class SkyblockGuideHighlightFeature private constructor(
                 "§7Enabled: §cNo",
             )
         }
-    }
 
-    private val massMigrations = mapOf(
-        "inventory.skyblockGuideConfig" to "inventory.skyblockGuide",
-        "inventory.highlightMissingSkyBlockLevelGuide" to "inventory.skyblockGuide.missingTasks",
-        "inventory.powerStoneGuide" to "inventory.skyblockGuide.powerStone",
-    )
+        private val massMigrations = mapOf(
+            "inventory.skyblockGuideConfig" to "inventory.skyblockGuide",
+            "inventory.highlightMissingSkyBlockLevelGuide" to "inventory.skyblockGuide.missingTasks",
+            "inventory.powerStoneGuide" to "inventory.skyblockGuide.powerStone",
+        )
 
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        massMigrations.forEach { (oldPath, newPath) ->
-            event.move(97, oldPath, newPath)
+        @HandleEvent
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            massMigrations.forEach { (oldPath, newPath) ->
+                event.move(97, oldPath, newPath)
+            }
         }
     }
 }
