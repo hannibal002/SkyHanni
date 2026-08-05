@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun.withErrorHandling
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration
-import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 
 /**
  * Helper class for delaying execution until a specific server time mark.
