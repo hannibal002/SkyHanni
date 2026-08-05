@@ -82,7 +82,7 @@ object MatriarchHelper {
 
     private fun accessPearls(): List<LorenzVec> {
         if (config.useShortestDistance) {
-            val path = tspCache ?: NavigationUtils.getRoute(
+            val path = tspCache ?: NavigationUtils.getRouteLocations(
                 pearlList.map { it.second },
                 maxIterations = 5
             ).also {
