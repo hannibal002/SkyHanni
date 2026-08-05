@@ -76,7 +76,7 @@ object DelayedRun {
     }
 
     /**
-     * Wraps [this] so that a crash is reported to the [ErrorManager] instead of taking down the 
+     * Wraps [this] so that a crash is reported to [ErrorManager] instead of taking down the
      */
     private fun Runnable.withErrorHandling(source: String) = Runnable {
         runWithErrorHandling(source) { run() }
