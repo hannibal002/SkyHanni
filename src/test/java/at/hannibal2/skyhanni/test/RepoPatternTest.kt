@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.test
 
+import at.hannibal2.skyhanni.utils.repopatterns.RepoDouble
+import at.hannibal2.skyhanni.utils.repopatterns.RepoInteger
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternDump
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
+import at.hannibal2.skyhanni.utils.repopatterns.RepoString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
@@ -492,4 +495,50 @@ object RepoPatternTest {
         RepoPatternManager.inTestDuplicateUsage = true
     }
 
+    @Test
+    fun testPrimitiveAndStringValues() {
+        val keyInt = nextKey()
+        val keyIntList = nextKey()
+        val keyDouble = nextKey()
+        val keyDoubleList = nextKey()
+        val keyString = nextKey()
+        val keyStringList = nextKey()
+
+        val intVal by RepoInteger.integer(keyInt, 10)
+        val intList by RepoInteger.list(keyIntList, 1, 2)
+        val doubleVal by RepoDouble.double(keyDouble, 5.5)
+        val doubleList by RepoDouble.list(keyDoubleList, 1.1, 2.2)
+        val stringVal by RepoString.string(keyString, "hello")
+        val stringList by RepoString.list(keyStringList, "a", "b")
+
+        assert(intVal == 10)
+        assert(intList == listOf(1, 2))
+        assert(doubleVal == 5.5)
+        assert(doubleList == listOf(1.1, 2.2))
+        assert(stringVal == "hello")
+        assert(stringList == listOf("a", "b"))
+
+        RepoPatternManager.loadPatternsFromDump(
+            RepoPatternDump(
+                regexes = mapOf(
+                    keyInt to "42",
+                    "$keyIntList.0" to "100",
+                    "$keyIntList.1" to "200",
+                    keyDouble to "99.99",
+                    "$keyDoubleList.0" to "3.3",
+                    "$keyDoubleList.1" to "4.4",
+                    keyString to "world",
+                    "$keyStringList.0" to "foo",
+                    "$keyStringList.1" to "bar",
+                ),
+            ),
+        )
+
+        assert(intVal == 42)
+        assert(intList == listOf(100, 200))
+        assert(doubleVal == 99.99)
+        assert(doubleList == listOf(3.3, 4.4))
+        assert(stringVal == "world")
+        assert(stringList == listOf("foo", "bar"))
+    }
 }
