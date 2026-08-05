@@ -199,6 +199,13 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
             return Filter.Result.DENY
         }
 
+        if (filterConfig.filterChunkSectionsUbo &&
+            formattedMessage.startsWith("Resizing Chunk Sections UBO")
+        ) {
+            filterConsole("chunk sections UBO resize")
+            return Filter.Result.DENY
+        }
+
         if (filterScoreboardErrors(event)) return Filter.Result.DENY
 
         if (!config.printUnfilteredDebugs) return Filter.Result.ACCEPT

@@ -127,4 +127,12 @@ class ConsoleFiltersConfig {
     )
     @ConfigEditorBoolean
     var filterExistingTeam: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Filter Chunk Sections UBO",
+        desc = "Filter 'Resizing Chunk Sections UBO' messages.",
+    )
+    @ConfigEditorBoolean
+    var filterChunkSectionsUbo: Boolean = true
 }
