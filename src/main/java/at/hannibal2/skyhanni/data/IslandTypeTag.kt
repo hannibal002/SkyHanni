@@ -33,7 +33,7 @@ enum class IslandTypeTag(vararg types: Any) {
     CONTESTS_SHOWN(IslandType.GARDEN, IslandType.HUB, IslandType.THE_FARMING_ISLANDS),
 
     /** Busy islands are islands where a player is doing something considered 'important'. */
-    BUSY(IslandType.DARK_AUCTION, IslandType.MINESHAFT, IslandType.THE_RIFT, IslandType.NONE, IslandType.UNKNOWN),
+    BUSY(IslandType.DARK_AUCTION, IslandType.MINESHAFT, IslandType.THE_RIFT, IslandType.SAFARI, IslandType.NONE, IslandType.UNKNOWN),
 
     /** islands without npc locations that are fixed. */
     NO_FIXED_NPC_LOCATIONS(
