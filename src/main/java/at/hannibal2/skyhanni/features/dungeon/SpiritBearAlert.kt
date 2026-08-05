@@ -18,36 +18,38 @@ import kotlin.time.Duration.Companion.seconds
 object SpiritBearAlert {
 
     private val config get() = SkyHanniMod.feature.dungeon
-    private var inF4BossRoom = false
+    private var inF4BossRoom = false //mark whether in F/M4
 
-    // change mark when enter boss room
+    // change mark when enter dungeon f/m4 boss room
     @HandleEvent
-    private fun onBossEnter(event: DungeonBossRoomEnterEvent) {
+    private fun onDungeonBossRoomEnter(event: DungeonBossRoomEnterEvent) {
+        if (!config.spiritBearAlert) return
         inF4BossRoom = DungeonApi.getCurrentBoss() == DungeonFloor.F4
     }
 
-    // reset mark when run end
+    // reset mark when a run end
     @HandleEvent
-    private fun onBossEnd(event: DungeonCompleteEvent) {
+    private fun onDungeonEnd(event: DungeonCompleteEvent) {
         inF4BossRoom = false
     }
-    //dual reset
+
+    // fallback reset if player disconnects or leaves
     @HandleEvent(WorldChangeEvent::class)
     private fun onWorldChange() {
         inF4BossRoom = false
     }
 
-    // show a alert when spirit bear spawn
-    // and highlight spirit bear during F/M4 boss fight
+    /* show a alert when spirit bear spawn
+    and highlight spirit bear during F/M4 boss fight
+    * */
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    private fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        if (!inF4BossRoom) return
+    private fun onNewMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!config.spiritBearAlert) return
+        if (!inF4BossRoom) return
         if (event.mob.name != "Spirit Bear") return
 
         event.mob.highlight(LorenzColor.RED.toColor())
-        TitleManager.sendTitle(titleText="§c§lSpirit Bear Spawn!",duration = 3.seconds)
-        ChatUtils.chat("§cSpirit Bear §ehas spawned!")
-        SoundUtils.playBeepSound()
+        TitleManager.sendTitle(titleText = "§c§lSpirit Bear Spawn!", duration = 3.seconds)
+        ChatUtils.chat("§cSpirit Bear §espawned!")
     }
 }

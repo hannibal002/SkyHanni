@@ -201,7 +201,7 @@ class DungeonConfig {
     @Expose
     @ConfigOption(
         name = "Spirit Bear Alert",
-        desc = "Shows a title and highlights Spirit Bear in red when it spawns during the F4/M4 boss fight.",
+        desc = "Shows a title and highlights Spirit Bear in red when it spawns during F4/M4 boss fight.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
