@@ -52,7 +52,7 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
             LorenzVec(x.toInt(), y.toInt(), z.toInt())
 
         override fun getExamples(): Collection<String> =
-            listOf("1 2 3", "-4 0 5", "~ 64 ~", "1:2:3", "LorenzVec(1, 2, 3), x=-262, y=58, z=117")
+            listOf("1 2 3", "-4 0 5", "~ 64 ~", "1:2:3", "-541,, 94,, 227", "LorenzVec(1, 2, 3)", "x=-262, y=58, z=117")
     }
 
     data object Double : LorenzVecArgumentType() {
@@ -90,6 +90,21 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
         )
 
         /**
+         * The coordinate format used by the SkyBlock Wiki. Values are separated by a comma followed
+         * by a narrow no-break space (U+202F), not by a regular space. The separator is written as
+         * `\u202f` in the pattern so it stays readable, but the regex tests below have to contain
+         * the literal character. Do not replace it with a normal space, the pattern would stop
+         * matching what the wiki actually produces.
+         *
+         * REGEX-TEST: -541, 94, 227
+         * REGEX-TEST: 1, 2, 3
+         */
+        private val wikiPattern by patternGroup.pattern(
+            "wiki",
+            "(?<x>-?\\d+),\\u202f(?<y>-?\\d+),\\u202f(?<z>-?\\d+)",
+        )
+
+        /**
          * REGEX-TEST: 1 2 3
          * REGEX-TEST: -4 0 5
          * REGEX-TEST: ~ 64 ~
@@ -110,7 +125,7 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
             "x=(?<x>-?\\d+(?:\\.\\d+)?),\\s*y=(?<y>-?\\d+(?:\\.\\d+)?),\\s*z=(?<z>-?\\d+(?:\\.\\d+)?)",
         )
 
-        private val patterns = listOf(lorenzVecPattern, colonPattern, spacePattern, namedParameterPattern)
+        private val patterns = listOf(lorenzVecPattern, colonPattern, wikiPattern, spacePattern, namedParameterPattern)
 
         private val invalidCoordinates = SimpleCommandExceptionType(LiteralMessage("Invalid coordinates"))
 
