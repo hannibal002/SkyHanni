@@ -39,7 +39,7 @@ class CustomWardrobeScreen(
 
         DelayedRun.runNextTick {
             updateScheduled = false
-            CustomWardrobe.update()
+            CustomWardrobe.onInventoryUpdate()
         }
     }
 

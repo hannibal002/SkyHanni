@@ -140,8 +140,12 @@ object CustomWardrobe {
         }
     }
 
-    internal fun update() {
+    internal fun onInventoryUpdate() {
         waitingForInventoryUpdate = false
+        update()
+    }
+
+    internal fun update() {
         displayRenderable = createRenderables()
     }
 
