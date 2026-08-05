@@ -232,7 +232,7 @@ object RepoPatternManager {
      * The caller must ensure the exclusivity to the [prefix]!
      *
      * @param prefix the prefix to search without the dot at the end (the match includes the .)
-     * @return returns any unused pattern on the [prefix] key space as a simple [Pattern]
+     * @return returns any pattern on the [prefix] key space (including list or any other complex structure, but as a simple pattern
      */
     internal fun getUnusedPatterns(prefix: String): List<Pattern> {
         if (localLoading) return emptyList()
@@ -242,7 +242,6 @@ object RepoPatternManager {
             ErrorManager.logErrorWithData(e, "getUnusedPatterns failed due to invalid key shape", "prefix" to prefix)
             return emptyList()
         }
-
         val prefixWithDot = "$prefix."
         val patterns = StringUtils.subMapOfStringsStartingWith(prefixWithDot, remotePattern)
         val holders = StringUtils.subMapOfStringsStartingWith(prefixWithDot, usedKeys)
@@ -254,12 +253,11 @@ object RepoPatternManager {
             val dot = unused.key.count { it == '.' }
             val possibleConflicts = noShareHolder.filter { it.key < dot }.flatMap { it.value }.toSet()
             var key: String = unused.key.removePrefix(prefixWithDot)
-
             while (key.isNotEmpty()) {
                 if (possibleConflicts.contains(key)) return@filter false
                 key = key.substringBeforeLastOrNull(".") ?: return@filter true
             }
             true
-        }.map { Pattern.compile(it.value) }
+        }.map { it.value.toPattern() }
     }
 }
