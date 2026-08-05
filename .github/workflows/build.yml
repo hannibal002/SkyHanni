@@ -39,30 +39,19 @@ jobs:
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: ./.github/actions/setup-normal-workspace
-                if: github.repository == 'hannibal002/SkyHanni'
-            -   uses: ./.github/actions/setup-normal-workspace
-                if: github.repository != 'hannibal002/SkyHanni'
             -   name: Build with Gradle w/retry
-                id: assemble_main
-                if: github.repository == 'hannibal002/SkyHanni'
-                continue-on-error: true
-                uses: ./.github/actions/gradle-retry
-                with:
-                    gradle-command: ${{ matrix.minecraft_version }}:assemble -x ${{ matrix.minecraft_version }}:test --stacktrace
-            -   name: Build with Gradle w/retry
-                id: assemble_fork
-                if: github.repository != 'hannibal002/SkyHanni'
+                id: assemble
                 continue-on-error: true
                 uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: ${{ matrix.minecraft_version }}:assemble -x ${{ matrix.minecraft_version }}:test --stacktrace
             -   name: Save assemble log on failure
-                if: steps.assemble_main.outcome == 'failure' || steps.assemble_fork.outcome == 'failure'
+                if: steps.assemble.outcome == 'failure'
                 run: |
                     cp "$GITHUB_WORKSPACE/gradle-output.log" \
                        "assemble-failure-${{ matrix.minecraft_version }}.log" 2>/dev/null || true
             -   name: Upload assemble failure artifact
-                if: steps.assemble_main.outcome == 'failure' || steps.assemble_fork.outcome == 'failure'
+                if: steps.assemble.outcome == 'failure'
                 uses: actions/upload-artifact@v7
                 with:
                     name: build-failure-output-${{ matrix.minecraft_version }}
@@ -74,12 +63,6 @@ jobs:
                     path: build/libs/SkyHanni-*-mc${{ matrix.minecraft_version }}.jar
                     archive: false
             -   name: Test with Gradle w/retry
-                if: github.repository == 'hannibal002/SkyHanni'
-                uses: ./.github/actions/gradle-retry
-                with:
-                    gradle-command: ${{ matrix.minecraft_version }}:test
-            -   name: Test with Gradle w/retry
-                if: github.repository != 'hannibal002/SkyHanni'
                 uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: ${{ matrix.minecraft_version }}:test
@@ -91,7 +74,7 @@ jobs:
                     path: versions/${{ matrix.minecraft_version }}/build/reports/tests/test/
                     if-no-files-found: warn
             -   name: Fail job if assemble failed
-                if: steps.assemble_main.outcome == 'failure' || steps.assemble_fork.outcome == 'failure'
+                if: steps.assemble.outcome == 'failure'
                 run: exit 1
 
     verify:
