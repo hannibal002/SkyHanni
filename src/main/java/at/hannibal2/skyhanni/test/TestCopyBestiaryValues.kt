@@ -41,6 +41,9 @@ object TestCopyBestiaryValues {
         var mobs: Array<String> = emptyArray()
 
         @Expose
+        var bracketType: String? = null
+
+        @Expose
         var bracket: Int = 0
     }
 
@@ -52,7 +55,7 @@ object TestCopyBestiaryValues {
     )
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!DevApi.config.debug.copyBestiaryData) return
         SkyHanniDebugsAndTests.displayLine = null
 
@@ -92,7 +95,7 @@ object TestCopyBestiaryValues {
         for (i in 10..43) {
             val stack = inventoryItems[i] ?: continue
             bestiaryTypePattern.matchMatcher(stack.cleanName) {
-                val lvl = group("lvl").toInt()
+                val lvl = group("lvl").formatInt()
                 var text = group("text").lowercase().replace(" ", "_")
 
                 val master = text.endsWith("(master)")
@@ -106,6 +109,10 @@ object TestCopyBestiaryValues {
         }
         obj.mobs = mobs.toTypedArray()
 
+        if (lore.any { it.contains("Critter") }) {
+            obj.bracketType = "CRITTER"
+        }
+
         val gson = GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create()
         val text = gson.toJson(obj)
         OSUtils.copyToClipboard(text)
@@ -114,7 +121,7 @@ object TestCopyBestiaryValues {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.copyBestiaryData", "dev.debug.copyBestiaryData")
     }
 }
