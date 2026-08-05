@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.utils.render.item
 
+import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.textures.GpuTexture
+import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
@@ -37,7 +39,12 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         val depthTextureView = depthTextureView ?: return
 
         // Clear before rendering
-        RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(texture, 0, depthTexture, 1.0)
+        RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(
+            texture,
+            GuiRenderer.CLEAR_COLOR,
+            depthTexture,
+            RenderCompat.CLEAR_DEPTH,
+        )
 
         val size = slotSize.toFloat()
         //~ if < 26.1 'Projection().apply { this.setupOrtho(-1000f, 1000f, size, size, true) }' -> 'size, size'
