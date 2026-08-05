@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TreeFellTitle {
-    private val config get() = SkyHanniMod.feature.foraging.trees.fellTitle
+    private val config get() = SkyHanniMod.feature.foraging.trees.instantFellTreeTitle
     private var display: Renderable? = null
     private var treeFellTimestamp: SimpleTimeMark = SimpleTimeMark.farPast()
 

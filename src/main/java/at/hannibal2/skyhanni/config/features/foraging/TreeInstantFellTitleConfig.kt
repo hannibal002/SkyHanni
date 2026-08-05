@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
-class TreeFellTitleConfig {
+class TreeInstantFellTitleConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Shows a title when a tree is fully felled.")
     @FeatureToggle
@@ -27,6 +27,6 @@ class TreeFellTitleConfig {
     var titleText = "You felled the entire Tree!"
 
     @Expose
-    @ConfigLink(owner = TreeFellTitleConfig::class, field = "enabled")
+    @ConfigLink(owner = TreeInstantFellTitleConfig::class, field = "enabled")
     val treeFellPosition = Position(500, 500)
 }
