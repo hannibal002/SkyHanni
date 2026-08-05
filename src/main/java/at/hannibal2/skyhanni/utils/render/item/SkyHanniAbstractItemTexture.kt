@@ -15,15 +15,6 @@ import com.mojang.blaze3d.GpuFormat
 
 abstract class SkyHanniAbstractItemTexture : AbstractTexture(), AutoCloseable {
 
-    companion object {
-        /**
-         * The depth of an empty render target. 26.2 renders with a reversed depth range,
-         * so "nothing drawn" is 0 rather than 1.
-         */
-        //~ if < 26.2 '0.0' -> '1.0'
-        const val CLEAR_DEPTH = 0.0
-    }
-
     protected var depthTexture: GpuTexture? = null
     protected var depthTextureView: GpuTextureView? = null
     private val usageInt = GpuTexture.USAGE_RENDER_ATTACHMENT or GpuTexture.USAGE_COPY_DST
