@@ -132,7 +132,7 @@ object ContributorAchievement {
         }
     }
 
-    fun onUniqueContributorSeen(profile: GameProfile, username: String) {
+    fun onUniqueContributorSeen(profile: GameProfile) {
         val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
         if (!completed && !config.discoverContributorMessage) return
         val resolvedProfile = ResolvableProfile.createResolved(profile)
@@ -144,7 +144,7 @@ object ContributorAchievement {
             hover = componentBuilder {
                 appendWithColor("You have encountered ", ChatFormatting.GRAY)
                 append(player)
-                appendWithColor(" $username", ChatFormatting.AQUA)
+                appendWithColor(" ${profile.name}", ChatFormatting.AQUA)
                 appendWithColor(" for the first time!", ChatFormatting.GRAY)
             }
         }

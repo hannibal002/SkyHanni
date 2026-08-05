@@ -326,21 +326,21 @@ object ContributorManager {
     @HandleEvent
     private fun onRenderNametag(event: EntityDisplayNameEvent<Player>) {
         val gameProfile = event.entity.gameProfile
-        val uuid = gameProfile.id
-        getSuffix(uuid)?.let {
-            recordSeenContributor(gameProfile, uuid, gameProfile.name)
+        getSuffix(gameProfile.id)?.let {
+            recordSeenContributor(gameProfile)
             if (!config.contributorNametags) return
             if (contribNametagAppendSpacePattern.find(event.chatComponent)) event.chatComponent.append(" ")
             event.chatComponent.append(it)
         }
     }
 
-    private fun recordSeenContributor(gameProfile: GameProfile, uuid: UUID, username: String) {
+    private fun recordSeenContributor(gameProfile: GameProfile) {
+        val uuid = gameProfile.id
         if (uuid == PlayerUtils.getRawUuid()) return
         if (uuid in seenContributors) return
         seenContributors[uuid] = SimpleTimeMark.now()
         saveConfig("added new seen contributor")
-        ContributorAchievement.onUniqueContributorSeen(gameProfile, username)
+        ContributorAchievement.onUniqueContributorSeen(gameProfile)
     }
 
     fun getDisplayNameFromUUID(uuid: UUID): String? = contributors[uuid]?.displayName
