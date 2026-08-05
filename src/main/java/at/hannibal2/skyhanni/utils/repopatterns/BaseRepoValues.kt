@@ -33,6 +33,7 @@ abstract class AbstractRepoValue<R, C>(
      * Once set, no other code locations can access this repo pattern (and therefore the key).
      * @see RepoPatternManager.checkExclusivity
      */
+    @Volatile
     internal var hasObtainedLock = false
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): C {
@@ -46,12 +47,15 @@ abstract class AbstractRepoValue<R, C>(
      */
     private fun verifyLock(thisRef: Any?, property: KProperty<*>) {
         if (hasObtainedLock) return
-        hasObtainedLock = true
-        val owner = RepoPatternKeyOwner(thisRef?.javaClass, property, shares, parent)
-        if (shares) {
-            RepoPatternManager.checkExclusivity(owner, key)
-        } else {
-            RepoPatternManager.checkNameSpaceExclusivity(owner, key)
+        synchronized(this) {
+            if (hasObtainedLock) return
+            hasObtainedLock = true
+            val owner = RepoPatternKeyOwner(thisRef?.javaClass, property, shares, parent)
+            if (shares) {
+                RepoPatternManager.checkExclusivity(owner, key)
+            } else {
+                RepoPatternManager.checkNameSpaceExclusivity(owner, key)
+            }
         }
     }
 }
@@ -127,8 +131,9 @@ abstract class BaseListRepoValue<C>(
     override fun loadFromRemote(remoteData: Map<String, String>, forceLocal: Boolean) {
         val prefix = "$key."
         val remoteEntries = remoteData.filterKeys { it.startsWith(prefix) }
+        val isPresentRemotely = remoteEntries.isNotEmpty() || remoteData.containsKey(key)
 
-        if (!forceLocal && remoteEntries.isNotEmpty()) {
+        if (!forceLocal && isPresentRemotely) {
             isLoadedRemotely = true
             val parsedList = remoteEntries.toSortedMap().values.mapNotNull {
                 runCatching { parse(it) }.onFailure { e ->
@@ -136,7 +141,7 @@ abstract class BaseListRepoValue<C>(
                 }.getOrNull()
             }
             wasOverridden = parsedList.map { it.toString() } != defaultRaw.map { parse(it).toString() }
-            _value = parsedList.ifEmpty { defaultRaw.map { parse(it) } }
+            _value = parsedList
         } else {
             isLoadedRemotely = false
             wasOverridden = false
