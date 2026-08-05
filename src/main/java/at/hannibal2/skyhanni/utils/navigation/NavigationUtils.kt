@@ -9,11 +9,17 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 object NavigationUtils {
 
+    fun getRouteLocations(
+        nodes: List<GraphNode>,
+        maxIterations: Int = 300,
+        neighborhoodSize: Int = 50,
+    ): List<LorenzVec> = getRoute(nodes, maxIterations, neighborhoodSize).map { it.position }
+
     fun getRoute(
         nodes: List<GraphNode>,
         maxIterations: Int = 300,
         neighborhoodSize: Int = 50,
-    ): List<LorenzVec> {
+    ): List<GraphNode> {
         if (nodes.isEmpty()) return emptyList()
 
         val closestNode = GraphUtils.nearestNodeOnCurrentIsland()
@@ -31,7 +37,7 @@ object NavigationUtils {
             )
         }
 
-        return route.drop(amountOffset).map { it.position }
+        return route.drop(amountOffset)
     }
 
     private fun calculateTravelingSalesman(

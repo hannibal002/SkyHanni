@@ -16,7 +16,7 @@ class SkyHanniRenderWorldEvent(
     val matrices: PoseStack,
     //~ if < 26.1 'CameraRenderState' -> 'Camera'
     val camera: CameraRenderState,
-    val vertexConsumers: MultiBufferSource.BufferSource,
+    val bufferSource: MultiBufferSource.BufferSource,
     val partialTicks: Float,
     var isCurrentlyDeferring: Boolean = true,
 ) : SkyHanniEvent()
