@@ -15,4 +15,14 @@ class SafariConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var namesInCenter: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Hideyho Finder",
+        desc = "Helps you find where Hideyho is hiding.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideyhoFinder: Boolean = true
+
 }
