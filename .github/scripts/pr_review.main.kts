@@ -3,7 +3,12 @@
 // called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, changelog-review.yml, check_dependencies.yml,
 // and keyword-labels.yml
 
-import com.google.gson.*
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.JsonNull
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import java.io.IOException
 import java.net.URI
 import java.net.URLEncoder
@@ -11,7 +16,11 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
-import kotlin.io.path.*
+import kotlin.io.path.Path
+import kotlin.io.path.div
+import kotlin.io.path.exists
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.readText
 import kotlin.system.exitProcess
 
 /**
@@ -146,7 +155,7 @@ fun error(message: String, commentError: Boolean = true, fix: String = defaultEr
         postPrComment(
             prNumber = prNumber,
             body = buildErrorComment(message, fix),
-            commentError = false
+            commentError = false,
         ) { "Error: could not post workflow error as comment (HTTP $it)" }
         errorCommentPosted = true
     }
@@ -197,7 +206,11 @@ data class Dependency(val owner: String, val repoName: String, val pullNumber: I
     val link: String = "https://github.com/$owner/$repoName/pull/$pullNumber"
 }
 
-enum class DependencyState { OPEN, CLOSED, UNRESOLVED }
+enum class DependencyState {
+    OPEN,
+    CLOSED,
+    UNRESOLVED
+}
 
 // Split during parsing, not derived afterwards: a line on hannibal002/SkyHanni-REPO is valid and deliberately
 // produces no dependency, so subtracting the recognized entries would report it as malformed.
@@ -319,8 +332,8 @@ fun getPrLabels(prNumber: String): Set<String> {
     val (status, body) = ghRepoGet("/issues/$prNumber/labels")
     if (status.isHttpError) return emptySet()
     val array = body as? JsonArray ?: return emptySet()
-    return array.mapNotNull {
-        (it as? JsonObject)?.get("name")?.takeIf { it.isJsonPrimitive }?.asString
+    return array.mapNotNull { element ->
+        (element as? JsonObject)?.get("name")?.takeIf { it.isJsonPrimitive }?.asString
     }.toSet()
 }
 
@@ -759,7 +772,7 @@ fun runDetektMode(prNumber: String) {
                 error(
                     "Detekt workflow did not complete successfully AND detekt-run.log does not exist, is null or empty. " +
                         "(conclusion: $conclusion). " +
-                        "Check the workflow run for details."
+                        "Check the workflow run for details.",
                 )
             }
         }
