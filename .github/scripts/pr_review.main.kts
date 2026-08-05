@@ -3,7 +3,10 @@
 // called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, changelog-review.yml, check_dependencies.yml,
 // and keyword-labels.yml
 
-@file:Suppress("CyclomaticComplexMethod")
+// TODO: remove the suppressions and split the complex functions once this file can be broken up into
+//  several files. Splitting them now would only add more top level functions to a file that is
+//  already well over 1000 lines long.
+@file:Suppress("CyclomaticComplexMethod", "LoopWithTooManyJumpStatements")
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
