@@ -135,8 +135,12 @@ When writing the PR description, ensure you fill out the template with all the n
 In the **What** section, write technical details or explanations that don't belong in the changelog.
 Including that field is optional for small changes.
 
-If your PR relies on another PR, please include this information at the beginning of the description. Use the format `- #<pr number>`
-for the dependency, or `- <url>` for REPO dependencies.
+If your PR relies on another PR, please include this information at the beginning of the description, under a `## Dependencies` heading.
+Use the format `- #<pr number>` for the dependency, or `- <url>` for REPO dependencies.
+
+Only the lines belonging to that section are read. The list may start after a blank line. The first line that does not start with `- `
+ends the section, so keep the entries together. An entry that cannot be resolved, for example a mistyped number, blocks the pull request
+until it is corrected.
 
 ### Changelog Builder
 
@@ -548,12 +552,20 @@ Two dependency formats are supported:
 - `- #<pr number>` for same-repository PRs
 - `- <url>` for external repository PRs
 
+Both are read only from the `## Dependencies` section, never from the rest of the description. The section starts at the heading, may be
+followed by blank lines, and ends at the first line that does not start with `- `. Text after a valid entry is ignored, so
+`- #1234 (needed for the item API)` is recognized. A line matching neither format is ignored.
+
 Dependencies on `hannibal002/SkyHanni-REPO` are explicitly excluded from the open check, as that repository is considered part of the same
 release unit.
 
-A comment is posted when a PR starts waiting, when the list of open dependencies changes, and when a dependency PR is closed. It names the
-closed PR if the run was triggered by one, followed by the dependencies that are still open, or by the note that the PR is no longer waiting
-on any. A run that has nothing new to announce, neither a changed list nor a newly closed dependency, produces no comment.
+An entry can also fail to resolve, for example a mistyped number or a link into a repository the workflow cannot read. Such an entry
+publishes a failing commit status and is listed in the comment with the line it was read from. The label is not applied, because no
+waiting relation is known to exist.
+
+A comment is posted when a PR starts waiting, when the list of open dependencies changes, when an unresolvable entry appears or disappears,
+and when a dependency PR is closed. It names the closed PR if the run was triggered by one, followed by the dependencies that are still
+open, or by the note that the PR is no longer waiting on any. A run that has nothing new to announce produces no comment.
 
 The check runs on every `opened`, `edited`, `closed`, and `synchronize` event via `pull_request_target`. On `closed`, all open PRs currently
 carrying the label are re-evaluated so the label is removed from dependent PRs when their dependency merges.

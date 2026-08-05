@@ -97,6 +97,9 @@ val dependencyLabel = "Waiting on Dependency PR"
 val dependencyStatusContext = "Check PR Dependencies"
 val dependencyComment = CommentType("dependency-check-review", "Show previous dependencies")
 
+val dependencySectionHeading = "## Dependencies"
+val dependencyEntryPrefix = "- "
+
 // Announced in the state marker of every dependency comment. Both directions are announced, so the presence of
 // a marker alone cannot tell which one it was.
 val dependencyStateWaiting = "waiting"
@@ -178,9 +181,12 @@ fun Int.requireSuccess(message: String, commentError: Boolean = true) {
 
 data class Finding(val path: String, val line: Int, val ruleId: String, val message: String)
 
-data class Dependency(val owner: String, val repoName: String, val pullNumber: Int) {
+// [sourceLine] keeps the raw line: a typo is only visible in what the author wrote, not in the resolved link.
+data class Dependency(val owner: String, val repoName: String, val pullNumber: Int, val sourceLine: String) {
     val link: String = "https://github.com/$owner/$repoName/pull/$pullNumber"
 }
+
+enum class DependencyState { OPEN, CLOSED, UNRESOLVED }
 
 // The closed pull request that triggered this run, used only when it is a dependency.
 data class DependencyTrigger(val pullNumber: Int, val merged: Boolean)
@@ -826,50 +832,93 @@ fun runChangelogMode(prNumber: String) {
     println("Done: changelog check comment posted")
 }
 
-fun parseDependencies(body: String): List<Dependency> {
+// Anchored and applied per line: unanchored over the whole body, a changelog line like "+ Fixed X - #1234." reads
+// as a dependency. Trailing text stays allowed, "- #1234 (needed for the item API)" is common.
+val dependencyUrlRegex = Regex("""^- https://github\.com/([\w-]+)/([\w-]+)/pull/(\d+)""")
+val dependencyNumberRegex = Regex("""^- #(\d+)""")
+
+// Null when the section is absent, empty when it exists without entries. Only the second case can carry a malformed
+// entry. The section ends at the first line that is not a list entry, but blank lines right below the heading are
+// skipped, writing one there is too common to let it drop everything underneath.
+fun extractDependencySection(body: String): List<String>? {
+    val lines = body.lines()
+    val headingIndex = lines.indexOfFirst { it.trim() == dependencySectionHeading }
+    if (headingIndex < 0) return null
+
+    var index = headingIndex + 1
+    while (index < lines.size && lines[index].isBlank()) index++
+
+    val entries = mutableListOf<String>()
+    while (index < lines.size && lines[index].startsWith(dependencyEntryPrefix)) {
+        entries.add(lines[index].trimEnd())
+        index++
+    }
+    return entries
+}
+
+fun parseDependencies(sectionLines: List<String>): List<Dependency> {
     val repoOwner = repo.substringBefore("/")
     val repoName = repo.substringAfter("/")
     val deps = mutableListOf<Dependency>()
 
-    val urlRegex = Regex("""- https://github\.com/([\w-]+)/([\w-]+)/pull/(\d+)""")
-    for (match in urlRegex.findAll(body)) {
-        val depOwner = match.groupValues[1]
-        val depRepo = match.groupValues[2]
-        val depNum = match.groupValues[3].toInt()
-        if (depOwner == "hannibal002" && depRepo == "SkyHanni-REPO") continue
-        deps.add(Dependency(depOwner, depRepo, depNum))
-    }
-
-    val prRegex = Regex("""- #(\d+)""")
-    for (match in prRegex.findAll(body)) {
-        deps.add(Dependency(repoOwner, repoName, match.groupValues[1].toInt()))
+    // toIntOrNull, because the digit group also matches a number too large for an Int. toInt would throw, and
+    // nothing catches that: the closed event iterates over every labeled PR and would abandon the rest of them.
+    for (line in sectionLines) {
+        val urlMatch = dependencyUrlRegex.find(line)
+        if (urlMatch != null) {
+            val depOwner = urlMatch.groupValues[1]
+            val depRepo = urlMatch.groupValues[2]
+            val depNum = urlMatch.groupValues[3].toIntOrNull() ?: continue
+            if (depOwner == "hannibal002" && depRepo == "SkyHanni-REPO") continue
+            deps.add(Dependency(depOwner, depRepo, depNum, line))
+            continue
+        }
+        val numberMatch = dependencyNumberRegex.find(line) ?: continue
+        val depNum = numberMatch.groupValues[1].toIntOrNull() ?: continue
+        deps.add(Dependency(repoOwner, repoName, depNum, line))
     }
 
     return deps
 }
 
-fun isDependencyOpen(dep: Dependency): Boolean {
+// A 404 used to count as "not open", so a typo turned the status green. It is reported instead, but never as
+// "does not exist": an unreadable repository and a link pointing at an issue both answer 404 as well.
+fun getDependencyState(dep: Dependency): DependencyState {
     val (status, body) = ghRequest("GET", "/repos/${dep.owner}/${dep.repoName}/pulls/${dep.pullNumber}")
     if (status == 404) {
-        System.err.println("Warning: dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber} not found, skipping")
-        return false
+        System.err.println("Warning: dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber} could not be resolved")
+        return DependencyState.UNRESOLVED
     }
     if (status.isHttpError) {
         dependencyError("Error: unexpected status $status for dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber}")
     }
     val state = (body as? JsonObject)?.get("state")?.takeIf { it.isJsonPrimitive }?.asString
-    return state == "open"
+    return if (state == "open") DependencyState.OPEN else DependencyState.CLOSED
 }
 
-fun setDependencyStatus(headSha: String, openDependencies: List<Dependency>) {
-    val hasOpenDependencies = openDependencies.isNotEmpty()
-    val description = when (openDependencies.size) {
-        0 -> "All dependency PRs are resolved"
-        1 -> "Waiting on 1 dependency PR"
-        else -> "Waiting on ${openDependencies.size} dependency PRs"
+// Kept under the 140 character limit the status API enforces on descriptions.
+fun buildDependencyStatusDescription(openCount: Int, unresolvedCount: Int): String {
+    if (openCount == 0 && unresolvedCount == 0) return "All dependency PRs are resolved"
+
+    val parts = mutableListOf<String>()
+    if (openCount > 0) {
+        parts.add("waiting on $openCount open dependency ${if (openCount == 1) "PR" else "PRs"}")
     }
+    if (unresolvedCount > 0) {
+        parts.add("$unresolvedCount ${if (unresolvedCount == 1) "entry" else "entries"} could not be resolved")
+    }
+    return parts.joinToString(", ").replaceFirstChar { it.uppercase() }
+}
+
+fun setDependencyStatus(
+    headSha: String,
+    openDependencies: List<Dependency>,
+    unresolvedDependencies: List<Dependency>,
+) {
+    val blocking = openDependencies.isNotEmpty() || unresolvedDependencies.isNotEmpty()
+    val description = buildDependencyStatusDescription(openDependencies.size, unresolvedDependencies.size)
     val payload = mutableMapOf<String, Any>(
-        "state" to if (hasOpenDependencies) "failure" else "success",
+        "state" to if (blocking) "failure" else "success",
         "context" to dependencyStatusContext,
         "description" to description,
     )
@@ -897,22 +946,35 @@ fun checkPrDependencies(issueNumber: String, trigger: DependencyTrigger? = null)
 
     // A missing section and a section without parseable links end in the same state as a pull request whose
     // dependencies are all closed, so they take the same path instead of returning early.
-    val hasSection = "## Dependencies" in prBody
-    val deps = if (hasSection) parseDependencies(prBody) else emptyList()
+    val sectionLines = extractDependencySection(prBody)
+    val deps = sectionLines?.let { parseDependencies(it) }.orEmpty()
     if (deps.isEmpty()) {
-        println("PR #$issueNumber: ${if (hasSection) "no dependency links found" else "no Dependencies section"}")
+        println("PR #$issueNumber: ${if (sectionLines != null) "no dependency links found" else "no Dependencies section"}")
         setLabel(issueNumber, dependencyLabel, false)
-        setDependencyStatus(headSha, emptyList())
-        handleDependencyComment(issueNumber, deps, emptyList(), trigger)
+        setDependencyStatus(headSha, emptyList(), emptyList())
+        handleDependencyComment(issueNumber, deps, emptyList(), emptyList(), trigger)
         return
     }
-    val openDeps = deps.filter { isDependencyOpen(it) }
-    setLabel(issueNumber, dependencyLabel, openDeps.isNotEmpty())
-    setDependencyStatus(headSha, openDeps)
-    handleDependencyComment(issueNumber, deps, openDeps, trigger)
 
-    println("PR #$issueNumber: ${if (openDeps.isNotEmpty()) "has open dependencies" else "all dependencies resolved"}")
+    // Resolved once per entry, the state is needed twice below and a second pass would double the requests.
+    val evaluated = deps.map { it to getDependencyState(it) }
+    val openDeps = evaluated.filter { it.second == DependencyState.OPEN }.map { it.first }
+    val unresolvedDeps = evaluated.filter { it.second == DependencyState.UNRESOLVED }.map { it.first }
+
+    // The label stays reserved for actually open dependencies, an unresolvable entry blocks through status only.
+    setLabel(issueNumber, dependencyLabel, openDeps.isNotEmpty())
+    setDependencyStatus(headSha, openDeps, unresolvedDeps)
+    handleDependencyComment(issueNumber, deps, openDeps, unresolvedDeps, trigger)
+
+    val summary = when {
+        unresolvedDeps.isNotEmpty() && openDeps.isNotEmpty() -> "has open and unresolvable dependencies"
+        unresolvedDeps.isNotEmpty() -> "has unresolvable dependencies"
+        openDeps.isNotEmpty() -> "has open dependencies"
+        else -> "all dependencies resolved"
+    }
+    println("PR #$issueNumber: $summary")
 }
+
 
 fun skipFailedDependencyCheck(issueNumber: String, reason: String) {
     System.err.println("Warning: could not evaluate dependencies of PR #$issueNumber ($reason), skipping")
@@ -981,8 +1043,8 @@ fun recheckPRsDependingOn(targetPrNum: Int) {
         val num = pr.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
         if (num.toIntOrNull() == targetPrNum) continue
         val body = pr.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
-        if ("## Dependencies" !in body) continue
-        val deps = parseDependencies(body)
+        val sectionLines = extractDependencySection(body) ?: continue
+        val deps = parseDependencies(sectionLines)
         if (deps.any { it.owner == repoOwner && it.repoName == repoName && it.pullNumber == targetPrNum }) {
             tryCheckPrDependencies(num)
         }
@@ -998,10 +1060,15 @@ val dependencyStatePrefix = "This PR is"
 // Trigger link format must stay identical when building and recognizing trigger entries.
 fun dependencyTriggerLink(pullNumber: Int): String = "- https://github.com/$repo/pull/$pullNumber"
 
-fun StringBuilder.appendDependencyState(openDependencies: List<Dependency>) {
+fun StringBuilder.appendDependencyState(openDependencies: List<Dependency>, hasUnresolved: Boolean) {
     if (openDependencies.isEmpty()) {
-        // Closed does not imply merged.
-        appendLine("$dependencyStatePrefix no longer waiting on any open dependency PRs.")
+        // "no longer" needs a state that was left behind, a PR blocked only by an unresolvable entry never waited.
+        if (hasUnresolved) {
+            appendLine("$dependencyStatePrefix not waiting on any open dependency PR.")
+        } else {
+            // Closed does not imply merged.
+            appendLine("$dependencyStatePrefix no longer waiting on any open dependency PRs.")
+        }
         return
     }
 
@@ -1013,7 +1080,33 @@ fun StringBuilder.appendDependencyState(openDependencies: List<Dependency>) {
     }
 }
 
-fun buildDependencyComment(trigger: DependencyTrigger?, openDependencies: List<Dependency>): String = buildString {
+// Rendered inside a code span, so only backticks have to go: one would close the span early and let the rest
+// render as markdown. Everything else, an "@" mention included, is inert there and stays readable as typed.
+fun sanitizeCodeSpan(text: String, maxLen: Int = 300): String = text.take(maxLen).replace("`", "'")
+
+// Below the state line on purpose: dependencyStateLines drops everything above it, hiding it from change detection.
+fun StringBuilder.appendUnresolvedDependencies(unresolvedDependencies: List<Dependency>) {
+    if (unresolvedDependencies.isEmpty()) return
+
+    appendLine()
+    val word = if (unresolvedDependencies.size == 1) "entry" else "entries"
+    appendLine("$warningIcon The following dependency $word could not be resolved:")
+    for (dep in unresolvedDependencies) {
+        appendLine("- `${sanitizeCodeSpan(dep.sourceLine)}`")
+    }
+    appendLine()
+    appendLine("This blocks the pull request. Check the number and the link for a typo.")
+    append(
+        "If the entry points at a pull request in a repository this bot cannot read, remove it from the section " +
+            "and mention it in the What section instead.",
+    )
+}
+
+fun buildDependencyComment(
+    trigger: DependencyTrigger?,
+    openDependencies: List<Dependency>,
+    unresolvedDependencies: List<Dependency>,
+): String = buildString {
     appendLine("### Dependencies")
     appendLine()
 
@@ -1024,7 +1117,8 @@ fun buildDependencyComment(trigger: DependencyTrigger?, openDependencies: List<D
         appendLine()
     }
 
-    appendDependencyState(openDependencies)
+    appendDependencyState(openDependencies, unresolvedDependencies.isNotEmpty())
+    appendUnresolvedDependencies(unresolvedDependencies)
 
     if (trigger != null && !trigger.merged) {
         appendLine()
@@ -1047,6 +1141,7 @@ fun handleDependencyComment(
     issueNumber: String,
     dependencies: List<Dependency>,
     openDependencies: List<Dependency>,
+    unresolvedDependencies: List<Dependency>,
     trigger: DependencyTrigger?,
 ) {
     val repoOwner = repo.substringBefore("/")
@@ -1064,9 +1159,12 @@ fun handleDependencyComment(
     val announced = announcedStates.lastOrNull()
     // A pull request that was never announced is in the same position as one whose dependencies are all closed.
     val announcedState = announced?.state ?: dependencyStateResolved
-    val currentState = if (openDependencies.isEmpty()) dependencyStateResolved else dependencyStateWaiting
+    // The marker answers "is this blocked", not why: both reasons can apply at once, a third value would fit neither.
+    val blocking = openDependencies.isNotEmpty() || unresolvedDependencies.isNotEmpty()
+    val currentState = if (blocking) dependencyStateWaiting else dependencyStateResolved
 
-    val body = buildDependencyComment(matchingTrigger, openDependencies)
+    val body = buildDependencyComment(matchingTrigger, openDependencies, unresolvedDependencies)
+
     // The state alone misses a second dependency being added while the pull request keeps waiting.
     val stateChanged = announcedState != currentState ||
         (announced != null && dependencyStateLines(announced.comment.body) != dependencyStateLines(body))
