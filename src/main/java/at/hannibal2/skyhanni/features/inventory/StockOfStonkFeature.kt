@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.transformAt
 import at.hannibal2.skyhanni.utils.compat.append
@@ -76,11 +75,9 @@ object StockOfStonkFeature {
 
     var inInventory = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (SkyBlockUtils.inSkyBlock) {
-            inInventory = inventoryPattern.matches(event.inventoryName)
-        }
+        inInventory = inventoryPattern.matches(event.inventoryName)
     }
 
     @HandleEvent
@@ -88,9 +85,8 @@ object StockOfStonkFeature {
         inInventory = false
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipTextEvent) {
-        if (!SkyBlockUtils.inSkyBlock) return
         if (!inInventory) return
         if (!inventoryPattern.matches(event.itemStack.cleanName)) return
 
