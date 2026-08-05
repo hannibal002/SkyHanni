@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -120,6 +121,20 @@ object GardenVisitorTooltip {
         toolTip.addAll(visitor.lastLore)
     }
 
+    private fun readItemLine(formattedLine: String, readingShoppingList: Boolean): Pair<NeuInternalName, Int>? {
+        fun String.removeCharmedSuffix() = removeSuffix(" §d❤")
+
+        val itemLine = if (readingShoppingList) formattedLine else formattedLine.removeCharmedSuffix()
+        val (itemName, amount) = ItemUtils.readItemAmount(itemLine) ?: return null
+        val internalName = NeuInternalName.fromItemNameOrNull(itemName.removeColor())
+            ?.replace("◆_", "") ?: return null
+
+        // Ignoring custom NEU items like copper
+        if (internalName.startsWith("SKYBLOCK_")) return null
+
+        return internalName to amount
+    }
+
     /**
      * The heavy lifting. Parses the entire tooltip, calculates economics,
      * and generates enriched tooltip lines.
@@ -139,21 +154,13 @@ object GardenVisitorTooltip {
         val requiredAmounts = mutableMapOf<NeuInternalName, Int>()
         val rewardAmounts = mutableMapOf<NeuInternalName, Int>()
 
-        fun String.removeCharmedSuffix() = removeSuffix(" §d❤")
-
         // First pass: Calculate totals
         for (formattedLine in stack.getLore()) {
             if (formattedLine.contains("Rewards")) {
                 readingShoppingList = false
             }
 
-            val itemLine = if (readingShoppingList) formattedLine else formattedLine.removeCharmedSuffix()
-            val (itemName, amount) = ItemUtils.readItemAmount(itemLine) ?: continue
-            val internalName = NeuInternalName.fromItemNameOrNull(itemName.removeColor())
-                ?.replace("◆_", "") ?: continue
-
-            // Ignoring custom NEU items like copper
-            if (internalName.startsWith("SKYBLOCK_")) continue
+            val (internalName, amount) = readItemLine(formattedLine, readingShoppingList) ?: continue
 
             val price = VisitorPriceCalculator.calculateItemPrice(internalName, amount)
 
@@ -168,26 +175,11 @@ object GardenVisitorTooltip {
             }
         }
 
-
         if (totalPrice < 0) {
             totalPrice = 0.0
         }
 
-        if (foundRewards.isNotEmpty()) {
-            val wasEmpty = visitor.allRewards.isEmpty()
-            visitor.allRewards = foundRewards
-            if (wasEmpty && config.rewardWarning.notifyInChat) {
-                visitor.getRewardWarningAwards().forEach { reward ->
-                    ChatUtils.chat(
-                        componentBuilder {
-                            append("Found Visitor Reward ")
-                            append(reward.displayName)
-                            append("!")
-                        },
-                    )
-                }
-            }
-        }
+        notifyFoundRewards(visitor, foundRewards)
 
         // Second pass: Build enriched tooltip
         readingShoppingList = true
@@ -205,48 +197,19 @@ object GardenVisitorTooltip {
                 }
             }
 
-
             copperPattern.matchMatcher(formattedLine) {
                 val copper = group("amount").formatInt()
-                val pricePerCopper = VisitorPriceCalculator.calculatePricePerCopper(totalPrice, copper)
-                visitor.pricePerCopper = pricePerCopper
-                visitor.totalPrice = totalPrice
-
-                val totalReward = VisitorPriceCalculator.calculateTotalReward(copper)
-                visitor.totalReward = totalReward
-
-                val timePerCopper = (farmingTimeRequired / copper).format()
-                var copperLine = formattedLine
-
-                if (config.inventory.copperPrice) {
-                    copperLine += " §7(paying §6${pricePerCopper.shortFormat()} §7per)"
-                }
-                if (config.inventory.copperTime) {
-                    copperLine += if (farmingTimeRequired != 0.seconds) {
-                        " §7(paying §b$timePerCopper §7per)"
-                    } else {
-                        " §7(§cno speed data!§7)"
-                    }
-                }
-                finalList[index] = copperLine
+                finalList[index] = updateCopperLine(visitor, formattedLine, copper, totalPrice, farmingTimeRequired)
             }
-
 
             if (formattedLine.contains("Rewards")) {
                 readingShoppingList = false
             }
 
-            val itemLine = if (readingShoppingList) formattedLine else formattedLine.removeCharmedSuffix()
-            val (itemName, parsedAmount) = ItemUtils.readItemAmount(itemLine) ?: continue
-            val internalName = NeuInternalName.fromItemNameOrNull(itemName.removeColor())
-                ?.replace("◆_", "") ?: continue
-
-            // Ignoring custom NEU items
-            if (internalName.startsWith("SKYBLOCK_")) continue
+            val (internalName, parsedAmount) = readItemLine(formattedLine, readingShoppingList) ?: continue
 
             val knownAmounts = if (readingShoppingList) requiredAmounts else rewardAmounts
             val amount = knownAmounts[internalName] ?: parsedAmount
-
             val price = VisitorPriceCalculator.calculateItemPrice(internalName, amount)
 
             if (config.inventory.showPrice) {
@@ -276,16 +239,54 @@ object GardenVisitorTooltip {
         }
 
         visitor.lastLore = finalList
-
         visitor.blockReason = visitor.blockReason()
     }
 
+    private fun notifyFoundRewards(visitor: VisitorApi.Visitor, foundRewards: List<NeuInternalName>) {
+        if (foundRewards.isEmpty()) return
+        val wasEmpty = visitor.allRewards.isEmpty()
+        visitor.allRewards = foundRewards
+        if (!wasEmpty || !config.rewardWarning.notifyInChat) return
+        visitor.getRewardWarningAwards().forEach { reward ->
+            val message = componentBuilder {
+                append("Found Visitor Reward ")
+                append(reward.displayName)
+                append("!")
+            }
+            ChatUtils.chat(message)
+        }
+    }
 
-    private fun getCropType(internalName: NeuInternalName) =
-        CropType.getByNameOrNull(
-            NeuItems.getPrimitiveMultiplier(internalName)
-                .internalName.itemNameWithoutColor,
-        )
+    private fun updateCopperLine(
+        visitor: VisitorApi.Visitor,
+        formattedLine: String,
+        copper: Int,
+        totalPrice: Double,
+        farmingTimeRequired: Duration,
+    ): String {
+        val pricePerCopper = VisitorPriceCalculator.calculatePricePerCopper(totalPrice, copper)
+        visitor.pricePerCopper = pricePerCopper
+        visitor.totalPrice = totalPrice
+        visitor.totalReward = VisitorPriceCalculator.calculateTotalReward(copper)
+
+        var copperLine = formattedLine
+        if (config.inventory.copperPrice) {
+            copperLine += " §7(paying §6${pricePerCopper.shortFormat()} §7per)"
+        }
+        if (config.inventory.copperTime) {
+            copperLine += if (farmingTimeRequired != 0.seconds) {
+                " §7(paying §b${(farmingTimeRequired / copper).format()} §7per)"
+            } else {
+                " §7(§cno speed data!§7)"
+            }
+        }
+        return copperLine
+    }
+
+    private fun getCropType(internalName: NeuInternalName): CropType? {
+        val itemName = NeuItems.getPrimitiveMultiplier(internalName).internalName.itemNameWithoutColor
+        return CropType.getByNameOrNull(itemName)
+    }
 
     private fun getCropAmount(internalName: NeuInternalName, amount: Int): Long? {
         getCropType(internalName) ?: return null
