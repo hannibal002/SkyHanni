@@ -22,6 +22,11 @@ class TreesConfig {
     val progress = TreeProgressConfig()
 
     @Expose
+    @ConfigOption(name = "Tree Fell Title", desc = "")
+    @Accordion
+    val fellTitle = TreeFellTitleConfig()
+
+    @Expose
     @ConfigOption(name = "Compact Sweep Details", desc = "Compacts messages related to Sweep Details calculations.")
     @ConfigEditorBoolean
     @FeatureToggle
