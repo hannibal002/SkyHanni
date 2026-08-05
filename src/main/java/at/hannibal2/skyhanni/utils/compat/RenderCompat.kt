@@ -11,6 +11,11 @@ import java.util.OptionalInt
 
 object RenderCompat {
 
+    /**
+     * The depth of an empty render target.
+     */
+    const val CLEAR_DEPTH = 1.0
+
     fun getMinecraftGuiTextured(): RenderPipeline = RenderPipelines.GUI_TEXTURED
 
     fun RenderPass.enableRenderPassScissorStateIfAble() {
