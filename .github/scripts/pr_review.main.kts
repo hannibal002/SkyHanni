@@ -833,17 +833,16 @@ fun parseSarifFindings(sarif: JsonObject, workspace: String): List<Finding> = bu
 
 fun runBuildMode(prNumber: String) {
     val log1 = readBuildLog(System.getenv("ARTIFACT_DIR_1"))
-    val log2 = readBuildLog(System.getenv("ARTIFACT_DIR_2"))
 
     buildComment.staleExisting(prNumber)
 
-    if (log1.isNullOrBlank() && log2.isNullOrBlank()) {
+    if (log1.isNullOrBlank()) {
         println("No build failures found, removing build label")
         setLabel(prNumber, buildLabel, false)
         exitProcess(0)
     }
 
-    val versions = filterStonecutterDuplicates(listOf("1.21.11" to log1, "26.1" to log2))
+    val versions = filterStonecutterDuplicates(listOf("26.1" to log1))
     buildComment.post(prNumber, buildBuildFailureBody(versions)) {
         "Error: could not post build failure comment (HTTP $it)"
     }
