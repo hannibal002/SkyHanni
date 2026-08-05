@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
  */
 class AreaTypeTag private constructor(
     val name: String,
-    private val defaultTypes: List<Any>,
+    defaultTypes: List<Any>,
 ) {
     private val types: MutableSet<AreaType> = defaultTypes.fold(
         mutableSetOf(),
