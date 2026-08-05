@@ -53,8 +53,8 @@ abstract class AbstractRepoValue<R, C>(
 ) : RepoValue<R, C> {
 
     /**
-     * Whether the pattern has obtained a lock on a code location and a key.
-     * Once set, no other code locations can access this repo pattern (and therefore the key).
+     * Whether the value has obtained a lock on a code location and a key.
+     * Once set, no other code locations can access this repo value (and therefore the key).
      * @see RepoPatternManager.checkExclusivity
      */
     @Volatile
