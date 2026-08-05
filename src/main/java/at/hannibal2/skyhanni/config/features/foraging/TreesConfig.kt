@@ -24,6 +24,7 @@ class TreesConfig {
     @Expose
     @ConfigOption(name = "Tree Insta-Fell Title", desc = "")
     @Accordion
+    @SearchTag("petalfall timber woodpecker")
     val instantFellTreeTitle = TreeInstantFellTitleConfig()
 
     @Expose

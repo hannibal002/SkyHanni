@@ -13,7 +13,7 @@ class TreeInstantFellTitleConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Shows a title when a tree is fully felled.")
     @FeatureToggle
-    @SearchTag("fig mangrove helix")
+    @SearchTag("petalfall timber woodpecker")
     var enabled = false
 
     @Expose
