@@ -133,19 +133,19 @@ dependencies {
     ksp(libs.autoservice.ksp)
     implementation(libs.autoservice.annotations)
 
-    target.fabricLoaderVersion?.let {
+    target.fabricLoaderVersion.let {
         implementation(it)
         "productionRuntimeMods"(it)
         mixinTestRuntime("net.fabricmc:fabric-loader-junit:${it.substringAfterLast(':')}")
     }
-    target.fabricApiVersion?.let {
+    target.fabricApiVersion.let {
         implementation(it)
         "productionRuntimeMods"(it)
     }
     implementation(libs.fabricLanguageKotlin)
     "productionRuntimeMods"(libs.fabricLanguageKotlin)
 
-    target.modMenuVersion?.let {
+    target.modMenuVersion.let {
         implementation("maven.modrinth:modmenu:$it")
     }
 
