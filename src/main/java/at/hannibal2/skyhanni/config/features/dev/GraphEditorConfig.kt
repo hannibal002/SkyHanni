@@ -30,9 +30,9 @@ class GraphEditorConfig {
     @ConfigEditorBoolean
     var autoSelectNode: Boolean = false
 
-    // TODO rename to selectNearestKey
+    // TODO rename to selectNearestNodeKey
     @Expose
-    @ConfigOption(name = "Select Nearest Key", desc = "Select the nearest node to be active. Double press to unselect.")
+    @ConfigOption(name = "Select Nearest Node", desc = "Select the nearest node to be active. Double press to unselect.")
     @ConfigEditorKeybind(defaultKey = KeyboardManager.MIDDLE_MOUSE)
     var selectKey: Int = KeyboardManager.MIDDLE_MOUSE
 
@@ -94,7 +94,7 @@ class GraphEditorConfig {
         desc = "Clear the graph. Also saves the graph to the clipboard, in case of a misclick."
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_P)
-    var clearKey: Int = GLFW.GLFW_KEY_P
+    var clearKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Vision Key", desc = "Toggle if the graph should render trough blocks.")
@@ -123,9 +123,10 @@ class GraphEditorConfig {
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var dissolveKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
+    // TODO rename to oneDirectionalKey
     @Expose
     @ConfigOption(
-        name = "Edge Cycle",
+        name = "One Directional Key",
         desc = "Cycles the direction of the edge that is between the active and the closest node. (Used to make one-directional ways)"
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_H)
