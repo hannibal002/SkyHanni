@@ -123,6 +123,7 @@ object MissingCropWarning {
         val position = nearbyPosition ?: if (targetedCategory == null) targetPosition.add(y = 1) else targetPosition
         clearTargetedCrop()
         cropStorage.saveDiagnosedPosition(plotId, category, position)
+        replacementPrompts.remove(category)
         ChatUtils.chat(
             "§aSaved diagnosed ${category.displayName} in Greenhouse plot §e$plotId§a at " +
                 "§e${position.x.toInt()}, ${position.y.toInt()}, ${position.z.toInt()}§a.",
@@ -471,10 +472,14 @@ object MissingCropWarning {
         scannedPositions: Map<CropCategory, LorenzVec>,
         rememberedPositions: Map<Int, Map<CropCategory, LorenzVec>>,
     ) {
+        val diagnosedPositions = cropStorage.diagnosedPositionsByPlot()
         scannedPositions.forEach { (category, newPosition) ->
             val oldPlotId = rememberedPositions.entries.firstOrNull { (plotId, positions) ->
                 plotId != newPlotId && category in positions
             }?.key ?: return@forEach
+            // Crop Diagnostics positions are explicitly confirmed by the player and remain authoritative.
+            // Decorative copies or mutations detected in another plot must not offer to replace them.
+            if (category.name in diagnosedPositions[oldPlotId].orEmpty()) return@forEach
             val replacement = CropReplacement(category, oldPlotId, newPlotId, newPosition)
             if (category.name in cropStorage.ignoredCropReplacementsByPlot()[newPlotId].orEmpty()) return@forEach
             replacementPrompts[category]?.let { existing ->
