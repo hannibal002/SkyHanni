@@ -13,11 +13,9 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class MixinScreen {
 
     @WrapOperation(
-        //~ if < 26.1 'extractRenderStateWithTooltipAndSubtitles' -> 'renderWithTooltipAndSubtitles'
         method = "extractRenderStateWithTooltipAndSubtitles",
         at = @At(
             value = "INVOKE",
-            //~ if < 26.1 'extractBackground' -> 'renderBackground'
             target = "Lnet/minecraft/client/gui/screens/Screen;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V"
         )
     )
