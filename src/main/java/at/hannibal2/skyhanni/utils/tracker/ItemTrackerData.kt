@@ -51,7 +51,7 @@ abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerDat
     }
 
     @Expose
-    var items: MutableMap<NeuInternalName, TrackedItem> = HashMap()
+    val items: MutableMap<NeuInternalName, TrackedItem> = HashMap()
 
     data class TrackedItem(
         @Expose var timesGained: Long = 0,

@@ -32,7 +32,7 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object PetUtils {
     // Late load from NEU repo
-    private var petSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
+    private var petSkins: Map<String, List<NeuItemJson>> = emptyMap()
     private var basePetLeveling: List<Int> = listOf()
     private var customPetLeveling: Map<String, NeuPetData> = mapOf()
     private var petTypes: Map<String, String> = mapOf()

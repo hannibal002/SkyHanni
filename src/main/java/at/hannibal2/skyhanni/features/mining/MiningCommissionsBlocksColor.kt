@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.DyeColor
 import net.minecraft.world.level.block.state.BlockState
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -57,7 +58,7 @@ object MiningCommissionsBlocksColor {
 
     private var oldSneakState = false
     private var dirty = false
-    private var replaceBlocksMapCache = mutableMapOf<BlockState, BlockState>()
+    private var replaceBlocksMapCache = ConcurrentHashMap<BlockState, BlockState>()
 
     // TODO Commission API
     @HandleEvent
@@ -117,7 +118,7 @@ object MiningCommissionsBlocksColor {
         }
 
         if (reload) {
-            replaceBlocksMapCache = mutableMapOf()
+            replaceBlocksMapCache = ConcurrentHashMap()
             MinecraftCompat.reloadChunks()
             dirty = false
         }
@@ -142,7 +143,7 @@ object MiningCommissionsBlocksColor {
     @HandleEvent
     fun onWorldChange() {
         enabled = false
-        replaceBlocksMapCache = mutableMapOf()
+        replaceBlocksMapCache = ConcurrentHashMap()
     }
 
     @HandleEvent

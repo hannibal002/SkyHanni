@@ -59,7 +59,7 @@ object DungeonLividFinder {
     var livid: RemotePlayer? = null
         private set
 
-    private var fakeLivids = mutableSetOf<RemotePlayer>()
+    private val fakeLivids = mutableSetOf<RemotePlayer>()
 
     // This only happens when in f5/m5 bossfight, so the performance impact is minimal
     @OptIn(AllEntitiesGetter::class)

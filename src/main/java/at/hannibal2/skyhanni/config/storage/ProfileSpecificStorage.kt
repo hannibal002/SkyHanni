@@ -94,7 +94,7 @@ class ProfileSpecificStorage(
 
     class SkillStorage {
         @Expose
-        var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
+        val skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
 
         @Expose
         var giftTalismanSkillXpBonus: Double = 0.0
@@ -108,11 +108,11 @@ class ProfileSpecificStorage(
 
     /** Written and read by [at.hannibal2.skyhanni.data.CurrencyApi]. */
     @Expose
-    var currencies: MutableMap<SkyblockCurrency, Long> = enumMapOf()
+    val currencies: MutableMap<SkyblockCurrency, Long> = enumMapOf()
 
     /** Written and read by [at.hannibal2.skyhanni.data.CurrencyApi]. */
     @Expose
-    var essences: MutableMap<NeuInternalName, Long> = mutableMapOf()
+    val essences: MutableMap<NeuInternalName, Long> = mutableMapOf()
 
     // features
     // - combat
@@ -131,7 +131,7 @@ class ProfileSpecificStorage(
     }
 
     @Expose
-    var instanceChestFavoriteItems: MutableList<NeuInternalName> = mutableListOf()
+    val instanceChestFavoriteItems: MutableList<NeuInternalName> = mutableListOf()
 
     // - commands
     @Expose
@@ -151,10 +151,10 @@ class ProfileSpecificStorage(
 
     class DungeonStorage {
         @Expose
-        var bosses: MutableMap<DungeonFloor, Int> = enumMapOf()
+        val bosses: MutableMap<DungeonFloor, Int> = enumMapOf()
 
         @Expose
-        var runs: MutableList<DungeonRunInfo> = generateMaxChestAsList()
+        val runs: MutableList<DungeonRunInfo> = generateMaxChestAsList()
 
         class DungeonRunInfo {
             constructor()
@@ -195,11 +195,11 @@ class ProfileSpecificStorage(
         var carnivalYear: Int = 0
 
         @Expose
-        var goals: MutableMap<CarnivalGoal, Boolean> = enumMapOf()
+        val goals: MutableMap<CarnivalGoal, Boolean> = enumMapOf()
 
         // - shop name -> (item name, tier)
         @Expose
-        var carnivalShopProgress: MutableMap<String, Map<String, Int>> = mutableMapOf()
+        val carnivalShopProgress: MutableMap<String, Map<String, Int>> = mutableMapOf()
     }
 
     // -- diana
@@ -211,13 +211,13 @@ class ProfileSpecificStorage(
         var profitTracker: DianaProfitTracker.Data = DianaProfitTracker.Data()
 
         @Expose
-        var profitTrackerPerElection: MutableMap<Int, DianaProfitTracker.Data> = mutableMapOf()
+        val profitTrackerPerElection: MutableMap<Int, DianaProfitTracker.Data> = mutableMapOf()
 
         @Expose
         var mythologicalMobTracker: MythologicalCreatureTracker.Data = MythologicalCreatureTracker.Data()
 
         @Expose
-        var mythologicalMobTrackerPerElection: MutableMap<Int, MythologicalCreatureTracker.Data> = mutableMapOf()
+        val mythologicalMobTrackerPerElection: MutableMap<Int, MythologicalCreatureTracker.Data> = mutableMapOf()
     }
 
     // -- winter
@@ -311,20 +311,20 @@ class ProfileSpecificStorage(
         var targetName: String? = null
 
         @Expose
-        var rabbitCounts: MutableMap<String, Int> = mutableMapOf()
+        val rabbitCounts: MutableMap<String, Int> = mutableMapOf()
 
         @Expose
-        var locationRabbitRequirements: MutableMap<String, LocationRabbit> = mutableMapOf()
+        val locationRabbitRequirements: MutableMap<String, LocationRabbit> = mutableMapOf()
 
         @Expose
-        var collectedEggLocations: MutableMap<IslandType, MutableSet<LorenzVec>> = enumMapOf()
+        val collectedEggLocations: MutableMap<IslandType, MutableSet<LorenzVec>> = enumMapOf()
 
         @Expose
-        var residentRabbits: MutableMap<IslandType, MutableMap<String, Boolean?>> = enumMapOf()
+        val residentRabbits: MutableMap<IslandType, MutableMap<String, Boolean?>> = enumMapOf()
 
         class HotspotRabbitStorage(@Expose var skyblockYear: Int?) {
             @Expose
-            var hotspotRabbits: MutableMap<IslandType, MutableMap<String, Boolean?>> = enumMapOf()
+            val hotspotRabbits: MutableMap<IslandType, MutableMap<String, Boolean?>> = enumMapOf()
         }
 
         @Expose
@@ -337,10 +337,10 @@ class ProfileSpecificStorage(
         var strayTracker: CFStrayTracker.Data = CFStrayTracker.Data()
 
         @Expose
-        var mealLastFound: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
+        val mealLastFound: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
 
         @Expose
-        var mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
+        val mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
 
         @Expose
         var hotChocolateMixinExpiry = farPast()
@@ -357,7 +357,7 @@ class ProfileSpecificStorage(
     }
 
     @Expose
-    var hoppityEventStats: MutableMap<Int, HoppityEventStats> = mutableMapOf()
+    val hoppityEventStats: MutableMap<Int, HoppityEventStats> = mutableMapOf()
 
     @Expose
     var hoppityStatLiveDisplayToggledOff: Boolean = false
@@ -379,14 +379,14 @@ class ProfileSpecificStorage(
         @Expose var typeCountsSince: RabbitData? = RabbitData(),
     ) {
         @Transient
-        var containingYears: MutableSet<Int> = mutableSetOf()
+        val containingYears: MutableSet<Int> = mutableSetOf()
 
         constructor(year: Int) : this() {
             containingYears.add(year)
         }
 
         constructor(years: Set<Int>) : this() {
-            containingYears = years.toMutableSet()
+            containingYears.addAll(years)
         }
 
         operator fun plusAssign(it: HoppityEventStats) {
@@ -464,28 +464,28 @@ class ProfileSpecificStorage(
         var lastGainedCropCollectionTime: SimpleTimeMark = farPast()
 
         @Expose
-        var cropCollectionCounter: MutableMap<CropType, CropCollectionApi.CropCollection> = enumMapOf()
+        val cropCollectionCounter: MutableMap<CropType, CropCollectionApi.CropCollection> = enumMapOf()
 
         @Expose
-        var cropMilestoneCounter: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
+        val cropMilestoneCounter: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
 
         @Expose
-        var toolCounterData: MutableMap<String, Long> = HashMap()
+        val toolCounterData: MutableMap<String, Long> = HashMap()
 
         @Expose
-        var cropUpgrades: MutableMap<CropType, Int> = enumMapOf()
+        val cropUpgrades: MutableMap<CropType, Int> = enumMapOf()
 
         @Expose
-        var cropsPerSecond: MutableMap<CropType, Int> = enumMapOf()
+        val cropsPerSecond: MutableMap<CropType, Int> = enumMapOf()
 
         @Expose
-        var latestBlocksPerSecond: MutableMap<CropType, Double> = enumMapOf()
+        val latestBlocksPerSecond: MutableMap<CropType, Double> = enumMapOf()
 
         @Expose
-        var latestTrueFarmingFortune: MutableMap<CropType, Double> = enumMapOf()
+        val latestTrueFarmingFortune: MutableMap<CropType, Double> = enumMapOf()
 
         @Expose
-        var personalBestFF: MutableMap<CropType, Double> = enumMapOf()
+        val personalBestFF: MutableMap<CropType, Double> = enumMapOf()
 
         @Expose
         var savedCropAccessory: CropAccessory? = CropAccessory.NONE
@@ -506,10 +506,10 @@ class ProfileSpecificStorage(
         var rareCropTracker: RareCropTracker.Data = RareCropTracker.Data()
 
         @Expose
-        var composterUpgrades: MutableMap<ComposterUpgrade, Int> = enumMapOf()
+        val composterUpgrades: MutableMap<ComposterUpgrade, Int> = enumMapOf()
 
         @Expose
-        var toolWithBountiful: MutableMap<CropType, Boolean> = enumMapOf()
+        val toolWithBountiful: MutableMap<CropType, Boolean> = enumMapOf()
 
         @Expose
         var composterCurrentOrganicMatterItem: NeuInternalName? = NONE
@@ -521,10 +521,10 @@ class ProfileSpecificStorage(
         var uniqueVisitors: Int = 0
 
         @Expose
-        var charmedVisitors: MutableSet<String> = mutableSetOf()
+        val charmedVisitors: MutableSet<String> = mutableSetOf()
 
         @Expose
-        var ignoredVisitors: MutableSet<String> = mutableSetOf()
+        val ignoredVisitors: MutableSet<String> = mutableSetOf()
 
         @Expose
         var visitorDrops: VisitorDrops = VisitorDrops()
@@ -540,7 +540,7 @@ class ProfileSpecificStorage(
             fun getTotalVisitors() = acceptedVisitors + deniedVisitors
 
             @Expose
-            var acceptedRarities: MutableMap<LorenzRarity, Long> = enumMapOf()
+            val acceptedRarities: MutableMap<LorenzRarity, Long> = enumMapOf()
 
             @Expose
             var copper: Int = 0
@@ -564,7 +564,7 @@ class ProfileSpecificStorage(
             var gemstonePowder: Long = 0
 
             @Expose
-            var rewardsCount: MutableMap<VisitorReward, Int> = enumMapOf()
+            val rewardsCount: MutableMap<VisitorReward, Int> = enumMapOf()
         }
 
         @Expose
@@ -572,23 +572,23 @@ class ProfileSpecificStorage(
 
         class PlotIcon {
             @Expose
-            var plotList: MutableMap<Int, NeuInternalName> = mutableMapOf()
+            val plotList: MutableMap<Int, NeuInternalName> = mutableMapOf()
         }
 
         @Expose
-        var plotData: MutableMap<Int, PlotData> = mutableMapOf()
+        val plotData: MutableMap<Int, PlotData> = mutableMapOf()
 
         @Expose
         var scoreboardPests: Int = 0
 
         @Expose
-        var cropStartLocations: MutableMap<CropType, LorenzVec> = enumMapOf()
+        val cropStartLocations: MutableMap<CropType, LorenzVec> = enumMapOf()
 
         @Expose
-        var cropLastFarmedLocations: MutableMap<CropType, LorenzVec> = enumMapOf()
+        val cropLastFarmedLocations: MutableMap<CropType, LorenzVec> = enumMapOf()
 
         @Expose
-        var farmingLanes: MutableMap<CropType, FarmingLane> = enumMapOf()
+        val farmingLanes: MutableMap<CropType, FarmingLane> = enumMapOf()
 
         @Expose
         var fortune: Fortune = Fortune()
@@ -619,7 +619,7 @@ class ProfileSpecificStorage(
             var cakeExpiring: SimpleTimeMark? = null
 
             @Expose
-            var carrolyn: MutableMap<CropType, Boolean> = enumMapOf()
+            val carrolyn: MutableMap<CropType, Boolean> = enumMapOf()
         }
 
         @Expose
@@ -633,10 +633,10 @@ class ProfileSpecificStorage(
 
         class FarmingWeightConfig {
             @Expose
-            var lastLeaderboardPosMap: MutableMap<EliteLeaderboardType, Int> = mutableMapOf()
+            val lastLeaderboardPosMap: MutableMap<EliteLeaderboardType, Int> = mutableMapOf()
 
             @Expose
-            var leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+            val leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
 
             @Expose
             var cropDisplayType: CropLeaderboardStorage = CropLeaderboardStorage(null, EliteLeaderboardMode.ALL_TIME)
@@ -649,15 +649,15 @@ class ProfileSpecificStorage(
                 WeightLeaderboardStorage(FarmingWeight.FARMING_WEIGHT, EliteLeaderboardMode.ALL_TIME)
 
             @Expose
-            var minAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+            val minAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
 
         }
 
         @Expose
-        var npcVisitorLocations: MutableMap<String, LorenzVec> = mutableMapOf()
+        val npcVisitorLocations: MutableMap<String, LorenzVec> = mutableMapOf()
 
         @Expose
-        var customGoalMilestone: MutableMap<CropType, Int> = enumMapOf()
+        val customGoalMilestone: MutableMap<CropType, Int> = enumMapOf()
 
         @Expose
         var pestProfitTracker: PestProfitTracker.BucketData = PestProfitTracker.BucketData()
@@ -669,7 +669,7 @@ class ProfileSpecificStorage(
         var gardenBpsTracker: GardenBpsTracker.TimedData = GardenBpsTracker.TimedData()
 
         @Expose
-        var overflowHoeLevels: MutableMap<String, Int> = mutableMapOf()
+        val overflowHoeLevels: MutableMap<String, Int> = mutableMapOf()
 
         @Expose
         var cropFeverTracker: CropFeverTracker.BucketData = CropFeverTracker.BucketData()
@@ -733,7 +733,7 @@ class ProfileSpecificStorage(
 
     class WardrobeStorage {
         @Expose
-        var data: MutableMap<Int, WardrobeData> = mutableMapOf()
+        val data: MutableMap<Int, WardrobeData> = mutableMapOf()
 
         @Expose
         var currentSlot: Int? = null
@@ -744,7 +744,7 @@ class ProfileSpecificStorage(
 
     class LoadoutStorage {
         @Expose
-        var data: MutableMap<Int, LoadoutData> = mutableMapOf()
+        val data: MutableMap<Int, LoadoutData> = mutableMapOf()
 
         @Expose
         var currentSlot: Int? = null
@@ -755,10 +755,10 @@ class ProfileSpecificStorage(
 
     class EquipmentStorage {
         @Expose
-        var slots: MutableList<SafeItemStack?> = CurrentEquipmentApi.getEmptyEquipment()
+        val slots: MutableList<SafeItemStack?> = CurrentEquipmentApi.getEmptyEquipment()
 
         @Expose
-        var riftSlots: MutableList<SafeItemStack?> = CurrentEquipmentApi.getEmptyEquipment()
+        val riftSlots: MutableList<SafeItemStack?> = CurrentEquipmentApi.getEmptyEquipment()
     }
 
     @Expose
@@ -766,10 +766,10 @@ class ProfileSpecificStorage(
 
     class BazaarOrdersStorage {
         @Expose
-        var buyOrders: MutableMap<NeuInternalName, Int> = mutableMapOf()
+        val buyOrders: MutableMap<NeuInternalName, Int> = mutableMapOf()
 
         @Expose
-        var sellOffers: MutableMap<NeuInternalName, Int> = mutableMapOf()
+        val sellOffers: MutableMap<NeuInternalName, Int> = mutableMapOf()
     }
 
     // - foraging
@@ -811,7 +811,7 @@ class ProfileSpecificStorage(
 
     class MiningStorage {
         @Expose
-        var kingsTalkedTo: MutableList<String> = mutableListOf()
+        val kingsTalkedTo: MutableList<String> = mutableListOf()
 
         @Expose
         var fossilExcavatorProfitTracker: ExcavatorProfitTracker.Data = ExcavatorProfitTracker.Data()
@@ -820,7 +820,7 @@ class ProfileSpecificStorage(
         var hotmTree: HotxTree = HotxTree()
 
         @Expose
-        var powder: MutableMap<PowderType, PowderStorage> = enumMapOf()
+        val powder: MutableMap<PowderType, PowderStorage> = enumMapOf()
 
         @Expose
         var tokens: Int = 0
@@ -839,16 +839,16 @@ class ProfileSpecificStorage(
             var mineshaftTotalCount: Int = 0
 
             @Expose
-            var blocksBroken: MutableList<PityData> = mutableListOf()
+            val blocksBroken: MutableList<PityData> = mutableListOf()
 
             @Expose
             var corpseProfitTracker: CorpseTracker.BucketData = CorpseTracker.BucketData()
 
             @Expose
-            var mineshaftsEnteredSinceNew: MutableMap<MineshaftDetection.MineshaftType, Int> = mutableMapOf()
+            val mineshaftsEnteredSinceNew: MutableMap<MineshaftDetection.MineshaftType, Int> = mutableMapOf()
 
             @Expose
-            var lastMineshaftTimeNew: MutableMap<MineshaftDetection.MineshaftType, SimpleTimeMark> = mutableMapOf()
+            val lastMineshaftTimeNew: MutableMap<MineshaftDetection.MineshaftType, SimpleTimeMark> = mutableMapOf()
         }
 
         @Expose
@@ -866,7 +866,7 @@ class ProfileSpecificStorage(
 
     // - minion
     @Expose
-    var minions: MutableMap<LorenzVec, MinionConfig>? = mutableMapOf()
+    val minions: MutableMap<LorenzVec, MinionConfig>? = mutableMapOf()
 
     class MinionConfig {
         @Expose
@@ -915,7 +915,7 @@ class ProfileSpecificStorage(
     var abiphoneContactAmount: Int? = null
 
     @Expose
-    var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> = enumMapOf()
+    val enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> = enumMapOf()
 
     @Expose
     var npcDayLimit: NpcDayLimitStorage = NpcDayLimitStorage()
@@ -934,19 +934,19 @@ class ProfileSpecificStorage(
 
     class CrimsonIsleStorage {
         @Expose
-        var quests: MutableList<String> = mutableListOf()
+        val quests: MutableList<String> = mutableListOf()
 
         @Expose
-        var miniBossesDoneToday: MutableList<String> = mutableListOf()
+        val miniBossesDoneToday: MutableList<String> = mutableListOf()
 
         @Expose
-        var kuudraTiersDone: MutableList<String> = mutableListOf()
+        val kuudraTiersDone: MutableList<String> = mutableListOf()
 
         @Expose
-        var trophyFishes: MutableMap<String, MutableMap<TrophyRarity, Int>> = mutableMapOf()
+        val trophyFishes: MutableMap<String, MutableMap<TrophyRarity, Int>> = mutableMapOf()
 
         @Expose
-        var reputation: MutableMap<FactionType, Int> = mutableMapOf()
+        val reputation: MutableMap<FactionType, Int> = mutableMapOf()
     }
 
     // - rift
@@ -955,7 +955,7 @@ class ProfileSpecificStorage(
 
     class RiftStorage {
         @Expose
-        var completedKloonTerminals: MutableList<KloonTerminal> = mutableListOf()
+        val completedKloonTerminals: MutableList<KloonTerminal> = mutableListOf()
 
         @Expose
         var verminTracker: VerminTracker.Data = VerminTracker.Data()
@@ -969,10 +969,10 @@ class ProfileSpecificStorage(
 
     // - slayer
     @Expose
-    var slayerProfitData: MutableMap<String, SlayerProfitTracker.Data> = mutableMapOf()
+    val slayerProfitData: MutableMap<String, SlayerProfitTracker.Data> = mutableMapOf()
 
     @Expose
-    var slayerRngMeter: MutableMap<String, SlayerRngMeterStorage> = mutableMapOf()
+    val slayerRngMeter: MutableMap<String, SlayerRngMeterStorage> = mutableMapOf()
 
     data class SlayerRngMeterStorage(
         @Expose var currentMeter: Long = -1,
@@ -986,7 +986,7 @@ class ProfileSpecificStorage(
     var currentPetUuid: UUID? = null
 
     @Expose
-    var stats: MutableMap<SkyblockStat, Double?> = enumMapOf()
+    val stats: MutableMap<SkyblockStat, Double?> = enumMapOf()
 
     @Expose
     var maxwell: MaxwellPowerStorage = MaxwellPowerStorage()
@@ -1013,7 +1013,7 @@ class ProfileSpecificStorage(
         var currentArrow: String? = null
 
         @Expose
-        var arrowAmount: MutableMap<NeuInternalName, Int> = mutableMapOf()
+        val arrowAmount: MutableMap<NeuInternalName, Int> = mutableMapOf()
     }
 
     @Expose
@@ -1041,10 +1041,10 @@ class ProfileSpecificStorage(
 
     class FairySoulsStorage {
         @Expose
-        var totalFound: MutableMap<IslandType, Int> = mutableMapOf()
+        val totalFound: MutableMap<IslandType, Int> = mutableMapOf()
 
         @Expose
-        var found: MutableMap<IslandType, MutableSet<LorenzVec>> = mutableMapOf()
+        val found: MutableMap<IslandType, MutableSet<LorenzVec>> = mutableMapOf()
     }
 
     @Expose
@@ -1056,7 +1056,7 @@ class ProfileSpecificStorage(
 
         class SpiderRelicsStorage {
             @Expose
-            var found: MutableSet<LorenzVec> = mutableSetOf()
+            val found: MutableSet<LorenzVec> = mutableSetOf()
         }
     }
 
@@ -1069,7 +1069,7 @@ class ProfileSpecificStorage(
     )
 
     @Expose
-    var attributeShards: MutableMap<String, AttributeShardData> = mutableMapOf()
+    val attributeShards: MutableMap<String, AttributeShardData> = mutableMapOf()
 
     data class AttributeShardData(
         @Expose var amountSyphoned: Int = 0,
@@ -1083,12 +1083,12 @@ class ProfileSpecificStorage(
 
     class HuntingStorage {
         @Expose
-        var trackedAttributeShards: MutableMap<String, Int> = mutableMapOf()
+        val trackedAttributeShards: MutableMap<String, Int> = mutableMapOf()
 
         @Expose
         var huntingProfitTracker: HuntingProfitTracker.Data = HuntingProfitTracker.Data()
     }
 
     @Expose
-    var hiddenCoopMembers: MutableSet<String> = mutableSetOf()
+    val hiddenCoopMembers: MutableSet<String> = mutableSetOf()
 }

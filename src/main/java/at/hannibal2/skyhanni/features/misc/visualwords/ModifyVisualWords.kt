@@ -22,7 +22,7 @@ object ModifyVisualWords {
     val componentCache = TimeAndSizeLimitedCache<Component, Component>(65565, 5.minutes)
 
     /** Replacements added manually by the user via /shwords. */
-    var userModifiedWords = mutableListOf<VisualWordText>()
+    var userModifiedWords: List<VisualWordText> = emptyList()
 
     /** Replacements added automatically by the mod for features, april fools, etc. */
     private val modModifiedWords = mutableListOf<VisualWordText>()
@@ -32,8 +32,7 @@ object ModifyVisualWords {
         finalWordsList = modModifiedWords + userModifiedWords
         textCache.clear()
         componentCache.clear()
-        SkyHanniMod.visualWordsData.modifiedWords =
-            userModifiedWords.map { it.toVisualWord() }.toMutableList()
+        SkyHanniMod.visualWordsData.modifiedWords = userModifiedWords.map { it.toVisualWord() }
         MinecraftCompat.hud.chat.refreshTrimmedMessages()
     }
 
@@ -42,7 +41,7 @@ object ModifyVisualWords {
     private fun modifyVisualWordsEnabled(): Boolean {
         if (!config.enabled || !changeWords) return false
         if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
-            userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
+            userModifiedWords = SkyHanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) }
             update()
         }
         return userModifiedWords.isNotEmpty()
@@ -102,8 +101,8 @@ object ModifyVisualWords {
         return componentCache.getOrPut(component) { visitAndReplace(component) }
     }
 
-    private fun doReplacements(characters: MutableList<StyledCharacter>): MutableList<StyledCharacter> {
-        var workingCharacters = characters
+    private fun doReplacements(characters: List<StyledCharacter>): List<StyledCharacter> {
+        var workingCharacters: List<StyledCharacter> = characters
 
         for (word in finalWordsList) {
             if (!word.enabled) continue

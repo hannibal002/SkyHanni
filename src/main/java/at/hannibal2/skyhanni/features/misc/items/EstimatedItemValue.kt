@@ -51,7 +51,7 @@ object EstimatedItemValue {
     private var display = emptyList<Renderable>()
     private val cache = mutableMapOf<SafeItemStack, List<Renderable>>()
     private var lastToolTipTime = 0L
-    var gemstoneUnlockCosts = NeuGemstoneCostJson()
+    var gemstoneUnlockCosts: Map<NeuInternalName, Map<String, List<String>>> = emptyMap()
     var hasLegacyGemstoneSlots = emptyList<NeuInternalName>()
     var bookBundleAmount = mapOf<String, Int>()
     var crimsonPrestigeCosts = mapOf<String, Map<NeuInternalName, Int>>()

@@ -18,32 +18,22 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
     /**
      * The entities to outline. This is progressively cumulated from [.entitiesToChooseFrom]
      */
-    var entitiesToOutline: HashMap<Entity, Color> = hashMapOf()
+    val entitiesToOutline: HashMap<Entity, Color> = hashMapOf()
 
     /**
      * The entities we can outline. Note that this set and [.entitiesToOutline] are disjoint at all times.
      */
-    var entitiesToChooseFrom: HashSet<Entity> = hashSetOf()
+    val entitiesToChooseFrom: HashSet<Entity> = hashSetOf()
 
     /**
      * Whether [.entitiesToChooseFrom] has been computed already.
      */
     private var computed: Boolean = false
 
-    /**
-     * Constructs the event, given the type and optional entities to outline.
-     *
-     *
-     * This will modify {@param potentialEntities} internally, so make a copy before passing it if necessary.
-     *
-     * @param theType of the event (see [Type]
-     */
+    // Constructs the event, given the type and optional entities to outline.
     init {
         type = theType
-        entitiesToChooseFrom = potentialEntities
-        if (!potentialEntities.isEmpty()) {
-            entitiesToOutline = HashMap(potentialEntities.size)
-        }
+        entitiesToChooseFrom.addAll(potentialEntities)
     }
 
     /**
@@ -83,14 +73,14 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
         @OptIn(AllEntitiesGetter::class)
         val entities: List<Entity> = EntityUtils.getAllEntities().toList()
         // Only render outlines around non-null entities within the camera frustum
-        entitiesToChooseFrom = HashSet(entities.size)
+        entitiesToChooseFrom.clear()
         // Empty invisible armor stands are common and never render an outlineable model
         for (entity in entities) {
             if (!entity.isEmptyInvisibleArmorStand() && entity !is ItemFrame) {
                 entitiesToChooseFrom.add(entity)
             }
         }
-        entitiesToOutline = HashMap(entitiesToChooseFrom.size)
+        entitiesToOutline.clear()
     }
 
     /**

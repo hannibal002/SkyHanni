@@ -16,7 +16,7 @@ import kotlin.time.Duration
 
 class PlayerSpecificStorage {
     @Expose
-    var profiles: MutableMap<String, ProfileSpecificStorage> = mutableMapOf() // profile name
+    val profiles: MutableMap<String, ProfileSpecificStorage> = mutableMapOf() // profile name
 
     @Expose
     var multipleProfiles: Boolean = false
@@ -40,11 +40,11 @@ class PlayerSpecificStorage {
     var communityShopAccountUpgrade: CommunityShopUpgrade? = null
 
     @Expose
-    var guildMembers: MutableList<String> = mutableListOf()
+    val guildMembers: MutableList<String> = mutableListOf()
 
     /** Written and read by [at.hannibal2.skyhanni.data.CurrencyApi], for currencies shared by all profiles. */
     @Expose
-    var currencies: MutableMap<SkyblockCurrency, Long> = enumMapOf()
+    val currencies: MutableMap<SkyblockCurrency, Long> = enumMapOf()
 
     @Expose
     var bazaar: BazaarStorage = BazaarStorage()
@@ -65,7 +65,7 @@ class PlayerSpecificStorage {
 
     class WinterStorage {
         @Expose
-        var playersThatHaveBeenGifted: MutableSet<String> = mutableSetOf()
+        val playersThatHaveBeenGifted: MutableSet<String> = mutableSetOf()
 
         @Expose
         var amountGifted: Int = 0
@@ -75,14 +75,14 @@ class PlayerSpecificStorage {
     }
 
     @Expose
-    var bingoSessions: MutableMap<Long, BingoSession> = mutableMapOf()
+    val bingoSessions: MutableMap<Long, BingoSession> = mutableMapOf()
 
     class BingoSession {
         @Expose
-        var tierOneMinionsDone: MutableSet<NeuInternalName> = mutableSetOf()
+        val tierOneMinionsDone: MutableSet<NeuInternalName> = mutableSetOf()
 
         @Expose
-        var goals: MutableMap<Int, BingoGoal> = mutableMapOf()
+        val goals: MutableMap<Int, BingoGoal> = mutableMapOf()
     }
 
     @Expose
@@ -105,5 +105,5 @@ class PlayerSpecificStorage {
     }
 
     @Expose
-    var slayerPersonalBests: MutableMap<BossType, Duration> = mutableMapOf()
+    val slayerPersonalBests: MutableMap<BossType, Duration> = mutableMapOf()
 }

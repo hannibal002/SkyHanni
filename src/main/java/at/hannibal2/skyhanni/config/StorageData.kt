@@ -8,11 +8,11 @@ import java.util.UUID
 
 class StorageData {
     @Expose
-    var players: MutableMap<UUID, PlayerSpecific> = mutableMapOf()
+    val players: MutableMap<UUID, PlayerSpecific> = mutableMapOf()
 
     class PlayerSpecific {
         @Expose
-        var profiles: MutableMap<String, ProfileSpecific> = mutableMapOf()
+        val profiles: MutableMap<String, ProfileSpecific> = mutableMapOf()
     }
 
     class ProfileSpecific {

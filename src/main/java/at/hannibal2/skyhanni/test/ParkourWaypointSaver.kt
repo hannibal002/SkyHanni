@@ -26,7 +26,7 @@ object ParkourWaypointSaver {
 
     private val config get() = DevApi.config.waypoint
     private var timeLastSaved = SimpleTimeMark.farPast()
-    private var locations = mutableListOf<LorenzVec>()
+    private var locations: List<LorenzVec> = emptyList()
     private var parkourHelper: ParkourHelper? = null
 
     @HandleEvent
@@ -43,9 +43,9 @@ object ParkourWaypointSaver {
                     loadClipboard()
                 } else {
                     if (PlayerUtils.isSneaking()) {
-                        locations.clear()
+                        locations = emptyList()
                     } else {
-                        locations = locations.dropLast(1).toMutableList()
+                        locations = locations.dropLast(1)
                     }
 //                     update()
                 }
@@ -54,7 +54,7 @@ object ParkourWaypointSaver {
             config.saveKey -> {
                 val newLocation = LocationUtils.getBlockBelowPlayer()
                 if (locations.isNotEmpty() && newLocation == locations.last()) return
-                locations.add(newLocation)
+                locations = locations + newLocation
                 update()
             }
         }
@@ -73,7 +73,7 @@ object ParkourWaypointSaver {
                 locations = clipboard.split("\n").map { line ->
                     val raw = line.replace("\"", "").replace(",", "")
                     raw.split(":").map { it.toDouble() }.toLorenzVec()
-                }.toMutableList()
+                }
             } catch (e: NumberFormatException) {
                 ErrorManager.logErrorWithData(
                     e,
@@ -93,7 +93,7 @@ object ParkourWaypointSaver {
         }
     }
 
-    private fun MutableList<LorenzVec>.copyLocations() {
+    private fun List<LorenzVec>.copyLocations() {
         val resultList = mutableListOf<String>()
         timeLastSaved = SimpleTimeMark.now()
         for (location in this) {

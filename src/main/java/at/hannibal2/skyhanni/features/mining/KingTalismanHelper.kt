@@ -45,7 +45,7 @@ object KingTalismanHelper {
     )
 
     private fun resetKings() {
-        storage?.kingsTalkedTo = mutableListOf<String>()
+        storage?.kingsTalkedTo?.clear()
         update()
     }
 
@@ -178,7 +178,10 @@ object KingTalismanHelper {
         if (!MiningApi.inDwarvenMines) return
 
         if (talismanPattern.matches(event.message)) {
-            storage?.kingsTalkedTo = kingCircles.toMutableList()
+            storage?.kingsTalkedTo?.apply {
+                clear()
+                addAll(kingCircles)
+            }
             update()
         }
     }

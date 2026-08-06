@@ -35,7 +35,7 @@ object FrozenTreasureTracker {
 
     private var estimatedIce = 0L
     private var lastEstimatedIce = 0L
-    private var icePerSecond = mutableListOf<Long>()
+    private val icePerSecond = mutableListOf<Long>()
     private var icePerHour = 0
     private var stoppedChecks = 0
     private val tracker = SkyHanniTracker(
@@ -61,7 +61,7 @@ object FrozenTreasureTracker {
     fun onWorldChange() {
         icePerHour = 0
         stoppedChecks = 0
-        icePerSecond = mutableListOf()
+        icePerSecond.clear()
         tracker.update()
     }
 
@@ -86,9 +86,7 @@ object FrozenTreasureTracker {
                 icePerSecond.add(0)
             }
             icePerSecond.add(difference)
-            val listCopy = icePerSecond
-            while (listCopy.size > 1200) listCopy.removeAt(0)
-            icePerSecond = listCopy
+            while (icePerSecond.size > 1200) icePerSecond.removeAt(0)
         }
         icePerHour = (icePerSecond.average() * 3600).toInt()
     }

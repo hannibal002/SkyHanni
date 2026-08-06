@@ -24,20 +24,20 @@ class Storage {
     var harvestFeastStorage: HarvestFeastStorage = HarvestFeastStorage()
 
     @Expose
-    var trackerDisplayModes: MutableMap<String, SkyHanniTracker.DisplayMode> = mutableMapOf()
+    val trackerDisplayModes: MutableMap<String, SkyHanniTracker.DisplayMode> = mutableMapOf()
 
     @Expose
     var foundDianaBurrowLocations: List<LorenzVec> = emptyList()
 
     @Expose
-    var players: MutableMap<UUID, PlayerSpecificStorage> = mutableMapOf()
+    val players: MutableMap<UUID, PlayerSpecificStorage> = mutableMapOf()
 
     @Expose
-    var blacklistedUsers: MutableList<String> = mutableListOf()
+    val blacklistedUsers: MutableList<String> = mutableListOf()
 
     @Expose
-    var reminders: MutableMap<String, Reminder> = mutableMapOf()
+    val reminders: MutableMap<String, Reminder> = mutableMapOf()
 
     @Expose
-    var testRenderablePositions: MutableMap<String, Position> = mutableMapOf()
+    val testRenderablePositions: MutableMap<String, Position> = mutableMapOf()
 }

@@ -12,12 +12,12 @@ object SkullTextureHolder {
     @Suppress("MaxLineLength", "SkullTexturesUseRepo")
     private const val ALEX_SKIN_TEXTURE = "ewogICJ0aW1lc3RhbXAiIDogMTcxMTY1OTI2NDg1NSwKICAicHJvZmlsZUlkIiA6ICI2YWI0MzE3ODg5ZmQ0OTA1OTdmNjBmNjdkOWQ3NmZkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJNSEZfQWxleCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS84M2NlZTVjYTZhZmNkYjE3MTI4NWFhMDBlODA0OWMyOTdiMmRiZWJhMGVmYjhmZjk3MGE1Njc3YTFiNjQ0MDMyIiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
 
-    private var skullTextures = mutableMapOf<String, String>()
+    private var skullTextures: Map<String, String> = emptyMap()
     private val cachedTextures = mutableListOf<StableOrTransientValue<*>>()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        skullTextures = event.getConstant<Map<String, String>>("Skulls").toMutableMap()
+        skullTextures = event.getConstant<Map<String, String>>("Skulls")
         cachedTextures.forEach { it.reset() }
     }
 

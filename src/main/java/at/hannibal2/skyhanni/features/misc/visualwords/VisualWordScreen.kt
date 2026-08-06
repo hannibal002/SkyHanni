@@ -27,7 +27,7 @@ class VisualWordScreen : SkyHanniBaseScreen() {
     var currentlyEditing = false
     var currentIndex = -1
     var activeInput: TextInput? = null
-    var modifiedWords: MutableList<VisualWord> = ModifyVisualWords.userModifiedWords
+    val modifiedWords: MutableList<VisualWord> = ModifyVisualWords.userModifiedWords
         .map { it.toVisualWord() }.toMutableList()
 
     /**
@@ -149,8 +149,7 @@ class VisualWordScreen : SkyHanniBaseScreen() {
     }
 
     fun saveChanges() {
-        ModifyVisualWords.userModifiedWords = modifiedWords
-            .map { VisualWordText.fromVisualWord(it) }.toMutableList()
+        ModifyVisualWords.userModifiedWords = modifiedWords.map { VisualWordText.fromVisualWord(it) }
         ModifyVisualWords.update()
         SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Updated visual words")
     }

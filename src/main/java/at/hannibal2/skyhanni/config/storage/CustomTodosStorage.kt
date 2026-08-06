@@ -5,5 +5,5 @@ import com.google.gson.annotations.Expose
 
 class CustomTodosStorage {
     @Expose
-    var customTodos: MutableList<CustomTodo> = ArrayList()
+    val customTodos: MutableList<CustomTodo> = ArrayList()
 }

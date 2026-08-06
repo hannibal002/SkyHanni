@@ -77,7 +77,7 @@ enum class ItemAbility(
     ECHO("Echo", 3, "Ancestral Spade");
 
     var newVariant = false
-    var internalNames = mutableListOf<NeuInternalName>()
+    val internalNames = mutableListOf<NeuInternalName>()
 
     constructor(
         cooldownInSeconds: Int,

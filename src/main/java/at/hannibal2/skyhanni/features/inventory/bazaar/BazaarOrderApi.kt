@@ -213,8 +213,14 @@ object BazaarOrderApi {
             }
         }
         val storage = storage ?: return
-        storage.buyOrders = buy
-        storage.sellOffers = sell
+        storage.buyOrders.apply {
+            clear()
+            putAll(buy)
+        }
+        storage.sellOffers.apply {
+            clear()
+            putAll(sell)
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)

@@ -150,8 +150,8 @@ object SkillApi {
     )
 
     val skillMenuDetector = InventoryDetector { skillMenuNamePattern }
-    var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
-    var oldSkillInfoMap = mutableMapOf<SkillType?, SkillInfo?>()
+    val skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
+    val oldSkillInfoMap = mutableMapOf<SkillType?, SkillInfo?>()
     private val skillStorage get() = ProfileStorageData.profileSpecific?.skills
     val storage get() = skillStorage?.skillData
     var exactLevelingMap = mapOf<Int, Int>()

@@ -68,9 +68,9 @@ object GardenVisitorCompactChat {
         "^ {2}§a§lREWARDS",
     )
 
-    private var visitorAcceptedChat = mutableListOf<String>()
+    private val visitorAcceptedChat = mutableListOf<String>()
     private var visitorNameFormatted = ""
-    private var rewardsList = mutableListOf<String>()
+    private val rewardsList = mutableListOf<String>()
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
@@ -88,8 +88,8 @@ object GardenVisitorCompactChat {
         val transformedMessage = event.message.removeResets()
 
         fullyAcceptedPattern.matchMatcher(transformedMessage) {
-            visitorAcceptedChat = mutableListOf()
-            rewardsList = mutableListOf()
+            visitorAcceptedChat.clear()
+            rewardsList.clear()
             val visitorColor = groupOrNull("color") ?: "§7"
             val visitorName = group("name")
             visitorNameFormatted = "$visitorColor$visitorName"

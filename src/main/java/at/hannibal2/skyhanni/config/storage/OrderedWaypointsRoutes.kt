@@ -6,5 +6,5 @@ import com.google.gson.annotations.Expose
 
 class OrderedWaypointsRoutes {
     @Expose
-    var routes: MutableMap<String, Waypoints<SkyHanniWaypoint>>? = null
+    val routes: MutableMap<String, Waypoints<SkyHanniWaypoint>> = mutableMapOf()
 }

@@ -38,7 +38,7 @@ object CarnivalShopHelper {
      */
     private val SLOT_RANGE = 11..15
 
-    private var repoEventShops = mutableListOf<EventShop>()
+    private var repoEventShops: List<EventShop> = emptyList()
     private var currentProgress: EventShopProgress? = null
     private var currentEventType: String = ""
     private var tokensOwned: Int = 0
@@ -120,7 +120,7 @@ object CarnivalShopHelper {
         val repoTokenShops = event.getConstant<NeuMiscJson>("carnivalshops").carnivalTokenShops
         repoEventShops = repoTokenShops.map { (key, value) ->
             EventShop(key.replace("_", " "), value.values.toMutableList())
-        }.toMutableList()
+        }
         checkSavedProgress()
         regenerateOverviewItemStack()
     }

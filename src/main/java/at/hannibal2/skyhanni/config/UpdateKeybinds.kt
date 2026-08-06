@@ -13,8 +13,7 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 
 @SkyHanniModule
 object UpdateKeybinds {
-
-    var keybinds: MutableSet<String> = mutableSetOf()
+    val keybinds: MutableSet<String> = mutableSetOf()
 
     private val logger = SkyHanniLogger("keybind_upgrader")
 

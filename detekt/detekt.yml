@@ -185,8 +185,8 @@ naming:
         active: false
 
 potential-bugs:
-    DoubleMutabilityForCollection: # went crazy about all the mutable collections
-        active: false
+    DoubleMutabilityForCollection:
+        active: true
     HasPlatformType: # false positives on config get() methods
         active: false
     StorageNeedsExpose:

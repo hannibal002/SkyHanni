@@ -24,14 +24,14 @@ object CosmeticFollowingLine {
 
     private val config get() = SkyHanniMod.feature.gui.cosmetic.followingLine
 
-    private var locations = LinkedHashMap<LorenzVec, LocationSpot>()
+    private val locations = LinkedHashMap<LorenzVec, LocationSpot>()
     private val latestLocations = LinkedHashMap<LorenzVec, LocationSpot>()
 
     class LocationSpot(val time: SimpleTimeMark, val onGround: Boolean)
 
     @HandleEvent
     fun onWorldChange() {
-        locations = LinkedHashMap()
+        locations.clear()
     }
 
     @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.FOLLOWING_LINE])

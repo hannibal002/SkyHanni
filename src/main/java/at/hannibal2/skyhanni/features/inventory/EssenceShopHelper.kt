@@ -57,7 +57,7 @@ object EssenceShopHelper {
      */
     private val SLOT_RANGE = 10..33
 
-    private var essenceShops = mutableListOf<EssenceShop>()
+    private var essenceShops: List<EssenceShop> = emptyList()
     private var currentProgress: EssenceShopProgress? = null
     private var currentEssenceType: String = ""
     private var currentEssenceItem: NeuInternalName? = null
@@ -151,7 +151,7 @@ object EssenceShopHelper {
         val repoEssenceShops = event.getConstant<Map<String, Map<String, NeuEssenceShopJson>>>("essenceshops")
         essenceShops = repoEssenceShops.map { (key, value) ->
             EssenceShop(key, value.values.toMutableList())
-        }.toMutableList()
+        }
     }
 
     @HandleEvent

@@ -109,8 +109,8 @@ object CFApi {
     var maxRabbits = 503
     var hitmanCosts = TreeSet<Long>()
     private var chocolateMilestones = TreeSet<Long>()
-    private var chocolateFactoryMilestones: MutableList<MilestoneJson> = mutableListOf()
-    private var chocolateShopMilestones: MutableList<MilestoneJson> = mutableListOf()
+    private var chocolateFactoryMilestones: List<MilestoneJson> = emptyList()
+    private var chocolateShopMilestones: List<MilestoneJson> = emptyList()
     private var maxPrestige = 6
     var cfShortcutIndex = 16
 
@@ -179,8 +179,8 @@ object CFApi {
         cfShortcutIndex = data.cfShortcutIndex
         chocolateMilestones = data.chocolateMilestones
         hitmanCosts = data.hitmanCosts
-        chocolateFactoryMilestones = data.chocolateFactoryMilestones.toMutableList()
-        chocolateShopMilestones = data.chocolateShopMilestones.toMutableList()
+        chocolateFactoryMilestones = data.chocolateFactoryMilestones
+        chocolateShopMilestones = data.chocolateShopMilestones
         specialRabbitTextures = data.specialRabbits
 
         CFUpgrade.updateIgnoredSlots()

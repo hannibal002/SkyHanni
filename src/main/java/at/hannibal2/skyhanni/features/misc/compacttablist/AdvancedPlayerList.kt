@@ -49,7 +49,7 @@ object AdvancedPlayerList {
         "^(?!SB Level).*\\[(?<level>(?:§.)*[\\d,]+)(?:§.)*] (?<name>.*)",
     )
 
-    private var playerData = mutableMapOf<Component, PlayerData>()
+    private var playerData: Map<Component, PlayerData> = emptyMap()
 
     fun createTabLine(component: Component, type: TabStringType) = playerData[component]?.let {
         TabLine(component, type, it.createCustomName())
@@ -119,9 +119,9 @@ object AdvancedPlayerList {
             else -> prepare
         }
 
-        var newPlayerList = sorted.map { it.key }.toMutableList()
+        val newPlayerList = sorted.map { it.key }.toMutableList()
         if (config.reverseSort) {
-            newPlayerList = newPlayerList.reversed().toMutableList()
+            newPlayerList.reverse()
         }
         if (extraTitles > 0 && newPlayerList.size >= 19) {
             newPlayerList.add(19, original.first())

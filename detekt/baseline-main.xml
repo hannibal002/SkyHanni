@@ -43,7 +43,6 @@
     <ID>Kdoc:CustomScoreboard.kt:/** * TODO LIST * - countdown events like fishing festival + fiesta when its not on tablist * - choose the amount of decimal places in shorten nums * - heavily optimize elements and events by only updating them when absolutely needed */</ID>
     <ID>Kdoc:ForagingTracker.kt:ForagingTracker$/** * this is a failsafe in the event of runes lacking sufficient NEU repo data to automagically * fetch their correct internal names, and thus translating their in-game names into internal * names literally */</ID>
     <ID>Kdoc:FossilExcavatorApi.kt:FossilExcavatorApi$/** * TODO fix the bug that readItemAmount produces two different outputs: * §r§fEnchanted Book -&gt; §fEnchanted * §fEnchanted Book §r§8x -&gt; §fEnchanted Book * * also maybe this is no bug, as enchanted book is no real item? */</ID>
-    <ID>Kdoc:RenderEntityOutlineEvent.kt:RenderEntityOutlineEvent$/** * Constructs the event, given the type and optional entities to outline. * * * This will modify {@param potentialEntities} internally, so make a copy before passing it if necessary. * * @param theType of the event (see [Type] */</ID>
     <ID>Kdoc:Renderable.kt:Renderable.Companion$/** Bottom Layer must be bigger then the top layer */</ID>
     <ID>Kdoc:RepoPatternGui.kt:RepoPatternGui.Companion$/** * Open the [RepoPatternGui] */</ID>
     <ID>Kdoc:ScoreboardPattern.kt:ScoreboardPattern$/** * Sometimes when the scoreboard updates, it only updates half way, * causing some lines to become mixed with other lines -&gt; broken. * This should already get handled fine but sometimes these errors still occur with some lines way too often. * This pattern is to catch those lines. */</ID>
@@ -3434,7 +3433,6 @@
     <ID>StatementWrapping:KuudraTier.kt:KuudraTier${ this.intTierNumber = tierNumber }</ID>
     <ID>StatementWrapping:PetData.kt:PetData${ specifiedRarity.oneAbove() ?: specifiedRarity }</ID>
     <ID>StatementWrapping:SkyHanniRealtimeItemSlot.kt:SkyHanniRealtimeItemSlot${ allocate(slotSize) }</ID>
-    <ID>StorageVarOrVal:ChatSoundResponseConfig.kt:ChatSoundResponseConfig$@Expose @ConfigOption(name = "Sound Responses", desc = "Add animal sounds to play when certain words are said in chat.") @ConfigEditorDraggableList var soundResponses = SoundResponseTypes.entries.toMutableList()</ID>
     <ID>StorageVarOrVal:GuiConfig.kt:GuiConfig$@Expose @ConfigOption(name = "Mayor Overlay", desc = "Settings for the mayor overlay.") @Accordion var mayorOverlay = MayorOverlayConfig()</ID>
     <ID>StorageVarOrVal:SpiritLeapConfig.kt:SpiritLeapConfig$@Expose @ConfigOption( name = "Spirit Leap Colors", desc = "Configure colors for each class and dead teammates.", ) @Accordion var colorConfig = SpiritLeapColorConfig()</ID>
     <ID>StorageVarOrVal:SpiritLeapConfig.kt:SpiritLeapConfig$@Expose @ConfigOption( name = "Spirit Leap Keybinds", desc = "Set keybinds and show keybind hints for Spirit Leap." ) @Accordion var spiritLeapKeybindConfig = SpiritLeapKeybindConfig()</ID>

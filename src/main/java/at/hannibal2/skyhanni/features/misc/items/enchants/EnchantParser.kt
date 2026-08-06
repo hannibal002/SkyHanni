@@ -91,7 +91,7 @@ object EnchantParser {
     // Used to determine how many enchants are used on each line
     // for this particular item, since consistency is not Hypixel's strong point
     private var maxEnchantsPerLine = 0
-    private var loreLines: MutableList<Component> = mutableListOf()
+    private val loreLines: MutableList<Component> = mutableListOf()
     private var orderedEnchants: TreeSet<FormattedEnchant> = TreeSet()
 
     private val loreCache: EnchantCache = EnchantCache()
@@ -231,7 +231,7 @@ object EnchantParser {
 
         stackingEnchants.clear()
         shouldBeSingleColumn = false
-        loreLines = mutableListOf()
+        loreLines.clear()
         orderedEnchants = TreeSet()
         maxEnchantsPerLine = 0
 

@@ -36,7 +36,7 @@ import kotlin.time.Duration.Companion.seconds
 object SummoningMobManager {
 
     private val config get() = SkyHanniMod.feature.combat.summonings
-    private var mobs = mutableSetOf<Mob>()
+    private val mobs = mutableSetOf<Mob>()
 
     private var lastChatTime: SimpleTimeMark = SimpleTimeMark.farPast()
     private val timeOut = 2.seconds

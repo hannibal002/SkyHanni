@@ -24,7 +24,7 @@ object TabListReader {
     private val patternGroup = RepoPattern.group("misc.compacttablist")
 
     var hypixelAdvertisingString = "HYPIXEL.NET"
-    var renderColumns = mutableListOf<RenderColumn>()
+    var renderColumns: List<RenderColumn> = emptyList()
         private set
 
     private var lastTab: List<Component>? = null
@@ -151,8 +151,9 @@ object TabListReader {
         parseSections(columns)
 
         val renderColumn = RenderColumn()
-        renderColumns = mutableListOf(renderColumn)
-        combineColumnsToRender(columns, renderColumn)
+        val columnsToRender = mutableListOf(renderColumn)
+        combineColumnsToRender(columns, renderColumn, columnsToRender)
+        renderColumns = columnsToRender
     }
 
     private fun rebuildColumns(tabList: List<Component>): List<TabColumn> = buildList {
@@ -310,13 +311,17 @@ object TabListReader {
         }
     }
 
-    private fun combineColumnsToRender(columns: List<TabColumn>, firstColumn: RenderColumn) {
+    private fun combineColumnsToRender(
+        columns: List<TabColumn>,
+        firstColumn: RenderColumn,
+        columnsToRender: MutableList<RenderColumn>,
+    ) {
         var currentColumn = firstColumn
         var lastTitleComponent: Component? = null
 
         fun newColumnOrSpacer(required: Boolean) {
             if (required || currentColumn.size() >= TabListRenderer.MAX_LINES) {
-                renderColumns.add(RenderColumn().also { currentColumn = it })
+                columnsToRender.add(RenderColumn().also { currentColumn = it })
             } else if (currentColumn.size() > 0) {
                 currentColumn.addLine(AdvancedPlayerList.createTabLine(Component.literal(""), TabStringType.TEXT))
             }
@@ -324,7 +329,7 @@ object TabListReader {
 
         fun addLine(line: Component) {
             if (currentColumn.size() >= TabListRenderer.MAX_LINES) {
-                renderColumns.add(RenderColumn().also { currentColumn = it })
+                columnsToRender.add(RenderColumn().also { currentColumn = it })
             }
             currentColumn.addLine(AdvancedPlayerList.createTabLine(line, TabStringType.fromComponent(line)))
         }

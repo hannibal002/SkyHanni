@@ -77,7 +77,7 @@ object BetterContainers {
     private var bufferedImageBase: BufferedImage? = null
     private var bufferedImageSlot: BufferedImage? = null
     private var bufferedImageButton: BufferedImage? = null
-    private var lastSlots: MutableList<Slot?>? = null
+    private var lastSlots: List<Slot?>? = null
 
     private var loaded = false
     private var gpuNative: NativeImage? = null

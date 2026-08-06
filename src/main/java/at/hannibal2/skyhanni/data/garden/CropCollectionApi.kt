@@ -127,7 +127,7 @@ object CropCollectionApi {
         }
 
         @Expose
-        var cropCollectionType: MutableMap<CropCollectionType, Long> = EnumMap(CropCollectionType::class.java)
+        val cropCollectionType: MutableMap<CropCollectionType, Long> = EnumMap(CropCollectionType::class.java)
     }
 
     @HandleEvent

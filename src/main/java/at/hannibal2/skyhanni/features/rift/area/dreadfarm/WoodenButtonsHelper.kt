@@ -47,7 +47,7 @@ object WoodenButtonsHelper {
     )
 
     private var buttonLocations = mapOf<String, List<LorenzVec>>()
-    private var hitButtons = mutableSetOf<LorenzVec>()
+    private val hitButtons = mutableSetOf<LorenzVec>()
     private var lastHitButton: LorenzVec? = null
     private var currentSpot: GraphNode? = null
     private var lastBlowgunFire = SimpleTimeMark.farPast()
@@ -150,7 +150,8 @@ object WoodenButtonsHelper {
 
         if (event.message != "§eYou've hit all §r§b56 §r§ewooden buttons!") return
         RiftApi.allButtonsHit = true
-        hitButtons = buttonLocations.values.flatten().toMutableSet()
+        hitButtons.clear()
+        hitButtons.addAll(buttonLocations.values.flatten())
         soulLocations["Dreadfarm"]?.get("Buttons")?.let {
             IslandGraphs.pathFind(
                 it,

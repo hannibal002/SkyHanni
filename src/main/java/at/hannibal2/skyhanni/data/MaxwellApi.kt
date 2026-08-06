@@ -58,7 +58,7 @@ object MaxwellApi {
         }
 
     private val NO_POWER by lazy { getPowerByNameOrNull("No Power") }
-    private var powers = mutableListOf<String>()
+    private var powers: List<String> = emptyList()
 
     private val patternGroup = RepoPattern.group("data.maxwell")
 
