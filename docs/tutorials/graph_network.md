@@ -118,13 +118,13 @@ If you are more than 3 blocks away from the selected node, two other things will
 - A new node at the current location gets added (like if you have no node selected).
 - A new edge (connection) between the selected node and the newly created node gets added.
 
-If you press the **Select Key** after creating a new node, you can move around and just keep pressing the add and select keys to quickly
+If you press the **Select Nearest Node** after creating a new node, you can move around and just keep pressing the add and select keys to quickly
 create a new line of nodes in the world.
 
 #### Adding and Deleting Edges
 
-By default, when you press `C`, you create a connection between the selected node (green) and the next closest node (yellow).
-When you press `C` again, the edge gets deleted.
+When you press **Connect Key** (by default `C`), you create a connection between the selected node (green) and the next closest node (yellow).
+When you press **Connect Key** again, the edge gets deleted.
 The normal edge color is blue, the edge between the selected and the nearest node is red.
 
 #### Moving a Node
@@ -159,7 +159,7 @@ The vast majority of nodes don't have either.
 
 #### Renaming a Node
 
-By default, the keybind `Y` is used to go into the text mode.
+The **Text Key** (by default `Y`) is used to go into the text mode.
 The text mode needs you to select a node first.
 
 In the text mode, you can use your keyboard to write down a name for the node.
