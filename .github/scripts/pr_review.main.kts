@@ -3,7 +3,17 @@
 // called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, changelog-review.yml, check_dependencies.yml,
 // and keyword-labels.yml
 
-import com.google.gson.*
+// TODO: remove the suppressions and split the complex functions once this file can be broken up into
+//  several files. Splitting them now would only add more top level functions to a file that is
+//  already well over 1000 lines long.
+@file:Suppress("CyclomaticComplexMethod", "LoopWithTooManyJumpStatements")
+
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.JsonNull
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import java.io.IOException
 import java.net.URI
 import java.net.URLEncoder
@@ -11,7 +21,11 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
-import kotlin.io.path.*
+import kotlin.io.path.Path
+import kotlin.io.path.div
+import kotlin.io.path.exists
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.readText
 import kotlin.system.exitProcess
 
 /**
@@ -53,6 +67,15 @@ val keywordLabels = listOf(
 )
 
 val workflowFailedMarker = "<!-- workflow-failed -->"
+
+// Suggested in every workflow error comment. Declared this early because error() falls back to it, and error()
+// already runs while the environment constants below are still being initialized.
+val defaultErrorFix = "merge the beta branch into this PR."
+
+// Nothing an author can do, so the default suggestion would send them down the wrong path.
+val apiFormatErrorFix = "re-run the workflow. The GitHub API returned a response this script could not read, " +
+    "which is not caused by anything in this pull request."
+
 
 /**
  * Identifies a comment posted by this script, so a later run finds its own previous comment again.
@@ -131,20 +154,20 @@ val gson = Gson()
 
 var errorCommentPosted = false
 
-fun error(message: String, commentError: Boolean = true): Nothing {
+fun error(message: String, commentError: Boolean = true, fix: String = defaultErrorFix): Nothing {
     System.err.println(message)
     if (commentError && !errorCommentPosted) {
         postPrComment(
             prNumber = prNumber,
-            body = buildErrorComment(message),
-            commentError = false
+            body = buildErrorComment(message, fix),
+            commentError = false,
         ) { "Error: could not post workflow error as comment (HTTP $it)" }
         errorCommentPosted = true
     }
     exitProcess(1)
 }
 
-fun buildErrorComment(message: String): String = buildString {
+fun buildErrorComment(message: String, fix: String): String = buildString {
     appendLine(workflowFailedMarker)
 
     appendLine("❌ Workflow failed ❌")
@@ -159,8 +182,7 @@ fun buildErrorComment(message: String): String = buildString {
     appendLine()
 
     appendLine("Most likely fix:")
-    val theSecretFix = "merge the beta branch into this PR."
-    appendLine(theSecretFix)
+    appendLine(fix)
     appendLine()
 
     appendLine("If the issue persists, please ping a maintainer on [SkyHanni Discord](https://discord.gg/skyhanni-997079228510117908).")
@@ -189,9 +211,13 @@ data class Dependency(val owner: String, val repoName: String, val pullNumber: I
     val link: String = "https://github.com/$owner/$repoName/pull/$pullNumber"
 }
 
-enum class DependencyState { OPEN, CLOSED, UNRESOLVED }
+enum class DependencyState {
+    OPEN,
+    CLOSED,
+    UNRESOLVED
+}
 
-// Split during parsing, not derived afterwards: a line on hannibal002/SkyHanni-REPO is valid and deliberately
+// Split during parsing, not derived afterward: a line on hannibal002/SkyHanni-REPO is valid and deliberately
 // produces no dependency, so subtracting the recognized entries would report it as malformed.
 data class ParsedDependencySection(val dependencies: List<Dependency>, val unrecognizedLines: List<String>)
 
@@ -212,14 +238,16 @@ data class DependencyProblems(
 // The closed pull request that triggered this run, used only when it is a dependency.
 data class DependencyTrigger(val pullNumber: Int, val merged: Boolean)
 
-
-class DependencyCheckException(message: String) : Exception(message)
+// [fix] travels with the exception because the handler that turns it into a comment sits several frames away and
+// cannot tell which kind of failure it is looking at.
+class DependencyCheckException(message: String, val fix: String = defaultErrorFix) : Exception(message)
 
 // PRs whose dependency check could not be completed. Collected instead of aborting, so one unreachable
 // PR cannot stop the remaining ones from getting their label and status updated.
 val failedDependencyChecks = mutableListOf<String>()
 
-fun dependencyError(message: String): Nothing = throw DependencyCheckException(message)
+fun dependencyError(message: String, fix: String = defaultErrorFix): Nothing =
+    throw DependencyCheckException(message, fix)
 
 fun sendGhRequest(request: HttpRequest): Pair<Int, JsonElement> {
     val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
@@ -264,7 +292,7 @@ fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, Jso
     val request = buildGhRequest(method, path, payload)
     if (!isRetryable(method, path)) return sendGhRequest(request)
 
-    // The GitHub API answers with 502/503/504 every now and then. Those are transient, so a single one
+    // The GitHub API answers with 502/503/504 occasionally. Those are transient, so a single one
     // must not fail the whole workflow run. The last attempt returns whatever it gets.
     repeat(maxRequestAttempts - 1) { index ->
         val attempt = index + 1
@@ -309,8 +337,8 @@ fun getPrLabels(prNumber: String): Set<String> {
     val (status, body) = ghRepoGet("/issues/$prNumber/labels")
     if (status.isHttpError) return emptySet()
     val array = body as? JsonArray ?: return emptySet()
-    return array.mapNotNull {
-        (it as? JsonObject)?.get("name")?.takeIf { it.isJsonPrimitive }?.asString
+    return array.mapNotNull { element ->
+        (element as? JsonObject)?.get("name")?.takeIf { it.isJsonPrimitive }?.asString
     }.toSet()
 }
 
@@ -332,6 +360,10 @@ fun sanitize(text: String, maxLen: Int = 300): String = text
     .replace("<", "&lt;")
     .replace(">", "&gt;")
     .replace("@", "&#64;")
+
+// Only backticks have to go, one would close the code span early. Everything else, an "@" mention included, is
+// inert inside a span, and sanitize would leave its backslashes visible there.
+fun sanitizeCodeSpan(text: String, maxLen: Int = 300): String = text.take(maxLen).replace("`", "'")
 
 fun StringBuilder.appendWarningTitle(title: String) {
     appendLine("### $warningIcon $title $warningIcon")
@@ -356,8 +388,9 @@ fun buildDetektBody(findings: List<Finding>): String = buildString {
 fun StringBuilder.appendCompact(findings: List<Finding>) {
     for (finding in findings) {
         val fileName = finding.path.substringAfterLast('/')
+        // The message renders outside the code span, so it keeps the full Markdown escaping.
         val message = sanitize(finding.message)
-        val className = sanitize(fileName)
+        val className = sanitizeCodeSpan(fileName)
         val line = finding.line
         appendLine("- ```$className:$line```: $message")
     }
@@ -366,11 +399,11 @@ fun StringBuilder.appendCompact(findings: List<Finding>) {
 fun StringBuilder.appendFull(findings: List<Finding>) {
     for (finding in findings) {
         val fileName = finding.path.substringAfterLast('/')
-        val ruleId = sanitize(finding.ruleId)
-        val message = sanitize(finding.message)
-        val className = sanitize(fileName)
+        val ruleId = sanitizeCodeSpan(finding.ruleId)
+        val message = sanitizeCodeSpan(finding.message)
+        val className = sanitizeCodeSpan(fileName)
         val line = finding.line
-        val path = sanitize(finding.path)
+        val path = sanitizeCodeSpan(finding.path)
         appendLine("- ```$className:$line```")
         appendLine("  message: `$message`")
         appendLine("  rule: `$ruleId`")
@@ -432,20 +465,21 @@ fun CommentType.findAllStates(comments: List<PrComment>): List<StateComment> = c
     state?.let { StateComment(comment, it) }
 }
 
-fun CommentType.post(prNumber: String, marker: String, body: String, errorMessage: (Int) -> String) {
+fun CommentType.post(prNumber: String, body: String, errorMessage: (Int) -> String) {
     postPrComment(prNumber, "$marker\n$body", errorMessage = errorMessage)
 }
 
-fun CommentType.post(prNumber: String, body: String, errorMessage: (Int) -> String) {
-    post(prNumber, marker, body, errorMessage)
+// Posts under a state marker instead of the plain one, for the modes that announce both directions.
+fun CommentType.postState(prNumber: String, state: String, body: String, errorMessage: (Int) -> String) {
+    postPrComment(prNumber, "${stateMarker(state)}\n$body", errorMessage = errorMessage)
 }
 
 
 // A collapsed comment loses its active marker, including the state variant. Only the stale marker remains, so
 // it can never be mistaken for the current announcement.
 //
-// Every body posted under a CommentType needs a line starting with "### ", it becomes the title of the spoiler
-// the collapsed comment turns into. A body without one ends up under [fallbackTitle].
+// Every body posted under a CommentType needs a line starting with "###" followed by a space, it becomes
+// the title of the spoiler the collapsed comment turns into. A body without one ends up under [fallbackTitle].
 // A failed collapse is harmless, so [onFailure] may return: the newest-state lookup ignores the leftover.
 fun CommentType.markAsStale(
     comment: PrComment,
@@ -611,11 +645,10 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
                         if (workspace.isNotEmpty()) it.replace("file://$workspace/", "").replace("$workspace/", "")
                         else it
                     }
-                    .take(300)
-                appendLine("- `$display`")
+                appendLine("- `${sanitizeCodeSpan(display)}`")
                 if (rawLine.trimStart().startsWith("e: ")) {
                     for (cont in parseErrorContinuations(logContent, rawLine)) {
-                        appendLine("  - `${cont.take(300)}`")
+                        appendLine("  - `${sanitizeCodeSpan(cont)}`")
                     }
                 }
             }
@@ -623,8 +656,8 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
         } else {
             val oneLiner = parseOneLiner(logContent)
             if (oneLiner != null) {
-                val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
-                appendLine("`$displayLine`")
+                val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ")
+                appendLine("`${sanitizeCodeSpan(displayLine)}`")
             }
         }
         if ("warnings found and -Werror specified" in logContent) {
@@ -711,8 +744,8 @@ fun buildDetektCrashBody(logContent: String): String = buildString {
     appendLine()
     val oneLiner = parseOneLiner(logContent)
     if (oneLiner != null) {
-        val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
-        appendLine("`$displayLine`")
+        val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ")
+        appendLine("`${sanitizeCodeSpan(displayLine)}`")
         appendLine()
     }
     appendLine("<details><summary>Excerpt</summary>")
@@ -745,7 +778,7 @@ fun runDetektMode(prNumber: String) {
                 error(
                     "Detekt workflow did not complete successfully AND detekt-run.log does not exist, is null or empty. " +
                         "(conclusion: $conclusion). " +
-                        "Check the workflow run for details."
+                        "Check the workflow run for details.",
                 )
             }
         }
@@ -800,17 +833,16 @@ fun parseSarifFindings(sarif: JsonObject, workspace: String): List<Finding> = bu
 
 fun runBuildMode(prNumber: String) {
     val log1 = readBuildLog(System.getenv("ARTIFACT_DIR_1"))
-    val log2 = readBuildLog(System.getenv("ARTIFACT_DIR_2"))
 
     buildComment.staleExisting(prNumber)
 
-    if (log1.isNullOrBlank() && log2.isNullOrBlank()) {
+    if (log1.isNullOrBlank()) {
         println("No build failures found, removing build label")
         setLabel(prNumber, buildLabel, false)
         exitProcess(0)
     }
 
-    val versions = filterStonecutterDuplicates(listOf("1.21.11" to log1, "26.1" to log2))
+    val versions = filterStonecutterDuplicates(listOf("26.1" to log1))
     buildComment.post(prNumber, buildBuildFailureBody(versions)) {
         "Error: could not post build failure comment (HTTP $it)"
     }
@@ -925,7 +957,16 @@ fun getDependencyState(dep: Dependency): DependencyState {
         dependencyError("Error: unexpected status $status for dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber}")
     }
     val state = (body as? JsonObject)?.get("state")?.takeIf { it.isJsonPrimitive }?.asString
-    return if (state == "open") DependencyState.OPEN else DependencyState.CLOSED
+    // Treating anything unreadable as closed would let the pull request merge, which is the same mistake the 404
+    // handling above used to make. A pull request only ever has these two states.
+    return when (state) {
+        "open" -> DependencyState.OPEN
+        "closed" -> DependencyState.CLOSED
+        else -> dependencyError(
+            "Error: dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber} has no usable state (got: $state)",
+            fix = apiFormatErrorFix,
+        )
+    }
 }
 
 // Kept under the status API's 140-character limit. A problem hides the open count, like the comment.
@@ -1105,10 +1146,6 @@ fun StringBuilder.appendDependencyState(openDependencies: List<Dependency>) {
     }
 }
 
-// Rendered inside a code span, so only backticks have to go: one would close the span early and let the rest
-// render as markdown. Everything else, an "@" mention included, is inert there and stays readable as typed.
-fun sanitizeCodeSpan(text: String, maxLen: Int = 300): String = text.take(maxLen).replace("`", "'")
-
 fun StringBuilder.appendProblemLines(lines: List<String>) {
     for (line in lines) {
         appendLine("- `${sanitizeCodeSpan(line)}`")
@@ -1259,7 +1296,7 @@ fun runDependenciesModeForOpenPr(prNum: String?) {
     try {
         checkPrDependencies(num)
     } catch (e: DependencyCheckException) {
-        error(e.message ?: "Error: dependency check failed for PR #$num")
+        error(e.message ?: "Error: dependency check failed for PR #$num", fix = e.fix)
     }
     if (System.getenv("PR_ACTION") == "reopened") {
         val targetPrNum = num.toIntOrNull() ?: return
@@ -1350,7 +1387,7 @@ fun runKeywordLabelMode(prNumber: String) {
         if (posting) {
             val body = if (keywordPresent) buildKeywordLabelAddedComment(entry)
             else buildKeywordLabelRemovedComment(entry)
-            entry.comment.post(prNumber, entry.comment.stateMarker(currentState), body) {
+            entry.comment.postState(prNumber, currentState, body) {
                 "Error: could not post \"${entry.label}\" comment (HTTP $it)"
             }
         }
