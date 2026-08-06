@@ -278,9 +278,3 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
         }
     }
 }
-
-interface RotatingPerkSlot<Data> {
-    val entry: Data
-    val perks: List<RotatingPerk>
-    var currentPerk: RotatingPerk?
-}
