@@ -11,19 +11,20 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object SlayerCocoonWarning {
-    /**
-     * WRAPPED-REGEX-TEST: "  §r§c§lYOU COCOONED YOUR SLAYER BOSS"
-     */
-    private val slayerCocoonPattern by RepoPattern.pattern(
-        "slayer.cocooned",
-        "\\s+§r§c§lYOU COCOONED YOUR SLAYER BOSS",
-    )
 
     private val config get() = SlayerApi.config
 
+    /**
+     * WRAPPED-REGEX-TEST: "  YOU COCOONED YOUR SLAYER BOSS"
+     */
+    private val slayerCocoonPattern by RepoPattern.pattern(
+        "slayer.cocooned.colorless",
+        "\\s+YOU COCOONED YOUR SLAYER BOSS",
+    )
+
     @HandleEvent
-    fun onChatMessage(event: SkyHanniChatEvent.Allow) {
-        if (slayerCocoonPattern.matches(event.message)) {
+    private fun onChatMessage(event: SkyHanniChatEvent.Allow) {
+        if (slayerCocoonPattern.matches(event.cleanMessage)) {
             if (config.cocoonTitle) TitleManager.sendTitle("§lSlayer Boss Cocooned!")
             if (config.cocoonDing) SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
         }
