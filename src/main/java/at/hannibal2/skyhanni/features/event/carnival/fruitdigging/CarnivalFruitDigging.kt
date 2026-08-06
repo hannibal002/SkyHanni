@@ -220,7 +220,7 @@ object CarnivalFruitDigging {
     private var gameGrid = GameGrid()
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
 
         if (config.remainingFruitDisplay) {
@@ -248,12 +248,12 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+    private fun onItemInHandChange(event: ItemInHandChangeEvent) {
         dowsingMode = event.newStack.getDowsingMode()
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         if (solverDirty) {
@@ -349,14 +349,14 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onContinuedBlockBreak(event: ContinuedBlockBreakEvent) {
+    private fun onContinuedBlockBreak(event: ContinuedBlockBreakEvent) {
         lastSquareDigging =
             if (event.position.getBlockAt() == Blocks.SAND) GamePos.fromLorenzVec(event.position) else null
         checkShovelMode()
     }
 
     @HandleEvent
-    fun onBlockChange(event: ServerBlockChangeEvent) {
+    private fun onBlockChange(event: ServerBlockChangeEvent) {
         val blockOld = event.oldState
         val blockNew = event.newState
 
@@ -414,7 +414,7 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<ItemEntity>) {
+    private fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<ItemEntity>) {
         if (!isEnabled()) return
         handleAnchor(event.entity)
     }
@@ -443,7 +443,7 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+    private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         if (!isEnabled()) return
 
         // Armor stand appears when a fruit is dug or exposed by watermelon
@@ -465,7 +465,7 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.enabled || !CarnivalAPI.inCarnivalArea) return
 
         val message = event.cleanMessage
@@ -510,7 +510,7 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         resetData()
     }
 
