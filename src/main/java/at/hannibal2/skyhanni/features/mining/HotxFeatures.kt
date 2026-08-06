@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
@@ -37,6 +37,7 @@ object HotxFeatures {
     private fun HotxHandler<*, *>.renderOverlay() {
         if (!shouldShowDisplay) return
 
+        val renderables = mutableListOf<Renderable>()
         rotatingPerkSlots.forEach { slot ->
             val entry = slot.entry
             if (!entry.isUnlocked || !entry.enabled) return@forEach
@@ -45,11 +46,13 @@ object HotxFeatures {
                 ?: "§cUnknown! Run ${"§b/${name.lowercase()}"} §cto fix this."
             val finalFormat = "§b${entry.guiName}§8: $perkDescriptionFormat"
 
-            position.renderRenderable(
-                Renderable.text(finalFormat),
-                posLabel = "${entry.guiName} Display",
-            )
+            renderables.add(Renderable.text(finalFormat))
         }
+
+        position.renderRenderables(
+            renderables,
+            posLabel = "${this.name} Display",
+        )
     }
 
     @HandleEvent(onlyOnSkyblock = true)
