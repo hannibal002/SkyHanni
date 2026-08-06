@@ -23,8 +23,9 @@ The node tags **Area** and **Small Area** define the current area for other SkyH
 The feature first finds the closest node to the player. Next, the graph network is traversed starting from this node until an area tag is
 found.
 
-Nodes without a specific area tag are considered to be in the default no_area, which covers the whole island.
-Some islands do not have any area at all. On those islands, the API will return `no_area`.
+Nodes without a specific area tag are considered to be in the default `no_area`, which covers the whole island.
+Some islands do not have any area at all. On those islands, the API will return `no_area`. Consequently, mod features that strictly require
+defined areas will not function on these islands.
 
 #### Current Area
 
@@ -152,7 +153,8 @@ the [Repo file](https://github.com/hannibal002/SkyHanni-REPO/tree/main/constants
 Additionally, while saving, these three things happen as well:
 
 - The **Error Finder** gets activated.
-- The current graph is applied as the island’s active graph network (optional, toggleable).
+- The current graph is applied as the island’s active graph network (optional, toggleable). This serves as the primary way to test changes
+  locally right away.
 - It shows stats in chat.
 
 ### Named Nodes and Tags
@@ -244,7 +246,7 @@ This is useful to mark paths the user can only move in one direction. E.g., drop
 Use the command `/shgraphweight` to set the weight of the selected node.
 By default, every node has the weight of 0.
 
-The weight gets added to the pathfinding route.
+The weight gets added to the pathfinding route calculation. One unit of weight represents one Minecraft block.
 This impacts all directions the node can pass through in the same way.
 
 When to use? When the path slows down the user considerably, e.g., moving through water or climbing up blocks without stairs. Especially
@@ -270,7 +272,8 @@ Also, the **Undo Key** works like normal for this.
 
 #### Disabled Nodes
 
-The command `/shgraphtoggledisabled` toggles the visibility of **Disabled Nodes**.
+Nodes cannot be manually disabled within the Graph Editor. Instead, this happens dynamically via the mod's codebase.
+The command `/shgraphtoggledisabled` merely toggles the visibility of these programmatically **Disabled Nodes**.
 
 Edges that touch a disabled node are also hidden if the disabled node is hidden.
 
@@ -304,6 +307,11 @@ current island by using the **Save Key**.
 
 The **Error Finder** analyzes the graph network as a whole and flags issues with nodes.
 It runs by default when saving the graph.
+When errors are found, this happens:
+
+- Errors are posted broadly by count and error category as chat messages.
+- The specific error text for the 10 closest faulty nodes is rendered directly below them in the world.
+- A pathfinding route to the nearest faulty node is automatically started.
 
 #### Find All
 
