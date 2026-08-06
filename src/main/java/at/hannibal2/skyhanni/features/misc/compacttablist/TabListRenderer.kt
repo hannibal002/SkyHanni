@@ -19,13 +19,8 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.network.chat.Component
-
-//? if >= 26.1 {
 import net.minecraft.client.gui.components.PlayerFaceExtractor
-//?} else {
-/*import net.minecraft.client.gui.components.PlayerFaceRenderer
-*///?}
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object TabListRenderer {
@@ -164,14 +159,9 @@ object TabListRenderer {
                 val hideIcons = config.advancedPlayerList.hidePlayerIcons.get() && !AdvancedPlayerList.ignoreCustomTabList()
                 if (tabLine.type == TabStringType.PLAYER && !hideIcons) {
                     tabLine.getInfo()?.let { playerInfo ->
-                        //~ if < 26.1 'texturePath' -> 'id'
                         val texture = playerInfo.skin.body().texturePath()
 
-                        //? if >= 26.1 {
                         PlayerFaceExtractor.extractRenderState(
-                            //?} else {
-                        /*PlayerFaceRenderer.draw(
-                        *///?}
                             DrawContextUtils.drawContext,
                             texture,
                             middleX,
