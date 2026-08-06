@@ -250,7 +250,7 @@ object AttributeShardsData {
      * REGEX-TEST: LOOT SHARE You received a Glacite Walker Shard for assisting Mealoan!
      * REGEX-TEST: LOOT SHARE You received 2 Mossybit Shards for assisting FallenYeti!
      * REGEX-TEST: LOOT SHARE! You received 2x Parakeet Shard from meowgirlemily catching a Parakeet!
-     * REGEX-TEST: LOOT SHARE! You received an Areita Shard from VirulentNyx catching an Areita! (4)
+     * REGEX-TEST: LOOT SHARE! You received an Areita Shard from VirulentNyx catching an Areita!
      */
     private val lootShareShardPattern by patternGroup.pattern(
         "loot.share.shard.colorless",
