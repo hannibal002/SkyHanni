@@ -286,9 +286,9 @@
     <ID>NoTopLevelDefinition:RenderableUtils.kt:@JvmName("stringListToRenderables") fun List&lt;String&gt;.toRenderables: List&lt;Renderable&gt;</ID>
     <ID>NoTopLevelDefinition:RenderableUtils.kt:fun MutableList&lt;Renderable&gt;.addLine</ID>
     <ID>NoTopLevelDefinition:RepoFileSystem.kt:private const val MAX_EMPTY_TGZ_ENTRIES = 10</ID>
-    <ID>NoTopLevelDefinition:SafeItemStack.kt://~ if &lt; 26.1 ' item?.value() ?: Items.AIR' -&gt; ' item' val SafeItemStack.itemType: Item get() = item?.value() ?: Items.AIR</ID>
     <ID>NoTopLevelDefinition:SafeItemStack.kt:fun SafeItemStack: SafeItemStack</ID>
     <ID>NoTopLevelDefinition:SafeItemStack.kt:private fun createItemStackTemplate: ItemStackTemplate</ID>
+    <ID>NoTopLevelDefinition:SafeItemStack.kt:val SafeItemStack.itemType: Item get() = item?.value() ?: Items.AIR</ID>
     <ID>NoTopLevelDefinition:SafeItemStackUtils.kt:fun SafeItemStack.ensureComponentsBound: SafeItemStack</ID>
     <ID>NoTopLevelDefinition:ScoreboardCompat.kt:fun Collection&lt;PlayerScoreEntry&gt;.getPlayerNames: List&lt;Component&gt;</ID>
     <ID>NoTopLevelDefinition:ScoreboardCompat.kt:fun Scoreboard.getSidebarObjective: Objective?</ID>
@@ -354,7 +354,7 @@
     <ID>NoTopLevelDefinition:TextCompat.kt:val map = mutableMapOf&lt;Int, MessageSignature&gt;()</ID>
     <ID>NoTopLevelDefinition:TextCompat.kt:var Component.command: String? get() = this.style.clickEvent?.takeIf { it.action() == ClickEvent.Action.RUN_COMMAND }?.let { (it as ClickEvent.RunCommand).command } set(value) { this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) } }</ID>
     <ID>NoTopLevelDefinition:TextCompat.kt:var Component.hover: Component? get() = this.style.hoverEvent?.takeIf { it.action() == HoverEvent.Action.SHOW_TEXT }?.let { (it as HoverEvent.ShowText).value } set(value) { value?.let { new -&gt; this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } } }</ID>
-    <ID>NoTopLevelDefinition:TextCompat.kt:var Component.stackHover: SafeItemStack? get() = this.style.hoverEvent?.takeIf { it.action() == HoverEvent.Action.SHOW_ITEM }?.let { //~ if &lt; 26.1 '.item.create()' -&gt; '.item' (it as HoverEvent.ShowItem).item.create() } set(value) { value?.let { new -&gt; this.copyIfNeeded().withStyle { //~ if &lt; 26.1 'ItemStackTemplate.fromNonEmptyStack(new)' -&gt; 'new' it.withHoverEvent(HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(new))) } } }</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:var Component.stackHover: SafeItemStack? get() = this.style.hoverEvent?.takeIf { it.action() == HoverEvent.Action.SHOW_ITEM }?.let { (it as HoverEvent.ShowItem).item.create() } set(value) { value?.let { new -&gt; this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(new))) } } }</ID>
     <ID>NoTopLevelDefinition:TextCompat.kt:var Component.suggest: String? get() = this.style.clickEvent?.takeIf { it.action() == ClickEvent.Action.SUGGEST_COMMAND }?.let { (it as ClickEvent.SuggestCommand).command } set(value) { this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) } }</ID>
     <ID>NoTopLevelDefinition:TextCompat.kt:var Component.url: String? get() = this.style.clickEvent?.takeIf { it.action() == ClickEvent.Action.OPEN_URL }?.let { (it as ClickEvent.OpenUrl).uri.toString() } set(value) { this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) } }</ID>
     <ID>NoTopLevelDefinition:TextCompat.kt:var MutableComponent.bold: Boolean get() = this.style.isBold set(value) { this.withStyle { it.withBold(value) } }</ID>
@@ -1080,8 +1080,6 @@
     <ID>PrivateEventListener:DefaultConfigFeatures.kt:DefaultConfigFeatures$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:DefaultConfigFeatures.kt:DefaultConfigFeatures$@HandleEvent fun onHypixelJoin</ID>
     <ID>PrivateEventListener:DeferredDrawer.kt:DeferredDrawer$@HandleEvent(priority = 999) fun onRenderWorld</ID>
-    <ID>PrivateEventListener:DelayedRun.kt:DelayedRun$@HandleEvent(priority = HandleEvent.LOWEST) fun onTick</ID>
-    <ID>PrivateEventListener:DelayedServerRun.kt:DelayedServerRun$@HandleEvent(priority = HandleEvent.LOWEST) fun onServerTick</ID>
     <ID>PrivateEventListener:DeployableDisplay.kt:DeployableDisplay$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:DeployableDisplay.kt:DeployableDisplay$@HandleEvent(onlyOnSkyblock = true) fun onEntitySpawn</ID>
     <ID>PrivateEventListener:DeployableDisplay.kt:DeployableDisplay$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
@@ -1687,7 +1685,6 @@
     <ID>PrivateEventListener:GardenVisitorTimer.kt:GardenVisitorTimer$@HandleEvent(PestKillEvent::class) fun onPestKill</ID>
     <ID>PrivateEventListener:GardenVisitorTimer.kt:GardenVisitorTimer$@HandleEvent(ProfileJoinEvent::class) fun onProfileJoin</ID>
     <ID>PrivateEventListener:GardenVisitorTimer.kt:GardenVisitorTimer$@HandleEvent(VisitorArrivalEvent::class) fun onVisitorArrival</ID>
-    <ID>PrivateEventListener:GardenVisitorTooltip.kt:GardenVisitorTooltip$@HandleEvent(priority = HandleEvent.HIGHEST) fun onVisitorOpen</ID>
     <ID>PrivateEventListener:GardenWarpCommands.kt:GardenWarpCommands$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onKeyDown</ID>
     <ID>PrivateEventListener:GardenWarpCommands.kt:GardenWarpCommands$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onMessageSendToServer</ID>
     <ID>PrivateEventListener:GardenYawAndPitch.kt:GardenYawAndPitch$@HandleEvent fun onConfigFix</ID>
@@ -2222,7 +2219,6 @@
     <ID>PrivateEventListener:MetalDetectorSolver.kt:MetalDetectorSolver$@HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS) fun onRenderWorld</ID>
     <ID>PrivateEventListener:MetalDetectorSolver.kt:MetalDetectorSolver$@HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS) fun onTick</ID>
     <ID>PrivateEventListener:MinecraftCompat.kt:MinecraftCompat$@HandleEvent internal fun onPacketReceived</ID>
-    <ID>PrivateEventListener:MinecraftConsoleFilter.kt:MinecraftConsoleFilter$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:MinecraftData.kt:MinecraftData$@HandleEvent fun onSecondPassed</ID>
     <ID>PrivateEventListener:MinecraftData.kt:MinecraftData$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:MinecraftData.kt:MinecraftData$@HandleEvent(onlyOnSkyblock = true) fun onItemInHandChange</ID>
@@ -2395,7 +2391,6 @@
     <ID>PrivateEventListener:NewYearCakeReminder.kt:NewYearCakeReminder$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:NewYearCakeReminder.kt:NewYearCakeReminder$@HandleEvent fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:NewYearCakeReminder.kt:NewYearCakeReminder$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
-    <ID>PrivateEventListener:NextJacobContestConfig.kt:NextJacobContestConfig$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:NoBitsWarning.kt:NoBitsWarning$@HandleEvent fun onBitsGain</ID>
     <ID>PrivateEventListener:NoBitsWarning.kt:NoBitsWarning$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:NoBreak.kt:NoBreak$@HandleEvent fun onConfigFix</ID>
@@ -2948,9 +2943,6 @@
     <ID>PrivateEventListener:SkyHanniDebugsAndTests.kt:SkyHanniDebugsAndTests$@HandleEvent(onlyOnSkyblock = true) fun showItemCategory</ID>
     <ID>PrivateEventListener:SkyHanniDebugsAndTests.kt:SkyHanniDebugsAndTests$@HandleEvent(onlyOnSkyblock = true) fun showItemRarity</ID>
     <ID>PrivateEventListener:SkyHanniDebugsAndTests.kt:SkyHanniDebugsAndTests$@Suppress("LongMethod") @HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:SkyHanniEvents.kt:SkyHanniEvents$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:SkyHanniEvents.kt:SkyHanniEvents$@HandleEvent fun onSecondPassed</ID>
-    <ID>PrivateEventListener:SkyHanniEvents.kt:SkyHanniEvents$@HandleEvent(priority = HandleEvent.HIGHEST) fun onRepoReload</ID>
     <ID>PrivateEventListener:SkyHanniItemRenderCoordinator.kt:SkyHanniItemRenderCoordinator$@HandleEvent fun onDebugDataCollect</ID>
     <ID>PrivateEventListener:SkyHanniMod.kt:SkyHanniMod$@HandleEvent fun onClientShutdown</ID>
     <ID>PrivateEventListener:SkyHanniMod.kt:SkyHanniMod$@HandleEvent fun onCommandRegistration</ID>
@@ -2958,18 +2950,11 @@
     <ID>PrivateEventListener:SkyHanniMod.kt:SkyHanniMod$@HandleEvent fun onTick</ID>
     <ID>PrivateEventListener:SkyHanniRepoManager.kt:SkyHanniRepoManager$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:SkyHanniRepoManager.kt:SkyHanniRepoManager$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:SkyHanniRoundedShapeRenderManager.kt:SkyHanniRoundedShapeRenderManager$@HandleEvent fun onDebugDataCollect</ID>
     <ID>PrivateEventListener:SkyHanniTracker.kt:SkyHanniTracker.Companion$@HandleEvent fun onTick</ID>
     <ID>PrivateEventListener:SkyMartCopperPrice.kt:SkyMartCopperPrice$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:SkyMartCopperPrice.kt:SkyMartCopperPrice$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:SkyMartCopperPrice.kt:SkyMartCopperPrice$@HandleEvent fun onInventoryClose</ID>
     <ID>PrivateEventListener:SkyMartCopperPrice.kt:SkyMartCopperPrice$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$@HandleEvent fun onBackgroundDrawn</ID>
-    <ID>PrivateEventListener:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$@HandleEvent fun onSlotClick</ID>
-    <ID>PrivateEventListener:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$@HandleEvent fun onTooltip</ID>
     <ID>PrivateEventListener:SkyblockStat.kt:SkyblockStat.Companion$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:SkyblockStat.kt:SkyblockStat.Companion$@HandleEvent fun onResourcePackReload</ID>
     <ID>PrivateEventListener:SkyblockStat.kt:SkyblockStat.Companion$@HandleEvent fun onWidgetUpdate</ID>
@@ -2979,7 +2964,6 @@
     <ID>PrivateEventListener:SlayerAchievements.kt:SlayerAchievements$@HandleEvent fun onAchievementRegistration</ID>
     <ID>PrivateEventListener:SlayerAchievements.kt:SlayerAchievements$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:SlayerBossSpawnSoon.kt:SlayerBossSpawnSoon$@HandleEvent fun onSlayerProgressChange</ID>
-    <ID>PrivateEventListener:SlayerCocoonWarning.kt:SlayerCocoonWarning$@HandleEvent fun onChatMessage</ID>
     <ID>PrivateEventListener:SlayerConfig.kt:SlayerConfig.Companion$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:SlayerItemsOnGround.kt:SlayerItemsOnGround$@HandleEvent fun onRenderWorld</ID>
     <ID>PrivateEventListener:SlayerItemsOnGround.kt:SlayerItemsOnGround$@HandleEvent fun onTick</ID>
@@ -3144,8 +3128,6 @@
     <ID>PrivateEventListener:TestCanSeeFace.kt:TestCanSeeFace$@HandleEvent(GuiRenderEvent::class) fun onGuiRender</ID>
     <ID>PrivateEventListener:TestCanSeeFace.kt:TestCanSeeFace$@HandleEvent(onlyOnSkyblock = true) fun onPlayerMove</ID>
     <ID>PrivateEventListener:TestChatCommand.kt:TestChatCommand$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:TestCopyBestiaryValues.kt:TestCopyBestiaryValues$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:TestCopyBestiaryValues.kt:TestCopyBestiaryValues$@HandleEvent(priority = HandleEvent.LOW) fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:TestCopyRngMeterValues.kt:TestCopyRngMeterValues$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:TestCopyRngMeterValues.kt:TestCopyRngMeterValues$@HandleEvent fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:TestExportTools.kt:TestExportTools$@HandleEvent fun onConfigFix</ID>
