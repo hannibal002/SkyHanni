@@ -11,7 +11,7 @@ import org.intellij.lang.annotations.Language
 @SkyHanniModule
 object HotfApi {
 
-    val lottery: LotteryPerk? get() = HotfData.rotatingPerkSlots.firstNotNullOfOrNull { it.currentPerk as? LotteryPerk }
+    val lottery: LotteryPerk? get() = HotfData.rotatingPerkSlots.find { it.entry == HotfData.LOTTERY }?.currentPerk as LotteryPerk?
 
     enum class LotteryPerk(
         override val displayDescription: String,
