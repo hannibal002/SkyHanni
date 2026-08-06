@@ -20,24 +20,17 @@ import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.vertex.BufferBuilder
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.Projection
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.resources.Identifier
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.joml.Vector4f
 
-//? if >= 26.1
-import net.minecraft.client.renderer.Projection
-
 object RoundedShapeDrawer {
 
     val projectionMatrix = ProjectionMatrixBuffer(
         "SkyHanni Rounded Shapes",
-        //? if < 26.1 {
-        /*1000.0f,
-        11000.0f,
-        true,
-        *///?}
     )
     var roundedUniform = SkyHanniRoundedUniform()
     var roundedOutlineUniform = SkyHanniRoundedOutlineUniform()
@@ -83,11 +76,8 @@ object RoundedShapeDrawer {
             RenderSystem.backupProjectionMatrix()
             val w = window.width.toFloat() / window.guiScale.toFloat()
             val h = window.height.toFloat() / window.guiScale.toFloat()
-            RenderSystem.setProjectionMatrix(
-                //~ if < 26.1 'Projection().apply { this.setupOrtho(1000f, 11000f, w, h, true) }' -> 'w, h'
-                projectionMatrix.getBuffer(Projection().apply { this.setupOrtho(1000f, 11000f, w, h, true) }),
-                ProjectionType.ORTHOGRAPHIC,
-            )
+            val projectionMatrixBuffer = projectionMatrix.getBuffer(Projection().apply { this.setupOrtho(1000f, 11000f, w, h, true) })
+            RenderSystem.setProjectionMatrix(projectionMatrixBuffer, ProjectionType.ORTHOGRAPHIC)
             val dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
                 Matrix4f().setTranslation(0.0f, 0.0f, -11000.0f),
                 Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
