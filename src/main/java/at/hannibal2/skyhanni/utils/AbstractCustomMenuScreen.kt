@@ -40,14 +40,11 @@ abstract class AbstractCustomMenuScreen(
     }
 
     override fun keyPressed(input: KeyEvent): Boolean {
-        if (super.keyPressed(input)) {
-            return true
-        }
         if (Minecraft.getInstance().options.keyInventory.matches(input)) {
             this.onClose()
             return true
         }
-        return false
+        return super.keyPressed(input)
     }
 
     override fun tick() {
