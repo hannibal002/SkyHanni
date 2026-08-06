@@ -59,8 +59,12 @@ a boundary (conflicting areas).
 
 ### Navigating
 
-[Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) and [A*](https://en.wikipedia.org/wiki/A*_search_algorithm) algorithms
-calculate the shortest path to navigate the user.
+The [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) algorithm calculates the shortest path to navigate the user.
+
+Features that visit many locations in one go, like **Fast Fairy Soul** or `/shnavigateall`, also need a good order to visit them in. That
+is the [Traveling Salesman Problem](https://en.wikipedia.org/wiki/Travelling_salesman_problem), solved with a
+[nearest neighbor](https://en.wikipedia.org/wiki/Nearest_neighbour_algorithm) route improved by
+[2-opt](https://en.wikipedia.org/wiki/2-opt). Each leg of that route is a normal Dijkstra path again.
 
 A non-exhaustive list of features:
 
