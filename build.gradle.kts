@@ -174,13 +174,8 @@ dependencies {
         ProjectTarget.MODERN_26100 -> "26.1.819"
     }
     val reiApi = "me.shedaniel:RoughlyEnoughItems-api:$reiVersion"
-    if (isDeobf) {
-        compileOnly(reiApi) { isTransitive = false }
-         compileOnly(libs.skyblockitemlist)
-    } else {
-        modCompileOnly(reiApi) { isTransitive = false }
-        modCompileOnly(libs.skyblockitemlist)
-    }
+    compileOnly(reiApi) { isTransitive = false }
+    compileOnly(libs.skyblockitemlist)
     "minecraftTestClientRuntimeLibraries"(reiApi) {
         isTransitive = false
     }
