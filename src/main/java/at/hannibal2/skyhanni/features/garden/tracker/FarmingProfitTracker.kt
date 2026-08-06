@@ -756,7 +756,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         val offerItem = event.inventoryItems[VisitorApi.ACCEPT_SLOT] ?: return false
         if (offerItem.hoverName.string != "Accept Offer") return false
         visitor.offer = VisitorApi.VisitorOffer(offerItem)
-        GardenVisitorTooltip.refreshVisitorOffer(visitor)
+        GardenVisitorTooltip.readVisitorOffer(visitor)
         return true
     }
 

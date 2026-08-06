@@ -118,7 +118,7 @@ enum class SkyblockStat(
 
     // <editor-fold desc="Hunting Stats">
     PULL(AQUA, '\uE02D'),
-    HUNTER_FORTUNE(LIGHT_PURPLE, '\uE05B'),
+    HUNTING_FORTUNE(LIGHT_PURPLE, '\uE05B'),
     CHARM_CHANCE(AQUA, '❣'),
     // </editor-fold>
 
@@ -273,6 +273,7 @@ enum class SkyblockStat(
             event.move(69, "#profile.stats.TRUE_DEFENCE", "#profile.stats.TRUE_DEFENSE")
             event.move(112, "#profile.stats.NETHER_WART_FORTUNE", "#profile.stats.NETHER_STALK_FORTUNE")
             event.remove(113, "#profile.stats.null")
+            event.move(141, "#profile.stats.HUNTER_FORTUNE", "#profile.stats.HUNTING_FORTUNE")
         }
     }
 }
