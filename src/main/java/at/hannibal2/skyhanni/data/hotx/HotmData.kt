@@ -424,6 +424,7 @@ enum class HotmData(
     companion object : HotxHandler<HotmData, HotmReward>(entries) {
 
         override val name: String = "HotM"
+        override val islandTypeTag = IslandTypeTag.MINING
         override val rotatingPerkSlots = listOf(
             object : RotatingPerkSlot<HotmData> {
                 override val entry: HotmData = SKY_MALL
@@ -432,7 +433,6 @@ enum class HotmData(
             },
         )
 
-        override val islandTypeTag = IslandTypeTag.MINING
         private val config get() = SkyHanniMod.feature.mining.hotm
         override val position: Position get() = config.skyMallPosition
 
