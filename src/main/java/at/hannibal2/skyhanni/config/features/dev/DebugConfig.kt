@@ -248,11 +248,6 @@ class DebugConfig {
     var addonsDebug: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Slayer Debug", desc = "Enable extra debug messages for Slayer features.")
-    @ConfigEditorBoolean
-    var slayerDebug: Boolean = false
-
-    @Expose
     @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")
     val addonsDebugPosition: Position = Position(300, 300)
 

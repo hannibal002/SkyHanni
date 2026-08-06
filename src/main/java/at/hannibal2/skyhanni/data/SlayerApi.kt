@@ -25,14 +25,15 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessaryOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.slayer.SlayerType as Type
-
 
 @SkyHanniModule
 object SlayerApi {
@@ -67,6 +68,14 @@ object SlayerApi {
     private val questFailedPattern by patternGroup.pattern(
         "quest.failed",
         "\\s*SLAYER QUEST FAILED!",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: "  YOU COCOONED YOUR SLAYER BOSS"
+     */
+    private val cocoonPattern by RepoPattern.pattern(
+        "slayer.cocooned.colorless",
+        "\\s+YOU COCOONED YOUR SLAYER BOSS",
     )
     // </editor-fold>
 
@@ -104,6 +113,11 @@ object SlayerApi {
      * How many consecutive updates have we seen that are invalid?
      */
     private var invalidUpdates = 0
+
+    /**
+     * The last time we saw a cocoon message, used to ensure it doesn't get stuck in a state where we think we are cocooned when we are not
+     */
+    private var lastCocoonTimestamp = ServerTimeMark.farPast()
 
     private val outsideRiftData = SlayerData()
     private val insideRiftData = SlayerData()
@@ -192,6 +206,14 @@ object SlayerApi {
                 data.currentState = FAILED
                 data.currentStateRaw = "no slayer"
                 SlayerStateChangeEvent(FAILED).post()
+            }
+            cocoonPattern.matches(message) -> {
+                val data = getCurrentData()
+                ChatUtils.debug("SlayerApi: Slayer boss cocooned, posting SlayerStateChangeEvent")
+                data.currentState = COCOONED
+                data.currentStateRaw = "cocooned"
+                SlayerStateChangeEvent(COCOONED).post()
+                lastCocoonTimestamp = ServerTimeMark.now()
             }
         }
     }
@@ -296,7 +318,13 @@ object SlayerApi {
 
         data.currentStateRaw = progress
 
-        val newState = detectState(progress)
+        var newState = detectState(progress)
+
+        val cocooned = data.currentState == COCOONED && lastCocoonTimestamp.passedSince() <= 6.seconds
+        if (cocooned && (newState == NO_ACTIVE_QUEST || newState == SLAIN)) {
+            ChatUtils.debug("SlayerApi: Cocooned state detected, overriding $newState to COCOONED")
+            newState = COCOONED
+        }
 
         // If the player kills the boss immediately after the boss spawns
         if (data.currentState == BOSS_FIGHT && newState == GRINDING) {
@@ -335,6 +363,7 @@ object SlayerApi {
         BOSS_FIGHT,
         FAILED,
         SLAIN,
+        COCOONED,
         NO_ACTIVE_QUEST,
     }
 
@@ -358,6 +387,15 @@ object SlayerApi {
                 currentAreaType = checkTypeForCurrentArea()
                 updateArea()
             }
+        }
+    }
+
+    @HandleEvent
+    private fun onWorldChange() {
+        val data = outsideRiftData
+        if (data.currentState == COCOONED) {
+            ChatUtils.debug("SlayerApi: World change detected, resetting cocooned state")
+            lastCocoonTimestamp = ServerTimeMark.farPast()
         }
     }
 
