@@ -82,11 +82,7 @@ object DialogUtils {
     private fun String.stripForbiddenChars(): String = filterNot { it in forbiddenCharacters }
 
     private fun messageBox(title: String, message: String): Boolean {
-        //? if >= 26.1 {
         return TinyFileDialogs.tinyfd_messageBox(title, message, "ok", "info", 1) != 0
-        //?} else {
-        /*return TinyFileDialogs.tinyfd_messageBox(title, message, "ok", "info", true)
-        *///?}
     }
 
     @HandleEvent
