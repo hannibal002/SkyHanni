@@ -153,14 +153,6 @@ enum class GraphNodeTag(
         onlyIsland = IslandType.GALATEA,
     ),
 
-    HIDEONSUN(
-        "hideonsun",
-        LorenzColor.YELLOW,
-        "Hideonsun",
-        "The yellow Shulkers.",
-        onlyIsland = IslandType.TORRHUS_CANYON,
-    ),
-
     TREE_PROTECTION_ORDER(
         "tree_protection_order",
         LorenzColor.RED,
@@ -169,11 +161,35 @@ enum class GraphNodeTag(
         onlyIslands = IslandTypeTag.FORAGING_CUSTOM_TREES,
     ),
 
-    HONEY_HIVE(
-        "honey_hive",
+    HIDEONSUN(
+        "hideonsun",
+        LorenzColor.YELLOW,
+        "Hideonsun",
+        "The yellow Shulkers.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    HONEYHIVE(
+        "honeyhive",
         LorenzColor.GOLD,
-        "Honey Hive",
-        "Lootable Honey Hive.",
+        "Honeyhive",
+        "Lootable Honeyhive.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    PANGOLIN(
+        "pangolin_area",
+        LorenzColor.BLUE,
+        "Pangolin",
+        "Possible Pangolin Critter spawn point.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    SANGER(
+        "sanger_area",
+        LorenzColor.GREEN,
+        "Sanger",
+        "Possible Sanger NPC spawn point.",
         onlyIsland = IslandType.TORRHUS_CANYON,
     ),
 
@@ -186,7 +202,7 @@ enum class GraphNodeTag(
     ),
 
     HIDEYHO_LOCATION(
-        "hideyho_location",
+        "hideyho",
         LorenzColor.LIGHT_PURPLE,
         "Hideyho Location",
         "A location that Hideyho can be found.",

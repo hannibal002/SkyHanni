@@ -14,7 +14,7 @@ import net.minecraft.world.item.DyeColor
 
 object ModernIslandExceptions {
 
-    internal fun galatea(
+    internal fun moongladeMarsh(
         baseEntity: LivingEntity,
         armorStand: ArmorStand?,
         nextEntity: LivingEntity?,
