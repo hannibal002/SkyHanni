@@ -44,7 +44,6 @@ object InventoryCompat {
     internal fun clickInventorySlot(windowId: Int, slotId: Int, mouseButton: Int, mode: ContainerInput) {
         val controller = Minecraft.getInstance().gameMode ?: return
         val player = MinecraftCompat.localPlayerOrNull ?: return
-        //~ if < 26.1 'handleContainerInput' -> 'handleInventoryMouseClick'
         controller.handleContainerInput(windowId, slotId, mouseButton, mode, player)
     }
 
