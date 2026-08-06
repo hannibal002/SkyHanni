@@ -73,8 +73,8 @@ A non-exhaustive list of features:
 
 ## Graph Editor
 
-To open up the Graph Editor run the command `/shgraph`. Run the command again to exit the Graph Editor at any time (or press the
-default key `Home`).
+To open up the Graph Editor run the command `/shgraph`.
+To exit the Graph Editor, run the command again or press the **Exit Key** (by default `Enter`).
 To load the Graph Editor with the existing repo data of the current island, run `/shgraphloadthisisland`.
 
 Press the **Vision Key** (by default `M`) to toggle visibility of nodes and edges behind blocks.
@@ -164,7 +164,7 @@ The text mode needs you to select a node first.
 
 In the text mode, you can use your keyboard to write down a name for the node.
 You see the text on the node in the world in real time while you write.
-Press `Esc` to exit the text mode.
+Press **Exit Key** (by default `Enter`) to exit the text mode.
 
 You can use `Control` + `V` to paste your clipboard as text while in the text mode.
 The new string does not append to the text, but rather replaces the whole old text.

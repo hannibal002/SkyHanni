@@ -33,8 +33,8 @@ class GraphEditorConfig {
     // TODO rename to selectNearestNodeKey
     @Expose
     @ConfigOption(name = "Select Nearest Node", desc = "Select the nearest node to be active. Double press to unselect.")
-    @ConfigEditorKeybind(defaultKey = KeyboardManager.MIDDLE_MOUSE)
-    var selectKey: Int = KeyboardManager.MIDDLE_MOUSE
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.LEFT_MOUSE)
+    var selectKey: Int = KeyboardManager.LEFT_MOUSE
 
     // TODO rename to selectLookingAtNodeKey
     @Expose
@@ -52,7 +52,7 @@ class GraphEditorConfig {
 
     @Expose
     @ConfigOption(name = "Exit Key", desc = "Exit out of text edit mode. If not in text edit mode, disables the graph editor.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_HOME)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_ENTER)
     var exitKey: Int = GLFW.GLFW_KEY_ENTER
 
     // TODO rename to nodeMoveKey
@@ -93,7 +93,7 @@ class GraphEditorConfig {
         name = "Clear Key",
         desc = "Clear the graph. Also saves the graph to the clipboard, in case of a misclick."
     )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_P)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var clearKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
