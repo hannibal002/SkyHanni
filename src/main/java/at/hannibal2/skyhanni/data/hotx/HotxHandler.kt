@@ -198,11 +198,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
         )
     }
 
-    protected open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }
-    protected abstract val rotatingPerks: List<RotPerkE>
     protected abstract val islandTypeTag: IslandTypeTag
-    abstract var currentRotPerk: RotPerkE?
-        protected set
     protected open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }
     protected abstract val rotatingPerkSlots: List<RotatingPerkSlot<Data>>
 
