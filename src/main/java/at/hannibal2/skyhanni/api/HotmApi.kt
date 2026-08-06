@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.HotfApi.LotteryPerk
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.hotx.HotfData
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.HotxPatterns.asPatternId
 import at.hannibal2.skyhanni.data.hotx.RotatingPerk
@@ -104,7 +106,7 @@ object HotmApi {
         }
     }
 
-    var skymall: SkymallPerk? = null
+    val skymall: SkymallPerk? get() = HotfData.rotatingPerkSlots.firstNotNullOfOrNull { it.currentPerk as? SkymallPerk }
 
     var mineshaftMayhem: MayhemPerk? = null
 

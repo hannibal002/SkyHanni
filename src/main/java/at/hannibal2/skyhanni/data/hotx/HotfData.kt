@@ -270,7 +270,7 @@ enum class HotfData(
             object : RotatingPerkSlot<HotfData> {
                 override val entry: HotfData = LOTTERY
                 override val perks = HotfApi.LotteryPerk.entries
-                override var currentPerk: RotatingPerk? = HotfApi.lottery
+                override var currentPerk: RotatingPerk? = null
             },
         )
         override val islandTypeTag = IslandTypeTag.FORAGING

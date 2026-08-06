@@ -428,7 +428,7 @@ enum class HotmData(
             object : RotatingPerkSlot<HotmData> {
                 override val entry: HotmData = SKY_MALL
                 override val perks = SkymallPerk.entries
-                override var currentPerk: RotatingPerk? = HotmApi.skymall
+                override var currentPerk: RotatingPerk? = null
             },
         )
 
