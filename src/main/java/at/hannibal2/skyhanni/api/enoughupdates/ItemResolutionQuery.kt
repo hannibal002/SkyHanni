@@ -42,7 +42,7 @@ import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 
-// Code taken from NotEnoughUpdates
+// Code originally from NotEnoughUpdates
 class ItemResolutionQuery {
 
     private var compound: DataComponentMap = DataComponentMap.EMPTY
@@ -53,6 +53,7 @@ class ItemResolutionQuery {
 
     @SkyHanniModule
     companion object {
+        private const val MAX_CANDIDATE_INTERNAL_NAMES = 20
 
         private val patternGroup = RepoPattern.group("misc.itemresolution")
 
@@ -76,7 +77,7 @@ class ItemResolutionQuery {
 
         val petRarities = listOf("COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC")
 
-        private val BAZAAR_ENCHANTMENT_PATTERN = "ENCHANTMENT_(\\D*)_(\\d+)".toPattern()
+        private val bazaarEnchantmentPattern = "ENCHANTMENT_(\\D*)_(\\d+)".toPattern()
 
         private var renamedEnchantments: Map<String, String> = mapOf()
         private var shardNameOverrides: Map<String, String> = mapOf()
@@ -92,14 +93,13 @@ class ItemResolutionQuery {
             ItemUtils.bazaarOverrides[hypixelId]?.let {
                 return it
             }
-            val matcher = BAZAAR_ENCHANTMENT_PATTERN.matcher(hypixelId)
-            if (matcher.matches()) {
-                return matcher.group(1) + ";" + matcher.group(2)
+            bazaarEnchantmentPattern.matchMatcher(hypixelId) {
+                return group(1) + ";" + group(2)
             }
             return hypixelId.replace(":", "-")
         }
 
-        fun findInternalNameByDisplayName(displayName: String, mayBeMangled: Boolean): NeuInternalName? {
+        fun findInternalNameByDisplayName(displayName: String, mayBeMangled: Boolean = false): NeuInternalName? {
             return filterInternalNameCandidates(
                 findInternalNameCandidatesForDisplayName(displayName),
                 displayName,
@@ -121,6 +121,7 @@ class ItemResolutionQuery {
             val cleanDisplayName = itemName.removeColor()
             var bestMatch: NeuInternalName? = null
             var bestMatchLength = -1
+            var bestMatchIsAmbiguous = false
             loop@ for (internalName in candidateInternalNames.map { it.toInternalName() }) {
                 if (NeuItems.isIgnoredDisplayNameItem(internalName)) continue
                 val unCleanItemDisplayName: String = EnoughUpdatesManager.getDisplayName(internalName)
@@ -143,7 +144,27 @@ class ItemResolutionQuery {
                 if (cleanItemDisplayName.length > bestMatchLength) {
                     bestMatchLength = cleanItemDisplayName.length
                     bestMatch = internalName
+                    bestMatchIsAmbiguous = false
+                } else if (cleanItemDisplayName.length == bestMatchLength) {
+                    bestMatchIsAmbiguous = true
                 }
+            }
+            // Many items share a display name, most notably every enchanted book is just called
+            // "Enchanted Book". Picking one of them would depend on the candidate iteration order,
+            // which silently attributes the wrong item to whatever asked for it.
+            if (bestMatchIsAmbiguous) {
+                ErrorManager.logErrorStateWithData(
+                    "Ambiguous item name: \"$displayName\"",
+                    "ItemResolutionQuery got an ambiguous display name",
+                    "candidateInternalNames" to buildString {
+                        append(candidateInternalNames.take(MAX_CANDIDATE_INTERNAL_NAMES).joinToString(", "))
+                        if (candidateInternalNames.size > MAX_CANDIDATE_INTERNAL_NAMES) {
+                            append(", ... (${candidateInternalNames.size - MAX_CANDIDATE_INTERNAL_NAMES} more items)")
+                        }
+                    },
+                    "mayBeMangled" to mayBeMangled,
+                )
+                return null
             }
             return bestMatch
         }
@@ -315,7 +336,7 @@ class ItemResolutionQuery {
             val s = lore[15]
             if (s == "§7Selected Drop") {
                 val displayName = lore[16]
-                return findInternalNameByDisplayName(displayName, false)
+                return findInternalNameByDisplayName(displayName)
             }
         }
 
@@ -344,7 +365,7 @@ class ItemResolutionQuery {
             return resolveEnchantmentByName(displayName)
         }
         if (itemType === Items.PLAYER_HEAD && displayName.contains("Essence")) {
-            findInternalNameByDisplayName(displayName, false)?.let { return it }
+            findInternalNameByDisplayName(displayName)?.let { return it }
         }
 
         return if (displayName.endsWith("Enchanted Book") && guiName.startsWith("Superpairs")) {
@@ -357,7 +378,7 @@ class ItemResolutionQuery {
         } else if (guiName == "Catacombs RNG Meter") {
             resolveItemInCatacombsRngMeter()
         } else if (guiName.startsWith("Choose Pet")) {
-            findInternalNameByDisplayName(displayName, false)
+            findInternalNameByDisplayName(displayName)
         } else if (guiName.endsWith("Experimentation Table RNG")) {
             resolveEnchantmentByName(displayName)
         } else if (AttributeShardsData.attributeMenuInventory.isInside()) {
@@ -377,7 +398,7 @@ class ItemResolutionQuery {
                 }
             }
         } else if (guiName == "Dye Compendium") {
-            findInternalNameByDisplayName(displayName, false)
+            findInternalNameByDisplayName(displayName)
         } else null
     }
 
