@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerSwapReminder {
 
-    private val config get() = SlayerApi.config.SwapReminder
+    private val config get() = SlayerApi.config.swapReminder
 
     private var hasRemindedForCurrentBoss = false
 
