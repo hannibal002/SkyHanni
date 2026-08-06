@@ -39,7 +39,7 @@ A non-exhaustive list of features:
     - Lets you navigate in a circle to all waypoints of a given category, e.g. fairy souls, hoppity eggs, fishing hotspots/wormholes.
     - On canyon: hideonsun, honeyhive, pangolin, sanger, tree protection order.
 
-## Graph Editor
+# Graph Editor
 
 To open up the graph editor run the command `/shgraph`. Run the command again to exit the whole graph edit at any time (or press the
 default key "Home").
@@ -55,7 +55,7 @@ Once the graph is loaded, you see two GUIs:
     - Useful to navigate to any given node quickly.
 - A keybind list, showing you what you can do at any given time by pressing the keys.
 
-### Basic Editing
+## Basic Editing
 
 The three most important/basic actions you can do are:
 
@@ -68,14 +68,14 @@ The graph editor uses colors to explain what node is selected and what node is c
 - The closest node to you is yellow.
 - The selected node is green.
 
-#### Select a Node
+### Select a Node
 
 Lets you select/deselect the next closest node to you.
 Only one node can be selected at the same time.
 
 By default, the keybind for "Select Nearest Node" this is "Left Mouse Button".
 
-#### Adding/Deleting Nodes
+### Adding/Deleting Nodes
 
 By default, when you press F, you create a new node at the location where you stand.
 If you have a node selected, this behavior is altered:
@@ -89,13 +89,13 @@ If you are more than 3 blocks away from the selected node, you do two things:
 If you press the select key after creating a new node, you can move around and just keep pressing the add and select keys to quickly create
 a new line of nodes in the world.
 
-#### Adding/Deleting Edges
+### Adding/Deleting Edges
 
 By default, when you press C, you create a connection between the selected node (green) and the next closest node (yellow).
 When you press C again, the edge gets deleted.
 The normal edge color is blue, the edge between the selected and the nearest node is red.
 
-#### Moving a Node
+### Moving a Node
 
 Instead of deleting and adding a new node, you can move the selected node around in the world.
 While you keep pressed the **Node Move Key** (default "Tab"), move the node by one block in each direction.
@@ -104,7 +104,7 @@ Use your Minecraft keybind to move the selected node:
 - W-A-S-D to move the node forward, backwards or sideways, relative to the direction you are looking at.
 - Use the sneak and jump keys to move the node up or down.
 
-### Named Nodes and Tags
+## Named Nodes and Tags
 
 To find targets on the graph and let the mod features programmatically connect to the nodes on the graph, we can give a node a name and a
 tag.
@@ -112,21 +112,21 @@ tag.
 A node with a name always needs a tag, a node with a tag always needs a name.
 The vast majority of nodes don't have either.
 
-#### Renaming a node
+### Renaming a node
 
-By default, the keybind Y is used to go into the text mode.
+By default, the keybind `Y` is used to go into the text mode.
 The text mode needs you to select a node first.
 
 In the text mode, you can use your keyboard to write down a name for the node.
 You see the text on the node in the world in real time while you write.
 Press Esc to exit the text mode.
 
-You can use Control + V to paste your clipboard as text while in the text mode.
+You can use `Control` + `V` to paste your clipboard as text while in the text mode.
 It does not append on the end of the text, but replaces the whole text to your clipboard.
 This can become useful if you want to add a lot of nodes with the same name.
 Or if other mods or vanilla Minecraft keybind mappings activate while you type in the text mode.
 
-#### Tagging a Node
+### Tagging a Node
 
 Once the node has a name, it shows up in the **List of Named Nodes**.
 In this list, you see the red "no tag" suffix next to the newly renamed node.
@@ -167,17 +167,38 @@ Small areas are for things like a building or a small cave, like the bank in hub
 The difference between area and small area is to visually differentiate in the **Area Navigation** feature and in /shnavigate, and for the
 option to show/hide small areas in the **Area Navigation** list.
 
-### Advanced Editing Tools
+## Advanced Editing Tools
 
 Apart from adding, deleting and moving nodes and edges, the graph editor has an amount of advanced editing tools
 
-undo
+### Undo and Redo
 
-run Dijkstra from current node to selected node
+Every action you do in the graph editor (adding/removing nodes/edges, renames, adding/removing tags, node weight, direction changes of
+edges), even big actions (loading, unloading the whole graph) can be undone via `Control` + `Z`. Also supports Redo via `Control` + `Y`.
 
-select near look
+### Navigate to Selected Node
 
-split/dissolve
+Press the **Navigate to Node** keybind (by default `G`) to start the navigation pathfinding logic, targeting the selected node.
+Since the navigation feature relies on the graph network data and not the graph editor directly, make sure to apply the graph editor to the
+current island by saving (by default 'O').
+
+### Select looking at Node
+
+You want to select a node that is further away, and its time consuming to walk up to the node to select it?
+Walk no more! you can set a key for the **Select looking at Node** keybind.
+Then, all you need to do is to look at the node you want to select, and press the keybind!
+
+### Split
+
+Use the **Split Key** to cut the currently red marked edge (between the selected node and the closest node) in half.
+that will create a new node in the middle of the edge, remove the old connection between the two old nodes, and add two new connections,
+from the new node to the two old nodes.
+
+The **Split Key** is not set by default.
+
+### Dissolve
+
+Use the **Dissolve Key** to delete a node that has exactly two connected nodes. The two remaining nodes then get a connection between them.
 
 edge cycle/one-directional edges
 
@@ -185,7 +206,7 @@ edge cycle/one-directional edges
 
 press save to test /shnavigate
 
-### Tools To deal with bugs
+## Tools to Test or Debug, and deal with merging networks
 
 Error Finder
 
@@ -195,7 +216,7 @@ Error Finder
 
 /merge
 
-### misc tools
+## misc tools
 
 feedback
 
@@ -206,6 +227,6 @@ clear key
 Save
 what does save all do
 
-### Parkour
+## Parkour
 
 two commands to import/export

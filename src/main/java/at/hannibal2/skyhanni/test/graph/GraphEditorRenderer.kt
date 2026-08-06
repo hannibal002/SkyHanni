@@ -75,7 +75,7 @@ object GraphEditorRenderer {
             add("§ePlace: §6${config.placeKey.name()}")
             add("§eSelect Nearest: §6${config.selectKey.name()}")
             add("§eSelect Looking at: §6${config.selectRaycastKey.name()}")
-            add("§eConnect: §6${config.connectKey.name()}")
+            add("§eConnect Nodes: §6${config.connectKey.name()}")
             add("§eTest Dijkstra: §6${config.dijkstraKey.name()}")
             add("§eVision: §6${config.throughBlocksKey.name()}")
             add("§eSave: §6${config.saveKey.name()}")

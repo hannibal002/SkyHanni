@@ -92,7 +92,7 @@ object GraphEditorNodeOperations {
         }
     }
 
-    fun handleConnect() {
+    fun handleConnectNodes() {
         if (state.activeNode == state.closestNode) return
         val edge = GraphEditor.state.getEdgeIndex(state.activeNode, state.closestNode)
         if (edge == null) {

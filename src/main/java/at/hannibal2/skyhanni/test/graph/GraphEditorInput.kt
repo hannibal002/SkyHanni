@@ -73,7 +73,7 @@ object GraphEditorInput {
         if (handleSelectLookingAt()) return
 
         if (config.connectKey.isKeyClicked()) {
-            GraphEditorNodeOperations.handleConnect()
+            GraphEditorNodeOperations.handleConnectNodes()
             return
         }
         if (handleThroughBlocks()) return
