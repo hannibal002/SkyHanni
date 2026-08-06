@@ -43,13 +43,6 @@ import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField
 
-//? if < 26.1 {
-/*import at.hannibal2.skyhanni.utils.compat.RenderCompat
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
-import net.minecraft.client.gui.screens.inventory.InventoryScreen
-import kotlin.math.roundToInt
-*///?}
-
 class GuiPositionEditor(
     private val positions: List<Position>,
     private val border: Int,
@@ -318,22 +311,10 @@ private class OldScreenRenderContext(
         val oldScreenMouseX = (mouseX / scaleX).toInt()
         val oldScreenMouseY = (mouseY / scaleY).toInt()
 
-        //? if < 26.1 {
-        /*if (oldScreen is InventoryScreen) {
-            renderOldInventoryScreen(oldScreen, scaleX, scaleY, mouseX, mouseY, oldScreenMouseX, oldScreenMouseY, partialTicks)
-            return
-        }
-        *///?}
-
         DrawContextUtils.pushPop {
             DrawContextUtils.scale(scaleX, scaleY)
-            //? if >= 26.1 {
             oldScreen.extractBackground(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
             oldScreen.extractRenderState(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
-            //?} else {
-            /*oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, oldScreenMouseX, oldScreenMouseY)
-            oldScreen.render(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
-            *///?}
         }
     }
 
@@ -368,76 +349,4 @@ private class OldScreenRenderContext(
         val windowWidth = Minecraft.getInstance().window.width
         return ((windowWidth + oldScreen.width - 1) / oldScreen.width).coerceAtLeast(1)
     }
-
-    //? if < 26.1 {
-    /*private fun renderOldInventoryScreen(
-        oldScreen: InventoryScreen,
-        scaleX: Float,
-        scaleY: Float,
-        mouseX: Int,
-        mouseY: Int,
-        oldScreenMouseX: Int,
-        oldScreenMouseY: Int,
-        partialTicks: Float,
-    ) {
-        DrawContextUtils.pushPop {
-            DrawContextUtils.scale(scaleX, scaleY)
-            drawInventoryBackground(oldScreen)
-        }
-        renderInventoryPlayer(oldScreen, scaleX, scaleY, mouseX, mouseY)
-        DrawContextUtils.pushPop {
-            DrawContextUtils.scale(scaleX, scaleY)
-            oldScreen.renderContents(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
-            oldScreen.renderCarriedItem(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY)
-            oldScreen.renderSnapbackItem(DrawContextUtils.drawContext)
-        }
-    }
-
-    private fun drawInventoryBackground(oldScreen: InventoryScreen) {
-        DrawContextUtils.drawContext.blit(
-            RenderCompat.getMinecraftGuiTextured(),
-            AbstractContainerScreen.INVENTORY_LOCATION,
-            oldScreen.containerLeft(),
-            oldScreen.containerTop(),
-            0f,
-            0f,
-            oldScreen.containerImageWidth(),
-            oldScreen.containerImageHeight(),
-            256,
-            256,
-        )
-    }
-
-    private fun renderInventoryPlayer(
-        oldScreen: InventoryScreen,
-        scaleX: Float,
-        scaleY: Float,
-        originalMouseX: Int,
-        originalMouseY: Int,
-    ) {
-        val player = Minecraft.getInstance().player ?: return
-        val left = oldScreen.containerLeft()
-        val top = oldScreen.containerTop()
-        val entityScale = (30 * ((scaleX + scaleY) / 2f)).roundToInt()
-
-        //~ if < 26.1 'extract' -> 'render'
-        InventoryScreen.extractEntityInInventoryFollowsMouse(
-            DrawContextUtils.drawContext,
-            ((left + 26) * scaleX).roundToInt(),
-            ((top + 8) * scaleY).roundToInt(),
-            ((left + 75) * scaleX).roundToInt(),
-            ((top + 78) * scaleY).roundToInt(),
-            entityScale,
-            0.0625f * ((scaleX + scaleY) / 2f),
-            originalMouseX.toFloat(),
-            originalMouseY.toFloat(),
-            player,
-        )
-    }
-
-    private fun AbstractContainerScreen<*>.containerLeft() = leftPos
-    private fun AbstractContainerScreen<*>.containerTop() = topPos
-    private fun AbstractContainerScreen<*>.containerImageWidth() = imageWidth
-    private fun AbstractContainerScreen<*>.containerImageHeight() = imageHeight
-    *///?}
 }
