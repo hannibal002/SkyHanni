@@ -56,24 +56,31 @@ abstract class SkyHanniBaseScreen(title: Component = Component.empty()) : Screen
     open fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {}
 
     override fun keyPressed(input: KeyEvent): Boolean {
-        postKeyTyped(null, input.key)
+        if (postKeyTyped(null, input.key)) {
+            return true
+        }
         return super.keyPressed(input)
     }
 
     override fun charTyped(input: CharacterEvent): Boolean {
-        postKeyTyped(input.codepoint.toChar(), null)
+        if (postKeyTyped(input.codepoint.toChar(), null)) {
+            return true
+        }
         return super.charTyped(input)
     }
 
-    private fun postKeyTyped(typedChar: Char?, keyCode: Int?) {
+    private fun postKeyTyped(typedChar: Char?, keyCode: Int?): Boolean {
         try {
-            onKeyTyped(typedChar, keyCode)
+            return onKeyTyped(typedChar, keyCode)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error while typing key", "screen" to this)
         }
+        return false
     }
 
-    open fun onKeyTyped(typedChar: Char?, keyCode: Int?) {}
+    open fun onKeyTyped(typedChar: Char?, keyCode: Int?): Boolean {
+        return false
+    }
 
     override fun mouseReleased(click: MouseButtonEvent): Boolean {
         postMouseReleased(click.x.toInt(), click.y.toInt(), click.button())

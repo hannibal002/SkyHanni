@@ -51,8 +51,8 @@ class CustomWardrobeScreen(
         menu.removeSlotListener(this)
     }
 
-    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
-        CustomWardrobeKeybinds.handlePress()
+    override fun onKeyTyped(typedChar: Char?, keyCode: Int?): Boolean {
+        return CustomWardrobeKeybinds.handlePress()
     }
 
     override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
