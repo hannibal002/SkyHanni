@@ -8,19 +8,15 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-//? if >= 26.1 {
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-//?}
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer {
 
-    //? if >= 26.1 {
     @Unique
     private GuiGraphicsExtractor skyhanni$guiGraphics;
 
@@ -29,9 +25,7 @@ public abstract class MixinGameRenderer {
         skyhanni$guiGraphics = graphics;
         return graphics;
     }
-    //?}
 
-    //? if >= 26.1 {
     @Inject(method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
     private void onRenderStartPhase(DeltaTracker deltaTracker, boolean shouldRenderLevel, boolean resourcesLoaded, CallbackInfo ci) {
         if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(skyhanni$guiGraphics, true).post();
@@ -46,20 +40,4 @@ public abstract class MixinGameRenderer {
     private void onRenderTail(DeltaTracker deltaTracker, boolean shouldRenderLevel, boolean resourcesLoaded, CallbackInfo ci) {
         GuiEditManager.renderLast(skyhanni$guiGraphics);
     }
-    //?} else {
-    /*@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V"))
-    private void onRenderStartPhase(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphicsExtractor context) {
-        if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(context, true).post();
-    }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderSavingIndicator(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
-    private void onRenderEndPhase(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphicsExtractor context) {
-        if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(context, false).post();
-    }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.AFTER))
-    private void onRenderTail(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphicsExtractor context) {
-        GuiEditManager.renderLast(context);
-    }
-    *///?}
 }
