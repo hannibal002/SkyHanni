@@ -23,7 +23,7 @@ sealed class GuiKeyPressEvent : CancellableSkyHanniEvent() {
     @PrimaryFunction("onGuiKeyboardKeyPress")
     class GuiKeyboardKeyPressEvent(
         override val guiContainer: SkyHanniGuiContainer,
-        private val keyEvent: KeyEvent
+        private val keyEvent: KeyEvent,
     ) : GuiKeyPressEvent() {
         override fun stackUnderCursor(): SafeItemStack? {
             return InventoryCompat.stackUnderCursor(keyEvent)
@@ -33,7 +33,7 @@ sealed class GuiKeyPressEvent : CancellableSkyHanniEvent() {
     @PrimaryFunction("onGuiMouseKeyPress")
     class GuiMouseKeyPressEvent(
         override val guiContainer: SkyHanniGuiContainer,
-        private val mouseEvent: MouseButtonEvent
+        private val mouseEvent: MouseButtonEvent,
     ) : GuiKeyPressEvent() {
         override fun stackUnderCursor(): SafeItemStack? {
             return InventoryCompat.stackUnderCursor(mouseEvent)
