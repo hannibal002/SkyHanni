@@ -31,7 +31,6 @@ class CustomWardrobeEditScreen(
         }
     }
 
-    //~ if < 26.1 'extractRenderState' -> 'render' {
     override fun extractRenderState(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTick: Float) {
         super.extractRenderState(graphics, mouseX, mouseY, partialTick)
         DrawContextUtils.setContext(graphics)
@@ -41,7 +40,6 @@ class CustomWardrobeEditScreen(
             DrawContextUtils.clearContext()
         }
     }
-    //~}
 
     // TODO: use SkyhanniBaseScreen.onDrawScreen() instead of this method
     private fun onDrawScreen() {
