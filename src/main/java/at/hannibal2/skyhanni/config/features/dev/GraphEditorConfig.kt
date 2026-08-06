@@ -10,9 +10,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
-class GraphConfig {
+class GraphEditorConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable the graphing tool.")
+    @ConfigOption(name = "Enabled", desc = "Enable the Graph Editor. Can also be toggled via /shgraph")
     @ConfigEditorBoolean
     var enabled: Boolean = false
 
@@ -30,13 +30,15 @@ class GraphConfig {
     @ConfigEditorBoolean
     var autoSelectNode: Boolean = false
 
+    // TODO rename to selectNearestKey
     @Expose
-    @ConfigOption(name = "Select Key", desc = "Select the nearest node to be active. Double press to unselect.")
+    @ConfigOption(name = "Select Nearest Key", desc = "Select the nearest node to be active. Double press to unselect.")
     @ConfigEditorKeybind(defaultKey = KeyboardManager.MIDDLE_MOUSE)
     var selectKey: Int = KeyboardManager.MIDDLE_MOUSE
 
+    // TODO rename to selectLookingAtNodeKey
     @Expose
-    @ConfigOption(name = "Select near look", desc = "Select the node closest to where you are looking.")
+    @ConfigOption(name = "Select looking at Node", desc = "Select the node you are pointing your cursor at.")
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var selectRaycastKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
@@ -49,13 +51,14 @@ class GraphConfig {
     var connectKey: Int = GLFW.GLFW_KEY_C
 
     @Expose
-    @ConfigOption(name = "Exit Key", desc = "Exit out of stuff. If nothing active disables the graph editor.")
+    @ConfigOption(name = "Exit Key", desc = "Exit out of text edit mode. If not in text edit mode, disables the graph editor.")
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_HOME)
-    var exitKey: Int = GLFW.GLFW_KEY_HOME
+    var exitKey: Int = GLFW.GLFW_KEY_ENTER
 
+    // TODO rename to nodeMoveKey
     @Expose
     @ConfigOption(
-        name = "Edit Key",
+        name = "Node Move Key",
         desc = "While holding the Key, edit the position of the active node or the selection block with the minecraft movement controls."
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_TAB)
@@ -66,10 +69,11 @@ class GraphConfig {
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_Y)
     var textKey: Int = GLFW.GLFW_KEY_Y
 
+    // TODO rename to navigateToNodeKey
     @Expose
     @ConfigOption(
-        name = "Test Dijkstra",
-        desc = "On key press, show the shortest path between the nearest node and the active node."
+        name = "Navigate to Node",
+        desc = "On key press, show the shortest path to the active node."
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_G)
     var dijkstraKey: Int = GLFW.GLFW_KEY_G
@@ -97,10 +101,11 @@ class GraphConfig {
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_M)
     var throughBlocksKey: Int = GLFW.GLFW_KEY_M
 
+    // TODO rename to feedbackKey
     @Expose
     @ConfigOption(
-        name = "Tutorial Key",
-        desc = "Toggle the tutorial mode. In this mode, you will get feedback for everything you do."
+        name = "Feedback Key",
+        desc = "Toggle the feedback mode. In this mode, you will get a chat message explaining on everything you do in the Graph Editor."
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_K)
     var tutorialKey: Int = GLFW.GLFW_KEY_K
@@ -127,11 +132,11 @@ class GraphConfig {
     var edgeCycle: Int = GLFW.GLFW_KEY_H
 
     @Expose
-    @ConfigLink(owner = GraphConfig::class, field = "enabled")
+    @ConfigLink(owner = GraphEditorConfig::class, field = "enabled")
     val infoDisplay: Position = Position(20, 20)
 
     @Expose
-    @ConfigLink(owner = GraphConfig::class, field = "enabled")
+    @ConfigLink(owner = GraphEditorConfig::class, field = "enabled")
     val namedNodesList: Position = Position(20, 20)
 
     @Expose

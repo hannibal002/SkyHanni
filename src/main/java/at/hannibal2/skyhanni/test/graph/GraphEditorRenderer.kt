@@ -29,7 +29,7 @@ object GraphEditorRenderer {
     private val nodes get() = state.nodes
     private val edges get() = state.edges
     private val closestNode get() = state.closestNode
-    private val inEditMode get() = state.inEditMode
+    private val inNodeMoveMode get() = state.inNodeMoveMode
     private val inTextMode get() = state.inTextMode
     private val activeNode get() = state.activeNode
     private val dissolvePossible get() = state.dissolvePossible
@@ -58,27 +58,34 @@ object GraphEditorRenderer {
     }
 
     private fun buildDisplay(): List<Renderable> = buildList {
+        add("§e§lGraph Editor")
         if (GraphEditor.hideDisabled) {
+            add("")
             add("§cDisabled nodes are hidden!")
+            add("")
         }
 
         val config = GraphEditor.config
-        add("§eExit: §6${config.exitKey.name()}")
-        if (!inEditMode && !inTextMode) {
+        if (inTextMode) {
+            add("§eExit Text Mode: §6${config.exitKey.name()}")
+        } else {
+            add("§eExit Graph Editor: §6${config.exitKey.name()}")
+        }
+        if (!inNodeMoveMode && !inTextMode) {
             add("§ePlace: §6${config.placeKey.name()}")
-            add("§eSelect: §6${config.selectKey.name()}")
-            add("§eSelect (Look): §6${config.selectRaycastKey.name()}")
+            add("§eSelect Nearest: §6${config.selectKey.name()}")
+            add("§eSelect Looking at: §6${config.selectRaycastKey.name()}")
             add("§eConnect: §6${config.connectKey.name()}")
             add("§eTest Dijkstra: §6${config.dijkstraKey.name()}")
             add("§eVision: §6${config.throughBlocksKey.name()}")
             add("§eSave: §6${config.saveKey.name()}")
             add("§eLoad: §6${config.loadKey.name()}")
             add("§eClear: §6${config.clearKey.name()}")
-            add("§eTutorial: §6${config.tutorialKey.name()}")
+            add("§eFeedback Mode: §6${config.tutorialKey.name()}")
             GraphEditorHistory.addDisplayLines(this)
             add(" ")
             if (activeNode != null) {
-                add("§eText: §6${config.textKey.name()}")
+                add("§eText Mode: §6${config.textKey.name()}")
                 if (dissolvePossible) add("§eDissolve: §6${config.dissolveKey.name()}")
                 if (selectedEdge != null) {
                     add("§eSplit: §6${config.splitKey.name()}")
@@ -87,13 +94,11 @@ object GraphEditorRenderer {
             }
         }
 
-        if (!inTextMode) {
-            if (activeNode != null) {
-                add("§eEdit active node: §6${config.editKey.name()}")
-            }
+        if (!inTextMode && activeNode != null) {
+            add("§eMove Node: §6${config.editKey.name()}")
         }
 
-        if (inEditMode) {
+        if (inNodeMoveMode) {
             add("§ex+ §6${Wasd.w.name()}")
             add("§ex- §6${Wasd.s.name()}")
             add("§ez+ §6${Wasd.a.name()}")

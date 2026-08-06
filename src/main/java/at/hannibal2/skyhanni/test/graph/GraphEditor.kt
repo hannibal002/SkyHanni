@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.features.dev.GraphConfig
+import at.hannibal2.skyhanni.config.features.dev.GraphEditorConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GraphEditor {
 
-    val config: GraphConfig get() = DevApi.config.devTool.graph
+    val config: GraphEditorConfig get() = DevApi.config.devTool.graph
 
     var state = GraphEditorState()
         set(value) {
@@ -38,8 +38,6 @@ object GraphEditor {
     fun isEnabled(): Boolean = config.enabled
 
     private val nodes get() = state.nodes
-    private val inTutorialMode get() = state.inTutorialMode
-    private val inEditMode get() = state.inEditMode
     private var disabledDirty = false
     var hideDisabled = false
         private set
@@ -48,8 +46,8 @@ object GraphEditor {
         disabledDirty = true
     }
 
-    fun feedBackInTutorial(text: String) {
-        if (inTutorialMode) {
+    fun feedback(text: String) {
+        if (state.inFeedbackMode) {
             ChatUtils.chat(text)
         }
     }
@@ -200,7 +198,7 @@ object GraphEditor {
 
     fun onMinecraftInput(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
         if (!isEnabled()) return
-        if (!inEditMode) return
+        if (!state.inNodeMoveMode) return
         if (keyBinding !in KeyboardManager.WasdInputMatrix) return
         cir.returnValue = false
     }
