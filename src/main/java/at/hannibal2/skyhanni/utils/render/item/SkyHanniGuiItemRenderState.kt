@@ -15,14 +15,9 @@ import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.client.renderer.state.gui.GuiItemRenderState
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
-
-//? if >= 26.1 {
-import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
-//?} else {
-/*import net.minecraft.client.renderer.LightTexture.FULL_BRIGHT
-*///?}
 
 data class SkyHanniGuiItemRenderState(
     val itemStack: SafeItemStack,
