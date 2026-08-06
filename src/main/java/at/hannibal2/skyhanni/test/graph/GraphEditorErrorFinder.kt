@@ -26,7 +26,7 @@ import java.awt.Color
  * Trying to find errors in Area Graph for the current graph editor instance
  */
 @SkyHanniModule
-object GraphEditorBugFinder {
+object GraphEditorErrorFinder {
 
     private const val ERROR_LINE_HEIGHT = 10f
     private const val MAX_RENDERED_NODES = 10
@@ -34,7 +34,7 @@ object GraphEditorBugFinder {
     private var errorsInWorld = emptyMap<GraphNode, Set<String>>()
     private var renderedErrors = emptyList<Pair<GraphNode, Set<String>>>()
 
-    private enum class BugCategory(val displayName: String) {
+    private enum class ErrorCategory(val displayName: String) {
         CONFLICTING_TAGS("conflicting tags"),
         CONFLICTING_AREAS("conflicting areas"),
         MISSING_DATA("missing data"),
@@ -44,78 +44,78 @@ object GraphEditorBugFinder {
     }
 
     /** Collects all errors found during a single test run. A node can have more than one error. */
-    private class BugCollector {
+    private class ErrorCollector {
         val errors = mutableMapOf<GraphNode, MutableSet<String>>()
-        val categoryCounts = mutableMapOf<BugCategory, Int>()
+        val categoryCounts = mutableMapOf<ErrorCategory, Int>()
 
         val totalErrors get() = categoryCounts.values.sum()
 
         /** Duplicate messages on the same node are dropped and therefore not counted. */
-        fun add(node: GraphNode, category: BugCategory, error: String) {
+        fun add(node: GraphNode, category: ErrorCategory, error: String) {
             if (!errors.getOrPut(node) { mutableSetOf() }.add(error)) return
             categoryCounts.addOrPut(category, 1)
         }
     }
 
     fun runTests() {
-        CoroutineSettings("graph editor bug finder").launchCoroutine {
+        CoroutineSettings("graph editor error finder").launchCoroutine {
             asyncTest()
         }
     }
 
     private fun asyncTest() {
         val graph = IslandGraphs.currentIslandGraph ?: return
-        val bugs = BugCollector()
+        val errors = ErrorCollector()
 
-        checkConflictingTags(graph, bugs)
-        checkConflictingAreas(graph, bugs)
-        checkMissingData(graph, bugs)
-        checkDeprecatedTags(graph, bugs)
-        checkInvalidNames(graph, bugs)
+        checkConflictingTags(graph, errors)
+        checkConflictingAreas(graph, errors)
+        checkMissingData(graph, errors)
+        checkDeprecatedTags(graph, errors)
+        checkInvalidNames(graph, errors)
         checkHasSpawn(graph)
-        checkOneWayEdges(graph, bugs)
+        checkOneWayEdges(graph, errors)
 
-        errorsInWorld = bugs.errors
+        errorsInWorld = errors.errors
         updateRenderedErrors()
-        reportBugCount(bugs)
-        bugs.errors.keys.minByOrNull {
+        reportErrorCount(errors)
+        errors.errors.keys.minByOrNull {
             it.distanceSqToPlayer()
-        }?.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
+        }?.pathFind("Graph Editor Error", Color.RED, condition = { isEnabled() })
     }
 
-    private fun reportBugCount(bugs: BugCollector) {
-        val totalErrors = bugs.totalErrors
+    private fun reportErrorCount(errors: ErrorCollector) {
+        val totalErrors = errors.totalErrors
         if (totalErrors == 0) return
-        val breakdown = bugs.categoryCounts.entries.sortedByDescending { it.value }
+        val breakdown = errors.categoryCounts.entries.sortedByDescending { it.value }
             .joinToString("\n") { (category, count) -> " §7${category.displayName}: §e${count.addSeparators()}" }
         ChatUtils.chat(
-            "§cGraph errors: ${totalErrors.addSeparators()} on ${bugs.errors.size.addSeparators()} nodes\n$breakdown",
+            "§cGraph errors: ${totalErrors.addSeparators()} on ${errors.errors.size.addSeparators()} nodes\n$breakdown",
         )
     }
 
-    private fun checkDeprecatedTags(graph: Graph, bugs: BugCollector) {
+    private fun checkDeprecatedTags(graph: Graph, errors: ErrorCollector) {
         for (node in graph) {
             @Suppress("DEPRECATION")
             if (node.hasTag(GraphNodeTag.TELEPORT)) {
-                bugs.add(node, BugCategory.DEPRECATED_TAGS, "deprecated teleport node")
+                errors.add(node, ErrorCategory.DEPRECATED_TAGS, "deprecated teleport node")
             }
         }
     }
 
-    private fun checkInvalidNames(graph: Graph, bugs: BugCollector) {
+    private fun checkInvalidNames(graph: Graph, errors: ErrorCollector) {
         for (node in graph) {
             val name = node.name ?: continue
             if (node.hasTag(GraphNodeTag.WARP)) {
                 if (!name.startsWith("/")) {
-                    bugs.add(node, BugCategory.INVALID_NAMES, "invalid warp name")
+                    errors.add(node, ErrorCategory.INVALID_NAMES, "invalid warp name")
                 }
             }
             if (node.hasTag(GraphNodeTag.JUMP_PAD)) {
                 if (IslandType.entries.none { it.name == name }) {
-                    bugs.add(node, BugCategory.INVALID_NAMES, "jump pad name is no known island name")
+                    errors.add(node, ErrorCategory.INVALID_NAMES, "jump pad name is no known island name")
                 }
                 if (name == SkyBlockUtils.currentIsland.name) {
-                    bugs.add(node, BugCategory.INVALID_NAMES, "jump pad name is current island name")
+                    errors.add(node, ErrorCategory.INVALID_NAMES, "jump pad name is current island name")
                 }
             }
         }
@@ -127,20 +127,20 @@ object GraphEditorBugFinder {
         }
     }
 
-    private fun checkMissingData(graph: Graph, bugs: BugCollector) {
+    private fun checkMissingData(graph: Graph, errors: ErrorCollector) {
         for (node in graph) {
             val nameNull = node.name.isNullOrBlank()
             val tagsEmpty = node.tags.isEmpty()
             if (nameNull > tagsEmpty) {
-                bugs.add(node, BugCategory.MISSING_DATA, "Missing name despite having tags")
+                errors.add(node, ErrorCategory.MISSING_DATA, "Missing name despite having tags")
             }
             if (tagsEmpty > nameNull) {
-                bugs.add(node, BugCategory.MISSING_DATA, "Missing tags despite having name")
+                errors.add(node, ErrorCategory.MISSING_DATA, "Missing tags despite having name")
             }
         }
     }
 
-    private fun checkConflictingAreas(graph: Graph, bugs: BugCollector) {
+    private fun checkConflictingAreas(graph: Graph, errors: ErrorCollector) {
         val nearestArea = mutableMapOf<GraphNode, GraphNode>()
         for (node in graph) {
             val pathToNearestArea = GraphUtils.findFastestPath(node) { it.getAreaTag() != null }?.first
@@ -156,34 +156,34 @@ object GraphEditorBugFinder {
                 val neighboringAreaNode = nearestArea[neighbor]?.name ?: continue
                 if (neighboringAreaNode == areaNode) continue
                 if ((null == node.getAreaTag())) {
-                    bugs.add(node, BugCategory.CONFLICTING_AREAS, "Conflicting areas $areaNode and $neighboringAreaNode")
+                    errors.add(node, ErrorCategory.CONFLICTING_AREAS, "Conflicting areas $areaNode and $neighboringAreaNode")
                 }
             }
         }
     }
 
-    private fun checkConflictingTags(graph: Graph, bugs: BugCollector) {
+    private fun checkConflictingTags(graph: Graph, errors: ErrorCollector) {
         for (node in graph) {
             if (!node.tags.any { it in NavigationHelper.allowedSingleNavigationTags }) continue
             val remainingTags = node.tags.filter { it in NavigationHelper.allowedSingleNavigationTags }
             if (remainingTags.size != 1) {
-                bugs.add(node, BugCategory.CONFLICTING_TAGS, "Conflicting tags: $remainingTags")
+                errors.add(node, ErrorCategory.CONFLICTING_TAGS, "Conflicting tags: $remainingTags")
             }
             if (node.hasTag(GraphNodeTag.MINES_EMISSARY)) {
                 if (!node.hasTag(GraphNodeTag.NPC)) {
-                    bugs.add(node, BugCategory.CONFLICTING_TAGS, "emissary without npc tag")
+                    errors.add(node, ErrorCategory.CONFLICTING_TAGS, "emissary without npc tag")
                 }
             }
         }
     }
 
-    private fun checkOneWayEdges(graph: Graph, bugs: BugCollector) {
+    private fun checkOneWayEdges(graph: Graph, errors: ErrorCollector) {
         for (node in graph) {
             for (neighbor in node.neighbors.keys) {
                 if (hasPathBack(start = neighbor, target = node)) continue
 
-                bugs.add(node, BugCategory.ONE_WAY_EDGES, "one-way edge starts here")
-                bugs.add(neighbor, BugCategory.ONE_WAY_EDGES, "one-way edge ends here (no way back)")
+                errors.add(node, ErrorCategory.ONE_WAY_EDGES, "one-way edge starts here")
+                errors.add(neighbor, ErrorCategory.ONE_WAY_EDGES, "one-way edge ends here (no way back)")
             }
         }
     }
