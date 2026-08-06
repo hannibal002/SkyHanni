@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -137,7 +136,7 @@ object RemainingSlayerKills {
     private fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
         if (!isEnabled()) return
 
-        val progress = event.newProgress.removeColor()
+        val progress = event.newProgress
         val newMissing = progressPattern.matchMatcher(progress) {
             val current = group("current").formatDouble()
             val max = group("max").formatDouble()

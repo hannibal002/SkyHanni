@@ -258,7 +258,8 @@
     + If any feature doesn't work on the new island and you think it should, make a bug report.
 + Added Hide Not Clickable support to the Birdfeeder inventory in Safari. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6261)
 + Renamed most instances of Galatea to Moonglade Marsh. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6248)
-
++ Added more Torrhus Canyon /shnavigateall support. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6292)
+    + Added Sanger and Pangolin support.
 
 #### Commands
 
@@ -385,6 +386,8 @@
 + Fixed Anita's Extra Farming Fortune Helper not showing. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6206)
 + Fixed Jacob Contest Warning Popup always failing to open. - Luna (https://github.com/hannibal002/SkyHanni/pull/6204)
 + Fixed Visitor Logbook statistics either not showing or being inaccurate. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6212)
++ Fixed the Visitor offer tooltip showing the price of a single item instead of the price for the required amount. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6287)
++ Fixed the Visitor offer tooltip staying greyed out while holding the bypass key. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6287)
 
 #### Combat
 
@@ -423,6 +426,7 @@
 + Fixed the item ability cooldown detection for the Giant's Sword. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/6116)
 + Fixed Fragged Ice Spray Wand not showing item ability cooldown. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6157)
 + Fixed Deployables not being detected sometimes. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6214)
++ Fixed a false error report when the Slayer quest scoreboard/widget was parsed while incomplete. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6238)
 
 #### GUI
 
@@ -529,6 +533,9 @@
 + Fixed Tree Progress Display being colorless. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6198)
 + Fixed Lottery Perk Display showing +5% Sweep instead of +10 Sweep. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6270)
 + Fixed Lottery Perk not getting detected in Torrhus Canyon Alpha. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6250)
++ Fixed SkyHanni saying Safari instead of Critter Safari. - Luna (https://github.com/hannibal002/SkyHanni/pull/6286)
++ Fixed the mod thinking the max Foraging level is still 54 instead of 57. - Luna (https://github.com/hannibal002/SkyHanni/pull/6285)
++ Fixed the mod thinking the max Hunting level is still 25 instead of 50. - Luna (https://github.com/hannibal002/SkyHanni/pull/6285)
 
 #### Rift
 
@@ -616,6 +623,8 @@
 + Fixed Flawed Ruby being shown as Flawed Sapphire in Powder Chest Profit Tracker. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6183)
 + Fixed the Cold Overlay and the Custom Scoreboard Cold line staying visible after leaving a cold area. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6262)
     + Hypixel removes Cold from the scoreboard when leaving the Glacite Tunnels in the Dwarven Mines or the Icy Biome on the Critter Safari, but SkyHanni kept the last known value.
++ Fixed ore block detection being broken, which also crashed the game on 1.21.11. - Luna (https://github.com/hannibal002/SkyHanni/pull/6291)
+    + Affected Mithril, Titanium, Hard Stone, Red Sand, Umber, and Tungsten detection.
 
 #### Chat
 
@@ -760,6 +769,7 @@
 + Fixed an error when switching lobbies while a SkyHanni feature is trying to get your location. - Luna (https://github.com/hannibal002/SkyHanni/pull/6275)
 + Fixed rendering issues when Longview is installed. - EnnuiL (https://github.com/hannibal002/SkyHanni/pull/6242)
 + Fixed snoozed reminders sometimes not showing up on screen when the timer was up. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6274)
++ Fixed a rare error when an entity gets damaged just as you switch lobbies. - Luna (https://github.com/hannibal002/SkyHanni/pull/6290)
 
 ### Technical Details
 
@@ -1131,6 +1141,10 @@
     + Neighbors are now sorted by id to avoid funny-looking diffs.
     + Now only showing the closest 10 errors to improve readability.
     + Now showing error count and category number in chat if there are any.
++ Changed `GardenVisitorTooltip` to read item amounts from the item lore instead of the rendered tooltip. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6287)
++ Improved error handling in RelayedRun and DelayedServerRun. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6296)
++ Made \@HandleEvent in non-\@SkyHanniModule classes fail loudly instead of silently. - Luna (https://github.com/hannibal002/SkyHanni/pull/6216)
++ Split up `GardenVisitorTooltip.readToolTip`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6287)
 
 ### Removed Features
 
@@ -1143,6 +1157,7 @@
     + Can now be done by clicking on the Visitor name in the Shopping List.
 + Removed Pest Spray Selector. - Luna (https://github.com/hannibal002/SkyHanni/pull/6115)
     + Hypixel now lets you choose the spray to use in a GUI, this feature became redundant.
++ Removed 1.21.11 support. - Luna (https://github.com/hannibal002/SkyHanni/pull/6268)
 
 ## Version 7.0.0
 
