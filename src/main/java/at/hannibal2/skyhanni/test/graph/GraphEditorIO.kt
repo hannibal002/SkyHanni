@@ -94,7 +94,7 @@ object GraphEditorIO {
             GraphEditorNetworks.bridgeNetworks(compileGraph)
             DelayedRun.runOrNextTick {
                 IslandGraphs.setNewGraph(compileGraph)
-                GraphEditorBugFinder.runTests()
+                GraphEditorErrorFinder.runTests()
                 if (GraphEditorNodeFinder.active) {
                     GraphEditorNodeFinder.calculateNewAllNodeFind()
                 }
