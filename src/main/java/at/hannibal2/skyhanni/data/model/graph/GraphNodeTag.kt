@@ -153,6 +153,62 @@ enum class GraphNodeTag(
         onlyIsland = IslandType.GALATEA,
     ),
 
+    TREE_PROTECTION_ORDER(
+        "tree_protection_order",
+        LorenzColor.RED,
+        "Tree Protection Order",
+        "Tree Protected by the Protection Order.",
+        onlyIslands = IslandTypeTag.FORAGING_CUSTOM_TREES,
+    ),
+
+    HIDEONSUN(
+        "hideonsun",
+        LorenzColor.YELLOW,
+        "Hideonsun",
+        "The yellow Shulkers.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    HONEYHIVE(
+        "honeyhive",
+        LorenzColor.GOLD,
+        "Honeyhive",
+        "Lootable Honeyhive.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    PANGOLIN(
+        "pangolin_area",
+        LorenzColor.BLUE,
+        "Pangolin",
+        "Possible Pangolin Critter spawn point.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    SANGER(
+        "sanger_area",
+        LorenzColor.GREEN,
+        "Sanger",
+        "Possible Sanger NPC spawn point.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    SAFARI_BELL(
+        "safari_bell",
+        LorenzColor.GOLD,
+        "Safari Bell",
+        "Bells to be rung in the Safari.",
+        onlyIsland = IslandType.SAFARI,
+    ),
+
+    HIDEYHO_LOCATION(
+        "hideyho",
+        LorenzColor.LIGHT_PURPLE,
+        "Hideyho Location",
+        "A location that Hideyho can be found.",
+        onlyIsland = IslandType.SAFARI,
+    ),
+
     ;
 
     val displayName: String = color.getChatColor() + cleanName
