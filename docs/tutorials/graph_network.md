@@ -17,6 +17,19 @@ one file per island.
 
 The Hypixel Lobby is currently the only map outside SkyBlock that is also using the graph network.
 
+### Why a Graph?
+
+A plain list of waypoints can only describe one route in one fixed order. As soon as the player stands somewhere else, or could take a
+shortcut, there is nothing left to calculate. A graph stores how places are connected instead of one finished route, so a path can be
+built from wherever the player currently is to wherever they want to go.
+
+The second reason is that not every connection is a straight walk. Warps, jump pads and teleport pads link two spots that are nowhere near
+each other. Some paths only work in one direction. Some paths are slower than their length suggests. None of that can be read out of the
+shape of the world, it has to be recorded by hand, and a graph holds all of it in one place.
+
+That handmade part is also why the Graph Editor works the way it does: you walk the island and drop nodes as you go, and the network is
+the result of that walk.
+
 ### Areas
 
 The node tags **Area** and **Small Area** define the current area for other SkyHanni features.
@@ -46,6 +59,13 @@ Small areas are for things like a building or a small cave, like the bank in the
 The distinction between an area and a small area allows for visual differentiation in the **Area Navigation** feature and in
 `/shnavigate`, and for the option to include or exclude small areas in the **Area Navigation** list.
 
+The two are not nested. A small area is not "inside" a large one, they are two flavors of the same thing, and the tag only controls the
+color and whether the entry can be hidden. Whichever area node is closest wins, no matter which of the two tags it carries.
+
+There is no real hierarchy because nothing needs one. Everything that asks for the current area expects a single answer, and nesting would
+mean recording in every graph file which area belongs to which parent. The trade-off is that walking into a house inside a village
+replaces the village instead of adding to it.
+
 #### What area is the node in?
 
 Giving every node an area tag is impractical.
@@ -53,6 +73,18 @@ Instead, we follow the graph chain from one node to its neighbors until we find 
 The name of that node then defines what area the player stands at.
 The next area needs to start on the other side of the "imaginary area boundary" and be connected to the first area.
 The boundary lies between two nodes that have different area tags.
+
+This solves three things at once:
+
+- Only the area nodes themselves need maintenance. Every other node inherits its area, so renaming or moving an area is one edit instead
+  of hundreds.
+- Walls are handled for free. Two spots on opposite sides of a wall can be one block apart, but walking between them takes a long way
+  around, so they end up in different areas without anyone describing that wall.
+- The same search that finds your current area also produces the distance to every other area, which is what the **Area Navigation** list
+  shows.
+
+The price is that borders come from the network, not from a shape someone drew. Where two connected nodes fall into different areas, one of
+them has to carry the area tag, otherwise the border ends up at a random spot.
 
 The **Error Finder** will warn you when nodes connect to multiple areas at the same time without
 a boundary (conflicting areas).
@@ -179,8 +211,11 @@ Press **Exit Key** (by default `Enter`) to exit the text mode.
 
 You can use `Control` + `V` to paste your clipboard as text while in the text mode.
 The new string does not append to the text, but rather replaces the whole old text.
+
 This can become useful if you want to add a lot of nodes with the same name, or if other mods or vanilla Minecraft keybind mappings activate
 while you type in the text mode.
+
+There is one shortcut: name a node `na` and leave the text mode, and it turns into a `no_area` node with the **Area** tag already applied.
 
 #### Tagging a Node
 
@@ -245,6 +280,14 @@ The three directions to cycle through:
 
 This is useful to mark paths the user can only move in one direction. E.g., drop-down paths, or jumping pad movements.
 
+Direction is a property of a normal edge instead of a separate kind of connection. In the saved file, a one directional edge is simply
+recorded on one side only. That keeps drops and jump pads out of the pathfinding as a special case, and the file format did not need a new
+field for them.
+
+One rule comes with it: there always has to be a way back somehow. A one directional edge leading into a dead end traps the navigation
+there, so the **Error Finder** flags any edge without a return path. The way back does not have to be direct, a long detour around is
+perfectly fine.
+
 #### Weighted Nodes
 
 Use the command `/shgraphweight` to set the weight of the selected node.
@@ -252,6 +295,17 @@ By default, every node has the weight of 0.
 
 The weight gets added to the pathfinding route calculation. One unit of weight represents one Minecraft block.
 This impacts all directions the node can pass through in the same way.
+
+The weight sits on the node rather than on the individual connections because what slows you down is a place, not a connection. Water, a
+climb, a gap: it is unpleasant no matter which side you approach from. One value on the node covers all of them, while putting it on the
+connections would be one edit per connection.
+
+Two things worth knowing before you set a value:
+
+- The weight applies to every connection that touches the node, and walking through the node pays it twice, once coming in and once going
+  out. Start small, a weight of 5 already steers the pathfinder away like a 10 block detour.
+- Because it counts the same in every direction, it cannot express "slow going up, fast coming down". If a path is only bad one way, use
+  the **One Directional Key** instead.
 
 When to use? When the path slows down the user considerably, e.g., moving through water or climbing up blocks without stairs. Especially
 useful when longer but faster to move through alternate paths exist.
@@ -295,6 +349,14 @@ Why does this exist?
 - For more examples, see `IslandGraphs.disableNodes` in the code base.
 
 This also impacts area detection.
+
+Why is this not simply stored in the graph file? Because it changes while you play. A node can be disabled during an event and enabled
+again minutes later, and it can differ from one player to the next. The files in the repo are identical for everyone and only change
+through a pull request, so a state like this has no place in them.
+
+For mapping that means two things. The disabled state is never part of what you save, and `/shgraphloadthisisland` refuses to load the
+island while parts of it are disabled, so a reduced graph does not end up in a PR by accident. Run the command again within 5 seconds if
+you want to load it anyway.
 
 ### Debug Tools
 
