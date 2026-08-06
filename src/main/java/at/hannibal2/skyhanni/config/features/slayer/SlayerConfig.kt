@@ -86,7 +86,7 @@ class SlayerConfig {
     @Expose
     @ConfigOption(
         name = "Reminder To Swap",
-        desc = "Allows you to set a displayable text on the screen to remind yourself",
+        desc = "Allows you to set a displayable text on the screen to remind yourself.",
     )
     @Accordion
     val swapReminder: SwapReminderConfig = SwapReminderConfig()

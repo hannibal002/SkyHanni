@@ -15,30 +15,11 @@ import kotlin.time.Duration.Companion.seconds
 object SlayerSwapReminder {
 
     private val config get() = SlayerApi.config.swapReminder
+    private val formattedTitle = config.titleText.replace("&", "§")
 
     private var hasRemindedForCurrentBoss = false
 
-    @HandleEvent(onlyOnSkyblock = true)
-    private fun onBossHealthChange(event: BossHealthChangeEvent) {
-        if (!isActive()) return
-        if (hasRemindedForCurrentBoss) return
-
-        val mob = event.entityData.mob
-        if (mob.category != MobCategory.SLAYER || !mob.belongsToPlayer()) return
-
-        val currentHealth = event.health.toDouble()
-        val maxHealth = event.maxHealth.toDouble()
-
-        // Ignore uninitialized or dead mob health states
-        if (maxHealth <= 0 || currentHealth <= 0) return
-
-        val hpPercentage = (currentHealth / maxHealth) * 100.0
-        if (hpPercentage > config.hpThreshold) return
-
-        hasRemindedForCurrentBoss = true
-
-        val formattedTitle = config.titleText.replace('&', '§')
-
+    private fun showReminder() {
         TitleManager.sendTitle(
             titleText = formattedTitle,
             duration = 2.seconds,
@@ -49,11 +30,36 @@ object SlayerSwapReminder {
         }
     }
 
+    private fun stopReminder() {
+        TitleManager.conditionallyStopTitle { !hasRemindedForCurrentBoss }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onBossHealthChange(event: BossHealthChangeEvent) {
+        if (!isActive()) return
+        if (hasRemindedForCurrentBoss) return
+
+        val mob = event.entityData.mob
+        if (mob.category != MobCategory.SLAYER || !mob.belongsToPlayer()) return
+
+        val lastHealth = event.lastHealth
+        val maxHealth = event.maxHealth
+
+        // Ignore uninitialized or dead mob health states
+        if (maxHealth <= 0 || lastHealth <= 0) return
+
+        val hpPercentage = (lastHealth / maxHealth) * 100.0
+        if (hpPercentage >= config.hpThreshold) return
+
+        hasRemindedForCurrentBoss = true
+    }
+
     @HandleEvent
     private fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob.category != MobCategory.SLAYER || !event.mob.belongsToPlayer()) return
 
         hasRemindedForCurrentBoss = false
+        stopReminder()
     }
 
     private fun isActive() = config.enabled && SlayerApi.isInBossFight()
