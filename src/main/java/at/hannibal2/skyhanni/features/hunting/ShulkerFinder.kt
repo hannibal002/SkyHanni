@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import net.minecraft.world.entity.monster.Shulker
@@ -21,7 +20,7 @@ import net.minecraft.world.entity.monster.Shulker
 object ShulkerFinder {
     private val config get() = SkyHanniMod.feature.hunting
 
-    private var route: MutableList<LorenzVec>? = null
+    private val route: MutableList<LorenzVec> = mutableListOf()
     private val storedRoute: MutableList<LorenzVec> = mutableListOf()
 
     private var navigating = false
@@ -34,22 +33,22 @@ object ShulkerFinder {
 
         val shulkerType = ShulkerType.entries.firstOrNull { it.island.isInIsland() } ?: return
 
-        val currentRoute = route?.takeIfNotEmpty() ?: run {
-            calculateRoute(shulkerType).also { newRoute ->
-                route = newRoute
-                newRoute?.let { storedRoute.addAll(it) }
-            } ?: error("Current island graph is null and there is a mistake")
+        if (route.isEmpty()) {
             // TODO add generic repo outdated error logic here
+            val newRoute = calculateRoute(shulkerType) ?: error("Current island graph is null and there is a mistake")
+            route.addAll(newRoute)
+            storedRoute.clear()
+            storedRoute.addAll(newRoute)
         }
 
-        navigateToNextShulker(currentRoute, shulkerType)
+        navigateToNextShulker(shulkerType)
     }
 
-    private fun navigateToNextShulker(currentRoute: MutableList<LorenzVec>, shulkerType: ShulkerType) {
-        val goal = currentRoute.removeFirstOrNull() ?: error("No shulker route found!")
+    private fun navigateToNextShulker(shulkerType: ShulkerType) {
+        val goal = route.removeFirstOrNull() ?: error("No shulker route found!")
 
-        if (currentRoute.isEmpty()) {
-            route = storedRoute
+        if (route.isEmpty()) {
+            route.addAll(storedRoute)
         }
 
         navigating = true
@@ -60,7 +59,7 @@ object ShulkerFinder {
             onFound = {
                 val nearby = goal.getEntitiesNearby<Shulker>(3.0)
                 if (nearby.isEmpty()) {
-                    navigateToNextShulker(currentRoute, shulkerType)
+                    navigateToNextShulker(shulkerType)
                 } else {
                     navigating = false
                 }
@@ -72,7 +71,7 @@ object ShulkerFinder {
     @HandleEvent
     private fun onIslandChange() {
         navigating = false
-        route = null
+        route.clear()
         storedRoute.clear()
     }
 
