@@ -328,6 +328,7 @@ There are also specific commands that come in handy:
     - Clicking on a network then navigates you to it.
 - `/shgraphmerge` merges graph data from the clipboard into the current Graph Network.
     - The nodes don't connect, they just exist in one Graph Editor.
+- `/shgraphcopynetwork` copies only the closest network to the clipboard.
 
 #### Parkour
 
