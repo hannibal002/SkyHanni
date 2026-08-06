@@ -3,7 +3,17 @@
 // called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, changelog-review.yml, check_dependencies.yml,
 // and keyword-labels.yml
 
-import com.google.gson.*
+// TODO: remove the suppressions and split the complex functions once this file can be broken up into
+//  several files. Splitting them now would only add more top level functions to a file that is
+//  already well over 1000 lines long.
+@file:Suppress("CyclomaticComplexMethod", "LoopWithTooManyJumpStatements")
+
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.JsonNull
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import java.io.IOException
 import java.net.URI
 import java.net.URLEncoder
@@ -11,7 +21,11 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
-import kotlin.io.path.*
+import kotlin.io.path.Path
+import kotlin.io.path.div
+import kotlin.io.path.exists
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.readText
 import kotlin.system.exitProcess
 
 /**
@@ -53,6 +67,15 @@ val keywordLabels = listOf(
 )
 
 val workflowFailedMarker = "<!-- workflow-failed -->"
+
+// Suggested in every workflow error comment. Declared this early because error() falls back to it, and error()
+// already runs while the environment constants below are still being initialized.
+val defaultErrorFix = "merge the beta branch into this PR."
+
+// Nothing an author can do, so the default suggestion would send them down the wrong path.
+val apiFormatErrorFix = "re-run the workflow. The GitHub API returned a response this script could not read, " +
+    "which is not caused by anything in this pull request."
+
 
 /**
  * Identifies a comment posted by this script, so a later run finds its own previous comment again.
@@ -100,6 +123,9 @@ val dependencyComment = CommentType("dependency-check-review", "Show previous de
 val dependencySectionHeading = "## Dependencies"
 val dependencyEntryPrefix = "- "
 
+// The line the pull request template ships with. Left in place, it means the section was never filled in.
+val dependencyTemplatePlaceholder = "- pr_number_or_link_here"
+
 // Announced in the state marker of every dependency comment. Both directions are announced, so the presence of
 // a marker alone cannot tell which one it was.
 val dependencyStateWaiting = "waiting"
@@ -128,20 +154,20 @@ val gson = Gson()
 
 var errorCommentPosted = false
 
-fun error(message: String, commentError: Boolean = true): Nothing {
+fun error(message: String, commentError: Boolean = true, fix: String = defaultErrorFix): Nothing {
     System.err.println(message)
     if (commentError && !errorCommentPosted) {
         postPrComment(
             prNumber = prNumber,
-            body = buildErrorComment(message),
-            commentError = false
+            body = buildErrorComment(message, fix),
+            commentError = false,
         ) { "Error: could not post workflow error as comment (HTTP $it)" }
         errorCommentPosted = true
     }
     exitProcess(1)
 }
 
-fun buildErrorComment(message: String): String = buildString {
+fun buildErrorComment(message: String, fix: String): String = buildString {
     appendLine(workflowFailedMarker)
 
     appendLine("❌ Workflow failed ❌")
@@ -156,8 +182,7 @@ fun buildErrorComment(message: String): String = buildString {
     appendLine()
 
     appendLine("Most likely fix:")
-    val theSecretFix = "merge the beta branch into this PR."
-    appendLine(theSecretFix)
+    appendLine(fix)
     appendLine()
 
     appendLine("If the issue persists, please ping a maintainer on [SkyHanni Discord](https://discord.gg/skyhanni-997079228510117908).")
@@ -186,19 +211,43 @@ data class Dependency(val owner: String, val repoName: String, val pullNumber: I
     val link: String = "https://github.com/$owner/$repoName/pull/$pullNumber"
 }
 
-enum class DependencyState { OPEN, CLOSED, UNRESOLVED }
+enum class DependencyState {
+    OPEN,
+    CLOSED,
+    UNRESOLVED
+}
+
+// Split during parsing, not derived afterward: a line on hannibal002/SkyHanni-REPO is valid and deliberately
+// produces no dependency, so subtracting the recognized entries would report it as malformed.
+data class ParsedDependencySection(val dependencies: List<Dependency>, val unrecognizedLines: List<String>)
+
+// Everything wrong with one dependency section, so the comment can name all of it at once. Placeholder and
+// duplicate heading are flags, two placeholder lines are still one mistake.
+data class DependencyProblems(
+    val unresolved: List<Dependency>,
+    val malformed: List<String>,
+    val hasPlaceholder: Boolean,
+    val hasDuplicateHeading: Boolean,
+) {
+    val count: Int = unresolved.size + malformed.size +
+        (if (hasPlaceholder) 1 else 0) + (if (hasDuplicateHeading) 1 else 0)
+
+    val isEmpty: Boolean get() = count == 0
+}
 
 // The closed pull request that triggered this run, used only when it is a dependency.
 data class DependencyTrigger(val pullNumber: Int, val merged: Boolean)
 
-
-class DependencyCheckException(message: String) : Exception(message)
+// [fix] travels with the exception because the handler that turns it into a comment sits several frames away and
+// cannot tell which kind of failure it is looking at.
+class DependencyCheckException(message: String, val fix: String = defaultErrorFix) : Exception(message)
 
 // PRs whose dependency check could not be completed. Collected instead of aborting, so one unreachable
 // PR cannot stop the remaining ones from getting their label and status updated.
 val failedDependencyChecks = mutableListOf<String>()
 
-fun dependencyError(message: String): Nothing = throw DependencyCheckException(message)
+fun dependencyError(message: String, fix: String = defaultErrorFix): Nothing =
+    throw DependencyCheckException(message, fix)
 
 fun sendGhRequest(request: HttpRequest): Pair<Int, JsonElement> {
     val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
@@ -243,7 +292,7 @@ fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, Jso
     val request = buildGhRequest(method, path, payload)
     if (!isRetryable(method, path)) return sendGhRequest(request)
 
-    // The GitHub API answers with 502/503/504 every now and then. Those are transient, so a single one
+    // The GitHub API answers with 502/503/504 occasionally. Those are transient, so a single one
     // must not fail the whole workflow run. The last attempt returns whatever it gets.
     repeat(maxRequestAttempts - 1) { index ->
         val attempt = index + 1
@@ -288,8 +337,8 @@ fun getPrLabels(prNumber: String): Set<String> {
     val (status, body) = ghRepoGet("/issues/$prNumber/labels")
     if (status.isHttpError) return emptySet()
     val array = body as? JsonArray ?: return emptySet()
-    return array.mapNotNull {
-        (it as? JsonObject)?.get("name")?.takeIf { it.isJsonPrimitive }?.asString
+    return array.mapNotNull { element ->
+        (element as? JsonObject)?.get("name")?.takeIf { it.isJsonPrimitive }?.asString
     }.toSet()
 }
 
@@ -311,6 +360,10 @@ fun sanitize(text: String, maxLen: Int = 300): String = text
     .replace("<", "&lt;")
     .replace(">", "&gt;")
     .replace("@", "&#64;")
+
+// Only backticks have to go, one would close the code span early. Everything else, an "@" mention included, is
+// inert inside a span, and sanitize would leave its backslashes visible there.
+fun sanitizeCodeSpan(text: String, maxLen: Int = 300): String = text.take(maxLen).replace("`", "'")
 
 fun StringBuilder.appendWarningTitle(title: String) {
     appendLine("### $warningIcon $title $warningIcon")
@@ -335,8 +388,9 @@ fun buildDetektBody(findings: List<Finding>): String = buildString {
 fun StringBuilder.appendCompact(findings: List<Finding>) {
     for (finding in findings) {
         val fileName = finding.path.substringAfterLast('/')
+        // The message renders outside the code span, so it keeps the full Markdown escaping.
         val message = sanitize(finding.message)
-        val className = sanitize(fileName)
+        val className = sanitizeCodeSpan(fileName)
         val line = finding.line
         appendLine("- ```$className:$line```: $message")
     }
@@ -345,11 +399,11 @@ fun StringBuilder.appendCompact(findings: List<Finding>) {
 fun StringBuilder.appendFull(findings: List<Finding>) {
     for (finding in findings) {
         val fileName = finding.path.substringAfterLast('/')
-        val ruleId = sanitize(finding.ruleId)
-        val message = sanitize(finding.message)
-        val className = sanitize(fileName)
+        val ruleId = sanitizeCodeSpan(finding.ruleId)
+        val message = sanitizeCodeSpan(finding.message)
+        val className = sanitizeCodeSpan(fileName)
         val line = finding.line
-        val path = sanitize(finding.path)
+        val path = sanitizeCodeSpan(finding.path)
         appendLine("- ```$className:$line```")
         appendLine("  message: `$message`")
         appendLine("  rule: `$ruleId`")
@@ -411,20 +465,21 @@ fun CommentType.findAllStates(comments: List<PrComment>): List<StateComment> = c
     state?.let { StateComment(comment, it) }
 }
 
-fun CommentType.post(prNumber: String, marker: String, body: String, errorMessage: (Int) -> String) {
+fun CommentType.post(prNumber: String, body: String, errorMessage: (Int) -> String) {
     postPrComment(prNumber, "$marker\n$body", errorMessage = errorMessage)
 }
 
-fun CommentType.post(prNumber: String, body: String, errorMessage: (Int) -> String) {
-    post(prNumber, marker, body, errorMessage)
+// Posts under a state marker instead of the plain one, for the modes that announce both directions.
+fun CommentType.postState(prNumber: String, state: String, body: String, errorMessage: (Int) -> String) {
+    postPrComment(prNumber, "${stateMarker(state)}\n$body", errorMessage = errorMessage)
 }
 
 
 // A collapsed comment loses its active marker, including the state variant. Only the stale marker remains, so
 // it can never be mistaken for the current announcement.
 //
-// Every body posted under a CommentType needs a line starting with "### ", it becomes the title of the spoiler
-// the collapsed comment turns into. A body without one ends up under [fallbackTitle].
+// Every body posted under a CommentType needs a line starting with "###" followed by a space, it becomes
+// the title of the spoiler the collapsed comment turns into. A body without one ends up under [fallbackTitle].
 // A failed collapse is harmless, so [onFailure] may return: the newest-state lookup ignores the leftover.
 fun CommentType.markAsStale(
     comment: PrComment,
@@ -590,11 +645,10 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
                         if (workspace.isNotEmpty()) it.replace("file://$workspace/", "").replace("$workspace/", "")
                         else it
                     }
-                    .take(300)
-                appendLine("- `$display`")
+                appendLine("- `${sanitizeCodeSpan(display)}`")
                 if (rawLine.trimStart().startsWith("e: ")) {
                     for (cont in parseErrorContinuations(logContent, rawLine)) {
-                        appendLine("  - `${cont.take(300)}`")
+                        appendLine("  - `${sanitizeCodeSpan(cont)}`")
                     }
                 }
             }
@@ -602,8 +656,8 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
         } else {
             val oneLiner = parseOneLiner(logContent)
             if (oneLiner != null) {
-                val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
-                appendLine("`$displayLine`")
+                val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ")
+                appendLine("`${sanitizeCodeSpan(displayLine)}`")
             }
         }
         if ("warnings found and -Werror specified" in logContent) {
@@ -690,8 +744,8 @@ fun buildDetektCrashBody(logContent: String): String = buildString {
     appendLine()
     val oneLiner = parseOneLiner(logContent)
     if (oneLiner != null) {
-        val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
-        appendLine("`$displayLine`")
+        val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ")
+        appendLine("`${sanitizeCodeSpan(displayLine)}`")
         appendLine()
     }
     appendLine("<details><summary>Excerpt</summary>")
@@ -724,7 +778,7 @@ fun runDetektMode(prNumber: String) {
                 error(
                     "Detekt workflow did not complete successfully AND detekt-run.log does not exist, is null or empty. " +
                         "(conclusion: $conclusion). " +
-                        "Check the workflow run for details."
+                        "Check the workflow run for details.",
                 )
             }
         }
@@ -779,17 +833,16 @@ fun parseSarifFindings(sarif: JsonObject, workspace: String): List<Finding> = bu
 
 fun runBuildMode(prNumber: String) {
     val log1 = readBuildLog(System.getenv("ARTIFACT_DIR_1"))
-    val log2 = readBuildLog(System.getenv("ARTIFACT_DIR_2"))
 
     buildComment.staleExisting(prNumber)
 
-    if (log1.isNullOrBlank() && log2.isNullOrBlank()) {
+    if (log1.isNullOrBlank()) {
         println("No build failures found, removing build label")
         setLabel(prNumber, buildLabel, false)
         exitProcess(0)
     }
 
-    val versions = filterStonecutterDuplicates(listOf("1.21.11" to log1, "26.1" to log2))
+    val versions = filterStonecutterDuplicates(listOf("26.1" to log1))
     buildComment.post(prNumber, buildBuildFailureBody(versions)) {
         "Error: could not post build failure comment (HTTP $it)"
     }
@@ -837,6 +890,8 @@ fun runChangelogMode(prNumber: String) {
 val dependencyUrlRegex = Regex("""^- https://github\.com/([\w-]+)/([\w-]+)/pull/(\d+)""")
 val dependencyNumberRegex = Regex("""^- #(\d+)""")
 
+fun countDependencyHeadings(body: String): Int = body.lines().count { it.trim() == dependencySectionHeading }
+
 // Null when the section is absent, empty when it exists without entries. Only the second case can carry a malformed
 // entry. The section ends at the first line that is not a list entry, but blank lines right below the heading are
 // skipped, writing one there is too common to let it drop everything underneath.
@@ -856,29 +911,38 @@ fun extractDependencySection(body: String): List<String>? {
     return entries
 }
 
-fun parseDependencies(sectionLines: List<String>): List<Dependency> {
+fun parseDependencySection(sectionLines: List<String>): ParsedDependencySection {
     val repoOwner = repo.substringBefore("/")
     val repoName = repo.substringAfter("/")
     val deps = mutableListOf<Dependency>()
+    val unrecognized = mutableListOf<String>()
 
-    // toIntOrNull, because the digit group also matches a number too large for an Int. toInt would throw, and
-    // nothing catches that: the closed event iterates over every labeled PR and would abandon the rest of them.
     for (line in sectionLines) {
         val urlMatch = dependencyUrlRegex.find(line)
         if (urlMatch != null) {
             val depOwner = urlMatch.groupValues[1]
             val depRepo = urlMatch.groupValues[2]
-            val depNum = urlMatch.groupValues[3].toIntOrNull() ?: continue
+            // A number too large for an Int cannot be a pull request. toInt would throw, and nothing catches
+            // that: the closed event iterates over every labeled PR and would abandon the rest of them.
+            val depNum = urlMatch.groupValues[3].toIntOrNull()
+            if (depNum == null) {
+                unrecognized.add(line)
+                continue
+            }
+            // Valid, and deliberately produces no dependency. Never a malformed line.
             if (depOwner == "hannibal002" && depRepo == "SkyHanni-REPO") continue
             deps.add(Dependency(depOwner, depRepo, depNum, line))
             continue
         }
-        val numberMatch = dependencyNumberRegex.find(line) ?: continue
-        val depNum = numberMatch.groupValues[1].toIntOrNull() ?: continue
+        val depNum = dependencyNumberRegex.find(line)?.groupValues?.get(1)?.toIntOrNull()
+        if (depNum == null) {
+            unrecognized.add(line)
+            continue
+        }
         deps.add(Dependency(repoOwner, repoName, depNum, line))
     }
 
-    return deps
+    return ParsedDependencySection(deps, unrecognized)
 }
 
 // A 404 used to count as "not open", so a typo turned the status green. It is reported instead, but never as
@@ -893,23 +957,28 @@ fun getDependencyState(dep: Dependency): DependencyState {
         dependencyError("Error: unexpected status $status for dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber}")
     }
     val state = (body as? JsonObject)?.get("state")?.takeIf { it.isJsonPrimitive }?.asString
-    return if (state == "open") DependencyState.OPEN else DependencyState.CLOSED
+    // Treating anything unreadable as closed would let the pull request merge, which is the same mistake the 404
+    // handling above used to make. A pull request only ever has these two states.
+    return when (state) {
+        "open" -> DependencyState.OPEN
+        "closed" -> DependencyState.CLOSED
+        else -> dependencyError(
+            "Error: dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber} has no usable state (got: $state)",
+            fix = apiFormatErrorFix,
+        )
+    }
 }
 
-// Kept under the status API's 140-character limit. An unresolvable entry hides the open count, like the comment.
-fun buildDependencyStatusDescription(openCount: Int, unresolvedCount: Int): String = when {
-    unresolvedCount > 0 -> dependencyUnresolvedTitle(unresolvedCount)
+// Kept under the status API's 140-character limit. A problem hides the open count, like the comment.
+fun buildDependencyStatusDescription(openCount: Int, problems: DependencyProblems): String = when {
+    !problems.isEmpty -> dependencyProblemsTitle(problems.count)
     openCount > 0 -> "Waiting on $openCount open dependency ${if (openCount == 1) "PR" else "PRs"}"
     else -> "All dependency PRs are resolved"
 }
 
-fun setDependencyStatus(
-    headSha: String,
-    openDependencies: List<Dependency>,
-    unresolvedDependencies: List<Dependency>,
-) {
-    val blocking = openDependencies.isNotEmpty() || unresolvedDependencies.isNotEmpty()
-    val description = buildDependencyStatusDescription(openDependencies.size, unresolvedDependencies.size)
+fun setDependencyStatus(headSha: String, openDependencies: List<Dependency>, problems: DependencyProblems) {
+    val blocking = openDependencies.isNotEmpty() || !problems.isEmpty
+    val description = buildDependencyStatusDescription(openDependencies.size, problems)
     val payload = mutableMapOf<String, Any>(
         "state" to if (blocking) "failure" else "success",
         "context" to dependencyStatusContext,
@@ -937,32 +1006,33 @@ fun checkPrDependencies(issueNumber: String, trigger: DependencyTrigger? = null)
     val headSha = (pr.get("head") as? JsonObject)?.get("sha")?.takeIf { it.isJsonPrimitive }?.asString
         ?: dependencyError("Error: head SHA missing for PR #$issueNumber")
 
-    // A missing section and a section without parseable links end in the same state as a pull request whose
-    // dependencies are all closed, so they take the same path instead of returning early.
+    // No early exit for a section without entries: one holding nothing but the template placeholder has no
+    // dependency and still has a problem to report. An empty entry list costs no requests below anyway.
     val sectionLines = extractDependencySection(prBody)
-    val deps = sectionLines?.let { parseDependencies(it) }.orEmpty()
-    if (deps.isEmpty()) {
-        println("PR #$issueNumber: ${if (sectionLines != null) "no dependency links found" else "no Dependencies section"}")
-        setLabel(issueNumber, dependencyLabel, false)
-        setDependencyStatus(headSha, emptyList(), emptyList())
-        handleDependencyComment(issueNumber, deps, emptyList(), emptyList(), trigger)
-        return
-    }
+    val parsed = sectionLines?.let { parseDependencySection(it) }
+    val deps = parsed?.dependencies.orEmpty()
 
     // Resolved once per entry, the state is needed twice below and a second pass would double the requests.
     val evaluated = deps.map { it to getDependencyState(it) }
     val openDeps = evaluated.filter { it.second == DependencyState.OPEN }.map { it.first }
-    val unresolvedDeps = evaluated.filter { it.second == DependencyState.UNRESOLVED }.map { it.first }
 
-    // The label stays reserved for actually open dependencies, an unresolvable entry blocks through status only.
+    val unrecognized = parsed?.unrecognizedLines.orEmpty()
+    val problems = DependencyProblems(
+        unresolved = evaluated.filter { it.second == DependencyState.UNRESOLVED }.map { it.first },
+        malformed = unrecognized.filterNot { it.trim() == dependencyTemplatePlaceholder },
+        hasPlaceholder = unrecognized.any { it.trim() == dependencyTemplatePlaceholder },
+        hasDuplicateHeading = countDependencyHeadings(prBody) > 1,
+    )
+
+    // The label stays reserved for actually open dependencies, a problem blocks through status and comment only.
     setLabel(issueNumber, dependencyLabel, openDeps.isNotEmpty())
-    setDependencyStatus(headSha, openDeps, unresolvedDeps)
-    handleDependencyComment(issueNumber, deps, openDeps, unresolvedDeps, trigger)
+    setDependencyStatus(headSha, openDeps, problems)
+    handleDependencyComment(issueNumber, deps, openDeps, problems, trigger)
 
     val summary = when {
-        unresolvedDeps.isNotEmpty() && openDeps.isNotEmpty() -> "has open and unresolvable dependencies"
-        unresolvedDeps.isNotEmpty() -> "has unresolvable dependencies"
+        !problems.isEmpty -> "has ${problems.count} section ${if (problems.count == 1) "problem" else "problems"}"
         openDeps.isNotEmpty() -> "has open dependencies"
+        sectionLines == null -> "no Dependencies section"
         else -> "all dependencies resolved"
     }
     println("PR #$issueNumber: $summary")
@@ -1037,7 +1107,7 @@ fun recheckPRsDependingOn(targetPrNum: Int) {
         if (num.toIntOrNull() == targetPrNum) continue
         val body = pr.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
         val sectionLines = extractDependencySection(body) ?: continue
-        val deps = parseDependencies(sectionLines)
+        val deps = parseDependencySection(sectionLines).dependencies
         if (deps.any { it.owner == repoOwner && it.repoName == repoName && it.pullNumber == targetPrNum }) {
             tryCheckPrDependencies(num)
         }
@@ -1050,12 +1120,13 @@ val dependencyReEvaluateNote = "You may need to re-evaluate this PR's dependenci
 // Must remain exact, otherwise dependencyStateLines drops the entire comment.
 val dependencyStatePrefix = "This PR is"
 
-// The unresolved comment has no state line, so dependencyStateLines needs this second anchor. Must stay a prefix
-// of dependencyUnresolvedTitle, otherwise a corrected entry never gets announced.
-val dependencyUnresolvedTitlePrefix = "### $warningIcon Could not resolve"
+// The problem comment has no state line, so dependencyStateLines needs this second anchor. Must stay a prefix of
+// dependencyProblemsTitle, otherwise a corrected section never gets announced.
+val dependencyProblemsTitlePrefix = "### $warningIcon The dependency section has"
 
-fun dependencyUnresolvedTitle(count: Int): String =
-    "Could not resolve $count dependency ${if (count == 1) "entry" else "entries"}"
+// The count sits at the end, so the prefix above stays stable.
+fun dependencyProblemsTitle(count: Int): String =
+    "The dependency section has $count ${if (count == 1) "problem" else "problems"}"
 
 // Trigger link format must stay identical when building and recognizing trigger entries.
 fun dependencyTriggerLink(pullNumber: Int): String = "- https://github.com/$repo/pull/$pullNumber"
@@ -1075,34 +1146,58 @@ fun StringBuilder.appendDependencyState(openDependencies: List<Dependency>) {
     }
 }
 
-// Rendered inside a code span, so only backticks have to go: one would close the span early and let the rest
-// render as markdown. Everything else, an "@" mention included, is inert there and stays readable as typed.
-fun sanitizeCodeSpan(text: String, maxLen: Int = 300): String = text.take(maxLen).replace("`", "'")
-
-
-
-fun StringBuilder.appendUnresolvedDependencies(unresolvedDependencies: List<Dependency>) {
-    appendWarningTitle(dependencyUnresolvedTitle(unresolvedDependencies.size))
-    appendLine()
-    for (dep in unresolvedDependencies) {
-        appendLine("- `${sanitizeCodeSpan(dep.sourceLine)}`")
+fun StringBuilder.appendProblemLines(lines: List<String>) {
+    for (line in lines) {
+        appendLine("- `${sanitizeCodeSpan(line)}`")
     }
     appendLine()
-    appendLine("This blocks the pull request. Check the number and the link for a typo.")
-    append(
-        "If the entry points at a pull request in a repository this bot cannot read, remove it from the section " +
-            "and mention it in the What section instead.",
-    )
+}
+
+fun StringBuilder.appendDependencyProblems(problems: DependencyProblems) {
+    appendWarningTitle(dependencyProblemsTitle(problems.count))
+    appendLine()
+
+    if (problems.unresolved.isNotEmpty()) {
+        appendLine("Could not be resolved:")
+        appendProblemLines(problems.unresolved.map { it.sourceLine })
+        appendLine(
+            "Check the number or the link for a typo. If the entry points at a pull request in a repository this " +
+                "bot cannot read, remove it and mention it in the What section instead.",
+        )
+        appendLine()
+    }
+
+    if (problems.malformed.isNotEmpty()) {
+        appendLine("Not a valid dependency entry:")
+        appendProblemLines(problems.malformed)
+        appendLine("Use `- #<pr number>` for this repository, or `- <url>` for another one.")
+        appendLine()
+    }
+
+    if (problems.hasPlaceholder) {
+        appendLine("The section still holds the template placeholder. Fill it in or remove the section.")
+        appendLine()
+    }
+
+    if (problems.hasDuplicateHeading) {
+        appendLine(
+            "The `## Dependencies` heading appears more than once. Only the first one is read, so every entry " +
+                "has to sit under it.",
+        )
+        appendLine()
+    }
+
+    append("This blocks the pull request.")
 }
 
 fun buildDependencyComment(
     trigger: DependencyTrigger?,
     openDependencies: List<Dependency>,
-    unresolvedDependencies: List<Dependency>,
+    problems: DependencyProblems,
 ): String = buildString {
-    // A broken section makes the open dependencies irrelevant, only the broken lines are worth showing.
-    if (unresolvedDependencies.isNotEmpty()) {
-        appendUnresolvedDependencies(unresolvedDependencies)
+    // A broken section makes the open dependencies irrelevant, only the problems are worth showing.
+    if (!problems.isEmpty) {
+        appendDependencyProblems(problems)
         return@buildString
     }
 
@@ -1129,7 +1224,7 @@ fun buildDependencyComment(
 fun dependencyStateLines(body: String): List<String> = body.lineSequence()
     .map { it.trim() }
     .filter { it.isNotEmpty() }
-    .dropWhile { !it.startsWith(dependencyStatePrefix) && !it.startsWith(dependencyUnresolvedTitlePrefix) }
+    .dropWhile { !it.startsWith(dependencyStatePrefix) && !it.startsWith(dependencyProblemsTitlePrefix) }
     .filterNot { it == dependencyReEvaluateNote }
     .toList()
 
@@ -1137,7 +1232,7 @@ fun handleDependencyComment(
     issueNumber: String,
     dependencies: List<Dependency>,
     openDependencies: List<Dependency>,
-    unresolvedDependencies: List<Dependency>,
+    problems: DependencyProblems,
     trigger: DependencyTrigger?,
 ) {
     val repoOwner = repo.substringBefore("/")
@@ -1156,10 +1251,10 @@ fun handleDependencyComment(
     // A pull request that was never announced is in the same position as one whose dependencies are all closed.
     val announcedState = announced?.state ?: dependencyStateResolved
     // The marker answers "is this blocked", not why: both reasons can apply at once, a third value would fit neither.
-    val blocking = openDependencies.isNotEmpty() || unresolvedDependencies.isNotEmpty()
+    val blocking = openDependencies.isNotEmpty() || !problems.isEmpty
     val currentState = if (blocking) dependencyStateWaiting else dependencyStateResolved
 
-    val body = buildDependencyComment(matchingTrigger, openDependencies, unresolvedDependencies)
+    val body = buildDependencyComment(matchingTrigger, openDependencies, problems)
 
     // The state alone misses a second dependency being added while the pull request keeps waiting.
     val stateChanged = announcedState != currentState ||
@@ -1173,8 +1268,8 @@ fun handleDependencyComment(
             .takeWhile { !it.startsWith(dependencyStatePrefix) }
             .any { it == dependencyTriggerLink(matchingTrigger.pullNumber) }
 
-    // The unresolved comment never shows the trigger, so without this every closed dependency reposts it.
-    val triggerIsNew = matchingTrigger != null && !triggerAlreadyAnnounced && unresolvedDependencies.isEmpty()
+    // The problem comment never shows the trigger, so without this every closed dependency reposts it.
+    val triggerIsNew = matchingTrigger != null && !triggerAlreadyAnnounced && problems.isEmpty
 
     val posting = stateChanged || triggerIsNew
     if (posting) {
@@ -1201,7 +1296,7 @@ fun runDependenciesModeForOpenPr(prNum: String?) {
     try {
         checkPrDependencies(num)
     } catch (e: DependencyCheckException) {
-        error(e.message ?: "Error: dependency check failed for PR #$num")
+        error(e.message ?: "Error: dependency check failed for PR #$num", fix = e.fix)
     }
     if (System.getenv("PR_ACTION") == "reopened") {
         val targetPrNum = num.toIntOrNull() ?: return
@@ -1292,7 +1387,7 @@ fun runKeywordLabelMode(prNumber: String) {
         if (posting) {
             val body = if (keywordPresent) buildKeywordLabelAddedComment(entry)
             else buildKeywordLabelRemovedComment(entry)
-            entry.comment.post(prNumber, entry.comment.stateMarker(currentState), body) {
+            entry.comment.postState(prNumber, currentState, body) {
                 "Error: could not post \"${entry.label}\" comment (HTTP $it)"
             }
         }
