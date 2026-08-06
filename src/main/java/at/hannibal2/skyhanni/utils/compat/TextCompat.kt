@@ -24,8 +24,8 @@ import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.resources.Identifier
-import java.awt.Color
 import net.minecraft.world.item.ItemStackTemplate
+import java.awt.Color
 import java.net.URI
 import java.util.Optional
 import kotlin.concurrent.atomics.AtomicBoolean
