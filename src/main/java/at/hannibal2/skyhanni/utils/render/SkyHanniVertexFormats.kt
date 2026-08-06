@@ -8,8 +8,6 @@ import com.mojang.blaze3d.vertex.VertexFormatElement
 import org.lwjgl.system.MemoryUtil
 
 private typealias VFEType = VertexFormatElement.Type
-//? if < 26.1
-//private typealias VFEUsage = VertexFormatElement.Usage
 
 object SkyHanniVertexFormats {
 
@@ -22,7 +20,6 @@ object SkyHanniVertexFormats {
     internal enum class VertexElement(
         private val index: Int = 0,
         private val type: VFEType = VFEType.FLOAT,
-        //~ if < 26.1 'normalized: Boolean = false' -> 'usage: VFEUsage = VFEUsage.GENERIC'
         private val normalized: Boolean = false,
         private val count: Int = 4,
     ) {
@@ -43,7 +40,6 @@ object SkyHanniVertexFormats {
         // see safeRegister() for details on how this is used and determined at runtime.
         private val registrationId: Int by lazy { lastRegisteredId + (ordinal + 1) }
         val element by lazy {
-            //~ if < 26.1 'false' -> 'usage'
             safeRegister(registrationId, index, type, false, count)
         }
     }
@@ -63,7 +59,6 @@ object SkyHanniVertexFormats {
         desiredId: Int,
         index: Int = 0,
         type: VFEType = VFEType.FLOAT,
-        //~ if < 26.1 'normalized: Boolean = false' -> 'usage: VFEUsage = VFEUsage.GENERIC'
         normalized: Boolean = false,
         count: Int = 4,
     ): VertexFormatElement {
@@ -74,7 +69,6 @@ object SkyHanniVertexFormats {
             "VertexFormatElement ID $desiredId was already taken, using $id instead",
             "SkyHanni vertex format element ID conflict. Desired ID $desiredId was already registered",
         )
-        //~ if < 26.1 'normalized' -> 'usage'
         return VertexFormatElement.register(id, index, type, normalized, count)
     }
 
