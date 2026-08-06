@@ -200,7 +200,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
 
     protected abstract val islandTypeTag: IslandTypeTag
     protected open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }
-    protected abstract val rotatingPerkSlots: List<RotatingPerkSlot<Data>>
+    abstract val rotatingPerkSlots: List<RotatingPerkSlot<Data>>
 
     abstract val resetChatPattern: Pattern
 
