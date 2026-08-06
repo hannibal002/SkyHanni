@@ -33,24 +33,24 @@ Features that only work on a specific area on an island rely on the network to d
 A non-exhaustive list of features:
 
 - The **Area Navigation** feature.
-    - A list that shows all areas on the current world, sorted by distance.
+    - A list that shows all areas in the current world, sorted by distance.
     - Click on it to navigate to that area.
-- Show area border in world.
+- Show the area border in the world.
 - Send a title when entering a new area.
 
 #### Small Areas
 
 Small areas are for things like a building or a small cave, like the bank in the Hub or Trapper's Den in The Farming Islands.
-(Large) normal areas are the big areas on the map, like the graveyard in the hub or Stronghold in Crimson Isle.
+(Large) normal areas are the big areas on the map, like the graveyard in the hub or the Stronghold in the Crimson Isle.
 The distinction between an area and a small area allows for visual differentiation in the **Area Navigation** feature and in
 `/shnavigate`, and for the option to include or exclude small areas in the **Area Navigation** list.
 
-#### What area is the node at?
+#### What area is the node in?
 
 Giving every node an area tag is impractical.
 Instead, we follow the graph chain from one node to its neighbors until we find an area name tag.
 The name of that node then defines what area the player stands at.
-The next area needs to start at the other side of the "imaginary area boundary" and be connected to the first area.
+The next area needs to start on the other side of the "imaginary area boundary" and be connected to the first area.
 
 The **Error Finder** will warn you when nodes connect to multiple areas at the same time without
 a boundary (conflicting areas).
@@ -75,7 +75,7 @@ A non-exhaustive list of features:
 
 ## Graph Editor
 
-To open up the Graph Editor run the command `/shgraph`.
+To enable the Graph Editor, run the command `/shgraph`.
 To exit the Graph Editor, run the command again or press the **Exit Key** (by default `Enter`).
 To load the Graph Editor with the existing repo data of the current island, run `/shgraphloadthisisland`.
 
@@ -120,13 +120,12 @@ If you are more than 3 blocks away from the selected node, two other things will
 - A new node at the current location gets added (like if you have no node selected).
 - A new edge (connection) between the selected node and the newly created node gets added.
 
-If you press the **Select Nearest Node** after creating a new node, you can move around and just keep pressing the add and select keys to
-quickly
-create a new line of nodes in the world.
+Press the **Select Nearest Node** after creating a new node, then move around and keep pressing the add and select keys to quickly create a
+new line of nodes in the world.
 
 #### Adding and Deleting Edges
 
-When pressing **Connect Key** (by default `C`), a connection between the selected node (green) and the next closest node (yellow) gets
+When pressing the **Connect Key** (by default `C`), a connection between the selected node (green) and the next closest node (yellow) gets
 created.
 Press **Connect Key** again to delete the edge.
 The normal edge color is blue, the edge between the selected and the nearest node is red.
@@ -157,7 +156,7 @@ Additionally, while saving, these three things happen as well:
 
 Assigning a name and a tag to a node allows mod features to find and connect to it programmatically.
 
-A node with a name always needs a tag, a node with a tag always needs a name.
+A node with a name always needs a tag, and a node with a tag always needs a name.
 The vast majority of nodes don't have either.
 
 #### Renaming a Node
@@ -201,7 +200,7 @@ Apart from adding, deleting and moving nodes and edges, the Graph Editor has a n
 #### Undo and Redo
 
 Every action you do in the Graph Editor (adding and removing nodes or edges, renaming nodes, adding and removing tags, node weight changes,
-direction changes of edges), even big actions (loading, unloading the whole graph) can be undone via `Control` + `Z`. Also supports
+direction changes of edges), even big actions (loading, unloading the whole graph) can be undone via `Control` + `Z`. It also supports
 Redo via `Control` + `Y`.
 
 #### Select Node by Looking
@@ -212,7 +211,7 @@ Then, all you need to do is to look at the node you want to select, and press th
 
 #### Split
 
-Use the **Split Key** to cut the currently red marked edge (between the selected node and the closest node) in half.
+Use the **Split Key** to cut the currently red-marked edge (between the selected node and the closest node) in half.
 That will create a new node in the middle of the edge, remove the old connection between the two old nodes, and add two new connections,
 from the new node to the two old nodes.
 
@@ -226,7 +225,7 @@ The **Dissolve Key** is not set by default.
 
 #### One Directional
 
-Use the **One Directional Key** (by default `H`) to cycle through the direction of the currently red marked edge (between the selected node
+Use the **One Directional Key** (by default `H`) to cycle through the direction of the currently red-marked edge (between the selected node
 and the closest node).
 
 The three directions to cycle through:
@@ -289,7 +288,7 @@ This also impacts area detection.
 
 ### Debug Tools
 
-There are some tools that aren't to edit the graph but rather to test or debug the network or to deal with merging conflicts.
+There are some tools that aren't to edit the graph but rather to test or debug the network or to deal with merge conflicts.
 
 #### Navigate to Selected Node
 
@@ -318,9 +317,9 @@ The **Feedback Key** (by default `K`) toggles the Feedback Mode.
 
 While the feedback mode is enabled, every action you do in the Graph Editor gets commented in the console. Useful for beginners.
 
-#### Disjoined Networks
+#### Disjointed Networks
 
-All nodes that connect are one network.
+All nodes that connect form one network.
 Breaking connections (e.g. via adding a new node that is not connected to the network) creates multiple disjointed networks.
 This unstable state requires fixing.
 Therefore, the **Error Finder** will flag such cases when saving.
