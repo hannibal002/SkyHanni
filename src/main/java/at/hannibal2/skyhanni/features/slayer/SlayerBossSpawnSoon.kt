@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -35,7 +34,7 @@ object SlayerBossSpawnSoon {
         if (!isEnabled()) return
         if (!SlayerApi.isInCorrectArea) return
 
-        val completion = progressPattern.matchMatcher(event.newProgress.removeColor()) {
+        val completion = progressPattern.matchMatcher(event.newProgress) {
             group("progress").formatDouble() / group("total").formatDouble()
         } ?: return
 
