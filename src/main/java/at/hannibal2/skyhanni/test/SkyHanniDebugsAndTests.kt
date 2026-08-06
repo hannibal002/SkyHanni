@@ -396,7 +396,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onKeyDown(event: KeyDownEvent) {
+    private fun onKeyDown(event: KeyDownEvent) {
         if (event.keyCode == debugConfig.copySubLocation && MinecraftCompat.screen == null) {
             HypixelData.skyBlockArea?.let(OSUtils::copyToClipboard)
         }
