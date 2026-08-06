@@ -138,7 +138,7 @@ object SlayerApi {
     fun isInBossFight() = state == ActiveQuestState.BOSS_FIGHT
 
     private class SlayerData {
-        var currentState: ActiveQuestState? = ActiveQuestState.NO_ACTIVE_QUEST
+        var currentState: ActiveQuestState = ActiveQuestState.NO_ACTIVE_QUEST
         var currentStateRaw: String? = null
         var type: Type? = null
     }
@@ -393,10 +393,11 @@ object SlayerApi {
     @HandleEvent
     private fun onWorldChange() {
         val data = outsideRiftData
-        if (data.currentState == COCOONED) {
-            ChatUtils.debug("SlayerApi: World change detected, resetting cocooned state")
-            lastCocoonTimestamp = ServerTimeMark.farPast()
-        }
+        if (data.currentState != COCOONED) return
+        ChatUtils.debug("SlayerApi: World change detected, resetting cocooned state")
+        data.currentState = NO_ACTIVE_QUEST
+        data.currentStateRaw = null
+        lastCocoonTimestamp = ServerTimeMark.farPast()
     }
 
     // TODO USE SH-REPO
