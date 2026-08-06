@@ -36,9 +36,9 @@ class GraphEditorConfig {
     @ConfigEditorKeybind(defaultKey = KeyboardManager.LEFT_MOUSE)
     var selectKey: Int = KeyboardManager.LEFT_MOUSE
 
-    // TODO rename to selectLookingAtNodeKey
+    // TODO rename to selectNodeByLookingKey
     @Expose
-    @ConfigOption(name = "Select looking at Node", desc = "Select the node you are pointing your cursor at.")
+    @ConfigOption(name = "Select Node by Looking", desc = "Select the node you are pointing your cursor at.")
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var selectRaycastKey: Int = GLFW.GLFW_KEY_UNKNOWN
 

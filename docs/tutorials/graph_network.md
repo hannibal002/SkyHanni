@@ -23,7 +23,7 @@ The node tags **Area** and **Small Area** define the current area for other SkyH
 The feature first finds the closest node to the player. Next, the graph network is traversed starting from this node until an area tag is
 found.
 
-The name `no_area` is used on nodes that are outside any specific area (the main area that spans over the whole island).
+Nodes without a specific area tag are considered to be in the default no_area, which covers the whole island.
 Some islands do not have any area at all. On those islands, the API will return `no_area`.
 
 #### Current Area
@@ -51,6 +51,7 @@ Giving every node an area tag is impractical.
 Instead, we follow the graph chain from one node to its neighbors until we find an area name tag.
 The name of that node then defines what area the player stands at.
 The next area needs to start on the other side of the "imaginary area boundary" and be connected to the first area.
+The boundary lies between two nodes that have different area tags
 
 The **Error Finder** will warn you when nodes connect to multiple areas at the same time without
 a boundary (conflicting areas).
@@ -71,13 +72,13 @@ A non-exhaustive list of features:
 - `/shnavigateall <target type>`
     - This allows you to navigate in a circle to all waypoints of a given category, e.g., fairy souls, hoppity eggs, fishing
       hotspots/wormholes.
-    - On Torrhus Canyon: hideonsun, honeyhive, pangolin, sanger, tree protection order.
+    - On Torrhus Canyon are additionally those categories: Hideonsun, Honeyhive, Pangolin, Sanger, Tree Protection Order.
 
 ## Graph Editor
 
 To enable the Graph Editor, run the command `/shgraph`.
 To exit the Graph Editor, run the command again or press the **Exit Key** (by default `Enter`).
-To load the Graph Editor with the existing repo data of the current island, run `/shgraphloadthisisland`.
+To load the Graph Editor with the existing [Repo data](https://github.com/hannibal002/SkyHanni-REPO/tree/main/constants/island_graphs) of the current island, run `/shgraphloadthisisland`.
 
 Press the **Vision Key** (by default `M`) to toggle visibility of nodes and edges behind blocks.
 
@@ -86,6 +87,7 @@ Once the graph is loaded, you see two GUIs:
 - **List of Named Nodes**
     - Contains the full list of all nodes on the graph that have a name.
     - Is used to add or remove tags to the node.
+    - Open the inventory to interact with it.
     - Useful to navigate to any given node quickly.
 - A keybind list, showing you what you can do at any given time by pressing the keys.
 
@@ -114,13 +116,14 @@ By default, the keybind for **Select Nearest Node** is `Left Mouse Button`.
 When you press the **Place Key** (by default `F`), you create a new node at the location where you stand.
 But if you have a node selected, this behavior is altered:
 
-If you are close to the selected node, you delete the selected node by pressing the **Place Key**.
-If you are more than 3 blocks away from the selected node, two other things will happen:
+If you are within 3 blocks of the selected node, you delete the selected node by pressing the **Place Key**.
+If you are more than 3 blocks away, two other things will happen:
 
 - A new node at the current location gets added (like if you have no node selected).
 - A new edge (connection) between the selected node and the newly created node gets added.
 
-Press the **Select Nearest Node** after creating a new node, then move around and keep pressing the add and select keys to quickly create a
+Press the **Select Nearest Node** after creating a new node, then move around and keep pressing the Place and Select Keys to quickly create
+a
 new line of nodes in the world.
 
 #### Adding and Deleting Edges
@@ -143,13 +146,12 @@ Use your Minecraft keybind to move the selected node:
 
 The **Save Key** (by default `O`) allows you to export the current graph.
 It will compile the graph into JSON format, and put the raw text of the JSON into your clipboard.
-Then you can put that text into e.g., your fork of the REPO file to include in a PR.
+Then you can put that text into e.g., your fork of the [Repo file](https://github.com/hannibal002/SkyHanni-REPO/tree/main/constants/island_graphs) to include in a PR.
 
 Additionally, while saving, these three things happen as well:
 
 - The **Error Finder** gets activated.
-- The Graph Network gets used on the current island (optionally, toggleable)
-    - Sets the current Graph Editor data as the Graph Network used on the current island.
+- The current graph is applied as the island’s active graph network (optional, toggleable).
 - It shows stats in chat.
 
 ### Named Nodes and Tags
@@ -170,8 +172,8 @@ Press **Exit Key** (by default `Enter`) to exit the text mode.
 
 You can use `Control` + `V` to paste your clipboard as text while in the text mode.
 The new string does not append to the text, but rather replaces the whole old text.
-This can become useful if you want to add a lot of nodes with the same name.
-Or if other mods or vanilla Minecraft keybind mappings activate while you type in the text mode.
+This can become useful if you want to add a lot of nodes with the same name, or if other mods or vanilla Minecraft keybind mappings activate
+while you type in the text mode.
 
 #### Tagging a Node
 
@@ -205,9 +207,9 @@ Redo via `Control` + `Y`.
 
 #### Select Node by Looking
 
-You want to select a node that is further away, and it's time-consuming to walk up to the node to select it?
-Walk no more! You can set a key for the **Select looking at Node** keybind.
-Then, all you need to do is to look at the node you want to select, and press the keybind!
+You want to select a node that is further away, and it's time-consuming to walk up to the node to select it? Walk no more!
+You can set a keybind for **Select Node by Looking**. Then, all you need to do is to look at the node you want to select, and press the
+keybind!
 
 #### Split
 
