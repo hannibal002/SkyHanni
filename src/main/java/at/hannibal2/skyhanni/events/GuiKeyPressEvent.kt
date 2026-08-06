@@ -16,15 +16,17 @@ import net.minecraft.client.input.MouseButtonEvent
  * if they want to see which key was pressed.
  */
 @PrimaryFunction("onGuiKeyPress")
-sealed class GuiKeyPressEvent : CancellableSkyHanniEvent() {
-    abstract val guiContainer: SkyHanniGuiContainer
+sealed class GuiKeyPressEvent(
+    val guiContainer: SkyHanniGuiContainer,
+) : CancellableSkyHanniEvent() {
+
     abstract fun stackUnderCursor(): SafeItemStack?
 
     @PrimaryFunction("onGuiKeyboardKeyPress")
     class GuiKeyboardKeyPressEvent(
-        override val guiContainer: SkyHanniGuiContainer,
+        guiContainer: SkyHanniGuiContainer,
         private val keyEvent: KeyEvent,
-    ) : GuiKeyPressEvent() {
+    ) : GuiKeyPressEvent(guiContainer) {
         override fun stackUnderCursor(): SafeItemStack? {
             return InventoryCompat.stackUnderCursor(keyEvent)
         }
@@ -32,9 +34,9 @@ sealed class GuiKeyPressEvent : CancellableSkyHanniEvent() {
 
     @PrimaryFunction("onGuiMouseKeyPress")
     class GuiMouseKeyPressEvent(
-        override val guiContainer: SkyHanniGuiContainer,
+        guiContainer: SkyHanniGuiContainer,
         private val mouseEvent: MouseButtonEvent,
-    ) : GuiKeyPressEvent() {
+    ) : GuiKeyPressEvent(guiContainer) {
         override fun stackUnderCursor(): SafeItemStack? {
             return InventoryCompat.stackUnderCursor(mouseEvent)
         }
