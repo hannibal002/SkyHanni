@@ -16,22 +16,27 @@ import net.minecraft.client.input.MouseButtonEvent
  * if they want to see which key was pressed.
  */
 @PrimaryFunction("onGuiKeyPress")
-class GuiKeyPressEvent(
-    val guiContainer: SkyHanniGuiContainer,
-    private val keyEvent: KeyEvent?,
-    private val mouseEvent: MouseButtonEvent?,
-) : CancellableSkyHanniEvent() {
-    constructor(guiContainer: SkyHanniGuiContainer, keyEvent: KeyEvent) :
-        this(guiContainer, keyEvent = keyEvent, mouseEvent = null)
-    constructor(guiContainer: SkyHanniGuiContainer, mouseEvent: MouseButtonEvent) :
-        this(guiContainer, keyEvent = null, mouseEvent = mouseEvent)
+sealed class GuiKeyPressEvent : CancellableSkyHanniEvent() {
+    abstract val guiContainer: SkyHanniGuiContainer
+    abstract fun stackUnderCursor(): SafeItemStack?
 
-    fun stackUnderCursor(): SafeItemStack? {
-        if (mouseEvent != null) {
-            return InventoryCompat.stackUnderCursor(mouseEvent)
-        } else if (keyEvent != null) {
+    @PrimaryFunction("onGuiKeyboardKeyPress")
+    class GuiKeyboardKeyPressEvent(
+        override val guiContainer: SkyHanniGuiContainer,
+        private val keyEvent: KeyEvent
+    ) : GuiKeyPressEvent() {
+        override fun stackUnderCursor(): SafeItemStack? {
             return InventoryCompat.stackUnderCursor(keyEvent)
         }
-        return null
+    }
+
+    @PrimaryFunction("onGuiMouseKeyPress")
+    class GuiMouseKeyPressEvent(
+        override val guiContainer: SkyHanniGuiContainer,
+        private val mouseEvent: MouseButtonEvent
+    ) : GuiKeyPressEvent() {
+        override fun stackUnderCursor(): SafeItemStack? {
+            return InventoryCompat.stackUnderCursor(mouseEvent)
+        }
     }
 }

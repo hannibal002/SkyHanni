@@ -93,7 +93,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         int keyCode = input.input();
         TextInput.Companion.onGuiInput(cir);
         boolean shouldCancelInventoryClose = KeyboardManager.checkIsInventoryClosure(keyCode);
-        if (new GuiKeyPressEvent((AbstractContainerScreen<?>) (Object) this, input).post().isCancelled() || shouldCancelInventoryClose) {
+        if (new GuiKeyPressEvent.GuiKeyboardKeyPressEvent((AbstractContainerScreen<?>) (Object) this, input).post().isCancelled() || shouldCancelInventoryClose) {
             cir.setReturnValue(false);
         }
     }
@@ -101,7 +101,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     @Inject(method = "mouseClicked", at = @At(value = "HEAD"), cancellable = true)
     private void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfoReturnable<Boolean> cir) {
         AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) (Object) this;
-        if (new GuiKeyPressEvent(screen, mouseButtonEvent).post().isCancelled()) {
+        if (new GuiKeyPressEvent.GuiMouseKeyPressEvent(screen, mouseButtonEvent).post().isCancelled()) {
             cir.setReturnValue(false);
         }
         if (new GuiMouseInputEvent(screen).post().isCancelled()) {
