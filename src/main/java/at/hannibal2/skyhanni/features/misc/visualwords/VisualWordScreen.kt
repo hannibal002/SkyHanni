@@ -55,26 +55,18 @@ class VisualWordScreen : SkyHanniBaseScreen() {
         }
     }
 
-    override fun onKeyTyped(typedChar: Char?, keyCode: Int?): Boolean = keyCode?.let {
+    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) = keyCode?.let {
         when {
-            it == GLFW.GLFW_KEY_ESCAPE || KeyboardManager.checkIsInventoryClosure(it) -> {
+            keyCode == GLFW.GLFW_KEY_ESCAPE || KeyboardManager.checkIsInventoryClosure(keyCode) ->
                 if (currentlyEditing) exitEditMode() else onClose()
-                true
-            }
 
-            it == GLFW.GLFW_KEY_TAB && currentlyEditing -> {
+            keyCode == GLFW.GLFW_KEY_TAB && currentlyEditing ->
                 activeInput = if (activeInput === phraseInput) replacementInput else phraseInput
-                true
-            }
 
-            (it == GLFW.GLFW_KEY_ENTER || it == GLFW.GLFW_KEY_KP_ENTER) && currentlyEditing -> {
+            (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) && currentlyEditing ->
                 exitEditMode()
-                true
-            }
-
-            else -> false
         }
-    } ?: false
+    } ?: Unit
 
     override fun isPauseScreen() = false
 

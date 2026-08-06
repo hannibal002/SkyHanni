@@ -196,24 +196,20 @@ class GuiPositionEditor(
             if (handled) break
         }
     }
-    override fun onKeyTyped(typedChar: Char?, keyCode: Int?): Boolean {
+
+    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
         if (keyCode == config.keyBindReset) {
             positions.firstOrNull { it.isHoveredWithMetrics() }?.resetPositionAndScale()
-            return true
+            return
         }
-
-        if (clickedPos == -1) return false
-
+        if (clickedPos == -1) return
         val position = positions[clickedPos]
-        if (position.clicked) return false
-
-        var handled = true
+        if (position.clicked) return
 
         position.withPositionMetrics {
             val dist = if (KeyboardManager.isShiftKeyDown()) 10 else 1
             val elementWidth = position.getDummySize(true).x
             val elementHeight = position.getDummySize(true).y
-
             when (keyCode) {
                 GLFW.GLFW_KEY_DOWN -> position.moveY(dist, elementHeight)
                 GLFW.GLFW_KEY_UP -> position.moveY(-dist, elementHeight)
@@ -221,11 +217,8 @@ class GuiPositionEditor(
                 GLFW.GLFW_KEY_RIGHT -> position.moveX(dist, elementWidth)
                 GLFW.GLFW_KEY_MINUS, GLFW.GLFW_KEY_KP_SUBTRACT -> position.scale -= .1F
                 GLFW.GLFW_KEY_EQUAL, GLFW.GLFW_KEY_KP_ADD -> position.scale += .1F
-                else -> handled = false
             }
         }
-
-        return handled
     }
 
     private fun Position.isHovered(): Boolean {
