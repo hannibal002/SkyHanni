@@ -4,25 +4,26 @@
 
 The **Graph Network** is a list of nodes (waypoints) and edges (lines between nodes) that represent individual islands.
 A powerful **Graph Editor** exists in SkyHanni that allows editing these networks.
-The network data is used for two distinct use cases:
+Two distinct use cases rely on the network data:
 
-- **Navigating** around an island (find the shortest path from where you are right now to some other spot on the island)
+- **Navigating** around an island (find the shortest path from the current location to some other spot on the island)
 - Detecting the **Current Area** where you are (like the area names from the scoreboard, just more precise and updating instantly instead of
   delayed)
 
-A lot of features in SkyHanni are powered by those two functionalities.
+These two functionalities power many SkyHanni features.
 
-The graph network is stored in JSON in the [SkyHanni Repo](https://github.com/hannibal002/SkyHanni-REPO/tree/main/constants/island_graphs),
+The graph network is stored as JSON in the [SkyHanni Repo](https://github.com/hannibal002/SkyHanni-REPO/tree/main/constants/island_graphs),
 one file per island.
 
 The Hypixel Lobby is currently the only map outside SkyBlock that is also using the graph network.
 
 ### Areas
 
-We use the node tags **Area** and **Small Area** to tell other SkyHanni features what area the user is at.
-That works by first finding the next closest node to the player.
-Then we check what area the node is at.
-We use the name `no_area` on nodes that are outside any specific area (the main area that spans over the whole island).
+The node tags **Area** and **Small Area** define the current area for other SkyHanni features.
+The feature first finds the closest node to the player. Next, the graph network is traversed starting from this node until an area tag is
+found.
+
+The name `no_area` is used on nodes that are outside any specific area (the main area that spans over the whole island).
 Some islands do not have any area at all. On those islands, the API will return `no_area`.
 
 #### Current Area
@@ -46,7 +47,7 @@ The distinction between an area and a small area allows for visual differentiati
 
 #### What area is the node at?
 
-We do not need to give every node an area tag, that would be impractical.
+Giving every node an area tag is impractical.
 Instead, we follow the graph chain from one node to its neighbors until we find an area name tag.
 The name of that node then defines what area the player stands at.
 The next area needs to start at the other side of the "imaginary area boundary" and be connected to the first area.
@@ -56,7 +57,8 @@ a boundary (conflicting areas).
 
 ### Navigating
 
-We use Dijkstra and A* to help the user find the shortest path to where they want to go.
+[Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) and [A*](https://en.wikipedia.org/wiki/A*_search_algorithm) algorithms
+calculate the shortest path to navigate the user.
 
 A non-exhaustive list of features:
 
@@ -118,13 +120,15 @@ If you are more than 3 blocks away from the selected node, two other things will
 - A new node at the current location gets added (like if you have no node selected).
 - A new edge (connection) between the selected node and the newly created node gets added.
 
-If you press the **Select Nearest Node** after creating a new node, you can move around and just keep pressing the add and select keys to quickly
+If you press the **Select Nearest Node** after creating a new node, you can move around and just keep pressing the add and select keys to
+quickly
 create a new line of nodes in the world.
 
 #### Adding and Deleting Edges
 
-When you press **Connect Key** (by default `C`), you create a connection between the selected node (green) and the next closest node (yellow).
-When you press **Connect Key** again, the edge gets deleted.
+When pressing **Connect Key** (by default `C`), a connection between the selected node (green) and the next closest node (yellow) gets
+created.
+Press **Connect Key** again to delete the edge.
 The normal edge color is blue, the edge between the selected and the nearest node is red.
 
 #### Moving a Node
@@ -151,8 +155,7 @@ Additionally, while saving, these three things happen as well:
 
 ### Named Nodes and Tags
 
-To find targets on the graph and let the mod features programmatically connect to the nodes on the graph, we can give a node a name and a
-tag.
+Assigning a name and a tag to a node allows mod features to find and connect to it programmatically.
 
 A node with a name always needs a tag, a node with a tag always needs a name.
 The vast majority of nodes don't have either.
@@ -239,7 +242,7 @@ This is useful to mark paths the user can only move in one direction. E.g., drop
 Use the command `/shgraphweight` to set the weight of the selected node.
 By default, every node has the weight of 0.
 
-The weight gets added on top of the length of the path when Dijkstra or A* calculates a path through the node.
+The weight gets added to the pathfinding route.
 This impacts all directions the node can pass through in the same way.
 
 When to use? When the path slows down the user considerably, e.g., moving through water or climbing up blocks without stairs. Especially
@@ -249,9 +252,9 @@ useful when longer but faster to move through alternate paths exist.
 
 The normal way to edit existing networks is using the `/shgraphloadthisisland` command.
 But sometimes you want to edit other graphs (your own version of something or to check out an open PR).
-For that, we have the explicit **Load Key** (by default `I`).
+The explicit **Load Key** (by default `I`) loads other graphs.
 
-When you press it, the current clipboard gets read as JSON and parsed into the Graph Editor.
+When pressed, the current clipboard gets read as JSON and parsed into the Graph Editor.
 
 #### Clear the Network
 
@@ -282,7 +285,7 @@ Why does this exist?
 - For dodging the Temporal Pillar in The Rift.
 - For more examples, see `IslandGraphs.disableNodes` in the code base.
 
-Area detection is also impacted by this.
+This also impacts area detection.
 
 ### Debug Tools
 
@@ -317,9 +320,9 @@ While the feedback mode is enabled, every action you do in the Graph Editor gets
 
 #### Disjoined Networks
 
-All nodes that connect are one network. When the connection breaks (or a new node gets added that is not connected to the network)
-we have multiple networks.
-This is not a stable state, we want to fix this.
+All nodes that connect are one network.
+Breaking connections (e.g. via adding a new node that is not connected to the network) creates multiple disjointed networks.
+This unstable state requires fixing.
 Therefore, the **Error Finder** will flag such cases when saving.
 
 There are also specific commands that come in handy:
