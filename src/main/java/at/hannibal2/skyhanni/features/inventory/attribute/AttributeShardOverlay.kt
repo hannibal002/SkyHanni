@@ -136,15 +136,17 @@ object AttributeShardOverlay {
             AttributeShardSorting.PRICE_TO_NEXT_TIER -> lines.sortedBy { it.priceToNextTier }
             AttributeShardSorting.PRICE_TO_MAXED -> lines.sortedBy { it.priceUntilMaxed }
         }
-        val filtered = sorted.filter { line ->
-            if (config.hideMaxed && line.currentTier == 10) return@filter false
-            if (config.onlyNotUnlocked && line.currentTier > 0) return@filter false
-            true
-        }
+        val filtered = sorted.filter { it.isVisible() }
 
         val adjustedMaxShards = if (config.onlyCurrentInventory) lastItemIdsInInventory.size else AttributeShardsData.maxShards
 
         display = buildDisplay(adjustedMaxShards, shardsWithData, filtered)
+    }
+
+    private fun AttributeShardDisplayLine.isVisible(): Boolean {
+        if (config.hideMaxed && currentTier == 10) return false
+        if (config.onlyNotUnlocked && currentTier > 0) return false
+        return true
     }
 
     private fun buildDisplay(
@@ -175,6 +177,7 @@ object AttributeShardOverlay {
         addButtons()
     }
 
+    @Suppress("LongMethod")
     private fun MutableList<Renderable>.addButtons() {
         addRenderableButton<AttributeShardSorting>(
             label = "Sorted By",
@@ -292,6 +295,7 @@ object AttributeShardOverlay {
         val priceUntilMaxedString =
             if (actualAmountUntilMaxed == 0) coveredString else "$priceColor${priceUntilMaxed.shortFormat()}"
 
+        priceToMax += priceUntilMaxed
 
         val priceString = when {
             currentTier == 10 -> "§a§lMaxed"
@@ -355,7 +359,7 @@ object AttributeShardOverlay {
     }
 
     @HandleEvent(InventoryUpdatedEvent::class, onlyOnSkyblock = true)
-    fun onInventoryUpdated() {
+    private fun onInventoryUpdated() {
         if (!AttributeShardsData.attributeMenuInventory.isInside()) return
         if (!config.onlyCurrentInventory) return
 
@@ -368,7 +372,7 @@ object AttributeShardOverlay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChestGuiRender() {
+    private fun onChestGuiRender() {
         if (!config.enabled) return
         if (!AttributeShardsData.attributeMenuInventory.isInside() && !AttributeShardsData.bazaarShardsInventory.isInside()) return
 
