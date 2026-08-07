@@ -398,6 +398,8 @@ object SlayerApi {
 
     @HandleEvent
     private fun onWorldChange() {
+        // Using outsideRiftData since rift does not have slayer cocoon
+        // and using getCurrentData is ambiguous while changing worlds (inside/outside rift)
         val data = outsideRiftData
         if (data.currentState != COCOONED) return
         ChatUtils.debug("SlayerApi: World change detected, resetting cocooned state")
