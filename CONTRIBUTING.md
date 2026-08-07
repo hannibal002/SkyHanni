@@ -501,7 +501,7 @@ label is applied.
   `build-failure-output-<version>` (one per matrix version). Uses `continue-on-error: true` on the assemble step so the artifact is
   uploaded before the job fails.
 - `.github/workflows/build-review.yml`: Triggered by `workflow_run` on completion of `build.yml`. Always uses base branch code. Runs
-  with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads both version artifacts (`1.21.11` and `26.1`) with
+  with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads all version artifacts with
   `continue-on-error: true`, resolves the PR number by branch name, and runs the review script.
 - `.github/scripts/pr_review.main.kts` (invoked with `MODE=build`): Reads the log files, extracts a one-liner (first `e:`
   compiler error line) and the stack trace starting from `FAILURE: Build failed with an exception` (capped at 10,000 characters).
