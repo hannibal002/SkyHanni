@@ -98,37 +98,32 @@ object CustomWardrobe {
     }
 
     fun renderWardrobeOverlay(screenWidth: Int, screenHeight: Int) {
-        val renderable = displayRenderable ?: run {
-            update()
-            displayRenderable ?: return
-        }
-
         val screenSize = screenWidth to screenHeight
 
         if (screenSize != lastScreenSize) {
             lastScreenSize = screenSize
-            val shouldUpdate = updateScreenSize(screenSize)
-            if (shouldUpdate) {
-                update()
+            if (updateScreenSize(screenSize)) {
                 return
             }
         }
 
-        val (width, height) = renderable.width to renderable.height
-        renderableDimensions = width to height
-
-        val left = (screenWidth - width) / 2
-        val top = (screenHeight - height) / 2
-        position.moveTo(left, top)
-        renderableTopCorner = left to top
+        val renderable = displayRenderable ?: return
 
         if (waitingForInventoryUpdate && config.loadingText) {
             val loadingRenderable = Renderable.text(
                 "§cLoading...",
                 scale = activeScale / 100.0,
             )
-            loadingPosition.moveTo(position.x + (width - loadingRenderable.width) / 2, position.y - loadingRenderable.height)
-                .renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
+            loadingPosition
+                .moveTo(
+                    position.x + (renderable.width - loadingRenderable.width) / 2,
+                    position.y - loadingRenderable.height,
+                )
+                .renderRenderable(
+                    loadingRenderable,
+                    posLabel = GUI_NAME,
+                    addToGuiManager = false,
+                )
         }
 
         DrawContextUtils.translatedPushPopResult(0f, 0f) {
@@ -149,10 +144,11 @@ object CustomWardrobe {
         displayRenderable = createRenderables()
     }
 
-    private fun updateScreenSize(gui: Pair<Int, Int>): Boolean {
+    internal fun updateScreenSize(gui: Pair<Int, Int>): Boolean {
         val renderable = currentMaxSize ?: run {
             activeScale = config.spacing.globalScale.get()
             update()
+            updateRenderablePosition(gui)
             return true
         }
         val previousActiveScale = activeScale
@@ -164,7 +160,26 @@ object CustomWardrobe {
 
         activeScale = config.spacing.globalScale.get().coerceAtMost(maxScale)
 
+        if (activeScale != previousActiveScale) {
+            update()
+        }
+
+        updateRenderablePosition(gui)
+
         return activeScale != previousActiveScale
+    }
+
+    private fun updateRenderablePosition(gui: Pair<Int, Int>) {
+        val renderable = displayRenderable ?: return
+
+        val (width, height) = renderable.width to renderable.height
+        renderableDimensions = width to height
+
+        val left = (gui.first - width) / 2
+        val top = (gui.second - height) / 2
+
+        position.moveTo(left, top)
+        renderableTopCorner = left to top
     }
 
     private fun createWarning(list: List<WardrobeSlot>): Pair<String?, List<WardrobeSlot>> {

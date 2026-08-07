@@ -27,7 +27,8 @@ class CustomWardrobeScreen(
 
     override fun onInitGui() {
         CustomWardrobe.switchingScreens = false
-        // slotChanged is called to update already
+        CustomWardrobe.updateScreenSize(width to height)
+        // slotChanged is called when a screen is opened, so no need to call CustomWardrobe.onInventoryUpdate() here
     }
 
     override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
