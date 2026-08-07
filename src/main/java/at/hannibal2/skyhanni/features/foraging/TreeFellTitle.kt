@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
@@ -21,15 +21,20 @@ object TreeFellTitle {
      */
     private val treeFellPattern by RepoPattern.pattern(
         "foraging.trees.treefell",
-        "[A-Z]+! You felled the entire Tree!"
+        "(?<perk>[A-Z]+)! You felled the entire Tree!",
     )
 
     @HandleEvent(onlyOnIslandTypeTag = [HAS_TREES])
     private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
-        if (!treeFellPattern.matches(event.cleanMessage)) return
+        val perk = treeFellPattern.matchMatcher(event.cleanMessage) {
+            group("perk")
+        } ?: return
 
-        val text = config.titleText.convertToFormatted()
+        val text = config.titleText
+            .replace("{perk}", perk)
+            .convertToFormatted()
+
         TitleManager.sendTitle(titleText = text, duration = config.duration.seconds)
     }
 

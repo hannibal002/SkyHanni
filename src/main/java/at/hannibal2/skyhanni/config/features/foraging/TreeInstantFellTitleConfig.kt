@@ -24,5 +24,5 @@ class TreeInstantFellTitleConfig {
     @Expose
     @ConfigOption(name = "Title Text", desc = "The text of the title.")
     @ConfigEditorText
-    var titleText = "&&6&&lYou felled the entire Tree!"
+    var titleText = "&&2&&l{perk}&&r &&6&&lTree Insta-Felled!"
 }
