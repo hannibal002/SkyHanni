@@ -8,7 +8,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class TreeInstantFellTitleConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shows a title when a fell entire tree perk activates (Petallfall, Timber & Woodpecker)")
+    @ConfigOption(name = "Enabled", desc = "Shows a title when a fell entire tree perk activates.")
+    @SearchTag(petalfall timber woodpecker)
     @FeatureToggle
     var enabled = false
 
