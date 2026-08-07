@@ -103,9 +103,15 @@ object CustomWardrobe {
             displayRenderable ?: return
         }
 
-        if (updateScreenSize(screenWidth, screenHeight)) {
-            update()
-            return
+        val screenSize = screenWidth to screenHeight
+
+        if (screenSize != lastScreenSize) {
+            lastScreenSize = screenSize
+            val shouldUpdate = updateScreenSize(screenSize)
+            if (shouldUpdate) {
+                update()
+                return
+            }
         }
 
         val (width, height) = renderable.width to renderable.height
@@ -143,11 +149,7 @@ object CustomWardrobe {
         displayRenderable = createRenderables()
     }
 
-    internal fun updateScreenSize(screenWidth: Int, screenHeight: Int): Boolean {
-        val screenSize = screenWidth to screenHeight
-        if (screenSize == lastScreenSize) return false
-        lastScreenSize = screenSize
-
+    private fun updateScreenSize(gui: Pair<Int, Int>): Boolean {
         val renderable = currentMaxSize ?: run {
             activeScale = config.spacing.globalScale.get()
             update()
@@ -156,8 +158,8 @@ object CustomWardrobe {
         val previousActiveScale = activeScale
         val unscaledRenderableWidth = renderable.first / activeScale.toDouble()
         val unscaledRenderableHeight = renderable.second / activeScale.toDouble()
-        val autoScaleWidth = 0.95 * screenWidth / unscaledRenderableWidth
-        val autoScaleHeight = 0.95 * screenHeight / unscaledRenderableHeight
+        val autoScaleWidth = 0.95 * gui.first / unscaledRenderableWidth
+        val autoScaleHeight = 0.95 * gui.second / unscaledRenderableHeight
         val maxScale = min(autoScaleWidth, autoScaleHeight).toInt()
 
         activeScale = config.spacing.globalScale.get().coerceAtMost(maxScale)
