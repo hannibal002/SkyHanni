@@ -38,7 +38,7 @@ object ArmorWardrobeApi : AbstractWardrobeApi() {
     @HandleEvent
     private fun onDebugDataCollect(event: DebugDataCollectEvent) = handleDebugDataCollect(event)
 
-    // This modifies the inWardrobe property aswell
+    // This also modifies the "inWardrobe" property
     internal fun matchesInventoryName(inventoryName: String): Boolean {
         return handleInventoryOpen(inventoryName)
     }
