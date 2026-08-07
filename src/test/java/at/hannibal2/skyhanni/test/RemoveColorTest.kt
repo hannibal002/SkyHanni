@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class RemoveColorTest {
     @Test
     fun testEdging() {
-        Assertions.assertEquals("test", "§".removeColor())
+        Assertions.assertEquals("", "§".removeColor())
         Assertions.assertEquals("a", "a§".removeColor())
         Assertions.assertEquals("b", "§ab§".removeColor())
     }
