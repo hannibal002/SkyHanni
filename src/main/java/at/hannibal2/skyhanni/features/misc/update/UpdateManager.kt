@@ -357,5 +357,12 @@ object UpdateManager {
                 else -> element
             }
         }
+        // Users who installed a beta version were previously left on the full release stream by default.
+        event.transform(142, "about.updateStream") { element ->
+            when {
+                element.asString == "RELEASES" && SkyHanniMod.isBetaVersion -> JsonPrimitive("BETA")
+                else -> element
+            }
+        }
     }
 }
