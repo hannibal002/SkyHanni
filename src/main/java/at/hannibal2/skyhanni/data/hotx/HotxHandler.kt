@@ -188,7 +188,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
                     extraInventoryHandling()
                 }
             },
-            onCloseInventory = {
+            onCloseInventory = { _ ->
                 data.forEach {
                     it.slot = null
                     it.item = null

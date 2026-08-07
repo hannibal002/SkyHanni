@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW
 
 abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *>>(
     private val hotx: HotxType,
-    private val displayText: String
+    private val displayText: String,
 ) {
     fun handleHotxCurrency(
         event: ToolTipTextEvent,
