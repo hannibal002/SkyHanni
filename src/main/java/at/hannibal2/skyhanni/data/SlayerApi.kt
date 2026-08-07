@@ -79,8 +79,8 @@ object SlayerApi {
     /**
      * WRAPPED-REGEX-TEST: "  YOU COCOONED YOUR SLAYER BOSS"
      */
-    private val cocoonPattern by RepoPattern.pattern(
-        "slayer.cocooned.colorless",
+    private val cocoonPattern by patternGroup.pattern(
+        "cocooned.colorless",
         "\\s+YOU COCOONED YOUR SLAYER BOSS",
     )
     // </editor-fold>
