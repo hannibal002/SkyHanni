@@ -831,12 +831,37 @@ fun parseSarifFindings(sarif: JsonObject, workspace: String): List<Finding> = bu
     }
 }
 
+// Posted when the run is red but carries no log to quote. Every reason for a missing artifact looks the same
+// from here, so it names the conclusion instead of guessing.
+fun buildGenericFailureBody(conclusion: String): String = buildString {
+    val workflowRunId = System.getenv("WORKFLOW_RUN_ID") ?: error("WORKFLOW_RUN_ID not set")
+    appendWarningTitle("Build failed")
+    appendLine()
+    appendLine("The build workflow finished with `${sanitizeCodeSpan(conclusion)}` but uploaded no error log.")
+    appendLine("That happens when a step fails outside of the parts that capture their output, so the cause is")
+    appendLine("only visible in the run itself.")
+    appendLine()
+    appendLine("\\[[workflow run](https://github.com/$repo/actions/runs/$workflowRunId)\\]")
+}
+
 fun runBuildMode(prNumber: String) {
     val log1 = readBuildLog(System.getenv("ARTIFACT_DIR_1"))
 
     buildComment.staleExisting(prNumber)
 
     if (log1.isNullOrBlank()) {
+        // A missing artifact is not proof of a green build: a step failing before its upload leaves it missing
+        // while the run is red. Only the conclusion tells those two apart.
+        val conclusion = System.getenv("WORKFLOW_CONCLUSION")?.takeIf { it.isNotEmpty() }
+            ?: error("WORKFLOW_CONCLUSION not set")
+        if (conclusion != "success") {
+            buildComment.post(prNumber, buildGenericFailureBody(conclusion)) {
+                "Error: could not post build failure comment (HTTP $it)"
+            }
+            setLabel(prNumber, buildLabel, true)
+            println("Build failed without a log artifact, posted generic comment, added label")
+            exitProcess(0)
+        }
         println("No build failures found, removing build label")
         setLabel(prNumber, buildLabel, false)
         exitProcess(0)
