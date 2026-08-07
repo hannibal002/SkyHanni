@@ -304,7 +304,7 @@ object EffectApi {
     private fun readActiveEffectTimes(lines: List<Component>): List<Duration> {
         val times = mutableListOf<Duration>()
         tabEffectPattern.matchAllComponents(lines) {
-            TimeUtils.getDurationOrNull(group("time"))?.let { times.add(it) }
+            TimeUtils.getDurationOrNull(group("time"))?.let { time -> times.add(time) }
         }
         return times
     }
