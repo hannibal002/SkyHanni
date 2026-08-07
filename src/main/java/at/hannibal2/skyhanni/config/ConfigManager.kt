@@ -73,7 +73,6 @@ class ConfigManager {
         }
         configDirectory.mkdirs()
 
-
         for (fileType in ConfigFileType.entries) {
             val clazzInstance = fileType.clazz.getDeclaredConstructor().newInstance()
             setConfigHolder(fileType, firstLoadFile(fileType.file, fileType, clazzInstance))
@@ -208,18 +207,27 @@ class ConfigManager {
 
     fun saveConfig(fileType: ConfigFileType, reason: String) {
         val json = jsonHolder[fileType] ?: error("Could not find json object for $fileType")
-        saveFile(fileType.file, fileType.fileName, json, reason)
-        saveFile(fileType.backupFile, fileType.fileName, json, reason)
+        saveFile(fileType.file, fileType, json, reason)
+        saveFile(fileType.backupFile, fileType, json, reason)
     }
 
-    private fun saveFile(file: File, fileName: String, data: Any, reason: String) {
+    private fun serialize(fileType: ConfigFileType, data: Any): String {
+        if (fileType != ConfigFileType.FEATURES) return gson.toJson(data)
+        // Enforced values only ever exist in memory, the file keeps the user's own values
+        val json = gson.toJsonTree(data)
+        EnforcedConfigValues.writeUserValues(json)
+        return gson.toJson(json)
+    }
+
+    private fun saveFile(file: File, fileType: ConfigFileType, data: Any, reason: String) {
+        val fileName = fileType.fileName
         if (disableSaving) return
         if (HypixelData.hypixelAlpha && !PlatformUtils.isDevEnvironment) return
         logger.log("saveConfig: $reason")
         try {
             logger.log("Saving $fileName file")
             file.parentFile.mkdirs()
-            StringFileHandler(file).save(gson.toJson(data))
+            StringFileHandler(file).save(serialize(fileType, data))
             logger.log("Saved $fileName file successfully")
         } catch (e: ClassCastException) {
             ErrorManager.logErrorWithData(
