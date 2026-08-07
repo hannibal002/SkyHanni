@@ -9,8 +9,7 @@ class RemoveColorTest {
     // keep this PR diff non-empty so the pull_request build actually runs
     @Test
     fun testEdging() {
-
-        thisFunctionDoesNotExist()
+        Assertions.assertEquals("a")
         Assertions.assertEquals("", "§".removeColor())
         Assertions.assertEquals("a", "a§".removeColor())
         Assertions.assertEquals("b", "§ab§".removeColor())
