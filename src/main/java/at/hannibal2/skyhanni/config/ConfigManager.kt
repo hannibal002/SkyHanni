@@ -85,6 +85,8 @@ class ConfigManager {
         }
 
         val features = SkyHanniMod.feature
+        // Has to run before the config is built, so that enforced options are already blocked off
+        EnforcedConfigValues.loadFromLocalRepo()
         recreateConfig()
 
         try {

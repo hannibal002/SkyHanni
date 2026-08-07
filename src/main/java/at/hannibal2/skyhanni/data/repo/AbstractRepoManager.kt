@@ -33,7 +33,6 @@ import kotlinx.coroutines.withContext
 
 @Suppress("TooManyFunctions")
 abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
-
     /**
      * Should be user-friendly, e.g. "SkyHanni" or "NotEnoughUpdates".
      * Gets used in error messages and logging.
@@ -166,10 +165,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     internal fun resolvePath(dir: String, name: String) = "$dir/$name.json"
 
     @PublishedApi
-    internal fun readJsonElement(path: String): JsonElement? {
+    internal fun readJsonElement(path: String, logMissing: Boolean = true): JsonElement? {
         if (repoFileSystem.exists(path)) return repoFileSystem.readJson(path)
         val fallback = repoDirectory.resolve(path)
         if (fallback.isFile) return fallback.getJson()
+        if (!logMissing) return null
         val repoDiagnostic = when {
             !repoDirectory.exists() -> "repo directory does not exist at '${repoDirectory.absolutePath}'"
             !repoDirectory.isDirectory -> "repo path exists but is not a directory: '${repoDirectory.absolutePath}'"
@@ -178,6 +178,20 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
         logger.error("Repo file not found: $path ($repoDiagnostic)")
         return null
+    }
+
+    /**
+     * Reads a constant straight from the repo files already present on disk, without downloading
+     * or reloading anything. Meant for data that is needed before the first repo reload happens.
+     *
+     * Returns null if the constant is not cached locally yet or could not be parsed.
+     */
+    inline fun <reified T : Any> readLocalConstantOrNull(constant: String): T? {
+        val json = readJsonElement(resolvePath("constants", constant), logMissing = false) ?: return null
+        return runCatching { ConfigManager.gson.fromJson<T>(json) }.getOrElse { e ->
+            logger.error("Could not read local constant '$constant': ${e.message}")
+            null
+        }
     }
 
     @PublishedApi
