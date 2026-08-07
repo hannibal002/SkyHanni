@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.MenuType
@@ -21,24 +22,41 @@ object MenuScreensHook {
         client: Minecraft,
         id: Int,
     ): Boolean {
-        val player = client.player ?: return false
         if (!SkyBlockUtils.inSkyBlock) return false
 
+        val player = client.player ?: return false
         val inventory = player.inventory
-        val menu = type.create(id, inventory)
         val inventoryName = name.unformattedTextCompat()
 
-        if (menu is ChestMenu && CustomWardrobe.shouldReplace(inventoryName)) {
-            player.containerMenu = menu
-            when (val screen = MinecraftCompat.screen) {
-                is CustomWardrobeScreen -> screen.changeHandler(menu)
-                is CustomWardrobeEditScreen ->
-                    MinecraftCompat.screen = CustomWardrobeEditScreen(menu, inventory, name)
-                else -> MinecraftCompat.screen = CustomWardrobeScreen(menu, name)
-            }
+        if (openCustomWardrobe(inventoryName, name, type, client, id, inventory)) {
             return true
         }
 
         return false
+    }
+
+    private fun <T : AbstractContainerMenu> openCustomWardrobe(
+        inventoryName: String,
+        name: Component,
+        type: MenuType<T>,
+        client: Minecraft,
+        id: Int,
+        inventory: Inventory,
+    ): Boolean {
+        if (!CustomWardrobe.shouldReplace(inventoryName)) return false
+
+        val menu = type.create(id, inventory) as? ChestMenu ?: return false
+
+        client.player?.containerMenu = menu
+
+        when (val screen = MinecraftCompat.screen) {
+            is CustomWardrobeScreen -> screen.changeHandler(menu)
+            is CustomWardrobeEditScreen ->
+                MinecraftCompat.screen = CustomWardrobeEditScreen(menu, inventory, name)
+            else ->
+                MinecraftCompat.screen = CustomWardrobeScreen(menu, name)
+        }
+
+        return true
     }
 }
