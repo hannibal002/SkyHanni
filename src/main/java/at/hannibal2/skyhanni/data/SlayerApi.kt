@@ -218,8 +218,8 @@ object SlayerApi {
                 ChatUtils.debug("SlayerApi: Slayer boss cocooned, posting SlayerStateChangeEvent")
                 data.currentState = COCOONED
                 data.currentStateRaw = "cocooned"
-                SlayerStateChangeEvent(COCOONED).post()
                 lastCocoonTime = ServerTimeMark.now()
+                SlayerStateChangeEvent(COCOONED).post()
             }
         }
     }
