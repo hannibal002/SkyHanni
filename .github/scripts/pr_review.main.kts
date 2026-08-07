@@ -134,6 +134,7 @@ val dependencyStateResolved = "resolved"
 val warningIcon = "⚠\uFE0F"
 
 val maxDirectFindings = 15
+val maxErrorContinuations = 5
 val maxLogChars = 10_000
 
 val maxRequestAttempts = 3
@@ -575,11 +576,12 @@ fun parseErrorContinuations(logContent: String, errorLine: String): List<String>
     if (idx < 0) return emptyList()
     val result = mutableListOf<String>()
     var i = idx + 1
-    while (i < lines.size) {
+    while (i < lines.size && result.size < maxErrorContinuations) {
         val next = lines[i]
-        if (next.isBlank()) break
+        // Only indented lines belong to the error above, everything else starts at column 0.
+        if (next.isBlank() || next == next.trimStart()) break
+        // Indented, but its own diagnosis.
         if (next.trimStart().startsWith("e: ") || next.trimStart().startsWith("w: ")) break
-        if (next.startsWith("> ") || next.startsWith("FAILURE") || next.startsWith("*")) break
         result.add(next.trim())
         i++
     }
