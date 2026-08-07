@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class RemoveColorTest {
+
+    // keep this PR diff non-empty so the pull_request build actually runs
     @Test
     fun testEdging() {
         Assertions.assertEquals("", "§".removeColor())
