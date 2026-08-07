@@ -14,10 +14,10 @@ import net.minecraft.world.inventory.ChestMenu
 import java.awt.Color
 
 class CustomWardrobeEditScreen(
-    handler: ChestMenu,
+    menu: ChestMenu,
     inventory: Inventory,
     title: Component,
-) : ContainerScreen(handler, inventory, title) {
+) : ContainerScreen(menu, inventory, title) {
     private val inventoryButtonPosition: Position = Position().ignoreScale()
     private var inventoryButton: Renderable? = null
 
