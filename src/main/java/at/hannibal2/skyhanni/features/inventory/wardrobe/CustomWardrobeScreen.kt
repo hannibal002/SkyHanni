@@ -26,7 +26,7 @@ class CustomWardrobeScreen(
 
     override fun onInitGui() {
         CustomWardrobe.switchingScreens = false
-        CustomWardrobe.update()
+        // slotChanged is called to update already
     }
 
     override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
