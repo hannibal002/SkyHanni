@@ -247,12 +247,24 @@ object AttributeShardsData {
     )
 
     /**
+     * REGEX-TEST:  GOOD CATCH! You caught Water Snake Shard x3!
+     * REGEX-TEST:  GREAT CATCH! You caught Giant Water Bug Shard x3!
+     * REGEX-TEST:  GOOD CATCH! You caught a Water Snake Shard!
+     */
+    private val caughtMultipleShardsPattern by patternGroup.pattern(
+        "caught-multiple.shards",
+        "\uE025 .+ CATCH! You caught(?: [an]+)? (?<shardName>.+) Shard(?: x(?<amount>\\d+))?!"
+    )
+
+    /**
      * REGEX-TEST: LOOT SHARE You received a Glacite Walker Shard for assisting Mealoan!
      * REGEX-TEST: LOOT SHARE You received 2 Mossybit Shards for assisting FallenYeti!
+     * REGEX-TEST: LOOT SHARE! You received 2x Parakeet Shard from meowgirlemily catching a Parakeet!
+     * REGEX-TEST: LOOT SHARE! You received an Areita Shard from VirulentNyx catching an Areita!
      */
     private val lootShareShardPattern by patternGroup.pattern(
         "loot.share.shard.colorless",
-        "LOOT SHARE You received (?:an?|(?<amount>\\d+)) (?<shardName>.+) Shards? for assisting .*!",
+        "LOOT SHARE!? You received (?:an?|(?<amount>\\d+)x?) (?<shardName>.+) Shards? (?:for assisting .*|from .*)!",
     )
 
     /**
@@ -322,6 +334,7 @@ object AttributeShardsData {
     // the boolean is if it should post the shard gain event
     private val shardGainChatPatterns = mapOf(
         caughtShardsPattern to (true to ShardSource.HUNT),
+        caughtMultipleShardsPattern to (true to ShardSource.FISHING),
         lootShareShardPattern to (true to ShardSource.HUNT),
         charmedShardPattern to (true to null),
         sentToHuntingBoxPattern to (false to ShardSource.SENT_TO_HUNTING_BOX),
