@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOrder
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
 /**
- * Fired after one of the bazaar order inventories ("Your Bazaar Orders" or "Co-op Bazaar Orders")
- * was opened and all of its entries were parsed.
+ * Fired after a bazaar order inventory ("Your Bazaar Orders" or "Co-op Bazaar Orders") was read.
+ * That happens when it opens, and again whenever its contents change while it stays open.
  *
- * This event describes an inventory, not the tracked order state. It is fired only when such an
- * inventory is opened. It is not fired when a chat message adds, reduces or removes a tracked
- * order, and it is not fired when the inventory is closed.
+ * This event describes an inventory, not the tracked order state. It is not fired when a chat
+ * message adds, reduces or removes a tracked order, and it is not fired when the inventory is
+ * closed.
  *
  * Use this when the contents of the inventory itself are needed, for example to decorate its slots.
  * To ask how much of a single item is currently on order, use `BazaarApi.getOpenBuyOrderAmount`

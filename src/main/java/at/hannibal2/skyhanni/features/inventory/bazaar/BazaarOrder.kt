@@ -15,7 +15,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
  * @property amount how many units this single order was placed for.
  * @property filled how many units the bazaar traded so far, claimed or not.
  * @property claimable how many traded units still wait to be picked up.
- * @property isOwn whether the order belongs to the player, not to a co-op member.
+ * @property isOwn whether the order belongs to the player. Always true without a co-op, where
+ * the inventory names no owner.
  */
 data class BazaarOrder(
     val slot: Int,

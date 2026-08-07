@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.bazaar.BazaarOrdersLoadedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -25,7 +24,9 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 /**
  * Keeps track of the bazaar orders the player currently has open.
  *
- * The order inventory is the authoritative source and replaces the stored state completely.
+ * The order inventory is the authoritative source and replaces the stored state completely. It is
+ * titled "Your Bazaar Orders" without a co-op and "Co-op Bazaar Orders" with one, and both are
+ * complete as far as the player's own orders go.
  * Chat messages only bridge the gap between two visits of that inventory, and only for buy
  * orders. Sell offers change exclusively on an inventory visit.
  */
@@ -37,11 +38,6 @@ object BazaarOrderApi {
     private val storage get() = ProfileStorageData.profileSpecific?.bazaarOrders
     private val buyOrders get() = storage?.buyOrders
     private val sellOffers get() = storage?.sellOffers
-
-    private val ownOrdersInventoryPattern by patternGroup.pattern(
-        "inventory.own",
-        "Your Bazaar Orders",
-    )
 
     /**
      * REGEX-TEST: §a§lBUY §fWheat
@@ -128,17 +124,21 @@ object BazaarOrderApi {
 
     private val ordersInventory = InventoryDetector(
         checkInventoryName = { BazaarApi.isBazaarOrderInventory(it) },
-        onOpenInventory = { it.onOrderInventoryOpen() },
+        onOpenInventory = { readOrders(it.inventoryItems) },
     )
 
     fun inOrderInventory(): Boolean = ordersInventory.isInside()
 
-    private fun InventoryFullyOpenedEvent.onOrderInventoryOpen() {
+    // Claiming or cancelling happens inside the open menu, which never reopens it.
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!ordersInventory.isInside()) return
+        readOrders(event.inventoryItems)
+    }
+
+    private fun readOrders(inventoryItems: Map<Int, SafeItemStack>) {
         val orders = parseInventory(inventoryItems)
-        // Only the own inventory is complete, a co-op inventory would wipe valid data.
-        if (ownOrdersInventoryPattern.matches(inventoryName)) {
-            syncOwnOrders(orders)
-        }
+        syncOwnOrders(orders)
         BazaarOrdersLoadedEvent(orders).post()
     }
 
@@ -156,20 +156,20 @@ object BazaarOrderApi {
         } ?: return null
 
         val lore = stack.getCleanLore()
-        // The bazaar omits both of these lines while nothing of the order has been traded yet.
+        // The bazaar omits the filled and claimable lines while nothing has been traded yet,
+        // and the owner line whenever the player has no co-op.
         val filled = filledPattern.firstMatcher(lore) { group("filled").formatInt() } ?: 0
         val claimable = claimablePattern.firstMatcher(lore) { group("amount").formatInt() } ?: 0
+        val owner = ownerPattern.firstMatcher(lore) { group("name") }
 
         val amount = amountPattern.firstMatcher(lore) { group("amount").formatInt() }
         val pricePerUnit = pricePerUnitPattern.firstMatcher(lore) { group("price").formatDouble() }
-        val owner = ownerPattern.firstMatcher(lore) { group("name") }
-        if (amount == null || pricePerUnit == null || owner == null) {
+        if (amount == null || pricePerUnit == null) {
             ErrorManager.logErrorStateWithData(
                 "Could not read a bazaar order",
                 "Bazaar order is missing a line that should always be present",
                 "missing amount" to (amount == null),
                 "missing price per unit" to (pricePerUnit == null),
-                "missing owner" to (owner == null),
                 "item name" to name,
                 "lore" to lore,
             )
@@ -184,7 +184,8 @@ object BazaarOrderApi {
             filled = filled,
             claimable = claimable,
             pricePerUnit = pricePerUnit,
-            isOwn = owner == PlayerUtils.getName(),
+            // Without a co-op the inventory shows no owner, and every order in it is the player's.
+            isOwn = owner == null || owner == PlayerUtils.getName(),
         )
     }
 
