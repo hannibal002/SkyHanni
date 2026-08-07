@@ -149,6 +149,15 @@ object EffectApi {
     )
 
     /**
+     * REGEX-TEST: You have 28 active effects. Use "/effects" to see them!
+     * REGEX-TEST: You have 10 non-god effects.
+     */
+    private val activeEffectsCountPattern by patternGroup.pattern(
+        "footer.active-effects-count",
+        "You have (?<count>\\d+) (?:active|non-god) effects?.*",
+    )
+
+    /**
      * REGEX-TEST: Active Effects
      */
     private val activeEffectsFooterPattern by patternGroup.pattern(
@@ -171,6 +180,17 @@ object EffectApi {
 
     private val profileStorage get() = ProfileStorageData.profileSpecific
     internal var totalEffectsCount = 0
+
+    /**
+     * Total active effects currently shown in the tab footer (either the "active" or "non-god"
+     * wording). Unlike [totalEffectsCount] this counts every effect, not just non-god ones.
+     */
+    var totalActiveEffects = 0
+        private set
+
+    /** The soonest-expiring active effect's remaining time, as shown in the tab footer, or null. */
+    var soonestActiveEffectRemaining: Duration? = null
+        private set
 
     // Todo: Add support for poison candy I, and add support for splash / other formats
     @HandleEvent(onlyOnSkyblock = true)
@@ -209,6 +229,17 @@ object EffectApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
+        // Only scan within the "Active Effects" section so unrelated footer lines can't be misread
+        // as effects. Empty when there is no such section, which resets the values to "none".
+        val effectSection = activeEffectsSection(event.footer)
+        val effectTimes = readActiveEffectTimes(effectSection)
+        soonestActiveEffectRemaining = effectTimes.minOrNull()
+        // The count line only appears when the footer truncates the effect list; with few effects
+        // it lists them all inline, so fall back to the number of effects actually shown.
+        totalActiveEffects = activeEffectsCountPattern.firstComponentMatcher(effectSection) {
+            group("count").toIntOrNull()
+        } ?: effectTimes.size
+
         if (!activeEffectsFooterPattern.anyMatchesComponent(event.footer)) return
         event.footer.readNonGodPotEffects()
 
@@ -251,6 +282,31 @@ object EffectApi {
             }
             else -> {}
         }
+    }
+
+    /** The footer's "Active Effects" section: the title line through the next blank line. */
+    private fun activeEffectsSection(footer: List<Component>): List<Component> {
+        val start = footer.indexOfFirst { activeEffectsFooterPattern.matches(it) }
+        if (start == -1) return emptyList()
+        val section = mutableListOf<Component>()
+        for (index in start until footer.size) {
+            val line = footer[index]
+            if (index != start && line.string.isBlank()) break
+            section.add(line)
+        }
+        return section
+    }
+
+    /**
+     * Reads the remaining time of every effect shown in the given lines (not just the allowlisted
+     * [NonGodPotEffect]s), so consumers can show generic effects like god-splash buffs.
+     */
+    private fun readActiveEffectTimes(lines: List<Component>): List<Duration> {
+        val times = mutableListOf<Duration>()
+        tabEffectPattern.matchAllComponents(lines) {
+            TimeUtils.getDurationOrNull(group("time"))?.let { times.add(it) }
+        }
+        return times
     }
 
     private fun List<Component>.readNonGodPotEffects() = tabEffectPattern.matchAllComponents(this) {
