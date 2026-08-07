@@ -134,7 +134,13 @@ val dependencyStateResolved = "resolved"
 val warningIcon = "⚠\uFE0F"
 
 val maxDirectFindings = 15
+val maxErrorContinuations = 5
+val maxOverloadCandidates = 3
 val maxLogChars = 10_000
+
+// Its candidate block is separated by a blank line and starts at column 0, out of reach for continuations.
+val overloadErrorMarker = "None of the following candidates is applicable:"
+
 
 val maxRequestAttempts = 3
 val retryDelayMillis = 2_000L
@@ -575,13 +581,31 @@ fun parseErrorContinuations(logContent: String, errorLine: String): List<String>
     if (idx < 0) return emptyList()
     val result = mutableListOf<String>()
     var i = idx + 1
-    while (i < lines.size) {
+    while (i < lines.size && result.size < maxErrorContinuations) {
         val next = lines[i]
-        if (next.isBlank()) break
+        // Only indented lines belong to the error above, everything else starts at column 0.
+        if (next.isBlank() || next == next.trimStart()) break
+        // Indented, but its own diagnosis.
         if (next.trimStart().startsWith("e: ") || next.trimStart().startsWith("w: ")) break
-        if (next.startsWith("> ") || next.startsWith("FAILURE") || next.startsWith("*")) break
         result.add(next.trim())
         i++
+    }
+    return result
+}
+
+// Signatures only, the indented details below each one add length but no information.
+fun parseOverloadCandidates(logContent: String, errorLine: String): List<String> {
+    if (!errorLine.trimEnd().endsWith(overloadErrorMarker)) return emptyList()
+    val lines = logContent.lines()
+    val idx = lines.indexOfFirst { it.trim() == errorLine }
+    if (idx < 0) return emptyList()
+    val result = mutableListOf<String>()
+    for (line in lines.drop(idx + 1)) {
+        val trimmed = line.trimStart()
+        if (trimmed.startsWith("e: ") || trimmed.startsWith("w: ")) break
+        if (line.startsWith("FAILURE")) break
+        if (line != trimmed || "fun " !in line) continue
+        result.add(line.trim())
     }
     return result
 }
@@ -649,6 +673,13 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
                 if (rawLine.trimStart().startsWith("e: ")) {
                     for (cont in parseErrorContinuations(logContent, rawLine)) {
                         appendLine("  - `${sanitizeCodeSpan(cont)}`")
+                    }
+                    val candidates = parseOverloadCandidates(logContent, rawLine)
+                    for (candidate in candidates.take(maxOverloadCandidates)) {
+                        appendLine("  - `${sanitizeCodeSpan(candidate)}`")
+                    }
+                    if (candidates.size > maxOverloadCandidates) {
+                        appendLine("  - _...and ${candidates.size - maxOverloadCandidates} more candidates_")
                     }
                 }
             }
