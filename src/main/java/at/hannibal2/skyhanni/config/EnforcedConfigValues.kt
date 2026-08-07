@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnforcedConfigValuesJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.EnforcedValue
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnforcedValueData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
@@ -17,7 +18,6 @@ import kotlin.time.Duration.Companion.INFINITE
 
 @SkyHanniModule
 object EnforcedConfigValues {
-
     private var enforcedConfigValuesData: List<EnforcedValueData> = listOf()
     private var hasSentPSAsOnce = false
 
@@ -33,7 +33,7 @@ object EnforcedConfigValues {
         }
         if (oldEnforcedValues == enforcedConfigValuesData) return
         hasSentPSAsOnce = false
-        // we have to recreate the whole config when a value changes
+        // We have to recreate the whole config when a value changes
         // so that the option is blocked off inside the config
         SkyHanniMod.configManager.recreateConfig()
     }
@@ -70,16 +70,23 @@ object EnforcedConfigValues {
 
     private fun enforceOntoConfig(config: Any) {
         for (enforcedValue in enforcedConfigValuesData.flatMap { it.enforcedValues }) {
-            val shimmy = Shimmy(config, enforcedValue.path.split(".")) ?: try {
-                ErrorManager.skyHanniError("Could not create shimmy for path ${enforcedValue.path}")
-            } catch (_: Exception) {
-                continue
-            }
-            val currentValue = shimmy.getJson()
-            if (currentValue != enforcedValue.value) {
-                shimmy.setJson(enforcedValue.value)
+            try {
+                enforceValue(config, enforcedValue)
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(
+                    e, "Failed to enforce a config value from the repo",
+                    "path" to enforcedValue.path,
+                    "value" to enforcedValue.value,
+                )
             }
         }
+    }
+
+    private fun enforceValue(config: Any, enforcedValue: EnforcedValue) {
+        val shimmy = Shimmy(config, enforcedValue.path.split("."))
+            ?: ErrorManager.skyHanniError("Could not create shimmy for path ${enforcedValue.path}")
+        if (shimmy.getJson() == enforcedValue.value) return
+        shimmy.setJson(enforcedValue.value)
     }
 
     fun isBlockedFromEditing(optionPath: String): String? {
@@ -88,5 +95,4 @@ object EnforcedConfigValues {
         } ?: return null
         return firstEnforcedValue.extraMessage.orEmpty()
     }
-
 }
