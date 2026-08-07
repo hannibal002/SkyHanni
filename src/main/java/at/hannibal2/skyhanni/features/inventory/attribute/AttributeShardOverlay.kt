@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getOpenBuyOrderAmount
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -45,18 +46,29 @@ object AttributeShardOverlay {
     private var lastShardsData: Map<String, ProfileSpecificStorage.AttributeShardData> = emptyMap()
     private var lastItemIdsInInventory: Set<NeuInternalName> = setOf()
     private var lastTotalShardsCollected = 0
+    private var lastTotalInBazaarOrders = 0
 
     fun updateDisplay() {
         if (!config.enabled) return
         val newData = storage?.toMap().orEmpty().filter { it.key !in AttributeShardsData.unconsumableAttributes }
         val newTotalShardsCollected = newData.values.sumOf { it.amountSyphoned + it.amountInBox }
+        val newTotalInBazaarOrders = if (config.includeBazaarOrders) {
+            newData.keys.sumOf { openBuyOrderAmount(it) }
+        } else 0
 
-        if (lastShardsData == newData && newTotalShardsCollected == lastTotalShardsCollected) return
+        if (lastShardsData == newData &&
+            newTotalShardsCollected == lastTotalShardsCollected &&
+            newTotalInBazaarOrders == lastTotalInBazaarOrders
+        ) return
         lastShardsData = newData
         lastTotalShardsCollected = newTotalShardsCollected
+        lastTotalInBazaarOrders = newTotalInBazaarOrders
 
         reconstructDisplay()
     }
+
+    private fun openBuyOrderAmount(shardName: String): Int =
+        AttributeShardsData.shardNameToInternalName(shardName)?.getOpenBuyOrderAmount() ?: 0
 
     enum class AttributeShardSorting(val displayName: String) {
         PRICE_TO_NEXT_TIER("Price to Next Tier"),
@@ -115,6 +127,7 @@ object AttributeShardOverlay {
                     amountToNextTier = toNextTier,
                     amountUntilMaxed = toMax,
                     amountInHuntingBox = if (config.includeHuntingBox) shardData.amountInBox else 0,
+                    amountInBazaarOrders = if (config.includeBazaarOrders) shardInternalName.getOpenBuyOrderAmount() else 0,
                 ),
             )
         }
@@ -131,29 +144,35 @@ object AttributeShardOverlay {
 
         val adjustedMaxShards = if (config.onlyCurrentInventory) lastItemIdsInInventory.size else AttributeShardsData.maxShards
 
-        display = buildList {
-            addString("§eAttribute Shard Overlay")
-            addString("§7Found Shards: §a$unlockedShards/$adjustedMaxShards")
-            addString("§7Maxed Shards: §a$maxedShards/$adjustedMaxShards")
-            addString("§7Total Shard Levels: §a$totalShardLevels/${adjustedMaxShards * 10}")
-            if (shardsWithData != AttributeShardsData.maxShards) {
-                val missingAmount = AttributeShardsData.maxShards - shardsWithData
-                val plural = StringUtils.pluralize(missingAmount, "shard")
-                addString("§cMissing shard data for $missingAmount $plural")
-                addString("§cPlease open /am and turn on advanced mode.")
-            }
-            if (filtered.isEmpty()) {
-                addString("§cNo Shards Found")
-                addString("§cTry changing your settings below.")
-            } else {
-                add(filtered.map { it.renderLine }.buildSearchableScrollable(height = 225, textInput, velocity = 25.0))
-            }
-            if (priceToMax > 0) {
-                val description = if (config.onlyCurrentInventory) "Shown" else "All"
-                addString("§7Total Price to Max $description Shards: §6${priceToMax.shortFormat()}")
-            }
-            addButtons()
+        display = buildDisplay(adjustedMaxShards, shardsWithData, filtered)
+    }
+
+    private fun buildDisplay(
+        adjustedMaxShards: Int,
+        shardsWithData: Int,
+        shardLines: List<AttributeShardDisplayLine>,
+    ): List<Renderable> = buildList {
+        addString("§eAttribute Shard Overlay")
+        addString("§7Found Shards: §a$unlockedShards/$adjustedMaxShards")
+        addString("§7Maxed Shards: §a$maxedShards/$adjustedMaxShards")
+        addString("§7Total Shard Levels: §a$totalShardLevels/${adjustedMaxShards * 10}")
+        if (shardsWithData != AttributeShardsData.maxShards) {
+            val missingAmount = AttributeShardsData.maxShards - shardsWithData
+            val plural = StringUtils.pluralize(missingAmount, "shard")
+            addString("§cMissing shard data for $missingAmount $plural")
+            addString("§cPlease open /am and turn on advanced mode.")
         }
+        if (shardLines.isEmpty()) {
+            addString("§cNo Shards Found")
+            addString("§cTry changing your settings below.")
+        } else {
+            add(shardLines.map { it.renderLine }.buildSearchableScrollable(height = 225, textInput, velocity = 25.0))
+        }
+        if (priceToMax > 0) {
+            val description = if (config.onlyCurrentInventory) "Shown" else "All"
+            addString("§7Total Price to Max $description Shards: §6${priceToMax.shortFormat()}")
+        }
+        addButtons()
     }
 
     private fun MutableList<Renderable>.addButtons() {
@@ -208,6 +227,16 @@ object AttributeShardOverlay {
         )
 
         addRenderableButton(
+            label = "Include Bazaar Orders",
+            config = config::includeBazaarOrders,
+            enabled = "Include Bazaar Orders",
+            disabled = "Exclude Bazaar Orders",
+            onChange = {
+                reconstructDisplay()
+            },
+        )
+
+        addRenderableButton(
             label = "Only Current Inventory",
             config = config::onlyCurrentInventory,
             enabled = "Only in Current Inventory",
@@ -233,7 +262,7 @@ object AttributeShardOverlay {
             onLeftClick = {
                 AttributeShardsData.resetHuntingBoxShards()
                 reconstructDisplay()
-            }
+            },
         )
         add(clickable)
     }
@@ -244,28 +273,25 @@ object AttributeShardOverlay {
         amountToNextTier: Int,
         amountUntilMaxed: Int,
         amountInHuntingBox: Int,
+        amountInBazaarOrders: Int,
     ): AttributeShardDisplayLine {
         val individualPrice = internalName.getPrice(config.overlayPriceSource.priceSource)
 
-        val actualAmountToNextTier = (amountToNextTier - amountInHuntingBox).coerceAtLeast(0)
-        val actualAmountUntilMaxed = (amountUntilMaxed - amountInHuntingBox).coerceAtLeast(0)
+        val alreadyCovered = amountInHuntingBox + amountInBazaarOrders
+        val actualAmountToNextTier = (amountToNextTier - alreadyCovered).coerceAtLeast(0)
+        val actualAmountUntilMaxed = (amountUntilMaxed - alreadyCovered).coerceAtLeast(0)
 
         val priceUntilNextTier = individualPrice * actualAmountToNextTier
         val priceUntilMaxed = individualPrice * actualAmountUntilMaxed
         val shardItemName = internalName.repoItemName
 
-        val priceToNextTierString = if (actualAmountToNextTier == 0) {
-            "§aEnough in Hunting Box"
-        } else {
-            "§6${(individualPrice * actualAmountToNextTier).shortFormat()}"
-        }
-        val priceUntilMaxedString = if (actualAmountUntilMaxed == 0) {
-            "§aEnough in Hunting Box"
-        } else {
-            "§6${(individualPrice * actualAmountUntilMaxed).shortFormat()}"
-        }
+        val coveredString = if (amountInBazaarOrders != 0) "§eOn order" else "§aEnough in Hunting Box"
+        val priceColor = if (amountInBazaarOrders != 0) "§b" else "§6"
+        val priceToNextTierString =
+            if (actualAmountToNextTier == 0) coveredString else "$priceColor${priceUntilNextTier.shortFormat()}"
+        val priceUntilMaxedString =
+            if (actualAmountUntilMaxed == 0) coveredString else "$priceColor${priceUntilMaxed.shortFormat()}"
 
-        priceToMax += priceUntilMaxed
 
         val priceString = when {
             currentTier == 10 -> "§a§lMaxed"
@@ -273,11 +299,10 @@ object AttributeShardOverlay {
             else -> "§6$priceToNextTierString"
         }
 
-        val bazaarAmount = when {
-            actualAmountUntilMaxed == 0 -> 1
-            config.displaySortingMethod == AttributeShardSorting.PRICE_TO_MAXED -> actualAmountUntilMaxed
-            else -> actualAmountToNextTier
-        }.coerceAtLeast(1)
+        val bazaarAmount = when (config.displaySortingMethod) {
+            AttributeShardSorting.PRICE_TO_MAXED -> actualAmountUntilMaxed
+            AttributeShardSorting.PRICE_TO_NEXT_TIER -> actualAmountToNextTier
+        }
 
         val tooltip = buildList {
             add(shardItemName)
@@ -285,29 +310,44 @@ object AttributeShardOverlay {
             add("§7Price per Shard: §6${individualPrice.shortFormat()}")
             add("§7Amount in Hunting Box: §a${amountInHuntingBox.addSeparators()}")
             if (currentTier < 10) {
-                if (currentTier != 9) {
+                if (currentTier != 9 && actualAmountToNextTier != 0) {
                     add("")
-                    if (actualAmountToNextTier != 0) add("§7Amount to Next Tier: §a$actualAmountToNextTier")
-                    add("§7Price to Next Tier: §6$priceToNextTierString")
+                    add("§7Amount to Next Tier: §a${actualAmountToNextTier.addSeparators()}")
+                    add("§7Price to Next Tier: §6${priceUntilNextTier.shortFormat()}")
                 }
+                if (actualAmountUntilMaxed != 0) {
+                    add("")
+                    add("§7Amount Until Maxed: §a${actualAmountUntilMaxed.addSeparators()}")
+                    add("§7Price Until Maxed: §6${priceUntilMaxed.shortFormat()}")
+                }
+            }
+            if (amountInBazaarOrders != 0) {
                 add("")
-                if (actualAmountUntilMaxed != 0) add("§7Amount Until Maxed: §a$actualAmountUntilMaxed")
-                add("§7Price Until Maxed: §6$priceUntilMaxedString")
+                add("§e${amountInBazaarOrders.addSeparators()}x §7in bazaar right now")
             }
             add("")
-            add("§eClick to open on bazaar!")
+            if (bazaarAmount > 0) {
+                add("§eClick to buy ${bazaarAmount.addSeparators()}x on bazaar!")
+            } else {
+                add("§7Nothing to buy right now")
+            }
+        }
+
+        val text = " §7- $shardItemName §e$currentTier $priceString"
+        val renderable = if (bazaarAmount > 0) {
+            Renderable.clickable(
+                text,
+                tips = tooltip,
+                onLeftClick = {
+                    BazaarApi.searchForBazaarItem(shardItemName, bazaarAmount)
+                },
+            )
+        } else {
+            Renderable.hoverTips(text, tips = tooltip)
         }
 
         val stack = Renderable.item(internalName.getItemStack())
-
-        val clickable = Renderable.clickable(
-            " §7- $shardItemName §e$currentTier $priceString",
-            tips = tooltip,
-            onLeftClick = {
-                BazaarApi.searchForBazaarItem(shardItemName, bazaarAmount)
-            },
-        )
-        val searchable = Renderable.horizontal(stack, clickable).toSearchable(shardItemName)
+        val searchable = Renderable.horizontal(stack, renderable).toSearchable(shardItemName)
 
         return AttributeShardDisplayLine(
             shardItemName.removeColor(), currentTier, priceUntilNextTier, priceUntilMaxed, searchable,
