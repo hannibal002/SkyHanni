@@ -97,7 +97,7 @@ object SlayerApi {
     var latestCategory = ""
     var tier = 0
 
-    var latestWrongAreaWarning = SimpleTimeMark.farPast()
+    var latestWrongAreaWarningTime = SimpleTimeMark.farPast()
 
     /**
      * What is the current progress of the slayer boss? could be a string with text, or percentage, or x/x kills.
@@ -117,7 +117,7 @@ object SlayerApi {
     /**
      * The last time we saw a cocoon message, used to ensure it doesn't get stuck in a state where we think we are cocooned when we are not
      */
-    private var lastCocoonTimestamp = ServerTimeMark.farPast()
+    private var lastCocoonTime = ServerTimeMark.farPast()
 
     private val outsideRiftData = SlayerData()
     private val insideRiftData = SlayerData()
@@ -213,7 +213,7 @@ object SlayerApi {
                 data.currentState = COCOONED
                 data.currentStateRaw = "cocooned"
                 SlayerStateChangeEvent(COCOONED).post()
-                lastCocoonTimestamp = ServerTimeMark.now()
+                lastCocoonTime = ServerTimeMark.now()
             }
         }
     }
@@ -320,7 +320,7 @@ object SlayerApi {
 
         var newState = detectState(progress)
 
-        val cocooned = data.currentState == COCOONED && lastCocoonTimestamp.passedSince() <= 6.seconds
+        val cocooned = data.currentState == COCOONED && lastCocoonTime.passedSince() <= 6.seconds
         if (cocooned && (newState == NO_ACTIVE_QUEST || newState == SLAIN)) {
             ChatUtils.debug("SlayerApi: Cocooned state detected, overriding $newState to COCOONED")
             newState = COCOONED
@@ -397,7 +397,7 @@ object SlayerApi {
         ChatUtils.debug("SlayerApi: World change detected, resetting cocooned state")
         data.currentState = NO_ACTIVE_QUEST
         data.currentStateRaw = null
-        lastCocoonTimestamp = ServerTimeMark.farPast()
+        lastCocoonTime = ServerTimeMark.farPast()
     }
 
     // TODO USE SH-REPO
