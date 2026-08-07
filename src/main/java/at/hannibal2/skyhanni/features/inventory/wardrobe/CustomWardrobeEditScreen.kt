@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -36,6 +37,12 @@ class CustomWardrobeEditScreen(
         DrawContextUtils.setContext(graphics)
         try {
             onDrawScreen()
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Error while drawing editable custom wardrobe screen",
+                "screen" to this,
+            )
         } finally {
             DrawContextUtils.clearContext()
         }
