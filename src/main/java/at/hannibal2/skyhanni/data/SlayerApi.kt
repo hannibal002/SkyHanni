@@ -45,6 +45,12 @@ object SlayerApi {
 
     private const val GRACE_UPDATE_COUNT = 3
 
+    /**
+     * Cocoons are actually 5 seconds, but +1 second just in case.
+     * This is for when the chat message appears, but even after this time has passed, the boss hasn't spawned yet.
+     */
+    private val GRACE_COCOON_TIME = 6.seconds
+
     // <editor-fold desc="Patterns">
     /**
      * WRAPPED-REGEX-TEST: "  SLAYER QUEST STARTED!"
@@ -320,7 +326,7 @@ object SlayerApi {
 
         var newState = detectState(progress)
 
-        val cocooned = data.currentState == COCOONED && lastCocoonTime.passedSince() <= 6.seconds
+        val cocooned = data.currentState == COCOONED && lastCocoonTime.passedSince() <= GRACE_COCOON_TIME
         if (cocooned && (newState == NO_ACTIVE_QUEST || newState == SLAIN)) {
             ChatUtils.debug("SlayerApi: Cocooned state detected, overriding $newState to COCOONED")
             newState = COCOONED
