@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -49,6 +50,13 @@ object MissingCropWarning {
     private var lastProcessedPlotId: Int? = null
     private var checkerRunCount = 0
     private val replacementPrompts = mutableMapOf<CropCategory, CropReplacement>()
+
+    @HandleEvent(ConfigLoadEvent::class)
+    private fun onConfigLoad() {
+        // Diagnostics can be used before the tab-list profile name has initialized. Flush anything
+        // collected in that window as soon as profile-specific storage becomes available.
+        cropStorage.syncRuntimeData()
+    }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     private fun onTick(event: SkyHanniTickEvent) {
@@ -122,11 +130,16 @@ object MissingCropWarning {
 
         val position = nearbyPosition ?: if (targetedCategory == null) targetPosition.add(y = 1) else targetPosition
         clearTargetedCrop()
-        cropStorage.saveDiagnosedPosition(plotId, category, position)
+        val persisted = cropStorage.saveDiagnosedPosition(plotId, category, position)
         replacementPrompts.remove(category)
         ChatUtils.chat(
-            "§aSaved diagnosed ${category.displayName} in Greenhouse plot §e$plotId§a at " +
-                "§e${position.x.toInt()}, ${position.y.toInt()}, ${position.z.toInt()}§a.",
+            if (persisted) {
+                "§aSaved diagnosed ${category.displayName} in Greenhouse plot §e$plotId§a at " +
+                    "§e${position.x.toInt()}, ${position.y.toInt()}, ${position.z.toInt()}§a."
+            } else {
+                "§eRemembered diagnosed ${category.displayName} for this session, but your SkyBlock profile " +
+                    "has not loaded yet. §7It will be saved automatically when profile data becomes available."
+            },
         )
     }
 
@@ -281,12 +294,15 @@ object MissingCropWarning {
         lastReportedRememberedMissingByPlot[plotId] = missing
 
         if (missing.isEmpty()) {
-            if (rememberedPositions.size >= CropCategory.entries.size) {
-                if (announcedCompletePlots.add(plotId)) {
+            if (announcedCompletePlots.add(plotId)) {
+                if (rememberedPositions.size >= CropCategory.entries.size) {
                     ChatUtils.chat("§aAll 12 unique Greenhouse crops are planted in Plot §e$plotId§a!")
+                } else {
+                    ChatUtils.chat(
+                        "§aAll §e${rememberedPositions.size} §aremembered unique " +
+                            "Greenhouse crops in Plot §e$plotId §aare present!",
+                    )
                 }
-            } else if (!previouslyReported.isNullOrEmpty()) {
-                ChatUtils.chat("§aAll remembered unique crops in Greenhouse Plot §e$plotId §aare planted!")
             }
             return
         }
@@ -473,13 +489,15 @@ object MissingCropWarning {
         rememberedPositions: Map<Int, Map<CropCategory, LorenzVec>>,
     ) {
         val diagnosedPositions = cropStorage.diagnosedPositionsByPlot()
+        val diagnosedCategories = diagnosedPositions.values
+            .flatMapTo(mutableSetOf()) { it.keys }
         scannedPositions.forEach { (category, newPosition) ->
+            // A Crop Diagnostics result is an explicit player choice. Ignore every automatic sighting
+            // of that crop, regardless of which stale detected entry happens to be visited first.
+            if (category.name in diagnosedCategories) return@forEach
             val oldPlotId = rememberedPositions.entries.firstOrNull { (plotId, positions) ->
                 plotId != newPlotId && category in positions
             }?.key ?: return@forEach
-            // Crop Diagnostics positions are explicitly confirmed by the player and remain authoritative.
-            // Decorative copies or mutations detected in another plot must not offer to replace them.
-            if (category.name in diagnosedPositions[oldPlotId].orEmpty()) return@forEach
             val replacement = CropReplacement(category, oldPlotId, newPlotId, newPosition)
             if (category.name in cropStorage.ignoredCropReplacementsByPlot()[newPlotId].orEmpty()) return@forEach
             replacementPrompts[category]?.let { existing ->

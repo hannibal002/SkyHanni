@@ -17,10 +17,35 @@ internal class GreenhouseCropStorage {
     private var pendingPersistentSave = false
 
     fun syncRuntimeData() {
-        storage?.diagnosedCropPositionsByPlot?.merge(runtimeDiagnosedPositionsByPlot)
-        storage?.detectedCropPositionsByPlot?.merge(runtimeDetectedCropPositionsByPlot)
-        storage?.mutationCropCategoriesByPlot?.mergeSets(runtimeMutationCropCategoriesByPlot)
-        storage?.ignoredCropReplacementsByPlot?.mergeSets(runtimeIgnoredReplacementsByPlot)
+        val profileStorage = storage ?: return
+        // Gson can deserialize fields explicitly stored as null without applying Kotlin's non-null
+        // constructor defaults, so repair every legacy profile map before merging runtime data.
+        var repairedNullMap = false
+        val diagnosedPositions = profileStorage.diagnosedCropPositionsByPlot ?: mutableMapOf<Int, MutableMap<String, LorenzVec>>()
+            .also {
+                profileStorage.diagnosedCropPositionsByPlot = it
+                repairedNullMap = true
+            }
+        val detectedPositions = profileStorage.detectedCropPositionsByPlot ?: mutableMapOf<Int, MutableMap<String, LorenzVec>>()
+            .also {
+                profileStorage.detectedCropPositionsByPlot = it
+                repairedNullMap = true
+            }
+        val mutationCategories = profileStorage.mutationCropCategoriesByPlot ?: mutableMapOf<Int, MutableSet<String>>()
+            .also {
+                profileStorage.mutationCropCategoriesByPlot = it
+                repairedNullMap = true
+            }
+        val ignoredReplacements = profileStorage.ignoredCropReplacementsByPlot ?: mutableMapOf<Int, MutableSet<String>>()
+            .also {
+                profileStorage.ignoredCropReplacementsByPlot = it
+                repairedNullMap = true
+            }
+        val changed = diagnosedPositions.merge(runtimeDiagnosedPositionsByPlot) or
+            detectedPositions.merge(runtimeDetectedCropPositionsByPlot) or
+            mutationCategories.mergeSets(runtimeMutationCropCategoriesByPlot) or
+            ignoredReplacements.mergeSets(runtimeIgnoredReplacementsByPlot)
+        if (repairedNullMap || changed) pendingPersistentSave = true
         savePendingData()
     }
 
@@ -31,9 +56,21 @@ internal class GreenhouseCropStorage {
         savePendingData()
     }
 
-    fun saveDiagnosedPosition(plotId: Int, category: CropCategory, position: LorenzVec) {
+    /** Returns whether the position was written to profile-backed storage immediately. */
+    fun saveDiagnosedPosition(plotId: Int, category: CropCategory, position: LorenzVec): Boolean {
         val name = category.name
         removeRememberedCategoryFromOtherPlots(name, plotId, diagnosed = true)
+        // Diagnostics are authoritative. Remove stale automatic sightings so rememberedCropPositions()
+        // cannot retain the same crop in another plot and later treat decoration as a replacement.
+        var removedDetected = false
+        listOfNotNull(runtimeDetectedCropPositionsByPlot, storage?.detectedCropPositionsByPlot).forEach { positionsByPlot ->
+            positionsByPlot.values.forEach { positions ->
+                removedDetected = positions.remove(name) != null || removedDetected
+            }
+        }
+        runtimeDetectedCropsByPlot.values.forEach { removedDetected = it.remove(name) || removedDetected }
+        storage?.detectedCropsByPlot?.values?.forEach { removedDetected = it.remove(name) || removedDetected }
+        if (removedDetected) pendingPersistentSave = true
         var changed = runtimeDiagnosedPositionsByPlot
             .getOrPut(plotId) { mutableMapOf() }
             .put(name, position) != position
@@ -42,6 +79,7 @@ internal class GreenhouseCropStorage {
             ?.put(name, position) != position || changed
         if (changed) pendingPersistentSave = true
         savePendingData()
+        return storage != null
     }
 
     fun rememberDetectedCrops(plotId: Int, positions: Map<CropCategory, LorenzVec>) {
@@ -233,16 +271,23 @@ internal class GreenhouseCropStorage {
 
 private fun MutableMap<Int, MutableMap<String, LorenzVec>>.merge(
     source: Map<Int, Map<String, LorenzVec>>,
-) {
+): Boolean {
+    var changed = false
     source.forEach { (plotId, positions) ->
-        getOrPut(plotId) { mutableMapOf() }.putAll(positions)
+        val destination = getOrPut(plotId) { mutableMapOf() }
+        positions.forEach { (name, position) ->
+            changed = destination.put(name, position) != position || changed
+        }
     }
+    return changed
 }
 
-private fun MutableMap<Int, MutableSet<String>>.mergeSets(source: Map<Int, Set<String>>) {
+private fun MutableMap<Int, MutableSet<String>>.mergeSets(source: Map<Int, Set<String>>): Boolean {
+    var changed = false
     source.forEach { (plotId, categories) ->
-        getOrPut(plotId) { mutableSetOf() }.addAll(categories)
+        changed = getOrPut(plotId) { mutableSetOf() }.addAll(categories) || changed
     }
+    return changed
 }
 
 private fun MutableMap<Int, Set<String>>.addStored(stored: Map<Int, Set<String>>) {
