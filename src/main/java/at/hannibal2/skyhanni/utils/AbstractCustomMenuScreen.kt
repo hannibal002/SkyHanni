@@ -61,9 +61,16 @@ abstract class AbstractCustomMenuScreen(
 
     override fun removed() {
         val player = MinecraftCompat.localPlayerOrNull ?: return
-        menu.removed(player)
+        if (!isSwitchingScreens()) {
+            menu.removed(player)
+        }
         menu.removeSlotListener(this)
     }
 
     override fun dataChanged(container: AbstractContainerMenu, property: Int, value: Int) = Unit
+
+    /**
+     * Override this method to return true if the screen is switching to another client side only screen.
+     */
+    open fun isSwitchingScreens(): Boolean = false
 }

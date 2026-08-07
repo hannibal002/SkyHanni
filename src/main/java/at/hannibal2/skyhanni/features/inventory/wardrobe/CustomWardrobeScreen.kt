@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 import at.hannibal2.skyhanni.utils.AbstractCustomMenuScreen
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
 import net.minecraft.world.inventory.AbstractContainerMenu
@@ -24,6 +23,8 @@ class CustomWardrobeScreen(
 
     override fun shouldShowItemList(): Boolean = CustomWardrobe.config.showReiItems
 
+    override fun isSwitchingScreens(): Boolean = CustomWardrobe.switchingScreens
+
     override fun onInitGui() {
         CustomWardrobe.switchingScreens = false
         CustomWardrobe.updateScreenSize(this.width, this.height)
@@ -42,14 +43,6 @@ class CustomWardrobeScreen(
             updateScheduled = false
             CustomWardrobe.onInventoryUpdate()
         }
-    }
-
-    override fun removed() {
-        val player = MinecraftCompat.localPlayerOrNull ?: return
-        if (!CustomWardrobe.switchingScreens) {
-            menu.removed(player)
-        }
-        menu.removeSlotListener(this)
     }
 
     override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
