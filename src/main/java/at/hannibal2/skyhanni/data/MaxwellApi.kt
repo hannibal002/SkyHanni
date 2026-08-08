@@ -180,7 +180,7 @@ object MaxwellApi {
     fun isThaumaturgyInventory(inventoryName: String) = thaumaturgyGuiPattern.matches(inventoryName)
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
@@ -207,7 +207,7 @@ object MaxwellApi {
 
     // load earlier, so that other features can already use the api in this event
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
 
         if (isThaumaturgyInventory(event.inventoryName)) {
@@ -359,7 +359,7 @@ object MaxwellApi {
 
     // Load powers from repo
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<MaxwellPowersJson>("MaxwellPowers")
         powers = data.powers
     }

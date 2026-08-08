@@ -546,16 +546,16 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST: §2᠅ §fMithril§f: §235,448
-         * REGEX-TEST: §d᠅ §fGemstone§f: §d36,758
-         * REGEX-TEST: §b᠅ §fGlacite§f: §b29,537
-         * REGEX-TEST: §2᠅ §fMithril Powder§f: §235,448
-         * REGEX-TEST: §d᠅ §fGemstone Powder§f: §d36,758
-         * REGEX-TEST: §b᠅ §fGlacite Powder§f: §b29,537
+         * REGEX-TEST: ᠅ Mithril: 35,448
+         * REGEX-TEST: ᠅ Gemstone: 36,758
+         * REGEX-TEST: ᠅ Glacite: 29,537
+         * REGEX-TEST: ᠅ Mithril Powder: 35,448
+         * REGEX-TEST: ᠅ Gemstone Powder: 36,758
+         * REGEX-TEST: ᠅ Glacite Powder: 29,537
          */
         val scoreboardPowderPattern by patternGroup.pattern(
             "scoreboard.powder",
-            "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?(?:§.)*:? (?:§.)*(?<amount>[\\d,.]*)",
+            "᠅ (?<type>Gemstone|Mithril|Glacite)(?: Powder)?: (?<amount>[\\d,.]*)",
         )
         // </editor-fold>
 
@@ -632,8 +632,8 @@ enum class HotmData(
         }
 
         @HandleEvent(onlyOnSkyblock = true)
-        fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
-            scoreboardPowderPattern.firstMatcher(event.added) {
+        private fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+            scoreboardPowderPattern.firstMatcher(event.added.map { it.removeColor() }) {
                 val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 type.setAmount(amount, postEvent = true)
@@ -647,7 +647,7 @@ enum class HotmData(
         }
 
         @HandleEvent
-        fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        private fun onWidgetUpdate(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.POWDER)) return
             event.lines.forEach { line ->
                 widgetPowderPattern.matchMatcher(line.string.removeColor()) {
@@ -685,14 +685,14 @@ enum class HotmData(
         }
 
         @HandleEvent
-        fun onIslandChange() {
+        private fun onIslandChange() {
             if (HotmApi.mineshaftMayhem == null) return
             HotmApi.mineshaftMayhem = null
             ChatUtils.debug("resetting mineshaftMayhem")
         }
 
         @HandleEvent
-        fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        private fun onDebugDataCollect(event: DebugDataCollectEvent) {
             event.title("HotM")
             event.addIrrelevant {
                 add("Tokens : $availableTokens/$tokens")
