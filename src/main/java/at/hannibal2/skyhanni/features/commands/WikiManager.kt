@@ -26,7 +26,7 @@ object WikiManager {
 
     private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
 
-    val wiki get() = data.official
+    val wiki get() = data.unofficial
 
     @HandleEvent
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
