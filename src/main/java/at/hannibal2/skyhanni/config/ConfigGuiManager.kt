@@ -53,7 +53,7 @@ object ConfigGuiManager {
      */
     internal fun configOptionMatchesSearch(input: String, path: String, option: ProcessedOption): Boolean =
         searchTerms(input).all { term ->
-            path.lowercase().contains(term) || option.getEditor().fulfillsSearch(term)
+            path.lowercase().contains(term) || option.getEditor()?.fulfillsSearch(term) == true
         }
 
     /** Checks whether a config category name matches a /sh search with the same semantics as [configOptionMatchesSearch]. */
@@ -64,6 +64,12 @@ object ConfigGuiManager {
         val search = input.trim().lowercase()
         return if (search.isEmpty()) emptyList() else search.split("+")
     }
+
+    /** Resolves a /sh search input to the config option field with a matching path, ignoring case and surrounding whitespace. */
+    fun getOptionFieldForPath(search: String): Field? = findOptionFieldForPath(optionPathToField, search)
+
+    internal fun findOptionFieldForPath(paths: Map<String, Field>, search: String): Field? =
+        paths.entries.firstOrNull { it.key.equals(search.trim(), ignoreCase = true) }?.value
 
     /** Suggestions for the /sh search: category names and option paths matching MoulConfig's search. */
     val configTabCompleteSuggestionProvider: SuggestionProvider<FabricClientCommandSource> by lazy {
