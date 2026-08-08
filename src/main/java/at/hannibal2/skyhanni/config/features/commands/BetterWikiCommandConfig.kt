@@ -28,16 +28,6 @@ class BetterWikiCommandConfig {
 
     @Expose
     @ConfigOption(
-        name = "Use Independent Wiki",
-        desc = "Use the independent wiki instead of the official one in most wiki-related chat messages.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    @SearchTag("fandom hypixel")
-    var useIndependent: Boolean = true
-
-    @Expose
-    @ConfigOption(
         name = "Auto Open",
         desc = "Directly open the Wiki when running the command instead of having to click a message in chat.",
     )
