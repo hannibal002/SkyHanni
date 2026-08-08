@@ -134,7 +134,13 @@ val dependencyStateResolved = "resolved"
 val warningIcon = "⚠\uFE0F"
 
 val maxDirectFindings = 15
+val maxErrorContinuations = 5
+val maxOverloadCandidates = 3
 val maxLogChars = 10_000
+
+// Its candidate block is separated by a blank line and starts at column 0, out of reach for continuations.
+val overloadErrorMarker = "None of the following candidates is applicable:"
+
 
 val maxRequestAttempts = 3
 val retryDelayMillis = 2_000L
@@ -575,13 +581,31 @@ fun parseErrorContinuations(logContent: String, errorLine: String): List<String>
     if (idx < 0) return emptyList()
     val result = mutableListOf<String>()
     var i = idx + 1
-    while (i < lines.size) {
+    while (i < lines.size && result.size < maxErrorContinuations) {
         val next = lines[i]
-        if (next.isBlank()) break
+        // Only indented lines belong to the error above, everything else starts at column 0.
+        if (next.isBlank() || next == next.trimStart()) break
+        // Indented, but its own diagnosis.
         if (next.trimStart().startsWith("e: ") || next.trimStart().startsWith("w: ")) break
-        if (next.startsWith("> ") || next.startsWith("FAILURE") || next.startsWith("*")) break
         result.add(next.trim())
         i++
+    }
+    return result
+}
+
+// Signatures only, the indented details below each one add length but no information.
+fun parseOverloadCandidates(logContent: String, errorLine: String): List<String> {
+    if (!errorLine.trimEnd().endsWith(overloadErrorMarker)) return emptyList()
+    val lines = logContent.lines()
+    val idx = lines.indexOfFirst { it.trim() == errorLine }
+    if (idx < 0) return emptyList()
+    val result = mutableListOf<String>()
+    for (line in lines.drop(idx + 1)) {
+        val trimmed = line.trimStart()
+        if (trimmed.startsWith("e: ") || trimmed.startsWith("w: ")) break
+        if (line.startsWith("FAILURE")) break
+        if (line != trimmed || "fun " !in line) continue
+        result.add(line.trim())
     }
     return result
 }
@@ -649,6 +673,13 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
                 if (rawLine.trimStart().startsWith("e: ")) {
                     for (cont in parseErrorContinuations(logContent, rawLine)) {
                         appendLine("  - `${sanitizeCodeSpan(cont)}`")
+                    }
+                    val candidates = parseOverloadCandidates(logContent, rawLine)
+                    for (candidate in candidates.take(maxOverloadCandidates)) {
+                        appendLine("  - `${sanitizeCodeSpan(candidate)}`")
+                    }
+                    if (candidates.size > maxOverloadCandidates) {
+                        appendLine("  - _...and ${candidates.size - maxOverloadCandidates} more candidates_")
                     }
                 }
             }
@@ -831,12 +862,37 @@ fun parseSarifFindings(sarif: JsonObject, workspace: String): List<Finding> = bu
     }
 }
 
+// Posted when the run is red but carries no log to quote. Every reason for a missing artifact looks the same
+// from here, so it names the conclusion instead of guessing.
+fun buildGenericFailureBody(conclusion: String): String = buildString {
+    val workflowRunId = System.getenv("WORKFLOW_RUN_ID") ?: error("WORKFLOW_RUN_ID not set")
+    appendWarningTitle("Build failed")
+    appendLine()
+    appendLine("The build workflow finished with `${sanitizeCodeSpan(conclusion)}` but uploaded no error log.")
+    appendLine("That happens when a step fails outside of the parts that capture their output, so the cause is")
+    appendLine("only visible in the run itself.")
+    appendLine()
+    appendLine("\\[[workflow run](https://github.com/$repo/actions/runs/$workflowRunId)\\]")
+}
+
 fun runBuildMode(prNumber: String) {
     val log1 = readBuildLog(System.getenv("ARTIFACT_DIR_1"))
 
     buildComment.staleExisting(prNumber)
 
     if (log1.isNullOrBlank()) {
+        // A missing artifact is not proof of a green build: a step failing before its upload leaves it missing
+        // while the run is red. Only the conclusion tells those two apart.
+        val conclusion = System.getenv("WORKFLOW_CONCLUSION")?.takeIf { it.isNotEmpty() }
+            ?: error("WORKFLOW_CONCLUSION not set")
+        if (conclusion != "success") {
+            buildComment.post(prNumber, buildGenericFailureBody(conclusion)) {
+                "Error: could not post build failure comment (HTTP $it)"
+            }
+            setLabel(prNumber, buildLabel, true)
+            println("Build failed without a log artifact, posted generic comment, added label")
+            exitProcess(0)
+        }
         println("No build failures found, removing build label")
         setLabel(prNumber, buildLabel, false)
         exitProcess(0)

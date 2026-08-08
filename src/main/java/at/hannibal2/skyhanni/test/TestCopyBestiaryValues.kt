@@ -110,7 +110,7 @@ object TestCopyBestiaryValues {
         obj.mobs = mobs.toTypedArray()
 
         if (lore.any { it.contains("Critter") }) {
-            obj.bracketType = "CRITTER"
+            obj.bracketType = "CRITTERS"
         }
 
         val gson = GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create()
