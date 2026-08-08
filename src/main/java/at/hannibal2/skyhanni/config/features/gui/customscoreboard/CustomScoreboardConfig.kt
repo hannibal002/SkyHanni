@@ -7,8 +7,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class CustomScoreboardConfig {
 
     @ConfigOption(
-        name = "Deprecated Feature",
-        desc = "SkyHanni's CustomScoreboard will not receive Updates in the future. Please switch to the mod for more & unique features.",
+        name = "Removed Feature",
+        desc = "SkyHanni's CustomScoreboard Has Been Removed. Please switch to the mod for more & unique features.",
     )
     @ConfigEditorButton(buttonText = "Download the Mod")
     val customScoreboardMod: Runnable = Runnable { openBrowser("https://modrinth.com/mod/skyblock-custom-scoreboard") }
