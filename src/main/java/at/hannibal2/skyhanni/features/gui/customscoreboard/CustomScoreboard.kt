@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -62,7 +63,11 @@ object CustomScoreboard {
 
     private var lastLines: List<ScoreboardLine> = emptyList()
 
-    private var deprecatedWarningShown = false
+    private var silencedWarning = false
+
+    private val customScoreboardModLoaded by lazy {
+        PlatformUtils.isModInstalled("customscoreboard")
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay() {
@@ -200,7 +205,6 @@ object CustomScoreboard {
     @HandleEvent(HypixelJoinEvent::class)
     fun onHypixelJoin() {
         updateAllIslandEntries()
-        showDeprecatedWarning()
     }
 
     @HandleEvent
@@ -214,17 +218,37 @@ object CustomScoreboard {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.NONE) updateAllIslandEntries()
         else updateIslandEntries()
+
+        showDeprecatedWarning()
     }
 
     private fun showDeprecatedWarning() {
-        if (deprecatedWarningShown) return
-        deprecatedWarningShown = true
+        if (!isEnabled()) return
+        if (silencedWarning) return
         ChatUtils.clickableLinkChat(
             message = "Custom Scoreboard is deprecated and no longer supported. " +
                 "Please use the replacement mod instead. " +
                 "This feature will be removed completely in a future update.",
             url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
             prefixColor = "§c"
+        )
+        ChatUtils.clickableChat(
+            message = "[I Get It]",
+            prefix = false,
+            prefixColor = "§a",
+            onClick = {
+                silencedWarning = true
+                ChatUtils.chat(
+                    message = "Custom scoreboard is still deprecated...",
+                    prefixColor = "§8",
+                    prefix = false,
+                )
+                ChatUtils.chat(
+                    message = "But you will be bothered about it this session!",
+                    prefixColor = "§e",
+                    prefix = false
+                )
+            }
         )
     }
 
@@ -293,7 +317,8 @@ object CustomScoreboard {
     }
 
     private fun isEnabled() =
-        (SkyBlockUtils.inSkyBlock || (OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected() && SkyBlockUtils.onHypixel)) && config.enabled.get()
+        (SkyBlockUtils.inSkyBlock || (OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected() && SkyBlockUtils.onHypixel))
+            && config.enabled.get() && !customScoreboardModLoaded
 
     @JvmStatic
     fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
