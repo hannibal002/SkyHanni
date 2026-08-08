@@ -311,8 +311,8 @@ object CustomScoreboard {
     }
 
     private fun isEnabled() =
-        (SkyBlockUtils.inSkyBlock || (OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected() && SkyBlockUtils.onHypixel))
-            && config.enabled.get() && !customScoreboardModLoaded
+        (SkyBlockUtils.inSkyBlock || (OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected() && SkyBlockUtils.onHypixel)) &&
+            config.enabled.get() && !customScoreboardModLoaded
 
     @JvmStatic
     fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
