@@ -79,8 +79,16 @@ public abstract class MixinItemFeatureRenderer {
             target = "Lnet/minecraft/client/renderer/feature/ItemFeatureRenderer;getVertexBuilder(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
         )
     )
-    //~ if < 26.2 'ItemFeatureRenderer' -> 'OutlineBufferSource'
-    private VertexConsumer modifyOutlineVertexConsumerProvider(ItemFeatureRenderer instance, RenderType renderType, Operation<VertexConsumer> original, /*? if < 26.2 {*//*@Local(argsOnly = true) *//*?}*/ItemFeatureRenderer.Submit itemCommand) {
+    private VertexConsumer modifyOutlineVertexConsumerProvider(
+        //~ if < 26.2 'ItemFeatureRenderer' -> 'OutlineBufferSource'
+        ItemFeatureRenderer instance,
+        RenderType renderType,
+        Operation<VertexConsumer> original,
+        //? if >= 26.2 {
+        ItemFeatureRenderer.Submit itemCommand
+        //?} else
+        //@Local(argsOnly = true) SubmitNodeStorage.ItemSubmit itemCommand
+    ) {
         Object obj = (Object) itemCommand;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
             //? if >= 26.2 {

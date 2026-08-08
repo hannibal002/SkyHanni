@@ -132,11 +132,6 @@ stonecutter handlers {
 stonecutter parameters {
     replacements {
         string(current.parsed < "26.2") {
-            replace(".mainCamera()", ".mainCamera")
-            replace("ItemFeatureRenderer.Submit", "SubmitNodeStorage.ItemSubmit")
-            replace("ModelFeatureRenderer.Submit", "SubmitNodeStorage.ModelSubmit")
-            replace("gameRenderer.featureRenderDispatcher()", "gameRenderer.featureRenderDispatcher")
-            replace("gameRenderer.lighting()", "gameRenderer.lighting")
             replace("net.minecraft.world.entity.monster.cubemob.MagmaCube", "net.minecraft.world.entity.monster.MagmaCube")
             replace("net.minecraft.world.entity.monster.cubemob.Slime", "net.minecraft.world.entity.monster.Slime")
 

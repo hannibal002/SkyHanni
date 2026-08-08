@@ -35,8 +35,14 @@ public abstract class MixinModelFeatureRenderer {
     //~ if < 26.2 'prepareModel' -> 'renderModel'
     //~ if < 26.2 'feature/ModelFeatureRenderer;getVertexBuilder' -> 'OutlineBufferSource;getBuffer'
     @WrapOperation(method = "prepareModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer;getVertexBuilder(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"))
-    //~ if < 26.2 'ModelFeatureRenderer' -> 'OutlineBufferSource'
-    private VertexConsumer getSkyHanniOutlineBuffer(ModelFeatureRenderer instance, RenderType layer, Operation<VertexConsumer> original, @Local(argsOnly = true) ModelFeatureRenderer.Submit<?> model) {
+    private VertexConsumer getSkyHanniOutlineBuffer(
+        //~ if < 26.2 'ModelFeatureRenderer' -> 'OutlineBufferSource'
+        ModelFeatureRenderer instance,
+        RenderType layer,
+        Operation<VertexConsumer> original,
+        //~ if < 26.2 'ModelFeatureRenderer.Submit' -> 'SubmitNodeStorage.ModelSubmit'
+        @Local(argsOnly = true) ModelFeatureRenderer.Submit<?> model
+    ) {
         if (skyhanni$usesCustomOutline(model)) {
             //? if >= 26.2 {
             SkyHanniOutlineHook.beginCustomOutlineBuild();
@@ -53,6 +59,7 @@ public abstract class MixinModelFeatureRenderer {
     }
 
     @Unique
+    //~ if < 26.2 'ModelFeatureRenderer.Submit' -> 'SubmitNodeStorage.ModelSubmit'
     private boolean skyhanni$usesCustomOutline(ModelFeatureRenderer.Submit<?> model) {
         Object obj = model;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) return true;

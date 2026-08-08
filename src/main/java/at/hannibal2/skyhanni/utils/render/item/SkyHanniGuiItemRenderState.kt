@@ -111,6 +111,7 @@ data class SkyHanniGuiItemRenderState(
         val rotated = ps.mulPose(rotationVector)
         ps.translate(0.0f, 0.03f, 0.125f)
 
+        //~ if < 26.2 'lighting()' -> 'lighting'
         Minecraft.getInstance().gameRenderer.lighting().setupFor(
             if (trackingState.usesBlockLight()) Lighting.Entry.ITEMS_3D else Lighting.Entry.ITEMS_FLAT,
         )

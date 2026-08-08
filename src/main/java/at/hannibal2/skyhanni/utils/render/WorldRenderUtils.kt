@@ -1104,6 +1104,7 @@ object WorldRenderUtils {
         )
     }
 
+    //~ if < 26.2 'mainCamera()' -> 'mainCamera'
     fun getViewerPos() = exactLocation(Minecraft.getInstance().gameRenderer.mainCamera())
 
     fun AABB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
@@ -1233,5 +1234,6 @@ object WorldRenderUtils {
     /**
      * Returns true if the camera is underwater.
      */
+    //~ if < 26.2 'mainCamera()' -> 'mainCamera'
     fun isRenderingUnderwater() = Minecraft.getInstance().gameRenderer.mainCamera().fluidInCamera == FogType.WATER
 }
