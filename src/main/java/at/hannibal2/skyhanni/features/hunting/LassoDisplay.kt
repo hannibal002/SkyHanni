@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -53,13 +54,16 @@ object LassoDisplay {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onEntityCustomNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
-        if (!config.lassoDisplay || !holdingLasso) return
+        if ((!config.lassoDisplay && !config.reelAlert) || !holdingLasso) return
         val entity = event.entity
         val name = event.newName?.takeIf { it.isLassoNametag() && entity.isAboveOwnLassoedMob() }
         if (name == null) {
             if (lassoNametags.remove(entity.id) == null) return
         } else {
             lassoNametags[entity.id] = name
+            if (config.reelAlert && name.isReel()) {
+                SoundUtils.playPlingSound()
+            }
         }
         updateDisplay()
     }
