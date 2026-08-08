@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.ConfigGuiManager.categoryNames
 import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.SackData
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.config.StorageData
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.toSuggestionProvider
 import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
@@ -162,7 +164,11 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
             literalCallback("gui") {
                 GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
             }
-            argCallback("search", BrigadierArguments.greedyString()) { search ->
+            argCallback(
+                "search",
+                BrigadierArguments.greedyString(),
+                suggestions = categoryNames.toSuggestionProvider(),
+            ) { search ->
                 openConfigGui(search)
             }
             simpleCallback {
