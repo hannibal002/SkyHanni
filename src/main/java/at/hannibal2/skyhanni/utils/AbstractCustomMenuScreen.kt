@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.wardrobe
+package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -12,6 +12,10 @@ import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.ContainerListener
 
 // Reference: https://github.com/SkyblockerMod/Skyblocker/blob/main/src/main/java/de/hysky/skyblocker/skyblock/dungeon/LeapOverlay.java
+/**
+ * An abstract class that replaces a skyblock menu screen with a custom one.
+ * Look at [at.hannibal2.skyhanni.mixins.hooks.MenuScreensHook] for when to use your custom menu screen.
+ */
 abstract class AbstractCustomMenuScreen(
     initialMenu: ChestMenu,
     title: Component,
@@ -36,14 +40,11 @@ abstract class AbstractCustomMenuScreen(
     }
 
     override fun keyPressed(input: KeyEvent): Boolean {
-        if (super.keyPressed(input)) {
-            return true
-        }
         if (Minecraft.getInstance().options.keyInventory.matches(input)) {
             this.onClose()
             return true
         }
-        return false
+        return super.keyPressed(input)
     }
 
     override fun tick() {
@@ -60,9 +61,16 @@ abstract class AbstractCustomMenuScreen(
 
     override fun removed() {
         val player = MinecraftCompat.localPlayerOrNull ?: return
-        menu.removed(player)
+        if (!isSwitchingScreens()) {
+            menu.removed(player)
+        }
         menu.removeSlotListener(this)
     }
 
     override fun dataChanged(container: AbstractContainerMenu, property: Int, value: Int) = Unit
+
+    /**
+     * Override this method to return true if the screen is switching to another client side only screen.
+     */
+    open fun isSwitchingScreens(): Boolean = false
 }

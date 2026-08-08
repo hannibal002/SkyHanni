@@ -24,8 +24,8 @@ object CustomWardrobeKeybinds {
         )
     private var lastClick = SimpleTimeMark.farPast()
 
-    internal fun handlePress(): Boolean {
-        if (!isEnabled()) return false
+    internal fun handlePress() {
+        if (!isEnabled()) return
         val slots = ArmorWardrobeApi.slots.filter { it.isInCurrentPage() }
             .filterNot { config.onlyFavorites && !it.favorite }
             .filterNot { config.hideEmptySlots && it.armor.all { piece -> piece == null } }
@@ -37,14 +37,8 @@ object CustomWardrobeKeybinds {
 
             slot.clickSlot()
             lastClick = SimpleTimeMark.now()
-            return true
         }
-
-        return false
     }
-
-    fun allowMouseClick() = isEnabled() && keybinds.filter { it < 0 }.any { it.isKeyHeld() }
-    fun allowKeyboardClick() = isEnabled() && keybinds.filter { it > 0 }.any { it.isKeyHeld() }
 
     private fun isEnabled() =
         SkyBlockUtils.inSkyBlock && CustomWardrobe.inCustomWardrobe && config.keybinds.slotKeybindsToggle && config.enabled
