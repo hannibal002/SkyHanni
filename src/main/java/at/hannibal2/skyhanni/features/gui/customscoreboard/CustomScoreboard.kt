@@ -238,12 +238,9 @@ object CustomScoreboard {
             onClick = {
                 silencedWarning = true
                 ChatUtils.chat(
-                    message = "§eSkyHanni's §aCustom scoreboard is still deprecated...",
+                    message = "§eSkyHanni's §aCustom scoreboard is still deprecated...\n " +
+                        "§aBut you will no longer be bothered about it this session!",
                     prefix = false,
-                )
-                ChatUtils.chat(
-                    message = "§aBut you will no longer be bothered about it this session!",
-                    prefix = false
                 )
             }
         )
