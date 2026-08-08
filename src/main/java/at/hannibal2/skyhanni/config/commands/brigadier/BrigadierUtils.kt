@@ -32,8 +32,9 @@ object BrigadierUtils {
      * Convert a static collection to be suggestions for an argument
      */
     fun Collection<String>.toSuggestionProvider() = SuggestionProvider<FabricClientCommandSource> { _, builder ->
+        val remaining = builder.remainingLowerCase
         for (s in this) {
-            if (s.startsWith(builder.remainingLowerCase)) {
+            if (s.lowercase().startsWith(remaining)) {
                 builder.suggest(s)
             }
         }
