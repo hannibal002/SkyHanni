@@ -228,7 +228,7 @@ object CustomScoreboard {
         ChatUtils.clickableLinkChat(
             message = "Custom Scoreboard is deprecated and no longer supported. " +
                 "Please use the replacement mod instead. " +
-                "This feature will be removed completely in a future update.",
+                "This feature will be removed completely in a future update. \n",
             url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
             prefixColor = "§c"
         )
