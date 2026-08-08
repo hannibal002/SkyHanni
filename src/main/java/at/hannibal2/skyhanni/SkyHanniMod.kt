@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager.configTabCompleteSuggestionProvider
+import at.hannibal2.skyhanni.config.ConfigGuiManager.getOptionFieldForPath
 import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
 import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigOption
-import at.hannibal2.skyhanni.config.ConfigGuiManager.optionPathToField
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.SkyHanniConfig
@@ -170,7 +170,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
                 BrigadierArguments.greedyString(),
                 suggestions = configTabCompleteSuggestionProvider,
             ) { search ->
-                val optionField = optionPathToField[search.lowercase()]
+                val optionField = getOptionFieldForPath(search)
                 if (optionField != null) {
                     openConfigOption(optionField)
                 } else {
