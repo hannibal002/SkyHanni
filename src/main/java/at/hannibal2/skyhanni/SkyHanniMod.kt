@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.ConfigGuiManager.configTabCompleteSuggestions
+import at.hannibal2.skyhanni.config.ConfigGuiManager.configTabCompleteSuggestionProvider
 import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
 import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigOption
 import at.hannibal2.skyhanni.config.ConfigGuiManager.optionPathToField
@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.config.StorageData
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.dynamicContainsSuggestionProvider
 import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
@@ -158,8 +157,6 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
         logger.log(Level.INFO, message)
     }
 
-    private const val MAX_CONFIG_TAB_COMPLETE_SUGGESTIONS = 200
-
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("sh") {
@@ -171,9 +168,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
             argCallback(
                 "search",
                 BrigadierArguments.greedyString(),
-                suggestions = dynamicContainsSuggestionProvider(limit = MAX_CONFIG_TAB_COMPLETE_SUGGESTIONS) {
-                    configTabCompleteSuggestions
-                },
+                suggestions = configTabCompleteSuggestionProvider,
             ) { search ->
                 val optionField = optionPathToField[search.lowercase()]
                 if (optionField != null) {
