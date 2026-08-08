@@ -6,13 +6,14 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.ConfigStructureReader
 import java.lang.reflect.Field
-import java.util.Stack
+import java.util.IdentityHashMap
 
 @SkyHanniModule
 object ConfigGuiManager {
@@ -77,26 +78,34 @@ object ConfigGuiManager {
 
     private class OptionPathReader : ConfigStructureReader {
         val options = mutableMapOf<String, Field>()
-        private val pathStack = Stack<String>()
+        private val instancePath = IdentityHashMap<Any, String>()
 
-        override fun beginCategory(baseObject: Any?, field: Field?, name: String, description: String) = Unit
+        override fun beginConfig(configClass: Class<out Config>, driver: ConfigProcessorDriver, config: Config) {
+            instancePath[config] = ""
+        }
+
+        override fun beginCategory(baseObject: Any?, field: Field?, name: String, description: String) {
+            if (field != null) mapChildInstance(baseObject, field)
+        }
 
         override fun endCategory() = Unit
 
-        override fun beginAccordion(baseObject: Any?, field: Field?, option: ConfigOption?, id: Int) = Unit
+        override fun beginAccordion(baseObject: Any?, field: Field?, option: ConfigOption?, id: Int) {
+            if (field != null) mapChildInstance(baseObject, field)
+        }
 
         override fun endAccordion() = Unit
 
-        override fun pushPath(fieldPath: String) {
-            pathStack.push(fieldPath)
-        }
-
-        override fun popPath() {
-            pathStack.pop()
+        private fun mapChildInstance(baseObject: Any?, field: Field) {
+            val parent = baseObject ?: return
+            val parentPath = instancePath[parent] ?: return
+            val child = field.get(parent) ?: return
+            instancePath[child] = if (parentPath.isEmpty()) field.name else "$parentPath.${field.name}"
         }
 
         override fun emitOption(baseObject: Any, field: Field, option: ConfigOption) {
-            options[pathStack.joinToString(".") + "." + field.name] = field
+            val path = instancePath[baseObject]
+            options[if (path.isNullOrEmpty()) field.name else "$path.${field.name}"] = field
         }
     }
 }
