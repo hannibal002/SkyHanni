@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
-enum class ScoreboardConfigEventElement() {
+enum class ScoreboardConfigEventElement {
     VOTING,
     SERVER_CLOSE,
     DUNGEONS,
@@ -32,6 +32,7 @@ enum class ScoreboardConfigEventElement() {
     ;
 
     companion object {
+        @Suppress("StorageNeedsExpose")
         @JvmField
         val defaultOption = listOf(
             VOTING,

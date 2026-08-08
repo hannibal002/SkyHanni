@@ -54,6 +54,7 @@ enum class ScoreboardConfigElement {
     ;
 
     companion object {
+        @Suppress("StorageNeedsExpose")
         @JvmField
         val defaultOptions = listOf(
             TITLE,
