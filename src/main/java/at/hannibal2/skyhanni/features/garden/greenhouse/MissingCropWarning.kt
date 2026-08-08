@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -560,13 +559,9 @@ object MissingCropWarning {
         )
     }
 
-    private fun scoreboardShowsGreenhouse(): Boolean =
-        SkyBlockUtils.scoreboardArea == "Greenhouse" ||
-            ScoreboardData.sidebarLinesFormatted.any {
-                it.removeColor().contains("Greenhouse", ignoreCase = true)
-            }
+    private fun scoreboardShowsGreenhouse(): Boolean = GreenhouseUtils.scoreboardShowsGreenhouse()
 
-    private fun isInGreenhouse(): Boolean = scoreboardShowsGreenhouse() || GardenPlotApi.inGreenhouse()
+    private fun isInGreenhouse(): Boolean = GreenhouseUtils.isInGreenhouse()
 
     private data class CropReplacement(
         val category: CropCategory,

@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
+import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseProfitTracker
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.CropLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
@@ -670,6 +671,7 @@ class ProfileSpecificStorage(
 
         class GreenHouseStorage(
             @Expose var nextCycle: SimpleTimeMark = farPast(),
+            @Expose var profitTracker: GreenhouseProfitTracker.Data? = GreenhouseProfitTracker.Data(),
             @Expose var detectedCropsByPlot: MutableMap<Int, MutableSet<String>>? = mutableMapOf(),
             @Expose
             var detectedCropPositionsByPlot: MutableMap<Int, MutableMap<String, LorenzVec>>? = mutableMapOf(),
@@ -679,7 +681,10 @@ class ProfileSpecificStorage(
             var mutationCropCategoriesByPlot: MutableMap<Int, MutableSet<String>>? = mutableMapOf(),
             @Expose
             var ignoredCropReplacementsByPlot: MutableMap<Int, MutableSet<String>>? = mutableMapOf(),
-        )
+        ) {
+            fun getOrCreateProfitTracker(): GreenhouseProfitTracker.Data =
+                profitTracker ?: GreenhouseProfitTracker.Data().also { profitTracker = it }
+        }
     }
 
     // - gui

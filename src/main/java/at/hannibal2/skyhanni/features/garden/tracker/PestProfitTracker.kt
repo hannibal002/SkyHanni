@@ -102,11 +102,21 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     val BITS = "SKYBLOCK_BIT".toInternalName()
     const val KILL_BITS = 5
     private val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
+    private val rareCropPestDrops by lazy {
+        RareCropTracker.RareCropDropType.entries
+            .filter { it.canDropFromPests }
+            .mapTo(mutableSetOf()) { NeuInternalName.fromItemNameOrInternalName(it.dropName) }
+    }
 
     private val noMessageDrops = setOf(
         "PESTERMINATOR;1",
         "ULTIMATE_SUNSET;1",
     ).toInternalNames()
+
+    fun isPestDropItem(internalName: NeuInternalName): Boolean =
+        internalName == PEST_SHARD ||
+            PestType.getByItemInternalNameOrNull(internalName) != null ||
+            internalName in rareCropPestDrops
 
     data class BucketData(
         @Expose private var totalPestsKills: Long = 0L,

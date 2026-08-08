@@ -111,7 +111,7 @@ object TrackerManager {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shedittracker") {
-            description = "Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers."
+            description = "Changes the tracked item amount for Diana, Fishing, Greenhouse, Pest, Excavator, and Slayer Item Trackers."
             category = CommandCategory.USERS_BUG_FIX
             legacyCallbackArgs { commandEditTracker(it) }
         }
