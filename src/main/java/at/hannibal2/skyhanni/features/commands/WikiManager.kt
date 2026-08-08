@@ -100,7 +100,7 @@ object WikiManager {
             simpleCallback {
                 sendWikiMessage("")
             }
-            argCallback("search", BrigadierArguments.greedyString(), ) { search ->
+            argCallback("search", BrigadierArguments.greedyString()) { search ->
                 sendWikiMessage(search)
             }
         }
