@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.ConfigGuiManager.categoryNames
+import at.hannibal2.skyhanni.config.ConfigGuiManager.configTabCompleteSuggestions
 import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
+import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigOption
+import at.hannibal2.skyhanni.config.ConfigGuiManager.optionPathToField
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.SkyHanniConfig
@@ -13,7 +15,6 @@ import at.hannibal2.skyhanni.config.StorageData
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.toSuggestionProvider
 import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
@@ -42,6 +43,8 @@ import at.hannibal2.skyhanni.utils.coroutines.SkyHanniCoroutineManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.mojang.brigadier.suggestion.SuggestionProvider
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.resources.Identifier
 import org.apache.logging.log4j.Level
@@ -156,6 +159,22 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
         logger.log(Level.INFO, message)
     }
 
+    private const val MAX_CONFIG_TAB_COMPLETE_SUGGESTIONS = 200
+
+    private val configTabCompleteSuggestionProvider: SuggestionProvider<FabricClientCommandSource> =
+        SuggestionProvider { _, builder ->
+            val remaining = builder.remainingLowerCase
+            var count = 0
+            for (suggestion in configTabCompleteSuggestions) {
+                if (suggestion.lowercase().contains(remaining)) {
+                    builder.suggest(suggestion)
+                    count++
+                    if (count >= MAX_CONFIG_TAB_COMPLETE_SUGGESTIONS) break
+                }
+            }
+            builder.buildFuture()
+        }
+
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("sh") {
@@ -167,9 +186,14 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
             argCallback(
                 "search",
                 BrigadierArguments.greedyString(),
-                suggestions = categoryNames.toSuggestionProvider(),
+                suggestions = configTabCompleteSuggestionProvider,
             ) { search ->
-                openConfigGui(search)
+                val optionField = optionPathToField[search.lowercase()]
+                if (optionField != null) {
+                    openConfigOption(optionField)
+                } else {
+                    openConfigGui(search)
+                }
             }
             simpleCallback {
                 openConfigGui()
