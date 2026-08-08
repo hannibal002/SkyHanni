@@ -19,7 +19,7 @@ class ConfigOptionIndexTest {
     @Test
     fun `option paths contain known examples`() {
         assertTrue("garden.noBreakItems" in optionPaths)
-        assertTrue("cropMilestones.progress" in optionPaths)
+        assertTrue("garden.cropMilestones.progress" in optionPaths)
         assertTrue("chat.filterType.empty" in optionPaths)
     }
 
