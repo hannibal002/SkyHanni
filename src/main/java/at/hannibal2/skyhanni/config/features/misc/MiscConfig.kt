@@ -172,6 +172,11 @@ class MiscConfig {
     val boopParty: BoopPartyConfig = BoopPartyConfig()
 
     @Expose
+    @ConfigOption(name = "Tooltip Price Info", desc = "")
+    @Accordion
+    val tooltipPriceInfo: TooltipPriceInfoConfig = TooltipPriceInfoConfig()
+
+    @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
     var resetSearchGuiOnClose: Boolean = true
