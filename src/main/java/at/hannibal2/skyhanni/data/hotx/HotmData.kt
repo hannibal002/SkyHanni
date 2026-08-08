@@ -540,7 +540,7 @@ enum class HotmData(
          * WRAPPED-REGEX-TEST: " Mithril: 99,918"
          * WRAPPED-REGEX-TEST: " Gemstone: 37,670"
          */
-        private val powderPattern by patternGroup.pattern(
+        private val widgetPowderPattern by patternGroup.pattern(
             "widget.powder-nocolor",
             "\\s*(?<type>\\w+): (?<amount>[\\d,.]+)",
         )
@@ -650,7 +650,7 @@ enum class HotmData(
         fun onWidgetUpdate(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.POWDER)) return
             event.lines.forEach { line ->
-                scoreboardPowderPattern.matchMatcher(line.string.removeColor()) {
+                widgetPowderPattern.matchMatcher(line.string.removeColor()) {
                     val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                     val amount = group("amount").formatLong()
                     type.setAmount(amount, postEvent = true)
