@@ -11,17 +11,16 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.blank
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.container
-import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import com.mojang.blaze3d.platform.NativeImage
@@ -100,7 +99,7 @@ object BetterContainers {
     @JvmStatic
     fun slotCanBeHighlighted(slot: Slot, original: Boolean): Boolean {
         return if (!isOverriding) original
-        else !isBlankStack(slot.item)
+        else !slot.item.blank
     }
 
     fun reset() {
@@ -116,7 +115,7 @@ object BetterContainers {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isOverriding) return
         val slot = event.slot ?: return
-        val isBlankStack = isBlankStack(slot.item)
+        val isBlankStack = slot.item.blank
         val isButtonStack = isButtonStack(slot.item)
         if (!(isBlankStack || isButtonStack)) return
         clickSlot(event.slotId)
@@ -145,7 +144,7 @@ object BetterContainers {
         }
         hasNullPane = (0 until inventory.containerSize).any { slotIndex ->
             val stack = inventory.getItem(slotIndex)
-            isBlankStack(stack)
+            stack.blank
         }
     }
 
@@ -204,7 +203,7 @@ object BetterContainers {
     }
 
     private fun shouldRenderStack(stack: SafeItemStack): Boolean {
-        return !isBlankStack(stack) && !isToggleOff(stack) && !isToggleOn(stack)
+        return !stack.blank && !isToggleOff(stack) && !isToggleOn(stack)
     }
 
     fun clickSlot(slot: Int) {
@@ -213,10 +212,6 @@ object BetterContainers {
     }
 
     private fun getClickedSlot(): Int = if (clickedSlotAt.passedSince() <= 500.milliseconds) clickedSlot else -1
-
-    private fun isBlankStack(stack: SafeItemStack): Boolean = stack.isStainedGlassPane(ColoredBlockCompat.BLACK) &&
-        stack.count == 1 &&
-        stack.getTooltip().isEmpty()
 
     private fun isButtonStack(
         stack: SafeItemStack?,
@@ -306,7 +301,7 @@ object BetterContainers {
 
             // This is weird, but it was a logical flip of a no-op from NEU's code :shrug:
             if (!isButton[cI][rI] || lastClickedSlot != index) {
-                isSlot[cI][rI] = !isBlankStack(stack) && !isButton[cI][rI]
+                isSlot[cI][rI] = !stack.blank && !isButton[cI][rI]
             }
         }
 
