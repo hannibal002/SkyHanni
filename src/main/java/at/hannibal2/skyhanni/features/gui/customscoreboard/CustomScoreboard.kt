@@ -233,19 +233,16 @@ object CustomScoreboard {
             prefixColor = "§c"
         )
         ChatUtils.clickableChat(
-            message = "[I Get It]",
+            message = "§a[I Got It]",
             prefix = false,
-            prefixColor = "§a",
             onClick = {
                 silencedWarning = true
                 ChatUtils.chat(
-                    message = "Custom scoreboard is still deprecated...",
-                    prefixColor = "§8",
+                    message = "§8SkyHanni's Custom scoreboard is still deprecated...",
                     prefix = false,
                 )
                 ChatUtils.chat(
-                    message = "But you will no longer be bothered about it this session!",
-                    prefixColor = "§e",
+                    message = "§eBut you will no longer be bothered about it this session!",
                     prefix = false
                 )
             }
