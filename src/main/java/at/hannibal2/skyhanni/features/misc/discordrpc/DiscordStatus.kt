@@ -120,7 +120,7 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
     PURSE(
         {
             val coins = PurseApi.getPurse()
-            val motes = CustomScoreboardUtils.getMotes().formatInt() // TODO put this in RiftApi instead of CustomScoreboardUtils
+            val motes = RiftApi.motes ?: 0
 
             if (RiftApi.inRift()) {
                 "${motes.addSeparators()} ${StringUtils.pluralize(motes, "Mote")}"

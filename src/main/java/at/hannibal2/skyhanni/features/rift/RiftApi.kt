@@ -5,19 +5,26 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import java.util.regex.Pattern
 
 @SkyHanniModule
 object RiftApi {
@@ -52,6 +59,17 @@ object RiftApi {
     var inRiftRace = false
     var trackingButtons = false
     var allButtonsHit = false
+
+    private fun getGroup(pattern: Pattern, list: List<String>, group: String) =
+        list.map { it.removeResets().trimWhiteSpace() }.firstNotNullOfOrNull { line ->
+            pattern.matchGroup(line, group)
+        }
+
+    val motes: Int? get() = getGroup(
+        ScoreboardPattern.motesPattern,
+        ScoreboardData.sidebarLinesFormatted,
+        "motes"
+    )?.formatIntOrNull()
 
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
