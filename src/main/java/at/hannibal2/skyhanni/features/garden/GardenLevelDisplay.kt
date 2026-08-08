@@ -126,8 +126,12 @@ object GardenLevelDisplay {
         DelayedRun.runDelayed(50.milliseconds) {
             // TODO utils function that is shared with Crop Milestone Display
             ChatUtils.clickableChat(
-                " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
-                    " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
+                listOf(
+                    " ",
+                    " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel",
+                    " §8+§aRespect from Elite Farmers and SkyHanni members :)",
+                    " "
+                ),
                 onClick = { HypixelCommands.gardenLevels() },
                 "§eClick to view your Garden Level progress and rewards!",
                 prefix = false,

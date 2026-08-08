@@ -189,22 +189,21 @@ object SkillProgress {
             if (newLevel % 5 == 0)
                 add("  §r§7§8+§d50 SkyHanni User Luck")
         }
-        val messages = listOf(
-            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
-            "  §r§b§lSKILL LEVEL UP §3$skillName §8$oldLevel➜§3$newLevel",
-            if (goalReached)
-                listOf(
-                    "",
-                    "  §r§d§lGOAL REACHED!",
-                    "",
-                ).joinToString("\n") else
-                "",
-            "  §r§a§lREWARDS",
-            rewards.joinToString("\n"),
-            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
-        )
 
-        chat(messages.joinToString("\n"), false)
+        val messages = buildList {
+            add("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
+            add("  §r§b§lSKILL LEVEL UP §3$skillName §8$oldLevel➜§3$newLevel")
+            if (goalReached) {
+                add("")
+                add("  §r§d§lGOAL REACHED!")
+                add("")
+            }
+            add("  §r§a§lREWARDS")
+            addAll(rewards)
+            add("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
+        }
+
+        chat(messages, false)
 
         if (goalReached)
             chat("§lYou have reached your goal level of §b§l${skill.customGoalLevel} §e§lin the §b§l$skillName §e§lskill!")
