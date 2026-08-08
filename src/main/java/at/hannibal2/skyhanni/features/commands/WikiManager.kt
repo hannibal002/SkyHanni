@@ -93,8 +93,8 @@ object WikiManager {
 
     @HandleEvent
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shindependentwiki") {
-            aliases = listOf("shunofficialwiki", "shfandomwiki", "wiki")
+        event.registerBrigadier("shwiki") {
+            aliases = listOf("shindependentwiki", "shunofficialwiki", "shfandomwiki", "wiki")
             description = "Searches the independent wiki with SkyHanni's own method."
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
@@ -104,8 +104,8 @@ object WikiManager {
                 sendWikiMessage(search)
             }
         }
-        event.registerBrigadier("shindependentwikithis") {
-            aliases = listOf("shunofficialwikithis", "shfandomwikithis", "wikithis")
+        event.registerBrigadier("shwikithis") {
+            aliases = listOf("shindependentwikithis", "shunofficialwikithis", "shfandomwikithis", "wikithis")
             description = "Searches the independent wiki with SkyHanni's own method."
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
