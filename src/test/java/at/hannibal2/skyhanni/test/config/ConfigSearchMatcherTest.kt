@@ -5,7 +5,10 @@ import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import io.mockk.every
 import io.mockk.mockk
+import java.lang.reflect.Field
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -58,5 +61,19 @@ class ConfigSearchMatcherTest {
         assertTrue(ConfigGuiManager.categoryMatchesSearch("The Rift", "rift"))
         assertFalse(ConfigGuiManager.categoryMatchesSearch("About", "garden"))
         assertTrue(ConfigGuiManager.categoryMatchesSearch("About", ""))
+    }
+
+    @Test
+    fun `option field lookup is case insensitive and trims whitespace`() {
+        val field = mockk<Field>()
+        val paths = mapOf(
+            "garden.noBreakItems" to field,
+            "cropMilestones.progress" to field,
+        )
+        assertEquals(field, ConfigGuiManager.findOptionFieldForPath(paths, "garden.noBreakItems"))
+        assertEquals(field, ConfigGuiManager.findOptionFieldForPath(paths, "GARDEN.NOBREAKITEMS"))
+        assertEquals(field, ConfigGuiManager.findOptionFieldForPath(paths, "  garden.noBreakItems  "))
+        assertNull(ConfigGuiManager.findOptionFieldForPath(paths, "garden.notFound"))
+        assertNull(ConfigGuiManager.findOptionFieldForPath(paths, ""))
     }
 }
