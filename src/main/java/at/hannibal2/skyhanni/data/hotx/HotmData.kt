@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -545,6 +544,19 @@ enum class HotmData(
             "widget.powder-nocolor",
             "\\s*(?<type>\\w+): (?<amount>[\\d,.]+)",
         )
+
+        /**
+         * REGEX-TEST: §2᠅ §fMithril§f: §235,448
+         * REGEX-TEST: §d᠅ §fGemstone§f: §d36,758
+         * REGEX-TEST: §b᠅ §fGlacite§f: §b29,537
+         * REGEX-TEST: §2᠅ §fMithril Powder§f: §235,448
+         * REGEX-TEST: §d᠅ §fGemstone Powder§f: §d36,758
+         * REGEX-TEST: §b᠅ §fGlacite Powder§f: §b29,537
+         */
+        val scoreboardPowderPattern by patternGroup.pattern(
+            "scoreboard.powder",
+            "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?(?:§.)*:? (?:§.)*(?<amount>[\\d,.]*)",
+        )
         // </editor-fold>
 
         override var tokens: Int
@@ -621,7 +633,7 @@ enum class HotmData(
 
         @HandleEvent(onlyOnSkyblock = true)
         fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
-            ScoreboardPattern.powderPattern.firstMatcher(event.added) {
+            scoreboardPowderPattern.firstMatcher(event.added) {
                 val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 type.setAmount(amount, postEvent = true)
@@ -638,7 +650,7 @@ enum class HotmData(
         fun onWidgetUpdate(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.POWDER)) return
             event.lines.forEach { line ->
-                powderPattern.matchMatcher(line.string.removeColor()) {
+                scoreboardPowderPattern.matchMatcher(line.string.removeColor()) {
                     val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                     val amount = group("amount").formatLong()
                     type.setAmount(amount, postEvent = true)

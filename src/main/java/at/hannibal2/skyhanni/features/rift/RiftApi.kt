@@ -10,24 +10,32 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import java.util.regex.Pattern
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object RiftApi {
+
+    /**
+     * REGEX-TEST: Motes: 137,242
+     */
+    private val motesPattern by RepoPattern.pattern(
+        "rift-api.motes",
+        "Motes: (?<motes>[\\d,]+).*",
+    )
 
     fun inRift() = IslandType.THE_RIFT.isInIsland()
 
@@ -60,16 +68,13 @@ object RiftApi {
     var trackingButtons = false
     var allButtonsHit = false
 
-    private fun getGroup(pattern: Pattern, list: List<String>, group: String) =
-        list.map { it.removeResets().trimWhiteSpace() }.firstNotNullOfOrNull { line ->
-            pattern.matchGroup(line, group)
+    // TODO: Cache this value and only update it when the scoreboard changes
+    val motes: Int? get() {
+        val scoreboardLines = ScoreboardData.sidebarLinesFormatted.map { it.removeColor().trimWhiteSpace() }
+        return motesPattern.firstMatcher(scoreboardLines) {
+            groupOrNull("motes")?.formatIntOrNull()
         }
-
-    val motes: Int? get() = getGroup(
-        ScoreboardPattern.motesPattern,
-        ScoreboardData.sidebarLinesFormatted,
-        "motes"
-    )?.formatIntOrNull()
+    }
 
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
