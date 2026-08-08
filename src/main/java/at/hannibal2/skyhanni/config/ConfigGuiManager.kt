@@ -45,12 +45,6 @@ object ConfigGuiManager {
         }.toMap()
     }
 
-    /** All config option paths, sorted alphabetically. */
-    val allOptionPaths: List<String> by lazy { optionPathToField.keys.sorted() }
-
-    /** Suggestions for the /sh search: category names followed by all config option paths. */
-    val configTabCompleteSuggestions: List<String> by lazy { categoryNames + allOptionPaths }
-
     /**
      * Checks whether a config option matches a /sh search, reusing MoulConfig's own matching
      * ([GuiOptionEditor.fulfillsSearch]) in addition to matching against the option's path.

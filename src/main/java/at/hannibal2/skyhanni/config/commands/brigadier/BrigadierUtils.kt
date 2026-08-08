@@ -55,27 +55,6 @@ object BrigadierUtils {
             builder.buildFuture()
         }
 
-    /**
-     * Dynamically generates suggestions for an argument based on a collection provided by a supplier,
-     * matching anywhere inside the suggestion instead of only at the start. Limits the number of suggestions
-     * shown per request to avoid flooding the client with large collections.
-     */
-    fun dynamicContainsSuggestionProvider(
-        limit: Int = Int.MAX_VALUE,
-        supplier: () -> Collection<String>,
-    ) = SuggestionProvider<FabricClientCommandSource> { _, builder ->
-        val remaining = builder.remainingLowerCase
-        var count = 0
-        for (option in supplier()) {
-            if (option.lowercase().contains(remaining)) {
-                builder.suggest(option)
-                count++
-                if (count >= limit) break
-            }
-        }
-        builder.buildFuture()
-    }
-
     private fun isCharAllowed(c: Char): Boolean = StringReader.isAllowedInUnquotedString(c) || c == SINGLE_QUOTE
 
     /** The same as [StringReader.readString], except it doesn't accept escaping with `'`. */
