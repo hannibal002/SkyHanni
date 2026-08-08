@@ -6,12 +6,20 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 
 @SkyHanniModule
 object ConfigGuiManager {
 
     private val widenConfig get() = SkyHanniMod.feature.gui.widenConfig
+
+    /** The names of all top-level config categories, extracted from the [Category] annotations of [SkyHanniConfig]. */
+    val categoryNames: List<String> by lazy {
+        SkyHanniConfig::class.java.declaredFields
+            .mapNotNull { it.getAnnotation(Category::class.java)?.name }
+            .toList()
+    }
 
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
