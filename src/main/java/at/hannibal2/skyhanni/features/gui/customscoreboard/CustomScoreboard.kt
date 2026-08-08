@@ -244,7 +244,7 @@ object CustomScoreboard {
                     prefix = false,
                 )
                 ChatUtils.chat(
-                    message = "But you will be bothered about it this session!",
+                    message = "But you will no longer be bothered about it this session!",
                     prefixColor = "§e",
                     prefix = false
                 )
