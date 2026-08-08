@@ -1,11 +1,8 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import java.util.regex.Pattern
 
 @SkyHanniModule
 object ScoreboardPattern {
@@ -13,14 +10,6 @@ object ScoreboardPattern {
 
     // Lines from the scoreboard
     private val scoreboardGroup by group.exclusiveGroup("scoreboard")
-
-    @HandleEvent(RepositoryReloadEvent::class)
-    fun onRepoReload() {
-        UnknownLinesHandler.invalidateRemoteOnlyPatterns()
-    }
-
-    internal fun computeRemoteOnlyPatterns(): Array<Pattern> =
-        scoreboardGroup.getUnusedPatterns().toTypedArray()
 
     // Main scoreboard
     private val mainSB = scoreboardGroup.group("main")

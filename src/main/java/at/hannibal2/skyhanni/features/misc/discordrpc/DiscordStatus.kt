@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.percen
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.items.enchants.Enchant
 import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
