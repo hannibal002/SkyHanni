@@ -53,7 +53,7 @@ object ConfigGuiManager {
      */
     internal fun configOptionMatchesSearch(input: String, path: String, option: ProcessedOption): Boolean =
         searchTerms(input).all { term ->
-            path.contains(term) || option.getEditor().fulfillsSearch(term)
+            path.lowercase().contains(term) || option.getEditor().fulfillsSearch(term)
         }
 
     /** Checks whether a config category name matches a /sh search with the same semantics as [configOptionMatchesSearch]. */
