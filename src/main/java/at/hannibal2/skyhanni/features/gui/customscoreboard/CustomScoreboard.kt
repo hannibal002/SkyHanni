@@ -63,7 +63,7 @@ object CustomScoreboard {
 
     private var lastLines: List<ScoreboardLine> = emptyList()
 
-    private var silencedWarning = false
+    private var warningSilenced = false
 
     private val customScoreboardModLoaded by lazy {
         PlatformUtils.isModInstalled("customscoreboard")
@@ -224,7 +224,7 @@ object CustomScoreboard {
 
     private fun showDeprecatedWarning() {
         if (!isEnabled()) return
-        if (silencedWarning) return
+        if (warningSilenced) return
         ChatUtils.clickableLinkChat(
             message = "Custom Scoreboard is deprecated and no longer supported. " +
                 "Please use the replacement mod instead. " +
@@ -239,7 +239,7 @@ object CustomScoreboard {
             replaceSameMessage = true,
             oneTimeClick = true,
             onClick = {
-                silencedWarning = true
+                warningSilenced = true
                 ChatUtils.chat(
                     message = "§eSkyHanni's §aCustom Scoreboard is still deprecated...\n" +
                         "§aBut you will no longer be bothered about it this session!",
