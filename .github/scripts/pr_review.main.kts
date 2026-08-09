@@ -339,6 +339,28 @@ fun setLabel(prNumber: String, label: String, hasFindings: Boolean) {
     }
 }
 
+// Only the newest status per context is shown, so republishing an unchanged one lands in the same state.
+// [description] is cut off by the status API above 140 characters.
+// [onFailure] carries the consequence, which differs per mode: warning, thrown exception, or ending the run.
+fun setCommitStatus(
+    headSha: String,
+    context: String,
+    blocking: Boolean,
+    description: String,
+    onFailure: (Int) -> Unit,
+) {
+    val payload = mutableMapOf<String, Any>(
+        "state" to if (blocking) "failure" else "success",
+        "context" to context,
+        "description" to description,
+    )
+    val runId = System.getenv("GITHUB_RUN_ID")
+    if (runId != null) payload["target_url"] = "https://github.com/$repo/actions/runs/$runId"
+
+    val (status, _) = ghRequest("POST", "/repos/$repo/statuses/$headSha", payload)
+    if (status.isHttpError) onFailure(status)
+}
+
 fun getPrLabels(prNumber: String): Set<String> {
     val (status, body) = ghRepoGet("/issues/$prNumber/labels")
     if (status.isHttpError) return emptySet()
@@ -795,18 +817,12 @@ fun buildConflictBody(): String = buildString {
 
 // Warns instead of aborting, one unwritable status must not stop the push path from reaching the rest.
 fun setConflictStatus(prNumber: String, headSha: String, hasConflicts: Boolean) {
-    val payload = mutableMapOf<String, Any>(
-        "state" to if (hasConflicts) "failure" else "success",
-        "context" to conflictLabel,
-        "description" to if (hasConflicts) "Conflicts with the base branch" else "No conflicts with the base branch",
-    )
-    val runId = System.getenv("GITHUB_RUN_ID")
-    if (runId != null) payload["target_url"] = "https://github.com/$repo/actions/runs/$runId"
-
-    val (status, _) = ghRequest("POST", "/repos/$repo/statuses/$headSha", payload)
-    if (status.isHttpError) {
-        System.err.println("Warning: could not update conflict status on PR #$prNumber (HTTP $status)")
-    }
+    setCommitStatus(
+        headSha = headSha,
+        context = conflictLabel,
+        blocking = hasConflicts,
+        description = if (hasConflicts) "Conflicts with the base branch" else "No conflicts with the base branch",
+    ) { System.err.println("Warning: could not update conflict status on PR #$prNumber (HTTP $it)") }
 }
 
 // [waitForMergeable] only for the triggering pull request, see fetchMergeStateWaiting.
@@ -1116,7 +1132,7 @@ fun getDependencyState(dep: Dependency): DependencyState {
     }
 }
 
-// Kept under the status API's 140-character limit. A problem hides the open count, like the comment.
+// A problem hides the open count, like the comment.
 fun buildDependencyStatusDescription(openCount: Int, problems: DependencyProblems): String = when {
     !problems.isEmpty -> dependencyProblemsTitle(problems.count)
     openCount > 0 -> "Waiting on $openCount open dependency ${if (openCount == 1) "PR" else "PRs"}"
@@ -1124,20 +1140,12 @@ fun buildDependencyStatusDescription(openCount: Int, problems: DependencyProblem
 }
 
 fun setDependencyStatus(headSha: String, openDependencies: List<Dependency>, problems: DependencyProblems) {
-    val blocking = openDependencies.isNotEmpty() || !problems.isEmpty
-    val description = buildDependencyStatusDescription(openDependencies.size, problems)
-    val payload = mutableMapOf<String, Any>(
-        "state" to if (blocking) "failure" else "success",
-        "context" to dependencyStatusContext,
-        "description" to description,
-    )
-    val runId = System.getenv("GITHUB_RUN_ID")
-    if (runId != null) payload["target_url"] = "https://github.com/$repo/actions/runs/$runId"
-
-    val (status, _) = ghRequest("POST", "/repos/$repo/statuses/$headSha", payload)
-    if (status.isHttpError) {
-        dependencyError("Error: could not update dependency status for $headSha (HTTP $status)")
-    }
+    setCommitStatus(
+        headSha = headSha,
+        context = dependencyStatusContext,
+        blocking = openDependencies.isNotEmpty() || !problems.isEmpty,
+        description = buildDependencyStatusDescription(openDependencies.size, problems),
+    ) { dependencyError("Error: could not update dependency status for $headSha (HTTP $it)") }
 }
 
 // Throws DependencyCheckException when this PR could not be evaluated. Callers that iterate over many PRs
@@ -1488,16 +1496,12 @@ fun buildKeywordLabelRemovedComment(entry: KeywordLabel): String = buildString {
 }
 
 fun setKeywordLabelStatus(headSha: String, entry: KeywordLabel, keywordPresent: Boolean) {
-    val payload = mutableMapOf<String, Any>(
-        "state" to if (keywordPresent) "failure" else "success",
-        "context" to entry.label,
-        "description" to if (keywordPresent) "Marked as \"${entry.label}\"" else "Not marked as \"${entry.label}\"",
-    )
-    val runId = System.getenv("GITHUB_RUN_ID")
-    if (runId != null) payload["target_url"] = "https://github.com/$repo/actions/runs/$runId"
-
-    val (status, _) = ghRequest("POST", "/repos/$repo/statuses/$headSha", payload)
-    status.requireSuccess("Error: could not update \"${entry.label}\" status for $headSha (HTTP $status)")
+    setCommitStatus(
+        headSha = headSha,
+        context = entry.label,
+        blocking = keywordPresent,
+        description = if (keywordPresent) "Marked as \"${entry.label}\"" else "Not marked as \"${entry.label}\"",
+    ) { error("Error: could not update \"${entry.label}\" status for $headSha (HTTP $it)") }
 }
 
 fun runKeywordLabelMode(prNumber: String) {
