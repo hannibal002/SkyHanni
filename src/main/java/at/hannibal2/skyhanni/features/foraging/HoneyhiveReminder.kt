@@ -56,19 +56,18 @@ object HoneyhiveReminder {
 
     @HandleEvent(onlyOnIsland = IslandType.TORRHUS_CANYON)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!config.enabled) return
+        val message = event.cleanMessage
 
-        if (!currentlyNavigating && hiveLootedPattern.matches(event.cleanMessage)) {
-            val location = LocationUtils.playerLocation()
+        when {
+            config.enabled && !currentlyNavigating && hiveLootedPattern.matches(message) -> {
+                val location = LocationUtils.playerLocation()
+                startHiveNavigation("You looted a honeyhive, want to collect the rest?", location)
+            }
 
-            startHiveNavigation("You looted a honeyhive, want to collect the rest?", location)
-
-            return
+            config.queenBeeNotification && queenBeePattern.matches(message) -> {
+                TitleManager.sendTitle("§6Honeyhive Instantly Refilled!")
+            }
         }
-
-        if (!config.queenBeeNotification) return
-        if (!queenBeePattern.matches(event.cleanMessage)) return
-        TitleManager.sendTitle("§6Honeyhive Instantly Refilled!")
     }
 
     @HandleEvent
