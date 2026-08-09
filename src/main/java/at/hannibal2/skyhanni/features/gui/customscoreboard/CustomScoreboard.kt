@@ -233,7 +233,7 @@ object CustomScoreboard {
             prefixColor = "§c"
         )
         ChatUtils.clickableChat(
-            message = "§a§l[UNDERSTOOD]",
+            message = "§2§l[I GET IT]",
             prefix = false,
             onClick = {
                 silencedWarning = true
