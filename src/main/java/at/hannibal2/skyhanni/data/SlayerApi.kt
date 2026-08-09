@@ -333,7 +333,7 @@ object SlayerApi {
 
         // If the player kills the boss immediately after the boss spawns
         if ((data.currentState == BOSS_FIGHT || data.currentState == COCOONED) && newState == GRINDING) {
-            ChatUtils.debug("SlayerApi: Intermediate state change detected: ${data.currentState.name} -> SLAIN -> GRINDING")
+            ChatUtils.debug("SlayerApi: Intermediate state change detected: ${data.currentState} -> SLAIN -> GRINDING")
             SlayerStateChangeEvent(SLAIN).post()
         }
         if (data.currentState == GRINDING && newState == SLAIN) {
@@ -405,6 +405,7 @@ object SlayerApi {
         data.currentState = NO_ACTIVE_QUEST
         data.currentStateRaw = null
         latestCocoonTime = ServerTimeMark.farPast()
+        SlayerStateChangeEvent(NO_ACTIVE_QUEST).post()
     }
 
     // TODO USE SH-REPO
