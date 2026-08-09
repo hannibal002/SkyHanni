@@ -102,7 +102,7 @@ object WikiManager {
         event.registerBrigadier("shwikithis") {
             aliases = listOf(
                 "shindependentwikithis", "shunofficialwikithis", "shfandomwikithis",
-                "wikithis", "wikihand"
+                "wikithis", "wikihand",
             )
             description = "Searches the independent wiki with SkyHanni's own method."
             category = CommandCategory.USERS_ACTIVE
