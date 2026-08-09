@@ -117,9 +117,6 @@ object WikiManager {
         data = event.getConstant<WikiJson>("misc/Wiki")
     }
 
-    // TOOD: Make it possible to disable the /wiki and /wikithis aliases.
-    // This is not possible right now since the config MUST BE loaded before the commands are registered.
-    // If you add the command after the config is loaded, it will work but show up as unavailable.
-    // And If you add it immediately and remove it when config finishes loading, other mods will still conflict with it.
+    // TODO: Make it possible to disable the /wiki and /wikithis aliases.
     private fun isEnabled() = config.enabled
 }
