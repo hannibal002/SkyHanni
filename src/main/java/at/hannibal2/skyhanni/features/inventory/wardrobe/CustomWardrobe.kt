@@ -58,7 +58,7 @@ object CustomWardrobe {
         hoveredColor: Color = Color(130, 130, 130, 200),
         unhoveredColor: Color = hoveredColor.darker(0.57),
         onClick: () -> Unit,
-        scale: Int = 100,
+        scale: Double = 1.0,
     ): Renderable =
         CustomRenderUtils.createLabeledButton(
             text = text,

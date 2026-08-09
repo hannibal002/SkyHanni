@@ -32,11 +32,10 @@ object CustomRenderUtils {
         height: Int,
         topBorderColor: ChromaColour,
         bottomBorderColor: ChromaColour,
-        scale: Int,
+        scale: Double,
     ): Renderable {
-        val buttonWidth = (width * (scale / 100.0)).toInt()
-        val buttonHeight = (height * (scale / 100.0)).toInt()
-        val textScale = (scale / 100.0)
+        val buttonWidth = (width * scale).toInt()
+        val buttonHeight = (height * scale).toInt()
 
         val renderable = Renderable.hoverable(
             Renderable.drawInsideRoundedRectWithOutline(
@@ -45,7 +44,7 @@ object CustomRenderUtils {
                         Renderable.placeholder(buttonWidth, buttonHeight),
                         onClick,
                     ),
-                    centerString(text, scale = textScale),
+                    centerString(text, scale = scale),
                     false,
                 ),
                 hoveredColor,
@@ -58,7 +57,7 @@ object CustomRenderUtils {
             Renderable.drawInsideRoundedRect(
                 Renderable.doubleLayered(
                     Renderable.placeholder(buttonWidth, buttonHeight),
-                    centerString(text, scale = textScale),
+                    centerString(text, scale = scale),
                 ),
                 unhoveredColor.darker(0.57),
                 padding = 0,
@@ -207,7 +206,7 @@ object CustomRenderUtils {
     fun addGuiBackground(
         renderable: Renderable,
         borderPadding: Int,
-        scale: Int,
+        scale: Double = 1.0,
         backgroundColor: ChromaColour,
         onLeftClick: () -> Unit,
     ) =
@@ -219,7 +218,7 @@ object CustomRenderUtils {
                         "§7SkyHanni",
                         horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
                         verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
-                        scale = 1.0 * (scale / 100.0),
+                        scale = scale,
                     ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unHovered = it) },
                     onLeftClick = onLeftClick
                 ),
