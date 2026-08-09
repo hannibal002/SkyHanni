@@ -279,7 +279,7 @@ object SlayerApi {
                 ErrorManager.skyHanniError(
                     message,
                     "lines" to lines,
-                    "source" to source.name,
+                    "source" to source,
                 )
             }
             return
