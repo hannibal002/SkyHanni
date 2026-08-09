@@ -392,6 +392,11 @@ class MiscConfig {
     val customTodos: CustomTodosConfig = CustomTodosConfig()
 
     @Expose
+    @ConfigOption(name = "Abiphone Directory Helper", desc = "")
+    @Accordion
+    val abiphoneDirectoryHelper: AbiphoneDirectoryHelperConfig = AbiphoneDirectoryHelperConfig()
+
+    @Expose
     @ConfigOption(
         name = "Maintain Volume During Warnings",
         desc = "Do not change game volume levels when warning sounds are played.",

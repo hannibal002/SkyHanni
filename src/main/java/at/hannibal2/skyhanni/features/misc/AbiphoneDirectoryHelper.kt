@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -12,6 +13,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
 @SkyHanniModule
 object AbiphoneDirectoryHelper {
+
+    private val config get() = SkyHanniMod.feature.misc.abiphoneDirectoryHelper
 
     /**
      * REGEX-TEST: Contacts Directory
@@ -40,6 +43,7 @@ object AbiphoneDirectoryHelper {
     @HandleEvent
     private fun onGuiClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
+        if (!config.wikiOnClick) return
         if (!inContactsDirectory) return
         val slot = event.slot ?: return
         if (slot.index !in 10..43) return
@@ -50,5 +54,5 @@ object AbiphoneDirectoryHelper {
         event.cancel()
     }
 
-    private fun isEnabled() = true
+    private fun isEnabled() = config.enabled
 }
