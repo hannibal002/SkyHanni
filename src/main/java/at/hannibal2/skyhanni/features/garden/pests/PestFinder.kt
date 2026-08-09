@@ -224,7 +224,7 @@ object PestFinder {
         teleportNearestInfestedPlot()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIslandTypeTag = [HAS_PESTS])
     fun onPlaySound(event: PlaySoundEvent) {
         if (PestApi.config.muteVacuum && event.soundName == "entity.wither.shoot") {
             event.cancel()

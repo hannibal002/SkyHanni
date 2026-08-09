@@ -31,6 +31,7 @@ enum class IslandTypeTag(vararg types: Any) {
     HOPPITY_DISALLOWED(IslandType.THE_RIFT, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.MINESHAFT, IslandType.SAFARI),
     HAS_SHOWCASES(PRIVATE_ISLAND, IslandType.HUB, IslandType.CRIMSON_ISLE),
     CONTESTS_SHOWN(IslandType.GARDEN, IslandType.HUB, IslandType.THE_FARMING_ISLANDS),
+    HAS_PESTS(IslandType.GARDEN, IslandType.TORRHUS_CANYON),
 
     /** Busy islands are islands where a player is doing something considered 'important'. */
     BUSY(IslandType.DARK_AUCTION, IslandType.MINESHAFT, IslandType.THE_RIFT, IslandType.SAFARI, IslandType.NONE, IslandType.UNKNOWN),
