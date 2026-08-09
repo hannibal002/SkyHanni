@@ -206,15 +206,14 @@ object CustomScoreboard {
     fun onHypixelJoin() {
         updateAllIslandEntries()
 
-        if (!config.enabled.get()) return
         if (customScoreboardModLoaded) {
-            if (!config.shownCustomScoreboardModInstalledWarning) {
-                config.shownCustomScoreboardModInstalledWarning = true
-                ChatUtils.chat(
-                    message = "SkyHanni's Custom Scoreboard feature has been disabled because the Custom Scoreboard mod is installed. " +
-                        "Please use the mod instead, as it has more features and is better maintained.",
-                )
-            }
+            if (config.shownCustomScoreboardModInstalledWarning) return
+            config.shownCustomScoreboardModInstalledWarning = true
+            if (!config.enabled.get()) return
+            ChatUtils.chat(
+                message = "SkyHanni's Custom Scoreboard feature has been disabled because the Custom Scoreboard mod is installed. " +
+                    "Please use the mod instead, as it has more features and is better maintained.",
+            )
         } else {
             config.shownCustomScoreboardModInstalledWarning = false
         }
