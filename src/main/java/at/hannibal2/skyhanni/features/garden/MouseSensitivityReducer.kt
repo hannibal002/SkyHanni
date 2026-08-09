@@ -110,7 +110,7 @@ object MouseSensitivityReducer {
     }
 
     @HandleEvent
-    private fun onIslandJoin() {
+    private fun onIslandLeave() {
         manualState = null
         autoState = null
     }
