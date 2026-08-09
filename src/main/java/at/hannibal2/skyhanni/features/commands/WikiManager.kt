@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -27,14 +26,6 @@ object WikiManager {
     private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
 
     val wiki get() = data.unofficial
-
-    @HandleEvent
-    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(6, "commands.useFandomWiki", "commands.fandomWiki.enabled")
-        // Apparently the above got changed again at some point but never got a migration
-        event.move(123, "commands.betterWiki.useFandom", "commands.betterWiki.useIndependent")
-        event.move(136, "commands.betterWiki.sbGuide", "commands.betterWiki.skyblockGuide")
-    }
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onGuiKeyPress() {
