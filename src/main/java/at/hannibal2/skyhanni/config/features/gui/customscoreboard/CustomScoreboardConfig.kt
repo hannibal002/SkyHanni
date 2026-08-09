@@ -66,4 +66,7 @@ class CustomScoreboardConfig {
     @Expose
     @ConfigLink(owner = CustomScoreboardConfig::class, field = "enabled")
     val position: Position = Position(10, 80)
+
+    @Expose
+    var shownCustomScoreboardModInstalledWarning = false
 }
