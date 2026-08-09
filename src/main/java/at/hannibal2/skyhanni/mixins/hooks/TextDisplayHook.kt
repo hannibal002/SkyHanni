@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.DisplayTextUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
@@ -36,5 +37,19 @@ object TextDisplayHook {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onTextDisplayRemoved(event: EntityRemovedEvent<Display.TextDisplay>) {
         EntityTextRemovedEvent(event.entity).post()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onArmorStandCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
+        if (EntityTextCheckRenderEvent(event.entity).post().isCancelled) {
+            event.cancel()
+        }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onTextDisplayCheckRender(event: CheckRenderEntityEvent<Display.TextDisplay>) {
+        if (EntityTextCheckRenderEvent(event.entity).post().isCancelled) {
+            event.cancel()
+        }
     }
 }

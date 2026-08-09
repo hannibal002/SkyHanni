@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.events.entity
 
+import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import net.minecraft.network.chat.Component
@@ -30,3 +31,13 @@ data class EntityTextUpdateEvent(
 data class EntityTextRemovedEvent(
     val entity: Entity,
 ) : SkyHanniEvent()
+
+/**
+ * Event that is fired when the game checks whether a text display entity or an armor stand with a custom name should be rendered.
+ * This event is a wrapper of [at.hannibal2.skyhanni.events.CheckRenderEntityEvent]
+ * Only fires on SkyBlock.
+ */
+@PrimaryFunction("onEntityTextCheckRender")
+data class EntityTextCheckRenderEvent(
+    val entity: Entity,
+) : CancellableSkyHanniEvent()
