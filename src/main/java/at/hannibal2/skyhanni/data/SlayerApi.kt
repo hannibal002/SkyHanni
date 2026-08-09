@@ -123,7 +123,7 @@ object SlayerApi {
     /**
      * The last time we saw a cocoon message, used to ensure it doesn't get stuck in a state where we think we are cocooned when we are not
      */
-    private var lastCocoonTime = ServerTimeMark.farPast()
+    private var latestCocoonTime = ServerTimeMark.farPast()
 
     private val outsideRiftData = SlayerData()
     private val insideRiftData = SlayerData()
@@ -218,7 +218,7 @@ object SlayerApi {
                 ChatUtils.debug("SlayerApi: Slayer boss cocooned, posting SlayerStateChangeEvent")
                 data.currentState = COCOONED
                 data.currentStateRaw = "cocooned"
-                lastCocoonTime = ServerTimeMark.now()
+                latestCocoonTime = ServerTimeMark.now()
                 SlayerStateChangeEvent(COCOONED).post()
             }
         }
@@ -326,7 +326,7 @@ object SlayerApi {
 
         var newState = detectState(progress)
 
-        val cocooned = data.currentState == COCOONED && lastCocoonTime.passedSince() <= GRACE_COCOON_TIME
+        val cocooned = data.currentState == COCOONED && latestCocoonTime.passedSince() <= GRACE_COCOON_TIME
         if (cocooned && (newState == NO_ACTIVE_QUEST || newState == SLAIN)) {
             ChatUtils.debug("SlayerApi: Cocooned state detected, overriding $newState to COCOONED")
             newState = COCOONED
@@ -405,7 +405,7 @@ object SlayerApi {
         ChatUtils.debug("SlayerApi: World change detected, resetting cocooned state")
         data.currentState = NO_ACTIVE_QUEST
         data.currentStateRaw = null
-        lastCocoonTime = ServerTimeMark.farPast()
+        latestCocoonTime = ServerTimeMark.farPast()
     }
 
     // TODO USE SH-REPO
