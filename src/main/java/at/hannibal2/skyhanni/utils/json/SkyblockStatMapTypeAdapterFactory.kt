@@ -10,14 +10,14 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import java.lang.reflect.ParameterizedType
 
-/*
-    Drops map entries keyed by a stat name that no longer exists, as well as SkyblockStat.UNKNOWN itself.
-    Reading removed stats as UNKNOWN instead rewrites the stat under that name on the next save, and makes the
-    read of the entire file fail with a duplicate key error as soon as a second removed stat joins it.
+/**
+ * Drops map entries keyed by a stat name that no longer exists, as well as SkyblockStat.UNKNOWN itself.
+ * Reading removed stats as UNKNOWN instead rewrites the stat under that name on the next save, and makes the
+ * read of the entire file fail with a duplicate key error as soon as a second removed stat joins it.
  */
 object SkyblockStatMapTypeAdapterFactory : TypeAdapterFactory {
 
-    override fun <T : Any?> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
+    override fun <T> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
         if (type.rawType != Map::class.java) return null
         val arguments = (type.type as? ParameterizedType)?.actualTypeArguments ?: return null
         if (arguments.first() != SkyblockStat::class.java) return null
