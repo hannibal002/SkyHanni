@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -63,9 +64,9 @@ object GeorgeHelper {
     private var display = emptyList<Renderable>()
 
     private fun checkInventoryItems() {
-        val items = InventoryUtils.getItemsAtSlots(SPAWN_EGG_SLOT)
+        val item = InventoryUtils.getItemAtSlotIndex(SPAWN_EGG_SLOT)?.takeUnlessEmpty() ?: return
 
-        constructDisplay(items[0].getLore())
+        constructDisplay(item.getLore())
     }
 
     private fun constructDisplay(lore: List<String>) {
