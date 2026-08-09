@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MineshaftCorpsesJson
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -29,6 +31,7 @@ import net.minecraft.core.Vec3i
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MineshaftWaypointManager {
@@ -92,6 +95,11 @@ object MineshaftWaypointManager {
         if (config.types.foundCorpse) {
             val article = if (event.corpseType == CorpseType.UMBER) "an" else "a"
             ChatUtils.chat("Found $article ${event.corpseType} Corpse§e at ${event.location.toLocalFormat()}.")
+        }
+
+        if (event.isLastCorpse && config.allCorpsesFoundAlert) {
+            TitleManager.sendTitle("§aAll Corpses Found", duration = 3.seconds)
+            SoundUtils.playBeepSound()
         }
     }
 
