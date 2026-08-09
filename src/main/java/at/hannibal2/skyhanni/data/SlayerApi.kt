@@ -46,8 +46,7 @@ object SlayerApi {
     private const val GRACE_UPDATE_COUNT = 3
 
     /**
-     * Cocoons are actually 5 seconds, but +1 second just in case.
-     * This is for when the chat message appears, but even after this time has passed, the boss hasn't spawned yet.
+     * Cocoons take 5 seconds to burst, but we give +1 second of grace time to account for any delays in the scoreboard update
      */
     private val GRACE_COCOON_TIME = 6.seconds
 
