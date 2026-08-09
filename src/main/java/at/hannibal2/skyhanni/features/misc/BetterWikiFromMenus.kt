@@ -40,12 +40,12 @@ object BetterWikiFromMenus {
 
         if (inBiblioInventory) {
             if (isWiki) {
-                WikiManager.sendWikiMessage()
+                WikiManager.sendWikiMessage(autoOpen = config.menuOpenWiki)
                 return
             }
 
             if (isWikithis) {
-                WikiManager.wikiThisItem()
+                WikiManager.wikiThisItem(autoOpen = config.menuOpenWiki)
                 return
             }
         }
