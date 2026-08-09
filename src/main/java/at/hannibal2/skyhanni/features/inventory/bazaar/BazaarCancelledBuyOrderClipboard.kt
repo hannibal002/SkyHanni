@@ -36,13 +36,6 @@ object BazaarCancelledBuyOrderClipboard {
         "(?:coins from |from |)(?<amount>.*)x missing items\\.",
     )
 
-    /**
-     * REGEX-TEST: [Bazaar] Cancelled! Refunded 12,345 coins from cancelling Buy Order!
-     */
-    private val cancelledMessagePattern by patternGroup.pattern(
-        "cancelledmessage.colorless",
-        "\\[Bazaar] Cancelled! Refunded (?<coins>.*) coins from cancelling Buy Order!",
-    )
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventorytitle",
         "Order options",
