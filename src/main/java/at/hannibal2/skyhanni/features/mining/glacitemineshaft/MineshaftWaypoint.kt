@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 data class MineshaftWaypoint(
     var type: Type,
     val location: LorenzVec,
-    val corpseType: CorpseType? = null,
+    var corpseType: CorpseType? = null,
     var isShared: Boolean = false,
 ) {
     val isCorpse get() = corpseType != null
@@ -16,6 +16,7 @@ data class MineshaftWaypoint(
     val labelScale get() = type.labelScale
     val textDisplay get() = type.labelColor.getChatColor() + label
     val fillColor get() = type.fillColor(this)
+    val fillMaxAlpha get() = type.fillMaxAlpha
     val shouldRender get() = type.renderCondition(this)
 
     enum class Type(
@@ -23,6 +24,7 @@ data class MineshaftWaypoint(
         val labelColor: LorenzColor,
         val labelScale: Double = 1.0,
         val fillColor: (MineshaftWaypoint) -> LorenzColor,
+        val fillMaxAlpha: Float = 0.33f,
         val renderCondition: (MineshaftWaypoint) -> Boolean,
     ) {
         ENTRANCE(
@@ -40,7 +42,9 @@ data class MineshaftWaypoint(
         POTENTIAL_CORPSE(
             label = { "Potential Corpse" },
             labelColor = LorenzColor.AQUA,
+            labelScale = 0.6,
             fillColor = { LorenzColor.AQUA },
+            fillMaxAlpha = 0.2f,
             renderCondition = { config.types.potentialCorpse },
         ),
         FOUND_CORPSE(
