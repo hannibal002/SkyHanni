@@ -25,6 +25,16 @@ class GreenhouseConfig {
     var missingCropWarning: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Mutation Blueprint",
+        desc = "Save and load Greenhouse layouts, then show shadows where mutations disappear. " +
+            "Use /shgreenhouseblueprint to open the layout library.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var mutationBlueprint: Boolean = true
+
+    @Expose
     var useDiagnosticCropPositionFinder: Boolean = true
 
     @Expose

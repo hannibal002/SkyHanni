@@ -109,6 +109,20 @@ internal object GreenhouseCropScanner {
         }
     }
 
+    fun skyShardsCropIdAt(position: LorenzVec): String? {
+        for (yOffset in -VARIABLE_HEIGHT_SEARCH_RADIUS..VARIABLE_HEIGHT_SEARCH_RADIUS) {
+            position.add(y = yOffset).getBlockStateAt().block.skyShardsCropId()?.let { return it }
+        }
+        getEntitiesInBox<ArmorStand>(position, FLOATING_CROP_ID_SEARCH_RADIUS) { stand ->
+            abs(stand.x - position.x) <= FLOATING_HEAD_HORIZONTAL_RADIUS &&
+                abs(stand.z - position.z) <= FLOATING_HEAD_HORIZONTAL_RADIUS
+        }.forEach { stand ->
+            listOf(stand.getStandHelmet(), stand.getHandItem()).firstNotNullOfOrNull { it.skyShardsCropId() }
+                ?.let { return it }
+        }
+        return null
+    }
+
     private fun findNearbyFloatingCropHead(category: CropCategory, center: LorenzVec): LorenzVec? = buildList {
         getEntitiesInBox<ArmorStand>(center, FLOATING_HEAD_SEARCH_RADIUS) { stand ->
             listOf(stand.getStandHelmet(), stand.getHandItem()).any { it.isFloatingCropHead(category) }
@@ -172,6 +186,37 @@ internal object GreenhouseCropScanner {
         }
     }
 
+    private fun SafeItemStack?.skyShardsCropId(): String? {
+        if (this?.itemType != Items.PLAYER_HEAD) return null
+        val name = cleanName.lowercase().filter(Char::isLetterOrDigit)
+        return when {
+            name.startsWith("cactus") -> "cactus"
+            name.startsWith("sunflower") -> "sunflower"
+            name.startsWith("moonflower") -> "moonflower"
+            name.startsWith("coco") -> "cocoa_beans"
+            name.startsWith("pumpkin") -> "pumpkin"
+            name.startsWith("melon") -> "melon"
+            else -> null
+        }
+    }
+
+    private fun Block.skyShardsCropId(): String? = when (this) {
+        Blocks.WHEAT -> "wheat"
+        Blocks.POTATOES -> "potato"
+        Blocks.CARROTS -> "carrot"
+        Blocks.PUMPKIN, Blocks.CARVED_PUMPKIN, Blocks.PUMPKIN_STEM, Blocks.ATTACHED_PUMPKIN_STEM -> "pumpkin"
+        Blocks.MELON -> "melon"
+        Blocks.COCOA -> "cocoa_beans"
+        Blocks.SUGAR_CANE -> "sugar_cane"
+        Blocks.CACTUS -> "cactus"
+        Blocks.NETHER_WART -> "nether_wart"
+        Blocks.RED_MUSHROOM -> "red_mushroom"
+        Blocks.BROWN_MUSHROOM -> "brown_mushroom"
+        Blocks.SUNFLOWER -> "sunflower"
+        Blocks.ROSE_BUSH -> "wild_rose"
+        else -> null
+    }
+
     private val deadCropBlocks = setOf(Blocks.DEAD_BUSH, Blocks.CHORUS_PLANT, Blocks.CHORUS_FLOWER)
     private val diagnosticOnlyCrops = setOf(CropCategory.PUMPKIN, CropCategory.COCOA_BEANS)
     private val variableHeightCrops = setOf(CropCategory.CACTUS, CropCategory.SUGAR_CANE)
@@ -195,6 +240,7 @@ internal object GreenhouseCropScanner {
     private const val DIAGNOSTIC_SEARCH_RADIUS = 2
     private const val VARIABLE_HEIGHT_SEARCH_RADIUS = 2
     private const val FLOATING_HEAD_SEARCH_RADIUS = 2.5
+    private const val FLOATING_CROP_ID_SEARCH_RADIUS = 3.0
     private const val FLOATING_HEAD_HORIZONTAL_RADIUS = 0.75
 }
 

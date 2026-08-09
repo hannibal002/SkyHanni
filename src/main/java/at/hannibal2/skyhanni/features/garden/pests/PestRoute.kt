@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasEtherwarp
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
+import at.hannibal2.skyhanni.utils.render.FrustumUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
@@ -128,6 +129,7 @@ object PestRoute {
         if (entity.deceased) return false
         if (canBeSeen(viewDistance = PEST_VIEW_DISTANCE)) return true
         if (LocationUtils.playerEyeLocation().distance(location) >= PEST_VIEW_DISTANCE) return false
+        if (!FrustumUtils.isVisible(entity.boundingBox)) return false
         return isObstructedOnlyByGlass(location)
     }
 
