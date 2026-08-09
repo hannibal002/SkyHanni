@@ -151,6 +151,6 @@ object MineshaftWaypointManager {
 
     @HandleEvent
     private fun onRepoReload(event: RepositoryReloadEvent) {
-        potentialCorpseLocations = event.getConstant<MineshaftCorpsesJson>("MineshaftCorpses").locations
+        potentialCorpseLocations = event.getConstant<MineshaftCorpsesJson>("FrozenCorpses").locations
     }
 }
