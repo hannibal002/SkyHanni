@@ -56,7 +56,7 @@ object CustomWardrobe {
     private val position: Position = Position().ignoreScale()
     private val loadingPosition: Position = Position().ignoreScale()
 
-    private var activeScale: Int = 100
+    private var activeScale: Double = 1.0
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
 
@@ -112,7 +112,7 @@ object CustomWardrobe {
         if (waitingForInventoryUpdate && config.loadingText) {
             val loadingRenderable = Renderable.text(
                 "§cLoading...",
-                scale = activeScale / 100.0,
+                scale = activeScale,
             )
             loadingPosition
                 .moveTo(
@@ -146,19 +146,19 @@ object CustomWardrobe {
 
     internal fun updateScreenSize(gui: Pair<Int, Int>): Boolean {
         val renderable = currentMaxSize ?: run {
-            activeScale = config.spacing.globalScale.get()
+            activeScale = config.spacing.globalScale.get() / 100.0
             update()
             updateRenderablePosition(gui)
             return true
         }
         val previousActiveScale = activeScale
-        val unscaledRenderableWidth = renderable.first / activeScale.toDouble()
-        val unscaledRenderableHeight = renderable.second / activeScale.toDouble()
+        val unscaledRenderableWidth = renderable.first / activeScale
+        val unscaledRenderableHeight = renderable.second / activeScale
         val autoScaleWidth = 0.95 * gui.first / unscaledRenderableWidth
         val autoScaleHeight = 0.95 * gui.second / unscaledRenderableHeight
-        val maxScale = min(autoScaleWidth, autoScaleHeight).toInt()
+        val maxScale = min(autoScaleWidth, autoScaleHeight)
 
-        activeScale = config.spacing.globalScale.get().coerceAtMost(maxScale)
+        activeScale = (config.spacing.globalScale.get() / 100.0).coerceAtMost(maxScale)
 
         if (activeScale != previousActiveScale) {
             update()
@@ -299,13 +299,13 @@ object CustomWardrobe {
 
         val maxPlayersPerRow = config.spacing.maxPlayersPerRow.get().coerceAtLeast(1)
         val maxPlayersRows = ((MAX_SLOT_PER_PAGE * MAX_PAGES - 1) / maxPlayersPerRow) + 1
-        val containerWidth = (config.spacing.slotWidth.get() * (activeScale / 100.0)).toInt()
-        val containerHeight = (config.spacing.slotHeight.get() * (activeScale / 100.0)).toInt()
+        val containerWidth = (config.spacing.slotWidth.get() * activeScale).toInt()
+        val containerHeight = (config.spacing.slotHeight.get() * activeScale).toInt()
         val playerWidth = (containerWidth * (config.spacing.playerScale.get() / 100.0))
-        val horizontalSpacing = (config.spacing.horizontalSpacing.get() * (activeScale / 100.0)).toInt()
-        val verticalSpacing = (config.spacing.verticalSpacing.get() * (activeScale / 100.0)).toInt()
-        val backgroundPadding = (config.spacing.backgroundPadding.get() * (activeScale / 100.0)).toInt()
-        val buttonVerticalSpacing = (config.spacing.buttonVerticalSpacing.get() * (activeScale / 100.0)).toInt()
+        val horizontalSpacing = (config.spacing.horizontalSpacing.get() * activeScale).toInt()
+        val verticalSpacing = (config.spacing.verticalSpacing.get() * activeScale).toInt()
+        val backgroundPadding = (config.spacing.backgroundPadding.get() * activeScale).toInt()
+        val buttonVerticalSpacing = (config.spacing.buttonVerticalSpacing.get() * activeScale).toInt()
 
         var maxRenderableWidth = maxPlayersPerRow * containerWidth + (maxPlayersPerRow - 1) * horizontalSpacing
         var maxRenderableHeight = maxPlayersRows * containerHeight + (maxPlayersRows - 1) * verticalSpacing
@@ -323,7 +323,7 @@ object CustomWardrobe {
             val warningRenderable = Renderable.wrappedText(
                 text,
                 maxRenderableWidth,
-                3.0 * (activeScale / 100.0),
+                3.0 * activeScale,
                 horizontalAlign = HorizontalAlignment.CENTER,
             )
             val withButtons = Renderable.vertical(
@@ -389,7 +389,7 @@ object CustomWardrobe {
                         "§7SkyHanni",
                         horizontalAlign = HorizontalAlignment.RIGHT,
                         verticalAlign = VerticalAlignment.BOTTOM,
-                        scale = 1.0 * (activeScale / 100.0),
+                        scale = activeScale,
                     ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unHovered = it) },
                     onLeftClick = {
                         config::enabled.jumpToEditor()
@@ -409,7 +409,7 @@ object CustomWardrobe {
 
     private fun addButtons(): Renderable {
         val (horizontalSpacing, verticalSpacing) = with(config.spacing) {
-            buttonHorizontalSpacing.get() * (activeScale / 100.0) to buttonVerticalSpacing.get() * (activeScale / 100.0)
+            buttonHorizontalSpacing.get() * activeScale to buttonVerticalSpacing.get() * activeScale
         }
 
         val backButton = createLabeledButton(
@@ -471,7 +471,7 @@ object CustomWardrobe {
     }
 
     private fun addSlotHoverableButtons(wardrobeSlot: WardrobeSlot): Renderable {
-        val textScale = 1.5 * (activeScale / 100.0)
+        val textScale = 1.5 * activeScale
         val shouldRender = !wardrobeSlot.isEmpty() && !wardrobeSlot.locked
         if (!shouldRender && !wardrobeSlot.favorite) return Renderable.placeholder(0, 0)
         val list = buildList {
@@ -506,9 +506,9 @@ object CustomWardrobe {
         unhoveredColor: Color = hoveredColor.darker(0.57),
         onClick: () -> Unit,
     ): Renderable {
-        val buttonWidth = (config.spacing.buttonWidth.get() * (activeScale / 100.0)).toInt()
-        val buttonHeight = (config.spacing.buttonHeight.get() * (activeScale / 100.0)).toInt()
-        val textScale = (activeScale / 100.0)
+        val buttonWidth = (config.spacing.buttonWidth.get() * activeScale).toInt()
+        val buttonHeight = (config.spacing.buttonHeight.get() * activeScale).toInt()
+        val textScale = activeScale
 
         val renderable = Renderable.hoverable(
             Renderable.drawInsideRoundedRectWithOutline(
