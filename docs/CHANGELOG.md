@@ -260,6 +260,8 @@
 + Renamed most instances of Galatea to Moonglade Marsh. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6248)
 + Added more Torrhus Canyon /shnavigateall support. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6292)
     + Added Sanger and Pangolin support.
++ Added `/shnavigateall Floor Drops` support to navigate to all Floor Drop locations in the Safari. - gm-infinite (https://github.com/hannibal002/SkyHanni/pull/6328)
++ Made Queen Bee Notification work without Honey Hive Reminder. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6319)
 
 #### Commands
 
@@ -306,6 +308,8 @@
 + Restored REI compatibility for Minecraft 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/6150)
     + Note: We highly recommend using [SkyBlock Item List](https://modrinth.com/mod/skyblock-item-list) instead.
 + Sped up pathfinding and optimized routes for the Fast Fairy Souls, Spider's Den Relics, and Shulker Finder. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6251)
++ Improved /shnavigate to accept more coordinate formats, e.g. x: 1, y: 2, z: 3 and 1, 2, 3. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6282)
+    + Text in front of the coordinates is ignored, so chat messages can be pasted directly.
 
 ### Fixes
 
@@ -454,6 +458,7 @@
 + Fixed an issue where forging a pet would incorrectly replace your currently equipped pet in the pet display. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6179)
 + Fixed All Skill Display showing wrong overflow level and current XP for skills with a cap below level 60. - Luna (https://github.com/hannibal002/SkyHanni/pull/6231)
 + Fixed Skill Progress Display adding the level 60 XP twice when custom goal is enabled and set. - Luna (https://github.com/hannibal002/SkyHanni/pull/6231)
++ Fixed Attribute Shards not showing their proper names in some SkyHanni GUIs. - Luna (https://github.com/hannibal002/SkyHanni/pull/6334)
 
 #### Item Ability
 
@@ -503,6 +508,7 @@
 + Fixed Legion/Bobbin Time text being too cramped. - ItsRealHim (https://github.com/hannibal002/SkyHanni/pull/6069)
 + Fixed false fishing bait change warnings when opening a sign GUI while holding a fishing rod. - Growling_Grizzly (https://github.com/hannibal002/SkyHanni/pull/6153)
 + Fixed Reforge Helper not working with Fishing Nets. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6278)
++ Fixed Fishing Profit Trackers not detecting shards from fishing. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6313)
 
 #### Item
 
@@ -536,6 +542,9 @@
 + Fixed SkyHanni saying Safari instead of Critter Safari. - Luna (https://github.com/hannibal002/SkyHanni/pull/6286)
 + Fixed the mod thinking the max Foraging level is still 54 instead of 57. - Luna (https://github.com/hannibal002/SkyHanni/pull/6285)
 + Fixed the mod thinking the max Hunting level is still 25 instead of 50. - Luna (https://github.com/hannibal002/SkyHanni/pull/6285)
++ Fixed Hideyho Finder sometimes marking Hideyho as found when he wasn't. - pan_truskawka045 (https://github.com/hannibal002/SkyHanni/pull/6329)
++ Fixed not detecting loot-shared Safari shards. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6311)
++ Fixed not properly tracking Karma books from tree gifts. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6331)
 
 #### Rift
 
@@ -592,6 +601,7 @@
     + Applies to both the main Bestiary menu and subcategory views.
 + Fixed Hunting Box Value not showing all shards when switching pages, especially with high server ping. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6226)
 + Fixed Minion Craft Helper and SkyBlock Guide Minion Highlight not working. - alex (https://github.com/hannibal002/SkyHanni/pull/6266)
++ Fixed Cancelled Buy Order Clipboard not working. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6321)
 
 #### Commands
 
@@ -625,6 +635,7 @@
     + Hypixel removes Cold from the scoreboard when leaving the Glacite Tunnels in the Dwarven Mines or the Icy Biome on the Critter Safari, but SkyHanni kept the last known value.
 + Fixed ore block detection being broken, which also crashed the game on 1.21.11. - Luna (https://github.com/hannibal002/SkyHanni/pull/6291)
     + Affected Mithril, Titanium, Hard Stone, Red Sand, Umber, and Tungsten detection.
++ Fixed mining features showing up on the Critter Safari. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6324)
 
 #### Chat
 
@@ -770,6 +781,10 @@
 + Fixed rendering issues when Longview is installed. - EnnuiL (https://github.com/hannibal002/SkyHanni/pull/6242)
 + Fixed snoozed reminders sometimes not showing up on screen when the timer was up. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6274)
 + Fixed a rare error when an entity gets damaged just as you switch lobbies. - Luna (https://github.com/hannibal002/SkyHanni/pull/6290)
++ Fixed Lottery Display colors not being uniform. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6316)
++ Fixed other mods' inventory buttons showing in the Custom Wardrobe. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6225)
++ Fixed stat migrations sometimes corrupting the config when upgrading from an older version. - Luna (https://github.com/hannibal002/SkyHanni/pull/6335)
++ Fixed Taming 60 Helper sometimes giving an error if you have Taming 60 already. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6325)
 
 ### Technical Details
 
@@ -1145,6 +1160,15 @@
 + Improved error handling in RelayedRun and DelayedServerRun. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6296)
 + Made \@HandleEvent in non-\@SkyHanniModule classes fail loudly instead of silently. - Luna (https://github.com/hannibal002/SkyHanni/pull/6216)
 + Split up `GardenVisitorTooltip.readToolTip`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6287)
++ Added console filters for five more spam messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6288)
+    + Received passengers for unknown entity.
+    + Missing texture references in model.
+    + Created: `<name>`-atlas.
+    + Requested creation of existing team.
+    + Resizing Chunk Sections UBO.
++ Added optional labels to delayed run tasks, which are shown in the error report when a task crashes. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6297)
++ Made CustomWardrobe an actual Screen instead of just overwriting the container rendering. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6225)
++ Made it easy to add item list support to custom SkyHanni UIs. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6225)
 
 ### Removed Features
 
