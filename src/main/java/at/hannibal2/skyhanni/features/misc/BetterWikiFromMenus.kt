@@ -45,14 +45,14 @@ object BetterWikiFromMenus {
             }
 
             if (isWikithis) {
-                WikiManager.wikiThisItem(autoOpen = true)
+                WikiManager.wikiThisItem()
                 return
             }
         }
 
         if (inSBGuideInventory && config.skyblockGuide) {
             val wikiSearch = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
-            WikiManager.sendWikiMessage(wikiSearch, autoOpen = config.menuOpenWiki)
+            WikiManager.sendWikiMessage(wikiSearch)
             event.cancel()
         }
     }
