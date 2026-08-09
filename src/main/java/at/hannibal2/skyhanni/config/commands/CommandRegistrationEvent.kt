@@ -17,7 +17,7 @@ class CommandRegistrationEvent(
 
     val commands: List<CommandData> get() = builders
 
-    // TODO: Make it possible to disable commands via config
+    // TODO: Make it possible to disable specific aliases via config
     fun registerBrigadier(name: String, builder: BaseBrigadierBuilder.() -> Unit) {
         val command = BaseBrigadierBuilder(name).apply(builder)
         command.hasUniqueName(builders)
