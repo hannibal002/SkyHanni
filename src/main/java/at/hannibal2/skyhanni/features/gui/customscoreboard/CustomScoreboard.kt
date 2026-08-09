@@ -230,11 +230,14 @@ object CustomScoreboard {
                 "Please use the replacement mod instead. " +
                 "This feature will be removed completely in a future update.",
             url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
-            prefixColor = "§c"
+            prefixColor = "§c",
+            replaceSameMessage = true,
         )
         ChatUtils.clickableChat(
             message = "§2§l[I GET IT]",
             prefix = false,
+            replaceSameMessage = true,
+            oneTimeClick = true,
             onClick = {
                 silencedWarning = true
                 ChatUtils.chat(
