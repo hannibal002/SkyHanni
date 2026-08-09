@@ -233,10 +233,9 @@ object CustomScoreboard {
 
         showDeprecatedWarning()
     }
-
     private fun showDeprecatedWarning() {
-        if (!isEnabled()) return
-        if (warningSilenced) return
+        if (!isEnabled() || warningSilenced) return
+
         ChatUtils.clickableLinkChat(
             message = "Custom Scoreboard is deprecated and no longer supported. " +
                 "Please use the replacement mod instead. " +
@@ -244,7 +243,18 @@ object CustomScoreboard {
             url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
             prefixColor = "§c",
             replaceSameMessage = true,
+            hover = """
+                §eWhy use the replacement?
+            
+                §7• §a100% feature parity with SkyHanni's Custom Scoreboard
+                §7• §aWorks identically by default
+                §7• §aBug fixes and improvements released independently
+                §7• §aAdditional features not available in SkyHanni
+                §7• §aConfig migration from SkyHanni is supported
+                §7• §aMaintained by a trusted former SkyHanni contributor
+            """.trimIndent()
         )
+
         ChatUtils.clickableChat(
             message = "§2§l[I GET IT]",
             prefix = false,
