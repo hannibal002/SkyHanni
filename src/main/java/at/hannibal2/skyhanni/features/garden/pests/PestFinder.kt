@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.WhenT
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -222,13 +221,6 @@ object PestFinder {
         lastKeyPress = SimpleTimeMark.now()
 
         teleportNearestInfestedPlot()
-    }
-
-    @HandleEvent(onlyOnIslandTypeTag = [HAS_PESTS])
-    private fun onPlaySound(event: PlaySoundEvent) {
-        if (PestApi.config.muteVacuum && event.soundName == "entity.wither.shoot") {
-            event.cancel()
-        }
     }
 
     private fun teleportNearestInfestedPlot() {

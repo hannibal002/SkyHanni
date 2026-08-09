@@ -65,7 +65,8 @@ class PestsConfig {
     @Expose
     @ConfigOption(
         name = "Mute Vacuum",
-        desc = "Mute the pest vacuum when using its right click ability.",
+        desc = "Mute the pest vacuum when using its right click ability. " +
+            "This works on any island with pests, not just the garden.",
     )
     @ConfigEditorBoolean
     var muteVacuum: Boolean = false
