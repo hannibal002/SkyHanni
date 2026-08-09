@@ -206,6 +206,7 @@ object CustomScoreboard {
     fun onHypixelJoin() {
         updateAllIslandEntries()
 
+        if (!config.enabled.get()) return
         if (customScoreboardModLoaded) {
             if (!config.shownCustomScoreboardModInstalledWarning) {
                 config.shownCustomScoreboardModInstalledWarning = true
