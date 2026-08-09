@@ -129,9 +129,9 @@ object MineshaftDetection {
         }
 
         if (SkyHanniMod.feature.mining.glaciteMineshaft.waypointsConfig.types.potentialCorpse) {
-           MineshaftWaypointManager.potentialCorpseLocations.getOrElse(type) { listOf() }.forEach {
-               MineshaftWaypointManager.waypoints.add(MineshaftWaypoint(POTENTIAL_CORPSE, it))
-           }
+            MineshaftWaypointManager.potentialCorpseLocations.getOrElse(type) { listOf() }.forEach {
+                MineshaftWaypointManager.waypoints.add(MineshaftWaypoint(POTENTIAL_CORPSE, it))
+            }
         }
     }
 
