@@ -13,7 +13,8 @@ import java.lang.reflect.ParameterizedType
 /**
  * Drops map entries keyed by a stat name that no longer exists, as well as SkyblockStat.UNKNOWN itself.
  * Reading removed stats as UNKNOWN instead rewrites the stat under that name on the next save, and makes the
- * read of the entire file fail with a duplicate key error as soon as a second removed stat joins it.
+ * read fail with a duplicate key error as soon as a second removed stat joins it, causing a cascading
+ * resulting in the entirety of storage.players being deserialized as null.
  */
 object SkyblockStatMapTypeAdapterFactory : TypeAdapterFactory {
 
