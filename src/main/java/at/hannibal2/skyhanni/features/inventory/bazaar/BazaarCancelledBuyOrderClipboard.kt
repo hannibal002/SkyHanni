@@ -41,7 +41,7 @@ object BazaarCancelledBuyOrderClipboard {
      */
     private val cancelledMessagePattern by patternGroup.pattern(
         "cancelledmessage.colorless",
-        "\\[Bazaar] Cancelled! Refunded (?<coins>.*) coins from cancelling Buy Order!"
+        "\\[Bazaar] Cancelled! Refunded (?<coins>.*) coins from cancelling Buy Order!",
     )
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventorytitle",
@@ -51,7 +51,7 @@ object BazaarCancelledBuyOrderClipboard {
     private var latestAmount: Int? = null
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!inventoryTitlePattern.matches(event.inventoryName)) return
         val stack = event.inventoryItems[11] ?: return
@@ -76,7 +76,7 @@ object BazaarCancelledBuyOrderClipboard {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         val coins = cancelledMessagePattern.matchMatcher(event.cleanMessage) {
             group("coins").formatDouble()
