@@ -97,6 +97,7 @@ object WikiManager {
         sendWikiMessage(search)
     }
 
+    // TODO: Make it possible to disable the /wiki and /wikithis aliases.
     @HandleEvent
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shwiki") {
@@ -127,7 +128,4 @@ object WikiManager {
     private fun onRepoReload(event: RepositoryReloadEvent) {
         data = event.getConstant<WikiJson>("misc/Wiki")
     }
-
-    // TODO: Make it possible to disable the /wiki and /wikithis aliases.
-    private fun isEnabled() = config.enabled
 }
