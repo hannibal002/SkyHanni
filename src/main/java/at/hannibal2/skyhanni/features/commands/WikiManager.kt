@@ -67,6 +67,10 @@ object WikiManager {
         displaySearch: String? = search,
         autoOpen: Boolean = config.autoOpenWiki,
     ) {
+        if (!SkyBlockUtils.inSkyBlock) {
+            ChatUtils.userError("You must be in SkyBlock to do this!")
+            return
+        }
         if (search.isNullOrBlank()) {
             ChatUtils.clickableLinkChat(
                 "§7Click §e§lHERE §7to visit the §6${wiki.name}§7!",
