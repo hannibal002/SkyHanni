@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.blank
+import at.hannibal2.skyhanni.utils.ItemUtils.isBlank
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -99,7 +99,7 @@ object BetterContainers {
     @JvmStatic
     fun slotCanBeHighlighted(slot: Slot, original: Boolean): Boolean {
         return if (!isOverriding) original
-        else !slot.item.blank
+        else !slot.item.isBlank
     }
 
     fun reset() {
@@ -115,7 +115,7 @@ object BetterContainers {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isOverriding) return
         val slot = event.slot ?: return
-        val isBlankStack = slot.item.blank
+        val isBlankStack = slot.item.isBlank
         val isButtonStack = isButtonStack(slot.item)
         if (!(isBlankStack || isButtonStack)) return
         clickSlot(event.slotId)
@@ -144,7 +144,7 @@ object BetterContainers {
         }
         hasNullPane = (0 until inventory.containerSize).any { slotIndex ->
             val stack = inventory.getItem(slotIndex)
-            stack.blank
+            stack.isBlank
         }
     }
 
@@ -203,7 +203,7 @@ object BetterContainers {
     }
 
     private fun shouldRenderStack(stack: SafeItemStack): Boolean {
-        return !stack.blank && !isToggleOff(stack) && !isToggleOn(stack)
+        return !stack.isBlank && !isToggleOff(stack) && !isToggleOn(stack)
     }
 
     fun clickSlot(slot: Int) {
@@ -301,7 +301,7 @@ object BetterContainers {
 
             // This is weird, but it was a logical flip of a no-op from NEU's code :shrug:
             if (!isButton[cI][rI] || lastClickedSlot != index) {
-                isSlot[cI][rI] = !stack.blank && !isButton[cI][rI]
+                isSlot[cI][rI] = !stack.isBlank && !isButton[cI][rI]
             }
         }
 

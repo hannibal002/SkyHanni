@@ -1130,9 +1130,11 @@ object ItemUtils {
         }
     }
 
-    val SafeItemStack.blank: Boolean get() = isStainedGlassPane(ColoredBlockCompat.BLACK) &&
+    fun SafeItemStack.takeUnlessEmpty(): SafeItemStack? = takeUnless { it.isEmpty }
+
+    val SafeItemStack.isBlank: Boolean get() = isStainedGlassPane(ColoredBlockCompat.BLACK) &&
         count == 1 &&
         getTooltip().isEmpty()
 
-    fun SafeItemStack.takeUnlessEmpty(): SafeItemStack? = takeUnless { it.isEmpty || it.blank }
+    fun SafeItemStack.takeUnlessBlank(): SafeItemStack? = takeUnless { it.isEmpty || it.isBlank }
 }

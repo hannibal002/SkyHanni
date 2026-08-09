@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessBlank
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
 @SkyHanniModule
@@ -43,7 +43,7 @@ object AbiphoneDirectoryHelper {
         if (!inContactsDirectory) return
         val slot = event.slot ?: return
         if (slot.index !in 10..43) return
-        val stack = slot.item.takeUnlessEmpty() ?: return
+        val stack = slot.item.takeUnlessBlank() ?: return
 
         val name = stack.cleanName
         WikiManager.sendWikiMessage(name)
