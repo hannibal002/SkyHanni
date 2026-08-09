@@ -22,7 +22,7 @@ object AbiphoneDirectoryHelper {
         "(?:\\(\\d+/\\d+\\) )?Contacts Directory",
     )
 
-    private var  inContactsDirectory = false
+    private var inContactsDirectory = false
 
     @HandleEvent
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
