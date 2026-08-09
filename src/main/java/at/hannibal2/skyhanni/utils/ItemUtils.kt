@@ -1134,5 +1134,5 @@ object ItemUtils {
         count == 1 &&
         getTooltip().isEmpty()
 
-    fun SafeItemStack.takeUnlessEmpty(): SafeItemStack? = takeUnless { it.blank }
+    fun SafeItemStack.takeUnlessEmpty(): SafeItemStack? = takeUnless { it.isEmpty || it.blank }
 }
