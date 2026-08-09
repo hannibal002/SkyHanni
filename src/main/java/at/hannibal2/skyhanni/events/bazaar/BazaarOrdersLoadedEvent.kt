@@ -21,3 +21,5 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
  */
 @PrimaryFunction("onBazaarOrdersLoaded")
 class BazaarOrdersLoadedEvent(val orders: List<BazaarOrder>) : SkyHanniEvent()
+
+// this is a test
