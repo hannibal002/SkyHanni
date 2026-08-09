@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.mining.OreBlock
-import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -34,6 +33,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.countBy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.absoluteValue
@@ -228,11 +228,12 @@ object MiningApi {
 
     @HandleEvent
     private fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        if (IslandTypeTag.IS_COLD.isInIsland()) {
+        if (IslandType.MINESHAFT.isInIsland()) {
             DungeonApi.dungeonRoomPattern.firstMatcher(event.new) {
                 groupOrNull("roomId")?.let { mineshaftRoomId = it }
             }
-
+        }
+        if (IslandTypeTag.IS_COLD.isInIsland()) {
             var found = false
             if (inColdArea()) {
                 coldPattern.firstMatcher(event.new) {
@@ -283,7 +284,6 @@ object MiningApi {
 
     @HandleEvent
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (IslandTypeTag.IS_COLD.isInIsland()) {
             if (coldResetPattern.matches(event.message)) {
                 updateCold(0)
@@ -291,6 +291,7 @@ object MiningApi {
                 return
             }
         }
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (pickobulusUsePattern.matches(event.message)) {
             lastPickobulusUse = SimpleTimeMark.now()
             return
@@ -336,24 +337,10 @@ object MiningApi {
             pickobulusWaitingForBlock = true
             return
         }
+
         if (waitingForInitSound) {
-            if (event.soundName != "entity.experience_orb.pickup") {
-                if (event.pitch != 0.7936508f) return
-                val pos = event.location.roundToBlock()
-                if (!recentClickedBlocks.containsKey(pos)) return
-                waitingForInitSound = false
-                waitingForEffMinerBlock = true
-                initBlockPos = event.location.roundToBlock()
-                lastInitSound = SimpleTimeMark.now()
-            } else {
-                if (lastClicked.passedSince() > 1.seconds) return
-                val block = lastClickedPos ?: return
-                val ore = OreBlock.getByStateOrNull(block.getBlockStateAt()) ?: return
-                if (ore.hasInitSound) return
-                ignoreInit = true
-                waitingForInitSound = false
-                waitingForEffMinerBlock = true
-                lastInitSound = SimpleTimeMark.now()
+            if (if (event.soundName == "entity.experience_orb.pickup") orbSound() else event.noOrbSound()) {
+                return
             }
         }
         if (waitingForEffMinerSound) {
@@ -363,6 +350,29 @@ object MiningApi {
             lastBlock.confirmed = true
             waitingForEffMinerBlock = true
         }
+    }
+
+    private fun orbSound(): Boolean {
+        if (lastClicked.passedSince() > 1.seconds) return true
+        val block = lastClickedPos ?: return true
+        val ore = OreBlock.getByStateOrNull(block.getBlockStateAt()) ?: return true
+        if (ore.hasInitSound) return true
+        ignoreInit = true
+        waitingForInitSound = false
+        waitingForEffMinerBlock = true
+        lastInitSound = SimpleTimeMark.now()
+        return false
+    }
+
+    private fun PlaySoundEvent.noOrbSound(): Boolean {
+        if (pitch != 0.7936508f) return true
+        val pos = location.roundToBlock()
+        if (!recentClickedBlocks.containsKey(pos)) return true
+        waitingForInitSound = false
+        waitingForEffMinerBlock = true
+        initBlockPos = location.roundToBlock()
+        lastInitSound = SimpleTimeMark.now()
+        return false
     }
 
     @HandleEvent
@@ -375,19 +385,13 @@ object MiningApi {
 
         if (oldState == newState) return
         if (oldBlock == Blocks.AIR || oldBlock == Blocks.BEDROCK) return
-        if (newBlock != Blocks.AIR && newBlock != Blocks.BEDROCK && !isTitanium(newState)) return
+        if (newBlock != Blocks.AIR && newBlock != Blocks.BEDROCK && !OreBlock.isTitanium(newState)) return
 
-        val pos = event.location
-        if (pickobulusActive && pickobulusWaitingForBlock) {
-            val explosionPos = pickobulusExplosionPos ?: return
-            if (explosionPos.distance(pos) > 15) return
-            val ore = OreBlock.getByStateOrNull(oldState) ?: return
-            if (pickobulusMinedBlocks.any { it.first == pos }) return
-            pickobulusMinedBlocks += pos to ore
-            pickobulusWaitingForBlock = false
-            pickobulusWaitingForSound = true
-            return
-        }
+        handleBlockBreak(event.location, oldState)
+    }
+
+    private fun handleBlockBreak(pos: LorenzVec, oldState: BlockState) {
+        if (tryHandlePickobulusBlock(pos, oldState)) return
 
         if (lastInitSound.passedSince() > 100.milliseconds) return
         if (pos.distanceToPlayer() > 7) return
@@ -400,13 +404,30 @@ object MiningApi {
             return
         }
 
-        if (waitingForEffMinerBlock && (!ignoreInit || !ore.hasInitSound)) {
-            if (surroundingMinedBlocks.any { it.second == pos }) return
-            waitingForEffMinerBlock = false
-            surroundingMinedBlocks += MinedBlock(ore, false) to pos
-            waitingForEffMinerSound = true
-            return
-        }
+        handleEffMinerBlock(ore, pos)
+    }
+
+    private fun handleEffMinerBlock(ore: OreBlock, pos: LorenzVec) {
+        if (!waitingForEffMinerBlock) return
+        if (ignoreInit && ore.hasInitSound) return
+
+        if (surroundingMinedBlocks.any { it.second == pos }) return
+        waitingForEffMinerBlock = false
+        surroundingMinedBlocks += MinedBlock(ore, false) to pos
+        waitingForEffMinerSound = true
+        return
+    }
+
+    private fun tryHandlePickobulusBlock(pos: LorenzVec, oldState: BlockState): Boolean {
+        if (!pickobulusActive || !pickobulusWaitingForBlock) return false
+        val explosionPos = pickobulusExplosionPos ?: return true
+        if (explosionPos.distance(pos) > 15) return true
+        val ore = OreBlock.getByStateOrNull(oldState) ?: return true
+        if (pickobulusMinedBlocks.any { it.first == pos }) return true
+        pickobulusMinedBlocks += pos to ore
+        pickobulusWaitingForBlock = false
+        pickobulusWaitingForSound = true
+        return true
     }
 
     @HandleEvent

@@ -21,7 +21,7 @@ enum class IslandTypeTag(vararg types: Any) {
 
     IS_COLD(IslandType.DWARVEN_MINES, IslandType.MINESHAFT, IslandType.SAFARI),
     NORMAL_MINING(IslandType.GOLD_MINES, IslandType.DEEP_CAVERNS),
-    ADVANCED_MINING(IS_COLD, IslandType.CRYSTAL_HOLLOWS),
+    ADVANCED_MINING(IslandType.DWARVEN_MINES, IslandType.MINESHAFT, IslandType.CRYSTAL_HOLLOWS),
     MINING(NORMAL_MINING, ADVANCED_MINING),
     CUSTOM_MINING(ADVANCED_MINING, IslandType.THE_END, IslandType.CRIMSON_ISLE, IslandType.SPIDER_DEN),
 
@@ -33,7 +33,7 @@ enum class IslandTypeTag(vararg types: Any) {
     CONTESTS_SHOWN(IslandType.GARDEN, IslandType.HUB, IslandType.THE_FARMING_ISLANDS),
 
     /** Busy islands are islands where a player is doing something considered 'important'. */
-    BUSY(IslandType.DARK_AUCTION, IslandType.MINESHAFT, IslandType.THE_RIFT, IslandType.NONE, IslandType.UNKNOWN),
+    BUSY(IslandType.DARK_AUCTION, IslandType.MINESHAFT, IslandType.THE_RIFT, IslandType.SAFARI, IslandType.NONE, IslandType.UNKNOWN),
 
     /** islands without npc locations that are fixed. */
     NO_FIXED_NPC_LOCATIONS(

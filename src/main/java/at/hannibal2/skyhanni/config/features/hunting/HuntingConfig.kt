@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.hunting
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.foraging.SafariConfig
 import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -13,6 +14,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class HuntingConfig {
+
+    @Expose
+    @Category(name = "Safari", desc = "Settings for the safari")
+    val safari = SafariConfig()
 
     @Expose
     @ConfigOption(name = "Shard Tracker", desc = "")
@@ -39,9 +44,10 @@ class HuntingConfig {
     val lassoDisplayPosition: Position = Position(380, 210)
 
     @Expose
-    @Category(name = "Fusion Keybinds", desc = "Settings for fusion keybinds")
+    @ConfigOption(name = "Fusion Keybinds", desc = "")
     @SearchTag("hunting box")
-    var fusionKeybinds = FusionKeybindsConfig()
+    @Accordion
+    val fusionKeybinds = FusionKeybindsConfig()
 
     @Expose
     @ConfigOption(
@@ -55,7 +61,7 @@ class HuntingConfig {
     @Expose
     @ConfigOption(
         name = "Shulker Finder",
-        desc = "Shows a route from your position to the nearest possible spawn point for a Shulker for easy hunting."
+        desc = "Shows a route from your position to the nearest possible spawn point for a Shulker for easy hunting.",
     )
     @SearchTag("hideonleaf hideonsun")
     @ConfigEditorBoolean
