@@ -73,10 +73,6 @@ object WikiManager {
         displaySearch: String? = search,
         autoOpen: Boolean = config.autoOpenWiki,
     ) {
-        if (!SkyBlockUtils.inSkyBlock) {
-            ChatUtils.userError("You must be in SkyBlock to do this!")
-            return
-        }
         if (search.isNullOrBlank()) {
             ChatUtils.clickableLinkChat(
                 "§7Click §e§lHERE §7to visit the §6${wiki.name}§7!",
@@ -92,6 +88,15 @@ object WikiManager {
         }
     }
 
+    private fun wikiCommand(search: String? = null) {
+        if (!SkyBlockUtils.inSkyBlock) {
+            ChatUtils.userError("You must be in SkyBlock to do this!")
+            return
+        }
+
+        sendWikiMessage(search)
+    }
+
     @HandleEvent
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shwiki") {
@@ -99,10 +104,10 @@ object WikiManager {
             description = "Searches the independent wiki with SkyHanni's own method."
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
-                sendWikiMessage()
+                wikiCommand()
             }
             argCallback("search", BrigadierArguments.greedyString()) { search ->
-                sendWikiMessage(search)
+                wikiCommand(search)
             }
         }
         event.registerBrigadier("shwikithis") {
