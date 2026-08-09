@@ -93,7 +93,7 @@ object WikiManager {
             description = "Searches the independent wiki with SkyHanni's own method."
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
-                sendWikiMessage("")
+                sendWikiMessage()
             }
             argCallback("search", BrigadierArguments.greedyString()) { search ->
                 sendWikiMessage(search)
