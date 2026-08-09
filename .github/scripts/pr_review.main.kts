@@ -662,35 +662,7 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
         appendWarningTitle("Build failed: $version")
         val workspace = System.getenv("GITHUB_WORKSPACE") ?: ""
         val rawErrorLines = parseAllErrors(logContent)
-        if (rawErrorLines.isNotEmpty()) {
-            for (rawLine in rawErrorLines.take(5)) {
-                val display = rawLine.trimStart().removePrefix("e: ")
-                    .let {
-                        if (workspace.isNotEmpty()) it.replace("file://$workspace/", "").replace("$workspace/", "")
-                        else it
-                    }
-                appendLine("- `${sanitizeCodeSpan(display)}`")
-                if (rawLine.trimStart().startsWith("e: ")) {
-                    for (cont in parseErrorContinuations(logContent, rawLine)) {
-                        appendLine("  - `${sanitizeCodeSpan(cont)}`")
-                    }
-                    val candidates = parseOverloadCandidates(logContent, rawLine)
-                    for (candidate in candidates.take(maxOverloadCandidates)) {
-                        appendLine("  - `${sanitizeCodeSpan(candidate)}`")
-                    }
-                    if (candidates.size > maxOverloadCandidates) {
-                        appendLine("  - _...and ${candidates.size - maxOverloadCandidates} more candidates_")
-                    }
-                }
-            }
-            if (rawErrorLines.size > 5) appendLine("_...and ${rawErrorLines.size - 5} more_")
-        } else {
-            val oneLiner = parseOneLiner(logContent)
-            if (oneLiner != null) {
-                val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ")
-                appendLine("`${sanitizeCodeSpan(displayLine)}`")
-            }
-        }
+        appendBuildErrors(rawErrorLines, workspace, logContent)
         if ("warnings found and -Werror specified" in logContent) {
             appendLine()
             appendLine("_Warning elevated to error by `-Werror`_")
@@ -712,6 +684,42 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
         appendLine()
         appendLine("</details>")
         appendLine()
+    }
+}
+
+fun StringBuilder.appendBuildErrors(rawErrorLines: List<String>, workspace: String, logContent: String) {
+    if (rawErrorLines.isNotEmpty()) {
+        for (rawLine in rawErrorLines.take(5)) {
+            appendErrorLine(rawLine, workspace, logContent)
+        }
+        if (rawErrorLines.size > 5) appendLine("_...and ${rawErrorLines.size - 5} more_")
+    } else {
+        val oneLiner = parseOneLiner(logContent)
+        if (oneLiner != null) {
+            val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ")
+            appendLine("`${sanitizeCodeSpan(displayLine)}`")
+        }
+    }
+}
+
+fun StringBuilder.appendErrorLine(rawLine: String, workspace: String, logContent: String) {
+    val display = rawLine.trimStart().removePrefix("e: ")
+        .let {
+            if (workspace.isNotEmpty()) it.replace("file://$workspace/", "").replace("$workspace/", "")
+            else it
+        }
+    appendLine("- `${sanitizeCodeSpan(display)}`")
+    if (rawLine.trimStart().startsWith("e: ")) {
+        for (cont in parseErrorContinuations(logContent, rawLine)) {
+            appendLine("  - `${sanitizeCodeSpan(cont)}`")
+        }
+        val candidates = parseOverloadCandidates(logContent, rawLine)
+        for (candidate in candidates.take(maxOverloadCandidates)) {
+            appendLine("  - `${sanitizeCodeSpan(candidate)}`")
+        }
+        if (candidates.size > maxOverloadCandidates) {
+            appendLine("  - _...and ${candidates.size - maxOverloadCandidates} more candidates_")
+        }
     }
 }
 
