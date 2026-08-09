@@ -228,11 +228,12 @@ object MiningApi {
 
     @HandleEvent
     private fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        if (IslandTypeTag.IS_COLD.isInIsland()) {
+        if (IslandType.MINESHAFT.isInIsland()) {
             DungeonApi.dungeonRoomPattern.firstMatcher(event.new) {
                 groupOrNull("roomId")?.let { mineshaftRoomId = it }
             }
-
+        }
+        if (IslandTypeTag.IS_COLD.isInIsland()) {
             var found = false
             if (inColdArea()) {
                 coldPattern.firstMatcher(event.new) {
@@ -283,7 +284,6 @@ object MiningApi {
 
     @HandleEvent
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (IslandTypeTag.IS_COLD.isInIsland()) {
             if (coldResetPattern.matches(event.message)) {
                 updateCold(0)
@@ -291,6 +291,7 @@ object MiningApi {
                 return
             }
         }
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (pickobulusUsePattern.matches(event.message)) {
             lastPickobulusUse = SimpleTimeMark.now()
             return
