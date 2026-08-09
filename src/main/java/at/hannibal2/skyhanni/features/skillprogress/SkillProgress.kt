@@ -194,9 +194,9 @@ object SkillProgress {
             add("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
             add("  §r§b§lSKILL LEVEL UP §3$skillName §8$oldLevel➜§3$newLevel")
             if (goalReached) {
-                add("")
+                add(" ")
                 add("  §r§d§lGOAL REACHED!")
-                add("")
+                add(" ")
             }
             add("  §r§a§lREWARDS")
             addAll(rewards)

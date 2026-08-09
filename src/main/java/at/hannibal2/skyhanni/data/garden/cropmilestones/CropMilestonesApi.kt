@@ -328,9 +328,9 @@ object CropMilestonesApi {
             add("§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r")
             add("  $levelUpLine")
             if (goalReached) {
-                add("")
+                add(" ")
                 add("  §r§d§lGOAL REACHED!")
-                add("")
+                add(" ")
             }
             add("  §r§a§lREWARDS§r")
             addAll(rewards)
