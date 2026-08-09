@@ -83,5 +83,6 @@ jobs:
                     ARTIFACT_DIR_1: ${{ runner.temp }}/build-failure-26.1
                     WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
                     HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+                    WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
                     MODE: build
                 run: kotlinc -script .github/scripts/pr_review.main.kts
