@@ -134,7 +134,13 @@ val dependencyStateResolved = "resolved"
 val warningIcon = "⚠\uFE0F"
 
 val maxDirectFindings = 15
+val maxErrorContinuations = 5
+val maxOverloadCandidates = 3
 val maxLogChars = 10_000
+
+// Its candidate block is separated by a blank line and starts at column 0, out of reach for continuations.
+val overloadErrorMarker = "None of the following candidates is applicable:"
+
 
 val maxRequestAttempts = 3
 val retryDelayMillis = 2_000L
@@ -331,6 +337,28 @@ fun setLabel(prNumber: String, label: String, hasFindings: Boolean) {
         val (status, _) = ghRequest("DELETE", "/repos/$repo/issues/$prNumber/labels/$encoded")
         if (status.isHttpError && status != 404) System.err.println("Warning: could not remove $label label (HTTP $status)")
     }
+}
+
+// Only the newest status per context is shown, so republishing an unchanged one lands in the same state.
+// [description] is cut off by the status API above 140 characters.
+// [onFailure] carries the consequence, which differs per mode: warning, thrown exception, or ending the run.
+fun setCommitStatus(
+    headSha: String,
+    context: String,
+    blocking: Boolean,
+    description: String,
+    onFailure: (Int) -> Unit,
+) {
+    val payload = mutableMapOf<String, Any>(
+        "state" to if (blocking) "failure" else "success",
+        "context" to context,
+        "description" to description,
+    )
+    val runId = System.getenv("GITHUB_RUN_ID")
+    if (runId != null) payload["target_url"] = "https://github.com/$repo/actions/runs/$runId"
+
+    val (status, _) = ghRequest("POST", "/repos/$repo/statuses/$headSha", payload)
+    if (status.isHttpError) onFailure(status)
 }
 
 fun getPrLabels(prNumber: String): Set<String> {
@@ -575,13 +603,31 @@ fun parseErrorContinuations(logContent: String, errorLine: String): List<String>
     if (idx < 0) return emptyList()
     val result = mutableListOf<String>()
     var i = idx + 1
-    while (i < lines.size) {
+    while (i < lines.size && result.size < maxErrorContinuations) {
         val next = lines[i]
-        if (next.isBlank()) break
+        // Only indented lines belong to the error above, everything else starts at column 0.
+        if (next.isBlank() || next == next.trimStart()) break
+        // Indented, but its own diagnosis.
         if (next.trimStart().startsWith("e: ") || next.trimStart().startsWith("w: ")) break
-        if (next.startsWith("> ") || next.startsWith("FAILURE") || next.startsWith("*")) break
         result.add(next.trim())
         i++
+    }
+    return result
+}
+
+// Signatures only, the indented details below each one add length but no information.
+fun parseOverloadCandidates(logContent: String, errorLine: String): List<String> {
+    if (!errorLine.trimEnd().endsWith(overloadErrorMarker)) return emptyList()
+    val lines = logContent.lines()
+    val idx = lines.indexOfFirst { it.trim() == errorLine }
+    if (idx < 0) return emptyList()
+    val result = mutableListOf<String>()
+    for (line in lines.drop(idx + 1)) {
+        val trimmed = line.trimStart()
+        if (trimmed.startsWith("e: ") || trimmed.startsWith("w: ")) break
+        if (line.startsWith("FAILURE")) break
+        if (line != trimmed || "fun " !in line) continue
+        result.add(line.trim())
     }
     return result
 }
@@ -638,28 +684,7 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
         appendWarningTitle("Build failed: $version")
         val workspace = System.getenv("GITHUB_WORKSPACE") ?: ""
         val rawErrorLines = parseAllErrors(logContent)
-        if (rawErrorLines.isNotEmpty()) {
-            for (rawLine in rawErrorLines.take(5)) {
-                val display = rawLine.trimStart().removePrefix("e: ")
-                    .let {
-                        if (workspace.isNotEmpty()) it.replace("file://$workspace/", "").replace("$workspace/", "")
-                        else it
-                    }
-                appendLine("- `${sanitizeCodeSpan(display)}`")
-                if (rawLine.trimStart().startsWith("e: ")) {
-                    for (cont in parseErrorContinuations(logContent, rawLine)) {
-                        appendLine("  - `${sanitizeCodeSpan(cont)}`")
-                    }
-                }
-            }
-            if (rawErrorLines.size > 5) appendLine("_...and ${rawErrorLines.size - 5} more_")
-        } else {
-            val oneLiner = parseOneLiner(logContent)
-            if (oneLiner != null) {
-                val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ")
-                appendLine("`${sanitizeCodeSpan(displayLine)}`")
-            }
-        }
+        appendBuildErrors(rawErrorLines, workspace, logContent)
         if ("warnings found and -Werror specified" in logContent) {
             appendLine()
             appendLine("_Warning elevated to error by `-Werror`_")
@@ -684,30 +709,105 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
     }
 }
 
-fun getMergeableState(prNumber: String): Boolean? {
-    val (status, body) = ghRepoGet("/pulls/$prNumber")
-    status.requireSuccess("Error: could not fetch PR mergeable state (HTTP $status), aborting")
-    val mergeableElement = (body as? JsonObject)?.get("mergeable") ?: return null
-    if (mergeableElement.isJsonNull) return null
-    return mergeableElement.asBoolean
+fun StringBuilder.appendBuildErrors(rawErrorLines: List<String>, workspace: String, logContent: String) {
+    if (rawErrorLines.isNotEmpty()) {
+        for (rawLine in rawErrorLines.take(5)) {
+            appendErrorLine(rawLine, workspace, logContent)
+        }
+        if (rawErrorLines.size > 5) appendLine("_...and ${rawErrorLines.size - 5} more_")
+    } else {
+        val oneLiner = parseOneLiner(logContent)
+        if (oneLiner != null) {
+            val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ")
+            appendLine("`${sanitizeCodeSpan(displayLine)}`")
+        }
+    }
 }
 
-fun getAllOpenPRNumbers(): List<String> {
-    val numbers = mutableListOf<String>()
+fun StringBuilder.appendErrorLine(rawLine: String, workspace: String, logContent: String) {
+    val display = rawLine.trimStart().removePrefix("e: ")
+        .let {
+            if (workspace.isNotEmpty()) it.replace("file://$workspace/", "").replace("$workspace/", "")
+            else it
+        }
+    appendLine("- `${sanitizeCodeSpan(display)}`")
+    if (rawLine.trimStart().startsWith("e: ")) {
+        for (cont in parseErrorContinuations(logContent, rawLine)) {
+            appendLine("  - `${sanitizeCodeSpan(cont)}`")
+        }
+        val candidates = parseOverloadCandidates(logContent, rawLine)
+        for (candidate in candidates.take(maxOverloadCandidates)) {
+            appendLine("  - `${sanitizeCodeSpan(candidate)}`")
+        }
+        if (candidates.size > maxOverloadCandidates) {
+            appendLine("  - _...and ${candidates.size - maxOverloadCandidates} more candidates_")
+        }
+    }
+}
+
+// error() exits the process and cannot be caught, so this mode throws and lets the caller decide.
+class MergeCheckException(message: String) : Exception(message)
+
+fun mergeCheckError(message: String): Nothing = throw MergeCheckException(message)
+
+// Collected so one unreadable pull request cannot end the whole push run.
+val failedMergeChecks = mutableListOf<String>()
+
+// [mergeable] is null while GitHub is still computing the merge, and when the field is unreadable. The head SHA
+// comes from the same response, the push trigger has no pull request in its event payload to take it from.
+data class MergeState(val headSha: String, val mergeable: Boolean?)
+
+fun fetchMergeState(prNumber: String): MergeState {
+    val (status, body) = ghRepoGet("/pulls/$prNumber")
+    if (status.isHttpError) mergeCheckError("Error: could not fetch PR #$prNumber (HTTP $status)")
+    val pr = body as? JsonObject ?: mergeCheckError("Error: unexpected response format for PR #$prNumber")
+    val headSha = (pr.get("head") as? JsonObject)?.get("sha")?.takeIf { it.isJsonPrimitive }?.asString
+        ?: mergeCheckError("Error: head SHA missing for PR #$prNumber")
+    val mergeable = pr.get("mergeable")?.takeIf { it.isJsonPrimitive }?.asBoolean
+    return MergeState(headSha, mergeable)
+}
+
+// GitHub starts computing the merge when first asked, so the run after a new commit regularly asks too early.
+val mergeableAttempts = 3
+
+fun fetchMergeStateWaiting(prNumber: String): MergeState {
+    var state = fetchMergeState(prNumber)
+    repeat(mergeableAttempts - 1) { index ->
+        if (state.mergeable != null) return state
+        System.err.println("Warning: mergeable still unknown for PR #$prNumber, retry ${index + 1} of ${mergeableAttempts - 1}")
+        Thread.sleep(retryDelayMillis * (index + 1))
+        state = fetchMergeState(prNumber)
+    }
+    return state
+}
+
+// [labels] comes from the listing, so the push path does not fetch them again per pull request.
+data class OpenPr(val number: String, val labels: Set<String>)
+
+fun parseLabelNames(pr: JsonObject): Set<String> {
+    val array = pr.get("labels") as? JsonArray ?: return emptySet()
+    return array.mapNotNullTo(mutableSetOf()) { element ->
+        (element as? JsonObject)?.get("name")?.takeIf { it.isJsonPrimitive }?.asString
+    }
+}
+
+fun getAllOpenPrs(): List<OpenPr> {
+    val prs = mutableListOf<OpenPr>()
     var page = 1
     while (true) {
         val (status, body) = ghRepoGet("/pulls?state=open&per_page=100&page=$page")
-        status.requireSuccess("Error: could not fetch open PRs (HTTP $status), aborting")
-        val array = body as? JsonArray ?: error("Error: unexpected response format for open PRs, aborting")
+        status.requireSuccess("Error: could not fetch open PRs (HTTP $status), aborting", commentError = false)
+        val array = body as? JsonArray
+            ?: error("Error: unexpected response format for open PRs, aborting", commentError = false)
         for (element in array) {
-            if (!element.isJsonObject) continue
-            val number = element.asJsonObject.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
-            numbers.add(number)
+            val pr = element as? JsonObject ?: continue
+            val number = pr.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+            prs.add(OpenPr(number, parseLabelNames(pr)))
         }
         if (array.size() < 100) break
         page++
     }
-    return numbers
+    return prs
 }
 
 fun buildConflictBody(): String = buildString {
@@ -715,27 +815,65 @@ fun buildConflictBody(): String = buildString {
     append("This pull request has conflicts with the base branch. Please resolve them before this PR can be merged.")
 }
 
-fun runMergeConflictMode(prNumber: String) {
-    val mergeableState = getMergeableState(prNumber)
-    if (mergeableState == null) {
+// Warns instead of aborting, one unwritable status must not stop the push path from reaching the rest.
+fun setConflictStatus(prNumber: String, headSha: String, hasConflicts: Boolean) {
+    setCommitStatus(
+        headSha = headSha,
+        context = conflictLabel,
+        blocking = hasConflicts,
+        description = if (hasConflicts) "Conflicts with the base branch" else "No conflicts with the base branch",
+    ) { System.err.println("Warning: could not update conflict status on PR #$prNumber (HTTP $it)") }
+}
+
+// [waitForMergeable] only for the triggering pull request, see fetchMergeStateWaiting.
+// [knownLabels] null means fetch them.
+fun runMergeConflictMode(prNumber: String, waitForMergeable: Boolean, knownLabels: Set<String>? = null) {
+    val mergeState = if (waitForMergeable) fetchMergeStateWaiting(prNumber) else fetchMergeState(prNumber)
+    val mergeable = mergeState.mergeable
+    if (mergeable == null) {
+        // No status either, every state the API offers would claim an answer this run does not have.
         println("PR #$prNumber: mergeable is null, skipping")
         return
     }
+    // Before the label check below, an already labeled pull request is exactly the one that needs the status.
+    setConflictStatus(prNumber, mergeState.headSha, !mergeable)
 
-    if (!mergeableState) {
-        val alreadyLabeled = conflictLabel in getPrLabels(prNumber)
-        if (alreadyLabeled) {
-            println("PR #$prNumber: conflicts found, already labeled, skipping")
+    if (!mergeable) {
+        // Only the comment is skipped, every push to beta would otherwise post another one.
+        if (conflictLabel in (knownLabels ?: getPrLabels(prNumber))) {
+            println("PR #$prNumber: conflicts found, already labeled, skipping comment")
+            return
+        }
+        // Label first, setLabel only warns: a comment without a label is invisible to the cleanup below.
+        setLabel(prNumber, conflictLabel, true)
+        conflictComment.staleExisting(prNumber)
+        conflictComment.post(prNumber, buildConflictBody()) { "Error: could not post conflict comment (HTTP $it)" }
+        println("PR #$prNumber: conflicts found, comment posted")
+    } else {
+        // Relies on the label being written before the comment above, so no label means no comment to collapse.
+        if (knownLabels != null && conflictLabel !in knownLabels) {
+            println("PR #$prNumber: no conflicts, nothing to clean up")
             return
         }
         conflictComment.staleExisting(prNumber)
-        conflictComment.post(prNumber, buildConflictBody()) { "Error: could not post conflict comment (HTTP $it)" }
-        setLabel(prNumber, conflictLabel, true)
-        println("PR #$prNumber: conflicts found, comment posted")
-    } else {
-        conflictComment.staleExisting(prNumber)
         setLabel(prNumber, conflictLabel, false)
         println("PR #$prNumber: no conflicts")
+    }
+}
+
+fun skipFailedMergeCheck(prNumber: String, reason: String) {
+    System.err.println("Warning: could not check PR #$prNumber ($reason), skipping")
+    failedMergeChecks.add(prNumber)
+}
+
+// A dropped connection has to be treated like an unreadable response, otherwise it still ends the loop.
+fun tryRunMergeConflictMode(pr: OpenPr) {
+    try {
+        runMergeConflictMode(pr.number, waitForMergeable = false, knownLabels = pr.labels)
+    } catch (e: MergeCheckException) {
+        skipFailedMergeCheck(pr.number, e.message ?: e.toString())
+    } catch (e: IOException) {
+        skipFailedMergeCheck(pr.number, e.toString())
     }
 }
 
@@ -831,12 +969,37 @@ fun parseSarifFindings(sarif: JsonObject, workspace: String): List<Finding> = bu
     }
 }
 
+// Posted when the run is red but carries no log to quote. Every reason for a missing artifact looks the same
+// from here, so it names the conclusion instead of guessing.
+fun buildGenericFailureBody(conclusion: String): String = buildString {
+    val workflowRunId = System.getenv("WORKFLOW_RUN_ID") ?: error("WORKFLOW_RUN_ID not set")
+    appendWarningTitle("Build failed")
+    appendLine()
+    appendLine("The build workflow finished with `${sanitizeCodeSpan(conclusion)}` but uploaded no error log.")
+    appendLine("That happens when a step fails outside of the parts that capture their output, so the cause is")
+    appendLine("only visible in the run itself.")
+    appendLine()
+    appendLine("\\[[workflow run](https://github.com/$repo/actions/runs/$workflowRunId)\\]")
+}
+
 fun runBuildMode(prNumber: String) {
     val log1 = readBuildLog(System.getenv("ARTIFACT_DIR_1"))
 
     buildComment.staleExisting(prNumber)
 
     if (log1.isNullOrBlank()) {
+        // A missing artifact is not proof of a green build: a step failing before its upload leaves it missing
+        // while the run is red. Only the conclusion tells those two apart.
+        val conclusion = System.getenv("WORKFLOW_CONCLUSION")?.takeIf { it.isNotEmpty() }
+            ?: error("WORKFLOW_CONCLUSION not set")
+        if (conclusion != "success") {
+            buildComment.post(prNumber, buildGenericFailureBody(conclusion)) {
+                "Error: could not post build failure comment (HTTP $it)"
+            }
+            setLabel(prNumber, buildLabel, true)
+            println("Build failed without a log artifact, posted generic comment, added label")
+            exitProcess(0)
+        }
         println("No build failures found, removing build label")
         setLabel(prNumber, buildLabel, false)
         exitProcess(0)
@@ -969,7 +1132,7 @@ fun getDependencyState(dep: Dependency): DependencyState {
     }
 }
 
-// Kept under the status API's 140-character limit. A problem hides the open count, like the comment.
+// A problem hides the open count, like the comment.
 fun buildDependencyStatusDescription(openCount: Int, problems: DependencyProblems): String = when {
     !problems.isEmpty -> dependencyProblemsTitle(problems.count)
     openCount > 0 -> "Waiting on $openCount open dependency ${if (openCount == 1) "PR" else "PRs"}"
@@ -977,20 +1140,12 @@ fun buildDependencyStatusDescription(openCount: Int, problems: DependencyProblem
 }
 
 fun setDependencyStatus(headSha: String, openDependencies: List<Dependency>, problems: DependencyProblems) {
-    val blocking = openDependencies.isNotEmpty() || !problems.isEmpty
-    val description = buildDependencyStatusDescription(openDependencies.size, problems)
-    val payload = mutableMapOf<String, Any>(
-        "state" to if (blocking) "failure" else "success",
-        "context" to dependencyStatusContext,
-        "description" to description,
-    )
-    val runId = System.getenv("GITHUB_RUN_ID")
-    if (runId != null) payload["target_url"] = "https://github.com/$repo/actions/runs/$runId"
-
-    val (status, _) = ghRequest("POST", "/repos/$repo/statuses/$headSha", payload)
-    if (status.isHttpError) {
-        dependencyError("Error: could not update dependency status for $headSha (HTTP $status)")
-    }
+    setCommitStatus(
+        headSha = headSha,
+        context = dependencyStatusContext,
+        blocking = openDependencies.isNotEmpty() || !problems.isEmpty,
+        description = buildDependencyStatusDescription(openDependencies.size, problems),
+    ) { dependencyError("Error: could not update dependency status for $headSha (HTTP $it)") }
 }
 
 // Throws DependencyCheckException when this PR could not be evaluated. Callers that iterate over many PRs
@@ -1341,16 +1496,12 @@ fun buildKeywordLabelRemovedComment(entry: KeywordLabel): String = buildString {
 }
 
 fun setKeywordLabelStatus(headSha: String, entry: KeywordLabel, keywordPresent: Boolean) {
-    val payload = mutableMapOf<String, Any>(
-        "state" to if (keywordPresent) "failure" else "success",
-        "context" to entry.label,
-        "description" to if (keywordPresent) "Marked as \"${entry.label}\"" else "Not marked as \"${entry.label}\"",
-    )
-    val runId = System.getenv("GITHUB_RUN_ID")
-    if (runId != null) payload["target_url"] = "https://github.com/$repo/actions/runs/$runId"
-
-    val (status, _) = ghRequest("POST", "/repos/$repo/statuses/$headSha", payload)
-    status.requireSuccess("Error: could not update \"${entry.label}\" status for $headSha (HTTP $status)")
+    setCommitStatus(
+        headSha = headSha,
+        context = entry.label,
+        blocking = keywordPresent,
+        description = if (keywordPresent) "Marked as \"${entry.label}\"" else "Not marked as \"${entry.label}\"",
+    ) { error("Error: could not update \"${entry.label}\" status for $headSha (HTTP $it)") }
 }
 
 fun runKeywordLabelMode(prNumber: String) {
@@ -1410,10 +1561,22 @@ val prNumberEnv: String? = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() 
 
 if (mode == "merge_conflict") {
     if (prNumberEnv != null) {
-        runMergeConflictMode(prNumberEnv)
+        // Nothing to salvage when the triggering pull request itself cannot be read.
+        try {
+            runMergeConflictMode(prNumberEnv, waitForMergeable = true)
+        } catch (e: MergeCheckException) {
+            error(e.message ?: "Error: could not check PR #$prNumberEnv", commentError = false)
+        } catch (e: IOException) {
+            error("Error: could not check PR #$prNumberEnv ($e)", commentError = false)
+        }
     } else {
         println("No PR_NUMBER set, rechecking all open PRs")
-        getAllOpenPRNumbers().forEach { runMergeConflictMode(it) }
+        // No waiting here, a beta push invalidates every open pull request at once and waiting adds minutes.
+        getAllOpenPrs().forEach { tryRunMergeConflictMode(it) }
+        // After the loop, so every reachable pull request is done before the run turns red.
+        if (failedMergeChecks.isNotEmpty()) {
+            error("Error: could not check ${failedMergeChecks.joinToString(", ") { "#$it" }}", commentError = false)
+        }
     }
     exitProcess(0)
 }
