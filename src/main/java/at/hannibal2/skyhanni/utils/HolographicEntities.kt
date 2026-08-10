@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.dungeon.replay.RecordedPosition
 import at.hannibal2.skyhanni.mixins.hooks.activeHolographicEntities
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -15,7 +14,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.associateNotNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.mojang.authlib.GameProfile
 import net.minecraft.client.Minecraft
-import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.client.renderer.LevelRenderer
@@ -23,13 +21,12 @@ import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.monster.zombie.Zombie
-import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
-import java.util.UUID
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.reflect.KClass
@@ -167,7 +164,7 @@ object HolographicEntities {
     fun createPlayerHologram(
         position: LorenzVec,
         yaw: Float,
-        profile: GameProfile = GameProfile(UUID.fromString("49f4c15d-14e0-4d75-be1b-9c1b85bad53c"), "martimavocado")
+        profile: GameProfile,
     ): HolographicEntity<AbstractClientPlayer>? {
         val level = Minecraft.getInstance().level ?: return null
         val player = RemotePlayer(level, profile)
@@ -227,5 +224,17 @@ object HolographicEntities {
         } finally {
             activeHolographicEntities.remove(entity)
         }
+    }
+
+
+    fun SkyHanniRenderWorldEvent.renderHolographicEntity(
+        holographicEntity: HolographicEntity<AbstractClientPlayer>,
+        opacity: Float = 0.3f,
+        heldItem: ItemStack = ItemStack.EMPTY,
+        mainHand: InteractionHand = InteractionHand.MAIN_HAND
+    ) {
+        holographicEntity.entity.setItemInHand(mainHand, heldItem)
+
+        this.renderHolographicEntity(holographicEntity as HolographicEntity<*>, opacity)
     }
 }

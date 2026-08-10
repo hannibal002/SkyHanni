@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.dungeon.replay.DungeonBossReplayConfig
 import at.hannibal2.skyhanni.config.features.dungeon.spiritleap.SpiritLeapConfig
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import com.google.gson.annotations.Expose
@@ -223,4 +224,12 @@ class DungeonConfig {
     @ConfigEditorBoolean
     @SearchTag("Dialogue Message Title")
     var bloodCampTimer: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Boss Replay",
+        desc = "",
+    )
+    @Accordion
+    val bossReplay: DungeonBossReplayConfig = DungeonBossReplayConfig()
 }
