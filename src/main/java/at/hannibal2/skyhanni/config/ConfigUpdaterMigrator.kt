@@ -117,6 +117,7 @@ object ConfigUpdaterMigrator {
                         "$realPrefix.${toPath.substringAfter('.')}", transform,
                     )
                 }
+                return
             }
             val oldElem = old.at(op, false)
             if (oldElem == null) {
@@ -165,6 +166,7 @@ object ConfigUpdaterMigrator {
                 for (realPrefix in realPrefixes) {
                     remove(since, "$realPrefix.${oldPath.substringAfter('.')}")
                 }
+                return
             }
             val oldElem = old.at(op, false)
             if (oldElem == null) {
