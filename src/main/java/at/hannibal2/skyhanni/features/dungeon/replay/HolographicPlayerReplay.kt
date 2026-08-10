@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.dungeon.replay
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HolographicEntities.HolographicEntity
@@ -8,23 +7,16 @@ import at.hannibal2.skyhanni.utils.HolographicEntities.renderHolographicEntity
 import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import com.mojang.authlib.GameProfile
-import net.minecraft.client.Minecraft
 import net.minecraft.client.player.AbstractClientPlayer
-import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object HolographicPlayerReplay {
-    private val mc get() = Minecraft.getInstance()
-    private val config get() = SkyHanniMod.feature.dev
-
     fun SkyHanniRenderWorldEvent.renderHolographicEntity(
         holographicEntity: HolographicEntity<AbstractClientPlayer>,
         opacity: Float = 0.3f,
         position: RecordedPosition,
-        previousPosition: RecordedPosition,
-        index: Int, //used for contrib spin
+        previousPosition: RecordedPosition
     ) {
         val newPosition = interpolateRecordedPosition(previousPosition, position, partialTicks)
 

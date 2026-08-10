@@ -237,8 +237,7 @@ object DungeonReplay {
             holographicPlayer ?: return,
             0.3f,
             recordedPosition,
-            previousPosition,
-            playIndex
+            previousPosition
         )
     }
 }
