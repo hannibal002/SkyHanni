@@ -26,7 +26,6 @@ import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.monster.zombie.Zombie
-import net.minecraft.world.item.ItemStack
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.reflect.KClass
@@ -230,8 +229,8 @@ object HolographicEntities {
     fun SkyHanniRenderWorldEvent.renderHolographicEntity(
         holographicEntity: HolographicEntity<AbstractClientPlayer>,
         opacity: Float = 0.3f,
-        heldItem: ItemStack = ItemStack.EMPTY,
-        mainHand: InteractionHand = InteractionHand.MAIN_HAND
+        heldItem: SafeItemStack = SafeItemStack.EMPTY,
+        mainHand: InteractionHand = InteractionHand.MAIN_HAND,
     ) {
         holographicEntity.entity.setItemInHand(mainHand, heldItem)
 

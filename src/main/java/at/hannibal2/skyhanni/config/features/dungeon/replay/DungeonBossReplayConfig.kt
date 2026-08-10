@@ -23,7 +23,7 @@ class DungeonBossReplayConfig {
     @Expose
     @ConfigOption(name = "Enabled Floors", desc = "Floors that should save replays")
     @ConfigEditorDraggableList
-    var enabledFloors: List<DungeonFloorWithBoss> = listOf(F7, M7)
+    val enabledFloors: MutableList<DungeonFloorWithBoss> = mutableListOf(F7, M7)
 
     // todo: idk why this shows in a random(?) order in the config, please help
     enum class DungeonFloorWithBoss(val isMaster: Boolean = false) {

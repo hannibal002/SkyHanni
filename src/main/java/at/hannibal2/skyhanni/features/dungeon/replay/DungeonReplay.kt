@@ -18,13 +18,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import com.google.gson.annotations.Expose
 import com.mojang.authlib.GameProfile
 import net.minecraft.client.player.AbstractClientPlayer
-import net.minecraft.world.item.ItemStack
 import java.util.UUID
 
 @SkyHanniModule
@@ -44,7 +44,7 @@ object DungeonReplay {
         }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!config.enabled) return
         if (!DungeonApi.inDungeon()) {
             playing = null
@@ -80,7 +80,7 @@ object DungeonReplay {
     }
 
     @HandleEvent
-    fun onBossStart(event: DungeonBossRoomEnterEvent) {
+    private fun onBossStart(event: DungeonBossRoomEnterEvent) {
         if (!config.enabled) return
         if (currentFloor?.isEnabled() != true) return
 
@@ -92,7 +92,7 @@ object DungeonReplay {
     }
 
     @HandleEvent
-    fun onBossEnd(event: DungeonCompleteEvent) {
+    private fun onBossEnd(event: DungeonCompleteEvent) {
         // this doesn't check for config or active floor so a previously started recording can safely end
         if (recording == null) return
 
@@ -148,7 +148,7 @@ object DungeonReplay {
     }
 
     @HandleEvent
-    fun onRender(event: SkyHanniRenderWorldEvent) {
+    private fun onRender(event: SkyHanniRenderWorldEvent) {
         val playData = playing ?: return
         val recordedPosition = RecordedPositionDelta.getComplete(
             playData.replay.recordedPositions,
@@ -158,7 +158,7 @@ object DungeonReplay {
         event.renderHolographicEntity(
             holographicPlayer ?: return,
             config.opacity / 100f,
-            recordedPosition.heldItemID?.getItemStackOrNull() ?: ItemStack.EMPTY
+            recordedPosition.heldItemID?.getItemStackOrNull() ?: SafeItemStack.EMPTY
         )
     }
 
@@ -166,7 +166,7 @@ object DungeonReplay {
         @Expose val recordedPositions: MutableList<RecordedPositionDelta> = mutableListOf(),
         @Expose val time: Long = Long.MAX_VALUE,
         @Expose val playerUUID: UUID = UUID.fromString("49f4c15d-14e0-4d75-be1b-9c1b85bad53c"),
-        @Expose val playerName: String = "martimavocado"
+        @Expose val playerName: String = "martimavocado",
     )
 
     data class RecordingData(val targetDungeon: DungeonFloorWithBoss) {
@@ -174,7 +174,10 @@ object DungeonReplay {
         val positionList = mutableListOf<RecordedPositionDelta>()
     }
 
-    data class PlayingData(val replay: DungeonGhostData, val holographicPlayer: HolographicEntities.HolographicEntity<AbstractClientPlayer>) {
+    data class PlayingData(
+        val replay: DungeonGhostData,
+        val holographicPlayer: HolographicEntities.HolographicEntity<AbstractClientPlayer>,
+    ) {
         var currentTick = 0
             set(value) {
                 field = value.coerceIn(0, replay.recordedPositions.size)
@@ -221,9 +224,7 @@ object DungeonReplay {
             }
 
             private fun RecordedPositionDelta.isComplete(): Boolean {
-                return position != null &&
-                    yaw != null &&
-                    heldItemID != null
+                return position != null && yaw != null && heldItemID != null
             }
         }
     }
