@@ -6,13 +6,16 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.dungeon.replay.RecordedPosition
 import at.hannibal2.skyhanni.mixins.hooks.activeHolographicEntities
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.associateNotNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import com.mojang.authlib.GameProfile
 import net.minecraft.client.Minecraft
+import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.state.EntityRenderState
@@ -22,6 +25,8 @@ import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.monster.zombie.Zombie
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.reflect.KClass
