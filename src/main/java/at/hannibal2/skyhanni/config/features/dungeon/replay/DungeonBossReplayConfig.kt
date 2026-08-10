@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import org.apache.commons.compress.compressors.lz4.FramedLZ4CompressorOutputStream
 
 class DungeonBossReplayConfig {
     @Expose
@@ -21,21 +22,21 @@ class DungeonBossReplayConfig {
     var enabledFloors: List<DungeonFloorWithBoss> = listOf(F7, M7)
 
     // todo: idk why this shows in a random(?) order in the config, please help
-    enum class DungeonFloorWithBoss(val baseFloor: DungeonFloor, val isMaster: Boolean = false) {
-        F1(DungeonFloor.F1),
-        F2(DungeonFloor.F2),
-        F3(DungeonFloor.F3),
-        F4(DungeonFloor.F4),
-        F5(DungeonFloor.F5),
-        F6(DungeonFloor.F6),
-        F7(DungeonFloor.F7),
-        M1(DungeonFloor.F1, true),
-        M2(DungeonFloor.F2, true),
-        M3(DungeonFloor.F3, true),
-        M4(DungeonFloor.F4, true),
-        M5(DungeonFloor.F5, true),
-        M6(DungeonFloor.F6, true),
-        M7(DungeonFloor.F7, true),
+    enum class DungeonFloorWithBoss(val isMaster: Boolean = false) {
+        F1,
+        F2,
+        F3,
+        F4,
+        F5,
+        F6,
+        F7,
+        M1(true),
+        M2(true),
+        M3(true),
+        M4(true),
+        M5(true),
+        M6(true),
+        M7(true),
         ;
 
         fun isEnabled() = SkyHanniMod.feature.dungeon.bossReplay.enabledFloors.contains(this)
