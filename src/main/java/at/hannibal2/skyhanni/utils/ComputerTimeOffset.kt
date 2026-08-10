@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.utils.EnumUtils.next
 import at.hannibal2.skyhanni.utils.EnumUtils.previous
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import org.apache.commons.net.ntp.NTPUDPClient
-import java.net.InetAddress
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import kotlin.time.Duration
@@ -19,7 +17,6 @@ import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.toJavaDuration
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -101,14 +98,7 @@ object ComputerTimeOffset {
             }
             return@runCatching null
         }
-        NTPUDPClient().apply {
-            setDefaultTimeout(10.seconds.toJavaDuration())
-        }.use { client ->
-            val address = InetAddress.getByName(ntpServer)
-            val timeInfo = client.getTime(address)
-            timeInfo.computeDetails()
-            timeInfo.offset.milliseconds
-        }
+        SntpClient.getOffset(ntpServer)
     }.onFailure { e ->
         if (e is SocketTimeoutException || e is UnknownHostException) {
             timeoutMap.addOrPut(ntpServer, 1)
