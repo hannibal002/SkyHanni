@@ -91,6 +91,13 @@ style:
         maxDestructuringEntries: 5
     AbstractClassCanBeConcreteClass: # this is usually intentional
         active: false
+    ForbiddenImport:
+        active: true
+        imports:
+            - value: 'org.lwjgl.glfw.GLFW'
+              reason: "Use InputConstants instead of GLFW constants, since 26.3 will remove GLFW."
+            - value: 'org.lwjgl.glfw.GLFW.*'
+              reason: "Use InputConstants instead of GLFW constants, since 26.3 will remove GLFW."
 
 ktlint:
     MaximumLineLength: # ktlint - handled by detekt
