@@ -16,8 +16,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
-import at.hannibal2.skyhanni.utils.HolographicEntities.HolographicBase
-import at.hannibal2.skyhanni.utils.HolographicEntities.entityHoloBases
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -25,7 +23,6 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import com.mojang.authlib.GameProfile
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.world.InteractionHand
-import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
 object DungeonReplay {
@@ -42,9 +39,19 @@ object DungeonReplay {
     private var currentRun: DungeonGhostData? = null
     private var bestRun = DungeonGhostData()
 
+    private val storage get() = SkyHanniMod.dungeonReplayStorage
+
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         val player = MinecraftCompat.localPlayerOrNull ?: return
+
+        if (playing) {
+            if (playIndex >= (currentRun?.recordedPositions?.size ?: 0)) {
+                playIndex = 0
+            } else {
+                playIndex += 1
+            }
+        }
 
         if (recording) {
             val position = player.position().toLorenzVec()
@@ -70,13 +77,6 @@ object DungeonReplay {
                 isUsingItem.takeIf { it != previousPosition.isUsingItem },
             )
             recordedPositions.add(newPosition)
-        }
-        if (playing) {
-            if (playIndex >= (currentRun?.recordedPositions?.size ?: 0)) {
-                playIndex = 0
-            } else {
-                playIndex += 1
-            }
         }
     }
 
@@ -126,7 +126,9 @@ object DungeonReplay {
 
             literal("storage") {
                 simpleCallback {
-                    startPlaying(SkyHanniMod.dungeonReplayStorage.manual)
+                    println(storage.manual)
+                    ChatUtils.chat(storage.manual.toString())
+                    startPlaying(storage.manual)
                     ChatUtils.chat("playing from storage")
                 }
             }
@@ -158,15 +160,13 @@ object DungeonReplay {
         holographicPlayer = HolographicEntities.createPlayerHologram(
             data.recordedPositions.first().position ?: run {
                 ErrorManager.skyHanniError("first pos is null")
-                return
             },
             data.recordedPositions.first().rotation?.y ?: run {
                 ErrorManager.skyHanniError("first rotation is null")
-                return
-            }
+            },
+            GameProfile(data.playerUUID, data.playerName)
         ) ?: run {
             ErrorManager.skyHanniError("null hologram")
-            return
         }
     }
 
@@ -196,32 +196,27 @@ object DungeonReplay {
 
         if (time < bestRun.time) {
             ChatUtils.chat("new pb! trying to save to '$type'")
-            val ghostData = DungeonGhostData(positions, time, player.gameProfile.id, player.gameProfile.name)
+            val ghostData = DungeonGhostData(positions.toMutableList(), time, player.gameProfile.id, player.gameProfile.name)
             when (type) {
                 "manual" -> {
-                    SkyHanniMod.dungeonReplayStorage.manual = ghostData
-                    println(SkyHanniMod.dungeonReplayStorage.manual)
+                    storage.manual = ghostData
+                    println(storage.manual)
                 }
 
                 "F3" -> {
-                    SkyHanniMod.dungeonReplayStorage.floor3 = ghostData
+                    storage.floor3 = ghostData
                 }
 
                 "F7" -> {
-                    SkyHanniMod.dungeonReplayStorage.floor7 = ghostData
+                    storage.floor7 = ghostData
                 }
 
                 "M7" -> {
-                    SkyHanniMod.dungeonReplayStorage.floorMaster7 = ghostData
+                    storage.floorMaster7 = ghostData
                 }
             }
             SkyHanniMod.configManager.saveConfig(ConfigFileType.DUNGEON_REPLAY, "Updated Dungeon Replays")
-            bestRun = bestRun.copy(
-                recordedPositions = positions.map { it.copy() },
-                time = time,
-                playerUUID = player.gameProfile.id,
-                playerName = player.gameProfile.name,
-            )
+            bestRun = bestRun.copy()
         }
     }
 
@@ -237,15 +232,13 @@ object DungeonReplay {
             playIndex
         )
         val previousPosition = RecordedPositionDelta.getComplete(currentRun?.recordedPositions ?: listOf(), previousIndex)
-        val gameProfile = GameProfile(currentRun?.playerUUID, currentRun?.playerName)
 
         event.renderHolographicEntity(
             holographicPlayer ?: return,
             0.3f,
             recordedPosition,
             previousPosition,
-            playIndex,
-            gameProfile
+            playIndex
         )
     }
 }

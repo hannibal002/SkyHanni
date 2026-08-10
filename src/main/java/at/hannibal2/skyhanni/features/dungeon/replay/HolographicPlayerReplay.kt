@@ -25,7 +25,6 @@ object HolographicPlayerReplay {
         position: RecordedPosition,
         previousPosition: RecordedPosition,
         index: Int, //used for contrib spin
-        gameProfile: GameProfile
     ) {
         val newPosition = interpolateRecordedPosition(previousPosition, position, partialTicks)
 
@@ -35,7 +34,6 @@ object HolographicPlayerReplay {
         } ?: ItemStack.EMPTY
 
         holographicEntity.entity.setItemInHand(position.interactionHand, item)
-//         holographicEntity.entity.gameProfile = gameProfile
         holographicEntity.moveTo(newPosition.position, newPosition.rotation.y)
 
         this.renderHolographicEntity(holographicEntity as HolographicEntity<*>, opacity)
