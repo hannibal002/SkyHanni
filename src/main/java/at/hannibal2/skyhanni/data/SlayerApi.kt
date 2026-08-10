@@ -411,7 +411,7 @@ object SlayerApi {
     // TODO USE SH-REPO
     private fun checkTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
         "Graveyard" -> if (trackerConfig.revenantInGraveyard.get() && IslandType.HUB.isInIsland()) Type.REVENANT else null
-        "Revenant Cave" -> Type.REVENANT
+        "Revenant Cave", "Crypts" -> Type.REVENANT
 
         "Spider Mound",
         "Arachne's Burrow",
