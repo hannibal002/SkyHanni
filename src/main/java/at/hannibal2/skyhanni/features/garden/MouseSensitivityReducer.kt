@@ -100,7 +100,7 @@ object MouseSensitivityReducer {
         return playerLocation().let { !BlockUtils.raycast(it, it.down(tolerance)).miss }
     }
 
-    fun setManualState(state: SensitivityState?, message: String? = null, configDisableOption: KProperty0<*>? = null) {
+    private fun setManualState(state: SensitivityState?, message: String? = null, configDisableOption: KProperty0<*>? = null) {
         manualState = state
 
         if (message != null && config.chatMessage) {
