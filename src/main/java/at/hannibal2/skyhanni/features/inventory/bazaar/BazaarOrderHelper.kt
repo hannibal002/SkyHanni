@@ -5,11 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.bazaar.BazaarOrdersLoadedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarDataOrError
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
@@ -25,19 +24,25 @@ object BazaarOrderHelper {
         highlightedSlots = if (config.orderHelper) load(event.orders) else emptyMap()
     }
 
+    @HandleEvent
+    private fun onInventoryClose() {
+        highlightedSlots = emptyMap()
+    }
+
     private fun load(orders: List<BazaarOrder>): Map<Int, LorenzColor> {
         val slots = mutableMapOf<Int, LorenzColor>()
-        val errorItems = mutableSetOf<NeuInternalName>()
         for (order in orders) {
             val data = order.internalName.getBazaarData()
             if (data == null) {
-                errorItems.add(order.internalName)
+                ErrorManager.logErrorStateWithData(
+                    "Could not highlight a bazaar order",
+                    "Can not find bazaar data for a bazaar order",
+                    "internal name" to order.internalName,
+                )
                 continue
             }
             highlightColor(order, data)?.let { slots[order.slot] = it }
         }
-        errorItems.firstOrNull()?.getBazaarDataOrError()
-
         return slots
     }
 
