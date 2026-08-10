@@ -14,7 +14,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import net.minecraft.resources.Identifier
 
 @SkyHanniModule
 object RenderEvents {
@@ -23,7 +22,7 @@ object RenderEvents {
     init {
         HudElementRegistry.attachElementBefore(
             VanillaHudElements.SLEEP,
-            Identifier.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
+            SkyHanniMod.id("gui_render_layer"),
             RenderEvents::postGui
         )
 
@@ -36,7 +35,7 @@ object RenderEvents {
     }
 
     @HandleEvent
-    fun onResourcePackReload() {
+    private fun onResourcePackReload() {
         SkyHanniItemRenderCoordinator.invalidateAtlas()
     }
 

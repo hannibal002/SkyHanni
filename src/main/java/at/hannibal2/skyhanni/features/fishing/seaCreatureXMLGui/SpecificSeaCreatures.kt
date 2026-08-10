@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.XmlUtils
-import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 import io.github.notenoughupdates.moulconfig.xml.Bind
@@ -18,7 +17,6 @@ class SpecificSeaCreatures(
     @field:Bind
     val seaCreatures: ObservableList<SpecificSeaCreatureStorageXMLHelper>,
 ) {
-
     @field:Bind
     var search: String = ""
 
@@ -33,16 +31,15 @@ class SpecificSeaCreatures(
 
     @SkyHanniModule
     companion object {
-
         @HandleEvent
-        fun onCommandRegistration(event: CommandRegistrationEvent) {
+        private fun onCommandRegistration(event: CommandRegistrationEvent) {
             event.registerBrigadier("shseacreatures") {
                 description = "Opens a Special Config Menu for Specific Sea Creature Settings."
                 category = CommandCategory.USERS_ACTIVE
                 aliases = listOf("shsc")
                 simpleCallback {
                     val existingSettings = updateList()
-                    val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/seacreaturetoggles.xml")
+                    val location = SkyHanniMod.id("gui/seacreaturetoggles/seacreaturetoggles.xml")
                     XmlUtils.openXmlScreen(SpecificSeaCreatures(existingSettings), location)
                 }
             }
@@ -189,8 +186,7 @@ class SpecificSeaCreatures(
     }
 
     private fun openXML(string: String) {
-        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/$string.xml")
+        val location = SkyHanniMod.id("gui/seacreaturetoggles/$string.xml")
         XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
     }
-
 }

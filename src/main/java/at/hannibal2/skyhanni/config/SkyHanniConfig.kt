@@ -20,25 +20,25 @@ import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
 import at.hannibal2.skyhanni.config.storage.Storage
+import at.hannibal2.skyhanni.utils.ConfigUtils.asMoulLocation
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.TimeUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.Social
 import io.github.notenoughupdates.moulconfig.annotations.Category
-import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory
 
 class SkyHanniConfig : Config() {
-    private val discord = MyResourceLocation("skyhanni", "social/discord.png")
-    private val github = MyResourceLocation("skyhanni", "social/github.png")
-    private val patreon = MyResourceLocation("skyhanni", "social/patreon.png")
+    private val discord = SkyHanniMod.id("social/discord.png")
+    private val github = SkyHanniMod.id("social/github.png")
+    private val patreon = SkyHanniMod.id("social/patreon.png")
     private val shSocials = listOf(
-        Social.forLink("Discord".asStructuredText(), discord, "https://discord.com/invite/skyhanni-997079228510117908"),
-        Social.forLink("GitHub".asStructuredText(), github, "https://github.com/hannibal002/SkyHanni"),
-        Social.forLink("Patreon".asStructuredText(), patreon, "https://www.patreon.com/hannibal2"),
+        Social.forLink("Discord".asStructuredText(), discord.asMoulLocation(), "https://discord.com/invite/skyhanni-997079228510117908"),
+        Social.forLink("GitHub".asStructuredText(), github.asMoulLocation(), "https://github.com/hannibal002/SkyHanni"),
+        Social.forLink("Patreon".asStructuredText(), patreon.asMoulLocation(), "https://www.patreon.com/hannibal2"),
     )
 
     // in moulconfig, this value is currently bugged (version 3.5.0)

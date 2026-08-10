@@ -12,17 +12,15 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.XmlUtils
-import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 
 @SkyHanniModule
 object CustomTodoDownload {
-
     var todos: List<CommunityTodo> = listOf()
         private set
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shdownloadtodo") {
             category = CommandCategory.USERS_ACTIVE
             description = "Download community /shtodos"
@@ -56,7 +54,7 @@ object CustomTodoDownload {
                 SkyHanniMod.customTodos.customTodos.forEach { todosList.add(CustomTodoEditor(it, todosList)) }
                 XmlUtils.openXmlScreen(
                     CommunityTodoViewer(todos, todosList),
-                    MyResourceLocation("skyhanni", "gui/customtodos/communitytodos.xml"),
+                    SkyHanniMod.id("gui/customtodos/communitytodos.xml"),
                 )
             }
         }
@@ -67,7 +65,7 @@ object CustomTodoDownload {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val constant = event.getConstant<CommunityTodosJson>("community/CommunityTodos")
         constant.communityTodos.forEach { CustomTodo.fromTemplate(it.todoData) }
         todos = constant.communityTodos

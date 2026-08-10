@@ -30,7 +30,6 @@ import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import java.util.concurrent.CompletableFuture
 
@@ -79,7 +78,7 @@ object ClientEvents {
         *///?}
 
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(
-            Identifier.fromNamespaceAndPath("skyhanni", "resources"),
+            SkyHanniMod.id("resources"),
         ) { currentReload, _, preparationBarrier, reloadExecutor ->
             CompletableFuture.runAsync(
                 { ResourcePackReloadEvent(currentReload.resourceManager()).post() },
