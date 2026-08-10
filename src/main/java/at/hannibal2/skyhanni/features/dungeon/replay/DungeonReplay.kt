@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import com.mojang.authlib.GameProfile
+import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
 
@@ -33,7 +34,7 @@ object DungeonReplay {
 
     private var recordedTime = SimpleTimeMark.farPast()
 
-    private var holographicPlayer: HolographicEntities.HolographicEntity<Player>? = null
+    private var holographicPlayer: HolographicEntities.HolographicEntity<AbstractClientPlayer>? = null
 
     private var playing = false
     private var playIndex = 0
@@ -107,26 +108,34 @@ object DungeonReplay {
             category = CommandCategory.USERS_ACTIVE
 
             literal("clear") {
-                recording = false
-                recordedPositions.clear()
-                recordedTime = SimpleTimeMark.farPast()
-                bestRun = DungeonGhostData()
-                ChatUtils.chat("cleared!")
+                simpleCallback {
+                    recording = false
+                    recordedPositions.clear()
+                    recordedTime = SimpleTimeMark.farPast()
+                    bestRun = DungeonGhostData()
+                    ChatUtils.chat("cleared!")
+                }
             }
 
             literal("play") {
-                startPlaying(bestRun)
-                ChatUtils.chat("playing")
+                simpleCallback {
+                    startPlaying(bestRun)
+                    ChatUtils.chat("playing")
+                }
             }
 
             literal("storage") {
-                startPlaying(SkyHanniMod.dungeonReplayStorage.manual)
-                ChatUtils.chat("playing from storage")
+                simpleCallback {
+                    startPlaying(SkyHanniMod.dungeonReplayStorage.manual)
+                    ChatUtils.chat("playing from storage")
+                }
             }
 
             literal("stop") {
-                playing = false
-                ChatUtils.chat("stopped")
+                simpleCallback {
+                    playing = false
+                    ChatUtils.chat("stopped")
+                }
             }
 
             simpleCallback {
@@ -137,25 +146,28 @@ object DungeonReplay {
     }
 
     private fun startPlaying(data: DungeonGhostData) {
+        if (data.recordedPositions.isEmpty()) {
+            ChatUtils.chat("empty replay list")
+            return
+        }
+
         currentRun = data
         playing = true
         playIndex = 0
 
-        val base = entityHoloBases[Player::class] ?: ErrorManager.skyHanniError(
-            "HolographicEntityDebug: Player not found in entityHoloBases (size=${entityHoloBases.size})"
-        )
-
-        @Suppress("UNCHECKED_CAST")
-        holographicPlayer = (base as HolographicBase<Player>).instance(
+        holographicPlayer = HolographicEntities.createPlayerHologram(
             data.recordedPositions.first().position ?: run {
-                ErrorManager.crashInDevEnv("first pos is null")
+                ErrorManager.skyHanniError("first pos is null")
                 return
             },
             data.recordedPositions.first().rotation?.y ?: run {
-                ErrorManager.crashInDevEnv("first rotation is null")
+                ErrorManager.skyHanniError("first rotation is null")
                 return
             }
-        )
+        ) ?: run {
+            ErrorManager.skyHanniError("null hologram")
+            return
+        }
     }
 
     private fun startRecording() {

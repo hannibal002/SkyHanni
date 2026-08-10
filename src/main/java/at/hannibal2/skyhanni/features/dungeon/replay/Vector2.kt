@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.features.dungeon.replay
 
+import com.google.gson.annotations.Expose
 import net.minecraft.world.phys.Vec2
 
 data class Vector2(
-    val x: Float = 0f,
-    val y: Float = 0f
+    @Expose val x: Float = 0f,
+    @Expose val y: Float = 0f
 ) {
     companion object {
         fun Vec2.toVector2(): Vector2 = Vector2(this.x, this.y)

@@ -15,7 +15,9 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.associateNotNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.mojang.authlib.GameProfile
 import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.AbstractClientPlayer
+import net.minecraft.client.player.RemotePlayer
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.state.EntityRenderState
@@ -27,6 +29,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.monster.zombie.Zombie
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
+import java.util.UUID
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.reflect.KClass
@@ -159,6 +162,17 @@ object HolographicEntities {
         while (direction < -180f) direction += 360f
         while (direction >= 180f) direction -= 360f
         return last + progress * direction
+    }
+
+    fun createPlayerHologram(
+        position: LorenzVec,
+        yaw: Float,
+        profile: GameProfile = GameProfile(UUID.fromString("49f4c15d-14e0-4d75-be1b-9c1b85bad53c"), "martimavocado")
+    ): HolographicEntity<AbstractClientPlayer>? {
+        val level = Minecraft.getInstance().level ?: return null
+        val player = RemotePlayer(level, profile)
+
+        return HolographicEntity(player, position, yaw)
     }
 
     /**

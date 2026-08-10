@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import com.mojang.authlib.GameProfile
 import net.minecraft.client.Minecraft
+import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 
@@ -19,7 +20,7 @@ object HolographicPlayerReplay {
     private val config get() = SkyHanniMod.feature.dev
 
     fun SkyHanniRenderWorldEvent.renderHolographicEntity(
-        holographicEntity: HolographicEntity<Player>,
+        holographicEntity: HolographicEntity<AbstractClientPlayer>,
         opacity: Float = 0.3f,
         position: RecordedPosition,
         previousPosition: RecordedPosition,
@@ -35,7 +36,7 @@ object HolographicPlayerReplay {
 
         holographicEntity.entity.setItemInHand(position.interactionHand, item)
 //         holographicEntity.entity.gameProfile = gameProfile
-        holographicEntity.moveTo(newPosition.position, newPosition.rotation.x)
+        holographicEntity.moveTo(newPosition.position, newPosition.rotation.y)
 
         this.renderHolographicEntity(holographicEntity as HolographicEntity<*>, opacity)
     }
