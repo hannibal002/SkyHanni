@@ -13,3 +13,4 @@ at/hannibal2/skyhanni/ org.spongepowered.asm.mixin.injection.ModifyConstant
 at/hannibal2/skyhanni/ org.spongepowered.asm.mixin.injection.Redirect
 # Here because SkyHanniDebugsAndTests references way too much stuff and this way we keep the internal dependencies lower
 at/hannibal2/skyhanni/ at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+at/hannibal2/skyhanni/ org.lwjgl.glfw.GLFW at/hannibal2/skyhanni/features/garden/SeeThroughWindow.kt

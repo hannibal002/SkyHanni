@@ -13,9 +13,18 @@ jobs:
         name: Checkout code
       - name: Check imports
         run: |
-            while IFS=' ' read search banned; do
-                echo Banning $banned from $search
-                grep -nrE -- "import $banned" src/main/java/"$search"|sed -E 's/^(.*):([0-9]+):(.*)/::error file=\1,line=\2::Illegal \3/g'|tee -a temp
+          while IFS=' ' read search banned allowed; do
+            echo Banning $banned from $search
+
+            grep -nrE -- "import $banned" src/main/java/"$search" \
+              | while IFS= read -r line; do
+                  if [[ -n "$allowed" && "$line" == *"$allowed:"* ]]; then
+                    continue
+                  fi
+                  echo "$line"
+                done \
+              | sed -E 's/^(.*):([0-9]+):(.*)/::error file=\1,line=\2::Illegal \3/g' \
+              | tee -a temp
             
           done<<<$(cat .github/workflows/illegal-imports.txt|sed -E 's/#.*//;/^$/d')
           found=$(wc -l temp|cut -d ' ' -f 1)
