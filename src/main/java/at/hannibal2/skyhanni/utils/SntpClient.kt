@@ -34,6 +34,7 @@ object SntpClient {
      * @throws java.net.SocketTimeoutException if the server does not respond in time
      * @throws IOException if the response is not a valid NTP server reply
      */
+    @Suppress("ThrowsCount")
     fun getOffset(server: String): Duration {
         val address = InetAddress.getByName(server)
         val buffer = ByteArray(PACKET_SIZE)
