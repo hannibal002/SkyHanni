@@ -190,9 +190,6 @@ dependencies {
     detektPlugins(project(":detekt"))
     detektPlugins(libs.detektrules.ktlint)
 
-    shadowImpl(libs.httpclient)
-    "minecraftTestClientRuntimeLibraries"(libs.httpclient)
-
     target.renderChestVersion?.let {
         includeImplementation("net.azureaaron:render-chest:$it")
         "productionRuntimeMods"("net.azureaaron:render-chest:$it")

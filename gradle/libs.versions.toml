@@ -22,7 +22,6 @@ junit = "5.14.4"
 mockk = "1.14.11"
 commons-net = "3.13.0"
 keval = "1.2.0"
-httpclient = "4.5.14"
 detektrules-neu = "1.0.0"
 
 [libraries]
@@ -45,7 +44,6 @@ mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-agent = { module = "io.mockk:mockk-agent-jvm", version.ref = "mockk" }
 commons-net = { module = "commons-net:commons-net", version.ref = "commons-net" }
 keval = { module = "com.notkamui.libs:keval", version.ref = "keval" }
-httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "httpclient" }
 
 detekt-api = { module = "dev.detekt:detekt-api", version.ref = "detekt" }
 detektrules-ktlint = { module = "dev.detekt:detekt-rules-ktlint-wrapper", version.ref = "detekt" }
