@@ -14,11 +14,6 @@ pluginManagement {
                 includeGroup("org.spongepowered")
             }
         }
-        maven("https://repo.nea.moe/releases") {
-            content {
-                includeGroup("moe.nea")
-            }
-        }
         maven("https://jitpack.io") {
             content {
                 includeGroupByRegex("(com|io)\\.github\\..*")
