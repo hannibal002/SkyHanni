@@ -2,12 +2,10 @@ package at.hannibal2.skyhanni.config.features.dungeon.replay
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.apache.commons.compress.compressors.lz4.FramedLZ4CompressorOutputStream
 
 class DungeonBossReplayConfig {
     @Expose
