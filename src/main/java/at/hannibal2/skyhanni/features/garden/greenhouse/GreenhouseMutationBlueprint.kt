@@ -189,9 +189,9 @@ object GreenhouseMutationBlueprint {
         )
         event.matrices.pushPose()
         event.matrices.translate(
-            position.x - event.camera.position.x,
+            position.x - event.camera.position.x + 0.5,
             position.y - event.camera.position.y + 0.5,
-            position.z - event.camera.position.z,
+            position.z - event.camera.position.z + 0.5,
         )
         event.matrices.scale(1.2f, 1.2f, 1.2f)
         renderState.submit(
