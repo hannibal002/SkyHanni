@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
+import net.minecraft.client.input.KeyEvent
+import org.lwjgl.glfw.GLFW
 import kotlin.math.floor
 
 internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBaseScreen() {
@@ -13,6 +15,9 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
     private var scrollOffset = 0
     private var maximumScroll = 0
     private var pendingDelete: String? = null
+    private var pendingRename: String? = null
+    private var renameText = ""
+    private var renameTextSelected = false
     private var currentMouseX = 0
     private var currentMouseY = 0
 
@@ -30,12 +35,19 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
 
         GuiRenderUtils.drawString("§6§lGreenhouse Layouts", panelX + PADDING, panelY + PADDING)
 
+        drawButton(panelX + panelWidth - 278, panelY + 9, 80, 18, "§dImport File") {
+            pendingDelete = null
+            cancelRename()
+            GreenhouseMutationBlueprint.importLayoutFile(plotId)
+        }
         drawButton(panelX + panelWidth - 188, panelY + 9, 80, 18, "§bImport Link") {
             pendingDelete = null
+            cancelRename()
             GreenhouseMutationBlueprint.importFromClipboard()
         }
         drawButton(panelX + panelWidth - 98, panelY + 9, 84, 18, "§aCapture New") {
             pendingDelete = null
+            cancelRename()
             GreenhouseMutationBlueprint.captureGreenhouse()
         }
 
@@ -63,7 +75,7 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
         GuiRenderUtils.disableScissor()
 
         GuiRenderUtils.drawString(
-            "§8Named capture: §7/shgreenhouseblueprint capture <name>",
+            "§8Click a layout name to rename it",
             panelX + PADDING,
             panelY + panelHeight - 22,
         )
@@ -86,7 +98,22 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
         GuiRenderUtils.drawRect(x + cardWidth - 1, y, x + cardWidth, y + CARD_HEIGHT, borderColor)
 
         drawGridPreview(x + 7, y + 7, blueprint)
-        GuiRenderUtils.drawString("${if (active) "§a● " else "§7○ "}§f$name", x + 58, y + 8)
+        if (pendingRename == name) {
+            drawRenameInput(x + 58, y + 5, cardWidth - 66)
+        } else {
+            val nameX = x + 58
+            val nameY = y + 8
+            val nameLabel = "${if (active) "§a● " else "§7○ "}§f$name"
+            val nameRight = (nameX + mc.font.width(nameLabel)).coerceAtMost(x + cardWidth - 8)
+            val nameHovered = currentMouseX in nameX until nameRight &&
+                currentMouseY in (y + 4) until (y + 19)
+            GuiRenderUtils.drawString(
+                "${if (active) "§a● " else "§7○ "}${if (nameHovered) "§e" else "§f"}$name",
+                nameX,
+                nameY,
+            )
+            actions.add(ActionArea(nameX, y + 4, nameRight, y + 19) { startRename(name) })
+        }
         val target = GreenhouseMutationBlueprint.targetMutation(blueprint)
         GuiRenderUtils.drawString(
             target?.let { "§7Spawned output: §e${it.displayName} §8(ignored)" } ?: "§7Spawned output: §cNot detected",
@@ -100,18 +127,30 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
         GuiRenderUtils.drawString("§a$setupCount setup §7• §b$buffCount buffs §7• §6$uniqueCount unique", x + 58, y + 33)
 
         val buttonY = y + CARD_HEIGHT - 20
+        if (pendingRename == name) {
+            drawButton(x + 58, buttonY, 42, 14, "§aSave") { saveRename() }
+            drawButton(x + 105, buttonY, 48, 14, "§7Cancel") { cancelRename() }
+            return
+        }
         drawButton(x + 58, buttonY, 42, 14, if (active) "§aLoaded" else "§eLoad") {
             pendingDelete = null
+            cancelRename()
             GreenhouseMutationBlueprint.loadLayout(plotId, name)
             ChatUtils.chat("§aLoaded Greenhouse layout §e$name §ain Plot §e$plotId§a.")
         }
         drawButton(x + 105, buttonY, 62, 14, "§bOverwrite") {
             pendingDelete = null
+            cancelRename()
             GreenhouseMutationBlueprint.captureGreenhouse(name)
+        }
+        drawButton(x + 172, buttonY, 48, 14, "§dExport") {
+            pendingDelete = null
+            cancelRename()
+            GreenhouseMutationBlueprint.exportLayout(name)
         }
         val confirmingDelete = pendingDelete == name
         drawButton(
-            x + 172,
+            x + 225,
             buttonY,
             if (confirmingDelete) 65 else 45,
             14,
@@ -124,6 +163,40 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
                 pendingDelete = name
             }
         }
+    }
+
+    private fun drawRenameInput(x: Int, y: Int, inputWidth: Int) {
+        GuiRenderUtils.drawRect(x, y, x + inputWidth, y + 16, INPUT_BORDER_COLOR)
+        GuiRenderUtils.drawRect(x + 1, y + 1, x + inputWidth - 1, y + 15, INPUT_BACKGROUND_COLOR)
+        if (renameTextSelected) {
+            val selectionWidth = mc.font.width(renameText).coerceAtMost(inputWidth - 6)
+            GuiRenderUtils.drawRect(x + 3, y + 3, x + 3 + selectionWidth, y + 13, INPUT_SELECTION_COLOR)
+        }
+        val cursor = if ((System.currentTimeMillis() / CURSOR_BLINK_INTERVAL) % 2L == 0L) "_" else ""
+        val availableWidth = inputWidth - 6
+        var visibleText = renameText
+        while (visibleText.isNotEmpty() && mc.font.width(visibleText + cursor) > availableWidth) {
+            visibleText = visibleText.drop(1)
+        }
+        GuiRenderUtils.drawString("§f$visibleText§e$cursor", x + 3, y + 4)
+    }
+
+    private fun startRename(name: String) {
+        pendingDelete = null
+        pendingRename = name
+        renameText = name
+        renameTextSelected = true
+    }
+
+    private fun saveRename() {
+        val oldName = pendingRename ?: return
+        if (GreenhouseMutationBlueprint.renameLayout(oldName, renameText)) cancelRename()
+    }
+
+    private fun cancelRename() {
+        pendingRename = null
+        renameText = ""
+        renameTextSelected = false
     }
 
     private fun drawGridPreview(
@@ -215,6 +288,32 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
         actions.lastOrNull { it.contains(originalMouseX, originalMouseY) }?.action?.invoke()
     }
 
+    override fun keyPressed(input: KeyEvent): Boolean {
+        if (pendingRename != null) {
+            when (input.key) {
+                GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_KP_ENTER -> saveRename()
+                GLFW.GLFW_KEY_BACKSPACE -> {
+                    renameText = if (renameTextSelected) "" else renameText.dropLast(1)
+                    renameTextSelected = false
+                }
+                GLFW.GLFW_KEY_ESCAPE -> cancelRename()
+                else -> return super.keyPressed(input)
+            }
+            return true
+        }
+        return super.keyPressed(input)
+    }
+
+    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
+        if (pendingRename != null && typedChar != null && !typedChar.isISOControl() &&
+            (renameTextSelected || renameText.length < GreenhouseMutationBlueprint.MAX_LAYOUT_NAME_LENGTH)
+        ) {
+            if (renameTextSelected) renameText = ""
+            renameTextSelected = false
+            renameText += typedChar
+        }
+    }
+
     override fun onHandleMouseInput() {
         if (!MouseCompat.hasScrollDelta()) return
         scrollOffset = (scrollOffset - MouseCompat.getScrollDelta()).coerceIn(0, maximumScroll)
@@ -260,9 +359,13 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
         private const val CHUNK_DIVIDER_COLOR = 0xFF87909B.toInt()
         private const val BUTTON_COLOR = 0xFF303030.toInt()
         private const val BUTTON_HOVER_COLOR = 0xFF505050.toInt()
+        private const val INPUT_BACKGROUND_COLOR = 0xFF181818.toInt()
+        private const val INPUT_BORDER_COLOR = 0xFFE0B84C.toInt()
+        private const val INPUT_SELECTION_COLOR = 0xFF355A85.toInt()
         private const val TARGET_CELL_COLOR = 0xFFFFAA00.toInt()
         private const val SPAWN_INPUT_COLOR = 0xFF4CAF50.toInt()
         private const val YIELD_BUFF_COLOR = 0xFF3ABED8.toInt()
         private const val UNIQUE_CROP_COLOR = 0xFFE0B84C.toInt()
+        private const val CURSOR_BLINK_INTERVAL = 500L
     }
 }

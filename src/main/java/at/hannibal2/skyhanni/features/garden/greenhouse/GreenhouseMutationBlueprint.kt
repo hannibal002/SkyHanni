@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.greenhouse
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DialogUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.createSkull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -33,6 +35,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.phys.AABB
+import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.UUID
 import kotlin.math.floor
@@ -495,6 +498,85 @@ object GreenhouseMutationBlueprint {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "load-greenhouse-mutation-layout")
     }
 
+    internal fun renameLayout(oldName: String, requestedName: String): Boolean {
+        val newName = requestedName.trim().take(MAX_LAYOUT_NAME_LENGTH)
+        if (newName.isEmpty()) {
+            ChatUtils.chat("§cA Greenhouse layout name cannot be empty.")
+            return false
+        }
+        val layouts = layoutMap() ?: run {
+            ChatUtils.chat("§cYour SkyBlock profile storage is not available yet.")
+            return false
+        }
+        val blueprint = layouts[oldName] ?: run {
+            ChatUtils.chat("§cThe Greenhouse layout §e$oldName §cno longer exists.")
+            return false
+        }
+        if (newName == oldName) return true
+        if (newName in layouts) {
+            ChatUtils.chat("§cA Greenhouse layout named §e$newName §calready exists.")
+            return false
+        }
+
+        layouts.remove(oldName)
+        layouts[newName] = blueprint
+        activeLayoutMap()?.entries?.forEach { entry ->
+            if (entry.value == oldName) entry.setValue(newName)
+        }
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "rename-greenhouse-mutation-layout")
+        ChatUtils.chat("§aRenamed Greenhouse layout §e$oldName §ato §e$newName§a.")
+        return true
+    }
+
+    internal fun exportLayout(name: String) {
+        val blueprint = layoutMap()?.get(name) ?: run {
+            ChatUtils.chat("§cThe Greenhouse layout §e$name §cno longer exists.")
+            return
+        }
+        val serialized = GreenhouseBlueprintFile.encode(name, blueprint)
+        val exportDirectory = File(ConfigManager.configDirectory, "greenhouse-layouts").absoluteFile
+        exportDirectory.mkdirs()
+        val defaultFile = File(exportDirectory, GreenhouseBlueprintFile.suggestedFileName(name))
+        DialogUtils.saveFileDialog("Export Greenhouse Layout", defaultFile.absolutePath) { selectedFile ->
+            val file = File(GreenhouseBlueprintFile.withFileExtension(selectedFile.absolutePath))
+            runCatching {
+                file.parentFile?.mkdirs()
+                file.writeText(serialized)
+            }.onSuccess {
+                ChatUtils.chat("§aExported Greenhouse layout §e$name §ato §b${file.absolutePath}§a.")
+            }.onFailure { exception ->
+                ChatUtils.chat("§cCould not export the Greenhouse layout: §7${exception.message}")
+            }
+        }
+    }
+
+    internal fun importLayoutFile(plotId: Int) {
+        val importDirectory = File(ConfigManager.configDirectory, "greenhouse-layouts").absoluteFile
+        importDirectory.mkdirs()
+        DialogUtils.openFileDialog("Import Greenhouse Layout", importDirectory.absolutePath + File.separator) { file ->
+            val imported = runCatching {
+                require(file.isFile) { "The selected path is not a file." }
+                require(file.length() <= GreenhouseBlueprintFile.MAX_FILE_BYTES) { "The layout file is too large." }
+                GreenhouseBlueprintFile.decode(file.readText())
+            }.getOrElse { exception ->
+                ChatUtils.chat("§cCould not import the Greenhouse layout: §7${exception.message}")
+                return@openFileDialog
+            }
+            val layouts = layoutMap() ?: run {
+                ChatUtils.chat("§cYour SkyBlock profile storage is not available yet.")
+                return@openFileDialog
+            }
+            val baseName = imported.name.take(MAX_LAYOUT_NAME_LENGTH).ifEmpty { file.nameWithoutExtension }
+                .take(MAX_LAYOUT_NAME_LENGTH).ifEmpty { "Imported Layout" }
+            val name = nextLayoutName(layouts.keys, baseName)
+            layouts[name] = imported.blueprint
+            activeLayoutMap()?.set(plotId, name)
+            resetMissingState()
+            SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "import-greenhouse-layout-file")
+            ChatUtils.chat("§aImported and loaded Greenhouse layout §e$name§a.")
+        }
+    }
+
     internal fun deleteLayout(name: String) {
         if (layoutMap()?.remove(name) == null) return
         activeLayoutMap()?.entries?.removeIf { it.value == name }
@@ -656,7 +738,7 @@ object GreenhouseMutationBlueprint {
     private const val REQUIRED_STABLE_CHECKS = 3
     private const val ANCHOR_HORIZONTAL_TOLERANCE = 0.1
     private const val ANCHOR_VERTICAL_TOLERANCE = 3.0
-    private const val MAX_LAYOUT_NAME_LENGTH = 32
+    internal const val MAX_LAYOUT_NAME_LENGTH = 32
     private const val IMPORTED_MUTATION_Y = 74.0
     private const val IMPORTED_CROP_Y = 74.0
     private const val NO_TARGET_MUTATION = "NONE"
