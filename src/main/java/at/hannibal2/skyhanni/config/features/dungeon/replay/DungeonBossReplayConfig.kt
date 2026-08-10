@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class DungeonBossReplayConfig {
@@ -13,6 +14,11 @@ class DungeonBossReplayConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Opacity", desc = "Changes the opacity of the player hologram.")
+    @ConfigEditorSlider(minValue = 5f, maxValue = 100f, minStep = 5f)
+    var opacity: Float = 30f
 
     @Expose
     @ConfigOption(name = "Enabled Floors", desc = "Floors that should save replays")

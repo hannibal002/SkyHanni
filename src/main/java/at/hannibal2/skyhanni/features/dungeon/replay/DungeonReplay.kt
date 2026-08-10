@@ -24,10 +24,8 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import com.google.gson.annotations.Expose
 import com.mojang.authlib.GameProfile
 import net.minecraft.client.player.AbstractClientPlayer
-import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
 import java.util.UUID
-import kotlin.collections.first
 
 @SkyHanniModule
 object DungeonReplay {
@@ -48,7 +46,10 @@ object DungeonReplay {
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!config.enabled) return
-        if (!DungeonApi.inDungeon()) return
+        if (!DungeonApi.inDungeon()) {
+            playing = null
+            return
+        }
 
         playing?.let {
             if (it.currentTick < it.replay.recordedPositions.size) {
@@ -67,14 +68,12 @@ object DungeonReplay {
 
         val position = player.position().toLorenzVec()
         val yaw = player.rotationVector.y
-        val interactionHand = player.swingingArm ?: InteractionHand.MAIN_HAND
         val heldItemID = player.activeItem.getInternalNameOrNull()
 
         val previousPosition = RecordedPositionDelta.getComplete(recording.positionList, recording.positionList.size - 1)
         val newPosition = RecordedPositionDelta(
             position.takeIf { it != previousPosition.position },
             yaw.takeIf { it != previousPosition.yaw },
-            interactionHand.takeIf { it != previousPosition.interactionHand },
             heldItemID.takeIf { it != previousPosition.heldItemID },
         )
         recording.positionList.add(newPosition)
@@ -94,8 +93,7 @@ object DungeonReplay {
 
     @HandleEvent
     fun onBossEnd(event: DungeonCompleteEvent) {
-        if (!config.enabled) return
-        if (currentFloor?.isEnabled() != true) return
+        // this doesn't check for config or active floor so a previously started recording can safely end
         if (recording == null) return
 
         stopRecording()
@@ -159,9 +157,8 @@ object DungeonReplay {
 
         event.renderHolographicEntity(
             holographicPlayer ?: return,
-            0.3f,
-            recordedPosition.heldItemID?.getItemStackOrNull() ?: ItemStack.EMPTY,
-            recordedPosition.interactionHand
+            config.opacity / 100f,
+            recordedPosition.heldItemID?.getItemStackOrNull() ?: ItemStack.EMPTY
         )
     }
 
@@ -189,16 +186,14 @@ object DungeonReplay {
     }
 
     data class RecordedPosition(
-        @Expose val position: LorenzVec,
-        @Expose val yaw: Float,
-        @Expose val interactionHand: InteractionHand,
-        @Expose val heldItemID: NeuInternalName? = null,
+        val position: LorenzVec,
+        val yaw: Float,
+        val heldItemID: NeuInternalName? = null,
     )
 
     data class RecordedPositionDelta(
         @Expose val position: LorenzVec? = null,
         @Expose val yaw: Float? = null,
-        @Expose val interactionHand: InteractionHand? = null,
         @Expose val heldItemID: NeuInternalName? = null,
     ) {
         companion object {
@@ -212,7 +207,6 @@ object DungeonReplay {
                     incompletePositions = incompletePositions.copy(
                         position = incompletePositions.position ?: position.position,
                         yaw = incompletePositions.yaw ?: position.yaw,
-                        interactionHand = incompletePositions.interactionHand ?: position.interactionHand,
                         heldItemID = incompletePositions.heldItemID ?: position.heldItemID,
                     )
 
@@ -222,7 +216,6 @@ object DungeonReplay {
                 return RecordedPosition(
                     incompletePositions.position ?: LorenzVec(),
                     incompletePositions.yaw ?: 0f,
-                    incompletePositions.interactionHand ?: InteractionHand.MAIN_HAND,
                     incompletePositions.heldItemID,
                 )
             }
@@ -230,7 +223,6 @@ object DungeonReplay {
             private fun RecordedPositionDelta.isComplete(): Boolean {
                 return position != null &&
                     yaw != null &&
-                    interactionHand != null &&
                     heldItemID != null
             }
         }
