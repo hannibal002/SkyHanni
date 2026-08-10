@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
+import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
@@ -15,12 +16,13 @@ import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.Identifier
 import java.lang.reflect.Field
+import java.util.WeakHashMap
 import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KProperty0
 
 object ConfigUtils {
-
     private const val UNKNOWN_EDITOR_INDEX = -1
 
     private val editorProviders = listOf<() -> MoulConfigEditor<*>>(
@@ -28,6 +30,8 @@ object ConfigUtils {
         PetDisplayConfigGuiManager::getEditorInstance,
     )
     private val editorIndexCache = mutableMapOf<Field, Int>()
+
+    private val moulconfigIdentifiers = WeakHashMap<Identifier, MyResourceLocation>()
 
     /**
      * Migrates a Boolean to an Enum Constant.
@@ -113,4 +117,11 @@ object ConfigUtils {
         get() = MinecraftCompat.screen is MoulConfigScreenComponent
 
     fun String.asStructuredText() = StructuredText.of(this)
+
+    /**
+     * Converts a Minecraft [Identifier] to a MoulConfig [MyResourceLocation].
+     */
+    fun Identifier.asMoulLocation(): MyResourceLocation = moulconfigIdentifiers.getOrPut(this) {
+        MyResourceLocation(namespace, path)
+    }
 }

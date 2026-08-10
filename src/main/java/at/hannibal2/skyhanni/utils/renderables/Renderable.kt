@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.renderables
 
-
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.data.GuiData
@@ -28,7 +27,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullValue
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
-import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -51,7 +49,6 @@ import kotlin.math.max
 
 @Suppress("TooManyFunctions")
 interface Renderable {
-
     val width: Int
     val height: Int
 
@@ -77,7 +74,6 @@ interface Renderable {
     fun render(mouseOffsetX: Int, mouseOffsetY: Int)
 
     companion object {
-
         val logger = SkyHanniLogger("debug/renderable")
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
 
@@ -268,7 +264,6 @@ interface Renderable {
             condition: () -> Boolean = { true },
             onHover: () -> Unit = {},
         ): Renderable {
-
             val render = fromAny(content) ?: text("Error")
             return object : Renderable {
                 override val width get() = render.width
@@ -590,12 +585,12 @@ interface Renderable {
                 } else {
                     if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
                         DrawContextUtils.drawContext.blitSprite(
-                            RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_background"),
+                            RenderCompat.getMinecraftGuiTextured(), Identifier.withDefaultNamespace("hud/experience_bar_background"),
                             mouseOffsetX, mouseOffsetY, width, height,
                         )
                     } else {
                         DrawContextUtils.drawContext.blit(
-                            RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                            RenderCompat.getMinecraftGuiTextured(), Identifier.parse(texture.path),
                             mouseOffsetX, mouseOffsetY, 0f, 0f, width, height, 182, 5, 256, 256, -1,
                         )
                     }
@@ -603,24 +598,24 @@ interface Renderable {
                     if (useChroma) {
                         if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
                             DrawContextUtils.drawContext.blitSprite(
-                                SkyHanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
+                                SkyHanniRenderLayers.getChromaTextured(), Identifier.withDefaultNamespace("hud/experience_bar_progress"),
                                 width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height,
                             )
                         } else {
                             DrawContextUtils.drawContext.blit(
-                                SkyHanniRenderLayers.getChromaTextured(), createResourceLocation(texture.path),
+                                SkyHanniRenderLayers.getChromaTextured(), Identifier.parse(texture.path),
                                 mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1,
                             )
                         }
                     } else {
                         if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
                             DrawContextUtils.drawContext.blitSprite(
-                                RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),
+                                RenderCompat.getMinecraftGuiTextured(), Identifier.withDefaultNamespace("hud/experience_bar_progress"),
                                 width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height,
                             )
                         } else {
                             DrawContextUtils.drawContext.blit(
-                                RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                                RenderCompat.getMinecraftGuiTextured(), Identifier.parse(texture.path),
                                 mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1,
                             )
                         }
@@ -654,7 +649,6 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-
             var state = startState
 
             override val width = content.width + padding * 2

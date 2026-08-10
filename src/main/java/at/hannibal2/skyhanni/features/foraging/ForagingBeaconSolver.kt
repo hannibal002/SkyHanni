@@ -55,7 +55,6 @@ import kotlin.time.times
 
 @SkyHanniModule
 object ForagingBeaconSolver {
-
     private val config get() = SkyHanniMod.feature.foraging.foragingBeacon
     private val debugConfig get() = SkyHanniMod.feature.dev.debug
 
@@ -125,7 +124,7 @@ object ForagingBeaconSolver {
 
         override fun toString() = displayName
 
-        private val identifier = Identifier.fromNamespaceAndPath("minecraft", name.lowercase() + "_stained_glass_pane")
+        private val identifier = Identifier.withDefaultNamespace("${name.lowercase()}_stained_glass_pane")
         val item by lazy { itemOverride ?: BuiltInRegistries.ITEM.getValue(identifier) }
 
         companion object {
@@ -212,8 +211,8 @@ object ForagingBeaconSolver {
         val range: IntRange,
         val target: BeaconPieceTarget,
     ) {
-        MATCH("Match Slots", 10..16, BeaconPieceTarget.REFERENCE),
-        CHANGE("Change Slots", 28..34, BeaconPieceTarget.OURS),
+        MATCH("Match Slots", 10..16, REFERENCE),
+        CHANGE("Change Slots", 28..34, OURS),
         ;
 
         companion object {
@@ -276,14 +275,14 @@ object ForagingBeaconSolver {
     private fun SafeItemStack.isPaused(): Boolean = this.`is`(ColoredBlockCompat.RED.clayBlock.asItem())
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (!debugConfig.moongladeBeacon || nextDevUpdate.isInFuture()) return
         display = drawDisplay()
         nextDevUpdate = SimpleTimeMark.now() + 100.milliseconds
     }
 
-    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    @HandleEvent(onlyOnIslandTypeTag = [FORAGING_CUSTOM_TREES])
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!solverEnabled()) return
         if (event.blockOverClick()) {
             SoundUtils.playErrorSound()
@@ -291,7 +290,7 @@ object ForagingBeaconSolver {
                 "§cOver-click Prevented",
                 subtitleText = "§7Hold §eControl §7to bypass",
                 duration = 1.seconds,
-                location = TitleManager.TitleLocation.INVENTORY,
+                location = INVENTORY,
             )
             return event.cancel()
         }
@@ -313,14 +312,14 @@ object ForagingBeaconSolver {
 
     private var currentServerTicks = 0
 
-    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onServerTick() {
+    @HandleEvent(onlyOnIslandTypeTag = [FORAGING_CUSTOM_TREES])
+    private fun onServerTick() {
         if (!colorMinigameInventory.isInside()) return
         currentServerTicks++
     }
 
-    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onPlaySound(event: PlaySoundEvent) {
+    @HandleEvent(onlyOnIslandTypeTag = [FORAGING_CUSTOM_TREES])
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (!colorMinigameInventory.isInside() || event.soundName != "block.note_block.bass") return
         val pitch = BeaconPitch.getByPitch(event.pitch) ?: return
 
@@ -347,8 +346,8 @@ object ForagingBeaconSolver {
         )
     }
 
-    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onBackgroundDrawn() {
+    @HandleEvent(onlyOnIslandTypeTag = [FORAGING_CUSTOM_TREES])
+    private fun onBackgroundDrawn() {
         if (!solverEnabled()) return
         InventoryUtils.getItemsInOpenChest().forEach { slot ->
             if (normalTuning.tryHighlightSlot(slot)) return@forEach
@@ -356,15 +355,15 @@ object ForagingBeaconSolver {
         }
     }
 
-    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
+    @HandleEvent(onlyOnIslandTypeTag = [FORAGING_CUSTOM_TREES])
+    private fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!solverEnabled()) return
         normalTuning.tryLabelIfAble(event)
         enchantedTuning.tryLabelIfAble(event)
     }
 
-    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onInventoryUpdated() {
+    @HandleEvent(onlyOnIslandTypeTag = [FORAGING_CUSTOM_TREES])
+    private fun onInventoryUpdated() {
         if (!solverEnabled()) return
 
         for (slot in InventoryUtils.getItemsInOpenChest().filter { it.hasItem() && it.item.isNotEmpty() }) {
@@ -432,14 +431,14 @@ object ForagingBeaconSolver {
                 BeaconPieceTarget.OURS to ours,
             )
 
-        override val reference: T get() = this[BeaconPieceTarget.REFERENCE]
-        override val ours: T get() = this[BeaconPieceTarget.OURS]
+        override val reference: T get() = this[REFERENCE]
+        override val ours: T get() = this[OURS]
     }
 
     private class NextPitchPair : DataPair<SimpleTimeMark>(SimpleTimeMark.farPast()) {
         private fun SimpleTimeMark.getFlooredDuration() = this.takeIf { !it.isFarPast() }?.timeUntil() ?: Duration.INFINITE
-        val referenceUntil get() = this[BeaconPieceTarget.REFERENCE].getFlooredDuration()
-        val oursUntil get() = this[BeaconPieceTarget.OURS].getFlooredDuration()
+        val referenceUntil get() = this[REFERENCE].getFlooredDuration()
+        val oursUntil get() = this[OURS].getFlooredDuration()
     }
 
     private inline fun <reified E : Enum<E>> E.internalGetOffset(other: E): Int {
@@ -484,12 +483,12 @@ object ForagingBeaconSolver {
         fun handlePitch(pitch: BeaconPitch): Unit = with(nextPitchPair) {
             if (isEnchanted && !upgradingStrength) return
             if (referenceUntil > acceptablePitchMargin || referenceUntil > oursUntil) return
-            with(bufferPair[BeaconPieceTarget.REFERENCE]) {
+            with(bufferPair[REFERENCE]) {
                 if (size >= 6) removeAt(0)
                 add(pitch)
                 if (distinct().size > 2) clear()
                 if (size < 3) return
-                pitchPair[BeaconPieceTarget.REFERENCE] = groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
+                pitchPair[REFERENCE] = groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
             }
         }
 
@@ -502,7 +501,7 @@ object ForagingBeaconSolver {
             val target = BeaconSlotRange.getByIndexOrNull(slot.containerSlot)?.target ?: return false
             if (slotPair[target] == slot.containerSlot) return false
             slotPair[target] = slot.containerSlot
-            if (target == BeaconPieceTarget.REFERENCE) updateMatchSlot(slot.containerSlot)
+            if (target == REFERENCE) updateMatchSlot(slot.containerSlot)
             return true
         }
 
@@ -585,8 +584,8 @@ object ForagingBeaconSolver {
             val calculatedSpeed = newTicks.average()
 
             val referenceSpeed = BeaconSpeed.byClosestTickSpeed(calculatedSpeed) ?: return
-            speedPair[BeaconPieceTarget.REFERENCE] = referenceSpeed
-            nextPitchPair[BeaconPieceTarget.REFERENCE] = referenceSpeed.getOffsetFromNow()
+            speedPair[REFERENCE] = referenceSpeed
+            nextPitchPair[REFERENCE] = referenceSpeed.getOffsetFromNow()
         }
 
         private fun SimpleTimeMark.getTimeUntilFormat(): String = when (this) {

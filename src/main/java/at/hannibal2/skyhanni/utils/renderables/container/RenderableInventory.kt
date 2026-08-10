@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.utils.renderables.container
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -13,8 +13,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import kotlin.math.ceil
 
 object RenderableInventory {
-
-    private val inventoryTextures = createResourceLocation("skyhanni", "gui/slot.png")
+    private val inventoryTextures = SkyHanniMod.id("gui/slot.png")
     private const val TEXTURE_WIDTH = 90
     private const val TEXTURE_HEIGHT = 54
 
