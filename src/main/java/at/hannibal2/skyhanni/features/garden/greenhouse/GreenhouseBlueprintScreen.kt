@@ -7,13 +7,20 @@ import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import net.minecraft.client.input.KeyEvent
 import org.lwjgl.glfw.GLFW
+import kotlin.math.abs
+import kotlin.math.exp
 import kotlin.math.floor
+import kotlin.math.roundToInt
 
 internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBaseScreen() {
 
     private val actions = mutableListOf<ActionArea>()
-    private var scrollOffset = 0
+    private var scrollOffset = 0.0
+    private var targetScrollOffset = 0.0
     private var maximumScroll = 0
+    private var lastDrawNanos = 0L
+    private var actionClipTop: Int? = null
+    private var actionClipBottom: Int? = null
     private var pendingDelete: String? = null
     private var pendingRename: String? = null
     private var renameText = ""
@@ -54,8 +61,9 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
         val listTop = panelY + HEADER_HEIGHT
         val listBottom = panelY + panelHeight - FOOTER_HEIGHT
         val layouts = GreenhouseMutationBlueprint.layouts().toSortedMap()
-        maximumScroll = (layouts.size * (CARD_HEIGHT + CARD_SPACING) - (listBottom - listTop)).coerceAtLeast(0)
-        scrollOffset = scrollOffset.coerceIn(0, maximumScroll)
+        val cardContentHeight = layouts.size * CARD_HEIGHT + (layouts.size - 1).coerceAtLeast(0) * CARD_SPACING
+        maximumScroll = (cardContentHeight - (listBottom - listTop)).coerceAtLeast(0)
+        updateSmoothScroll()
 
         GuiRenderUtils.enableScissor(panelX + PADDING, listTop, panelX + panelWidth - PADDING, listBottom)
         if (layouts.isEmpty()) {
@@ -66,9 +74,13 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
             )
         } else {
             layouts.entries.forEachIndexed { index, (name, blueprint) ->
-                val cardY = listTop + index * (CARD_HEIGHT + CARD_SPACING) - scrollOffset
-                if (cardY >= listTop && cardY + CARD_HEIGHT <= listBottom) {
+                val cardY = (listTop + index * (CARD_HEIGHT + CARD_SPACING) - scrollOffset).roundToInt()
+                if (cardY + CARD_HEIGHT > listTop && cardY < listBottom) {
+                    actionClipTop = listTop
+                    actionClipBottom = listBottom
                     drawLayoutCard(panelX + PADDING, cardY, panelWidth - PADDING * 2, name, blueprint)
+                    actionClipTop = null
+                    actionClipBottom = null
                 }
             }
         }
@@ -112,7 +124,7 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
                 nameX,
                 nameY,
             )
-            actions.add(ActionArea(nameX, y + 4, nameRight, y + 19) { startRename(name) })
+            addAction(nameX, y + 4, nameRight, y + 19) { startRename(name) }
         }
         val target = GreenhouseMutationBlueprint.targetMutation(blueprint)
         GuiRenderUtils.drawString(
@@ -132,11 +144,16 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
             drawButton(x + 105, buttonY, 48, 14, "§7Cancel") { cancelRename() }
             return
         }
-        drawButton(x + 58, buttonY, 42, 14, if (active) "§aLoaded" else "§eLoad") {
+        drawButton(x + 58, buttonY, 42, 14, if (active) "§cUnload" else "§eLoad") {
             pendingDelete = null
             cancelRename()
-            GreenhouseMutationBlueprint.loadLayout(plotId, name)
-            ChatUtils.chat("§aLoaded Greenhouse layout §e$name §ain Plot §e$plotId§a.")
+            if (active) {
+                GreenhouseMutationBlueprint.unloadLayout(plotId)
+                ChatUtils.chat("§aUnloaded Greenhouse layout §e$name §afrom Plot §e$plotId§a.")
+            } else {
+                GreenhouseMutationBlueprint.loadLayout(plotId, name)
+                ChatUtils.chat("§aLoaded Greenhouse layout §e$name §ain Plot §e$plotId§a.")
+            }
         }
         drawButton(x + 105, buttonY, 62, 14, "§bOverwrite") {
             pendingDelete = null
@@ -280,7 +297,15 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
         GuiRenderUtils.drawRect(x, y, x + buttonWidth, y + buttonHeight, if (hovered) BUTTON_HOVER_COLOR else BUTTON_COLOR)
         val textX = x + (buttonWidth - mc.font.width(label)) / 2
         GuiRenderUtils.drawString(label, textX, y + (buttonHeight - 8) / 2)
-        actions.add(ActionArea(x, y, x + buttonWidth, y + buttonHeight, action))
+        addAction(x, y, x + buttonWidth, y + buttonHeight, action)
+    }
+
+    private fun addAction(minX: Int, minY: Int, maxX: Int, maxY: Int, action: () -> Unit) {
+        val clippedMinY = actionClipTop?.let { minY.coerceAtLeast(it) } ?: minY
+        val clippedMaxY = actionClipBottom?.let { maxY.coerceAtMost(it) } ?: maxY
+        if (clippedMinY < clippedMaxY) {
+            actions.add(ActionArea(minX, clippedMinY, maxX, clippedMaxY, action))
+        }
     }
 
     override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
@@ -316,7 +341,27 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
 
     override fun onHandleMouseInput() {
         if (!MouseCompat.hasScrollDelta()) return
-        scrollOffset = (scrollOffset - MouseCompat.getScrollDelta()).coerceIn(0, maximumScroll)
+        targetScrollOffset = (targetScrollOffset - MouseCompat.getScrollDelta())
+            .coerceIn(0.0, maximumScroll.toDouble())
+    }
+
+    private fun updateSmoothScroll() {
+        targetScrollOffset = targetScrollOffset.coerceIn(0.0, maximumScroll.toDouble())
+        scrollOffset = scrollOffset.coerceIn(0.0, maximumScroll.toDouble())
+
+        val now = System.nanoTime()
+        val elapsedSeconds = if (lastDrawNanos == 0L) {
+            0.0
+        } else {
+            ((now - lastDrawNanos) / NANOS_PER_SECOND).coerceIn(0.0, MAX_SCROLL_FRAME_TIME)
+        }
+        lastDrawNanos = now
+
+        val interpolation = 1.0 - exp(-SCROLL_SMOOTHING_SPEED * elapsedSeconds)
+        scrollOffset += (targetScrollOffset - scrollOffset) * interpolation
+        if (abs(targetScrollOffset - scrollOffset) < SCROLL_SNAP_DISTANCE) {
+            scrollOffset = targetScrollOffset
+        }
     }
 
     override fun isPauseScreen() = false
@@ -347,6 +392,10 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
         private const val FOOTER_HEIGHT = 38
         private const val CARD_HEIGHT = 70
         private const val CARD_SPACING = 6
+        private const val SCROLL_SMOOTHING_SPEED = 18.0
+        private const val SCROLL_SNAP_DISTANCE = 0.1
+        private const val MAX_SCROLL_FRAME_TIME = 0.05
+        private const val NANOS_PER_SECOND = 1_000_000_000.0
         private const val GRID_SIZE = 10
         private const val CELL_SIZE = 4
         private const val PREVIEW_SIZE = GRID_SIZE * CELL_SIZE

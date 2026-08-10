@@ -387,10 +387,8 @@ object GreenhouseMutationBlueprint {
             ChatUtils.chat("§cYou must be standing in a Greenhouse plot.")
             return
         }
-        val removed = activeLayoutMap()?.remove(plot.id) != null
+        val removed = unloadLayout(plot.id)
         if (removed) {
-            SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "clear-greenhouse-mutation-blueprint")
-            resetMissingState()
             ChatUtils.chat("§aUnloaded the mutation layout from Greenhouse Plot §e${plot.id}§a.")
         } else {
             ChatUtils.chat("§eThere is no mutation layout loaded for this plot.")
@@ -496,6 +494,13 @@ object GreenhouseMutationBlueprint {
         activeLayoutMap()?.set(plotId, name)
         resetMissingState()
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "load-greenhouse-mutation-layout")
+    }
+
+    internal fun unloadLayout(plotId: Int): Boolean {
+        if (activeLayoutMap()?.remove(plotId) == null) return false
+        resetMissingState()
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "unload-greenhouse-mutation-layout")
+        return true
     }
 
     internal fun renameLayout(oldName: String, requestedName: String): Boolean {

@@ -155,6 +155,8 @@ internal object GreenhouseCropScanner {
             abs(x - this@hasFloatingHeadAtCropPosition.x) <= FLOATING_HEAD_HORIZONTAL_RADIUS &&
                 abs(z - this@hasFloatingHeadAtCropPosition.z) <= FLOATING_HEAD_HORIZONTAL_RADIUS
 
+        if (hasPlacedCropHead()) return true
+
         val armorStandHead = getEntitiesInBox<ArmorStand>(this, FLOATING_HEAD_SEARCH_RADIUS) {
             it.isInCropColumn() && listOf(it.getStandHelmet(), it.getHandItem()).any { stack ->
                 stack.isFloatingCropHead(category)
@@ -165,10 +167,14 @@ internal object GreenhouseCropScanner {
         return getEntitiesInBox<Display.ItemDisplay>(this, FLOATING_HEAD_SEARCH_RADIUS) {
             it.isInCropColumn() && it.itemStack.isFloatingCropHead(category)
         }.isNotEmpty() || getEntitiesInBox<Display.BlockDisplay>(this, FLOATING_HEAD_SEARCH_RADIUS) {
-            // Block displays do not expose an item name, so only use them for cactus where this was observed.
-            category == CropCategory.CACTUS && it.isInCropColumn() && it.blockState.block in playerHeadBlocks
+            it.isInCropColumn() && it.blockState.block in playerHeadBlocks
         }.isNotEmpty()
     }
+
+    private fun LorenzVec.hasPlacedCropHead(): Boolean =
+        (-VARIABLE_HEIGHT_SEARCH_RADIUS..VARIABLE_HEIGHT_SEARCH_RADIUS).any { yOffset ->
+            add(y = yOffset).getBlockStateAt().block in playerHeadBlocks
+        }
 
     private fun SafeItemStack?.isFloatingCropHead(category: CropCategory): Boolean =
         floatingCropHeadCategory() == category
