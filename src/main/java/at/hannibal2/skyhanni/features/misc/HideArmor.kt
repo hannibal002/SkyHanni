@@ -16,7 +16,7 @@ import net.minecraft.world.entity.player.Player
 @SkyHanniModule
 object HideArmor {
 
-    val config: HideArmorConfig get() = SkyHanniMod.feature.misc.hideArmor
+    private val config: HideArmorConfig get() = SkyHanniMod.feature.misc.hideArmor
 
     fun shouldHideArmor(entity: Player): Boolean {
         if (!SkyBlockUtils.inSkyBlock) return false
@@ -34,7 +34,7 @@ object HideArmor {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(91, "misc.hideArmor2", "misc.hideArmor")
     }
 }

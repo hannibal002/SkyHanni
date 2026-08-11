@@ -25,7 +25,7 @@ public abstract class MixinCapeLayer {
         method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/AvatarRenderState;FF)V",
         at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V")
     )
-    private boolean skipChestplateCapeOffset(PoseStack instance, float x, float y, float z) {
+    private boolean wrapChestplateCapeOffset(PoseStack instance, float x, float y, float z) {
         return !HideArmorHookKt.shouldHideSlot(EquipmentSlot.CHEST);
     }
 
