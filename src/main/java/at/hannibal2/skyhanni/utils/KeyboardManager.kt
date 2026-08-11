@@ -189,7 +189,7 @@ object KeyboardManager {
             createKeyMapping(key, defaultKey, id)
         }
 
-    fun createKeyMapping(key: Int, defaultKey: Int, id: String): KeyMapping {
+    private fun createKeyMapping(key: Int, defaultKey: Int, id: String): KeyMapping {
         val keyMapping = KeyMapping(
             id,
             defaultKey,
