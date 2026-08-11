@@ -182,17 +182,20 @@ object KeyboardManager {
         val parts = option.path.split(".")
         // wardrobe.keybinds.open -> wardrobe.open
         // dev.chat.peekKey -> chat.peekKey
-        val name = if (parts.size >= 3 && parts[parts.lastIndex - 1].startsWith("keybind", true)) {
+
+        val name = if (
+            parts.size >= 3 &&
+            parts[parts.lastIndex - 1].startsWith("keybind", true)
+        ) {
             listOf(parts[parts.lastIndex - 2], parts.last())
         } else {
             parts.takeLast(2)
         }
 
-        // wardrobe.open -> Wardrobe Open
         return name
             .joinToString(" ")
-            .replace(Regex("(?i)keybind"), "")
-            .replace(Regex("(?i)key$"), "")
+            .replace(Regex("(?i)keybindConfig"), "")
+            .replace(Regex("(?i)keybind(?=Option)"), "")
             .replace(Regex("([a-z])([A-Z])"), "$1 $2")
             .replace(Regex("([A-Za-z])([0-9])"), "$1 $2")
             .replace(Regex("\\s+"), " ")
