@@ -16,7 +16,7 @@ import net.minecraft.world.entity.player.Player
 @SkyHanniModule
 object HideArmor {
 
-    private val config: HideArmorConfig get() = SkyHanniMod.feature.misc.hideArmor
+    internal val config: HideArmorConfig get() = SkyHanniMod.feature.misc.hideArmor
 
     fun shouldHideArmor(entity: Player): Boolean {
         if (!SkyBlockUtils.inSkyBlock) return false
