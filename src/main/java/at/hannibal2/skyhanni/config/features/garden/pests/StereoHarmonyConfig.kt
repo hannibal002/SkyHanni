@@ -13,7 +13,7 @@ class StereoHarmonyConfig {
     @ConfigOption(name = "Enabled", desc = "Show a display of what pest is being boosted by your vinyl.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var displayEnabled: Boolean = true
+    var displayEnabled: Boolean = false
 
     @Expose
     @ConfigOption(name = "Always Show", desc = "Show the display even while not farming.")
