@@ -987,7 +987,7 @@ fun runBuildMode(prNumber: String) {
 
     buildComment.staleExisting(prNumber)
 
-    if (log1.isNullOrBlank()) {
+    if (log1.isNullOrBlank() && log2.isNullOrBlank()) {
         // A missing artifact is not proof of a green build: a step failing before its upload leaves it missing
         // while the run is red. Only the conclusion tells those two apart.
         val conclusion = System.getenv("WORKFLOW_CONCLUSION")?.takeIf { it.isNotEmpty() }
