@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class PestsConfig {
@@ -69,6 +70,7 @@ class PestsConfig {
             "This works on any island with pests, not just the garden.",
     )
     @ConfigEditorBoolean
+    @SearchTag("torrhus canyon")
     var muteVacuum: Boolean = false
 
     @Expose
