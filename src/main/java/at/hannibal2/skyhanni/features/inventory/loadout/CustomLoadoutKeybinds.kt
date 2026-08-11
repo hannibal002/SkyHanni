@@ -47,7 +47,6 @@ object CustomLoadoutKeybinds {
             config.contestSlot11,
             config.contestSlot12,
         )
-    private var waitingForMenuClose = false
     private var debugEnabled = false
 
     @HandleEvent
@@ -75,11 +74,6 @@ object CustomLoadoutKeybinds {
 
     private fun handlePress(): Boolean {
         if (!isEnabled()) return false
-        if (waitingForMenuClose) {
-            debug("§cIgnored key press until the loadout menu is closed.")
-            return false
-        }
-
         val slots = LoadoutApi.slots.filter { it.isInCurrentPage() }
         if (config.cycleKey.isKeyHeld()) {
             return cycleLoadout(slots)
@@ -102,7 +96,6 @@ object CustomLoadoutKeybinds {
                     "click sent: §e$clicked",
             )
             if (clicked) {
-                waitingForMenuClose = true
                 return true
             }
         }
@@ -127,7 +120,6 @@ object CustomLoadoutKeybinds {
 
         for (slot in cycle) {
             if (!LoadoutApi.clickSlot(slot)) continue
-            waitingForMenuClose = true
             debug(
                 "§7Cycle key -> contest active: §e${FarmingContestApi.isContestActive}§7, " +
                     "chosen slot: §e${slot.id + 1}",
@@ -136,14 +128,6 @@ object CustomLoadoutKeybinds {
         }
         debug("§cCycle key pressed, but its active order has no available loadouts on this page.")
         return false
-    }
-
-    @HandleEvent
-    private fun onInventoryClose() {
-        if (waitingForMenuClose) {
-            waitingForMenuClose = false
-            debug("§7Loadout menu closed; cycle key unlocked.")
-        }
     }
 
     fun allowMouseClick() = isEnabled() && (
