@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
@@ -224,8 +224,8 @@ object CustomScoreboard {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.NONE) updateAllIslandEntries()
+    fun onIslandJoin(event: IslandJoinEvent) {
+        if (event.island == IslandType.NONE) updateAllIslandEntries()
         else updateIslandEntries()
 
         showDeprecatedWarning()
@@ -244,14 +244,14 @@ object CustomScoreboard {
             replaceSameMessage = true,
             hover = """
                 §eWhy use the replacement?
-            
+
                 §7• §a100% feature parity with SkyHanni's Custom Scoreboard
                 §7• §aWorks identically by default
                 §7• §aBug fixes and improvements released independently
                 §7• §aAdditional features not available in SkyHanni
                 §7• §aConfig migration from SkyHanni is supported
                 §7• §aMaintained by a trusted former SkyHanni contributor
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         ChatUtils.clickableChat(
@@ -266,7 +266,7 @@ object CustomScoreboard {
                         "§aBut you will no longer be bothered about it this session!",
                     prefix = false,
                 )
-            }
+            },
         )
     }
 
