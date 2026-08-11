@@ -13,8 +13,6 @@ import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
-import net.fabricmc.fabric.api.client.screen.v1.Screens
-import net.minecraft.client.KeyMapping
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import java.lang.reflect.Field
