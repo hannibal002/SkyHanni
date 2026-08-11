@@ -17,8 +17,6 @@ enum class ShardSource {
     SYPHON,
     FUSE,
     CHARM,
-    NAGA,
-    SALT,
     HUNT,
     FISHING,
     SENT_TO_HUNTING_BOX,
