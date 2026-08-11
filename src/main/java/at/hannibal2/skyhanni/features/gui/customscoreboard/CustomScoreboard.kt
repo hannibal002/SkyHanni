@@ -195,8 +195,8 @@ object CustomScoreboard {
         ) {
             updateIslandEntries()
         }
+        // For some reason using ConditionalUtils.onEnable makes it call this callback 3 times
         config.enabled.whenChanged { old, new ->
-            // Since Custom Scoreboard calls notifyObservers(), using onEnabled will make it call this function 3 times.
             if (old == new || !new) return@whenChanged
             showDeprecatedWarning()
         }
