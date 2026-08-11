@@ -138,11 +138,6 @@ public abstract class MixinLevelRenderer {
         return matrixStack;
     }
 
-    @Inject(method = "extractVisibleEntities", at = @At(value = "HEAD"))
-    public void resetRealGlowing(CallbackInfo ci) {
-        RenderLivingEntityHelper.postNoXrayOutlineEvent();
-    }
-
     @WrapOperation(method = "extractVisibleEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/state/EntityRenderState;appearsGlowing()Z"))
     public boolean shouldAlsoGlow(EntityRenderState instance, Operation<Boolean> original, @Local Entity entity) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
