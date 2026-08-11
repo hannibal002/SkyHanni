@@ -275,7 +275,7 @@ object CustomScoreboard {
             §7• §aAdditional features not available in SkyHanni
             §7• §aConfig migration from SkyHanni is supported
             §7• §aMaintained by a trusted former SkyHanni contributor
-        """.trimIndent(),
+            """.trimIndent(),
         )
     }
 
