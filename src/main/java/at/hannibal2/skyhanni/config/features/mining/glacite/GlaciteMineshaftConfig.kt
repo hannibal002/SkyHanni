@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.mining.glacite
 
-import at.hannibal2.skyhanni.config.core.elements.ConfigEditorKeyMap
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
@@ -28,7 +28,7 @@ class GlaciteMineshaftConfig {
         desc = "Share the location of the nearest waypoint upon key press.\n" +
             "§eYou can share the location even if it has already been shared!"
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var shareWaypointLocation: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

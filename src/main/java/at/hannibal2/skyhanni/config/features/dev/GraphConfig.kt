@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.core.elements.ConfigEditorKeyMap
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -22,7 +22,7 @@ class GraphConfig {
         desc = "Place a new node at the current position. If a node is active automatically connects. " +
             "Deletes a node if you are only 3 blocks away instead of placing a new one."
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_F)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_F)
     var placeKey: Int = GLFW.GLFW_KEY_F
 
     @Expose
@@ -32,12 +32,12 @@ class GraphConfig {
 
     @Expose
     @ConfigOption(name = "Select Key", desc = "Select the nearest node to be active. Double press to unselect.")
-    @ConfigEditorKeyMap(defaultKey = KeyboardManager.MIDDLE_MOUSE)
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.MIDDLE_MOUSE)
     var selectKey: Int = KeyboardManager.MIDDLE_MOUSE
 
     @Expose
     @ConfigOption(name = "Select near look", desc = "Select the node closest to where you are looking.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var selectRaycastKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
@@ -45,12 +45,12 @@ class GraphConfig {
         name = "Connect Key",
         desc = "Connect the nearest node with the active node. If the nodes are already connected removes the connection."
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_C)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_C)
     var connectKey: Int = GLFW.GLFW_KEY_C
 
     @Expose
     @ConfigOption(name = "Exit Key", desc = "Exit out of stuff. If nothing active disables the graph editor.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_HOME)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_HOME)
     var exitKey: Int = GLFW.GLFW_KEY_HOME
 
     @Expose
@@ -58,12 +58,12 @@ class GraphConfig {
         name = "Edit Key",
         desc = "While holding the Key, edit the position of the active node or the selection block with the minecraft movement controls."
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_TAB)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_TAB)
     var editKey: Int = GLFW.GLFW_KEY_TAB
 
     @Expose
     @ConfigOption(name = "Text Key", desc = "Start text mode, which allows editing a name of a node.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_Y)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_Y)
     var textKey: Int = GLFW.GLFW_KEY_Y
 
     @Expose
@@ -71,17 +71,17 @@ class GraphConfig {
         name = "Test Dijkstra",
         desc = "On key press, show the shortest path between the nearest node and the active node."
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_G)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_G)
     var dijkstraKey: Int = GLFW.GLFW_KEY_G
 
     @Expose
     @ConfigOption(name = "Save Key", desc = "Save the current graph to the clipboard.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_O)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_O)
     var saveKey: Int = GLFW.GLFW_KEY_O
 
     @Expose
     @ConfigOption(name = "Load Key", desc = "Load a graph from clipboard, if valid.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_I)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_I)
     var loadKey: Int = GLFW.GLFW_KEY_I
 
     @Expose
@@ -89,12 +89,12 @@ class GraphConfig {
         name = "Clear Key",
         desc = "Clear the graph. Also saves the graph to the clipboard, in case of a misclick."
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_P)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_P)
     var clearKey: Int = GLFW.GLFW_KEY_P
 
     @Expose
     @ConfigOption(name = "Vision Key", desc = "Toggle if the graph should render trough blocks.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_M)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_M)
     var throughBlocksKey: Int = GLFW.GLFW_KEY_M
 
     @Expose
@@ -102,7 +102,7 @@ class GraphConfig {
         name = "Tutorial Key",
         desc = "Toggle the tutorial mode. In this mode, you will get feedback for everything you do."
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_K)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_K)
     var tutorialKey: Int = GLFW.GLFW_KEY_K
 
     @Expose
@@ -110,12 +110,12 @@ class GraphConfig {
         name = "Split Key",
         desc = "Key for splitting an edge that is between the active and the closest node."
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var splitKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Dissolve Key", desc = "Dissolve the active node into one edge if it only has two edges.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var dissolveKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
@@ -123,7 +123,7 @@ class GraphConfig {
         name = "Edge Cycle",
         desc = "Cycles the direction of the edge that is between the active and the closest node. (Used to make one-directional ways)"
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_H)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_H)
     var edgeCycle: Int = GLFW.GLFW_KEY_H
 
     @Expose

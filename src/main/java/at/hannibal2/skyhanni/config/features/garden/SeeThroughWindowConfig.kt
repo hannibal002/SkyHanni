@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden
 
-import at.hannibal2.skyhanni.config.core.elements.ConfigEditorKeyMap
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -20,6 +20,6 @@ class SeeThroughWindowConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "Press this key to toggle See Through Farming")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var keybind: Int = GLFW.GLFW_KEY_UNKNOWN
 }

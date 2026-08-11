@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.config.features.combat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.core.elements.ConfigEditorKeyMap
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
@@ -53,7 +53,7 @@ class InstanceChestProfitConfig {
         desc = "Press while Hovering an item to add/remove it from favorites which will Star chests containing this item in Croesus" +
             " and highlight the Item in Instance Chests."
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var keybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

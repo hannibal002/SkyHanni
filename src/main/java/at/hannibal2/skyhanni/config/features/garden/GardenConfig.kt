@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features.garden
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.core.elements.ConfigEditorKeyMap
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
 import at.hannibal2.skyhanni.config.features.garden.contest.JacobContestConfig
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig
@@ -21,6 +20,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
@@ -230,7 +230,7 @@ class GardenConfig {
         desc = "Show Garden plot borders when pressing this key " +
             "(similar to how F3 + G shows chunk borders).",
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var plotBorderKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
