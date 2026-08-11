@@ -58,6 +58,6 @@ class BetterWikiCommandConfig {
         desc = "Search for an item's wiki page with this keybind.\n" +
             "§cFor an optimal experience, do §lNOT §cbind this to a mouse button.",
     )
-    @ConfigEditorKeyMap
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var wikiKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 }

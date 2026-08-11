@@ -28,7 +28,7 @@ class PestTrapConfig {
         name = "Release All Hotkey",
         desc = "Release all pests in a pest trap when you press this keybind."
     )
-    @ConfigEditorKeyMap
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var releaseHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

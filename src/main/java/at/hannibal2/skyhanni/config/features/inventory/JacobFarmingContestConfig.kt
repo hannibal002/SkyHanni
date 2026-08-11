@@ -28,7 +28,7 @@ class JacobFarmingContestConfig {
         name = "Open On Elite",
         desc = "Open the contest on §eeliteskyblock.com§7 when pressing this key in Jacob's menu or the calendar."
     )
-    @ConfigEditorKeyMap
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var openOnElite: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

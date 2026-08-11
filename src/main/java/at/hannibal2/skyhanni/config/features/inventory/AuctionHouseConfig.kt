@@ -65,7 +65,7 @@ class AuctionHouseConfig {
         name = "Copy Underbid Keybind",
         desc = "Copy the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding."
     )
-    @ConfigEditorKeyMap
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var copyUnderbidKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

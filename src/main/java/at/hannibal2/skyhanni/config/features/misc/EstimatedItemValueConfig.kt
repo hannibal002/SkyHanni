@@ -28,7 +28,7 @@ class EstimatedItemValueConfig {
 
     @Expose
     @ConfigOption(name = "Hotkey", desc = "Press this key to show the Estimated Item Value.")
-    @ConfigEditorKeyMap
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var hotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

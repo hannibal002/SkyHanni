@@ -65,16 +65,16 @@ class LoadoutKeybindConfig {
 
     @Expose
     @ConfigOption(name = "Slot 10", desc = "Keybind for loadout slot 10.")
-    @ConfigEditorKeyMap
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var slot10: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Slot 11", desc = "Keybind for loadout slot 11.")
-    @ConfigEditorKeyMap
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var slot11: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Slot 12", desc = "Keybind for loadout slot 12.")
-    @ConfigEditorKeyMap
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var slot12: Int = GLFW.GLFW_KEY_UNKNOWN
 }

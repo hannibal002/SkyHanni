@@ -487,7 +487,7 @@ class MiscConfig {
 
     @Expose
     @ConfigOption(name = "Abiphone Hotkey", desc = "Answer incoming abiphone calls with a hotkey.")
-    @ConfigEditorKeyMap
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var abiphoneAcceptKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

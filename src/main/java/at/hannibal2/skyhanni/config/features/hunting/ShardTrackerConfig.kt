@@ -25,7 +25,7 @@ class ShardTrackerConfig {
 
     @Expose
     @ConfigOption(name = "Select Shard Key", desc = "Press this key in your hunting box to track the hovered shard.")
-    @ConfigEditorKeyMap
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var selectShardKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @ConfigOption(

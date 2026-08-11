@@ -49,7 +49,7 @@ class TunnelMapsConfig {
         name = "Campfire Hotkey",
         desc = "Hotkey to warp to the campfire. If the travel scroll is not unlocked, show a path to the campfire instead."
     )
-    @ConfigEditorKeyMap
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var campfireKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
@@ -62,7 +62,7 @@ class TunnelMapsConfig {
 
     @Expose
     @ConfigOption(name = "Next Spot Hotkey", desc = "Hotkey to select the next spot.")
-    @ConfigEditorKeyMap
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var nextSpotHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
