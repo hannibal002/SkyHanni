@@ -158,8 +158,8 @@ public abstract class MixinLevelRenderer {
         if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
         SkyHanniOutlineHook.getVertexConsumers().endOutlineBatch();
     }
-    *///?} else {
-    /*@Inject(
+
+    @Inject(
         method = "lambda$addLateDebugPass$0",
         at = @At(
             value = "FIELD",
