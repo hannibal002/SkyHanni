@@ -25,6 +25,7 @@ import net.minecraft.world.item.component.ResolvableProfile
 @SkyHanniModule
 object ContributorAchievement {
     private val config get() = SkyHanniMod.feature.dev
+    private val achievementMessages get() = SkyHanniMod.feature.misc.achievementMessages
 
     private const val CONTRIBUTOR_ACHIEVEMENT = "Contrib Achievement"
     private const val CONTRIBUTOR_FRIEND_ACHIEVEMENT = "Contrib Friend"
@@ -134,10 +135,13 @@ object ContributorAchievement {
 
     fun onUniqueContributorSeen(profile: GameProfile) {
         val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
-        // This will show the message even if the config is disabled, but the achievement is completed because
-        // Players were impersonating contributors after people asked who is the contributor here.
-        // And this message is only shown once, so it should be fine.
-        if (!completed && !config.discoverContributorMessage) return
+
+        // If the achievement was completed and achievement messages are enabled,
+        // or if the discover contributor message is enabled, then show the message.
+        if ((!completed || !achievementMessages) && !config.discoverContributorMessage) {
+            return
+        }
+
         val resolvedProfile = ResolvableProfile.createResolved(profile)
         val sprite = PlayerSprite(resolvedProfile, false)
         val player = Component.`object`(sprite)
