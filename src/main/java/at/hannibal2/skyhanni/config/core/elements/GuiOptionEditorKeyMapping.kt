@@ -87,12 +87,20 @@ class GuiOptionEditorKeyMapping(option: ProcessedOption, keyMapping: KeyMapping)
                     val mouseX = context.mouseX
                     val mouseY = context.mouseY
 
-                    if (mouseX > width / 6 - 24 && mouseX < width / 6 + 16 && mouseY > height - 7 - 14 && mouseY < height - 7 + 2) {
+                    if (mouseX > width / 6 - 24 &&
+                        mouseX < width / 6 + 16 &&
+                        mouseY > height - 7 - 14 &&
+                        mouseY < height - 7 + 2
+                        ) {
                         this.editingKeycode = true
                         return true
                     }
 
-                    if (mouseX > width / 6 - 24 + 48 - 3 && mouseX < width / 6 - 24 + 48 + 13 - 5 && mouseY > height - 7 - 14 + 3 && mouseY < height - 7 - 14 + 3 + 11) {
+                    if (mouseX > width / 6 - 24 + 48 - 3 &&
+                        mouseX < width / 6 - 24 + 48 + 13 - 5 &&
+                        mouseY > height - 7 - 14 + 3
+                        && mouseY < height - 7 - 14 + 3 + 11
+                        ) {
                         this.setKey(this.keyMapping.defaultKey)
                         return true
                     }
