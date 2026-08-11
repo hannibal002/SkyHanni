@@ -173,7 +173,8 @@ object KeyboardManager {
             val mapping = getOrCreateKeyMapping(
                 option.get() as Int,
                 annotation.defaultKey,
-                option.path,
+                // TODO: This should be a translation key
+                option.name.text,
             )
             GuiOptionEditorKeyMapping(option, mapping)
         }
