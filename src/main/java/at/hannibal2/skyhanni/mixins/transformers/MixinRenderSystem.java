@@ -13,7 +13,7 @@ public abstract class MixinRenderSystem {
 
     @Inject(method = "flipFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DynamicUniforms;reset()V"))
     private static void clearChromaUniforms(CallbackInfo ci) {
-        GuiRendererHook.INSTANCE.getChromaUniform().clear();
+        GuiRendererHook.clearChromaUniforms();
     }
 }
 *///?}

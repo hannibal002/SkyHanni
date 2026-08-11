@@ -28,7 +28,7 @@ import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 *///?}
 
 object GuiRendererHook {
-    var chromaUniform = SkyHanniChromaUniform()
+    private var chromaUniform = SkyHanniChromaUniform()
     var chromaBufferSlice: GpuBufferSlice? = null
 
     fun computeChromaBufferSlice() {
@@ -50,12 +50,12 @@ object GuiRendererHook {
         chromaBufferSlice = chromaUniform.writeWith(chromaSize, timeOffset, saturation, forwardDirection)
     }
 
-    //? if >= 26.2 {
+    @JvmStatic
     fun clearChromaUniforms() {
         chromaUniform.clear()
+        //? if >= 26.2
         chromaBufferSlice = null
     }
-    //?}
 
     // This 'should' be fine being injected into GuiRenderer's render pass since if the bound pipeline's shader doesn't
     // have a uniform with the given name, then the buffer slice will never be bound

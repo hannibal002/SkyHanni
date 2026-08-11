@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinGameRenderer262 {
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;endFrame()V", shift = At.Shift.AFTER))
-    private void clearChromaUniforms(DeltaTracker deltaTracker, boolean advanceGameTime, CallbackInfo ci) {
-        GuiRendererHook.INSTANCE.clearChromaUniforms();
+    private void clearChromaUniforms(CallbackInfo ci) {
+        GuiRendererHook.clearChromaUniforms();
     }
 }
 //?}
