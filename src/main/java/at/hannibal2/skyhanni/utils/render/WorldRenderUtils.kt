@@ -517,17 +517,6 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawCircleFilled(
-        entity: Entity,
-        rad: Double,
-        color: Color,
-        depth: Boolean = true,
-        segments: Int = 32,
-    ) {
-        val exactLocation = exactLocation(entity)
-        drawCircleFilled(exactLocation.x, exactLocation.y, exactLocation.z, rad, color, depth, segments)
-    }
-
-    fun SkyHanniRenderWorldEvent.drawCircleFilled(
         locX: Double,
         locY: Double,
         locZ: Double,
@@ -879,13 +868,6 @@ object WorldRenderUtils {
         }
     }
 
-    // TODO add chroma color support
-    fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: AABB, color: Color, lineWidth: Int, depth: Boolean) {
-        LineDrawer.draw3D(this, lineWidth, depth) {
-            drawEdges(axisAlignedBB, color)
-        }
-    }
-
     fun SkyHanniRenderWorldEvent.draw3DLine(
         p1: LorenzVec,
         p2: LorenzVec,
@@ -904,18 +886,6 @@ object WorldRenderUtils {
         depth: Boolean,
     ) = LineDrawer.draw3D(this, lineWidth, depth) {
         draw3DLine(p1, p2, color)
-    }
-
-    fun SkyHanniRenderWorldEvent.draw3DPolyline(
-        points: List<LorenzVec>,
-        color: Color,
-        lineWidth: Int,
-        depth: Boolean,
-    ) {
-        if (points.size < 2) return
-        LineDrawer.draw3D(this, lineWidth, depth) {
-            points.zipWithNext { a, b -> draw3DLine(a, b, color) }
-        }
     }
 
     fun SkyHanniRenderWorldEvent.draw3DBezier2(

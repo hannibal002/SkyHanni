@@ -2,18 +2,11 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
-import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemRenderableConfig
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemRenderableConfig
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.mojang.blaze3d.platform.Lighting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
@@ -26,7 +19,6 @@ import net.minecraft.util.FormattedCharSequence
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
-import java.text.DecimalFormat
 import kotlin.math.min
 import kotlin.math.sqrt
 
@@ -55,10 +47,6 @@ object GuiRenderUtils {
     }
 
     fun drawStringCentered(str: String, x: Int, y: Int) {
-        drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
-    }
-
-    fun drawStringCentered(str: Component, x: Int, y: Int) {
         drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
     }
 
@@ -108,74 +96,11 @@ object GuiRenderUtils {
         }
     }
 
-    fun drawTexts(strings: List<Component>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
-        var newY = y
-        for (string in strings) {
-            DrawContextUtils.drawContext.text(fr, string, x, newY, color, shadow)
-            newY += 9
-        }
-    }
-
     fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
         left <= x && x < left + width && top <= y && y < top + height
 
-    fun getFarmingBar(
-        label: String,
-        tooltip: String,
-        currentValue: Number,
-        maxValue: Number,
-        width: Int,
-        textScale: Float = .7f,
-    ): Renderable {
-        val current = currentValue.toDouble().coerceAtLeast(0.0)
-        val percent = current.fractionOf(maxValue)
-        val scale = textScale.toDouble()
-        return with(Renderable) {
-            hoverTips(
-                vertical(
-                    text(label, scale = scale),
-                    fixedSizeLine(
-                        listOf(
-                            text(
-                                "§2${DecimalFormat("0.##").format(current)} / ${
-                                    DecimalFormat(
-                                        "0.##",
-                                    ).format(maxValue)
-                                }☘",
-                                scale = scale, horizontalAlign = HorizontalAlignment.LEFT,
-                            ),
-                            text(
-                                "§2${(percent * 100).roundTo(1)}%",
-                                scale = scale,
-                                horizontalAlign = HorizontalAlignment.RIGHT,
-                            ),
-                        ),
-                        width,
-                    ),
-                    progressBar(percent, width = width),
-                ),
-                tooltip.split('\n').map(StringRenderable::from),
-            )
-        }
-    }
-
-    fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
-        drawRect(
-            (left * inverseScale).toInt(),
-            (top * inverseScale).toInt(),
-            (right * inverseScale).toInt(),
-            (bottom * inverseScale).toInt(),
-            color,
-        )
-    }
-
     fun drawRect(left: Int, top: Int, right: Int, bottom: Int, color: Int) {
         DrawContextUtils.drawContext.fill(left, top, right, bottom, color)
-    }
-
-    fun renderItemAndBackground(item: SafeItemStack, x: Int, y: Int, color: Int) {
-        DrawContextUtils.drawItem(item, x, y)
-        drawRect(x, y, x + 16, y + 16, color)
     }
 
     fun drawGradientRect(

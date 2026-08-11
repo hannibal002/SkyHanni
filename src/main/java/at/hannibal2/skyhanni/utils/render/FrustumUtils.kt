@@ -12,7 +12,4 @@ object FrustumUtils {
 
     fun isVisible(box: AABB): Boolean = frustum.isVisible(box)
 
-    fun isVisible(minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double) =
-        isVisible(AABB(minX, minY, minZ, maxX, maxY, maxZ))
-
 }
