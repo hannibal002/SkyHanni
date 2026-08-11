@@ -16,7 +16,7 @@ object BetterWikiFromMenus {
     private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(6, "fandomWiki", "commands.fandomWiki")
         // Apparently the above got changed again at some point but never got a migration
     }
@@ -40,14 +40,12 @@ object BetterWikiFromMenus {
 
         if (inBiblioInventory) {
             if (isWiki) {
-                WikiManager.sendWikiMessage()
+                WikiManager.sendWikiMessage(autoOpen = config.menuOpenWiki)
                 return
             }
 
-            if (isWikithis) {
-                WikiManager.wikiThisItem()
-                return
-            }
+            WikiManager.wikiThisItem(autoOpen = config.menuOpenWiki)
+            return
         }
 
         if (inSBGuideInventory && config.skyblockGuide) {

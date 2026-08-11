@@ -71,7 +71,7 @@ object WikiManager {
     fun sendWikiMessage(
         search: String? = null,
         displaySearch: String? = search,
-        autoOpen: Boolean = config.autoOpenWiki,
+        autoOpen: Boolean,
     ) {
         if (search.isNullOrBlank()) {
             ChatUtils.clickableLinkChat(
@@ -94,7 +94,7 @@ object WikiManager {
             return
         }
 
-        sendWikiMessage(search)
+        sendWikiMessage(search, autoOpen = config.autoOpenWiki)
     }
 
     // TODO: Make it possible to disable the /wiki and /wikithis aliases.
