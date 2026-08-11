@@ -17,7 +17,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(name = "Peek Chat", desc = "Hold this key to keep the chat open.")
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_Z)
-    var peekChat: Int = GLFW.GLFW_KEY_Z
+    var peekChat: Int = GLFW.GLFW_KEY_UNKNOWN
 
     // TODO move into own sub category
     @Expose
