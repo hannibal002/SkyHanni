@@ -164,18 +164,15 @@ object KeyboardManager {
 
     fun getKeyName(keyCode: Int): String = IMinecraft.INSTANCE.getKeyName(keyCode).text
 
-    private val SKYHANNI = KeyMapping.Category.register(
+    private val SKYHANNI_CONFIG_CATEGORY = KeyMapping.Category.register(
         Identifier.fromNamespaceAndPath("skyhanni", "keys")
     )
 
     fun injectConfigProcessor(processor: BlockingMoulConfigProcessor) {
         processor.registerConfigEditor(ConfigEditorKeybind::class.java) { option, annotation ->
-            val displayName = getDisplayNameForKeyMapping(option)
             val mapping = getOrCreateKeyMapping(
-                option.get() as Int,
+                option,
                 annotation.defaultKey,
-                // HACK: it's supposed to take a translation key
-                displayName,
             )
             GuiOptionEditorKeyMapping(option, mapping)
         }
@@ -194,28 +191,37 @@ object KeyboardManager {
         // wardrobe.open -> Wardrobe Open
         return name
             .joinToString(" ")
+            .replace(Regex("(?i)keybind"), "")
+            .replace(Regex("(?i)key$"), "")
             .replace(Regex("([a-z])([A-Z])"), "$1 $2")
             .replace(Regex("([A-Za-z])([0-9])"), "$1 $2")
+            .replace(Regex("\\s+"), " ")
+            .trim()
             .split(" ")
-            .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+            .joinToString(" ") { it.replaceFirstChar(Char::uppercase) }
     }
 
     private val keyMappingMap = mutableMapOf<String, KeyMapping>()
 
-    private fun getOrCreateKeyMapping(key: Int, defaultKey: Int, id: String): KeyMapping =
-        keyMappingMap.computeIfAbsent(id) {
-            createKeyMapping(key, defaultKey, id)
+    private fun getOrCreateKeyMapping(option: ProcessedOption, defaultKey: Int): KeyMapping =
+        keyMappingMap.computeIfAbsent(option.path) {
+            createKeyMapping(option, defaultKey, it)
         }
 
-    fun createKeyMapping(key: Int, defaultKey: Int, id: String): KeyMapping {
-        val type = if (key in 0..5) InputConstants.Type.MOUSE else InputConstants.Type.KEYSYM
+    fun createKeyMapping(option: ProcessedOption, defaultKey: Int, id: String): KeyMapping {
+        val keyValue = option.get() as Int
+        val type = if (keyValue in 0..5) InputConstants.Type.MOUSE else InputConstants.Type.KEYSYM
+        val displayName = getDisplayNameForKeyMapping(option)
+
         val keyMapping = KeyMapping(
-            id,
+            // HACK: This is meant to be a translation key
+            displayName,
             type,
             defaultKey,
-            SKYHANNI,
+            SKYHANNI_CONFIG_CATEGORY,
         )
-        val key = type.getOrCreate(key)
+
+        val key = type.getOrCreate(keyValue)
         keyMapping.setKey(key)
         KeyMappingHelper.registerKeyMapping(keyMapping)
         return keyMapping
