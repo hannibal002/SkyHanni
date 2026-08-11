@@ -227,7 +227,7 @@ object PestApi {
         PestUpdateEvent.post()
     }
 
-    @HandleEvent(onlyOnIslandTypeTag = [HAS_PESTS])
+    @HandleEvent(onlyOnIslandTypeTag = [HAS_OWN_PESTS])
     private fun onPlaySound(event: PlaySoundEvent) {
         if (config.muteVacuum && event.soundName == "entity.wither.shoot") {
             event.cancel()
