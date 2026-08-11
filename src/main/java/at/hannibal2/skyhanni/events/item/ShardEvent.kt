@@ -23,5 +23,4 @@ enum class ShardSource {
     CAPTURED,
     FLOOR_DROP,
     GIVEN,
-    UNKNOWN,
 }
