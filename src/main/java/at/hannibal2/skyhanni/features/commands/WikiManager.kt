@@ -102,7 +102,7 @@ object WikiManager {
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shwiki") {
             aliases = listOf("shindependentwiki", "shunofficialwiki", "shfandomwiki", "wiki")
-            description = "Searches the independent wiki with SkyHanni's own method."
+            description = "Searches the independent wiki."
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
                 wikiCommand()
@@ -116,7 +116,7 @@ object WikiManager {
                 "shindependentwikithis", "shunofficialwikithis", "shfandomwikithis",
                 "wikithis", "wikihand",
             )
-            description = "Searches the independent wiki with SkyHanni's own method."
+            description = "Searches the current held item in the independent wiki."
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
                 wikiThisItem()
