@@ -11,6 +11,28 @@ class GreenhouseConfig {
 
     @Expose
     @ConfigOption(
+        name = "Missing Crop Warning",
+        desc = "Scan Greenhouse plots and warn when one or more unique crops are not planted.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var missingCropWarning: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Mutation Blueprint",
+        desc = "Save and load Greenhouse layouts, then show shadows where mutations disappear. " +
+            "Use /shgreenhouseblueprint to open the layout library.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var mutationBlueprint: Boolean = true
+
+    @Expose
+    var useDiagnosticCropPositionFinder: Boolean = true
+
+    @Expose
+    @ConfigOption(
         name = "Growth Cycle Timer",
         desc = "Show a timer for the next growth stage. Open the Crop Diagnostics menu in the Greenhouse to detect the time.",
     )
