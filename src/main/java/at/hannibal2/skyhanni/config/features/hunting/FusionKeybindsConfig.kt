@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.hunting
 
-import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
@@ -21,12 +21,12 @@ class FusionKeybindsConfig {
     @Expose
     @ConfigOption(name = "Repeat Fusion Keybind", desc = "Keybind to repeat the previous fusion.")
     @SearchTag("hunting box")
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    val repeatFusionKeybind: Property<Int> = Property.of(KEY_UNKNOWN)
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    val repeatFusionKeybind: Property<Int> = Property.of(KeyboardManager.KEY_UNKNOWN)
 
     @Expose
     @ConfigOption(name = "Confirm Fusion Keybind", desc = "Keybind to confirm the current fusion.")
     @SearchTag("hunting box")
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    val confirmFusionKeybind: Property<Int> = Property.of(KEY_UNKNOWN)
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    val confirmFusionKeybind: Property<Int> = Property.of(KeyboardManager.KEY_UNKNOWN)
 }

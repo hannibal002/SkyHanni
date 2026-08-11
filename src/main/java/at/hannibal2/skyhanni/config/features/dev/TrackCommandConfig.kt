@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -25,6 +25,6 @@ class TrackCommandConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "Press this keybind to start/stop tracking.")
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var toggleKeybind: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var toggleKeybind: Int = KeyboardManager.KEY_UNKNOWN
 }

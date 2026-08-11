@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.chat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -18,7 +18,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(name = "Peek Chat", desc = "Hold this key to keep the chat open.")
     @ConfigEditorKeybind(defaultKey = InputConstants.KEY_Z)
-    var peekChat: Int = KEY_UNKNOWN
+    var peekChat: Int = KeyboardManager.KEY_UNKNOWN
 
     // TODO move into own sub category
     @Expose

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.hunting
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.foraging.SafariConfig
-import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -71,8 +71,8 @@ class HuntingConfig {
     @Expose
     @SearchTag("hideonleaf hideonsun")
     @ConfigOption(name = "Show next Hideonleaf", desc = "Press this key to show the next Hideonleaf.")
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var nextShulkerKeybind: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var nextShulkerKeybind: Int = KeyboardManager.KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Fusion Display", desc = "Displays the shard you are fusing and how many you have.")

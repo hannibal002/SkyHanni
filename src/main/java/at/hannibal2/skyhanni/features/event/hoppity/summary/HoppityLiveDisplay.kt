@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFShopPrice.men
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -130,7 +130,7 @@ object HoppityLiveDisplay {
     fun onKeyPress(event: KeyPressEvent) {
         reCheckInventoryState()
         if (!config.enabled) return
-        if (config.toggleKeybind == KEY_UNKNOWN || config.toggleKeybind != event.keyCode) return
+        if (config.toggleKeybind == KeyboardManager.KEY_UNKNOWN || config.toggleKeybind != event.keyCode) return
         // Only toggle from inventory if the user is in the Chocolate Factory
         if (MinecraftCompat.screen != null && !CFApi.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return

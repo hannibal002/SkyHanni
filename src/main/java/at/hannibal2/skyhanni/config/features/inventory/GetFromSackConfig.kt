@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
@@ -49,6 +49,6 @@ class GetFromSackConfig {
         name = "GfS Keybind",
         desc = "Fills your inventory with the item you are hovering over."
     )
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var keybind: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var keybind: Int = KeyboardManager.KEY_UNKNOWN
 }

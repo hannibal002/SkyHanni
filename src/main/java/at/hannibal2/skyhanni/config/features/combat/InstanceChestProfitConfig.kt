@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.combat
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.ItemPriceSource
-import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -53,8 +53,8 @@ class InstanceChestProfitConfig {
         desc = "Press while Hovering an item to add/remove it from favorites which will Star chests containing this item in Croesus" +
             " and highlight the Item in Instance Chests."
     )
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var keybind: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var keybind: Int = KeyboardManager.KEY_UNKNOWN
 
     @Expose
     @ConfigLink(owner = InstanceChestProfitConfig::class, field = "croesusAllChestsOverlay")

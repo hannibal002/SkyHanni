@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
 import com.google.gson.annotations.Expose
 import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -38,8 +37,8 @@ class GraphConfig {
 
     @Expose
     @ConfigOption(name = "Select near look", desc = "Select the node closest to where you are looking.")
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var selectRaycastKey: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var selectRaycastKey: Int = KeyboardManager.KEY_UNKNOWN
 
     @Expose
     @ConfigOption(
@@ -111,13 +110,13 @@ class GraphConfig {
         name = "Split Key",
         desc = "Key for splitting an edge that is between the active and the closest node."
     )
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var splitKey: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var splitKey: Int = KeyboardManager.KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Dissolve Key", desc = "Dissolve the active node into one edge if it only has two edges.")
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var dissolveKey: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var dissolveKey: Int = KeyboardManager.KEY_UNKNOWN
 
     @Expose
     @ConfigOption(

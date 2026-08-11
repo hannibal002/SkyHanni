@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory.customloadout
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -66,16 +66,16 @@ class LoadoutKeybindConfig {
 
     @Expose
     @ConfigOption(name = "Slot 10", desc = "Keybind for loadout slot 10.")
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var slot10: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var slot10: Int = KeyboardManager.KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Slot 11", desc = "Keybind for loadout slot 11.")
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var slot11: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var slot11: Int = KeyboardManager.KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Slot 12", desc = "Keybind for loadout slot 12.")
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var slot12: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var slot12: Int = KeyboardManager.KEY_UNKNOWN
 }

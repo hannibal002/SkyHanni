@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.commands
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
@@ -58,6 +58,6 @@ class BetterWikiCommandConfig {
         desc = "Search for an item's wiki page with this keybind.\n" +
             "§cFor an optimal experience, do §lNOT §cbind this to a mouse button.",
     )
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var wikiKeybind: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var wikiKeybind: Int = KeyboardManager.KEY_UNKNOWN
 }

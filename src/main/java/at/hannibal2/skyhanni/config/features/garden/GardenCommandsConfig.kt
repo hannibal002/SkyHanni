@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
@@ -22,22 +22,22 @@ class GardenCommandsConfig {
         name = "Spawn Hotkey",
         desc = "Press this key to teleport you to your Garden spawn. §cOnly works while in the garden.",
     )
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var homeHotkey: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var homeHotkey: Int = KeyboardManager.KEY_UNKNOWN
 
     @Expose
     @ConfigOption(
         name = "Set Spawn Hotkey",
         desc = "Press this key to set your Garden spawn. §cOnly works while in the garden.",
     )
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var sethomeHotkey: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var sethomeHotkey: Int = KeyboardManager.KEY_UNKNOWN
 
     @Expose
     @ConfigOption(
         name = "Barn Hotkey",
         desc = "Press this key to teleport you to the Garden barn. §cOnly works while in the garden."
     )
-    @ConfigEditorKeybind(defaultKey = KEY_UNKNOWN)
-    var barnHotkey: Int = KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var barnHotkey: Int = KeyboardManager.KEY_UNKNOWN
 }

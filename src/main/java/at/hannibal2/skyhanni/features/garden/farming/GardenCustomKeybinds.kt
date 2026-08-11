@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -178,14 +177,14 @@ object GardenCustomKeybinds {
     @JvmStatic
     fun disableAll() {
         with(config) {
-            attack.set(KEY_UNKNOWN)
-            useItem.set(KEY_UNKNOWN)
-            left.set(KEY_UNKNOWN)
-            right.set(KEY_UNKNOWN)
-            forward.set(KEY_UNKNOWN)
-            back.set(KEY_UNKNOWN)
-            jump.set(KEY_UNKNOWN)
-            sneak.set(KEY_UNKNOWN)
+            attack.set(KeyboardManager.KEY_UNKNOWN)
+            useItem.set(KeyboardManager.KEY_UNKNOWN)
+            left.set(KeyboardManager.KEY_UNKNOWN)
+            right.set(KeyboardManager.KEY_UNKNOWN)
+            forward.set(KeyboardManager.KEY_UNKNOWN)
+            back.set(KeyboardManager.KEY_UNKNOWN)
+            jump.set(KeyboardManager.KEY_UNKNOWN)
+            sneak.set(KeyboardManager.KEY_UNKNOWN)
         }
     }
 
