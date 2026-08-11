@@ -19,6 +19,7 @@ import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import net.minecraft.client.KeyMapping
 import org.lwjgl.glfw.GLFW
 
+// Refrence: https://github.com/AzureAaron/Dandelion/blob/master/src/main/java/net/azureaaron/dandelion/impl/moulconfig/editor/DandelionKeyMappingEditor.java
 class GuiOptionEditorKeyMapping(option: ProcessedOption, keyMapping: KeyMapping) : ComponentEditor(option) {
     private val component: GuiComponent = this.wrapComponent(KeyMappingComponent(keyMapping))
 
