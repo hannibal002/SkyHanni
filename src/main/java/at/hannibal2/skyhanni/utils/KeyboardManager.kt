@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.BlockingMoulConfigProcessor
+import at.hannibal2.skyhanni.config.core.elements.ConfigEditorKeyMapping
+import at.hannibal2.skyhanni.config.core.elements.GuiOptionEditorKeyMapping
 import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -14,6 +17,7 @@ import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.input.InputQuirks
 import net.minecraft.client.input.KeyEvent
+import net.minecraft.resources.Identifier
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
 
@@ -157,6 +161,23 @@ object KeyboardManager {
     }
 
     fun getKeyName(keyCode: Int): String = IMinecraft.INSTANCE.getKeyName(keyCode).text
+
+    private val SKYHANNI = KeyMapping.Category.register(
+        Identifier.fromNamespaceAndPath("skyhanni", "keys")
+    )
+
+    fun injectConfigProcessor(processor: BlockingMoulConfigProcessor) {
+        processor.registerConfigEditor(ConfigEditorKeyMapping::class.java) { option, annotation ->
+            val key = InputConstants.getKey(annotation.defaultKey)
+            val keyMapping = KeyMapping(
+                option.name.text,
+                key.type,
+                key.value,
+                SKYHANNI,
+            )
+            GuiOptionEditorKeyMapping(option, keyMapping)
+        }
+    }
 
     object WasdInputMatrix : Iterable<KeyMapping> {
         operator fun contains(keyBinding: KeyMapping) = when (keyBinding) {
