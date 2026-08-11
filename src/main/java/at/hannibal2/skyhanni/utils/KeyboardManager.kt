@@ -178,31 +178,6 @@ object KeyboardManager {
         }
     }
 
-    private fun getDisplayNameForKeyMapping(option: ProcessedOption): String {
-        val parts = option.path.split(".")
-        // wardrobe.keybinds.open -> wardrobe.open
-        // dev.chat.peekKey -> chat.peekKey
-        val name = if (
-            parts.size >= 3 &&
-            parts[parts.lastIndex - 1].startsWith("keybind", true)
-        ) {
-            listOf(parts[parts.lastIndex - 2], parts.last())
-        } else {
-            parts.takeLast(2)
-        }
-
-        return name
-            .joinToString(" ")
-            .replace(Regex("(?i)keybindConfig"), "")
-            .replace(Regex("(?i)keybind(?=Option)"), "")
-            .replace(Regex("([a-z])([A-Z])"), "$1 $2")
-            .replace(Regex("([A-Za-z])([0-9])"), "$1 $2")
-            .replace(Regex("\\s+"), " ")
-            .trim()
-            .split(" ")
-            .joinToString(" ") { it.replaceFirstChar(Char::uppercase) }
-    }
-
     private val keyMappingMap = mutableMapOf<String, KeyMapping>()
 
     private fun getOrCreateKeyMapping(option: ProcessedOption, defaultKey: Int): KeyMapping =
@@ -227,6 +202,31 @@ object KeyboardManager {
         keyMapping.setKey(key)
         KeyMappingHelper.registerKeyMapping(keyMapping)
         return keyMapping
+    }
+
+    private fun getDisplayNameForKeyMapping(option: ProcessedOption): String {
+        val parts = option.path.split(".")
+        // wardrobe.keybinds.open -> wardrobe.open
+        // dev.chat.peekKey -> chat.peekKey
+        val name = if (
+            parts.size >= 3 &&
+            parts[parts.lastIndex - 1].startsWith("keybind", true)
+        ) {
+            listOf(parts[parts.lastIndex - 2], parts.last())
+        } else {
+            parts.takeLast(2)
+        }
+
+        return name
+            .joinToString(" ")
+            .replace(Regex("(?i)keybindConfig"), "")
+            .replace(Regex("(?i)keybind(?=Option)"), "")
+            .replace(Regex("([a-z])([A-Z])"), "$1 $2")
+            .replace(Regex("([A-Za-z])([0-9])"), "$1 $2")
+            .replace(Regex("\\s+"), " ")
+            .trim()
+            .split(" ")
+            .joinToString(" ") { it.replaceFirstChar(Char::uppercase) }
     }
 
     object WasdInputMatrix : Iterable<KeyMapping> {
