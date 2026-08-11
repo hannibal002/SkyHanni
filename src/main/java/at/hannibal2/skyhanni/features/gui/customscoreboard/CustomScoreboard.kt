@@ -207,15 +207,12 @@ object CustomScoreboard {
         updateAllIslandEntries()
 
         if (customScoreboardModLoaded) {
-            if (config.shownCustomScoreboardModInstalledWarning) return
-            config.shownCustomScoreboardModInstalledWarning = true
             if (!config.enabled.get()) return
             ChatUtils.chat(
                 message = "SkyHanni's Custom Scoreboard feature has been disabled because the Custom Scoreboard mod is installed. " +
                     "Please use the mod instead, as it has more features and is better maintained.",
             )
-        } else {
-            config.shownCustomScoreboardModInstalledWarning = false
+            config.enabled.set(false)
         }
     }
 
@@ -233,6 +230,7 @@ object CustomScoreboard {
 
         showDeprecatedWarning()
     }
+
     private fun showDeprecatedWarning() {
         if (!isEnabled() || warningSilenced) return
 
