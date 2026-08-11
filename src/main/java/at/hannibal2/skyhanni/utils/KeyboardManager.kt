@@ -182,7 +182,6 @@ object KeyboardManager {
         val parts = option.path.split(".")
         // wardrobe.keybinds.open -> wardrobe.open
         // dev.chat.peekKey -> chat.peekKey
-
         val name = if (
             parts.size >= 3 &&
             parts[parts.lastIndex - 1].startsWith("keybind", true)
