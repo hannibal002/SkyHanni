@@ -208,10 +208,13 @@ object CustomScoreboard {
 
         if (customScoreboardModLoaded) {
             if (!config.enabled.get()) return
-            ChatUtils.chat(
-                message = "SkyHanni's Custom Scoreboard feature has been disabled because the Custom Scoreboard mod is installed. " +
-                    "Please use the mod instead, as it has more features and is better maintained.",
+
+            showCustomScoreboardReplacementMessage(
+                message = "SkyHanni's §cCustom Scoreboard §ahas been disabled because " +
+                    "§bSkyBlock Custom Scoreboard §ais installed.\n" +
+                    "§e[Click here to open it on Modrinth]",
             )
+
             config.enabled.set(false)
         }
     }
@@ -234,24 +237,11 @@ object CustomScoreboard {
     private fun showDeprecatedWarning() {
         if (!isEnabled() || warningSilenced) return
 
-        ChatUtils.clickableLinkChat(
+        showCustomScoreboardReplacementMessage(
             message = "Custom Scoreboard is deprecated and no longer supported.\n" +
                 "Please switch to §bSkyBlock Custom Scoreboard§c, a standalone replacement\n" +
                 "created and maintained by a trusted former SkyHanni contributor.\n" +
                 "§e[Click here to open it on Modrinth]",
-            url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
-            prefixColor = "§c",
-            replaceSameMessage = true,
-            hover = """
-                §eWhy use the replacement?
-
-                §7• §a100% feature parity with SkyHanni's Custom Scoreboard
-                §7• §aWorks identically by default
-                §7• §aBug fixes and improvements released independently
-                §7• §aAdditional features not available in SkyHanni
-                §7• §aConfig migration from SkyHanni is supported
-                §7• §aMaintained by a trusted former SkyHanni contributor
-            """.trimIndent(),
         )
 
         ChatUtils.clickableChat(
@@ -267,6 +257,25 @@ object CustomScoreboard {
                     prefix = false,
                 )
             },
+        )
+    }
+
+    private fun showCustomScoreboardReplacementMessage(message: String) {
+        ChatUtils.clickableLinkChat(
+            message = message,
+            url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
+            prefixColor = "§c",
+            replaceSameMessage = true,
+            hover = """
+            §eWhy use the replacement?
+
+            §7• §a100% feature parity with SkyHanni's Custom Scoreboard
+            §7• §aWorks identically by default
+            §7• §aBug fixes and improvements released independently
+            §7• §aAdditional features not available in SkyHanni
+            §7• §aConfig migration from SkyHanni is supported
+            §7• §aMaintained by a trusted former SkyHanni contributor
+        """.trimIndent(),
         )
     }
 
