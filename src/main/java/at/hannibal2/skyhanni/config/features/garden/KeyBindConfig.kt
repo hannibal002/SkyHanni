@@ -54,7 +54,7 @@ class KeyBindConfig {
     @ConfigEditorBoolean
     var sunsGrasp: Boolean = true
 
-    TODO("Rename excludeBarn to excludeUnfarmablePlots")
+    // TODO Rename excludeBarn to excludeUnfarmablePlots
     @Expose
     @ConfigOption(name = "Exclude Unfarmable Plots", desc = "Disable this feature while on the barn plot or in a greenhouse.")
     @ConfigEditorBoolean
