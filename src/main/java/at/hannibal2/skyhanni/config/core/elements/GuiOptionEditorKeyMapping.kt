@@ -91,16 +91,16 @@ class GuiOptionEditorKeyMapping(option: ProcessedOption, keyMapping: KeyMapping)
                         mouseX < width / 6 + 16 &&
                         mouseY > height - 7 - 14 &&
                         mouseY < height - 7 + 2
-                        ) {
+                    ) {
                         this.editingKeycode = true
                         return true
                     }
 
                     if (mouseX > width / 6 - 24 + 48 - 3 &&
                         mouseX < width / 6 - 24 + 48 + 13 - 5 &&
-                        mouseY > height - 7 - 14 + 3
-                        && mouseY < height - 7 - 14 + 3 + 11
-                        ) {
+                        mouseY > height - 7 - 14 + 3 &&
+                        mouseY < height - 7 - 14 + 3 + 11
+                    ) {
                         this.setKey(this.keyMapping.defaultKey)
                         return true
                     }

@@ -205,10 +205,10 @@ object KeyboardManager {
 
     private fun getOrCreateKeyMapping(option: ProcessedOption, defaultKey: Int): KeyMapping =
         keyMappingMap.computeIfAbsent(option.path) {
-            createKeyMapping(option, defaultKey, it)
+            createKeyMapping(option, defaultKey)
         }
 
-    fun createKeyMapping(option: ProcessedOption, defaultKey: Int, id: String): KeyMapping {
+    fun createKeyMapping(option: ProcessedOption, defaultKey: Int): KeyMapping {
         val keyValue = option.get() as Int
         val type = if (keyValue in 0..5) InputConstants.Type.MOUSE else InputConstants.Type.KEYSYM
         val displayName = getDisplayNameForKeyMapping(option)
