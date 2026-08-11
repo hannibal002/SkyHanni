@@ -20,13 +20,13 @@ import net.minecraft.client.KeyMapping
 import org.lwjgl.glfw.GLFW
 
 class GuiOptionEditorKeyMapping(option: ProcessedOption, keyMapping: KeyMapping) : ComponentEditor(option) {
-    private val component: GuiComponent = this.wrapComponent(KeyMappingComponent(option, keyMapping))
+    private val component: GuiComponent = this.wrapComponent(KeyMappingComponent(keyMapping))
 
     override fun getDelegate(): GuiComponent {
         return this.component
     }
 
-    private class KeyMappingComponent(private val option: ProcessedOption, private val keyMapping: KeyMapping) : GuiComponent() {
+    private class KeyMappingComponent(private val keyMapping: KeyMapping) : GuiComponent() {
         private var editingKeycode = false
 
         override fun getWidth(): Int {
@@ -92,7 +92,7 @@ class GuiOptionEditorKeyMapping(option: ProcessedOption, keyMapping: KeyMapping)
                     }
 
                     if (mouseX > width / 6 - 24 + 48 - 3 && mouseX < width / 6 - 24 + 48 + 13 - 5 && mouseY > height - 7 - 14 + 3 && mouseY < height - 7 - 14 + 3 + 11) {
-                        this.setKey(this.keyMapping.getDefaultKey())
+                        this.setKey(this.keyMapping.defaultKey)
                         return true
                     }
                 }
@@ -129,7 +129,6 @@ class GuiOptionEditorKeyMapping(option: ProcessedOption, keyMapping: KeyMapping)
         private fun setKey(key: InputConstants.Key) {
             this.keyMapping.setKey(key)
             KeyMapping.resetMapping()
-            option.set(key.name)
         }
     }
 }

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.input.InputQuirks
@@ -168,15 +169,33 @@ object KeyboardManager {
 
     fun injectConfigProcessor(processor: BlockingMoulConfigProcessor) {
         processor.registerConfigEditor(ConfigEditorKeyMapping::class.java) { option, annotation ->
-            val key = InputConstants.getKey(annotation.defaultKey)
-            val keyMapping = KeyMapping(
-                option.name.text,
-                key.type,
-                key.value,
-                SKYHANNI,
+
+            val mapping = getOrCreateKeyMapping(
+                option.get() as Int,
+                annotation.defaultKey,
+                option.path,
             )
-            GuiOptionEditorKeyMapping(option, keyMapping)
+            GuiOptionEditorKeyMapping(option, mapping)
         }
+    }
+
+    private val keyMappingMap = mutableMapOf<String, KeyMapping>()
+
+    private fun getOrCreateKeyMapping(key: Int, defaultKey: Int, id: String): KeyMapping =
+        keyMappingMap.computeIfAbsent(id) {
+            createKeyMapping(key, defaultKey, id)
+        }
+
+    fun createKeyMapping(key: Int, defaultKey: Int, id: String): KeyMapping {
+        val keyMapping = KeyMapping(
+            id,
+            defaultKey,
+            SKYHANNI,
+        )
+        val key = InputConstants.Type.KEYSYM.getOrCreate(key)
+        keyMapping.setKey(key)
+        KeyMappingHelper.registerKeyMapping(keyMapping)
+        return keyMapping
     }
 
     object WasdInputMatrix : Iterable<KeyMapping> {
