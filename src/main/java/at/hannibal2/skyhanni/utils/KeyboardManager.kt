@@ -187,12 +187,14 @@ object KeyboardManager {
         }
 
     fun createKeyMapping(key: Int, defaultKey: Int, id: String): KeyMapping {
+        val type = if (key in 0..5) InputConstants.Type.MOUSE else InputConstants.Type.KEYSYM
         val keyMapping = KeyMapping(
             id,
+            type,
             defaultKey,
             SKYHANNI,
         )
-        val key = InputConstants.Type.KEYSYM.getOrCreate(key)
+        val key = type.getOrCreate(key)
         keyMapping.setKey(key)
         KeyMappingHelper.registerKeyMapping(keyMapping)
         return keyMapping
