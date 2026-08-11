@@ -55,7 +55,7 @@ class KeyBindConfig {
     var sunsGrasp: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Exclude Barn", desc = "Disable this feature while on the barn plot.")
+    @ConfigOption(name = "Exclude Unfarmable Plots", desc = "Disable this feature while on the barn plot or in a greenhouse.")
     @ConfigEditorBoolean
     var excludeBarn: Boolean = false
 
