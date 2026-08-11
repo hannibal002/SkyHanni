@@ -70,7 +70,7 @@ object CustomScoreboard {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         display ?: return
 
@@ -88,7 +88,7 @@ object CustomScoreboard {
     }
 
     @HandleEvent
-    fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
+    private fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == GUI_NAME) {
             with(displayConfig.alignment) {
                 if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN || verticalAlignment != VerticalAlignment.DONT_ALIGN) {
@@ -112,7 +112,7 @@ object CustomScoreboard {
     }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (!isEnabled()) return
 
         if (dirty || nextScoreboardUpdate.isInPast()) {
@@ -134,7 +134,7 @@ object CustomScoreboard {
     }
 
     @HandleEvent(ScoreboardUpdateEvent::class)
-    fun onScoreboardChange() {
+    private fun onScoreboardChange() {
         dirty = true
     }
 
@@ -188,7 +188,7 @@ object CustomScoreboard {
             ?: dropWhile { it.display.isBlank() }.dropLastWhile { it.display.isBlank() }
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         ConditionalUtils.onToggle(
             config.scoreboardEntries,
             eventsConfig.eventEntries,
@@ -203,7 +203,7 @@ object CustomScoreboard {
     }
 
     @HandleEvent(HypixelJoinEvent::class)
-    fun onHypixelJoin() {
+    private fun onHypixelJoin() {
         updateAllIslandEntries()
 
         if (customScoreboardModLoaded) {
@@ -220,14 +220,14 @@ object CustomScoreboard {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         runDelayed(2.seconds) {
             if (!SkyBlockUtils.inSkyBlock || !(SkyBlockUtils.onHypixel && OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected())) dirty = true
         }
     }
 
     @HandleEvent
-    fun onIslandJoin(event: IslandJoinEvent) {
+    private fun onIslandJoin(event: IslandJoinEvent) {
         if (event.island == IslandType.NONE) updateAllIslandEntries()
         else updateIslandEntries()
 
@@ -301,7 +301,7 @@ object CustomScoreboard {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Custom Scoreboard")
         event.addIrrelevant {
             if (!config.enabled.get()) {
