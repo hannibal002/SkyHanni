@@ -175,6 +175,7 @@ object KeyboardManager {
             val mapping = getOrCreateKeyMapping(
                 option.get() as Int,
                 annotation.defaultKey,
+                // TODO: this should be a translation key
                 displayName,
             )
             GuiOptionEditorKeyMapping(option, mapping)
