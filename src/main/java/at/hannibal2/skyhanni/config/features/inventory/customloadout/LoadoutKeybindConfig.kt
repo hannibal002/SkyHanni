@@ -1,7 +1,11 @@
 package at.hannibal2.skyhanni.config.features.inventory.customloadout
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
@@ -22,7 +26,7 @@ class LoadoutKeybindConfig {
     @Expose
     @ConfigOption(
         name = "Cycle Key",
-        desc = "Cycles through the ordered loadouts below. The loadout menu must be closed before cycling again.",
+        desc = "Cycles through the ordered loadouts below.",
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var cycleKey: Int = GLFW.GLFW_KEY_UNKNOWN
@@ -41,124 +45,14 @@ class LoadoutKeybindConfig {
     val contestCycleOrder: MutableList<CycleLoadout> = mutableListOf()
 
     @Expose
-    @ConfigOption(name = "Slot 1", desc = "Keybind for loadout slot 1.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_1)
-    var slot1: Int = GLFW.GLFW_KEY_1
+    @ConfigOption(name = "Slot Keybinds", desc = "Keybinds used to select loadouts.")
+    @Accordion
+    val slotKeybinds: LoadoutSlotKeybindConfig = LoadoutSlotKeybindConfig(useNumberKeyDefaults = true)
 
     @Expose
-    @ConfigOption(name = "Slot 2", desc = "Keybind for loadout slot 2.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_2)
-    var slot2: Int = GLFW.GLFW_KEY_2
-
-    @Expose
-    @ConfigOption(name = "Slot 3", desc = "Keybind for loadout slot 3.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_3)
-    var slot3: Int = GLFW.GLFW_KEY_3
-
-    @Expose
-    @ConfigOption(name = "Slot 4", desc = "Keybind for loadout slot 4.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_4)
-    var slot4: Int = GLFW.GLFW_KEY_4
-
-    @Expose
-    @ConfigOption(name = "Slot 5", desc = "Keybind for loadout slot 5.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_5)
-    var slot5: Int = GLFW.GLFW_KEY_5
-
-    @Expose
-    @ConfigOption(name = "Slot 6", desc = "Keybind for loadout slot 6.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_6)
-    var slot6: Int = GLFW.GLFW_KEY_6
-
-    @Expose
-    @ConfigOption(name = "Slot 7", desc = "Keybind for loadout slot 7.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_7)
-    var slot7: Int = GLFW.GLFW_KEY_7
-
-    @Expose
-    @ConfigOption(name = "Slot 8", desc = "Keybind for loadout slot 8.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_8)
-    var slot8: Int = GLFW.GLFW_KEY_8
-
-    @Expose
-    @ConfigOption(name = "Slot 9", desc = "Keybind for loadout slot 9.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_9)
-    var slot9: Int = GLFW.GLFW_KEY_9
-
-    @Expose
-    @ConfigOption(name = "Slot 10", desc = "Keybind for loadout slot 10.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var slot10: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Slot 11", desc = "Keybind for loadout slot 11.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var slot11: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Slot 12", desc = "Keybind for loadout slot 12.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var slot12: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Contest Slot 1", desc = "Alternate keybind for loadout slot 1 during a Jacob's Contest.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var contestSlot1: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Contest Slot 2", desc = "Alternate keybind for loadout slot 2 during a Jacob's Contest.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var contestSlot2: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Contest Slot 3", desc = "Alternate keybind for loadout slot 3 during a Jacob's Contest.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var contestSlot3: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Contest Slot 4", desc = "Alternate keybind for loadout slot 4 during a Jacob's Contest.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var contestSlot4: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Contest Slot 5", desc = "Alternate keybind for loadout slot 5 during a Jacob's Contest.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var contestSlot5: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Contest Slot 6", desc = "Alternate keybind for loadout slot 6 during a Jacob's Contest.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var contestSlot6: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Contest Slot 7", desc = "Alternate keybind for loadout slot 7 during a Jacob's Contest.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var contestSlot7: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Contest Slot 8", desc = "Alternate keybind for loadout slot 8 during a Jacob's Contest.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var contestSlot8: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Contest Slot 9", desc = "Alternate keybind for loadout slot 9 during a Jacob's Contest.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var contestSlot9: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Contest Slot 10", desc = "Alternate keybind for loadout slot 10 during a Jacob's Contest.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var contestSlot10: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Contest Slot 11", desc = "Alternate keybind for loadout slot 11 during a Jacob's Contest.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var contestSlot11: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Contest Slot 12", desc = "Alternate keybind for loadout slot 12 during a Jacob's Contest.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var contestSlot12: Int = GLFW.GLFW_KEY_UNKNOWN
+    @ConfigOption(name = "Contest Slot Keybinds", desc = "Alternate keybinds used during a Jacob's Contest.")
+    @Accordion
+    val contestSlotKeybinds: LoadoutSlotKeybindConfig = LoadoutSlotKeybindConfig()
 
     enum class CycleLoadout(private val displayName: String) {
         LOADOUT_1("Loadout 1"),
@@ -176,5 +70,26 @@ class LoadoutKeybindConfig {
         ;
 
         override fun toString() = displayName
+    }
+
+    @SkyHanniModule
+    companion object {
+        @HandleEvent
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) = migrateSlotKeybinds(event)
+
+        internal fun migrateSlotKeybinds(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            for (slot in 1..12) {
+                event.move(
+                    143,
+                    "inventory.customLoadout.keybinds.slot$slot",
+                    "inventory.customLoadout.keybinds.slotKeybinds.slot$slot",
+                )
+                event.move(
+                    143,
+                    "inventory.customLoadout.keybinds.contestSlot$slot",
+                    "inventory.customLoadout.keybinds.contestSlotKeybinds.slot$slot",
+                )
+            }
+        }
     }
 }

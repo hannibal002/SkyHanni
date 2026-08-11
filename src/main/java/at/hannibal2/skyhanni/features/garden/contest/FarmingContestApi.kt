@@ -56,6 +56,14 @@ object FarmingContestApi {
     )
 
     /**
+     * REGEX-TEST: Jacob's Contest
+     */
+    private val contestTitlePattern by patternGroup.pattern(
+        "title.colorless",
+        "Jacob's Contest",
+    )
+
+    /**
      * REGEX-TEST: Jacob's Contest: 17m left
      * REGEX-TEST: Jacob's Contest: 1m 36s left
      */
@@ -151,7 +159,7 @@ object FarmingContestApi {
     }
 
     private fun readCurrentCrop(): CropType? {
-        val line = scoreboardLines.nextAfter(after = { it.startsWith("Jacob's Contest") }) ?: return null
+        val line = scoreboardLines.nextAfter(after = { contestTitlePattern.matches(it) }) ?: return null
         return sidebarCropPattern.matchMatcher(line) {
             val cropName = group("crop")
             try {
@@ -161,7 +169,7 @@ object FarmingContestApi {
                     e, "Farming contest read current crop failed",
                     "cropName" to cropName,
                     "line" to line,
-                    "sidebarLinesFormatted" to scoreboardLines,
+                    "scoreboardLines" to scoreboardLines,
                 )
                 null
             }
