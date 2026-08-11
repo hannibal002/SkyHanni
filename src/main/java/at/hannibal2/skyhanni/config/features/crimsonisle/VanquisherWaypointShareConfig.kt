@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.config.features.crimsonisle
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.elements.ConfigEditorKeyMap
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
@@ -21,7 +21,7 @@ class VanquisherWaypointShareConfig {
 
     @Expose
     @ConfigOption(name = "Keybind Share", desc = "Manually share your Vanquisher spawns with a keybind.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_Y)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_Y)
     var keybindSharing: Int = GLFW.GLFW_KEY_Y
 
     @Expose

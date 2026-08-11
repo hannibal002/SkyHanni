@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.elements.ConfigEditorKeyMap
 import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.glfw.GLFW
@@ -69,41 +69,41 @@ class KeyBindConfig {
 
     @Expose
     @ConfigOption(name = "Attack", desc = "")
-    @ConfigEditorKeybind(defaultKey = KeyboardManager.LEFT_MOUSE)
+    @ConfigEditorKeyMap(defaultKey = KeyboardManager.LEFT_MOUSE)
     val attack: Property<Int> = Property.of(KeyboardManager.LEFT_MOUSE)
 
     @Expose
     @ConfigOption(name = "Use Item", desc = "")
-    @ConfigEditorKeybind(defaultKey = KeyboardManager.RIGHT_MOUSE)
+    @ConfigEditorKeyMap(defaultKey = KeyboardManager.RIGHT_MOUSE)
     val useItem: Property<Int> = Property.of(KeyboardManager.RIGHT_MOUSE)
 
     @Expose
     @ConfigOption(name = "Move Left", desc = "")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_A)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_A)
     val left: Property<Int> = Property.of(GLFW.GLFW_KEY_A)
 
     @Expose
     @ConfigOption(name = "Move Right", desc = "")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_D)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_D)
     val right: Property<Int> = Property.of(GLFW.GLFW_KEY_D)
 
     @Expose
     @ConfigOption(name = "Move Forward", desc = "")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_W)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_W)
     val forward: Property<Int> = Property.of(GLFW.GLFW_KEY_W)
 
     @Expose
     @ConfigOption(name = "Move Back", desc = "")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_S)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_S)
     val back: Property<Int> = Property.of(GLFW.GLFW_KEY_S)
 
     @Expose
     @ConfigOption(name = "Jump", desc = "")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_SPACE)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_SPACE)
     val jump: Property<Int> = Property.of(GLFW.GLFW_KEY_SPACE)
 
     @Expose
     @ConfigOption(name = "Sneak", desc = "")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_LEFT_SHIFT)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_LEFT_SHIFT)
     val sneak: Property<Int> = Property.of(GLFW.GLFW_KEY_LEFT_SHIFT)
 }

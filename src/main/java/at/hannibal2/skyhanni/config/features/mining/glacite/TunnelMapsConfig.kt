@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.config.features.mining.glacite
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.elements.ConfigEditorKeyMap
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -49,7 +49,7 @@ class TunnelMapsConfig {
         name = "Campfire Hotkey",
         desc = "Hotkey to warp to the campfire. If the travel scroll is not unlocked, show a path to the campfire instead."
     )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var campfireKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
@@ -62,7 +62,7 @@ class TunnelMapsConfig {
 
     @Expose
     @ConfigOption(name = "Next Spot Hotkey", desc = "Hotkey to select the next spot.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var nextSpotHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

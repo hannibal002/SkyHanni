@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.BlockingMoulConfigProcessor
+import at.hannibal2.skyhanni.config.core.elements.ConfigEditorKeyMap
 import at.hannibal2.skyhanni.config.core.elements.GuiOptionEditorKeyMapping
 import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
@@ -9,9 +10,9 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import com.mojang.blaze3d.platform.InputConstants
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper
 import net.minecraft.client.KeyMapping
@@ -168,12 +169,13 @@ object KeyboardManager {
     )
 
     fun injectConfigProcessor(processor: BlockingMoulConfigProcessor) {
-        processor.registerConfigEditor(ConfigEditorKeybind::class.java) { option, annotation ->
+        processor.registerConfigEditor(ConfigEditorKeyMap::class.java) { option, annotation ->
+
+            val displayName = annotation.displayName.takeIfNotEmpty() ?: option.name.text
             val mapping = getOrCreateKeyMapping(
                 option.get() as Int,
                 annotation.defaultKey,
-                // TODO: This should be a translation key
-                option.name.text,
+                displayName,
             )
             GuiOptionEditorKeyMapping(option, mapping)
         }

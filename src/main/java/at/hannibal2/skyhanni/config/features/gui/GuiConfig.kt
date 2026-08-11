@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.gui
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.elements.ConfigEditorKeyMap
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
 import at.hannibal2.skyhanni.config.features.gui.moveablehud.ActionBarConfig
@@ -20,7 +21,6 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -51,12 +51,12 @@ class GuiConfig {
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var keyBindOpen: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Reset Hotkey", desc = "Key to press hovering a gui element to reset it's position and scale in the GUI Editor.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_R)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_R)
     var keyBindReset: Int = GLFW.GLFW_KEY_R
 
     @Expose

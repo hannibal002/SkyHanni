@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.config.features.dungeon.spiritleap
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.elements.ConfigEditorKeyMap
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
@@ -31,7 +31,7 @@ class SpiritLeapKeybindConfig {
         name = "Keybind: First Target",
         desc = "Keybind for teleporting to the first available Spirit Leap target."
     )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_1)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_1)
     var keybindOption1 = GLFW.GLFW_KEY_1
 
     @Expose
@@ -39,7 +39,7 @@ class SpiritLeapKeybindConfig {
         name = "Keybind: Second Target",
         desc = "Keybind for teleporting to the second available Spirit Leap target."
     )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_2)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_2)
     var keybindOption2 = GLFW.GLFW_KEY_2
 
     @Expose
@@ -47,7 +47,7 @@ class SpiritLeapKeybindConfig {
         name = "Keybind: Third Target",
         desc = "Keybind for teleporting to the third available Spirit Leap target."
     )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_3)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_3)
     var keybindOption3 = GLFW.GLFW_KEY_3
 
     @Expose
@@ -55,6 +55,6 @@ class SpiritLeapKeybindConfig {
         name = "Keybind: Fourth Target",
         desc = "Keybind for teleporting to the fourth available Spirit Leap target."
     )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_4)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_4)
     var keybindOption4 = GLFW.GLFW_KEY_4
 }

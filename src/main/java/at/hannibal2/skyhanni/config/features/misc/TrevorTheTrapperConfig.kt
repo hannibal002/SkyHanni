@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.elements.ConfigEditorKeyMap
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
@@ -117,7 +117,7 @@ class TrevorTheTrapperConfig {
         desc = "Press this key to warp to Trevor's Den or to accept the quest. " +
             "§eRequires the relevant above settings to be toggled"
     )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var keyBind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
