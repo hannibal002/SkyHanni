@@ -37,7 +37,7 @@ class TrophyFishDisplayConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var keybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

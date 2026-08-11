@@ -22,7 +22,7 @@ class GardenCommandsConfig {
         name = "Spawn Hotkey",
         desc = "Press this key to teleport you to your Garden spawn. §cOnly works while in the garden.",
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var homeHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
@@ -30,7 +30,7 @@ class GardenCommandsConfig {
         name = "Set Spawn Hotkey",
         desc = "Press this key to set your Garden spawn. §cOnly works while in the garden.",
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var sethomeHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
@@ -38,6 +38,6 @@ class GardenCommandsConfig {
         name = "Barn Hotkey",
         desc = "Press this key to teleport you to the Garden barn. §cOnly works while in the garden."
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var barnHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 }

@@ -21,12 +21,12 @@ class FusionKeybindsConfig {
     @Expose
     @ConfigOption(name = "Repeat Fusion Keybind", desc = "Keybind to repeat the previous fusion.")
     @SearchTag("hunting box")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     val repeatFusionKeybind: Property<Int> = Property.of(GLFW.GLFW_KEY_UNKNOWN)
 
     @Expose
     @ConfigOption(name = "Confirm Fusion Keybind", desc = "Keybind to confirm the current fusion.")
     @SearchTag("hunting box")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     val confirmFusionKeybind: Property<Int> = Property.of(GLFW.GLFW_KEY_UNKNOWN)
 }

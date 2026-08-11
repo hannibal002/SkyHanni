@@ -102,7 +102,7 @@ class VisitorConfig {
             "§eUseful for getting Ephemeral Gratitudes during the Great Spook event."
     )
     @SearchTag("halloween")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var acceptHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 
 

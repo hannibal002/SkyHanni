@@ -12,12 +12,12 @@ class WaypointsConfig {
         name = "Save Hotkey",
         desc = "Saves block location to a temporary parkour and copies everything to your clipboard."
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var saveKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Delete Hotkey", desc = "Deletes the last saved location for when you make a mistake.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var deleteKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

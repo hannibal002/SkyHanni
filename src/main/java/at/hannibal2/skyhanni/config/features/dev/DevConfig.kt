@@ -65,7 +65,7 @@ class DevConfig {
 
     @Expose
     @ConfigOption(name = "Slot Number", desc = "Show slot number in inventory while pressing this key.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var showSlotNumberKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

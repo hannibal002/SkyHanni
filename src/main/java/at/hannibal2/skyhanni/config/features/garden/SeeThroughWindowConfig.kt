@@ -20,6 +20,6 @@ class SeeThroughWindowConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "Press this key to toggle See Through Farming")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var keybind: Int = GLFW.GLFW_KEY_UNKNOWN
 }

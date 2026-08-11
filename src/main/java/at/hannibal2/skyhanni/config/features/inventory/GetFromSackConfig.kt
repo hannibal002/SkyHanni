@@ -49,6 +49,6 @@ class GetFromSackConfig {
         name = "GfS Keybind",
         desc = "Fills your inventory with the item you are hovering over."
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var keybind: Int = GLFW.GLFW_KEY_UNKNOWN
 }

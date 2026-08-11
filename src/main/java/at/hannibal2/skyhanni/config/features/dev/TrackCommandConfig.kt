@@ -25,6 +25,6 @@ class TrackCommandConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "Press this keybind to start/stop tracking.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var toggleKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 }

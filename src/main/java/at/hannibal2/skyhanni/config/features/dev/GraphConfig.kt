@@ -37,7 +37,7 @@ class GraphConfig {
 
     @Expose
     @ConfigOption(name = "Select near look", desc = "Select the node closest to where you are looking.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var selectRaycastKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
@@ -110,12 +110,12 @@ class GraphConfig {
         name = "Split Key",
         desc = "Key for splitting an edge that is between the active and the closest node."
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var splitKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Dissolve Key", desc = "Dissolve the active node into one edge if it only has two edges.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var dissolveKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

@@ -28,7 +28,7 @@ class GlaciteMineshaftConfig {
         desc = "Share the location of the nearest waypoint upon key press.\n" +
             "§eYou can share the location even if it has already been shared!"
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var shareWaypointLocation: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

@@ -51,7 +51,7 @@ class GuiConfig {
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var keyBindOpen: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

@@ -75,7 +75,7 @@ class HoppityLiveDisplayConfig {
 
     @Expose
     @ConfigOption(name = "Card Toggle Keybind", desc = "Toggle the GUI element with this keybind.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var toggleKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

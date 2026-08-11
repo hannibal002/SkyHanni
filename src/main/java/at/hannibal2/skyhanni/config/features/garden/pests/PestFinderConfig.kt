@@ -76,7 +76,7 @@ class PestFinderConfig {
 
     @Expose
     @ConfigOption(name = "Teleport Hotkey", desc = "Press this key to warp to the nearest plot with pests on it.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var teleportHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

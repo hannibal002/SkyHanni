@@ -230,7 +230,7 @@ class GardenConfig {
         desc = "Show Garden plot borders when pressing this key " +
             "(similar to how F3 + G shows chunk borders).",
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var plotBorderKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

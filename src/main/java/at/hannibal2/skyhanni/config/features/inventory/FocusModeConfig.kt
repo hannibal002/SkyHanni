@@ -21,7 +21,7 @@ class FocusModeConfig {
 
     @Expose
     @ConfigOption(name = "Toggle Key", desc = "Key to toggle the focus mode on and off.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var toggleKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose

@@ -71,7 +71,7 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var copyInternalName: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
@@ -79,7 +79,7 @@ class DebugConfig {
         name = "Copy Cosmetics Skull Data",
         desc = "Copies the cosmetic data for skins with different variants but no animations."
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var copyCosmeticsSkullData: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
@@ -114,12 +114,12 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(name = "Copy Item Data", desc = "Copies item NBT data on key press in a GUI to clipboard.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var copyItemData: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Copy Compressed Item Data", desc = "Copies compressed item NBT data on key press in a GUI to clipboard.")
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var copyItemDataCompressed: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
@@ -189,7 +189,7 @@ class DebugConfig {
         name = "Bypass Advanced Tab List",
         desc = "The Advanced Player Tab list is disabled while pressing this hotkey.",
     )
-    @ConfigEditorKeyMap(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @ConfigEditorKeyMap
     var bypassAdvancedPlayerTabList: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
