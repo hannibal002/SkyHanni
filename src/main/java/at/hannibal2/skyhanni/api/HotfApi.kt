@@ -47,8 +47,6 @@ object HotfApi {
         override val itemPattern by RepoPattern.pattern("$basePath.item.${asPatternId()}", itemFallback)
     }
 
-    // The Critter icon is a private use character that gets lost when copying chat or lore into a text
-    // report, so its position is matched permissively instead of literally.
     enum class BeekeeperPerk(
         override val displayDescription: String,
         @field:Language("RegExp") val chatFallback: String,
