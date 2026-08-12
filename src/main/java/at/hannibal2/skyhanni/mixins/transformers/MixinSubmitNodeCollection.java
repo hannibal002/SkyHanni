@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
+import at.hannibal2.skyhanni.mixins.hooks.RenderAlphaStore;
+import at.hannibal2.skyhanni.utils.render.ItemRenderTransparency;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.renderer.SubmitNodeCollection;
@@ -38,6 +40,11 @@ public abstract class MixinSubmitNodeCollection<E> {
         Operation<Void> original
     ) {
         skyhanni$markCustomOutline(modelSubmit);
+        Integer alpha = ItemRenderTransparency.getAlphaOverride();
+        Object modelSubmitObject = modelSubmit;
+        if (alpha != null && modelSubmitObject instanceof RenderAlphaStore alphaStore) {
+            alphaStore.skyhanni$setRenderAlpha(alpha);
+        }
         original.call(storage, renderType, modelSubmit);
     }
 

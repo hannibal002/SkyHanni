@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
+import at.hannibal2.skyhanni.mixins.hooks.RenderAlphaStore;
 import at.hannibal2.skyhanni.mixins.hooks.SkyHanniOutlineHook;
+import at.hannibal2.skyhanni.utils.render.AlphaVertexConsumer;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -17,6 +19,22 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(ModelFeatureRenderer.class)
 public abstract class MixinModelFeatureRenderer {
+
+    @WrapOperation(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/Model;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V", ordinal = 0))
+    private void applyRenderAlpha(
+        net.minecraft.client.model.Model<?> instance,
+        com.mojang.blaze3d.vertex.PoseStack poseStack,
+        VertexConsumer vertexConsumer,
+        int light,
+        int overlay,
+        int color,
+        Operation<Void> original,
+        @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model
+    ) {
+        Object object = model;
+        int alpha = object instanceof RenderAlphaStore alphaStore ? alphaStore.skyhanni$getRenderAlpha() : 255;
+        original.call(instance, poseStack, alpha < 255 ? new AlphaVertexConsumer(vertexConsumer, alpha) : vertexConsumer, light, overlay, color);
+    }
 
     @WrapOperation(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V"))
     private void setSkyHanniOutlineColor(OutlineBufferSource instance, int color, Operation<Void> original, @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model) {

@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.position
+import at.hannibal2.skyhanni.utils.render.ItemRenderTransparency
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.client.Minecraft
@@ -188,17 +189,19 @@ object GreenhouseMutationBlueprint {
         event.matrices.pushPose()
         event.matrices.translate(
             position.x - event.camera.position.x + 0.5,
-            position.y - event.camera.position.y + 0.5,
+            position.y - event.camera.position.y + MUTATION_GHOST_CENTER_Y,
             position.z - event.camera.position.z + 0.5,
         )
         event.matrices.scale(1.2f, 1.2f, 1.2f)
-        renderState.submit(
-            event.matrices,
-            minecraft.gameRenderer.featureRenderDispatcher.submitNodeStorage,
-            FULL_BRIGHT,
-            OverlayTexture.pack(0.8f, false),
-            0,
-        )
+        ItemRenderTransparency.withOpacity(MUTATION_GHOST_OPACITY) {
+            renderState.submit(
+                event.matrices,
+                minecraft.gameRenderer.featureRenderDispatcher.submitNodeStorage,
+                FULL_BRIGHT,
+                OverlayTexture.pack(0.8f, false),
+                0,
+            )
+        }
         event.matrices.popPose()
     }
 
@@ -707,6 +710,8 @@ object GreenhouseMutationBlueprint {
     private const val REQUIRED_STABLE_CHECKS = 3
     private const val ANCHOR_HORIZONTAL_TOLERANCE = 0.1
     private const val ANCHOR_VERTICAL_TOLERANCE = 3.0
+    private const val MUTATION_GHOST_OPACITY = 0.4f
+    private const val MUTATION_GHOST_CENTER_Y = 0.3
     internal const val MAX_LAYOUT_NAME_LENGTH = 32
     private const val IMPORTED_MUTATION_Y = 74.0
     private const val IMPORTED_CROP_Y = 74.0

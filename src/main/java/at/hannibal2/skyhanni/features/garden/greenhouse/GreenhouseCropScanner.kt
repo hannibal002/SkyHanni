@@ -8,11 +8,8 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.itemType
-import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.item.Items
@@ -21,26 +18,6 @@ import net.minecraft.world.level.block.Blocks
 import kotlin.math.abs
 
 internal object GreenhouseCropScanner {
-
-    fun findNearbyCropPosition(category: CropCategory, center: LorenzVec): LorenzVec? {
-        val world = MinecraftCompat.localWorldOrNull ?: return null
-        if (category in headOnlyCrops) return findNearbyFloatingCropHead(category, center)
-
-        val centerPos = center.toBlockPos()
-        // Crop Diagnostics can open when the player right-clicks the farmland below a crop.
-        // Prefer the clicked block and the block directly above it before searching the surrounding
-        // mutation. Otherwise decorative blocks of the same crop type can steal the diagnosed position.
-        listOf(centerPos, centerPos.above()).firstOrNull {
-            CropCategory.fromBlock(world.getBlockState(it).block) == category
-        }?.let { return it.toLorenzVec() }
-
-        val from = centerPos.offset(-DIAGNOSTIC_SEARCH_RADIUS, -DIAGNOSTIC_SEARCH_RADIUS, -DIAGNOSTIC_SEARCH_RADIUS)
-        val to = centerPos.offset(DIAGNOSTIC_SEARCH_RADIUS, DIAGNOSTIC_SEARCH_RADIUS, DIAGNOSTIC_SEARCH_RADIUS)
-        return BlockPos.betweenClosed(from, to)
-            .filter { CropCategory.fromBlock(world.getBlockState(it).block) == category }
-            .minByOrNull { it.distSqr(centerPos) }
-            ?.toLorenzVec()
-    }
 
     fun scanGreenhouse(plot: GardenPlot): Set<CropCategory> = scanGreenhousePositions(plot).keys
 
@@ -53,14 +30,6 @@ internal object GreenhouseCropScanner {
         val state = position.getBlockStateAt()
         return when {
             state.block in deadCropBlocks -> true
-
-            // Crop Diagnostics supplies the identity for crops that can use custom backing blocks.
-            category in diagnosticOnlyCrops -> {
-                val hasNearbyCrop = findNearbyCropPosition(category, position) != null
-                val hasFloatingHead = category in floatingHeadCrops &&
-                    position.hasFloatingHeadAtCropPosition(category)
-                !hasNearbyCrop && !hasFloatingHead
-            }
 
             category in floatingHeadCrops && position.hasFloatingHeadAtCropPosition(category) -> false
 
@@ -203,7 +172,6 @@ internal object GreenhouseCropScanner {
     }
 
     private val deadCropBlocks = setOf(Blocks.DEAD_BUSH, Blocks.CHORUS_PLANT, Blocks.CHORUS_FLOWER)
-    private val diagnosticOnlyCrops = setOf(CropCategory.PUMPKIN, CropCategory.COCOA_BEANS)
     private val variableHeightCrops = setOf(CropCategory.CACTUS, CropCategory.SUGAR_CANE)
     private val floatingHeadCrops = setOf(
         CropCategory.CACTUS,
@@ -219,7 +187,6 @@ internal object GreenhouseCropScanner {
     )
     private val playerHeadBlocks = setOf(Blocks.PLAYER_HEAD, Blocks.PLAYER_WALL_HEAD)
 
-    private const val DIAGNOSTIC_SEARCH_RADIUS = 2
     private const val VARIABLE_HEIGHT_SEARCH_RADIUS = 2
     private const val FLOATING_HEAD_SEARCH_RADIUS = 2.5
     private const val FLOATING_CROP_ID_SEARCH_RADIUS = 3.0

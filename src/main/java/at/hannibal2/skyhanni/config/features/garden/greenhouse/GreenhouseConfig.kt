@@ -16,7 +16,7 @@ class GreenhouseConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var missingCropWarning: Boolean = true
+    var missingCropWarning: Boolean = false
 
     @Expose
     @ConfigLink(owner = GreenhouseConfig::class, field = "missingCropWarning")
@@ -30,10 +30,7 @@ class GreenhouseConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var mutationBlueprint: Boolean = true
-
-    @Expose
-    var useDiagnosticCropPositionFinder: Boolean = true
+    var mutationBlueprint: Boolean = false
 
     @Expose
     @ConfigOption(
