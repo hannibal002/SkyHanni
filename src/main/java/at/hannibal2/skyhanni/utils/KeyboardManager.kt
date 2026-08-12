@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.BlockingMoulConfigProcessor
 import at.hannibal2.skyhanni.config.core.elements.GuiOptionEditorKeyMapping
@@ -19,7 +20,6 @@ import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.input.InputQuirks
 import net.minecraft.client.input.KeyEvent
-import net.minecraft.resources.Identifier
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
 
@@ -165,7 +165,7 @@ object KeyboardManager {
     fun getKeyName(keyCode: Int): String = IMinecraft.INSTANCE.getKeyName(keyCode).text
 
     private val SKYHANNI_CONFIG_CATEGORY = KeyMapping.Category.register(
-        Identifier.fromNamespaceAndPath("skyhanni", "keys")
+        SkyHanniMod.id("keys")
     )
 
     fun injectConfigProcessor(processor: BlockingMoulConfigProcessor) {
