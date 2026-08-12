@@ -42,7 +42,7 @@ object ItemPriceUtils {
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
         pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double? {
-        SkyblockCurrency.getByInternalNameOrNull(this)?.let { return it.coinValue }
+        SkyblockCurrency.getByInternalNameOrNull(this)?.coinValue?.let { return it }
 
         when (this) {
             NeuInternalName.GEMSTONE_COLLECTION -> return 0.0

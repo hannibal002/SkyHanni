@@ -69,6 +69,11 @@ value class NeuInternalName private constructor(private val internalName: String
 
         val SKYBLOCK_COIN = "SKYBLOCK_COIN".toInternalName()
 
+        val SKYBLOCK_GOLD_MEDAL = "SKYBLOCK_GOLD_MEDAL".toInternalName()
+        val SKYBLOCK_SILVER_MEDAL = "SKYBLOCK_SILVER_MEDAL".toInternalName()
+        val SKYBLOCK_BRONZE_MEDAL = "SKYBLOCK_BRONZE_MEDAL".toInternalName()
+        val SKYBLOCK_COPPER = "SKYBLOCK_COPPER".toInternalName()
+
         val WISP_POTION = "WISP_POTION".toInternalName()
         val ENCHANTED_HAY_BLOCK = "ENCHANTED_HAY_BLOCK".toInternalName()
         val TIGHTLY_TIED_HAY_BALE = "TIGHTLY_TIED_HAY_BALE".toInternalName()

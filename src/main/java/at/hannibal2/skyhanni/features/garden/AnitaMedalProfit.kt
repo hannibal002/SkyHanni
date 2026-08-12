@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -16,17 +14,17 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LoreCostUtils
+import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
@@ -43,30 +41,34 @@ object AnitaMedalProfit {
     var inInventory = false
 
     enum class MedalType(
-        val displayName: String,
-        val simpleName: String = displayName.removeColor().split(" ")[0],
+        val simpleName: String,
         val factorBronze: Int,
-        val color: LorenzColor = displayName.substring(1, 2)[0].toLorenzColor() ?: LorenzColor.WHITE,
+        val currency: SkyblockCurrency,
     ) {
-        GOLD("§6Gold medal", "gold", 8),
-        SILVER("§fSilver medal", "silver", 2),
-        BRONZE("§cBronze medal", "bronze", 1),
+        GOLD("gold", 8, SkyblockCurrency.GOLD_MEDAL),
+        SILVER("silver", 2, SkyblockCurrency.SILVER_MEDAL),
+        BRONZE("bronze", 1, SkyblockCurrency.BRONZE_MEDAL),
         ;
 
+        val displayName = currency.displayName
+
+        val color: LorenzColor = displayName.substring(1, 2)[0].toLorenzColor() ?: LorenzColor.WHITE
+
         companion object {
-            fun bySimpleNameOrNull(name: String) = entries.firstOrNull { it.simpleName == name }
+            fun bySimpleNameOrNull(name: String): MedalType? = entries.firstOrNull { it.simpleName == name }
+
+            fun getByInternalNameOrNull(internalName: NeuInternalName): MedalType? =
+                entries.firstOrNull { it.currency.internalName == internalName }
         }
     }
 
-    private fun getMedal(name: String) = MedalType.entries.firstOrNull { it.displayName == name }
-
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         inInventory = false
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.medalProfitEnabled) return
         if (event.inventoryName != "Anita") return
         if (VisitorApi.inInventory) return
@@ -97,7 +99,7 @@ object AnitaMedalProfit {
         val itemName = getItemName(item)
         if (isInvalidItemName(itemName.string)) return
 
-        val requiredItems = getRequiredItems(item)
+        val requiredItems = item.readLoreCosts()
         val additionalMaterials = getAdditionalMaterials(requiredItems)
         val additionalCost = getAdditionalCost(additionalMaterials)
 
@@ -172,16 +174,9 @@ object AnitaMedalProfit {
         } else name
     }
 
-    private fun getAdditionalMaterials(requiredItems: Map<String, Int>): Map<NeuInternalName, Int> {
-        val additionalMaterials = mutableMapOf<NeuInternalName, Int>()
-        for ((name, amount) in requiredItems) {
-            val medal = getMedal(name)
-            if (medal == null) {
-                additionalMaterials[NeuInternalName.fromItemName(name)] = amount
-            }
-        }
-        return additionalMaterials
-    }
+    private fun getAdditionalMaterials(requiredItems: List<LoreCostUtils.LoreCostEntry>): Map<NeuInternalName, Int> =
+        requiredItems.filter { MedalType.getByInternalNameOrNull(it.internalName) == null }
+            .associate { it.internalName to it.amount.toInt() }
 
     private fun getAdditionalCost(requiredItems: Map<NeuInternalName, Int>): Double {
         var otherItemsPrice = 0.0
@@ -191,50 +186,17 @@ object AnitaMedalProfit {
         return otherItemsPrice
     }
 
-    private fun getBronzeCost(requiredItems: Map<String, Int>): Int? {
-        for ((name, amount) in requiredItems) {
-            getMedal(name)?.let {
-                return it.factorBronze * amount
+    private fun getBronzeCost(requiredItems: List<LoreCostUtils.LoreCostEntry>): Int? {
+        for (entry in requiredItems) {
+            MedalType.getByInternalNameOrNull(entry.internalName)?.let {
+                return it.factorBronze * entry.amount.toInt()
             }
         }
         return null
     }
 
-    private fun getRequiredItems(item: SafeItemStack): MutableMap<String, Int> {
-        val items = mutableMapOf<String, Int>()
-        var next = false
-        val lore = item.getLore()
-        for (line in lore) {
-            if (line == "§7Cost") {
-                next = true
-                continue
-            }
-            if (next) {
-                if (line == "") {
-                    next = false
-                    continue
-                }
-
-                val rawItemName = line.replace("§8 ", " §8")
-
-                val pair = ItemUtils.readItemAmount(rawItemName)
-                if (pair == null) {
-                    ErrorManager.logErrorStateWithData(
-                        "Error in Anita Medal Contest", "Could not read item amount",
-                        "rawItemName" to rawItemName,
-                        "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
-                        "lore" to lore,
-                    )
-                    continue
-                }
-                items.add(pair)
-            }
-        }
-        return items
-    }
-
     @HandleEvent
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    private fun onChestGuiRender() {
         if (!inInventory || VisitorApi.inInventory) return
         config.medalProfitPos.renderRenderables(
             display,
@@ -244,7 +206,7 @@ object AnitaMedalProfit {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.anitaMedalProfitEnabled", "garden.anitaShop.medalProfitEnabled")
         event.move(3, "garden.anitaMedalProfitPos", "garden.anitaShop.medalProfitPos")
     }

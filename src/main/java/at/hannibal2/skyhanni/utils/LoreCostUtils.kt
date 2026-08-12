@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -32,51 +32,51 @@ object LoreCostUtils {
         "(?:§5§o)?§7Cost(?:: (?<inline>.+))?",
     )
 
-    /**
-     * REGEX-TEST: §b5,000 Bits
-     * REGEX-TEST: §240 Pests
-     * REGEX-TEST: §63,000,000,000 Chocolate
-     * REGEX-TEST: §c250 Copper
-     * REGEX-TEST: §61,940,000 Coins
-     */
-    private val currencyPattern by patternGroup.pattern(
-        "currency",
-        "(?:§.)*(?<amount>[\\d,]+) (?<name>[\\w' ]+)",
-    )
+    fun SafeItemStack.readLoreCosts(): List<LoreCostEntry> = getLoreComponent()
+        .map { it.formattedTextCompatLessResets() }
+        .readLoreCosts(hoverName.formattedTextCompatLeadingWhiteLessResets())
 
-    fun SafeItemStack.readLoreCosts(): List<LoreCostEntry> =
-        getLoreComponent().map { it.formattedTextCompatLessResets() }.readLoreCosts()
-
-    fun List<String>.readLoreCosts(): List<LoreCostEntry> {
-        val headerIndex = indexOfFirst { costHeaderPattern.matches(it) }.takeIf { it != -1 } ?: return emptyList()
+    fun List<String>.readLoreCosts(itemName: String = "<unknown>"): List<LoreCostEntry> {
+        val headerIndex = indexOfLast { costHeaderPattern.matches(it) }.takeIf { it != -1 } ?: return emptyList()
 
         costHeaderPattern.matchMatcher(this[headerIndex]) {
-            groupOrNull("inline")?.let { return listOf(readCostLine(it)) }
+            groupOrNull("inline")?.let { return listOf(readCostLine(it, itemName)) }
         }
 
-        return drop(headerIndex + 1).takeWhile { it.isNotEmpty() }.map { readCostLine(it) }
+        return drop(headerIndex + 1).takeWhile { it.isNotEmpty() }.map { readCostLine(it, itemName) }
     }
 
-    private fun readCostLine(rawLine: String): LoreCostEntry {
+    private fun readCostLine(rawLine: String, itemName: String): LoreCostEntry {
         // some lines write the amount as "Gold medal§8 x2" instead of "Gold medal §8x2"
         val line = rawLine.replace("§8 ", " §8")
 
         readCurrencyOrNull(line)?.let { return it }
 
         val (name, amount) = ItemUtils.readItemAmount(line) ?: run {
-            ErrorManager.logErrorStateWithData(
-                "Could not read a cost line",
-                "readItemAmount failed on a lore cost line",
-                "rawLine" to rawLine,
-                betaOnly = true,
-            )
+            logCostLineError("Could not read the amount of a cost line", rawLine, itemName)
             return LoreCostEntry(NeuInternalName.MISSING_ITEM, 1)
         }
-        return LoreCostEntry(NeuInternalName.fromItemName(name), amount.toLong())
+
+        val internalName = NeuInternalName.fromItemNameOrNull(name) ?: run {
+            logCostLineError("Unknown item in a cost line", rawLine, itemName)
+            NeuInternalName.MISSING_ITEM
+        }
+        return LoreCostEntry(internalName, amount.toLong())
     }
 
-    private fun readCurrencyOrNull(line: String): LoreCostEntry? = currencyPattern.matchMatcher(line) {
-        val currency = SkyblockCurrency.getByLoreNameOrNull(group("name")) ?: return@matchMatcher null
-        LoreCostEntry(currency.internalName, group("amount").formatLong())
+    private fun logCostLineError(reason: String, rawLine: String, itemName: String) {
+        ErrorManager.logErrorStateWithData(
+            "Could not read the cost of an item",
+            reason,
+            "rawLine" to rawLine,
+            "itemName" to itemName,
+            "inventoryName" to InventoryUtils.openInventoryName(),
+            betaOnly = true,
+        )
     }
+
+    private fun readCurrencyOrNull(line: String): LoreCostEntry? =
+        SkyblockCurrency.readCurrencyOrNull(line)?.let { (currency, amount) ->
+            LoreCostEntry(currency.internalName, amount)
+        }
 }
