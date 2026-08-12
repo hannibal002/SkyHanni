@@ -70,7 +70,7 @@ object RemainingSlayerKills {
      */
     private val killCombatWisdomPattern by patternGroup.pattern(
         "kill-combat-wisdom",
-        "\\+\\d+ Kill Combo \\+(?<wisdom>\\d+)☯ Combat Wisdom",
+        "\\+\\d+ Kill Combo \\+(?<wisdom>\\d+)${SkyblockStat.COMBAT_WISDOM} Combat Wisdom",
     )
 
     data class SlayerData(
