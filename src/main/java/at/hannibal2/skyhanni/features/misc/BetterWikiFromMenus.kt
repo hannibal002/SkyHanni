@@ -22,7 +22,7 @@ object BetterWikiFromMenus {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
 
         val chestName = InventoryUtils.openInventoryName()

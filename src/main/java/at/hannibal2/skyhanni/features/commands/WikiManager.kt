@@ -55,7 +55,7 @@ object WikiManager {
         sendWikiMessage(wikiUrlSearch, itemDisplayName.removeColor(), autoOpen)
     }
 
-    fun wikiThisItem(autoOpen: Boolean = config.autoOpenWiki) {
+    fun wikiThisItem(autoOpen: Boolean) {
         if (!SkyBlockUtils.inSkyBlock) {
             ChatUtils.userError("You must be in SkyBlock to do this!")
             return
@@ -116,10 +116,10 @@ object WikiManager {
                 "shindependentwikithis", "shunofficialwikithis", "shfandomwikithis",
                 "wikithis", "wikihand",
             )
-            description = "Searches the current held item in the independent wiki."
+            description = "Searches the currently held item in the independent wiki."
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
-                wikiThisItem()
+                wikiThisItem(config.autoOpenWiki)
             }
         }
     }
