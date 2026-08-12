@@ -133,6 +133,8 @@ object HolographicEntities {
         fun instance(position: LorenzVec, yaw: Float): HolographicEntity<T>? {
             val level = Minecraft.getInstance().level ?: return null
             val entity = entityType.create(level, EntitySpawnReason.COMMAND) ?: return null
+            //? if >= 26.2
+            entity.id = FakeEntityIdProvider.getNextId()
             return HolographicEntity(entity, position, yaw)
         }
     }
@@ -143,7 +145,10 @@ object HolographicEntities {
         BuiltInRegistries.ENTITY_TYPE.associateNotNull type@{ entityType ->
             // Create a throwaway instance only to determine the KClass key.
             val testEntity: LivingEntity = runCatching {
-                entityType.create(level, EntitySpawnReason.COMMAND)
+                entityType.create(level, EntitySpawnReason.COMMAND)?.apply {
+                    //? if >= 26.2
+                    id = FakeEntityIdProvider.getNextId()
+                }
             }.getOrNull() as? LivingEntity ?: return@type null
             @Suppress("UNCHECKED_CAST")
             testEntity::class to HolographicBase(entityType as EntityType<LivingEntity>)

@@ -10,8 +10,7 @@ import net.minecraft.world.scores.PlayerTeam
 import net.minecraft.world.scores.Scoreboard
 
 //? if >= 26.2 {
-import kotlin.concurrent.atomics.AtomicInt
-import kotlin.concurrent.atomics.fetchAndDecrement
+import at.hannibal2.skyhanni.utils.FakeEntityIdProvider
 //?}
 
 class FakePlayer(val player: AbstractClientPlayer) : ClientMannequin(
@@ -20,7 +19,7 @@ class FakePlayer(val player: AbstractClientPlayer) : ClientMannequin(
 ) {
     //? if >= 26.2 {
     init {
-        setId(nextFakeEntityId.fetchAndDecrement())
+        id = FakeEntityIdProvider.getNextId()
     }
     //?}
 
@@ -34,9 +33,6 @@ class FakePlayer(val player: AbstractClientPlayer) : ClientMannequin(
         player.isModelPartShown(part) && part != PlayerModelPart.CAPE
 
     companion object {
-        //? if >= 26.2
-        private val nextFakeEntityId = AtomicInt(-1)
-
         fun fromLocalPlayer(): FakePlayer? = MinecraftCompat.localPlayerOrNull?.let { FakePlayer(it) }
 
         fun fromLocalPlayerOrThrow(): FakePlayer = fromLocalPlayer()
