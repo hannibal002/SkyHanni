@@ -25,14 +25,15 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessaryOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.slayer.SlayerType as Type
-
 
 @SkyHanniModule
 object SlayerApi {
@@ -43,6 +44,11 @@ object SlayerApi {
     private val patternGroup = RepoPattern.group("slayer.api")
 
     private const val GRACE_UPDATE_COUNT = 3
+
+    /**
+     * Cocoons take 5 seconds to burst, but we give +1 second of grace time to account for any delays in the scoreboard update
+     */
+    private val GRACE_COCOON_TIME = 6.seconds
 
     // <editor-fold desc="Patterns">
     /**
@@ -68,6 +74,14 @@ object SlayerApi {
         "quest.failed",
         "\\s*SLAYER QUEST FAILED!",
     )
+
+    /**
+     * WRAPPED-REGEX-TEST: "  YOU COCOONED YOUR SLAYER BOSS"
+     */
+    private val cocoonPattern by patternGroup.pattern(
+        "cocooned.colorless",
+        "\\s+YOU COCOONED YOUR SLAYER BOSS",
+    )
     // </editor-fold>
 
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
@@ -88,7 +102,7 @@ object SlayerApi {
     var latestCategory = ""
     var tier = 0
 
-    var latestWrongAreaWarning = SimpleTimeMark.farPast()
+    var latestWrongAreaWarningTime = SimpleTimeMark.farPast()
 
     /**
      * What is the current progress of the slayer boss? could be a string with text, or percentage, or x/x kills.
@@ -104,6 +118,11 @@ object SlayerApi {
      * How many consecutive updates have we seen that are invalid?
      */
     private var invalidUpdates = 0
+
+    /**
+     * The last time we saw a cocoon message, used to ensure it doesn't get stuck in a state where we think we are cocooned when we are not
+     */
+    private var latestCocoonTime = ServerTimeMark.farPast()
 
     private val outsideRiftData = SlayerData()
     private val insideRiftData = SlayerData()
@@ -124,7 +143,7 @@ object SlayerApi {
     fun isInBossFight() = state == ActiveQuestState.BOSS_FIGHT
 
     private class SlayerData {
-        var currentState: ActiveQuestState? = ActiveQuestState.NO_ACTIVE_QUEST
+        var currentState: ActiveQuestState = ActiveQuestState.NO_ACTIVE_QUEST
         var currentStateRaw: String? = null
         var type: Type? = null
     }
@@ -193,6 +212,14 @@ object SlayerApi {
                 data.currentStateRaw = "no slayer"
                 SlayerStateChangeEvent(FAILED).post()
             }
+            cocoonPattern.matches(message) -> {
+                val data = getCurrentData()
+                ChatUtils.debug("SlayerApi: Slayer boss cocooned, posting SlayerStateChangeEvent")
+                data.currentState = COCOONED
+                data.currentStateRaw = "cocooned"
+                latestCocoonTime = ServerTimeMark.now()
+                SlayerStateChangeEvent(COCOONED).post()
+            }
         }
     }
 
@@ -252,7 +279,7 @@ object SlayerApi {
                 ErrorManager.skyHanniError(
                     message,
                     "lines" to lines,
-                    "source" to source.name,
+                    "source" to source,
                 )
             }
             return
@@ -296,11 +323,17 @@ object SlayerApi {
 
         data.currentStateRaw = progress
 
-        val newState = detectState(progress)
+        var newState = detectState(progress)
+
+        val cocooned = data.currentState == COCOONED && latestCocoonTime.passedSince() <= GRACE_COCOON_TIME
+        if (cocooned && (newState == NO_ACTIVE_QUEST || newState == SLAIN)) {
+            ChatUtils.debug("SlayerApi: Cocooned state detected, overriding $newState to COCOONED")
+            newState = COCOONED
+        }
 
         // If the player kills the boss immediately after the boss spawns
-        if (data.currentState == BOSS_FIGHT && newState == GRINDING) {
-            ChatUtils.debug("SlayerApi: Intermediate state change detected: BOSS_FIGHT -> SLAIN -> GRINDING")
+        if ((data.currentState == BOSS_FIGHT || data.currentState == COCOONED) && newState == GRINDING) {
+            ChatUtils.debug("SlayerApi: Intermediate state change detected: ${data.currentState} -> SLAIN -> GRINDING")
             SlayerStateChangeEvent(SLAIN).post()
         }
         if (data.currentState == GRINDING && newState == SLAIN) {
@@ -335,6 +368,7 @@ object SlayerApi {
         BOSS_FIGHT,
         FAILED,
         SLAIN,
+        COCOONED,
         NO_ACTIVE_QUEST,
     }
 
@@ -361,10 +395,23 @@ object SlayerApi {
         }
     }
 
+    @HandleEvent
+    private fun onWorldChange() {
+        // Using outsideRiftData since rift does not have slayer cocoon
+        // and using getCurrentData is ambiguous while changing worlds (inside/outside rift)
+        val data = outsideRiftData
+        if (data.currentState != COCOONED) return
+        ChatUtils.debug("SlayerApi: World change detected, resetting cocooned state")
+        data.currentState = NO_ACTIVE_QUEST
+        data.currentStateRaw = null
+        latestCocoonTime = ServerTimeMark.farPast()
+        SlayerStateChangeEvent(NO_ACTIVE_QUEST).post()
+    }
+
     // TODO USE SH-REPO
     private fun checkTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
         "Graveyard" -> if (trackerConfig.revenantInGraveyard.get() && IslandType.HUB.isInIsland()) Type.REVENANT else null
-        "Revenant Cave" -> Type.REVENANT
+        "Revenant Cave", "Crypts" -> Type.REVENANT
 
         "Spider Mound",
         "Arachne's Burrow",
