@@ -67,7 +67,6 @@ object DeferredDrawer {
         stringsNoDepth.forEach { string ->
             event.drawString(
                 string.location,
-                string.text,
                 string.component,
                 seeThroughBlocks = true,
                 string.color,
@@ -81,7 +80,6 @@ object DeferredDrawer {
         stringsDepth.forEach { string ->
             event.drawString(
                 string.location,
-                string.text,
                 string.component,
                 seeThroughBlocks = false,
                 string.color,
@@ -125,24 +123,6 @@ object DeferredDrawer {
 
     fun deferString(
         location: LorenzVec,
-        text: String,
-        color: Color?,
-        scale: Double,
-        shadow: Boolean,
-        yOffset: Float,
-        backgroundColor: Int,
-        depth: Boolean,
-    ) {
-        val deferredString = DeferredString(location, text, null, color, scale, shadow, yOffset, backgroundColor)
-        if (depth) {
-            stringsDepth.add(deferredString)
-        } else {
-            stringsNoDepth.add(deferredString)
-        }
-    }
-
-    fun deferString(
-        location: LorenzVec,
         component: Component,
         color: Color?,
         scale: Double,
@@ -151,7 +131,7 @@ object DeferredDrawer {
         backgroundColor: Int,
         depth: Boolean,
     ) {
-        val deferredString = DeferredString(location, null, component, color, scale, shadow, yOffset, backgroundColor)
+        val deferredString = DeferredString(location, component, color, scale, shadow, yOffset, backgroundColor)
         if (depth) {
             stringsDepth.add(deferredString)
         } else {
@@ -174,13 +154,11 @@ object DeferredDrawer {
 
     data class DeferredString(
         val location: LorenzVec,
-        val text: String?,
-        val component: Component?,
+        val component: Component,
         val color: Color?,
         val scale: Double,
         val shadow: Boolean,
         val yOffset: Float,
         val backgroundColor: Int,
     )
-
 }
