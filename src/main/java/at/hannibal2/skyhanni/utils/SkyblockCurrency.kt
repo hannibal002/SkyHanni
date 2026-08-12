@@ -37,7 +37,7 @@ enum class SkyblockCurrency(
         loreNames = setOf("coin", "coins", "skyblock coin", "skyblock coins", "skyblock_coin", "skyblock_coins"),
     ),
 
-    // Bits Shop from Elisabeth
+    // Bits Shop from Elizabeth
     BITS("BITS".toInternalName(), "§bBits", loreNames = setOf("bit", "bits")),
 
     // Pesthunter's Wares in Garden
