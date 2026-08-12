@@ -106,8 +106,7 @@ class DevConfig {
     @Expose
     @ConfigOption(
         name = "Discover Contributor Message",
-        desc = "Sends a chat message when seeing a contributor. " +
-            "If disabled, only shows the message the first time any contributor is discovered."
+        desc = "Sends a chat message when seeing a contributor.",
     )
     @ConfigEditorBoolean
     var discoverContributorMessage: Boolean = false
