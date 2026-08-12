@@ -51,7 +51,7 @@ object FarmingPersonalBestGain {
      */
     private val newFFPattern by patternGroup.pattern(
         "ff.new.colorless",
-        "\\[NPC] Jacob: Your Personal Bests perk is now granting you \\+(?<ff>.*)${FARMING_FORTUNE.hypixelIcon} (?<crop>.*) Fortune!",
+        "\\[NPC] Jacob: Your Personal Bests perk is now granting you \\+(?<ff>.*)${FARMING_FORTUNE} (?<crop>.*) Fortune!",
     )
 
     /**
@@ -61,7 +61,7 @@ object FarmingPersonalBestGain {
     @Suppress("MaxLineLength")
     private val unused by patternGroup.pattern(
         "ff.new",
-        "§e\\[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6\\+(?<ff>.*)${FARMING_FORTUNE.hypixelIcon} (?<crop>.*) Fortune§f!",
+        "§e\\[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6\\+(?<ff>.*)${FARMING_FORTUNE} (?<crop>.*) Fortune§f!",
     )
     // </editor-fold>
 

@@ -32,7 +32,7 @@ object JyrreTimer {
     @Suppress("MaxLineLength")
     private val drankBottlePattern by RepoPattern.pattern(
         "event.winter.drank.jyrre",
-        "§7You consumed a §r§6Refined Bottle of Jyrre §r§7and gained §r§b\\+300${SkyblockStat.INTELLIGENCE.hypixelIcon} Intelligence §r§7for §r§a60m§r§7!",
+        "§7You consumed a §r§6Refined Bottle of Jyrre §r§7and gained §r§b\\+300${SkyblockStat.INTELLIGENCE} Intelligence §r§7for §r§a60m§r§7!",
     )
     private var display: Renderable? = null
     private var duration = 0.seconds

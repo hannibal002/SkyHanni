@@ -114,14 +114,14 @@ object HotmApi {
         @field:Language("RegExp") val itemFallback: String,
     ) : RotatingPerk {
         MINING_SPEED(
-            displayDescription = "§6+100${SkyblockStat.MINING_SPEED.hypixelIcon} Mining Speed",
-            chatFallback = "Gain \\+100${SkyblockStat.MINING_SPEED.hypixelIcon} Mining Speed\\.",
-            itemFallback = "Gain \\+100${SkyblockStat.MINING_SPEED.hypixelIcon} Mining Speed\\.",
+            displayDescription = "§6+100${SkyblockStat.MINING_SPEED} Mining Speed",
+            chatFallback = "Gain \\+100${SkyblockStat.MINING_SPEED} Mining Speed\\.",
+            itemFallback = "Gain \\+100${SkyblockStat.MINING_SPEED} Mining Speed\\.",
         ),
         MINING_FORTUNE(
-            displayDescription = "§6+50${SkyblockStat.MINING_FORTUNE.hypixelIcon} Mining Fortune",
-            chatFallback = "Gain \\+50${SkyblockStat.MINING_FORTUNE.hypixelIcon} Mining Fortune\\.",
-            itemFallback = "Gain \\+50${SkyblockStat.MINING_FORTUNE.hypixelIcon} Mining Fortune\\.",
+            displayDescription = "§6+50${SkyblockStat.MINING_FORTUNE} Mining Fortune",
+            chatFallback = "Gain \\+50${SkyblockStat.MINING_FORTUNE} Mining Fortune\\.",
+            itemFallback = "Gain \\+50${SkyblockStat.MINING_FORTUNE} Mining Fortune\\.",
         ),
         EXTRA_POWDER(
             displayDescription = "§a+15% §7more Powder",
@@ -155,9 +155,9 @@ object HotmApi {
         @field:Language("RegExp") val chatFallback: String,
     ) {
         SCRAP_CHANCE("Your Suspicious Scrap chance was buffed by your Mineshaft Mayhem perk!"),
-        MINING_FORTUNE("You received a ${SkyblockStat.MINING_FORTUNE.hypixelIcon} Mining Fortune buff from your Mineshaft Mayhem perk!"),
-        MINING_SPEED("You received a ${SkyblockStat.MINING_SPEED.hypixelIcon} Mining Speed buff from your Mineshaft Mayhem perk!"),
-        COLD_RESISTANCE("You received a ${SkyblockStat.COLD_RESISTANCE.hypixelIcon} Cold Resistance buff from your Mineshaft Mayhem perk!"),
+        MINING_FORTUNE("You received a ${SkyblockStat.MINING_FORTUNE} Mining Fortune buff from your Mineshaft Mayhem perk!"),
+        MINING_SPEED("You received a ${SkyblockStat.MINING_SPEED} Mining Speed buff from your Mineshaft Mayhem perk!"),
+        COLD_RESISTANCE("You received a ${SkyblockStat.COLD_RESISTANCE} Cold Resistance buff from your Mineshaft Mayhem perk!"),
         ABILITY_COOLDOWN("Your Pickaxe Ability cooldown was reduced from your Mineshaft Mayhem perk!"),
         ;
 

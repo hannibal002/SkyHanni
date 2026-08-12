@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
-enum class SkyblockIcon(val icon: Char) { DAMAGE('\uE050'),
+enum class SkyblockIcon(val icon: Char) {
+    DAMAGE('\uE050'),
     HEALTH('\uE010'),
     DEFENSE('\uE008'),
     TRUE_DEFENSE('\uE027'),
@@ -98,4 +99,7 @@ enum class SkyblockIcon(val icon: Char) { DAMAGE('\uE050'),
     CLOVER('☘'),
     LIGHTNING('⚡'),
     PICKAXE('⸕'),
+    ;
+
+    override fun toString(): String = icon.toString()
 }

@@ -61,13 +61,13 @@ object FarmingFortuneDisplay {
      */
     private val universalTabFortunePattern by patternGroup.pattern(
         "tablist.universal-no-color",
-        " Farming Fortune: ${FARMING_FORTUNE.hypixelIcon}(?<fortune>\\d+)",
+        " Farming Fortune: ${FARMING_FORTUNE}(?<fortune>\\d+)",
     )
 
     @Suppress("MaxLineLength")
     private val cropSpecificTabFortunePattern by patternGroup.pattern(
         "tablist.cropspecific-no-color",
-        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: ${FARMING_FORTUNE.hypixelIcon}(?<fortune>\\d+)",
+        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: ${FARMING_FORTUNE}(?<fortune>\\d+)",
     )
 
     /**
@@ -75,7 +75,7 @@ object FarmingFortuneDisplay {
      */
     private val collectionPattern by patternGroup.pattern(
         "collection",
-        "§7You have §6\\+(?<ff>\\d{1,3})${FARMING_FORTUNE.hypixelIcon} .*",
+        "§7You have §6\\+(?<ff>\\d{1,3})${FARMING_FORTUNE} .*",
     )
 
     @Suppress("MaxLineLength")
@@ -93,7 +93,7 @@ object FarmingFortuneDisplay {
      */
     private val lotusAbilityPattern by patternGroup.pattern(
         "lotusability",
-        "§7Piece Bonus: §6+(?<bonus>.*)${FARMING_FORTUNE.hypixelIcon}",
+        "§7Piece Bonus: §6+(?<bonus>.*)${FARMING_FORTUNE}",
     )
 
     /**
@@ -102,7 +102,7 @@ object FarmingFortuneDisplay {
     // todo make pattern work on Melon and Cropie armor
     private val armorAbilityFortunePattern by patternGroup.pattern(
         "armorabilityfortune",
-        "§7.*§7Grants §6(?<bonus>.*)${FARMING_FORTUNE.hypixelIcon}.*",
+        "§7.*§7Grants §6(?<bonus>.*)${FARMING_FORTUNE}.*",
     )
 
     /**
@@ -113,7 +113,7 @@ object FarmingFortuneDisplay {
      */
     private val pestFortuneBuffPattern by patternGroup.pattern(
         "pestfortunebuff-no-color",
-        " Bonus: (?<inactive>INACTIVE)?(?:\\+(?<fortune>\\d+)${FARMING_FORTUNE.hypixelIcon} (?<time>.*))?.*",
+        " Bonus: (?<inactive>INACTIVE)?(?:\\+(?<fortune>\\d+)${FARMING_FORTUNE} (?<time>.*))?.*",
     )
 
     private var display = emptyList<Renderable>()

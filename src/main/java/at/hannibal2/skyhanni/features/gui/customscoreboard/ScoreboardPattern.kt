@@ -208,7 +208,7 @@ object ScoreboardPattern {
      */
     val m7dragonsPattern by dungeonSB.pattern(
         "m7dragons",
-        "§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+(?:§.${SkyblockStat.HEALTH.hypixelIcon})?",
+        "§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+(?:§.${SkyblockStat.HEALTH})?",
     )
     val keysPattern by dungeonSB.pattern(
         "keys",
@@ -238,7 +238,7 @@ object ScoreboardPattern {
      */
     val floor3GuardiansPattern by dungeonSB.pattern(
         "floor3guardians",
-        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a [\\w,.]*(?:§c${SkyblockStat.HEALTH.hypixelIcon})?",
+        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a [\\w,.]*(?:§c${SkyblockStat.HEALTH})?",
     )
 
     // kuudra
@@ -475,7 +475,7 @@ object ScoreboardPattern {
      */
     val fortunateFreezingBonusPattern by miningSB.pattern(
         "fortunatefreezing.bonus",
-        "Event Bonus: §6\\+\\d+${SkyblockStat.MINING_FORTUNE.hypixelIcon}",
+        "Event Bonus: §6\\+\\d+${SkyblockStat.MINING_FORTUNE}",
     )
 
     /**
@@ -537,7 +537,7 @@ object ScoreboardPattern {
      */
     val bossHealthBarPattern by combatSB.pattern(
         "magmabosshealthbar",
-        "§.[\\w,.]+§f/§a10M§c${SkyblockStat.HEALTH.hypixelIcon}",
+        "§.[\\w,.]+§f/§a10M§c${SkyblockStat.HEALTH}",
     )
 
     /**
@@ -546,7 +546,7 @@ object ScoreboardPattern {
      */
     val bossHPPattern by combatSB.pattern(
         "bosshp",
-        "(?:Protector|Dragon) HP: §a[\\d,.]* §c${SkyblockStat.HEALTH.hypixelIcon}",
+        "(?:Protector|Dragon) HP: §a[\\d,.]* §c${SkyblockStat.HEALTH}",
     )
 
     /**

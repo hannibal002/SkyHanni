@@ -125,7 +125,7 @@ object GhostTracker {
      */
     private val itemDropPattern by patternGroup.pattern(
         "itemdrop.colorless",
-        "RARE DROP! (?<item>.+) \\(\\+(?<mf>\\d+)%? ${SkyblockStat.MAGIC_FIND.hypixelIcon} Magic Find\\)",
+        "RARE DROP! (?<item>.+) \\(\\+(?<mf>\\d+)%? ${SkyblockStat.MAGIC_FIND} Magic Find\\)",
     )
 
     /**

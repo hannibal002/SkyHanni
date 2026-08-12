@@ -67,7 +67,7 @@ object MobFilter {
      */
     val mobNameFilter by patternGroup.pattern(
         "filter.basic",
-        "$level$mobType(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,${SkyblockStat.HEALTH.hypixelIcon}]+",
+        "$level$mobType(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,${SkyblockStat.HEALTH}]+",
     )
 
     /**
@@ -94,7 +94,7 @@ object MobFilter {
      */
     val bossMobNameFilter by patternGroup.pattern(
         "filter.boss",
-        "^. $level$mobType(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,${SkyblockStat.HEALTH.hypixelIcon}]+| █+)? .$",
+        "^. $level$mobType(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,${SkyblockStat.HEALTH}]+| █+)? .$",
     )
 
     @Suppress("MaxLineLength")
@@ -132,7 +132,7 @@ object MobFilter {
     )
     val jerryMagmaCubePattern by patternGroup.pattern(
         "pattern.jerry.magma.cube",
-        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c${SkyblockStat.HEALTH.hypixelIcon}",
+        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c${SkyblockStat.HEALTH}",
     )
     val summonOwnerPattern by patternGroup.pattern(
         "pattern.summon.owner",

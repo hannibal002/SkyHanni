@@ -102,4 +102,6 @@ enum class SkyblockMobType(
         icon.icon,
         enchant,
     )
+
+    override fun toString(): String = hypixelIcon.toString()
 }

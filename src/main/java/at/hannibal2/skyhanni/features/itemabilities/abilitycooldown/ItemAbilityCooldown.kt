@@ -50,7 +50,7 @@ object ItemAbilityCooldown {
     )
     private val youBuffedYourselfPattern by patternGroup.pattern(
         "buffedyourself",
-        "§aYou buffed yourself for §r§c\\+\\d+${SkyblockStat.STRENGTH.hypixelIcon} Strength",
+        "§aYou buffed yourself for §r§c\\+\\d+${SkyblockStat.STRENGTH} Strength",
     )
 
     /**

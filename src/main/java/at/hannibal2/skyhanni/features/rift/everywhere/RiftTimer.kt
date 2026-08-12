@@ -36,7 +36,7 @@ object RiftTimer {
      */
     private val nametagPattern by patternGroup.pattern(
         "nametag.timer",
-        "(?<time>\\d+) ${SkyblockStat.RIFT_TIME.hypixelIcon}",
+        "(?<time>\\d+) ${SkyblockStat.RIFT_TIME}",
     )
 
     private var display = emptyList<String>()
@@ -140,7 +140,7 @@ object RiftTimer {
         val time = nametagPattern.matchMatcher(nametag) {
             group("time")?.toIntOrNull()
         } ?: return
-        event.text = Component.literal("${time.seconds.format()} §a${SkyblockStat.RIFT_TIME.hypixelIcon}")
+        event.text = Component.literal("${time.seconds.format()} §a${SkyblockStat.RIFT_TIME}")
     }
 
     fun isEnabled() = RiftApi.inRift() && config.enabled

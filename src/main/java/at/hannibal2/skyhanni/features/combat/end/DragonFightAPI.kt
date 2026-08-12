@@ -43,7 +43,7 @@ object DragonFightAPI {
      */
     private val scoreboardHPPattern by group.pattern(
         "scoreboard.hp",
-        "Dragon HP: (?<hp>.*) ${SkyblockStat.HEALTH.hypixelIcon}",
+        "Dragon HP: (?<hp>.*) ${SkyblockStat.HEALTH}",
     )
 
     /**

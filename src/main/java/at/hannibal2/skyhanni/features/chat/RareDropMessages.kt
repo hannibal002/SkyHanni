@@ -101,7 +101,7 @@ object RareDropMessages {
      */
     private val enchantedBookPattern by repoGroup.pattern(
         "enchantedbook.colorless",
-        "RARE DROP! Enchanted Book(?: \\(\\+\\d+%? ${MAGIC_FIND.hypixelIcon} Magic Find\\))?.*",
+        "RARE DROP! Enchanted Book(?: \\(\\+\\d+%? ${MAGIC_FIND} Magic Find\\))?.*",
     )
 
     private val petPatterns = listOf(
@@ -197,7 +197,7 @@ object RareDropMessages {
             category = CommandCategory.DEVELOPER_TEST
 
             simpleCallback {
-                ChatUtils.chat("§6§lRARE DROP! §r§fEnchanted Book §r§b(+§r§b208% §r§b${MAGIC_FIND.hypixelIcon} Magic Find§r§b)", prefix = false)
+                ChatUtils.chat("§6§lRARE DROP! §r§fEnchanted Book §r§b(+§r§b208% §r§b${MAGIC_FIND} Magic Find§r§b)", prefix = false)
                 ChatUtils.chat("Testing Enchanted Book Name")
                 onItemAdd(ItemAddEvent("ANGLER;6".toInternalName(), 1, ItemAddManager.Source.ITEM_ADD))
             }

@@ -61,7 +61,7 @@ object AnitaExtraFarmingFortune {
      */
     private val farmingFortunePattern by patternGroup.pattern(
         "farmingfortune",
-        "You have: \\+(?<farmingFortune>\\d+)${SkyblockStat.FARMING_FORTUNE.hypixelIcon} Farming Fortune",
+        "You have: \\+(?<farmingFortune>\\d+)${SkyblockStat.FARMING_FORTUNE} Farming Fortune",
     )
 
     /**

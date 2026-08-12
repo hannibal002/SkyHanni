@@ -146,7 +146,7 @@ object DragonFeatures {
      */
     private val tabDamagePattern by tabListGroup.pattern(
         "fight.player",
-        "\\s(?<name>.+): (?<damage>[\\d.]+[kM]?)${SkyblockStat.HEALTH.hypixelIcon}",
+        "\\s(?<name>.+): (?<damage>[\\d.]+[kM]?)${SkyblockStat.HEALTH}",
     )
 
     private var yourEyes = 0

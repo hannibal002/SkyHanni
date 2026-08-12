@@ -132,7 +132,7 @@ object GardenNextJacobContest {
      */
     private val cropPattern by patternGroup.pattern(
         "crop-no-color",
-        " ?(?:○|(?<boosted>${SkyblockStat.FARMING_FORTUNE.hypixelIcon})) (?<crop>.*)",
+        " ?(?:○|(?<boosted>${SkyblockStat.FARMING_FORTUNE})) (?<crop>.*)",
     )
 
     /**

@@ -31,7 +31,7 @@ object BonusPestChanceDisplay {
      */
     private val bonusPestChancePattern by patternGroup.pattern(
         "widget-no-color",
-        "\\s+Bonus Pest Chance: ${SkyblockStat.BONUS_PEST_CHANCE.hypixelIcon}(?<amount>[\\d,.]+)",
+        "\\s+Bonus Pest Chance: ${SkyblockStat.BONUS_PEST_CHANCE}(?<amount>[\\d,.]+)",
     )
     private var display: Renderable? = null
 

@@ -67,7 +67,7 @@ object MiningApi {
     @Suppress("MaxLineLength")
     private val coldResetPattern by group.pattern(
         "cold.reset",
-        "§6The warmth of the campfire reduced your §r§b${SkyblockStat.COLD_RESISTANCE.hypixelIcon} Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
+        "§6The warmth of the campfire reduced your §r§b${SkyblockStat.COLD_RESISTANCE} Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
     )
 
     // This intentionally uses the old heat icon, since Hypixel has not updated it in this location.

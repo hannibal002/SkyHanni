@@ -96,7 +96,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
 private fun renderPerson(title: String, name: String?, perks: List<Perk>?): Renderable {
     val colorCode = ElectionApi.mayorNameToColorCode(name.orEmpty())
     val perkLines = perks?.takeIf { config.showPerks }?.map { perk ->
-        " ${if (perk.minister) "§6${MAGIC_FIND.hypixelIcon} " else ""}§e${perk.perkName}" to "§7${perk.description}"
+        " ${if (perk.minister) "§6${MAGIC_FIND} " else ""}§e${perk.perkName}" to "§7${perk.description}"
     }.orEmpty()
 
     return Renderable.vertical(

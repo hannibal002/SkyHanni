@@ -57,7 +57,7 @@ object PunchcardHighlight {
     @Suppress("MaxLineLength")
     private val punchedPattern by patternGroup.pattern(
         "new",
-        "§5§lPUNCHCARD! §r§eYou punched §r§.(?:.*?)?(?<name>\\w+)§r§. §r§eand both regained §r§a\\+25${SkyblockStat.RIFT_TIME.hypixelIcon} Rift Time§r§e!",
+        "§5§lPUNCHCARD! §r§eYou punched §r§.(?:.*?)?(?<name>\\w+)§r§. §r§eand both regained §r§a\\+25${SkyblockStat.RIFT_TIME} Rift Time§r§e!",
     )
 
     /**

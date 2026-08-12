@@ -94,10 +94,10 @@ object DungeonChatFilter {
         "§6§lDUNGEON BUFF! §r§fA §r§dBlessing of (.*)§r§f was found! (.*)".toPattern(),
         "§eA §r§a§r§dBlessing of (.*)§r§e was picked up!".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§dBlessing of (.*)§r§e!".toPattern(),
-        " {5}§r§7Granted you §r§a§r§a(.*)§r§7 & §r§a(.*)x §r§c${SkyblockStat.STRENGTH.hypixelIcon} Strength§r§7.".toPattern(),
-        " {5}§r§7Also granted you §r§a§r§a(.*)§r§7 & §r§a(.*)x §r§9${SkyblockStat.CRIT_DAMAGE.hypixelIcon} Crit Damage§r§7.".toPattern(),
+        " {5}§r§7Granted you §r§a§r§a(.*)§r§7 & §r§a(.*)x §r§c${SkyblockStat.STRENGTH} Strength§r§7.".toPattern(),
+        " {5}§r§7Also granted you §r§a§r§a(.*)§r§7 & §r§a(.*)x §r§9${SkyblockStat.CRIT_DAMAGE} Crit Damage§r§7.".toPattern(),
         " {5}§r§7(Grants|Granted) you §r§a(.*) Defense §r§7and §r§a+(.*) Damage§r§7.".toPattern(),
-        " {5}§r§7Granted you §r§a§r§a(.*)x HP §r§7and §r§a§r§a(.*)x §r§c${SkyblockStat.HEALTH_REGEN.hypixelIcon} Health Regen§r§7.".toPattern(),
+        " {5}§r§7Granted you §r§a§r§a(.*)x HP §r§7and §r§a§r§a(.*)x §r§c${SkyblockStat.HEALTH_REGEN} Health Regen§r§7.".toPattern(),
         " {5}§r§7(Grants|Granted) you §r§a(.*) Intelligence §r§7and §r§a+(.*)? Speed§r§7.".toPattern(),
         " {5}§r§7Granted you §r§a+(.*) HP§r§7, §r§a(.*) Defense§r§7, §r§a(.*) Intelligence§r§7, and §r§a(.*) Strength§r§7.".toPattern(),
     )

@@ -25,11 +25,11 @@ object CompactBingoChat {
     private val patternGroup = RepoPattern.group("bingo.compactchat")
     private val healthPattern by patternGroup.pattern(
         "health",
-        " {3}§r§7§8\\+§a.* §c${SkyblockStat.HEALTH.hypixelIcon} Health"
+        " {3}§r§7§8\\+§a.* §c${SkyblockStat.HEALTH} Health"
     )
     private val strengthPattern by patternGroup.pattern(
         "strength",
-        " {3}§r§7§8\\+§a. §c${SkyblockStat.STRENGTH.hypixelIcon} Strength"
+        " {3}§r§7§8\\+§a. §c${SkyblockStat.STRENGTH} Strength"
     )
     private val borderPattern by patternGroup.pattern(
         "border",

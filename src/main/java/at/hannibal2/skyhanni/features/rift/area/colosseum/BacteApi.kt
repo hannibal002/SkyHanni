@@ -23,7 +23,7 @@ object BacteApi {
     @Suppress("MaxLineLength")
     private val namePattern by group.pattern(
         "name",
-        "§2﴾ §8\\[§7Lv\\d+§8\\] §l§a(?<name>.*)§r §.[\\d.,]+§f\\/§a[\\d.,]+§c${SkyblockStat.HEALTH.hypixelIcon} §2﴿",
+        "§2﴾ §8\\[§7Lv\\d+§8\\] §l§a(?<name>.*)§r §.[\\d.,]+§f\\/§a[\\d.,]+§c${SkyblockStat.HEALTH} §2﴿",
     )
 
     /**

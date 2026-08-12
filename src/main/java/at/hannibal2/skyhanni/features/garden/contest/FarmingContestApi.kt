@@ -51,7 +51,7 @@ object FarmingContestApi {
      */
     private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop.colorless",
-        "\\s*(?:○|${SkyblockStat.FARMING_FORTUNE.hypixelIcon}) (?<crop>.*) .*",
+        "\\s*(?:○|${SkyblockStat.FARMING_FORTUNE}) (?<crop>.*) .*",
     )
 
     /**

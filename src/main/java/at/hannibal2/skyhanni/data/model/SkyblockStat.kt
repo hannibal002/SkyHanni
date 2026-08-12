@@ -240,6 +240,8 @@ enum class SkyblockStat(
 
     fun asString(value: Int) = (if (value > 0) "+" else "") + value.toString() + " " + this.icon
 
+    override fun toString(): String = hypixelIcon.toString()
+
     @SkyHanniModule
     companion object {
         val fontSizeOfLargestIcon by lazy {
