@@ -48,7 +48,11 @@ object FarmingContestApi {
     )
 
     /**
+     * WRAPPED-REGEX-TEST: " ○ Cocoa Beans 2h"
+     * WRAPPED-REGEX-TEST: " ○ Cocoa Beans 2h15m"
+     * WRAPPED-REGEX-TEST: " ○ Cocoa Beans 2h15m14s"
      * WRAPPED-REGEX-TEST: " ○ Cocoa Beans 15m14s"
+     * WRAPPED-REGEX-TEST: " ○ Cocoa Beans 14s"
      */
     private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop.colorless",
@@ -92,6 +96,9 @@ object FarmingContestApi {
 
     private val contests = mutableMapOf<Long, FarmingContest>()
     private var internalContest = false
+    private val scoreboardLines get() = ScoreboardData.sidebarLinesRaw.map { it.removeColor() }
+    private val contestWidgetLines
+        get() = TabWidget.JACOB_CONTEST.lines.map { it.string.removeColor().trim() }
     val inContest
         get() = internalContest && IslandTypeTag.CONTESTS_SHOWN.isInIsland()
     val isContestActive
@@ -175,10 +182,6 @@ object FarmingContestApi {
             }
         }
     }
-
-    private val scoreboardLines get() = ScoreboardData.sidebarLinesRaw.map { it.removeColor() }
-    private val contestWidgetLines
-        get() = TabWidget.JACOB_CONTEST.lines.map { it.string.removeColor().trim() }
 
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {

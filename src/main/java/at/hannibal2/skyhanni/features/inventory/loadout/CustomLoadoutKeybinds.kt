@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.inventory.loadout
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.inventory.customloadout.LoadoutKeybindConfig
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
@@ -14,12 +16,50 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 @SkyHanniModule
 object CustomLoadoutKeybinds {
 
-    private data class LoadoutBinding(val slotIndex: Int, val key: Int, val contest: Boolean)
+    private enum class LoadoutLayout(val displayName: String) {
+        CONTEST("contest"),
+        DEFAULT("normal"),
+    }
+
+    private data class LoadoutLayoutDefinition(
+        val layout: LoadoutLayout,
+        val isActive: () -> Boolean,
+        val keybinds: () -> List<Int>,
+        val cycleOrder: () -> List<LoadoutKeybindConfig.CycleLoadout>,
+    )
+
+    private data class LoadoutBinding(val slotIndex: Int, val key: Int, val layout: LoadoutLayout)
 
     private val config get() = LoadoutApi.config.keybinds
     private val keybinds get() = config.slotKeybinds.asList()
     private val contestKeybinds get() = config.contestSlotKeybinds.asList()
+    private val layoutDefinitions
+        get() = listOf(
+            LoadoutLayoutDefinition(
+                LoadoutLayout.CONTEST,
+                { FarmingContestApi.isContestActive },
+                { contestKeybinds },
+                { config.contestCycleOrder },
+            ),
+            LoadoutLayoutDefinition(LoadoutLayout.DEFAULT, { true }, { keybinds }, { config.cycleOrder }),
+        )
     private var debugEnabled = false
+
+    @HandleEvent
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        for (slot in 1..12) {
+            event.move(
+                143,
+                "inventory.customLoadout.keybinds.slot$slot",
+                "inventory.customLoadout.keybinds.slotKeybinds.slot$slot",
+            )
+            event.move(
+                143,
+                "inventory.customLoadout.keybinds.contestSlot$slot",
+                "inventory.customLoadout.keybinds.contestSlotKeybinds.slot$slot",
+            )
+        }
+    }
 
     @HandleEvent
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -35,12 +75,12 @@ object CustomLoadoutKeybinds {
     }
 
     @HandleEvent
-    fun onGuiKeyPress(event: GuiKeyPressEvent) {
+    private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (handlePress()) event.cancel()
     }
 
     @HandleEvent
-    fun onGuiMouseInput(event: GuiMouseInputEvent) {
+    private fun onGuiMouseInput(event: GuiMouseInputEvent) {
         if (handlePress()) event.cancel()
     }
 
@@ -53,7 +93,7 @@ object CustomLoadoutKeybinds {
 
         val bindings = activeKeybinds()
 
-        for ((index, key, contest) in bindings) {
+        for ((index, key, layout) in bindings) {
             if (!key.isKeyHeld()) continue
             val slot = slots.getOrNull(index)
             if (slot == null) {
@@ -64,7 +104,7 @@ object CustomLoadoutKeybinds {
             val clicked = LoadoutApi.clickSlot(slot)
             debug(
                 "§7Key §e$key §7-> contest active: §e${FarmingContestApi.isContestActive}§7, " +
-                    "binding: §e${if (contest) "contest" else "normal"}§7, chosen slot: §e${index + 1}§7, " +
+                    "layout: §e${layout.displayName}§7, chosen slot: §e${index + 1}§7, " +
                     "click sent: §e$clicked",
             )
             if (clicked) {
@@ -76,12 +116,10 @@ object CustomLoadoutKeybinds {
     }
 
     private fun cycleLoadout(slots: List<LoadoutSlot>): Boolean {
-        val contestOrder = config.contestCycleOrder
-        val configuredOrder = if (FarmingContestApi.isContestActive && contestOrder.isNotEmpty()) {
-            contestOrder
-        } else {
-            config.cycleOrder
-        }
+        val activeLayouts = layoutDefinitions.filter { it.isActive() }
+        val definition = activeLayouts.firstOrNull { it.cycleOrder().isNotEmpty() } ?: activeLayouts.last()
+        val layout = definition.layout
+        val configuredOrder = definition.cycleOrder()
         val orderedSlots = configuredOrder.mapNotNull { slots.getOrNull(it.ordinal) }
         val currentIndex = orderedSlots.indexOfFirst { it.id == LoadoutApi.currentSlot }
         val cycle = if (currentIndex == -1) {
@@ -94,7 +132,7 @@ object CustomLoadoutKeybinds {
             if (!LoadoutApi.clickSlot(slot)) continue
             debug(
                 "§7Cycle key -> contest active: §e${FarmingContestApi.isContestActive}§7, " +
-                    "chosen slot: §e${slot.id + 1}",
+                    "layout: §e${layout.displayName}§7, chosen slot: §e${slot.id + 1}",
             )
             return true
         }
@@ -112,12 +150,11 @@ object CustomLoadoutKeybinds {
             activeKeybinds().any { it.key > 0 && it.key.isKeyHeld() }
         )
 
-    private fun activeKeybinds(): List<LoadoutBinding> = buildList {
-        if (FarmingContestApi.isContestActive) {
-            contestKeybinds.forEachIndexed { index, key -> add(LoadoutBinding(index, key, true)) }
+    private fun activeKeybinds(): List<LoadoutBinding> = layoutDefinitions
+        .filter { it.isActive() }
+        .flatMap { definition ->
+            definition.keybinds().mapIndexed { index, key -> LoadoutBinding(index, key, definition.layout) }
         }
-        keybinds.forEachIndexed { index, key -> add(LoadoutBinding(index, key, false)) }
-    }
 
     private fun debug(message: String) {
         if (debugEnabled) ChatUtils.debug("Loadout keybinds: $message")
