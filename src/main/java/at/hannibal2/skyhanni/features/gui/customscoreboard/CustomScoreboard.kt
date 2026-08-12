@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
-import at.hannibal2.skyhanni.events.IslandJoinEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
@@ -227,8 +227,8 @@ object CustomScoreboard {
     }
 
     @HandleEvent
-    private fun onIslandJoin(event: IslandJoinEvent) {
-        if (event.island == IslandType.NONE) updateAllIslandEntries()
+    private fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland == IslandType.NONE) updateAllIslandEntries()
         else updateIslandEntries()
 
         showDeprecatedWarning()
