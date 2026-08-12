@@ -198,6 +198,8 @@ object CustomScoreboard {
         // For some reason using ConditionalUtils.onEnable makes it call this callback 3 times
         config.enabled.whenChanged { old, new ->
             if (old == new || !new) return@whenChanged
+
+            if (disableForCustomScoreboardMod()) return@whenChanged
             showDeprecatedWarning()
         }
     }
@@ -205,18 +207,7 @@ object CustomScoreboard {
     @HandleEvent(HypixelJoinEvent::class)
     private fun onHypixelJoin() {
         updateAllIslandEntries()
-
-        if (customScoreboardModLoaded) {
-            if (!config.enabled.get()) return
-
-            showCustomScoreboardReplacementMessage(
-                message = "SkyHanni's §cCustom Scoreboard §ahas been disabled because " +
-                    "§bSkyBlock Custom Scoreboard §ais installed.\n" +
-                    "§e[Click here to open it on Modrinth]",
-            )
-
-            config.enabled.set(false)
-        }
+        disableForCustomScoreboardMod()
     }
 
     @HandleEvent
@@ -258,6 +249,20 @@ object CustomScoreboard {
                 )
             },
         )
+    }
+
+    private fun disableForCustomScoreboardMod(): Boolean {
+        if (!config.enabled.get()) return false
+        if (!customScoreboardModLoaded) return false
+
+        showCustomScoreboardReplacementMessage(
+            message = "SkyHanni's §cCustom Scoreboard §ahas been disabled because " +
+                "§bSkyBlock Custom Scoreboard §ais installed.\n" +
+                "§e[Click here to open it on Modrinth]",
+        )
+
+        config.enabled.set(false)
+        return true
     }
 
     private fun showCustomScoreboardReplacementMessage(message: String) {
