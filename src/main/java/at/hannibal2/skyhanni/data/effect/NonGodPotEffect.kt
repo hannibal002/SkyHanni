@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.effect
 
+import at.hannibal2.skyhanni.data.model.SkyblockMobType
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeType
 import at.hannibal2.skyhanni.utils.repopatterns.NullableRepoPatternDelegate
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -142,14 +143,14 @@ enum class NonGodPotEffect(
     PEST_REPELLENT(
         "Pest Repellent I",
         displayName = "§6Pest Repellent I§r",
-        effectGainedMessage = "YUM!  Pests will now spawn 2x less while you break crops for the next 60m!",
+        effectGainedMessage = "YUM! ${SkyblockMobType.PEST} Pests will now spawn 2x less while you break crops for the next 60m!",
         effectDuration = 1.hours,
         effectChangeType = EffectDurationChangeType.SET,
     ),
     PEST_REPELLENT_MAX(
         "Pest Repellent II",
         displayName = "§6Pest Repellent II",
-        effectGainedMessage = "YUM!  Pests will now spawn 4x less while you break crops for the next 60m!",
+        effectGainedMessage = "YUM! ${SkyblockMobType.PEST} Pests will now spawn 4x less while you break crops for the next 60m!",
         effectDuration = 1.hours,
         effectChangeType = EffectDurationChangeType.SET,
     ),

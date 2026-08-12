@@ -49,7 +49,8 @@ object BonusPestChanceDisplay {
             val amount = group("amount").formatInt()
 
             display = Renderable.text {
-                if (compact) append("§2 BPC ") else append("§2 Bonus Pest Chance ")
+                append("§2${SkyblockStat.BONUS_PEST_CHANCE}")
+                if (compact) append(" BPC ") else append(" Bonus Pest Chance ")
                 if (disabled) append("§c§m") else append("§f")
                 append("$amount%")
                 if (disabled && !compact) append("§r §cDISABLED")
