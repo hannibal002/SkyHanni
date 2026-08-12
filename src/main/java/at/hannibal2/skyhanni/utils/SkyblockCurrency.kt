@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.BitsApi
+import at.hannibal2.skyhanni.data.CurrencyApi.getFromStorage
 import at.hannibal2.skyhanni.data.PurseApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -35,7 +36,7 @@ enum class SkyblockCurrency(
     val coinValue: Double? = null,
     private val loreNames: Set<String>,
     /** How much of this currency the player owns, or null when SkyHanni does not track it. */
-    private val ownedAmount: (() -> Long?),
+    private val ownedAmount: SkyblockCurrency.() -> Long?,
 ) {
     // Universal
     COINS(
@@ -67,11 +68,7 @@ enum class SkyblockCurrency(
     ),
 
     // SkyMart in Garden
-    COPPER(
-        NeuInternalName.SKYBLOCK_COPPER, "Copper", RED, loreNames = setOf("copper"),
-        // TODO add
-        ownedAmount = { null },
-    ),
+    COPPER(NeuInternalName.SKYBLOCK_COPPER, "Copper", RED, loreNames = setOf("copper"), ownedAmount = { getFromStorage() }),
 
     // Anita in Garden
     GOLD_MEDAL(
@@ -113,7 +110,7 @@ enum class SkyblockCurrency(
      */
     fun readAmountOrNull(text: String): Long? = readCurrencyOrNull(text)?.takeIf { it.first == this }?.second
 
-    fun getOwnedAmountOrNull(): Long? = ownedAmount.invoke()
+    fun getOwnedAmountOrNull(): Long? = ownedAmount.invoke(this)
 
     /** Formats an amount the way it appears in a cost lore, for example "§b5,000 Bits". */
     fun formatAmount(amount: Long): String = "${color.getChatColor()}${amount.addSeparators()} $displayName"
