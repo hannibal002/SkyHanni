@@ -40,13 +40,16 @@ internal object GreenhouseGridScanner {
         val occupiedByMutations = occupiedMutationCells(plot.middle, mutations)
         for (row in 0 until GRID_SIZE) {
             for (column in 0 until GRID_SIZE) {
-                if (row to column in occupiedByMutations) continue
                 val position = LorenzVec(
                     middle.x + column - GRID_RADIUS.toDouble(),
                     CROP_Y,
                     middle.z + row - GRID_RADIUS.toDouble(),
                 )
-                val cropId = GreenhouseCropScanner.skyShardsCropIdAt(position) ?: continue
+                val cropId = if (row to column in occupiedByMutations) {
+                    GreenhouseCropScanner.independentCropHeadIdAt(position)
+                } else {
+                    GreenhouseCropScanner.skyShardsCropIdAt(position)
+                } ?: continue
                 val category = CropCategory.fromCropId(cropId) ?: continue
                 add(CropCell(cropId, category, row, column, position))
             }

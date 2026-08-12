@@ -88,6 +88,33 @@ internal object GreenhouseCropScanner {
         return null
     }
 
+    /**
+     * Finds a crop represented by its own named head, even when its grid cell is also covered by a mutation.
+     * Mutation models can contain crop-like blocks, so this deliberately accepts only heads which are not
+     * themselves recognised as mutation items.
+     */
+    fun independentCropHeadIdAt(position: LorenzVec): String? {
+        fun SafeItemStack?.independentCropId(): String? {
+            if (GreenhouseMutation.fromItem(this) != null) return null
+            return skyShardsCropId()
+        }
+
+        getEntitiesInBox<ArmorStand>(position, FLOATING_CROP_ID_SEARCH_RADIUS) { stand ->
+            abs(stand.x - position.x) <= FLOATING_HEAD_HORIZONTAL_RADIUS &&
+                abs(stand.z - position.z) <= FLOATING_HEAD_HORIZONTAL_RADIUS
+        }.forEach { stand ->
+            listOf(stand.getStandHelmet(), stand.getHandItem()).firstNotNullOfOrNull { it.independentCropId() }
+                ?.let { return it }
+        }
+        getEntitiesInBox<Display.ItemDisplay>(position, FLOATING_CROP_ID_SEARCH_RADIUS) { display ->
+            abs(display.x - position.x) <= FLOATING_HEAD_HORIZONTAL_RADIUS &&
+                abs(display.z - position.z) <= FLOATING_HEAD_HORIZONTAL_RADIUS
+        }.forEach { display ->
+            display.itemStack.independentCropId()?.let { return it }
+        }
+        return null
+    }
+
     private fun findNearbyFloatingCropHead(category: CropCategory, center: LorenzVec): LorenzVec? = buildList {
         getEntitiesInBox<ArmorStand>(center, FLOATING_HEAD_SEARCH_RADIUS) { stand ->
             listOf(stand.getStandHelmet(), stand.getHandItem()).any { it.isFloatingCropHead(category) }
