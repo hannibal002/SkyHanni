@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LoreCostUtils
 import at.hannibal2.skyhanni.utils.LoreCostUtils.LoreCostEntry
+import at.hannibal2.skyhanni.utils.LoreCostUtils.hasTradeLine
 import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -31,8 +32,6 @@ import net.minecraft.network.chat.Component
 object NpcTradeHelper {
 
     private val config get() = SkyHanniMod.feature.inventory.npcTrade
-
-    private const val TRADE_LINE = "§eClick to trade!"
 
     private var tradeItems = mapOf<Int, TradeItem>()
 
@@ -75,7 +74,7 @@ object NpcTradeHelper {
 
     private fun readTradeItem(item: SafeItemStack): TradeItem? {
         val lore = item.getLoreComponent().map { it.formattedTextCompatLessResets() }
-        if (TRADE_LINE !in lore) return null
+        if (!lore.hasTradeLine()) return null
 
         val costs = lore.readLoreCosts(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
         if (costs.isEmpty()) return null

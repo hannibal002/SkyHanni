@@ -24,12 +24,14 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
  *
  * [internalName] has to be the id of the real repo item whenever the name resolves to one, even
  * if that item has no price, as is the case for [NeuInternalName.SKYBLOCK_COPPER].
+ * [displayName] is written without color, use [coloredName] where the color is wanted.
  * [coinValue] is the worth of a single unit in coins, or null when unknown.
  * [loreNames] are the names as written in the lore, lowercase and without color codes.
  */
 enum class SkyblockCurrency(
     val internalName: NeuInternalName,
     val displayName: String,
+    val color: LorenzColor,
     val coinValue: Double? = null,
     private val loreNames: Set<String>,
     /** How much of this currency the player owns, or null when SkyHanni does not track it. */
@@ -38,18 +40,19 @@ enum class SkyblockCurrency(
     // Universal
     COINS(
         NeuInternalName.SKYBLOCK_COIN,
-        "§6Coins",
+        "Coins",
+        GOLD,
         coinValue = 1.0,
         loreNames = setOf("coin", "coins", "skyblock coin", "skyblock coins", "skyblock_coin", "skyblock_coins"),
         ownedAmount = { PurseApi.currentPurse.toLong() },
     ),
 
     // Bits Shop from Elisabeth
-    BITS("BITS".toInternalName(), "§bBits", loreNames = setOf("bit", "bits"), ownedAmount = { BitsApi.bits.toLong() }),
+    BITS("BITS".toInternalName(), "Bits", AQUA, loreNames = setOf("bit", "bits"), ownedAmount = { BitsApi.bits.toLong() }),
 
     // Pesthunter's Wares in Garden
     PESTS(
-        "PESTS".toInternalName(), "§2Pests", loreNames = setOf("pest", "pests"),
+        "PESTS".toInternalName(), "Pests", DARK_GREEN, loreNames = setOf("pest", "pests"),
         // TODO add
         ownedAmount = { null },
     ),
@@ -57,49 +60,52 @@ enum class SkyblockCurrency(
     // Chocolate Factory
     CHOCOLATE(
         "CHOCOLATE".toInternalName(),
-        "§6Chocolate",
+        "Chocolate",
+        GOLD,
         loreNames = setOf("chocolate"),
         ownedAmount = { ChocolateAmount.CURRENT.chocolate() + ChocolateAmount.chocolateSinceUpdate() },
     ),
 
     // SkyMart in Garden
     COPPER(
-        NeuInternalName.SKYBLOCK_COPPER, "§cCopper", loreNames = setOf("copper"),
+        NeuInternalName.SKYBLOCK_COPPER, "Copper", RED, loreNames = setOf("copper"),
         // TODO add
         ownedAmount = { null },
     ),
 
     // Anita in Garden
     GOLD_MEDAL(
-        NeuInternalName.SKYBLOCK_GOLD_MEDAL, "§6Gold medal", loreNames = setOf("gold medal", "gold medals"),
+        NeuInternalName.SKYBLOCK_GOLD_MEDAL, "Gold medal", GOLD, loreNames = setOf("gold medal", "gold medals"),
         // TODO add
         ownedAmount = { null },
     ),
     SILVER_MEDAL(
-        NeuInternalName.SKYBLOCK_SILVER_MEDAL, "§fSilver medal", loreNames = setOf("silver medal", "silver medals"),
+        NeuInternalName.SKYBLOCK_SILVER_MEDAL, "Silver medal", WHITE, loreNames = setOf("silver medal", "silver medals"),
         // TODO add
         ownedAmount = { null },
     ),
     BRONZE_MEDAL(
-        NeuInternalName.SKYBLOCK_BRONZE_MEDAL, "§cBronze medal", loreNames = setOf("bronze medal", "bronze medals"),
+        NeuInternalName.SKYBLOCK_BRONZE_MEDAL, "Bronze medal", RED, loreNames = setOf("bronze medal", "bronze medals"),
         // TODO add
         ownedAmount = { null },
     ),
 
     // Tony's Shop in the Farming Islands
     PELTS(
-        "PELTS".toInternalName(), "§5Pelts", loreNames = setOf("pelt", "pelts"),
+        "PELTS".toInternalName(), "Pelts", DARK_PURPLE, loreNames = setOf("pelt", "pelts"),
         // TODO add
         ownedAmount = { null },
     ),
 
     // Cosmetics in various shops
     GEMS(
-        "GEMS".toInternalName(), "§aGems", loreNames = setOf("gem", "gems"),
+        "GEMS".toInternalName(), "Gems", GREEN, loreNames = setOf("gem", "gems"),
         // TODO add
         ownedAmount = { null },
     ),
     ;
+
+    val coloredName: String = color.getChatColor() + displayName
 
     /**
      * Reads the amount from a text that writes it in front of the name, like "5,000 Bits".
@@ -110,27 +116,27 @@ enum class SkyblockCurrency(
     fun getOwnedAmountOrNull(): Long? = ownedAmount.invoke()
 
     /** Formats an amount the way it appears in a cost lore, for example "§b5,000 Bits". */
-    fun formatAmount(amount: Long): String = displayName.take(2) + amount.addSeparators() + " " + displayName.removeColor()
+    fun formatAmount(amount: Long): String = "${color.getChatColor()}${amount.addSeparators()} $displayName"
 
     @SkyHanniModule
     companion object {
 
         /**
-         * REGEX-TEST: §b5,000 Bits
-         * REGEX-TEST: §240 Pests
-         * REGEX-TEST: §c250 Copper
-         * REGEX-TEST: §61,940,000 Coins
-         * REGEX-TEST: §629.1 Coins
+         * REGEX-TEST: 5,000 Bits
+         * REGEX-TEST: 40 Pests
+         * REGEX-TEST: 250 Copper
+         * REGEX-TEST: 1,940,000 Coins
+         * REGEX-TEST: 29.1 Coins
          * REGEX-TEST: 46,559,892,200 Chocolate
-         * REGEX-TEST: §a400 Gems
-         * REGEX-TEST: §575 Pelts
+         * REGEX-TEST: 400 Gems
+         * REGEX-TEST: 75 Pelts
          */
         private val amountPattern by RepoPattern.pattern(
             "utils.currency.amount",
-            "(?:§.)*(?<amount>[\\d,.]+) (?<name>[\\w' ]+)",
+            "(?<amount>[\\d,.]+) (?<name>[\\w' ]+)",
         )
 
-        fun readCurrencyOrNull(text: String): Pair<SkyblockCurrency, Long>? = amountPattern.matchMatcher(text) {
+        fun readCurrencyOrNull(text: String): Pair<SkyblockCurrency, Long>? = amountPattern.matchMatcher(text.removeColor()) {
             val currency = getByLoreNameOrNull(group("name")) ?: return@matchMatcher null
             currency to group("amount").formatLong()
         }

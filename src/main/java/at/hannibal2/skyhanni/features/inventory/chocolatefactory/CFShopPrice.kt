@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LoreCostUtils.hasTradeLine
 import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -116,7 +117,7 @@ object CFShopPrice {
                 .filter { it.internalName != CFApi.CHOCOLATE_ITEM }
                 .sumOf { it.internalName.getPrice() * it.amount }
                 .takeIf { it != 0.0 }
-            val canBeBought = lore.any { it == "§eClick to trade!" }
+            val canBeBought = lore.hasTradeLine()
 
             newProducts.add(Product(slot, item.repoItemName, internalName, chocolate, itemPrice, otherItemsPrice, canBeBought))
         }

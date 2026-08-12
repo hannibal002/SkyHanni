@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LoreCostUtils
 import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -50,9 +49,7 @@ object AnitaMedalProfit {
         BRONZE("bronze", 1, SkyblockCurrency.BRONZE_MEDAL),
         ;
 
-        val displayName = currency.displayName
-
-        val color: LorenzColor = displayName.substring(1, 2)[0].toLorenzColor() ?: LorenzColor.WHITE
+        val color: LorenzColor get() = currency.color
 
         companion object {
             fun bySimpleNameOrNull(name: String): MedalType? = entries.firstOrNull { it.simpleName == name }

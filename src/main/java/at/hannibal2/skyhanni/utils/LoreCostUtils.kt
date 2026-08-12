@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -23,16 +24,31 @@ object LoreCostUtils {
 
     fun isCostHeader(line: String): Boolean = costHeaderPattern.matches(line)
 
-    private val patternGroup = RepoPattern.group("utils.lore.cost")
+    /** True when the item can be bought right now, as opposed to a locked or already owned entry. */
+    fun List<String>.hasTradeLine(): Boolean = any { tradeLinePattern.matches(it.removeColor()) }
+
+    private val patternGroup = RepoPattern.group("utils.lore")
 
     /**
+     * This is one of the few patterns that keeps its color codes on purpose. The cost written
+     * into the header line is handed on as is, so that features can find that exact line again
+     * in the tooltip. Matching without color would strip it and break that lookup.
+     *
      * REGEX-TEST: §7Cost
      * REGEX-TEST: §5§o§7Cost
      * REGEX-TEST: §7Cost: §b5,000 Bits
      */
     private val costHeaderPattern by patternGroup.pattern(
-        "header",
-        "(?:§5§o)?§7Cost(?:: (?<inline>.+))?",
+        "cost.header",
+        "(?:§.)*Cost(?:: (?<cost>.+))?",
+    )
+
+    /**
+     * REGEX-TEST: Click to trade!
+     */
+    private val tradeLinePattern by patternGroup.pattern(
+        "trade.click",
+        "Click to trade!",
     )
 
     fun SafeItemStack.readLoreCosts(): List<LoreCostEntry> = getLoreComponent()
@@ -43,7 +59,7 @@ object LoreCostUtils {
         val headerIndex = indexOfLast { costHeaderPattern.matches(it) }.takeIf { it != -1 } ?: return emptyList()
 
         costHeaderPattern.matchMatcher(this[headerIndex]) {
-            groupOrNull("inline")?.let { return listOf(readCostLine(it, itemName)) }
+            groupOrNull("cost")?.let { return listOf(readCostLine(it, itemName)) }
         }
 
         return drop(headerIndex + 1).takeWhile { it.isNotEmpty() }.map { readCostLine(it, itemName) }
