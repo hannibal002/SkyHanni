@@ -59,7 +59,7 @@ class HotfConfig {
     @Expose
     @ConfigOption(
         name = "Whispers for 10 Levels",
-        desc = "Show the amount of forest whispers needed to level a perk up 10 times when holding the shift key."
+        desc = "Show the amount of forest whispers needed to level a perk up 10 times when holding the shift key.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -68,7 +68,7 @@ class HotfConfig {
     @Expose
     @ConfigOption(
         name = "Current Whispers",
-        desc = "Displays the current amount of whispers available for the specific perk when viewing its tooltip."
+        desc = "Displays the current amount of whispers available for the specific perk when viewing its tooltip.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -77,7 +77,8 @@ class HotfConfig {
     enum class RotatingPerkDisplayVisibility(val display: String) {
         OFF("Off"),
         FORAGING_ONLY("Foraging Islands Only"),
-        EVERYWHERE("Everywhere");
+        EVERYWHERE("Everywhere"),
+        ;
 
         override fun toString() = display
     }
