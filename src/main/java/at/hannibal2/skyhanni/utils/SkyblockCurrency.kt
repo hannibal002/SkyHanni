@@ -32,8 +32,8 @@ enum class SkyblockCurrency(
     val displayName: String,
     val coinValue: Double? = null,
     private val loreNames: Set<String>,
-    /** How much of this currency the player owns, or 0 when SkyHanni does not track it. */
-    private val ownedAmount: (() -> Long),
+    /** How much of this currency the player owns, or null when SkyHanni does not track it. */
+    private val ownedAmount: (() -> Long?),
 ) {
     // Universal
     COINS(
@@ -51,7 +51,7 @@ enum class SkyblockCurrency(
     PESTS(
         "PESTS".toInternalName(), "§2Pests", loreNames = setOf("pest", "pests"),
         // TODO add
-        ownedAmount = { 0 },
+        ownedAmount = { null },
     ),
 
     // Chocolate Factory
@@ -66,38 +66,38 @@ enum class SkyblockCurrency(
     COPPER(
         NeuInternalName.SKYBLOCK_COPPER, "§cCopper", loreNames = setOf("copper"),
         // TODO add
-        ownedAmount = { 0 },
+        ownedAmount = { null },
     ),
 
     // Anita in Garden
     GOLD_MEDAL(
         NeuInternalName.SKYBLOCK_GOLD_MEDAL, "§6Gold medal", loreNames = setOf("gold medal", "gold medals"),
         // TODO add
-        ownedAmount = { 0 },
+        ownedAmount = { null },
     ),
     SILVER_MEDAL(
         NeuInternalName.SKYBLOCK_SILVER_MEDAL, "§fSilver medal", loreNames = setOf("silver medal", "silver medals"),
         // TODO add
-        ownedAmount = { 0 },
+        ownedAmount = { null },
     ),
     BRONZE_MEDAL(
         NeuInternalName.SKYBLOCK_BRONZE_MEDAL, "§cBronze medal", loreNames = setOf("bronze medal", "bronze medals"),
         // TODO add
-        ownedAmount = { 0 },
+        ownedAmount = { null },
     ),
 
     // Tony's Shop in the Farming Islands
     PELTS(
         "PELTS".toInternalName(), "§5Pelts", loreNames = setOf("pelt", "pelts"),
         // TODO add
-        ownedAmount = { 0 },
+        ownedAmount = { null },
     ),
 
     // Cosmetics in various shops
     GEMS(
         "GEMS".toInternalName(), "§aGems", loreNames = setOf("gem", "gems"),
         // TODO add
-        ownedAmount = { 0 },
+        ownedAmount = { null },
     ),
     ;
 
@@ -107,7 +107,7 @@ enum class SkyblockCurrency(
      */
     fun readAmountOrNull(text: String): Long? = readCurrencyOrNull(text)?.takeIf { it.first == this }?.second
 
-    fun getOwnedAmount(): Long = ownedAmount.invoke()
+    fun getOwnedAmountOrNull(): Long? = ownedAmount.invoke()
 
     /** Formats an amount the way it appears in a cost lore, for example "§b5,000 Bits". */
     fun formatAmount(amount: Long): String = displayName.take(2) + amount.addSeparators() + " " + displayName.removeColor()

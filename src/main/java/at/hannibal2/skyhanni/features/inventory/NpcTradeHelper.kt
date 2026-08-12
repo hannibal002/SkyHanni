@@ -106,7 +106,7 @@ object NpcTradeHelper {
 
         val owned = when {
             internalName == NeuInternalName.MISSING_ITEM -> null
-            currency != null -> currency.getOwnedAmount()
+            currency != null -> currency.getOwnedAmountOrNull()
             else -> internalName.getAmountInInventory().toLong()
         }
         val covered = owned != null && owned >= amount
