@@ -92,7 +92,7 @@ object BazaarOrderApi {
      * REGEX-TEST: By: [MVP+] hannibal2
      * REGEX-TEST: By: hannibal2
      */
-    private val ownerPattern by patternGroup.pattern(
+    val ownerPattern by patternGroup.pattern(
         "owner.colorless",
         "By: (?:\\[[^]]+] )?(?<name>\\S+)",
     )
