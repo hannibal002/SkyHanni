@@ -72,6 +72,22 @@ object StashCompact {
         "generic",
         "§eOne or more (?:item|material)s? didn't fit in your inventory and were added to your (?:item|material) stash! §6Click here §eto pick them up!",
     )
+
+    /**
+     * REGEX-TEST: §r§c§lYOUR STASH IS ALMOST AT MAX CAPACITY!
+     */
+    private val almostFull1Pattern by patternGroup.pattern(
+        "almost.full",
+        " *§r§c§lYOUR STASH IS ALMOST AT MAX CAPACITY!.*",
+    )
+
+    /**
+     * REGEX-TEST: §r§cITEMS SENT TO A FULL STASH WILL BE DELETED
+     */
+    private val almostFull2Pattern by patternGroup.pattern(
+        "deletion.warning",
+        " *§r§cITEMS SENT TO A FULL STASH WILL BE DELETED.*",
+    )
     // </editor-fold>
 
     private val config get() = SkyHanniMod.feature.chat.filterType.stashMessages
@@ -94,6 +110,7 @@ object StashCompact {
 
     data class StashMessage(val materialCount: Int, val type: String) {
         var differingMaterialsCount: Int? = null
+        var isAlmostFull: Boolean = false
     }
 
     @HandleEvent
@@ -129,6 +146,21 @@ object StashCompact {
             event.blockedReason = REASON
         }
 
+        almostFull1Pattern.matchMatcher(event.message) {
+            event.blockedReason = REASON
+            val currentType = currentType ?: return@matchMatcher
+            val pendingMessage = currentMessages[currentType]
+            if (pendingMessage != null) {
+                pendingMessage.isAlmostFull = true
+            } else {
+                ChatUtils.chat("§c§lWarning: anything stashed past 720 will be deleted!")
+            }
+        }
+
+        almostFull2Pattern.matchMatcher(event.message) {
+            event.blockedReason = REASON
+        }
+
         pickupStashPattern.matchMatcher(event.message) {
             event.blockedReason = REASON
             ChatUtils.deleteNextMessage(REASON) { StringUtils.isEmpty(it.string) }
@@ -140,7 +172,7 @@ object StashCompact {
                 if (config.hideDuplicateWarning.enabled && lastMessage == currentMessage) return@matchMatcher
             }
 
-            currentMessage.sendCompactedStashMessage()
+            currentMessage.sendCompactedStashMessage(currentType)
         }
 
         if (!config.hideAddedMessages) return
@@ -150,9 +182,7 @@ object StashCompact {
         }
     }
 
-    private fun StashMessage.sendCompactedStashMessage() {
-        val currentType = currentType ?: return
-
+    private fun StashMessage.sendCompactedStashMessage(currentType: StashType) {
         val typeNameFormat = StringUtils.pluralize(materialCount, currentType.displayName)
         val (mainColor, accentColor) = currentType.colorCodePair
 
@@ -160,10 +190,11 @@ object StashCompact {
             ", ${mainColor}totalling $accentColor$it ${StringUtils.pluralize(it, "type")}$mainColor"
         }.orEmpty()
         val action = if (config.useViewStash) "view" else "pickup"
+        val almostFullExtra = if (isAlmostFull) " §c§lWarning: anything stashed past 720 will be deleted!" else ""
 
         ChatUtils.clickableChat(
             "${mainColor}You have $accentColor${materialCount.shortFormat()} $mainColor$typeNameFormat in stash$typeStringExtra. " +
-                "${mainColor}Click to $accentColor$action ${mainColor}your stash!",
+                "${mainColor}Click to $accentColor$action ${mainColor}your stash!$almostFullExtra",
             onClick = {
                 if (config.useViewStash) HypixelCommands.viewStash(type)
                 else HypixelCommands.pickupStash()
