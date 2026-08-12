@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
+import at.hannibal2.skyhanni.utils.HolographicEntities.HolographicEntity
 import at.hannibal2.skyhanni.utils.HolographicEntities.renderHolographicEntity
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -27,6 +28,7 @@ import com.google.gson.annotations.Expose
 import com.mojang.authlib.GameProfile
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.renderer.entity.state.AvatarRenderState
+import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.player.PlayerModelPart
 import java.util.UUID
@@ -40,7 +42,7 @@ object DungeonReplay {
     private var recording: RecordingData? = null
     private var playing: PlayingData? = null
 
-    private var holographicPlayer: HolographicEntities.HolographicEntity<AbstractClientPlayer>? = null
+    private var holographicPlayer: HolographicEntity<AbstractClientPlayer>? = null
 
     private val currentFloor: DungeonFloorWithBoss?
         get() {
@@ -59,8 +61,7 @@ object DungeonReplay {
                     if (recording == null) {
                         ChatUtils.chat("start recording for m7")
                         startRecording(DungeonFloorWithBoss.M7)
-                    }
-                    else {
+                    } else {
                         ChatUtils.chat("stop recording for m7")
                         stopRecording()
                     }
@@ -119,9 +120,12 @@ object DungeonReplay {
         val yaw = player.rotationVector.y
         val heldItemID = player.activeItem.getInternalNameOrNull()
         val pose = player.pose
-        val modelFeatures = PlayerModelPart.entries.filter { modelPart -> player.isModelPartShown(modelPart) }.map { PlayerModelFeature.fromName(it.name) }.toSet()
+        val modelFeatures = PlayerModelPart.entries
+            .filter { modelPart -> player.isModelPartShown(modelPart) }
+            .map { PlayerModelFeature.fromName(it.name) }.toSet()
 
-        val previousPosition = RecordedPositionDelta.getComplete(recording.positionList, recording.positionList.size - 1)
+        val previousPosition =
+            RecordedPositionDelta.getComplete(recording.positionList, recording.positionList.size - 1)
         val newPosition = RecordedPositionDelta(
             position.takeIf { it != previousPosition.position },
             yaw.takeIf { it != previousPosition.yaw },
@@ -214,9 +218,32 @@ object DungeonReplay {
         event.renderHolographicEntity(
             holographicPlayer ?: return,
             config.opacity / 100f,
-            recordedPosition.heldItemID?.getItemStackOrNull() ?: SafeItemStack.EMPTY,
-            pose = recordedPosition.pose,
-            modelFeatures = recordedPosition.modelFeatures,
+            recordedPosition,
+        )
+    }
+
+    private fun SkyHanniRenderWorldEvent.renderHolographicEntity(
+        holographicEntity: HolographicEntity<AbstractClientPlayer>,
+        opacity: Float = 0.3f,
+        recordedPosition: RecordedPosition,
+    ) {
+        val heldItem = recordedPosition.heldItemID?.getItemStackOrNull() ?: SafeItemStack.EMPTY
+        val pose = recordedPosition.pose
+        val modelFeatures = recordedPosition.modelFeatures
+
+        this.renderHolographicEntity(
+            holographicEntity, opacity,
+            preExtractHook = { entity ->
+                entity.setItemInHand(InteractionHand.MAIN_HAND, heldItem)
+                entity.pose = pose
+            },
+            postExtractHook = { entityRenderState ->
+                if (entityRenderState is AvatarRenderState) {
+                    modelFeatures.forEach {
+                        it.property.set(entityRenderState, true)
+                    }
+                }
+            },
         )
     }
 
@@ -234,7 +261,7 @@ object DungeonReplay {
 
     data class PlayingData(
         val replay: DungeonGhostData,
-        val holographicPlayer: HolographicEntities.HolographicEntity<AbstractClientPlayer>,
+        val holographicPlayer: HolographicEntity<AbstractClientPlayer>,
     ) {
         var currentTick = 0
             set(value) {

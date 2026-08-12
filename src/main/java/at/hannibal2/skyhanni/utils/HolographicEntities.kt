@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.dungeon.replay.PlayerModelFeature
 import at.hannibal2.skyhanni.mixins.hooks.activeHolographicEntities
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -19,15 +18,12 @@ import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.entity.EntityRenderer
-import net.minecraft.client.renderer.entity.state.AvatarRenderState
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.monster.zombie.Zombie
 import kotlin.math.cos
 import kotlin.math.sin
@@ -116,6 +112,8 @@ object HolographicEntities {
             }
             this.position = position
             this.yaw = yaw
+
+            this.entity.updateWalkAnimation(this.position.distance(this.lastPosition).toFloat())
         }
 
         fun interpolatedPosition(partialTicks: Float): LorenzVec =
@@ -232,30 +230,5 @@ object HolographicEntities {
         } finally {
             activeHolographicEntities.remove(entity)
         }
-    }
-
-
-    fun SkyHanniRenderWorldEvent.renderHolographicEntity(
-        holographicEntity: HolographicEntity<AbstractClientPlayer>,
-        opacity: Float = 0.3f,
-        heldItem: SafeItemStack = SafeItemStack.EMPTY,
-        mainHand: InteractionHand = InteractionHand.MAIN_HAND,
-        pose: Pose = Pose.STANDING,
-        modelFeatures: Set<PlayerModelFeature> = setOf(),
-    ) {
-        this.renderHolographicEntity(
-            holographicEntity, opacity,
-            preExtractHook = { entity ->
-                entity.setItemInHand(mainHand, heldItem)
-                entity.pose = pose
-            },
-            postExtractHook = { entityRenderState ->
-                if (entityRenderState is AvatarRenderState) {
-                    modelFeatures.forEach {
-                        it.property.set(entityRenderState, true)
-                    }
-                }
-            },
-        )
     }
 }
