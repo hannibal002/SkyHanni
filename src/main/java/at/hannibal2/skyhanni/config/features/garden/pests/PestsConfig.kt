@@ -67,7 +67,7 @@ class PestsConfig {
     @ConfigOption(
         name = "Mute Vacuum",
         desc = "Mute the pest vacuum when using its right click ability. " +
-            "This works on any island with pests, not just the garden.",
+            "This works on any island with pests, not just the Garden.",
     )
     @ConfigEditorBoolean
     @SearchTag("torrhus canyon")
