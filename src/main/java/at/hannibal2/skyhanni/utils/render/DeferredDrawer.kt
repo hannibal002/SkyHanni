@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -66,7 +67,6 @@ object DeferredDrawer {
         strings.forEach { string ->
             event.drawString(
                 string.location,
-                string.text,
                 string.component,
                 seeThroughBlocks = !string.depth,
                 string.color,
@@ -117,10 +117,7 @@ object DeferredDrawer {
         yOffset: Float,
         backgroundColor: Int,
         depth: Boolean,
-    ) {
-        val deferredString = DeferredString(location, text, null, color, scale, shadow, yOffset, backgroundColor, depth)
-        strings.add(deferredString)
-    }
+    ) = deferString(location, text.asComponent(), color, scale, shadow, yOffset, backgroundColor, depth)
 
     fun deferString(
         location: LorenzVec,
@@ -132,7 +129,7 @@ object DeferredDrawer {
         backgroundColor: Int,
         depth: Boolean,
     ) {
-        val deferredString = DeferredString(location, null, component, color, scale, shadow, yOffset, backgroundColor, depth)
+        val deferredString = DeferredString(location, component, color, scale, shadow, yOffset, backgroundColor, depth)
         strings.add(deferredString)
     }
 
@@ -151,8 +148,7 @@ object DeferredDrawer {
 
     data class DeferredString(
         val location: LorenzVec,
-        val text: String?,
-        val component: Component?,
+        val component: Component,
         val color: Color?,
         val scale: Double,
         val shadow: Boolean,
@@ -160,5 +156,4 @@ object DeferredDrawer {
         val backgroundColor: Int,
         val depth: Boolean,
     )
-
 }

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.compat.deceased
@@ -283,12 +284,12 @@ object WorldRenderUtils {
          * Positive values move text up on screen, independent of camera angle.
          */
         yOffset: Float = 0f,
-        backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
+        backgroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) {
         if (text != null) {
-            drawString(location, text, seeThroughBlocks, color, scale, shadow, yOffset, backGroundColor)
+            drawString(location, text, seeThroughBlocks, color, scale, shadow, yOffset, backgroundColor)
         } else if (component != null) {
-            drawString(location, component, seeThroughBlocks, color, scale, shadow, yOffset, backGroundColor)
+            drawString(location, component, seeThroughBlocks, color, scale, shadow, yOffset, backgroundColor)
         } else {
             ErrorManager.skyHanniError("Both string and Component are null")
         }
@@ -301,96 +302,9 @@ object WorldRenderUtils {
         color: Color? = null,
         scale: Double = 0.53333333,
         shadow: Boolean = false,
-        /**
-         * Screen-space vertical offset applied after camera-facing rotation.
-         * Positive values move text up on screen, independent of camera angle.
-         */
         yOffset: Float = 0f,
-        backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
-    ) {
-        if (this.isCurrentlyDeferring) {
-            DeferredDrawer.deferString(
-                location,
-                text,
-                color,
-                scale,
-                shadow,
-                yOffset,
-                backGroundColor,
-                !seeThroughBlocks,
-            )
-            return
-        }
-
-        val cameraPos = camera.position
-        val fr = Minecraft.getInstance().font
-        val adjustedScale = (scale * 0.05).toFloat()
-        val x = -fr.width(text) / 2f
-
-        //? if >= 26.2 {
-        matrices.pushPose()
-        matrices.translate(
-            (location.x - cameraPos.x()).toFloat(),
-            (location.y - cameraPos.y()).toFloat(),
-            (location.z - cameraPos.z()).toFloat(),
-        )
-        matrices.mulPose(camera.rotation())
-        matrices.translate(0f, -yOffset * adjustedScale, 0f)
-        matrices.scale(adjustedScale, -adjustedScale, adjustedScale)
-        submitOrderedText(
-            x,
-            0f,
-            Component.literal(text).visualOrderText,
-            shadow,
-            if (seeThroughBlocks) SEE_THROUGH else POLYGON_OFFSET,
-            15728880,
-            color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-            backGroundColor,
-            0,
-        )
-        matrices.popPose()
-        //?} else {
-        /*val matrix = Matrix4f()
-        matrix.translate(
-            (location.x - cameraPos.x()).toFloat(),
-            (location.y - cameraPos.y()).toFloat(),
-            (location.z - cameraPos.z()).toFloat(),
-        ).rotate(camera.rotation())
-            .translate(0f, -yOffset * adjustedScale, 0f)
-            .scale(adjustedScale, -adjustedScale, adjustedScale)
-
-        if (seeThroughBlocks) {
-            deferredSeeThroughText.add { bufferSource ->
-                fr.drawInBatch(
-                    text,
-                    x,
-                    0f,
-                    color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-                    shadow,
-                    matrix,
-                    bufferSource,
-                    SEE_THROUGH,
-                    backGroundColor,
-                    FULL_BRIGHT,
-                )
-            }
-            return
-        }
-
-        fr.drawInBatch(
-            text,
-            x,
-            0f,
-            color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-            shadow,
-            matrix,
-            bufferSource,
-            if (seeThroughBlocks) SEE_THROUGH else POLYGON_OFFSET,
-            backGroundColor,
-            FULL_BRIGHT,
-        )
-        *///?}
-    }
+        backgroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
+    ) = drawString(location, text.asComponent(), seeThroughBlocks, color, scale, shadow, yOffset, backgroundColor)
 
     fun SkyHanniRenderWorldEvent.drawString(
         location: LorenzVec,
@@ -404,7 +318,7 @@ object WorldRenderUtils {
          * Positive values move text up on screen, independent of camera angle.
          */
         yOffset: Float = 0f,
-        backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
+        backgroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) {
         if (this.isCurrentlyDeferring) {
             DeferredDrawer.deferString(
@@ -414,7 +328,7 @@ object WorldRenderUtils {
                 scale,
                 shadow,
                 yOffset,
-                backGroundColor,
+                backgroundColor,
                 !seeThroughBlocks,
             )
             return
@@ -443,7 +357,7 @@ object WorldRenderUtils {
             if (seeThroughBlocks) SEE_THROUGH else POLYGON_OFFSET,
             15728880,
             color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-            backGroundColor,
+            backgroundColor,
             0,
         )
         matrices.popPose()
@@ -468,7 +382,7 @@ object WorldRenderUtils {
                     matrix,
                     bufferSource,
                     SEE_THROUGH,
-                    backGroundColor,
+                    backgroundColor,
                     FULL_BRIGHT,
                 )
             }
@@ -484,7 +398,7 @@ object WorldRenderUtils {
             matrix,
             bufferSource,
             if (seeThroughBlocks) SEE_THROUGH else POLYGON_OFFSET,
-            backGroundColor,
+            backgroundColor,
             FULL_BRIGHT,
         )
         *///?}
@@ -761,53 +675,23 @@ object WorldRenderUtils {
         location: LorenzVec,
         text: String,
         scaleMultiplier: Double,
-        /**
-         * Screen-space vertical offset applied after camera-facing rotation.
-         * Positive values move text up on screen, independent of camera angle.
-         */
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
         smallestViewDistance: Double = 5.0,
         seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
-    ) {
-        val (viewerX, viewerY, viewerZ) = getViewerPos()
-
-        val x = location.x
-        val y = location.y
-        val z = location.z
-
-        val player = MinecraftCompat.localPlayerOrNull ?: return
-        val eyeHeight = player.getEyeHeight(player.pose)
-
-        val dX = (x - viewerX) * (x - viewerX)
-        val dY = (y - (viewerY + eyeHeight)) * (y - (viewerY + eyeHeight))
-        val dZ = (z - viewerZ) * (z - viewerZ)
-        val distToPlayerSq = dX + dY + dZ
-        var distToPlayer = sqrt(distToPlayerSq)
-        // TODO this is optional maybe?
-        distToPlayer = distToPlayer.coerceAtLeast(smallestViewDistance)
-
-        if (distToPlayer < hideTooCloseAt) return
-        maxDistance?.let {
-            if (!seeThroughBlocks && distToPlayer > it) return
-        }
-
-        val distRender = distToPlayer.coerceAtMost(50.0)
-
-        var scale = distRender / 12
-        scale *= scaleMultiplier
-
-        val resultX = viewerX + (x + 0.5 - viewerX) / (distToPlayer / distRender)
-        val resultY = if (ignoreY) y * distToPlayer / distRender else viewerY + eyeHeight +
-            (y + 20 * distToPlayer / 300 - (viewerY + eyeHeight)) / (distToPlayer / distRender)
-        val resultZ = viewerZ + (z + 0.5 - viewerZ) / (distToPlayer / distRender)
-
-        val renderLocation = LorenzVec(resultX, resultY, resultZ)
-
-        drawString(renderLocation, "§f$text", seeThroughBlocks, null, scale, true, yOff, 0)
-    }
+    ) = drawDynamicText(
+        location,
+        text.asComponent(),
+        scaleMultiplier,
+        yOff,
+        hideTooCloseAt,
+        smallestViewDistance,
+        seeThroughBlocks,
+        ignoreY,
+        maxDistance,
+    )
 
     fun SkyHanniRenderWorldEvent.drawDynamicText(
         location: LorenzVec,
@@ -1138,22 +1022,20 @@ object WorldRenderUtils {
         k: Float,
         l: Float,
         m: Float,
-    ) {
-        addChainedFilledBoxVertices(
-            matrices,
-            vertexConsumer,
-            d.toFloat(),
-            e.toFloat(),
-            f.toFloat(),
-            g.toFloat(),
-            h.toFloat(),
-            i.toFloat(),
-            j,
-            k,
-            l,
-            m,
-        )
-    }
+    ) = addChainedFilledBoxVertices(
+        matrices,
+        vertexConsumer,
+        d.toFloat(),
+        e.toFloat(),
+        f.toFloat(),
+        g.toFloat(),
+        h.toFloat(),
+        i.toFloat(),
+        j,
+        k,
+        l,
+        m,
+    )
 
     private fun addChainedFilledBoxVertices(
         matrices: PoseStack,
