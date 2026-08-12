@@ -4,13 +4,14 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.submitCustomGeometry
 import net.minecraft.world.phys.AABB
 import java.awt.Color
 
 //? if >= 26.2 {
 import net.minecraft.client.renderer.gizmos.DrawableGizmoPrimitives
-//?}
+//?} else {
+/*import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.submitCustomGeometry
+*///?}
 
 class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent, val lineWidth: Int, val depth: Boolean) {
 

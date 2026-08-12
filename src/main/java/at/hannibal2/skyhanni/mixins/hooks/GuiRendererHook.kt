@@ -28,7 +28,7 @@ import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 *///?}
 
 object GuiRendererHook {
-    private var chromaUniform = SkyHanniChromaUniform()
+    private val chromaUniform = SkyHanniChromaUniform()
     var chromaBufferSlice: GpuBufferSlice? = null
 
     fun computeChromaBufferSlice() {
