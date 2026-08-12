@@ -766,9 +766,7 @@ object ItemUtils {
         if (this == NeuInternalName.WISP_POTION) {
             return "§fWisp's Ice-Flavored Water"
         }
-        if (this == NeuInternalName.SKYBLOCK_COIN) {
-            return "§6Coins"
-        }
+        SkyblockCurrency.getByInternalNameOrNull(this)?.let { return it.displayName }
         if (this == NeuInternalName.NONE) {
             error("NEUInternalName.NONE has no name!")
         }
