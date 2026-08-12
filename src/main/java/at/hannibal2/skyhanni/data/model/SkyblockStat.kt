@@ -36,120 +36,172 @@ enum class SkyblockStat(
     private val hypixelId: String? = null,
     generatePatterns: Boolean = true,
 ) {
-    DAMAGE(RED, '\uE050', generatePatterns = false), // weapon only
+    DAMAGE(RED, SkyblockIcon.DAMAGE, generatePatterns = false), // weapon only
 
     // <editor-fold desc="Combat Stats">
-    HEALTH(RED, '\uE010'), // TODO get from action bar
-    DEFENSE(GREEN, '\uE008'), // TODO get from action bar
-    TRUE_DEFENSE(WHITE, '\uE027'),
-    STRENGTH(RED, '\uE00D'),
-    CRIT_CHANCE(DARK_BLUE, '\uE02C', hypixelId = "CRITICAL_CHANCE"),
-    CRIT_DAMAGE(DARK_BLUE, '\uE007', hypixelId = "CRITICAL_DAMAGE"),
-    BONUS_ATTACK_SPEED(YELLOW, '\uE001', displayName = "Attack Speed", hypixelId = "ATTACK_SPEED"),
-    FEROCITY(RED, '\uE00B'),
-    SWING_RANGE(YELLOW, '\uE024'),
-    INTELLIGENCE(AQUA, '\uE003'), // TODO get from action bar
-    ABILITY_DAMAGE(RED, '\uE002', hypixelId = "ABILITY_DAMAGE_PERCENT"),
-    HEALTH_REGEN(RED, '\uE011', hypixelId = "HEALTH_REGENERATION"),
-    VITALITY(DARK_RED, '\uE028'), // TODO get from action bar
-    MENDING(GREEN, '\uE014'),
+    HEALTH(RED, SkyblockIcon.HEALTH), // TODO get from action bar
+    DEFENSE(GREEN, SkyblockIcon.DEFENSE), // TODO get from action bar
+    TRUE_DEFENSE(WHITE, SkyblockIcon.TRUE_DEFENSE),
+    STRENGTH(RED, SkyblockIcon.STRENGTH),
+    CRIT_CHANCE(
+        DARK_BLUE,
+        SkyblockIcon.CRIT_CHANCE,
+        hypixelId = "CRITICAL_CHANCE",
+    ),
+    CRIT_DAMAGE(
+        DARK_BLUE,
+        SkyblockIcon.CRIT_DAMAGE,
+        hypixelId = "CRITICAL_DAMAGE",
+    ),
+    BONUS_ATTACK_SPEED(
+        YELLOW,
+        SkyblockIcon.ATTACK_SPEED,
+        displayName = "Attack Speed",
+        hypixelId = "ATTACK_SPEED",
+    ),
+    FEROCITY(RED, SkyblockIcon.FEROCITY),
+    SWING_RANGE(YELLOW, SkyblockIcon.SWING_RANGE),
+    INTELLIGENCE(AQUA, SkyblockIcon.INTELLIGENCE), // TODO get from action bar
+    ABILITY_DAMAGE(
+        RED,
+        SkyblockIcon.ABILITY_DAMAGE,
+        hypixelId = "ABILITY_DAMAGE_PERCENT",
+    ),
+    HEALTH_REGEN(
+        RED,
+        SkyblockIcon.HEALTH_REGEN,
+        hypixelId = "HEALTH_REGENERATION",
+    ),
+    VITALITY(DARK_RED, SkyblockIcon.VITALITY), // TODO get from action bar
+    MENDING(GREEN, SkyblockIcon.MENDING),
 
     // <editor-fold desc="Mining Stats">
-    BREAKING_POWER(DARK_GREEN, '\uE005'),
-    MINING_SPEED(GOLD, '\uE015'),
-    MINING_SPREAD(YELLOW, '\uE016'),
-    GEMSTONE_SPREAD(YELLOW, '\uE00F'),
-    PRISTINE(DARK_PURPLE, '\uE01C'),
-    MINING_FORTUNE(GOLD, '\uE053'),
-    ORE_FORTUNE(GOLD, '\uE053'),
-    BLOCK_FORTUNE(GOLD, '\uE053'),
-    DWARVEN_METAL_FORTUNE(GOLD, '\uE053'),
-    GEMSTONE_FORTUNE(GOLD, '\uE053'),
+    BREAKING_POWER(DARK_GREEN, SkyblockIcon.BREAKING_POWER),
+    MINING_SPEED(GOLD, SkyblockIcon.MINING_SPEED),
+    MINING_SPREAD(YELLOW, SkyblockIcon.MINING_SPREAD),
+    GEMSTONE_SPREAD(YELLOW, SkyblockIcon.GEMSTONE_SPREAD),
+    PRISTINE(DARK_PURPLE, SkyblockIcon.PRISTINE),
+    MINING_FORTUNE(GOLD, SkyblockIcon.MINING_FORTUNE),
+    ORE_FORTUNE(GOLD, SkyblockIcon.MINING_FORTUNE),
+    BLOCK_FORTUNE(GOLD, SkyblockIcon.MINING_FORTUNE),
+    DWARVEN_METAL_FORTUNE(GOLD, SkyblockIcon.MINING_FORTUNE),
+    GEMSTONE_FORTUNE(GOLD, SkyblockIcon.MINING_FORTUNE),
     // </editor-fold>
 
     // <editor-fold desc="Farming Stats">
-    BONUS_PEST_CHANCE(DARK_GREEN, '\uE019'),
-    OVERBLOOM(YELLOW, '\uE02B'),
-    FARMING_FORTUNE(GOLD, '\uE051'),
-    WHEAT_FORTUNE(GOLD, '\uE051'),
-    CARROT_FORTUNE(GOLD, '\uE051'),
-    POTATO_FORTUNE(GOLD, '\uE051'),
-    PUMPKIN_FORTUNE(GOLD, '\uE051'),
-    SUGAR_CANE_FORTUNE(GOLD, '\uE051'),
-    MELON_FORTUNE(GOLD, '\uE051', displayName = "Melon Slice Fortune"),
-    CACTUS_FORTUNE(GOLD, '\uE051'),
-    COCOA_BEANS_FORTUNE(GOLD, '\uE051'),
-    MUSHROOM_FORTUNE(GOLD, '\uE051'),
-    NETHER_STALK_FORTUNE(GOLD, '\uE051', displayName = "Nether Wart Fortune"),
-    SUNFLOWER_FORTUNE(GOLD, '\uE051'),
-    MOONFLOWER_FORTUNE(GOLD, '\uE051'),
-    WILD_ROSE_FORTUNE(GOLD, '\uE051'),
+    BONUS_PEST_CHANCE(DARK_GREEN, SkyblockIcon.BONUS_PEST_CHANCE),
+    OVERBLOOM(YELLOW, SkyblockIcon.OVERBLOOM),
+    FARMING_FORTUNE(GOLD, SkyblockIcon.FARMING_FORTUNE),
+    WHEAT_FORTUNE(GOLD, SkyblockIcon.FARMING_FORTUNE),
+    CARROT_FORTUNE(GOLD, SkyblockIcon.FARMING_FORTUNE),
+    POTATO_FORTUNE(GOLD, SkyblockIcon.FARMING_FORTUNE),
+    PUMPKIN_FORTUNE(GOLD, SkyblockIcon.FARMING_FORTUNE),
+    SUGAR_CANE_FORTUNE(GOLD, SkyblockIcon.FARMING_FORTUNE),
+    MELON_FORTUNE(
+        GOLD,
+        SkyblockIcon.FARMING_FORTUNE,
+        displayName = "Melon Slice Fortune",
+    ),
+    CACTUS_FORTUNE(GOLD, SkyblockIcon.FARMING_FORTUNE),
+    COCOA_BEANS_FORTUNE(GOLD, SkyblockIcon.FARMING_FORTUNE),
+    MUSHROOM_FORTUNE(GOLD, SkyblockIcon.FARMING_FORTUNE),
+    NETHER_STALK_FORTUNE(
+        GOLD,
+        SkyblockIcon.FARMING_FORTUNE,
+        displayName = "Nether Wart Fortune",
+    ),
+    SUNFLOWER_FORTUNE(GOLD, SkyblockIcon.FARMING_FORTUNE),
+    MOONFLOWER_FORTUNE(GOLD, SkyblockIcon.FARMING_FORTUNE),
+    WILD_ROSE_FORTUNE(GOLD, SkyblockIcon.FARMING_FORTUNE),
     // </editor-fold>
 
     // <editor-fold desc="Foraging Stats">
-    SWEEP(DARK_GREEN, '\uE023'),
-    FORAGING_FORTUNE(GOLD, '\uE054'),
-    FIG_FORTUNE(GOLD, '\uE054'),
-    MANGROVE_FORTUNE(GOLD, '\uE054'),
-    HELIX_FORTUNE(GOLD, '\uE054'),
+    SWEEP(DARK_GREEN, SkyblockIcon.SWEEP),
+    FORAGING_FORTUNE(GOLD, SkyblockIcon.FORAGING_FORTUNE),
+    FIG_FORTUNE(GOLD, SkyblockIcon.FORAGING_FORTUNE),
+    MANGROVE_FORTUNE(GOLD, SkyblockIcon.FORAGING_FORTUNE),
+    HELIX_FORTUNE(GOLD, SkyblockIcon.FORAGING_FORTUNE),
     // </editor-fold>
 
     // <editor-fold desc="Fishing Stats">
-    FISHING_SPEED(AQUA, '\uE00C'),
-    SEA_CREATURE_CHANCE(DARK_AQUA, '\uE021'),
-    DOUBLE_HOOK_CHANCE(BLUE, '\uE009'),
-    TROPHY_FISH_CHANCE(GOLD, '\uE02A', displayName = "Trophy Chance"),
-    TREASURE_CHANCE(GOLD, '\uE025'),
-
+    FISHING_SPEED(AQUA, SkyblockIcon.FISHING_SPEED),
+    SEA_CREATURE_CHANCE(DARK_AQUA, SkyblockIcon.SEA_CREATURE_CHANCE),
+    DOUBLE_HOOK_CHANCE(BLUE, SkyblockIcon.DOUBLE_HOOK_CHANCE),
+    TROPHY_FISH_CHANCE(
+        GOLD,
+        SkyblockIcon.TROPHY_FISH_CHANCE,
+        displayName = "Trophy Chance",
+    ),
+    TREASURE_CHANCE(GOLD, SkyblockIcon.TREASURE_CHANCE),
     // </editor-fold>
 
     // <editor-fold desc="Miscellaneous Stats">
     // TODO get from Minecraft walk speed attribute (500+ Speed works fine now)
-    SPEED(WHITE, '\uE022', hypixelId = "WALK_SPEED"),
-    MAGIC_FIND(AQUA, '\uE01A'),
-    PET_LUCK(LIGHT_PURPLE, '\uE013'),
-    HEAT_RESISTANCE(RED, '\uE012'),
-    COLD_RESISTANCE(AQUA, '\uE006'),
-    RESPIRATION(DARK_AQUA, '\uE01D'),
-    PRESSURE_RESISTANCE(BLUE, '\uE01B'),
-    FEAR(DARK_PURPLE, '\uE00A'),
-    TRACKING(LIGHT_PURPLE, '\uE077'),
+    SPEED(WHITE, SkyblockIcon.SPEED, hypixelId = "WALK_SPEED"),
+    MAGIC_FIND(AQUA, SkyblockIcon.MAGIC_FIND),
+    PET_LUCK(LIGHT_PURPLE, SkyblockIcon.PET_LUCK),
+    HEAT_RESISTANCE(RED, SkyblockIcon.HEAT_RESISTANCE),
+    COLD_RESISTANCE(AQUA, SkyblockIcon.COLD_RESISTANCE),
+    RESPIRATION(DARK_AQUA, SkyblockIcon.RESPIRATION),
+    PRESSURE_RESISTANCE(BLUE, SkyblockIcon.PRESSURE_RESISTANCE),
+    FEAR(DARK_PURPLE, SkyblockIcon.FEAR),
+    TRACKING(LIGHT_PURPLE, SkyblockIcon.TRACKING),
     // </editor-fold>
 
     // <editor-fold desc="Hunting Stats">
-    PULL(AQUA, '\uE02D'),
-    HUNTING_FORTUNE(LIGHT_PURPLE, '\uE05B'),
-    CHARM_CHANCE(AQUA, '❣'),
+    PULL(AQUA, SkyblockIcon.PULL),
+    HUNTING_FORTUNE(LIGHT_PURPLE, SkyblockIcon.HUNTING_FORTUNE),
+    CHARM_CHANCE(AQUA, SkyblockIcon.CHARM_CHANCE),
     // </editor-fold>
 
     // <editor-fold desc="Wisdom Stats">
-    COMBAT_WISDOM(DARK_AQUA, '☯'),
-    FARMING_WISDOM(DARK_AQUA, '☯'),
-    FISHING_WISDOM(DARK_AQUA, '☯'),
-    MINING_WISDOM(DARK_AQUA, '☯'),
-    FORAGING_WISDOM(DARK_AQUA, '☯'),
-    ENCHANTING_WISDOM(DARK_AQUA, '☯'),
-    ALCHEMY_WISDOM(DARK_AQUA, '☯'),
-    CARPENTRY_WISDOM(DARK_AQUA, '☯'),
-    RUNECRAFTING_WISDOM(DARK_AQUA, '☯'),
-    TAMING_WISDOM(DARK_AQUA, '☯'),
-    SOCIAL_WISDOM(DARK_AQUA, '☯'),
-    HUNTING_WISDOM(DARK_AQUA, '☯'),
+    COMBAT_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
+    FARMING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
+    FISHING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
+    MINING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
+    FORAGING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
+    ENCHANTING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
+    ALCHEMY_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
+    CARPENTRY_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
+    RUNECRAFTING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
+    TAMING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
+    SOCIAL_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
+    HUNTING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
     // </editor-fold>
 
     // <editor-fold desc="Rift Stats">
-    RIFT_TIME(GREEN, '\uE020'),
-    RIFT_DAMAGE(DARK_PURPLE, '\uE01E'),
+    RIFT_TIME(GREEN, SkyblockIcon.RIFT_TIME),
+    RIFT_DAMAGE(DARK_PURPLE, SkyblockIcon.RIFT_DAMAGE),
+
     // TODO get from Minecraft walk speed attribute
-    RIFT_SPEED(WHITE, '\uE022', displayName = "Speed", hypixelId = "RIFT_WALK_SPEED"),
-    RIFT_INTELLIGENCE(AQUA, '\uE003', displayName = "Intelligence"),
+    RIFT_SPEED(
+        WHITE,
+        SkyblockIcon.SPEED,
+        displayName = "Speed",
+        hypixelId = "RIFT_WALK_SPEED",
+    ),
+    RIFT_INTELLIGENCE(
+        AQUA,
+        SkyblockIcon.INTELLIGENCE,
+        displayName = "Intelligence",
+    ),
+
     // MAGIC_FIND is just the overworld stat
-    MANA_REGEN(AQUA, '\uE004'),
-    HEARTS(RED, '\uE01F'),
+    MANA_REGEN(AQUA, SkyblockIcon.MANA_REGEN),
+    HEARTS(RED, SkyblockIcon.HEARTS),
     // </editor-fold>
 
     UNKNOWN(GRAY, '?', generatePatterns = false),
     ;
+
+    constructor(
+        color: LorenzColor,
+        hypixelIcon: SkyblockIcon,
+        displayName: String? = null,
+        hypixelId: String? = null,
+        generatePatterns: Boolean = true,
+    ) :
+        this(color, hypixelIcon.icon, displayName, hypixelId, generatePatterns)
 
     val displayName: String = displayName ?: toFormattedName()
 
