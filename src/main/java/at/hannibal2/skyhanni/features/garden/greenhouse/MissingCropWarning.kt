@@ -9,10 +9,12 @@ import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
@@ -22,10 +24,15 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 
 @SkyHanniModule
@@ -36,16 +43,14 @@ object MissingCropWarning {
 
     private var previousScan: Set<CropCategory>? = null
     private var stableScanCount = 0
-    private var lastReportedMissing: Set<CropCategory>? = null
+    private val detectedCropsByVisitedPlot = mutableMapOf<Int, Set<CropCategory>>()
+    private var checklistDisplay: Renderable? = null
+    private var checklistVisible = true
     private var pendingDiagnostic: Pair<CropCategory, LorenzVec>? = null
     private var lastTargetedCrop: Pair<CropCategory, LorenzVec>? = null
     private var lastTargetedPosition: LorenzVec? = null
     private var missingCropWaypointsPlotId: Int? = null
     private var missingCropWaypoints: Map<CropCategory, LorenzVec> = emptyMap()
-    private val previousRememberedMissingByPlot = mutableMapOf<Int, Set<CropCategory>>()
-    private val stableRememberedChecksByPlot = mutableMapOf<Int, Int>()
-    private val lastReportedRememberedMissingByPlot = mutableMapOf<Int, Set<CropCategory>>()
-    private val announcedCompletePlots = mutableSetOf<Int>()
     private var lastProcessedPlotId: Int? = null
     private var checkerRunCount = 0
     private val replacementPrompts = mutableMapOf<CropCategory, CropReplacement>()
@@ -55,6 +60,12 @@ object MissingCropWarning {
         // Diagnostics can be used before the tab-list profile name has initialized. Flush anything
         // collected in that window as soon as profile-specific storage becomes available.
         cropStorage.syncRuntimeData()
+    }
+
+    @HandleEvent(WorldChangeEvent::class)
+    private fun onWorldChange() {
+        clearChecklistSession()
+        reset()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -94,10 +105,9 @@ object MissingCropWarning {
             val mutationCategory = targeted?.first
                 ?: lastTargetedPosition?.getBlockStateAt()?.block?.let(CropCategory::fromBlock)
             if (mutationCategory != null) {
-                cropStorage.rememberMutationCropCategory(plotId, mutationCategory)
                 ChatUtils.chat(
                     "§eIgnored decorative ${mutationCategory.displayName} blocks in this mutation. " +
-                        "§7Use Crop Diagnostics on the real crop to save it.",
+                        "§7Detected mutation footprints are excluded from the 10x10 crop scan.",
                 )
             }
             clearTargetedCrop()
@@ -165,19 +175,15 @@ object MissingCropWarning {
         preparePlotScan(plot.id)
         missingCropWaypointsPlotId = plot.id
         missingCropWaypoints = emptyMap()
+        if (!GreenhouseGridScanner.isLoaded(plot)) return
 
+        val outOfGridDetectedCrops = cropStorage.detectedCropPositionsByPlot()[plot.id].orEmpty()
+            .filterValues { !GreenhouseGridScanner.isInsideGrid(plot, it) }
+            .keys
+        cropStorage.removeDetectedCropPositions(plot.id, outOfGridDetectedCrops)
         val allRememberedPositions = cropStorage.rememberedCropPositions()
-        val allRememberedCategories = allRememberedPositions.values.flatMapTo(mutableSetOf()) { it.keys }
         val rawScannedPositions = GreenhouseCropScanner.scanGreenhousePositions(plot)
-            .filterKeys { it !in cropStorage.mutationCropCategoriesByPlot()[plot.id].orEmpty() }
         promptForCropReplacements(plot.id, rawScannedPositions, allRememberedPositions)
-
-        // Once every unique crop has a remembered home, those positions are authoritative. The live scan
-        // above may offer a replacement, but it must never save one until the player confirms it.
-        if (allRememberedCategories.size >= CropCategory.entries.size) {
-            validateRememberedCropsInPlot(plot.id, allRememberedPositions[plot.id].orEmpty())
-            return
-        }
 
         val scannedPositions = rawScannedPositions.filterKeys { category ->
             allRememberedPositions.none { (rememberedPlotId, positions) ->
@@ -185,21 +191,11 @@ object MissingCropWarning {
             }
         }
         val present = scannedPositions.keys - missingDiagnosedCropsOnPlot(plot.id)
+        val spotted = rawScannedPositions.keys - missingDiagnosedCropsOnPlot(plot.id)
 
-        // Positive sightings do not need stabilization. Floating display entities can fluctuate between
-        // consecutive scans, which previously prevented a complete live scan from ever being remembered.
         cropStorage.rememberDetectedCrops(plot.id, scannedPositions)
-        if (present.size >= CropCategory.entries.size) {
-            missingCropWaypoints = emptyMap()
-            lastReportedMissing = emptySet()
-            if (announcedCompletePlots.add(plot.id)) {
-                ChatUtils.chat("§aAll 12 unique Greenhouse crops are planted in Plot §e${plot.id}§a!")
-            }
-            return
-        }
-
-        if (present != previousScan) {
-            previousScan = present
+        if (spotted != previousScan) {
+            previousScan = spotted
             stableScanCount = 1
             return
         }
@@ -208,6 +204,7 @@ object MissingCropWarning {
 
         val presentNames = present.mapTo(mutableSetOf()) { it.name }
         cropStorage.updateDetectedCrops(plot.id, presentNames, scannedPositions)
+        recordStableScan(plot.id, spotted)
 
         // Only validate positions belonging to the plot the player is currently inside. Positions from a
         // neighbouring Greenhouse may also be in loaded chunks, but loading must not make them current.
@@ -215,102 +212,103 @@ object MissingCropWarning {
         val missingPositions = rememberedPositions[plot.id].orEmpty().filter { (category, position) ->
             position.isInLoadedChunk() && GreenhouseCropScanner.isMissingCrop(position, category)
         }
-        val missing = missingPositions.keys
         missingCropWaypoints = missingPositions
-        if (missing == lastReportedMissing) return
-        lastReportedMissing = missing
-
-        if (missing.isEmpty() && rememberedPositions.values.sumOf { it.size } >= CropCategory.entries.size) {
-            ChatUtils.chat("§aAll 12 unique Greenhouse crops are planted!")
-        } else if (missing.isNotEmpty()) {
-            ChatUtils.chat(
-                "§cMissing Greenhouse ${if (missing.size == 1) "crop" else "crops"}: §e" +
-                    missing.joinToString("§7, §e") { it.displayName },
-            )
-        }
     }
 
     private fun preparePlotScan(plotId: Int) {
         if (lastProcessedPlotId == plotId) return
         previousScan = null
         stableScanCount = 0
-        lastReportedMissing = null
-        announcedCompletePlots.remove(plotId)
-        previousRememberedMissingByPlot.remove(plotId)
-        stableRememberedChecksByPlot.remove(plotId)
-        lastReportedRememberedMissingByPlot.remove(plotId)
         lastProcessedPlotId = plotId
     }
 
     private fun reset() {
         previousScan = null
         stableScanCount = 0
-        lastReportedMissing = null
         missingCropWaypointsPlotId = null
         missingCropWaypoints = emptyMap()
-        previousRememberedMissingByPlot.clear()
-        stableRememberedChecksByPlot.clear()
-        lastReportedRememberedMissingByPlot.clear()
-        announcedCompletePlots.clear()
         lastProcessedPlotId = null
         clearTargetedCrop()
     }
 
-    private fun validateRememberedCropsInPlot(
-        plotId: Int,
-        rememberedPositions: Map<CropCategory, LorenzVec>,
-    ) {
-        // Once every unique has a known home, never sweep unrelated plots again. Only validate the
-        // remembered XYZ entries belonging to the plot the player is currently standing in.
-        if (rememberedPositions.isEmpty()) return
-        val initiallyMissing = rememberedPositions.filter { (category, position) ->
-            position.isInLoadedChunk() && GreenhouseCropScanner.isMissingCrop(position, category)
-        }
-        val diagnosedCategories = cropStorage.diagnosedPositionsByPlot()[plotId].orEmpty().keys
-            .mapNotNullTo(mutableSetOf(), CropCategory::fromStorageName)
-        val replacements = if (initiallyMissing.isEmpty()) emptyMap() else {
-            GardenPlotApi.plots.firstOrNull { it.id == plotId }
-                ?.let(GreenhouseCropScanner::scanGreenhousePositions)
-                .orEmpty()
-                .filterKeys { it !in cropStorage.mutationCropCategoriesByPlot()[plotId].orEmpty() }
-                .filterKeys { it in initiallyMissing && it !in diagnosedCategories }
-        }
-        if (replacements.isNotEmpty()) cropStorage.saveDetectedCropPositions(plotId, replacements)
-        val missingPositions = initiallyMissing - replacements.keys
-        val missing = missingPositions.keys
-        if (previousRememberedMissingByPlot[plotId] != missing) {
-            previousRememberedMissingByPlot[plotId] = missing
-            stableRememberedChecksByPlot[plotId] = 1
+    private fun recordStableScan(plotId: Int, spotted: Set<CropCategory>) {
+        detectedCropsByVisitedPlot[plotId] = spotted
+        updateChecklistDisplay()
+    }
+
+    private fun updateChecklistDisplay() {
+        if (detectedCropsByVisitedPlot.isEmpty()) {
+            checklistDisplay = null
             return
         }
-        val stableChecks = stableRememberedChecksByPlot.getOrDefault(plotId, 0) + 1
-        stableRememberedChecksByPlot[plotId] = stableChecks
-        if (stableChecks < REQUIRED_STABLE_REMEMBERED_CHECKS) return
-
-        missingCropWaypoints = missingPositions
-        val previouslyReported = lastReportedRememberedMissingByPlot[plotId]
-        if (previouslyReported == missing) return
-        lastReportedRememberedMissingByPlot[plotId] = missing
-
-        if (missing.isEmpty()) {
-            if (announcedCompletePlots.add(plotId)) {
-                if (rememberedPositions.size >= CropCategory.entries.size) {
-                    ChatUtils.chat("§aAll 12 unique Greenhouse crops are planted in Plot §e$plotId§a!")
-                } else {
-                    ChatUtils.chat(
-                        "§aAll §e${rememberedPositions.size} §aremembered unique " +
-                            "Greenhouse crops in Plot §e$plotId §aare present!",
-                    )
-                }
+        val plotIds = checklistPlotIds()
+        val table = buildList {
+            add(
+                buildList {
+                    add(Renderable.text("§7Crop"))
+                    plotIds.forEach { plotId ->
+                        add(Renderable.text(plotId?.let { "§ePlot $it" } ?: "§8Unvisited"))
+                    }
+                },
+            )
+            CropCategory.entries.forEach { category ->
+                add(
+                    buildList {
+                        add(Renderable.text("§f${category.displayName}"))
+                        plotIds.forEach { plotId ->
+                            val spotted = plotId?.let(detectedCropsByVisitedPlot::get)
+                            val marker = when {
+                                spotted == null -> "§8—"
+                                category in spotted -> "§a✔"
+                                else -> "§c✘"
+                            }
+                            add(Renderable.text(marker))
+                        }
+                    },
+                )
             }
-            return
         }
-        announcedCompletePlots.remove(plotId)
-        ChatUtils.chat(
-            "§c${missingPositions.entries.joinToString("§7, §c") { (category, position) ->
-                "${category.displayName} §7(${position.x.toInt()}, ${position.y.toInt()}, ${position.z.toInt()})§c"
-            }} ${if (missing.size == 1) "is" else "are"} supposed to be at Greenhouse Plot §e$plotId§c.",
-        )
+        val content = buildList {
+            add(Renderable.text("§6§lGreenhouse Crop Checklist"))
+            add(
+                Renderable.text(
+                    "§7Visited: §e${detectedCropsByVisitedPlot.size}/$EXPECTED_GREENHOUSE_COUNT",
+                ),
+            )
+            add(Renderable.table(table, xSpacing = 7, ySpacing = 1))
+            add(Renderable.text(combinedMissingLine()))
+        }
+        checklistDisplay = Renderable.drawInsideDarkRect(Renderable.vertical(content, spacing = 1), padding = 4)
+    }
+
+    private fun checklistPlotIds(): List<Int?> {
+        val knownIds = GardenPlotApi.plots.asSequence()
+            .filter { it.greenhouse }
+            .map { it.id }
+            .plus(detectedCropsByVisitedPlot.keys.asSequence())
+            .distinct()
+            .sorted()
+            .toMutableList<Int?>()
+        while (knownIds.size < EXPECTED_GREENHOUSE_COUNT) knownIds.add(null)
+        return knownIds
+    }
+
+    private fun combinedMissingLine(): String {
+        if (detectedCropsByVisitedPlot.size < EXPECTED_GREENHOUSE_COUNT) {
+            return "§7Visit every Greenhouse to calculate missing crops."
+        }
+        val spotted = detectedCropsByVisitedPlot.values.flatten().toSet()
+        val missing = CropCategory.entries.toSet() - spotted
+        return if (missing.isEmpty()) {
+            "§aAll unique crops spotted across the Greenhouses."
+        } else {
+            "§cMissing: §e" + missing.joinToString("§7, §e") { it.displayName }
+        }
+    }
+
+    private fun clearChecklistSession() {
+        detectedCropsByVisitedPlot.clear()
+        checklistDisplay = null
     }
 
     private fun diagnosedPresentCrops(currentPlotId: Int?): Set<CropCategory> =
@@ -336,22 +334,6 @@ object MissingCropWarning {
             }
         }.toMap()
 
-    private fun missingRememberedCropPositionsOnPlot(plotId: Int): Map<CropCategory, LorenzVec> = buildMap {
-        val diagnosedCategories = cropStorage.diagnosedPositionsByPlot()[plotId].orEmpty().keys
-            .mapNotNullTo(mutableSetOf(), CropCategory::fromStorageName)
-        cropStorage.detectedCropPositionsByPlot()[plotId].orEmpty().forEach { (name, position) ->
-            val category = CropCategory.fromStorageName(name) ?: return@forEach
-            if (
-                category !in diagnosedCategories &&
-                position.isInLoadedChunk() &&
-                GreenhouseCropScanner.isMissingCrop(position, category)
-            ) {
-                put(category, position)
-            }
-        }
-        putAll(missingDiagnosedCropPositionsOnPlot(plotId))
-    }
-
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.missingCropWarning || !isInGreenhouse()) return
@@ -367,6 +349,13 @@ object MissingCropWarning {
         }
     }
 
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
+    private fun onRenderOverlay() {
+        if (!config.missingCropWarning || !checklistVisible) return
+        val display = checklistDisplay ?: return
+        config.cropChecklistPosition.renderRenderable(display, posLabel = "Greenhouse Crop Checklist")
+    }
+
     @HandleEvent
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shgreenhousecropdebug") {
@@ -378,6 +367,11 @@ object MissingCropWarning {
             description = "Lists the plots SkyHanni knows are Greenhouses"
             category = CommandCategory.DEVELOPER_DEBUG
             simpleCallback { showKnownGreenhousePlots() }
+        }
+        event.registerBrigadier("shgreenhousechecklist") {
+            description = "Toggles the Greenhouse crop checklist display"
+            category = CommandCategory.USERS_ACTIVE
+            simpleCallback { toggleChecklistDisplay() }
         }
         event.registerBrigadier("shuniquedetect") {
             description = "Toggles saving unique crop positions from Crop Diagnostics"
@@ -399,8 +393,14 @@ object MissingCropWarning {
     private fun resetGreenhouseCropData() {
         cropStorage.clearAll()
         replacementPrompts.clear()
+        clearChecklistSession()
         reset()
         ChatUtils.chat("§aCleared all remembered Greenhouse crop locations.")
+    }
+
+    private fun toggleChecklistDisplay() {
+        checklistVisible = !checklistVisible
+        ChatUtils.chat("§eGreenhouse crop checklist ${if (checklistVisible) "§ashown" else "§chidden"}§e.")
     }
 
     private fun clearDiagnosticCropPositions() {
@@ -462,8 +462,6 @@ object MissingCropWarning {
                 appendLine(" §7Checker runs this session: §e$checkerRunCount")
                 appendLine(" §7Live scan: §e${liveCrops.namesOrNone()}")
                 appendLine(" §7Saved crops: §e${savedCrops.namesOrNone()}")
-                val mutationCategories = cropStorage.mutationCropCategoriesByPlot()[plot?.id].orEmpty()
-                appendLine(" §7Mutation decorations: §e${mutationCategories.namesOrNone()}")
                 val allPresent = savedCrops + diagnosedPresentCrops(plot?.id)
                 appendLine(" §7Missing: §e${(CropCategory.entries.toSet() - allPresent).namesOrNone()}")
                 append(" §7Diagnosed positions: §e")
@@ -571,6 +569,6 @@ object MissingCropWarning {
     )
 
     private const val REQUIRED_STABLE_SCANS = 2
-    private const val REQUIRED_STABLE_REMEMBERED_CHECKS = 3
+    private const val EXPECTED_GREENHOUSE_COUNT = 3
     private const val MUTATION_CROP_LORE = "Mutation Crop"
 }

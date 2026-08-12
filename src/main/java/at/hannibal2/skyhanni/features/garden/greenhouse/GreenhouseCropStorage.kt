@@ -240,6 +240,22 @@ internal class GreenhouseCropStorage {
         savePendingData()
     }
 
+    fun removeDetectedCropPositions(plotId: Int, names: Set<String>) {
+        if (names.isEmpty()) return
+        var changed = false
+        listOfNotNull(
+            runtimeDetectedCropPositionsByPlot,
+            storage?.detectedCropPositionsByPlot,
+        ).forEach { positionsByPlot ->
+            val positions = positionsByPlot[plotId] ?: return@forEach
+            names.forEach { changed = positions.remove(it) != null || changed }
+        }
+        runtimeDetectedCropsByPlot[plotId]?.let { changed = it.removeAll(names) || changed }
+        storage?.detectedCropsByPlot?.get(plotId)?.let { changed = it.removeAll(names) || changed }
+        if (changed) pendingPersistentSave = true
+        savePendingData()
+    }
+
     private fun removeRememberedCategoryFromOtherPlots(name: String, plotId: Int, diagnosed: Boolean) {
         val runtime = if (diagnosed) runtimeDiagnosedPositionsByPlot else runtimeDetectedCropPositionsByPlot
         val profile = if (diagnosed) storage?.diagnosedCropPositionsByPlot else storage?.detectedCropPositionsByPlot

@@ -12,7 +12,6 @@ internal object GreenhouseLayoutCapture {
         mutations: List<GreenhouseDetectedMutation>,
     ): List<GreenHouseStorage.BlueprintCellStorage> = buildList {
         val middle = plot.middle.toBlockPos()
-        val occupiedByMutations = mutableSetOf<Pair<Int, Int>>()
         mutations.forEach { detected ->
             val anchorColumn = floor(detected.position.x).toInt() - middle.x + GRID_RADIUS
             val anchorRow = floor(detected.position.z).toInt() - middle.z + GRID_RADIUS
@@ -25,30 +24,13 @@ internal object GreenhouseLayoutCapture {
                     column = topLeftColumn,
                 ),
             )
-            repeat(detected.mutation.size) { rowOffset ->
-                repeat(detected.mutation.size) { columnOffset ->
-                    occupiedByMutations.add(topLeftRow + rowOffset to topLeftColumn + columnOffset)
-                }
-            }
         }
-        for (row in 0 until GRID_SIZE) {
-            for (column in 0 until GRID_SIZE) {
-                if (row to column in occupiedByMutations) continue
-                val position = LorenzVec(
-                    middle.x + column - GRID_RADIUS.toDouble(),
-                    CROP_Y,
-                    middle.z + row - GRID_RADIUS.toDouble(),
-                )
-                GreenhouseCropScanner.skyShardsCropIdAt(position)?.let { cropId ->
-                    add(GreenHouseStorage.BlueprintCellStorage(cropId = cropId, row = row, column = column))
-                }
-            }
+        GreenhouseGridScanner.scanCropCells(plot, mutations).forEach { cell ->
+            add(GreenHouseStorage.BlueprintCellStorage(cell.cropId, cell.row, cell.column))
         }
     }
 
-    private const val GRID_RADIUS = 5
-    private const val GRID_SIZE = GRID_RADIUS * 2
-    private const val CROP_Y = 74.0
+    private const val GRID_RADIUS = GreenhouseGridScanner.GRID_RADIUS
 }
 
 internal data class GreenhouseDetectedMutation(

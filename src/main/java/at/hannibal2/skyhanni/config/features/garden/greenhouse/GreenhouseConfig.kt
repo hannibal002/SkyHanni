@@ -19,6 +19,10 @@ class GreenhouseConfig {
     var missingCropWarning: Boolean = true
 
     @Expose
+    @ConfigLink(owner = GreenhouseConfig::class, field = "missingCropWarning")
+    val cropChecklistPosition: Position = Position(10, 80)
+
+    @Expose
     @ConfigOption(
         name = "Mutation Blueprint",
         desc = "Save and load Greenhouse layouts, then show shadows where mutations disappear. " +

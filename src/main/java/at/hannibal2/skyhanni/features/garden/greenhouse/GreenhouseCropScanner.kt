@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.garden.greenhouse
 
 import at.hannibal2.skyhanni.features.garden.plot.GardenPlot
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
-import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesInBoundingBox
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesInBox
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -20,7 +18,6 @@ import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.phys.AABB
 import kotlin.math.abs
 
 internal object GreenhouseCropScanner {
@@ -45,44 +42,12 @@ internal object GreenhouseCropScanner {
             ?.toLorenzVec()
     }
 
-    fun scanGreenhouse(plot: GardenPlot): Set<CropCategory> =
-        scanGreenhousePositions(plot).keys
+    fun scanGreenhouse(plot: GardenPlot): Set<CropCategory> = scanGreenhousePositions(plot).keys
 
-    fun scanGreenhousePositions(plot: GardenPlot): Map<CropCategory, LorenzVec> {
-        val world = MinecraftCompat.localWorldOrNull ?: return emptyMap()
-        val middle = plot.middle.toBlockPos()
-        val from = BlockPos(middle.x - SCAN_RADIUS, MIN_GARDEN_Y, middle.z - SCAN_RADIUS)
-        val to = BlockPos(middle.x + SCAN_RADIUS, MAX_GARDEN_Y, middle.z + SCAN_RADIUS)
-        return buildMap {
-            for (pos in BlockPos.betweenClosed(from, to)) {
-                val block = world.getBlockState(pos).block
-                CropCategory.fromBlock(block)?.let {
-                    if (it !in headOnlyCrops) putIfAbsent(it, pos.toLorenzVec())
-                }
-                if (size == CropCategory.entries.size) return@buildMap
-            }
-            scanFloatingCropHeads(
-                AABB(
-                    from.x.toDouble(),
-                    from.y.toDouble(),
-                    from.z.toDouble(),
-                    (to.x + 1).toDouble(),
-                    (to.y + 1).toDouble(),
-                    (to.z + 1).toDouble(),
-                ),
-            )
-        }
-    }
+    fun scanGreenhousePositions(plot: GardenPlot): Map<CropCategory, LorenzVec> =
+        GreenhouseGridScanner.scan(plot).cropPositions
 
-    fun isCompleteScanAreaLoaded(plot: GardenPlot): Boolean {
-        val middle = plot.middle
-        return listOf(
-            middle.add(x = -SCAN_RADIUS, z = -SCAN_RADIUS),
-            middle.add(x = -SCAN_RADIUS, z = SCAN_RADIUS),
-            middle.add(x = SCAN_RADIUS, z = -SCAN_RADIUS),
-            middle.add(x = SCAN_RADIUS, z = SCAN_RADIUS),
-        ).all { it.isInLoadedChunk() }
-    }
+    fun isCompleteScanAreaLoaded(plot: GardenPlot): Boolean = GreenhouseGridScanner.isLoaded(plot)
 
     fun isMissingCrop(position: LorenzVec, category: CropCategory): Boolean {
         val state = position.getBlockStateAt()
@@ -131,19 +96,6 @@ internal object GreenhouseCropScanner {
             it.itemStack.isFloatingCropHead(category)
         }.mapTo(this) { it.getLorenzVec() }
     }.minByOrNull { it.distanceSq(center) }
-
-    private fun MutableMap<CropCategory, LorenzVec>.scanFloatingCropHeads(scanArea: AABB) {
-        getEntitiesInBoundingBox<ArmorStand>(scanArea).forEach { stand ->
-            listOf(stand.getStandHelmet(), stand.getHandItem())
-                .firstNotNullOfOrNull { it.floatingCropHeadCategory() }
-                ?.let { this[it] = stand.getLorenzVec() }
-        }
-        getEntitiesInBoundingBox<Display.ItemDisplay>(scanArea).forEach { display ->
-            display.itemStack.floatingCropHeadCategory()?.let {
-                this[it] = display.getLorenzVec()
-            }
-        }
-    }
 
     /**
      * Hypixel sometimes renders Greenhouse crops such as cactus and moonflower as floating player heads.
@@ -240,9 +192,6 @@ internal object GreenhouseCropScanner {
     )
     private val playerHeadBlocks = setOf(Blocks.PLAYER_HEAD, Blocks.PLAYER_WALL_HEAD)
 
-    private const val SCAN_RADIUS = 8
-    private const val MIN_GARDEN_Y = 60
-    private const val MAX_GARDEN_Y = 100
     private const val DIAGNOSTIC_SEARCH_RADIUS = 2
     private const val VARIABLE_HEIGHT_SEARCH_RADIUS = 2
     private const val FLOATING_HEAD_SEARCH_RADIUS = 2.5
@@ -281,6 +230,22 @@ internal enum class CropCategory(
         fun fromStorageName(name: String): CropCategory? = entries.firstOrNull { it.name == name }
         fun fromDisplayName(name: String): CropCategory? = entries.firstOrNull {
             name == it.displayName || name in it.itemNames
+        }
+
+        fun fromCropId(cropId: String): CropCategory? = when (cropId.lowercase()) {
+            "wheat" -> WHEAT
+            "potato" -> POTATO
+            "carrot" -> CARROT
+            "pumpkin" -> PUMPKIN
+            "melon" -> MELON
+            "cocoa_beans" -> COCOA_BEANS
+            "sugar_cane" -> SUGAR_CANE
+            "cactus" -> CACTUS
+            "nether_wart" -> NETHER_WART
+            "red_mushroom", "brown_mushroom" -> MUSHROOM
+            "moonflower", "sunflower" -> SUNFLOWER
+            "wild_rose" -> WILD_ROSE
+            else -> null
         }
     }
 }

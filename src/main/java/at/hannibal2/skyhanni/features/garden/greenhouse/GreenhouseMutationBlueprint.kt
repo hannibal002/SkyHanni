@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.plot.GardenPlot
 import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DialogUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.createSkull
@@ -34,7 +33,6 @@ import net.minecraft.client.renderer.item.ItemStackRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.item.ItemDisplayContext
-import net.minecraft.world.phys.AABB
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.UUID
@@ -72,8 +70,8 @@ object GreenhouseMutationBlueprint {
             missingCropCells = emptySet()
             return
         }
-        val area = greenhouseArea(plot)
-        if (!area.isLoaded()) return
+        val area = GreenhouseGridScanner.area(plot)
+        if (!GreenhouseGridScanner.isLoaded(plot)) return
 
         val liveMutations = GreenhouseMutationScanner.scan(area).toMutableList()
         val targetMutation = blueprint.targetMutation()
@@ -241,8 +239,8 @@ object GreenhouseMutationBlueprint {
             ChatUtils.chat("§cEnable §eMutation Blueprint §cin the Greenhouse settings first.")
             return
         }
-        val area = greenhouseArea(plot)
-        if (!area.isLoaded()) {
+        val area = GreenhouseGridScanner.area(plot)
+        if (!GreenhouseGridScanner.isLoaded(plot)) {
             ChatUtils.chat("§cThe Greenhouse planting grid must be loaded before it can be captured.")
             return
         }
@@ -314,14 +312,16 @@ object GreenhouseMutationBlueprint {
             ChatUtils.chat("§cThe clipboard does not contain text.")
             return
         }
+        val isSkyMutations = clipboard.contains("skymutations", ignoreCase = true)
+        val provider = if (isSkyMutations) "SkyMutations" else "SkyShards"
         val imported = try {
-            SkyShardsLayoutCodec.decode(clipboard)
+            if (isSkyMutations) SkyMutationsLayoutCodec.decode(clipboard) else SkyShardsLayoutCodec.decode(clipboard)
         } catch (exception: IllegalArgumentException) {
-            ChatUtils.chat("§cCould not import the SkyShards layout: §7${exception.message}")
+            ChatUtils.chat("§cCould not import the $provider layout: §7${exception.message}")
             return
         }
         if (imported.placements.isEmpty()) {
-            ChatUtils.chat("§cThe SkyShards layout is empty.")
+            ChatUtils.chat("§cThe $provider layout is empty.")
             return
         }
 
@@ -367,11 +367,11 @@ object GreenhouseMutationBlueprint {
             ChatUtils.chat("§cYour SkyBlock profile storage is not available yet.")
             return
         }
-        val name = nextLayoutName(layouts.keys, "SkyShards")
+        val name = nextLayoutName(layouts.keys, provider)
         layouts[name] = blueprint
         activeLayoutMap()?.set(plot.id, name)
         resetMissingState()
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "import-skyshards-greenhouse-layout")
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "import-greenhouse-layout")
 
         val cropCount = cells.count { !it.target && it.cropCategory() != null }
         val unsupportedCount = imported.inputs.size - mutations.size - cropCount
@@ -453,27 +453,6 @@ object GreenhouseMutationBlueprint {
                 targetMessage(blueprint.targetMutation()),
         )
     }
-
-    private fun greenhouseArea(plot: GardenPlot): AABB {
-        val middle = plot.middle.toBlockPos()
-        // The 10x10 planting grid consists of the inward-facing 5x5 corners of the
-        // four central chunks in the 6x6-chunk plot.
-        return AABB(
-            (middle.x - GREENHOUSE_GRID_RADIUS).toDouble(),
-            MIN_GARDEN_Y.toDouble(),
-            (middle.z - GREENHOUSE_GRID_RADIUS).toDouble(),
-            (middle.x + GREENHOUSE_GRID_RADIUS).toDouble(),
-            MAX_GARDEN_Y.toDouble() + 1,
-            (middle.z + GREENHOUSE_GRID_RADIUS).toDouble(),
-        )
-    }
-
-    private fun AABB.isLoaded(): Boolean = listOf(
-        LorenzVec(minX, MIN_GARDEN_Y.toDouble(), minZ),
-        LorenzVec(minX, MIN_GARDEN_Y.toDouble(), maxZ - 1),
-        LorenzVec(maxX - 1, MIN_GARDEN_Y.toDouble(), minZ),
-        LorenzVec(maxX - 1, MIN_GARDEN_Y.toDouble(), maxZ - 1),
-    ).all { it.isInLoadedChunk() }
 
     internal fun layouts(): Map<String, GreenHouseStorage.MutationBlueprintStorage> = layoutMap().orEmpty()
 
@@ -675,21 +654,8 @@ object GreenhouseMutationBlueprint {
         }
     }
 
-    private fun GreenHouseStorage.BlueprintCellStorage.cropCategory(): CropCategory? = when (cropId) {
-        "wheat" -> CropCategory.WHEAT
-        "potato" -> CropCategory.POTATO
-        "carrot" -> CropCategory.CARROT
-        "pumpkin" -> CropCategory.PUMPKIN
-        "melon" -> CropCategory.MELON
-        "cocoa_beans" -> CropCategory.COCOA_BEANS
-        "sugar_cane" -> CropCategory.SUGAR_CANE
-        "cactus" -> CropCategory.CACTUS
-        "nether_wart" -> CropCategory.NETHER_WART
-        "red_mushroom", "brown_mushroom" -> CropCategory.MUSHROOM
-        "moonflower", "sunflower" -> CropCategory.SUNFLOWER
-        "wild_rose" -> CropCategory.WILD_ROSE
-        else -> null
-    }
+    private fun GreenHouseStorage.BlueprintCellStorage.cropCategory(): CropCategory? =
+        CropCategory.fromCropId(cropId)
 
     private fun GreenHouseStorage.MutationBlueprintStorage.targetMutation(): GreenhouseMutation? = when {
         targetMutationId == NO_TARGET_MUTATION -> null
@@ -737,9 +703,7 @@ object GreenhouseMutationBlueprint {
         val crops: Set<Int>,
     )
 
-    private const val MIN_GARDEN_Y = 60
-    private const val MAX_GARDEN_Y = 100
-    private const val GREENHOUSE_GRID_RADIUS = 5
+    private const val GREENHOUSE_GRID_RADIUS = GreenhouseGridScanner.GRID_RADIUS
     private const val REQUIRED_STABLE_CHECKS = 3
     private const val ANCHOR_HORIZONTAL_TOLERANCE = 0.1
     private const val ANCHOR_VERTICAL_TOLERANCE = 3.0
