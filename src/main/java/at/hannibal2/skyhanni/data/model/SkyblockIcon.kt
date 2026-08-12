@@ -1,105 +1,107 @@
 package at.hannibal2.skyhanni.data.model
 
-enum class SkyblockIcon(val icon: Char) {
-    DAMAGE('\uE050'),
-    HEALTH('\uE010'),
-    DEFENSE('\uE008'),
-    TRUE_DEFENSE('\uE027'),
-    STRENGTH('\uE00D'),
-    CRIT_CHANCE('\uE02C'),
-    CRIT_DAMAGE('\uE007'),
-    ATTACK_SPEED('\uE001'),
-    FEROCITY('\uE00B'),
-    SWING_RANGE('\uE024'),
-    INTELLIGENCE('\uE003'),
-    ABILITY_DAMAGE('\uE002'),
-    HEALTH_REGEN('\uE011'),
-    VITALITY('\uE028'),
-    MENDING('\uE014'),
-    BREAKING_POWER('\uE005'),
-    MINING_SPEED('\uE015'),
-    MINING_SPREAD('\uE016'),
-    GEMSTONE_SPREAD('\uE00F'),
-    PRISTINE('\uE01C'),
-    MINING_FORTUNE('\uE053'),
-    BONUS_PEST_CHANCE('\uE019'),
-    OVERBLOOM('\uE02B'),
-    FARMING_FORTUNE('\uE051'),
-    SWEEP('\uE023'),
-    FORAGING_FORTUNE('\uE054'),
-    FISHING_SPEED('\uE00C'),
-    SEA_CREATURE_CHANCE('\uE021'),
-    DOUBLE_HOOK_CHANCE('\uE009'),
-    TROPHY_FISH_CHANCE('\uE02A'),
-    TREASURE_CHANCE('\uE025'),
-    SPEED('\uE022'),
-    MAGIC_FIND('\uE01A'),
-    PET_LUCK('\uE013'),
-    HEAT_RESISTANCE('\uE012'),
-    COLD_RESISTANCE('\uE006'),
-    RESPIRATION('\uE01D'),
-    PRESSURE_RESISTANCE('\uE01B'),
-    FEAR('\uE00A'),
-    TRACKING('\uE077'),
-    PULL('\uE02D'),
-    HUNTING_FORTUNE('\uE05B'),
-    CHARM_CHANCE('❣'),
-    WISDOM('☯'),
-    RIFT_TIME('\uE020'),
-    RIFT_DAMAGE('\uE01E'),
-    MANA_REGEN('\uE004'),
-    HEARTS('\uE01F'),
-    AIRBORNE('\uE070'),
-    ANIMAL('\uE071'),
-    AQUATIC('\uE072'),
-    ARCANE('\uE073'),
-    ARTHROPOD('\uE074'),
-    CONSTRUCT('\uE075'),
-    CRITTER('\uE007'),
-    CUBIC('\uE076'),
-    ELUSIVE('\uE077'),
-    ENDER('\uE078'),
-    FROZEN('\uE079'),
-    GLACIAL('\uE07A'),
-    HUMANOID('\uE07B'),
-    INFERNAL('\uE07C'),
-    MAGMATIC('\uE07D'),
-    MYTHOLOGICAL('\uE07E'),
-    PEST('\uE07F'),
-    SHIELDED('\uE080'),
-    SKELETAL('\uE081'),
-    SPOOKY('\uE082'),
-    SUBTERRANEAN('\uE083'),
-    UNDEAD('\uE084'),
-    WITHER('\uE085'),
-    WOODLAND('\uE086'),
-
-    // Regular Unicode Characters
-    HOT_TEA('☕'),
-    SMALL_DIAMOND('✦'),
-    BIG_DIAMOND('◆'),
-    CIRCLE('●'),
-    RECYCLE('♲'),
-    SUN('☀'),
-    SKULL('☠'),
-    HEAT('♨'),
-    SNOWFLAKE('❄'),
-    BINGO('Ⓑ'),
-    RECTANGLE('▬'),
-    SQUARE('■'),
-    METEOR('☄'),
-    PHONE('✆'),
-    CAKE('⛃'),
-    STAR('✯'),
-    EGG('☬'),
-    HEXAGON('⏣'),
-    BOOMERANG('﴾'),
-    HEART('❤'),
-    EMPTY_CIRCLE('○'),
-    CLOVER('☘'),
-    LIGHTNING('⚡'),
-    PICKAXE('⸕'),
-    ;
-
+@JvmInline
+value class SkyblockIcon(val icon: Char) {
     override fun toString(): String = icon.toString()
+
+    companion object {
+        val DAMAGE = SkyblockIcon('\uE050')
+        val HEALTH = SkyblockIcon('\uE010')
+        val DEFENSE = SkyblockIcon('\uE008')
+        val TRUE_DEFENSE = SkyblockIcon('\uE027')
+        val STRENGTH = SkyblockIcon('\uE00D')
+        val CRIT_CHANCE = SkyblockIcon('\uE02C')
+        val CRIT_DAMAGE = SkyblockIcon('\uE007')
+        val ATTACK_SPEED = SkyblockIcon('\uE001')
+        val FEROCITY = SkyblockIcon('\uE00B')
+        val SWING_RANGE = SkyblockIcon('\uE024')
+        val INTELLIGENCE = SkyblockIcon('\uE003')
+        val ABILITY_DAMAGE = SkyblockIcon('\uE002')
+        val HEALTH_REGEN = SkyblockIcon('\uE011')
+        val VITALITY = SkyblockIcon('\uE028')
+        val MENDING = SkyblockIcon('\uE014')
+        val BREAKING_POWER = SkyblockIcon('\uE005')
+        val MINING_SPEED = SkyblockIcon('\uE015')
+        val MINING_SPREAD = SkyblockIcon('\uE016')
+        val GEMSTONE_SPREAD = SkyblockIcon('\uE00F')
+        val PRISTINE = SkyblockIcon('\uE01C')
+        val MINING_FORTUNE = SkyblockIcon('\uE053')
+        val BONUS_PEST_CHANCE = SkyblockIcon('\uE019')
+        val OVERBLOOM = SkyblockIcon('\uE02B')
+        val FARMING_FORTUNE = SkyblockIcon('\uE051')
+        val SWEEP = SkyblockIcon('\uE023')
+        val FORAGING_FORTUNE = SkyblockIcon('\uE054')
+        val FISHING_SPEED = SkyblockIcon('\uE00C')
+        val SEA_CREATURE_CHANCE = SkyblockIcon('\uE021')
+        val DOUBLE_HOOK_CHANCE = SkyblockIcon('\uE009')
+        val TROPHY_FISH_CHANCE = SkyblockIcon('\uE02A')
+        val TREASURE_CHANCE = SkyblockIcon('\uE025')
+        val SPEED = SkyblockIcon('\uE022')
+        val MAGIC_FIND = SkyblockIcon('\uE01A')
+        val PET_LUCK = SkyblockIcon('\uE013')
+        val HEAT_RESISTANCE = SkyblockIcon('\uE012')
+        val COLD_RESISTANCE = SkyblockIcon('\uE006')
+        val RESPIRATION = SkyblockIcon('\uE01D')
+        val PRESSURE_RESISTANCE = SkyblockIcon('\uE01B')
+        val FEAR = SkyblockIcon('\uE00A')
+        val TRACKING = SkyblockIcon('\uE077')
+        val PULL = SkyblockIcon('\uE02D')
+        val HUNTING_FORTUNE = SkyblockIcon('\uE05B')
+        val CHARM_CHANCE = SkyblockIcon('❣')
+        val WISDOM = SkyblockIcon('☯')
+        val RIFT_TIME = SkyblockIcon('\uE020')
+        val RIFT_DAMAGE = SkyblockIcon('\uE01E')
+        val MANA_REGEN = SkyblockIcon('\uE004')
+        val HEARTS = SkyblockIcon('\uE01F')
+        val AIRBORNE = SkyblockIcon('\uE070')
+        val ANIMAL = SkyblockIcon('\uE071')
+        val AQUATIC = SkyblockIcon('\uE072')
+        val ARCANE = SkyblockIcon('\uE073')
+        val ARTHROPOD = SkyblockIcon('\uE074')
+        val CONSTRUCT = SkyblockIcon('\uE075')
+        val CRITTER = SkyblockIcon('\uE007')
+        val CUBIC = SkyblockIcon('\uE076')
+        val ELUSIVE = SkyblockIcon('\uE077')
+        val ENDER = SkyblockIcon('\uE078')
+        val FROZEN = SkyblockIcon('\uE079')
+        val GLACIAL = SkyblockIcon('\uE07A')
+        val HUMANOID = SkyblockIcon('\uE07B')
+        val INFERNAL = SkyblockIcon('\uE07C')
+        val MAGMATIC = SkyblockIcon('\uE07D')
+        val MYTHOLOGICAL = SkyblockIcon('\uE07E')
+        val PEST = SkyblockIcon('\uE07F')
+        val SHIELDED = SkyblockIcon('\uE080')
+        val SKELETAL = SkyblockIcon('\uE081')
+        val SPOOKY = SkyblockIcon('\uE082')
+        val SUBTERRANEAN = SkyblockIcon('\uE083')
+        val UNDEAD = SkyblockIcon('\uE084')
+        val WITHER = SkyblockIcon('\uE085')
+        val WOODLAND = SkyblockIcon('\uE086')
+        val QUESTION_MARK = SkyblockIcon('?')
+
+        val HOT_TEA = SkyblockIcon('☕')
+        val SMALL_DIAMOND = SkyblockIcon('✦')
+        val BIG_DIAMOND = SkyblockIcon('◆')
+        val CIRCLE = SkyblockIcon('●')
+        val RECYCLE = SkyblockIcon('♲')
+        val SUN = SkyblockIcon('☀')
+        val SKULL = SkyblockIcon('☠')
+        val HEAT = SkyblockIcon('♨')
+        val SNOWFLAKE = SkyblockIcon('❄')
+        val BINGO = SkyblockIcon('Ⓑ')
+        val RECTANGLE = SkyblockIcon('▬')
+        val SQUARE = SkyblockIcon('■')
+        val METEOR = SkyblockIcon('☄')
+        val PHONE = SkyblockIcon('✆')
+        val CAKE = SkyblockIcon('⛃')
+        val STAR = SkyblockIcon('✯')
+        val EGG = SkyblockIcon('☬')
+        val HEXAGON = SkyblockIcon('⏣')
+        val BOOMERANG = SkyblockIcon('﴾')
+        val HEART = SkyblockIcon('❤')
+        val EMPTY_CIRCLE = SkyblockIcon('○')
+        val CLOVER = SkyblockIcon('☘')
+        val LIGHTNING = SkyblockIcon('⚡')
+        val PICKAXE = SkyblockIcon('⸕')
+    }
 }

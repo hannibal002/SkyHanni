@@ -6,102 +6,96 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 
 enum class SkyblockMobType(
     displayName: String? = null,
-    val hypixelIcon: Char,
+    val hypixelIcon: SkyblockIcon,
     val enchant: NeuInternalName? = null,
 ) {
     AIRBORNE(
-        icon = SkyblockIcon.AIRBORNE,
+        hypixelIcon = SkyblockIcon.AIRBORNE,
         enchant = "GRAVITY".toInternalName(),
     ),
     ANIMAL(
-        icon = SkyblockIcon.ANIMAL,
+        hypixelIcon = SkyblockIcon.ANIMAL,
     ),
     AQUATIC(
-        icon = SkyblockIcon.AQUATIC,
+        hypixelIcon = SkyblockIcon.AQUATIC,
         enchant = "IMPALING".toInternalName(),
     ),
     ARCANE(
-        icon = SkyblockIcon.ARCANE,
+        hypixelIcon = SkyblockIcon.ARCANE,
     ),
     ARTHROPOD(
-        icon = SkyblockIcon.ARTHROPOD,
+        hypixelIcon = SkyblockIcon.ARTHROPOD,
         enchant = "BANE_OF_ARTHROPODS".toInternalName(),
     ),
     CONSTRUCT(
-        icon = SkyblockIcon.CONSTRUCT,
+        hypixelIcon = SkyblockIcon.CONSTRUCT,
     ),
     CRITTER(
-        icon = SkyblockIcon.CRITTER,
+        hypixelIcon = SkyblockIcon.CRITTER,
     ),
     CUBIC(
-        icon = SkyblockIcon.CUBIC,
+        hypixelIcon = SkyblockIcon.CUBIC,
         enchant = "CUBISM".toInternalName(),
     ),
     ELUSIVE(
-        icon = SkyblockIcon.ELUSIVE,
+        hypixelIcon = SkyblockIcon.ELUSIVE,
     ),
     ENDER(
-        icon = SkyblockIcon.ENDER,
+        hypixelIcon = SkyblockIcon.ENDER,
         enchant = "ENDER_SLAYER".toInternalName(),
     ),
     FROZEN(
-        icon = SkyblockIcon.FROZEN,
+        hypixelIcon = SkyblockIcon.FROZEN,
     ),
     GLACIAL(
-        icon = SkyblockIcon.GLACIAL,
+        hypixelIcon = SkyblockIcon.GLACIAL,
         enchant = null,
     ),
     HUMANOID(
-        icon = SkyblockIcon.HUMANOID,
+        hypixelIcon = SkyblockIcon.HUMANOID,
     ),
     INFERNAL(
-        icon = SkyblockIcon.INFERNAL,
+        hypixelIcon = SkyblockIcon.INFERNAL,
         enchant = "SMOLDERING".toInternalName(),
     ),
     MAGMATIC(
-        icon = SkyblockIcon.MAGMATIC,
+        hypixelIcon = SkyblockIcon.MAGMATIC,
         enchant = "PYROCLASM".toInternalName(),
     ),
     MYTHOLOGICAL(
-        icon = SkyblockIcon.MYTHOLOGICAL,
+        hypixelIcon = SkyblockIcon.MYTHOLOGICAL,
     ),
     PEST(
-        icon = SkyblockIcon.PEST,
+        hypixelIcon = SkyblockIcon.PEST,
     ),
     SHIELDED(
-        icon = SkyblockIcon.SHIELDED,
+        hypixelIcon = SkyblockIcon.SHIELDED,
     ),
     SKELETAL(
-        icon = SkyblockIcon.SKELETAL,
+        hypixelIcon = SkyblockIcon.SKELETAL,
         enchant = "SMITE".toInternalName(),
     ),
     SPOOKY(
-        icon = SkyblockIcon.SPOOKY,
+        hypixelIcon = SkyblockIcon.SPOOKY,
     ),
     SUBTERRANEAN(
-        icon = SkyblockIcon.SUBTERRANEAN,
+        hypixelIcon = SkyblockIcon.SUBTERRANEAN,
     ),
     UNDEAD(
-        icon = SkyblockIcon.UNDEAD,
+        hypixelIcon = SkyblockIcon.UNDEAD,
         enchant = "SMITE".toInternalName(),
     ),
     WITHER(
-        icon = SkyblockIcon.WITHER,
+        hypixelIcon = SkyblockIcon.WITHER,
         enchant = "SMITE".toInternalName(),
     ),
     WOODLAND(
-        icon = SkyblockIcon.WOODLAND,
+        hypixelIcon = SkyblockIcon.WOODLAND,
         enchant = "WOODSPLITTER".toInternalName(),
     ),
     ;
 
     val displayName = displayName ?: toFormattedName()
-
-    constructor(displayName: String? = null, icon: SkyblockIcon, enchant: NeuInternalName? = null) : this(
-        displayName,
-        icon.icon,
-        enchant,
-    )
 
     override fun toString(): String = hypixelIcon.toString()
 }

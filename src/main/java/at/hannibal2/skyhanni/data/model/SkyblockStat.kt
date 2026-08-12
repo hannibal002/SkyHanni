@@ -31,7 +31,7 @@ private val patternGroup = RepoPattern.group("stats")
 
 enum class SkyblockStat(
     val color: LorenzColor,
-    val hypixelIcon: Char,
+    val hypixelIcon: SkyblockIcon,
     displayName: String? = null,
     private val hypixelId: String? = null,
     generatePatterns: Boolean = true,
@@ -191,17 +191,8 @@ enum class SkyblockStat(
     HEARTS(RED, SkyblockIcon.HEARTS),
     // </editor-fold>
 
-    UNKNOWN(GRAY, '?', generatePatterns = false),
+    UNKNOWN(GRAY, SkyblockIcon.QUESTION_MARK, generatePatterns = false),
     ;
-
-    constructor(
-        color: LorenzColor,
-        hypixelIcon: SkyblockIcon,
-        displayName: String? = null,
-        hypixelId: String? = null,
-        generatePatterns: Boolean = true,
-    ) :
-        this(color, hypixelIcon.icon, displayName, hypixelId, generatePatterns)
 
     val displayName: String = displayName ?: toFormattedName()
 
