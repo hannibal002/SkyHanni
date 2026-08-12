@@ -77,6 +77,7 @@ value class SkyblockIcon(val icon: Char) {
         val UNDEAD = SkyblockIcon('\uE084')
         val WITHER = SkyblockIcon('\uE085')
         val WOODLAND = SkyblockIcon('\uE086')
+        val MASTER_MODE = SkyblockIcon('\uE067')
         val QUESTION_MARK = SkyblockIcon('?')
 
         val HOT_TEA = SkyblockIcon('☕')
