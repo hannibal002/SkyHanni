@@ -19,13 +19,11 @@ import at.hannibal2.skyhanni.utils.compat.hover
 import com.mojang.authlib.GameProfile
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.contents.objects.PlayerSprite
-import net.minecraft.world.item.component.ResolvableProfile
 
 @SkyHanniModule
 object ContributorAchievement {
     private val config get() = SkyHanniMod.feature.dev
-    private val achievementMessages get() = SkyHanniMod.feature.misc.achievementMessages
+    private val shouldShowMessages get() = AchievementManager.shouldShowMessages
 
     private const val CONTRIBUTOR_ACHIEVEMENT = "Contrib Achievement"
     private const val CONTRIBUTOR_FRIEND_ACHIEVEMENT = "Contrib Friend"
@@ -134,26 +132,35 @@ object ContributorAchievement {
     }
 
     fun onUniqueContributorSeen(profile: GameProfile) {
-        val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
+        if (showContributorAchievement(profile)) return
+        showContributorDiscovered(profile)
+    }
 
-        // If the achievement was completed and achievement messages are enabled,
-        // or if the discover contributor message is enabled, then show the message.
-        if ((!completed || !achievementMessages) && !config.discoverContributorMessage) {
-            return
-        }
-
-        val resolvedProfile = ResolvableProfile.createResolved(profile)
-        val sprite = PlayerSprite(resolvedProfile, false)
-        val player = Component.`object`(sprite)
+    private fun showContributorDiscovered(profile: GameProfile) {
+        if (!config.discoverContributorMessage) return
+        val message = getDiscoverComponent(profile)
         ChatUtils.chat {
             appendWithColor("A wild SkyHanni contributor appears!", ChatFormatting.GOLD)
             appendWithColor(" (hover)", ChatFormatting.GRAY)
-            hover = componentBuilder {
-                appendWithColor("You have encountered ", ChatFormatting.GRAY)
-                append(player)
-                appendWithColor(" ${profile.name}", ChatFormatting.AQUA)
-                appendWithColor(" for the first time!", ChatFormatting.GRAY)
-            }
+            hover = message
+        }
+    }
+
+    private fun showContributorAchievement(profile: GameProfile): Boolean {
+        val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
+        if (!completed && !shouldShowMessages) return false
+        val message = getDiscoverComponent(profile)
+        ChatUtils.chat(message)
+        return true
+    }
+
+    private fun getDiscoverComponent(profile: GameProfile): Component {
+        val player = profile.asComponent()
+        return componentBuilder {
+            appendWithColor("You have discovered ", ChatFormatting.GRAY)
+            append(player)
+            appendWithColor(" ${profile.name}", ChatFormatting.AQUA)
+            appendWithColor(" for the first time!", ChatFormatting.GRAY)
         }
     }
 

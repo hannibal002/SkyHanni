@@ -40,7 +40,7 @@ import net.minecraft.world.item.Items
 object AchievementManager {
 
     private val config get() = SkyHanniMod.achievementStorage.achievements
-    private val shouldShowMessages get() = SkyHanniMod.feature.misc.achievementMessages
+    val shouldShowMessages get() = SkyHanniMod.feature.misc.achievementMessages
     val group = RepoPattern.group("achievements")
     private val achievementSound = SoundUtils.createSound("ui.toast.challenge_complete", 1f, .8f)
 
