@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class HotfConfig {
     @Expose
@@ -20,9 +21,13 @@ class HotfConfig {
     var highlightEnabledPerks: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Lottery Display", desc = "Display your current Lottery perk in a GUI element.")
+    @ConfigOption(
+        name = "Rotating Perk Display",
+        desc = "Display your current Lottery and Beekeeper perks in a GUI element.",
+    )
     @ConfigEditorDropdown
-    var lotteryDisplay: LotteryDisplayVisibility = LotteryDisplayVisibility.OFF
+    @SearchTag("Lottery Beekeeper")
+    var lotteryDisplay: RotatingPerkDisplayVisibility = RotatingPerkDisplayVisibility.OFF
 
     @Expose
     @ConfigLink(owner = HotfConfig::class, field = "lotteryDisplay")
@@ -69,7 +74,7 @@ class HotfConfig {
     @FeatureToggle
     var currentWhispers: Boolean = true
 
-    enum class LotteryDisplayVisibility(val display: String) {
+    enum class RotatingPerkDisplayVisibility(val display: String) {
         OFF("Off"),
         FORAGING_ONLY("Foraging Islands Only"),
         EVERYWHERE("Everywhere");
