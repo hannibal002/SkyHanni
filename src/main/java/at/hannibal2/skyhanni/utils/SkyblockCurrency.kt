@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.BitsApi
+import at.hannibal2.skyhanni.data.PurseApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -28,6 +32,8 @@ enum class SkyblockCurrency(
     val displayName: String,
     val coinValue: Double? = null,
     private val loreNames: Set<String>,
+    /** How much of this currency the player owns, or 0 when SkyHanni does not track it. */
+    private val ownedAmount: (() -> Long),
 ) {
     // Universal
     COINS(
@@ -35,30 +41,64 @@ enum class SkyblockCurrency(
         "§6Coins",
         coinValue = 1.0,
         loreNames = setOf("coin", "coins", "skyblock coin", "skyblock coins", "skyblock_coin", "skyblock_coins"),
+        ownedAmount = { PurseApi.currentPurse.toLong() },
     ),
 
-    // Bits Shop from Elizabeth
-    BITS("BITS".toInternalName(), "§bBits", loreNames = setOf("bit", "bits")),
+    // Bits Shop from Elisabeth
+    BITS("BITS".toInternalName(), "§bBits", loreNames = setOf("bit", "bits"), ownedAmount = { BitsApi.bits.toLong() }),
 
     // Pesthunter's Wares in Garden
-    PESTS("PESTS".toInternalName(), "§2Pests", loreNames = setOf("pest", "pests")),
+    PESTS(
+        "PESTS".toInternalName(), "§2Pests", loreNames = setOf("pest", "pests"),
+        // TODO add
+        ownedAmount = { 0 },
+    ),
 
     // Chocolate Factory
-    CHOCOLATE("CHOCOLATE".toInternalName(), "§6Chocolate", loreNames = setOf("chocolate")),
+    CHOCOLATE(
+        "CHOCOLATE".toInternalName(),
+        "§6Chocolate",
+        loreNames = setOf("chocolate"),
+        ownedAmount = { ChocolateAmount.CURRENT.chocolate() + ChocolateAmount.chocolateSinceUpdate() },
+    ),
 
     // SkyMart in Garden
-    COPPER(NeuInternalName.SKYBLOCK_COPPER, "§cCopper", loreNames = setOf("copper")),
+    COPPER(
+        NeuInternalName.SKYBLOCK_COPPER, "§cCopper", loreNames = setOf("copper"),
+        // TODO add
+        ownedAmount = { 0 },
+    ),
 
     // Anita in Garden
-    GOLD_MEDAL(NeuInternalName.SKYBLOCK_GOLD_MEDAL, "§6Gold medal", loreNames = setOf("gold medal", "gold medals")),
-    SILVER_MEDAL(NeuInternalName.SKYBLOCK_SILVER_MEDAL, "§fSilver medal", loreNames = setOf("silver medal", "silver medals")),
-    BRONZE_MEDAL(NeuInternalName.SKYBLOCK_BRONZE_MEDAL, "§cBronze medal", loreNames = setOf("bronze medal", "bronze medals")),
+    GOLD_MEDAL(
+        NeuInternalName.SKYBLOCK_GOLD_MEDAL, "§6Gold medal", loreNames = setOf("gold medal", "gold medals"),
+        // TODO add
+        ownedAmount = { 0 },
+    ),
+    SILVER_MEDAL(
+        NeuInternalName.SKYBLOCK_SILVER_MEDAL, "§fSilver medal", loreNames = setOf("silver medal", "silver medals"),
+        // TODO add
+        ownedAmount = { 0 },
+    ),
+    BRONZE_MEDAL(
+        NeuInternalName.SKYBLOCK_BRONZE_MEDAL, "§cBronze medal", loreNames = setOf("bronze medal", "bronze medals"),
+        // TODO add
+        ownedAmount = { 0 },
+    ),
 
     // Tony's Shop in the Farming Islands
-    PELTS("PELTS".toInternalName(), "§5Pelts", loreNames = setOf("pelt", "pelts")),
+    PELTS(
+        "PELTS".toInternalName(), "§5Pelts", loreNames = setOf("pelt", "pelts"),
+        // TODO add
+        ownedAmount = { 0 },
+    ),
 
     // Cosmetics in various shops
-    GEMS("GEMS".toInternalName(), "§aGems", loreNames = setOf("gem", "gems")),
+    GEMS(
+        "GEMS".toInternalName(), "§aGems", loreNames = setOf("gem", "gems"),
+        // TODO add
+        ownedAmount = { 0 },
+    ),
     ;
 
     /**
@@ -66,6 +106,11 @@ enum class SkyblockCurrency(
      * Returns null for currencies written the other way around, like "Gold medal §8x2".
      */
     fun readAmountOrNull(text: String): Long? = readCurrencyOrNull(text)?.takeIf { it.first == this }?.second
+
+    fun getOwnedAmount(): Long = ownedAmount.invoke()
+
+    /** Formats an amount the way it appears in a cost lore, for example "§b5,000 Bits". */
+    fun formatAmount(amount: Long): String = displayName.take(2) + amount.addSeparators() + " " + displayName.removeColor()
 
     @SkyHanniModule
     companion object {

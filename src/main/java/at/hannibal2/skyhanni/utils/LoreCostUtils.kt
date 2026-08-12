@@ -17,8 +17,11 @@ object LoreCostUtils {
      * One line of an item cost lore.
      *
      * [internalName] is [NeuInternalName.MISSING_ITEM] when the line could not be read.
+     * [rawLine] is the lore line this entry was read from, unchanged.
      */
-    data class LoreCostEntry(val internalName: NeuInternalName, val amount: Long)
+    data class LoreCostEntry(val internalName: NeuInternalName, val amount: Long, val rawLine: String)
+
+    fun isCostHeader(line: String): Boolean = costHeaderPattern.matches(line)
 
     private val patternGroup = RepoPattern.group("utils.lore.cost")
 
@@ -50,18 +53,18 @@ object LoreCostUtils {
         // some lines write the amount as "Gold medal§8 x2" instead of "Gold medal §8x2"
         val line = rawLine.replace("§8 ", " §8")
 
-        readCurrencyOrNull(line)?.let { return it }
+        readCurrencyOrNull(line, rawLine)?.let { return it }
 
         val (name, amount) = ItemUtils.readItemAmount(line) ?: run {
             logCostLineError("Could not read the amount of a cost line", rawLine, itemName)
-            return LoreCostEntry(NeuInternalName.MISSING_ITEM, 1)
+            return LoreCostEntry(NeuInternalName.MISSING_ITEM, 1, rawLine)
         }
 
         val internalName = NeuInternalName.fromItemNameOrNull(name) ?: run {
             logCostLineError("Unknown item in a cost line", rawLine, itemName)
             NeuInternalName.MISSING_ITEM
         }
-        return LoreCostEntry(internalName, amount.toLong())
+        return LoreCostEntry(internalName, amount.toLong(), rawLine)
     }
 
     private fun logCostLineError(reason: String, rawLine: String, itemName: String) {
@@ -75,8 +78,8 @@ object LoreCostUtils {
         )
     }
 
-    private fun readCurrencyOrNull(line: String): LoreCostEntry? =
+    private fun readCurrencyOrNull(line: String, rawLine: String): LoreCostEntry? =
         SkyblockCurrency.readCurrencyOrNull(line)?.let { (currency, amount) ->
-            LoreCostEntry(currency.internalName, amount)
+            LoreCostEntry(currency.internalName, amount, rawLine)
         }
 }
