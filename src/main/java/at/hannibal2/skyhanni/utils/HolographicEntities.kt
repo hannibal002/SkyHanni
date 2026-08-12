@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.dungeon.replay.PlayerModelFeature
 import at.hannibal2.skyhanni.mixins.hooks.activeHolographicEntities
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -18,6 +19,7 @@ import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.entity.EntityRenderer
+import net.minecraft.client.renderer.entity.state.AvatarRenderState
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
 import net.minecraft.core.registries.BuiltInRegistries
@@ -25,6 +27,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.monster.zombie.Zombie
 import kotlin.math.cos
 import kotlin.math.sin
@@ -177,6 +180,8 @@ object HolographicEntities {
     fun <T : LivingEntity> SkyHanniRenderWorldEvent.renderHolographicEntity(
         holographicEntity: HolographicEntity<T>,
         opacity: Float = 0.3f,
+        preExtractHook: ((LivingEntity) -> Unit) = {},
+        postExtractHook: ((EntityRenderState) -> Unit) = {},
     ) {
         val entity = holographicEntity.entity
         val mobPosition = holographicEntity.interpolatedPosition(partialTicks)
@@ -190,6 +195,8 @@ object HolographicEntities {
         entity.yBodyRotO = interpolatedYaw
         entity.yHeadRot = interpolatedYaw
         entity.yHeadRotO = interpolatedYaw
+
+        preExtractHook(entity)
 
         val client = Minecraft.getInstance()
         @Suppress("UNCHECKED_CAST")
@@ -206,6 +213,8 @@ object HolographicEntities {
         client.level?.let { level ->
             entityRenderState.lightCoords = LevelRenderer.getLightCoords(level, mobPosition.toBlockPos())
         }
+
+        postExtractHook(entityRenderState)
 
         activeHolographicEntities.add(entity)
         try {
@@ -231,9 +240,22 @@ object HolographicEntities {
         opacity: Float = 0.3f,
         heldItem: SafeItemStack = SafeItemStack.EMPTY,
         mainHand: InteractionHand = InteractionHand.MAIN_HAND,
+        pose: Pose = Pose.STANDING,
+        modelFeatures: Set<PlayerModelFeature> = setOf(),
     ) {
-        holographicEntity.entity.setItemInHand(mainHand, heldItem)
-
-        this.renderHolographicEntity(holographicEntity as HolographicEntity<*>, opacity)
+        this.renderHolographicEntity(
+            holographicEntity, opacity,
+            preExtractHook = { entity ->
+                entity.setItemInHand(mainHand, heldItem)
+                entity.pose = pose
+            },
+            postExtractHook = { entityRenderState ->
+                if (entityRenderState is AvatarRenderState) {
+                    modelFeatures.forEach {
+                        it.property.set(entityRenderState, true)
+                    }
+                }
+            },
+        )
     }
 }
