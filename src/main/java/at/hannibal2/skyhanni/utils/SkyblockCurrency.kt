@@ -120,13 +120,14 @@ enum class SkyblockCurrency(
          * REGEX-TEST: §240 Pests
          * REGEX-TEST: §c250 Copper
          * REGEX-TEST: §61,940,000 Coins
+         * REGEX-TEST: §629.1 Coins
          * REGEX-TEST: 46,559,892,200 Chocolate
          * REGEX-TEST: §a400 Gems
          * REGEX-TEST: §575 Pelts
          */
         private val amountPattern by RepoPattern.pattern(
             "utils.currency.amount",
-            "(?:§.)*(?<amount>[\\d,]+) (?<name>[\\w' ]+)",
+            "(?:§.)*(?<amount>[\\d,.]+) (?<name>[\\w' ]+)",
         )
 
         fun readCurrencyOrNull(text: String): Pair<SkyblockCurrency, Long>? = amountPattern.matchMatcher(text) {
