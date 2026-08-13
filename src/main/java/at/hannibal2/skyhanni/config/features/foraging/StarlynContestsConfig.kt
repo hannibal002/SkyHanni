@@ -11,20 +11,26 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 class StarlynContestsConfig {
 
     @Expose
-    @ConfigOption(name = "Coupon Prices", desc = "Help to identify profitable items to buy at Starlyn Sister shops.")
+    @ConfigOption(name = "Coupon Prices", desc = "Help to identify profitable items to buy at §dStarlyn Sister §rshops.")
     @ConfigEditorBoolean
     @FeatureToggle
     var starlynCouponProfitEnabled = true
 
     @Expose
-    @ConfigOption(name = "Compact Results", desc = "Compacts the messages for your placement in a §dStarlyn Sister §7contest.")
+    @ConfigOption(name = "Coupon Amount", desc = "Displays the number of §dStarlyn Sister §rcoupons you own while in their shops.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var starlynCouponAmount = true
+
+    @Expose
+    @ConfigOption(name = "Compact Results", desc = "Compacts the messages for your placement in a §dStarlyn Sister §rcontest.")
     @SearchTag("Agatha Miria")
     @ConfigEditorBoolean
     @FeatureToggle
     var compactResults = false
 
     @Expose
-    @ConfigOption(name = "Compact Personal Bests", desc = "Compact messages from log collection §dpersonal bests §7during contests.")
+    @ConfigOption(name = "Compact Personal Bests", desc = "Compact messages from log collection §dpersonal bests §rduring contests.")
     @SearchTag("Agatha Miria")
     @ConfigEditorBoolean
     @FeatureToggle
