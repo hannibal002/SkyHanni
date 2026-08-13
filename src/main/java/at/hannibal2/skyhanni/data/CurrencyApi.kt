@@ -3,16 +3,21 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyblockCurrency
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 /**
  * Remembers how much of a currency the player owns, for currencies that Hypixel only shows on
@@ -21,7 +26,18 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 @SkyHanniModule
 object CurrencyApi {
 
+    private val patternGroup = RepoPattern.group("data.currency")
+
+    /**
+     * REGEX-TEST: You have: 1,005 Gems
+     */
+    private val gemsAmountPattern by patternGroup.pattern(
+        "gems.amount",
+        "You have: (?<amount>[\\d,]+) Gems",
+    )
+
     private val storage get() = ProfileStorageData.profileSpecific?.currencies
+
 
     private fun SkyblockCurrency.setAmount(amount: Long) {
         storage?.put(this, amount)
@@ -43,19 +59,43 @@ object CurrencyApi {
             ScoreboardPattern.sowdustPattern.matchMatcher(message) {
                 SkyblockCurrency.SOWDUST.setAmount(group("sowdust").formatLong())
             }
+            ScoreboardPattern.gemsPattern.matchMatcher(message) {
+                SkyblockCurrency.GEMS.setAmount(group("gems").formatLong())
+            }
         }
     }
 
-    // the widget groups match anything, so the amounts are not guaranteed to be numbers
+    /**
+     * The widget groups match anything, so the amount is neither guaranteed to be a number nor to be
+     * written out. Hypixel shortens gems to "1k", and a rounded amount is worse than none at all.
+     */
+    private fun String.exactAmountOrNull(): Long? =
+        removeColor().takeIf { it.isNotEmpty() && it.all { char -> char.isDigit() || char == ',' } }?.formatLongOrNull()
+
     @HandleEvent(onlyOnSkyblock = true)
     private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         when {
             event.isWidget(TabWidget.COPPER) -> TabWidget.COPPER.matchMatcherFirstLine {
-                group("copper").formatLongOrNull()?.let { SkyblockCurrency.COPPER.setAmount(it) }
+                group("copper").exactAmountOrNull()?.let { SkyblockCurrency.COPPER.setAmount(it) }
             }
 
             event.isWidget(TabWidget.SOWDUST) -> TabWidget.SOWDUST.matchMatcherFirstLine {
-                group("sowdust").formatLongOrNull()?.let { SkyblockCurrency.SOWDUST.setAmount(it) }
+                group("sowdust").exactAmountOrNull()?.let { SkyblockCurrency.SOWDUST.setAmount(it) }
+            }
+
+            event.isWidget(TabWidget.GEMS) -> TabWidget.GEMS.matchMatcherFirstLine {
+                group("gems").exactAmountOrNull()?.let { SkyblockCurrency.GEMS.setAmount(it) }
+            }
+        }
+    }
+
+    // the "SkyBlock Gems" item shows up in every menu that sells something for gems
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        for (item in event.inventoryItems.values) {
+            gemsAmountPattern.firstMatcher(item.getLoreComponent().map { it.string.removeColor() }) {
+                SkyblockCurrency.GEMS.setAmount(group("amount").formatLong())
+                return
             }
         }
     }

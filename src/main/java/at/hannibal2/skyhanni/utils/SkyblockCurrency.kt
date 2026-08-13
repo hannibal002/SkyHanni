@@ -98,11 +98,7 @@ enum class SkyblockCurrency(
     ),
 
     // Cosmetics in various shops
-    GEMS(
-        "GEMS".toInternalName(), "Gems", GREEN, loreNames = setOf("gem", "gems"),
-        // TODO add
-        ownedAmount = { null },
-    ),
+    GEMS("GEMS".toInternalName(), "Gems", GREEN, loreNames = setOf("gem", "gems"), ownedAmount = { getFromStorage() }),
     ;
 
     val coloredName: String = color.getChatColor() + displayName
