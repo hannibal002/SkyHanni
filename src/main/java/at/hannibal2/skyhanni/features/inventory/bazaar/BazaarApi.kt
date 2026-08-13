@@ -131,6 +131,25 @@ object BazaarApi {
 
     fun NeuInternalName.isBazaarItem() = getBazaarData() != null
 
+    /**
+     * The amount of this item the player has ordered but not received yet, summed over all
+     * open buy orders.
+     *
+     * Refreshed whenever a bazaar order inventory is opened. Kept roughly current in between
+     * by the bazaar chat messages.
+     */
+    fun NeuInternalName.getOpenBuyOrderAmount(): Int =
+        BazaarOrderApi.getOpenAmount(this, SimpleTransactionType.BUY_ORDER)
+
+    /**
+     * The amount of this item the player has offered for sale but not sold yet.
+     *
+     * Only refreshed while a bazaar order inventory is open. No chat message updates this in
+     * between, unlike the buy side, so the value can be out of date.
+     */
+    fun NeuInternalName.getOpenSellOfferAmount(): Int =
+        BazaarOrderApi.getOpenAmount(this, SimpleTransactionType.SELL_OFFER)
+
     fun searchForBazaarItem(internalName: NeuInternalName, amount: Int? = null) {
         searchForBazaarItem(internalName.itemNameWithoutColor, amount)
     }
