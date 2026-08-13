@@ -21,6 +21,11 @@ class DungeonBossReplayConfig {
     var opacity: Float = 30f
 
     @Expose
+    @ConfigOption(name = "Checkpoints", desc = "When playing a replay, wait between each F7/M7 phase.")
+    @ConfigEditorBoolean
+    var checkpoints: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Enabled Floors", desc = "Floors that should save replays")
     @ConfigEditorDraggableList
     val enabledFloors: MutableList<DungeonFloorWithBoss> = mutableListOf(F7, M7)

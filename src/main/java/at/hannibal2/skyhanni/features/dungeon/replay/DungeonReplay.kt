@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.dungeon.replay.DungeonBossReplayConfig.DungeonFloorWithBoss
+import at.hannibal2.skyhanni.events.dungeon.DungeonBossPhaseChangeEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import com.google.gson.annotations.Expose
@@ -160,6 +162,16 @@ object DungeonReplay {
         playing = null
     }
 
+    @HandleEvent
+    private fun onBossPhaseChange(event: DungeonBossPhaseChangeEvent) {
+        if (!config.checkpoints) return
+        val recording = recording ?: return
+        if (!recording.targetDungeon.equalsOneOf(DungeonFloorWithBoss.F7, DungeonFloorWithBoss.M7)) return
+
+        playing?.bumpCheckpoint()
+        recording.checkpoints.add(recording.positionList.size)
+    }
+
     private fun startPlaying(data: DungeonGhostData) {
         if (data.recordedPositions.isEmpty() || data.time == 0L) return
 
@@ -194,6 +206,7 @@ object DungeonReplay {
             recording.positionList,
             recording.startTime.passedSince().inWholeMilliseconds,
             player.gameProfile.id, player.gameProfile.name,
+            recording.checkpoints.toList().takeIf { it.isNotEmpty() }
         )
         val currentPB = storage.replays[recording.targetDungeon]
 
@@ -252,25 +265,41 @@ object DungeonReplay {
         @Expose val time: Long = Long.MAX_VALUE,
         @Expose val playerUUID: UUID = UUID.fromString("49f4c15d-14e0-4d75-be1b-9c1b85bad53c"),
         @Expose val playerName: String = "martimavocado",
+        @Expose val checkpoints: List<Int>? = null,
     )
 
     data class RecordingData(val targetDungeon: DungeonFloorWithBoss) {
         val startTime = SimpleTimeMark.now()
         val positionList = mutableListOf<RecordedPositionDelta>()
+        val checkpoints: MutableList<Int> = mutableListOf()
     }
 
     data class PlayingData(
         val replay: DungeonGhostData,
         val holographicPlayer: HolographicEntity<AbstractClientPlayer>,
     ) {
+        val nextCheckpoint: Int?
+            get() = currentCheckpointIndex?.let { replay.checkpoints?.getOrNull(it) }
+
+        private var currentCheckpointIndex: Int? =
+            0.takeIf { replay.checkpoints?.any() == true && config.checkpoints }
+
         var currentTick = 0
             set(value) {
+                nextCheckpoint?.let {
+                    if (it <= value) return
+                }
+
                 field = value.coerceIn(0, replay.recordedPositions.size)
 
                 val currentTickData = RecordedPositionDelta.getComplete(replay.recordedPositions, field)
 
                 holographicPlayer.moveTo(currentTickData.position, currentTickData.yaw, false)
             }
+
+        fun bumpCheckpoint() {
+            currentCheckpointIndex = currentCheckpointIndex?.plus(1)?.coerceIn(0, replay.checkpoints?.size)
+        }
     }
 
     data class RecordedPosition(
