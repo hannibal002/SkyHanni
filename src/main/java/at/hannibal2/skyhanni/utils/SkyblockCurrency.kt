@@ -52,11 +52,7 @@ enum class SkyblockCurrency(
     BITS("BITS".toInternalName(), "Bits", AQUA, loreNames = setOf("bit", "bits"), ownedAmount = { BitsApi.bits.toLong() }),
 
     // Pesthunter's Wares in Garden
-    PESTS(
-        "PESTS".toInternalName(), "Pests", DARK_GREEN, loreNames = setOf("pest", "pests"),
-        // TODO add
-        ownedAmount = { null },
-    ),
+    PESTS("PESTS".toInternalName(), "Pests", DARK_GREEN, loreNames = setOf("pest", "pests"), ownedAmount = { getFromStorage() }),
 
     // Chocolate Factory
     CHOCOLATE(

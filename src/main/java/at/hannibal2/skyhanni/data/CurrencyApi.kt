@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyblockCurrency
@@ -43,6 +42,14 @@ object CurrencyApi {
     private val peltsAmountPattern by patternGroup.pattern(
         "pelts.amount",
         "Pelts: (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * REGEX-TEST: Vacuum Bag: 2,161  Pests
+     */
+    private val pestsAmountPattern by patternGroup.pattern(
+        "pests.amount",
+        "Vacuum Bag: (?<amount>[\\d,]+) \uE018 Pests",
     )
 
     private val storage get() = ProfileStorageData.profileSpecific?.currencies
@@ -106,13 +113,23 @@ object CurrencyApi {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         for (item in event.inventoryItems.values) {
-            // Tony's Shop in the Farming Island names one of its items after the amount the player owns
+            // tony's shop names one of its items after the amount the player owns
             peltsAmountPattern.matchMatcher(item.hoverName.string.removeColor()) {
                 SkyblockCurrency.PELTS.setAmount(group("amount").formatLong())
             }
+            readLoreAmounts(item.getLoreComponent().map { it.string.removeColor() })
+        }
+    }
+
+    private fun readLoreAmounts(lore: List<String>) {
+        for (line in lore) {
             // the "SkyBlock Gems" item shows up in every menu that sells something for gems
-            gemsAmountPattern.firstMatcher(item.getLoreComponent().map { it.string.removeColor() }) {
+            gemsAmountPattern.matchMatcher(line) {
                 SkyblockCurrency.GEMS.setAmount(group("amount").formatLong())
+            }
+            // the Pesthunter Menu, the vacuum bag is where the pests are kept
+            pestsAmountPattern.matchMatcher(line) {
+                SkyblockCurrency.PESTS.setAmount(group("amount").formatLong())
             }
         }
     }
