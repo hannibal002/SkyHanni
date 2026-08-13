@@ -9,14 +9,14 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import net.minecraft.world.inventory.Slot
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -93,8 +93,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
         entry.slot = this
         entry.item = item
 
-        val rawLore = item.getLore()
-        val lore = item.getLoreComponent().takeIf { it.isNotEmpty() }?.map { it.string.removeColor() } ?: return
+        val lore = item.getCleanLore().takeIfNotEmpty() ?: return
 
         if (entry != core && notUnlockedPattern.matches(lore.last())) {
             entry.rawLevel = 0
@@ -106,7 +105,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
         entry.isUnlocked = true
 
         // This needs color codes
-        entry.rawLevel = levelPattern.matchMatcher(rawLore.first(), readingLevelTransform) ?: entry.maxLevel
+        entry.rawLevel = levelPattern.matchMatcher(item.getLore().first(), readingLevelTransform) ?: entry.maxLevel
 
         // raw level to ignore the blue egg buff
         if (entry.rawLevel > entry.maxLevel) {
@@ -156,10 +155,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
             heartItem = this
         }
 
-        val lore = item.getLoreComponent().map { it.string.removeColor() }
-
         val tokenPattern = if (isHeartItem) heartTokensPattern else resetTokensPattern
-        lore@ for (line in lore) {
+        lore@ for (line in item.getCleanLore()) {
             tokenPattern.matchMatcher(line) {
                 val token = group("token").toInt()
                 if (isHeartItem) {
