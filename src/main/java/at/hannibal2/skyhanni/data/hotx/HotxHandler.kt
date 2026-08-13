@@ -248,7 +248,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
 
         if (!entry.enabled || !entry.isUnlocked) return
 
-        // Hypixel sometimes doesn't show the current perk in lore if switching hotx trees via loadouts
+        // Hypixel sometimes doesn't show the current perk in lore if switching hotx trees layouts
         val index = HotxPatterns.itemPreEffectPattern.indexOfFirstMatch(lore) ?: return
 
         val nextLine = lore.getOrNull(index + 1) ?: return
