@@ -76,6 +76,7 @@ object AchievementManager {
     fun updateTieredAchievement(id: String, newProgress: Int) {
         if (HypixelData.hypixelAlpha) return
         val achievement = config[id] ?: ErrorManager.skyHanniError("Achievement with unknown id", "id" to id)
+        if (achievement.data.progress == newProgress) return
         val currentTier = achievement.getCurrentTier() ?: 0
         achievement.data.progress = newProgress
         val newTier = achievement.getCurrentTier() ?: 0
