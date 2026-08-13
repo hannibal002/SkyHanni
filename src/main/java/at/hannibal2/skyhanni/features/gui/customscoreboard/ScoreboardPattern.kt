@@ -313,7 +313,7 @@ object ScoreboardPattern {
      */
     val peltsPattern by farmingSB.pattern(
         "pelts",
-        "(?:§.)*Pelts: (?:§.)*[\\d,]+.*",
+        "(?:§.)*Pelts: (?:§.)*(?<pelts>[\\d,]+).*",
     )
 
     /**

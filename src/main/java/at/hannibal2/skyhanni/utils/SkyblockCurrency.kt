@@ -91,11 +91,7 @@ enum class SkyblockCurrency(
     ),
 
     // Tony's Shop in the Farming Islands
-    PELTS(
-        "PELTS".toInternalName(), "Pelts", DARK_PURPLE, loreNames = setOf("pelt", "pelts"),
-        // TODO add
-        ownedAmount = { null },
-    ),
+    PELTS("PELTS".toInternalName(), "Pelts", DARK_PURPLE, loreNames = setOf("pelt", "pelts"), ownedAmount = { getFromStorage() }),
 
     // Cosmetics in various shops
     GEMS("GEMS".toInternalName(), "Gems", GREEN, loreNames = setOf("gem", "gems"), ownedAmount = { getFromStorage() }),

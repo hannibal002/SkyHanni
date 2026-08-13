@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -34,6 +35,14 @@ object CurrencyApi {
     private val gemsAmountPattern by patternGroup.pattern(
         "gems.amount",
         "You have: (?<amount>[\\d,]+) Gems",
+    )
+
+    /**
+     * REGEX-TEST: Pelts: 815
+     */
+    private val peltsAmountPattern by patternGroup.pattern(
+        "pelts.amount",
+        "Pelts: (?<amount>[\\d,]+)",
     )
 
     private val storage get() = ProfileStorageData.profileSpecific?.currencies
@@ -62,6 +71,11 @@ object CurrencyApi {
             ScoreboardPattern.gemsPattern.matchMatcher(message) {
                 SkyblockCurrency.GEMS.setAmount(group("gems").formatLong())
             }
+
+            // the pattern is shared with the custom scoreboard, a repo override may still lack the group
+            ScoreboardPattern.peltsPattern.matchMatcher(message) {
+                groupOrNull("pelts")?.formatLongOrNull()?.let { SkyblockCurrency.PELTS.setAmount(it) }
+            }
         }
     }
 
@@ -89,13 +103,16 @@ object CurrencyApi {
         }
     }
 
-    // the "SkyBlock Gems" item shows up in every menu that sells something for gems
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         for (item in event.inventoryItems.values) {
+            // Tony's Shop in the Farming Island names one of its items after the amount the player owns
+            peltsAmountPattern.matchMatcher(item.hoverName.string.removeColor()) {
+                SkyblockCurrency.PELTS.setAmount(group("amount").formatLong())
+            }
+            // the "SkyBlock Gems" item shows up in every menu that sells something for gems
             gemsAmountPattern.firstMatcher(item.getLoreComponent().map { it.string.removeColor() }) {
                 SkyblockCurrency.GEMS.setAmount(group("amount").formatLong())
-                return
             }
         }
     }
