@@ -45,11 +45,16 @@ object LoreCostUtils {
     )
 
     /**
+     * Shops word this line differently, the essence perk shops unlock and the chip menu levels
+     * up, but all of them list their cost the same way.
+     *
      * REGEX-TEST: Click to trade!
+     * REGEX-TEST: Click to unlock!
+     * REGEX-TEST: Click to level up!
      */
     private val tradeLinePattern by patternGroup.pattern(
         "trade.click",
-        "Click to trade!",
+        "Click to (?:trade|unlock|level up)!",
     )
 
     /**
