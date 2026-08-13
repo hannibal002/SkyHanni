@@ -148,7 +148,7 @@ object AnitaMedalProfit {
         )
     }
 
-    private fun MutableList<Any>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Int>) {
+    private fun MutableList<Any>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Long>) {
         for ((internalName, amount) in additionalMaterials) {
             add(internalName.getPriceName(amount))
         }
@@ -171,11 +171,11 @@ object AnitaMedalProfit {
         } else name
     }
 
-    private fun getAdditionalMaterials(requiredItems: List<LoreCostUtils.LoreCostEntry>): Map<NeuInternalName, Int> =
+    private fun getAdditionalMaterials(requiredItems: List<LoreCostUtils.LoreCostEntry>): Map<NeuInternalName, Long> =
         requiredItems.filter { MedalType.getByInternalNameOrNull(it.internalName) == null }
-            .associate { it.internalName to it.amount.toInt() }
+            .associate { it.internalName to it.amount }
 
-    private fun getAdditionalCost(requiredItems: Map<NeuInternalName, Int>): Double {
+    private fun getAdditionalCost(requiredItems: Map<NeuInternalName, Long>): Double {
         var otherItemsPrice = 0.0
         for ((name, amount) in requiredItems) {
             otherItemsPrice += name.getPrice() * amount
@@ -183,10 +183,10 @@ object AnitaMedalProfit {
         return otherItemsPrice
     }
 
-    private fun getBronzeCost(requiredItems: List<LoreCostUtils.LoreCostEntry>): Int? {
+    private fun getBronzeCost(requiredItems: List<LoreCostUtils.LoreCostEntry>): Long? {
         for (entry in requiredItems) {
             MedalType.getByInternalNameOrNull(entry.internalName)?.let {
-                return it.factorBronze * entry.amount.toInt()
+                return it.factorBronze * entry.amount
             }
         }
         return null

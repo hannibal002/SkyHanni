@@ -79,12 +79,12 @@ object StarlynSisterCouponProfit {
         val requiredItems = item.readLoreCosts()
         val price = internalName.getPrice()
         var totalCost = 0.0
-        var couponAmount = 0
+        var couponAmount = 0L
         for ((name, amount) in requiredItems) {
             val itemPrice = name.getPriceOrNull() ?: continue
             totalCost += itemPrice * amount
             if (name == currentSisterType?.couponName) {
-                couponAmount = amount.toInt()
+                couponAmount = amount
             }
         }
         val profit = price - totalCost
