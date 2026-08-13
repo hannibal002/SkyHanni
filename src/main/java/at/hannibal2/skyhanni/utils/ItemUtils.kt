@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
-import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
@@ -34,7 +33,6 @@ import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItem
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
@@ -670,27 +668,11 @@ object ItemUtils {
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val SafeItemStack.repoItemName: String
-        get() {
-            getAttributeFromShard()?.let {
-                return it.getAttributeName()
-            }
-            return getInternalNameOrNull()?.repoItemName ?: "<null>"
-        }
+        get() = getInternalNameOrNull()?.repoItemName ?: "<null>"
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val SafeItemStack.repoItemNameCompact: String
-        get() {
-            getAttributeFromShard()?.let {
-                return it.getAttributeName()
-            }
-            return getInternalNameOrNull()?.repoItemNameCompact ?: "<null>"
-        }
-
-    fun SafeItemStack.getAttributeFromShard(): Pair<String, Int>? {
-        if (!(getInternalName().asString().startsWith("ATTRIBUTE_SHARD"))) return null
-        val attributes = getAttributes() ?: return null
-        return attributes.firstOrNull()
-    }
+        get() = getInternalNameOrNull()?.repoItemNameCompact ?: "<null>"
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val SafeItemStack.itemNameWithoutColor: String get() = repoItemName.removeColor()
