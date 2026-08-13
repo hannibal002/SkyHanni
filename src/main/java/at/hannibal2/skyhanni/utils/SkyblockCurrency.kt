@@ -106,6 +106,18 @@ enum class SkyblockCurrency(
         "SOWDUST".toInternalName(), "Sowdust", DARK_GREEN, loreNames = setOf("sowdust"),
         ownedAmount = { getFromStorage() },
     ),
+
+    // Rift shops
+    MOTES(
+        NeuInternalName.SKYBLOCK_MOTE, "Mote", LIGHT_PURPLE, loreNames = setOf("mote", "motes"),
+        ownedAmount = { getFromStorage() },
+    ),
+
+    // TODO add these currencies, each one needs a real cost line from its shop first
+    //  - North Stars, waiting on the winter event
+    //  - Carnival Tokens, waiting on the carnival event
+    //  - Bingo Points, waiting on the bingo event
+    //  - Kuudra Tokens, waiting on a second player for kuudra run
     ;
 
     val coloredName: String = color.getChatColor() + displayName

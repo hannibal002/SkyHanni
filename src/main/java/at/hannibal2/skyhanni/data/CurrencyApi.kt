@@ -115,6 +115,9 @@ object CurrencyApi {
             ScoreboardPattern.gemsPattern.matchMatcher(message) {
                 SkyblockCurrency.GEMS.setAmount(group("gems").formatLong())
             }
+            ScoreboardPattern.motesPattern.matchMatcher(message) {
+                SkyblockCurrency.MOTES.setAmount(group("motes").formatLong())
+            }
 
             // the pattern is shared with the custom scoreboard, a repo override may still lack the group
             ScoreboardPattern.peltsPattern.matchMatcher(message) {

@@ -120,11 +120,12 @@ object NpcTradeHelper {
         val sacks = if (currency == null) internalName.getAmountInSacksOrNull() ?: 0 else 0
         val sackText = if (sacks > 0) " §7(sacks: §a${sacks.addSeparators()}§7)" else ""
 
-        // currencies other than coins have no price, getPriceName would show a "(0)" behind them
-        val name = if (currency != null && currency.coinValue == null) {
-            currency.formatAmount(amount)
-        } else {
-            internalName.getPriceName(amount)
+        val name = when {
+            // the line could not be read, leaving it untouched beats replacing it with a broken name
+            internalName == NeuInternalName.MISSING_ITEM -> entry.rawLine
+            // currencies other than coins have no price, getPriceName would show a "(0)" behind them
+            currency != null && currency.coinValue == null -> currency.formatAmount(amount)
+            else -> internalName.getPriceName(amount)
         }
 
         return CostLine(entry.rawLine, name + suffix + sackText, covered, owned != null)
