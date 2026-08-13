@@ -52,6 +52,16 @@ object CurrencyApi {
         "Vacuum Bag: (?<amount>[\\d,]+) \uE018 Pests",
     )
 
+    /**
+     * REGEX-TEST: GOLD medals: 174
+     * REGEX-TEST: SILVER medals: 16
+     * REGEX-TEST: BRONZE medals: 6
+     */
+    private val medalAmountPattern by patternGroup.pattern(
+        "medal.amount",
+        "(?<type>GOLD|SILVER|BRONZE) medals: (?<amount>[\\d,]+)",
+    )
+
     private val storage get() = ProfileStorageData.profileSpecific?.currencies
 
 
@@ -83,6 +93,7 @@ object CurrencyApi {
             ScoreboardPattern.peltsPattern.matchMatcher(message) {
                 groupOrNull("pelts")?.formatLongOrNull()?.let { SkyblockCurrency.PELTS.setAmount(it) }
             }
+            readCleanLine(message.removeColor())
         }
     }
 
@@ -117,21 +128,34 @@ object CurrencyApi {
             peltsAmountPattern.matchMatcher(item.hoverName.string.removeColor()) {
                 SkyblockCurrency.PELTS.setAmount(group("amount").formatLong())
             }
-            readLoreAmounts(item.getLoreComponent().map { it.string.removeColor() })
+            for (line in item.getLoreComponent().map { it.string.removeColor() }) {
+                readCleanLine(line)
+            }
         }
     }
 
-    private fun readLoreAmounts(lore: List<String>) {
-        for (line in lore) {
-            // the "SkyBlock Gems" item shows up in every menu that sells something for gems
-            gemsAmountPattern.matchMatcher(line) {
-                SkyblockCurrency.GEMS.setAmount(group("amount").formatLong())
-            }
-            // the Pesthunter Menu, the vacuum bag is where the pests are kept
-            pestsAmountPattern.matchMatcher(line) {
-                SkyblockCurrency.PESTS.setAmount(group("amount").formatLong())
-            }
+    /** Lines that read the same in an item lore and in the scoreboard, once the colors are gone. */
+    private fun readCleanLine(line: String) {
+        // the "SkyBlock Gems" item shows up in every menu that sells something for gems
+        gemsAmountPattern.matchMatcher(line) {
+            SkyblockCurrency.GEMS.setAmount(group("amount").formatLong())
         }
+        // the Pesthunter Menu, the vacuum bag is where the pests are kept
+        pestsAmountPattern.matchMatcher(line) {
+            SkyblockCurrency.PESTS.setAmount(group("amount").formatLong())
+        }
+        // the Jacob's Farming Contest menu, and the scoreboard while a contest is running
+        medalAmountPattern.matchMatcher(line) {
+            medalCurrencyOrNull(group("type"))?.setAmount(group("amount").formatLong())
+        }
+    }
+
+    // null is unreachable, the pattern allows nothing else
+    private fun medalCurrencyOrNull(type: String) = when (type) {
+        "GOLD" -> SkyblockCurrency.GOLD_MEDAL
+        "SILVER" -> SkyblockCurrency.SILVER_MEDAL
+        "BRONZE" -> SkyblockCurrency.BRONZE_MEDAL
+        else -> null
     }
 
     @HandleEvent

@@ -72,18 +72,15 @@ enum class SkyblockCurrency(
     // Anita in Garden
     GOLD_MEDAL(
         NeuInternalName.SKYBLOCK_GOLD_MEDAL, "Gold medal", GOLD, loreNames = setOf("gold medal", "gold medals"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
     SILVER_MEDAL(
         NeuInternalName.SKYBLOCK_SILVER_MEDAL, "Silver medal", WHITE, loreNames = setOf("silver medal", "silver medals"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
     BRONZE_MEDAL(
         NeuInternalName.SKYBLOCK_BRONZE_MEDAL, "Bronze medal", RED, loreNames = setOf("bronze medal", "bronze medals"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
 
     // Tony's Shop in the Farming Islands
