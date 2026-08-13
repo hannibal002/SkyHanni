@@ -62,8 +62,6 @@ loom.apply {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
             vmArgs("-Xmx4G", "-Dnarrator.none=true")
-            programArgs("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
-            programArgs("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
         }
         removeIf { it.name == "server" }
     }
