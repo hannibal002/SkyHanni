@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyblockCurrency
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.network.chat.Component
@@ -39,7 +40,10 @@ object NpcTradeHelper {
      * [evaluable] is false when the owned amount is unknown, for example a currency SkyHanni
      * does not track. Such an item is never marked as affordable.
      */
-    private class CostLine(val rawLine: String, val text: String, val covered: Boolean, val evaluable: Boolean)
+    private class CostLine(val rawLine: String, val text: String, val covered: Boolean, val evaluable: Boolean) {
+        /** The tooltip adds color codes of its own to the lore line, so the lookup ignores them. */
+        val cleanLine = rawLine.removeColor()
+    }
 
     private class TradeItem(val lines: List<CostLine>, val headerSuffix: String) {
         val canAfford = lines.all { it.evaluable && it.covered }
@@ -144,7 +148,7 @@ object NpcTradeHelper {
                 event.toolTip[index] = Component.literal(newLine + tradeItem.headerSuffix)
                 continue
             }
-            val costLine = tradeItem.lines.firstOrNull { it.rawLine == line } ?: continue
+            val costLine = tradeItem.lines.firstOrNull { it.cleanLine == line.removeColor() } ?: continue
             event.toolTip[index] = Component.literal(costLine.text)
         }
     }
