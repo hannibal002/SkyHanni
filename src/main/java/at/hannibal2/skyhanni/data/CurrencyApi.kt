@@ -89,8 +89,11 @@ object CurrencyApi {
         "\\s*(?<type>[\\w ]+): (?<amount>[\\d,]+)",
     )
 
-    private val storage get() = ProfileStorageData.profileSpecific?.currencies
+    private val profileStorage get() = ProfileStorageData.profileSpecific?.currencies
+    private val accountStorage get() = ProfileStorageData.playerSpecific?.currencies
     private val essenceStorage get() = ProfileStorageData.profileSpecific?.essences
+
+    private val SkyblockCurrency.storage get() = if (accountWide) accountStorage else profileStorage
 
     private fun SkyblockCurrency.setAmount(amount: Long) {
         storage?.put(this, amount)
@@ -263,11 +266,17 @@ object CurrencyApi {
     private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Currencies")
         event.addIrrelevant {
-            for ((currency, amount) in storage.orEmpty()) {
-                add("$currency: $amount")
+            add("profile:")
+            for ((currency, amount) in profileStorage.orEmpty()) {
+                add(" - $currency: $amount")
             }
+            add("account:")
+            for ((currency, amount) in accountStorage.orEmpty()) {
+                add(" - $currency: $amount")
+            }
+            add("essence:")
             for ((internalName, amount) in essenceStorage.orEmpty()) {
-                add("${internalName.asString()}: $amount")
+                add(" - ${internalName.asString()}: $amount")
             }
         }
     }

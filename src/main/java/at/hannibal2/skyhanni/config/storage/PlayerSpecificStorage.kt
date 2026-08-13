@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
+import at.hannibal2.skyhanni.utils.SkyblockCurrency
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import com.google.gson.annotations.Expose
 import java.time.LocalDate
 import kotlin.time.Duration
@@ -39,6 +41,10 @@ class PlayerSpecificStorage {
 
     @Expose
     var guildMembers: MutableList<String> = mutableListOf()
+
+    /** Written and read by [at.hannibal2.skyhanni.data.CurrencyApi], for currencies shared by all profiles. */
+    @Expose
+    var currencies: MutableMap<SkyblockCurrency, Long> = CollectionUtils.enumMapOf()
 
     @Expose
     var bazaar: BazaarStorage = BazaarStorage()

@@ -38,6 +38,8 @@ enum class SkyblockCurrency(
     private val loreNames: Set<String>,
     /** Set when the lore name alone is ambiguous and only unique on one island. */
     private val island: IslandType? = null,
+    /** True when the amount belongs to the account instead of the current profile. */
+    val accountWide: Boolean = false,
     /**
      * How much of this currency the player owns, or null when SkyHanni does not track it.
      * There is no default on purpose, every currency has to state where its amount comes from.
@@ -55,7 +57,11 @@ enum class SkyblockCurrency(
     ),
 
     // Bits Shop from Elisabeth
-    BITS("BITS".toInternalName(), "Bits", AQUA, loreNames = setOf("bit", "bits"), ownedAmount = { BitsApi.bits.toLong() }),
+    BITS(
+        "BITS".toInternalName(), "Bits", AQUA, loreNames = setOf("bit", "bits"),
+        accountWide = true,
+        ownedAmount = { BitsApi.bits.toLong() },
+    ),
 
     // Pesthunter's Wares in Garden
     PESTS(
@@ -101,6 +107,7 @@ enum class SkyblockCurrency(
     // Cosmetics in various shops
     GEMS(
         "GEMS".toInternalName(), "Gems", GREEN, loreNames = setOf("gem", "gems"),
+        accountWide = true,
         ownedAmount = { getFromStorage() },
     ),
 
