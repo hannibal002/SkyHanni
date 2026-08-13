@@ -15,8 +15,9 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.readItemAmount
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -193,7 +194,7 @@ object StarlynSisterCouponProfit {
             .takeWhile { it.isNotEmpty() }
             .mapNotNull { line ->
                 val rawItemName = line.replace("§8 ", " §8")
-                ItemUtils.readItemAmount(rawItemName)?.let { (name, amount) ->
+                readItemAmount(rawItemName)?.let { (name, amount) ->
                     NeuInternalName.fromItemName(name) to amount
                 } ?: run {
                     ErrorManager.logErrorStateWithData(
