@@ -11,7 +11,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
@@ -174,11 +175,11 @@ object CurrencyApi {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         for (item in event.inventoryItems.values) {
-            // tony's shop names one of its items after the amount the player owns
-            peltsAmountPattern.matchMatcher(item.hoverName.string.removeColor()) {
+            // Tony's Shop names one of its items after the amount the player owns
+            peltsAmountPattern.matchMatcher(item.cleanName) {
                 SkyblockCurrency.PELTS.setAmount(group("amount").formatLong())
             }
-            for (line in item.getLoreComponent().map { it.string.removeColor() }) {
+            for (line in item.getCleanLore()) {
                 readCleanLine(line)
             }
         }

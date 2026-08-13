@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.inventory.NpcTradeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LoreCostUtils.LoreCostEntry
@@ -78,11 +79,8 @@ object NpcTradeApi {
 
         val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val costs = lore.readLoreCosts(name).takeIf { it.isNotEmpty() } ?: return null
-        return NpcTrade(item.getInternalName(), name.removeColor(), costs)
+        return NpcTrade(item.getInternalName(), item.cleanName, costs)
     }
-
-    /** The form [trades] is keyed by. */
-    fun SafeItemStack.tradeName(): String = hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onChat(event: SkyHanniChatEvent.Allow) {

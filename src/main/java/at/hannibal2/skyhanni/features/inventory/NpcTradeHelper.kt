@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.CurrencyApi
 import at.hannibal2.skyhanni.data.NpcTradeApi
-import at.hannibal2.skyhanni.data.NpcTradeApi.tradeName
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
@@ -14,6 +13,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.LoreCostUtils
 import at.hannibal2.skyhanni.utils.LoreCostUtils.LoreCostEntry
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -134,7 +134,7 @@ object NpcTradeHelper {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onToolTip(event: ToolTipTextEvent) {
         if (!config.costBreakdown) return
-        val tradeItem = tradeItems[event.itemStack.tradeName()] ?: return
+        val tradeItem = tradeItems[event.itemStack.cleanName] ?: return
 
         for ((index, component) in event.toolTip.withIndex()) {
             // the tooltip prefixes every lore line, the lines from the item itself do not have it
@@ -159,7 +159,7 @@ object NpcTradeHelper {
             // the trades outlive the menu, an item of the same name in the player inventory is not one
             if (!slot.isTopInventory()) continue
             val item = slot.item.orNull() ?: continue
-            if (tradeItems[item.tradeName()]?.canAfford == true) {
+            if (tradeItems[item.cleanName]?.canAfford == true) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }
