@@ -70,6 +70,9 @@ enum class SkyblockCurrency(
     // SkyMart in Garden
     COPPER(NeuInternalName.SKYBLOCK_COPPER, "Copper", RED, loreNames = setOf("copper"), ownedAmount = { getFromStorage() }),
 
+    // Garden chip upgrades
+    SOWDUST("SOWDUST".toInternalName(), "Sowdust", DARK_GREEN, loreNames = setOf("sowdust"), ownedAmount = { getFromStorage() }),
+
     // Anita in Garden
     GOLD_MEDAL(
         NeuInternalName.SKYBLOCK_GOLD_MEDAL, "Gold medal", GOLD, loreNames = setOf("gold medal", "gold medals"),

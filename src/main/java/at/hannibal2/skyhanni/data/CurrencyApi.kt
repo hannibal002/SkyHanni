@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyblockCurrency
-import at.hannibal2.skyhanni.utils.SkyblockCurrency.COPPER
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 
@@ -35,19 +34,29 @@ object CurrencyApi {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         for (line in event.new) {
-            ScoreboardPattern.copperPattern.matchMatcher(line.trimWhiteSpace().removeResets()) {
-                COPPER.setAmount(group("copper").formatLong())
+            val message = line.trimWhiteSpace().removeResets()
+
+            ScoreboardPattern.copperPattern.matchMatcher(message) {
+                SkyblockCurrency.COPPER.setAmount(group("copper").formatLong())
+            }
+            // while sowdust is gained, hypixel shortens the number, those lines are skipped on purpose
+            ScoreboardPattern.sowdustPattern.matchMatcher(message) {
+                SkyblockCurrency.SOWDUST.setAmount(group("sowdust").formatLong())
             }
         }
     }
 
+    // the widget groups match anything, so the amounts are not guaranteed to be numbers
     @HandleEvent(onlyOnSkyblock = true)
     private fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.COPPER)) return
+        when {
+            event.isWidget(TabWidget.COPPER) -> TabWidget.COPPER.matchMatcherFirstLine {
+                group("copper").formatLongOrNull()?.let { SkyblockCurrency.COPPER.setAmount(it) }
+            }
 
-        // the widget group matches anything, so the amount is not guaranteed to be a number
-        TabWidget.COPPER.matchMatcherFirstLine {
-            group("copper").formatLongOrNull()?.let { COPPER.setAmount(it) }
+            event.isWidget(TabWidget.SOWDUST) -> TabWidget.SOWDUST.matchMatcherFirstLine {
+                group("sowdust").formatLongOrNull()?.let { SkyblockCurrency.SOWDUST.setAmount(it) }
+            }
         }
     }
 
