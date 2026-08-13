@@ -38,23 +38,27 @@ object LoreCostUtils {
      * REGEX-TEST: §7Cost
      * REGEX-TEST: §5§o§7Cost
      * REGEX-TEST: §7Cost: §b5,000 Bits
+     * REGEX-TEST: §7Cost to unlock: §550 Tokens
      */
     private val costHeaderPattern by patternGroup.pattern(
         "cost.header",
-        "(?:§.)*Cost(?:: (?<cost>.+))?",
+        "(?:§.)*Cost(?: to unlock)?(?:: (?<cost>.+))?",
     )
 
     /**
      * Shops word this line differently, the essence perk shops unlock and the chip menu levels
-     * up, but all of them list their cost the same way.
+     * up, but all of them list their cost the same way. Kuudra names the mouse button, and its
+     * preview line uses the right button, which must not count as a trade.
      *
      * REGEX-TEST: Click to trade!
      * REGEX-TEST: Click to unlock!
      * REGEX-TEST: Click to level up!
+     * REGEX-TEST: Left Click to unlock!
+     * REGEX-FAIL: Right Click to preview!
      */
     private val tradeLinePattern by patternGroup.pattern(
         "trade.click",
-        "Click to (?:trade|unlock|level up)!",
+        "(?:Left )?Click to (?:trade|unlock|level up)!",
     )
 
     /**

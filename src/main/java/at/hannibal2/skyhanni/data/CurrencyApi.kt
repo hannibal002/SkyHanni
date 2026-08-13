@@ -119,9 +119,13 @@ object CurrencyApi {
                 SkyblockCurrency.MOTES.setAmount(group("motes").formatLong())
             }
 
-            // the pattern is shared with the custom scoreboard, a repo override may still lack the group
+            // these patterns are shared with the custom scoreboard, a repo override may still lack the group
             ScoreboardPattern.peltsPattern.matchMatcher(message) {
                 groupOrNull("pelts")?.formatLongOrNull()?.let { SkyblockCurrency.PELTS.setAmount(it) }
+            }
+            // the group also matches shortened numbers, those are dropped by formatLongOrNull
+            ScoreboardPattern.tokensPattern.matchMatcher(message) {
+                groupOrNull("tokens")?.formatLongOrNull()?.let { SkyblockCurrency.KUUDRA_TOKEN.setAmount(it) }
             }
             readCleanLine(message.removeColor())
         }
@@ -197,6 +201,12 @@ object CurrencyApi {
         val essences = essenceStorage ?: return
         val owned = essences[internalName] ?: return
         essences[internalName] = (owned - total).coerceAtLeast(0)
+    }
+
+    // kuudra tokens only exist within a run, every visit starts over at zero
+    @HandleEvent
+    private fun onWorldChange() {
+        SkyblockCurrency.KUUDRA_TOKEN.setAmount(0)
     }
 
     /** Lines that read the same in an item lore and in the scoreboard, once the colors are gone. */

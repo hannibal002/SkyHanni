@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.CurrencyApi.getFromStorage
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PurseApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -35,6 +36,8 @@ enum class SkyblockCurrency(
     val color: LorenzColor,
     val coinValue: Double? = null,
     private val loreNames: Set<String>,
+    /** Set when the lore name alone is ambiguous and only unique on one island. */
+    private val island: IslandType? = null,
     /**
      * How much of this currency the player owns, or null when SkyHanni does not track it.
      * There is no default on purpose, every currency has to state where its amount comes from.
@@ -113,11 +116,17 @@ enum class SkyblockCurrency(
         ownedAmount = { getFromStorage() },
     ),
 
+    // the lore only writes "Tokens", the island is what makes it unambiguous
+    KUUDRA_TOKEN(
+        "KUUDRA_TOKEN".toInternalName(), "Tokens", DARK_PURPLE, loreNames = setOf("token", "tokens"),
+        island = IslandType.KUUDRA_ARENA,
+        ownedAmount = { getFromStorage() },
+    ),
+
     // TODO add these currencies, each one needs a real cost line from its shop first
     //  - North Stars, waiting on the winter event
-    //  - Carnival Tokens, waiting on the carnival event
+    //  - Carnival Tokens, waiting on the carnival event, the item is SKYBLOCK_CARNIVAL_POINT
     //  - Bingo Points, waiting on the bingo event
-    //  - Kuudra Tokens, waiting on a second player for kuudra run
     ;
 
     val coloredName: String = color.getChatColor() + displayName
@@ -129,6 +138,9 @@ enum class SkyblockCurrency(
     fun readAmountOrNull(text: String): Long? = readCurrencyOrNull(text)?.takeIf { it.first == this }?.second
 
     fun getOwnedAmountOrNull(): Long? = ownedAmount.invoke(this)
+
+    /** False when this currency belongs to an island the player is not on. */
+    private fun isAvailable(): Boolean = island?.isInIsland() ?: true
 
     /** Formats an amount the way it appears in a cost lore, for example "§b5,000 Bits". */
     fun formatAmount(amount: Long): String = "${color.getChatColor()}${amount.addSeparators()} $displayName"
@@ -162,7 +174,7 @@ enum class SkyblockCurrency(
 
         fun getByLoreNameOrNull(name: String): SkyblockCurrency? {
             val clean = name.removeColor().lowercase()
-            return entries.firstOrNull { clean in it.loreNames }
+            return entries.firstOrNull { clean in it.loreNames && it.isAvailable() }
         }
 
         /**
