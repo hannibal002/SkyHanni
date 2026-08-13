@@ -181,7 +181,7 @@ enum class SkyblockCurrency(
 
         fun getByLoreNameOrNull(name: String): SkyblockCurrency? {
             val clean = name.removeColor().lowercase()
-            return entries.firstOrNull { clean in it.loreNames && it.isAvailable() }
+            return entries.firstOrNull { it.isAvailable() && clean in it.loreNames }
         }
 
         /**
