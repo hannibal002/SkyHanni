@@ -135,7 +135,8 @@ object NpcTradeHelper {
         val tradeItem = tradeItems[slot] ?: return
 
         for ((index, component) in event.toolTip.withIndex()) {
-            val line = component.formattedTextCompatLessResets()
+            // the tooltip prefixes every lore line, the lines from the item itself do not have it
+            val line = component.formattedTextCompatLessResets().removePrefix("§5§o")
             if (LoreCostUtils.isCostHeader(line)) {
                 // the inline form writes the only cost entry into the header line itself
                 val inlineCost = tradeItem.lines.firstOrNull { line.contains(it.rawLine) }
