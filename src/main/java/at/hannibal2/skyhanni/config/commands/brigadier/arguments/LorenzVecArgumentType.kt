@@ -52,7 +52,7 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
             LorenzVec(x.toInt(), y.toInt(), z.toInt())
 
         override fun getExamples(): Collection<String> =
-            listOf("1 2 3", "-4 0 5", "~ 64 ~", "1:2:3", "-4, 0, 5", "LorenzVec(1, 2, 3)", "x: -262, y: 58, z: 117")
+            listOf("1 2 3", "-4 0 5", "~ 64 ~", "1:2:3", "-4, 0, 5", "-541,, 94,, 227", "LorenzVec(1, 2, 3)", "x: -262, y: 58, z: 117")
     }
 
     data object Double : LorenzVecArgumentType() {
@@ -97,6 +97,21 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
         )
 
         /**
+         * The coordinate format used by the SkyBlock Wiki. Values are separated by a comma followed
+         * by a narrow no-break space (U+202F), not by a regular space. The separator is written as
+         * `\u202f` in the pattern so it stays readable, but the regex tests below have to contain
+         * the literal character. Do not replace it with a normal space, the pattern would stop
+         * matching what the wiki actually produces.
+         *
+         * REGEX-TEST: -541, 94, 227
+         * REGEX-TEST: 1, 2, 3
+         */
+        private val wikiPattern by patternGroup.pattern(
+            "wiki",
+            "(?<x>-?\\d+),\\u202f(?<y>-?\\d+),\\u202f(?<z>-?\\d+)",
+        )
+
+        /**
          * REGEX-TEST: 1 2 3
          * REGEX-TEST: -4 0 5
          * REGEX-TEST: ~ 64 ~
@@ -137,7 +152,7 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
          * match closest to the start. Patterns that identify themselves through a keyword or a separator come
          * first, ambiguous ones last, so that unrelated text next to the coordinates cannot win.
          */
-        private val patterns = listOf(lorenzVecPattern, namedParameterPattern, spacePattern, commaPattern, colonPattern)
+        private val patterns = listOf(lorenzVecPattern, namedParameterPattern, spacePattern, commaPattern, colonPattern, wikiPattern)
 
         private val invalidCoordinates = SimpleCommandExceptionType(LiteralMessage("Invalid coordinates"))
 
