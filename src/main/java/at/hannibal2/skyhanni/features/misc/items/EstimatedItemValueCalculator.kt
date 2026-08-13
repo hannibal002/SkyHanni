@@ -185,8 +185,6 @@ object EstimatedItemValueCalculator {
         return totalPrice to basePrice
     }
 
-    private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
-
     private fun addReforgeStone(stack: SafeItemStack, list: MutableList<String>): Double {
         val rawReforgeName = stack.getReforgeModifier() ?: return 0.0
 
@@ -945,10 +943,4 @@ object EstimatedItemValueCalculator {
 
     private fun NeuInternalName.getPrice(): Double = getPriceOrNull() ?: 0.0
     private fun NeuInternalName.getPriceOrNull(): Double? = getPriceOrNull(config.priceSource.get())
-
-    // TODO create attribute class and use this instead of pair, sync with getAttributeFromShard()
-    fun Pair<String, Int>.getAttributeName(): String {
-        val name = first.fixMending().allLettersFirstUppercase()
-        return "§b$name $second Shard"
-    }
 }
