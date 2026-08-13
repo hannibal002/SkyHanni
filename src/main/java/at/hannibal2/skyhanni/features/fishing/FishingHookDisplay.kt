@@ -70,7 +70,7 @@ object FishingHookDisplay {
 
         val current = timerEntity
         if (current != null && current.id != event.entity.id) {
-            // Prefer the closest entity to the bobber if there ar multiple
+            // Prefer the closest entity to the bobber if there are multiple
             if (current.position.distanceTo(bobber.position()) < position.distanceTo(bobber.position())) {
                 return
             }
