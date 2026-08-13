@@ -48,8 +48,7 @@ internal object GreenhouseCropScanner {
             position.add(y = yOffset).getBlockStateAt().block.skyShardsCropId()?.let { return it }
         }
         getEntitiesInBox<ArmorStand>(position, FLOATING_CROP_ID_SEARCH_RADIUS) { stand ->
-            abs(stand.x - position.x) <= FLOATING_HEAD_HORIZONTAL_RADIUS &&
-                abs(stand.z - position.z) <= FLOATING_HEAD_HORIZONTAL_RADIUS
+            stand.isInCropColumn(position)
         }.forEach { stand ->
             listOf(stand.getStandHelmet(), stand.getHandItem()).firstNotNullOfOrNull { it.skyShardsCropId() }
                 ?.let { return it }
@@ -69,15 +68,13 @@ internal object GreenhouseCropScanner {
         }
 
         getEntitiesInBox<ArmorStand>(position, FLOATING_CROP_ID_SEARCH_RADIUS) { stand ->
-            abs(stand.x - position.x) <= FLOATING_HEAD_HORIZONTAL_RADIUS &&
-                abs(stand.z - position.z) <= FLOATING_HEAD_HORIZONTAL_RADIUS
+            stand.isInCropColumn(position)
         }.forEach { stand ->
             listOf(stand.getStandHelmet(), stand.getHandItem()).firstNotNullOfOrNull { it.independentCropId() }
                 ?.let { return it }
         }
         getEntitiesInBox<Display.ItemDisplay>(position, FLOATING_CROP_ID_SEARCH_RADIUS) { display ->
-            abs(display.x - position.x) <= FLOATING_HEAD_HORIZONTAL_RADIUS &&
-                abs(display.z - position.z) <= FLOATING_HEAD_HORIZONTAL_RADIUS
+            display.isInCropColumn(position)
         }.forEach { display ->
             display.itemStack.independentCropId()?.let { return it }
         }
@@ -99,25 +96,26 @@ internal object GreenhouseCropScanner {
      * that a decorative head belonging to a neighbouring crop cannot satisfy this position.
      */
     private fun LorenzVec.hasFloatingHeadAtCropPosition(category: CropCategory): Boolean {
-        fun net.minecraft.world.entity.Entity.isInCropColumn(): Boolean =
-            abs(x - this@hasFloatingHeadAtCropPosition.x) <= FLOATING_HEAD_HORIZONTAL_RADIUS &&
-                abs(z - this@hasFloatingHeadAtCropPosition.z) <= FLOATING_HEAD_HORIZONTAL_RADIUS
-
         if (hasPlacedCropHead()) return true
 
         val armorStandHead = getEntitiesInBox<ArmorStand>(this, FLOATING_HEAD_SEARCH_RADIUS) {
-            it.isInCropColumn() && listOf(it.getStandHelmet(), it.getHandItem()).any { stack ->
+            it.isInCropColumn(this) && listOf(it.getStandHelmet(), it.getHandItem()).any { stack ->
                 stack.isFloatingCropHead(category)
             }
         }.isNotEmpty()
         if (armorStandHead) return true
 
         return getEntitiesInBox<Display.ItemDisplay>(this, FLOATING_HEAD_SEARCH_RADIUS) {
-            it.isInCropColumn() && it.itemStack.isFloatingCropHead(category)
+            it.isInCropColumn(this) && it.itemStack.isFloatingCropHead(category)
         }.isNotEmpty() || getEntitiesInBox<Display.BlockDisplay>(this, FLOATING_HEAD_SEARCH_RADIUS) {
-            it.isInCropColumn() && it.blockState.block in playerHeadBlocks
+            it.isInCropColumn(this) && it.blockState.block in playerHeadBlocks
         }.isNotEmpty()
     }
+
+    /** Entity-backed crops are positioned around the center of their planting block, not its corner. */
+    private fun net.minecraft.world.entity.Entity.isInCropColumn(position: LorenzVec): Boolean =
+        abs(x - (position.x + BLOCK_CENTER_OFFSET)) <= FLOATING_HEAD_HORIZONTAL_RADIUS &&
+            abs(z - (position.z + BLOCK_CENTER_OFFSET)) <= FLOATING_HEAD_HORIZONTAL_RADIUS
 
     private fun LorenzVec.hasPlacedCropHead(): Boolean =
         (-VARIABLE_HEIGHT_SEARCH_RADIUS..VARIABLE_HEIGHT_SEARCH_RADIUS).any { yOffset ->
@@ -191,6 +189,7 @@ internal object GreenhouseCropScanner {
     private const val FLOATING_HEAD_SEARCH_RADIUS = 2.5
     private const val FLOATING_CROP_ID_SEARCH_RADIUS = 3.0
     private const val FLOATING_HEAD_HORIZONTAL_RADIUS = 0.75
+    private const val BLOCK_CENTER_OFFSET = 0.5
 }
 
 internal enum class CropCategory(
