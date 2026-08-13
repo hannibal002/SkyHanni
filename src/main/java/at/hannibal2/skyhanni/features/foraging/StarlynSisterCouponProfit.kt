@@ -208,7 +208,7 @@ object StarlynSisterCouponProfit {
             }.toMap()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     private fun onChestGuiRender() {
         if (!config.starlynCouponProfitEnabled || !starlynInventory.isInside()) return
         updateDisplay()
