@@ -36,13 +36,6 @@ object BazaarCancelledBuyOrderClipboard {
         "(?:coins from |from |)(?<amount>.*)x missing items\\.",
     )
 
-    /**
-     * REGEX-TEST: [Bazaar] Cancelled! Refunded 12,345 coins from cancelling Buy Order!
-     */
-    private val cancelledMessagePattern by patternGroup.pattern(
-        "cancelledmessage.colorless",
-        "\\[Bazaar] Cancelled! Refunded (?<coins>.*) coins from cancelling Buy Order!"
-    )
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventorytitle",
         "Order options",
@@ -51,7 +44,7 @@ object BazaarCancelledBuyOrderClipboard {
     private var latestAmount: Int? = null
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!inventoryTitlePattern.matches(event.inventoryName)) return
         val stack = event.inventoryItems[11] ?: return
@@ -76,9 +69,9 @@ object BazaarCancelledBuyOrderClipboard {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        val coins = cancelledMessagePattern.matchMatcher(event.cleanMessage) {
+        val coins = BazaarOrderApi.cancelledPattern.matchMatcher(event.cleanMessage) {
             group("coins").formatDouble()
         } ?: return
 
