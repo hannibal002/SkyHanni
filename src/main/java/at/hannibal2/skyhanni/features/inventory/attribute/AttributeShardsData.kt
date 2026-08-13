@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -279,14 +280,12 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: SALT You charmed a Magma Slug and captured 3 Shards from it.
-     * REGEX-TEST: SALT You charmed a Lapis Zombie and captured its Shard.
-     * REGEX-TEST: CHARM You charmed a Lapis Zombie and captured its Shard.
-     * REGEX-TEST: NAGA You charmed a Lapis Zombie and captured its Shard.
+     * REGEX-TEST: CHARM! You charmed the Haggard and received 3 Haggard Shards!
+     * REGEX-TEST: CHARM! You charmed the Slug and received 1 Keeled Slug Shard!
      */
     private val charmedShardPattern by patternGroup.pattern(
         "charmed.shard.colorless",
-        "(?<charmType>CHARM|SALT|NAGA) You charmed an? (?<shardName>.+) and captured (?:(?<amount>\\d+) Shards from it|its Shard)\\.",
+        "CHARM! You charmed the .+ and received (?<amount>\\d+) (?<shardName>.+) Shards?!",
     )
 
     /**
@@ -331,16 +330,15 @@ object AttributeShardsData {
         "You have been given a (?<shardName>.+)!",
     )
 
-    // the boolean is if it should post the shard gain event
-    private val shardGainChatPatterns = mapOf(
-        caughtShardsPattern to (true to ShardSource.HUNT),
-        caughtMultipleShardsPattern to (true to ShardSource.FISHING),
-        lootShareShardPattern to (true to ShardSource.HUNT),
-        charmedShardPattern to (true to null),
-        sentToHuntingBoxPattern to (false to ShardSource.SENT_TO_HUNTING_BOX),
-        capturedShardPattern to (true to ShardSource.CAPTURED),
-        floorDropShardPattern to (true to ShardSource.FLOOR_DROP),
-        givenShardsPattern to (true to ShardSource.GIVEN),
+    private val shardGainChatPatterns = mapOf<Pattern, ShardSource>(
+        caughtShardsPattern to HUNT,
+        caughtMultipleShardsPattern to FISHING,
+        lootShareShardPattern to HUNT,
+        charmedShardPattern to CHARM,
+        sentToHuntingBoxPattern to SENT_TO_HUNTING_BOX,
+        capturedShardPattern to CAPTURED,
+        floorDropShardPattern to FLOOR_DROP,
+        givenShardsPattern to GIVEN,
     )
 
     @HandleEvent(priority = HandleEvent.LOWEST)
@@ -413,7 +411,7 @@ object AttributeShardsData {
             setAttributeState(shardInternalName, false)
         }
 
-        for ((pattern, shouldPostGainEvent) in shardGainChatPatterns) {
+        for ((pattern, source) in shardGainChatPatterns) {
             pattern.matchMatcher(message) {
                 val shardName = group("shardName")
                 val amount = groupOrNull("amount")?.toInt() ?: 1
@@ -424,24 +422,10 @@ object AttributeShardsData {
                     return
                 }
 
-                val source = shouldPostGainEvent.second
-                val newSource = if (source == null) {
-                    val type = groupOrNull("charmType")
-                    when (type) {
-                        "CHARM" -> ShardSource.CHARM
-                        "NAGA" -> ShardSource.NAGA
-                        "SALT" -> ShardSource.SALT
-
-                        else -> ShardSource.UNKNOWN
-                    }
+                if (source == SENT_TO_HUNTING_BOX) {
+                    ShardEvent(shardInternalName, amount, source).post()
                 } else {
-                    source
-                }
-
-                if (shouldPostGainEvent.first) {
-                    ShardGainEvent(shardInternalName, amount, newSource).post()
-                } else {
-                    ShardEvent(shardInternalName, amount, newSource).post()
+                    ShardGainEvent(shardInternalName, amount, source).post()
                 }
                 return
             }
