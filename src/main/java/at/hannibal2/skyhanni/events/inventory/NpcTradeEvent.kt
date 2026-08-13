@@ -13,8 +13,9 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
  * what a single one of them costs, exactly as the item lore lists it, so multiply the two to get
  * what the purchase took in total.
  *
- * Only fired while the menu the item was bought from is still known, a purchase from an already
- * closed menu cannot be priced and stays silent.
+ * The costs come from the last menu that listed the item under that name, and that list is kept
+ * after the menu closed: some shops ask for the amount in a follow up menu and only confirm the
+ * purchase once the shop itself is already gone.
  */
 @PrimaryFunction("onNpcTrade")
 class NpcTradeEvent(

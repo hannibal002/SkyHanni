@@ -65,6 +65,12 @@ object NpcTradeApi {
         readTrades(event.inventoryItems.values)
     }
 
+    // kept past closing the menu, but not past leaving the island
+    @HandleEvent
+    private fun onWorldChange() {
+        trades = emptyMap()
+    }
+
     // a menu without trades leaves the previous ones alone, they are still needed after it closed
     private fun readTrades(items: Collection<SafeItemStack>) {
         // the same item can sit in several slots, the costs are the same in all of them
