@@ -55,8 +55,8 @@ object FishingHookDisplay {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onEntityTextUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         if (!isEnabled()) return
-
         val newName = event.newName ?: return
+        val bobber = FishingApi.bobber ?: return
 
         val displayText = fishingHookPattern.matchMatcher(newName) {
             if (groupOrNull("alert") != null) {
@@ -70,8 +70,7 @@ object FishingHookDisplay {
 
         val current = timerEntity
         if (current != null && current.id != event.entity.id) {
-            val bobber = FishingApi.bobber ?: return
-
+            // Prefer the closest entity to the bobber if there ar multiple
             if (current.position.distanceTo(bobber.position()) < position.distanceTo(bobber.position())) {
                 return
             }
