@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
@@ -34,25 +34,30 @@ object HotxFeatures {
         handlers.forEach { it.renderOverlay() }
     }
 
-    private fun HotxHandler<*, *, *>.renderOverlay() {
+    private fun HotxHandler<*, *>.renderOverlay() {
         if (!shouldShowDisplay) return
-        val rotatingPerkEntry = rotatingPerkEntry
-        if (!rotatingPerkEntry.isUnlocked || !rotatingPerkEntry.enabled) return
-        val currentPerk = currentRotPerk
 
-        val perkDescriptionFormat = currentPerk?.displayDescription
-            ?: "§cUnknown! Run ${"§b/${name.lowercase()}"} §cto fix this."
-        val finalFormat = "§b${rotatingPerkEntry.guiName}§8: $perkDescriptionFormat"
+        val renderables = mutableListOf<Renderable>()
+        rotatingPerkSlots.forEach { slot ->
+            val entry = slot.entry
+            if (!entry.isUnlocked || !entry.enabled) return@forEach
+            val currentPerk = slot.currentPerk
+            val perkDescriptionFormat = currentPerk?.displayDescription
+                ?: "§cUnknown! Run ${"§b/${name.lowercase()}"} §cto fix this."
+            val finalFormat = "§b${entry.guiName}§8: $perkDescriptionFormat"
 
-        position.renderRenderable(
-            Renderable.text(finalFormat),
-            posLabel = "${rotatingPerkEntry.guiName} Display",
+            renderables.add(Renderable.text(finalFormat))
+        }
+
+        position.renderRenderables(
+            renderables,
+            posLabel = "${this.name} Display",
         )
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        val claimMap: Map<HotxHandler<*, *, *>, Boolean?> = listOf(
+        val claimMap: Map<HotxHandler<*, *>, Boolean?> = listOf(
             HotmData, HotfData,
         ).associateWith { data ->
             data.tryReadRotatingPerkChat(event)
@@ -72,7 +77,7 @@ object HotxFeatures {
 
     @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, onlyOnSkyblock = true)
     fun onBackgroundDrawn() {
-        val handler: HotxHandler<*, *, *> = when {
+        val handler: HotxHandler<*, *> = when {
             HotmData.inInventory && configHotm.highlightEnabledPerks -> HotmData
             HotfData.inInventory && configHotf.highlightEnabledPerks -> HotfData
             else -> return
@@ -91,7 +96,7 @@ object HotxFeatures {
     }
 
     private fun handleLevelStackSize(event: RenderItemTipEvent) {
-        val handler: HotxHandler<*, *, *> = when {
+        val handler: HotxHandler<*, *> = when {
             HotmData.inInventory && configHotm.levelStackSize -> HotmData
             HotfData.inInventory && configHotf.levelStackSize -> HotfData
             else -> return
@@ -105,7 +110,7 @@ object HotxFeatures {
     }
 
     private fun handleTokenStackSize(event: RenderItemTipEvent) {
-        val handler: HotxHandler<*, *, *> = when {
+        val handler: HotxHandler<*, *> = when {
             HotmData.inInventory && configHotm.tokenStackSize -> HotmData
             HotfData.inInventory && configHotf.tokenStackSize -> HotfData
             else -> return
