@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 class StarlynContestsConfig {
 
     @Expose
-    @ConfigOption(name = "Coupon Prices", desc = "Help to identify profitable items to buy at §dStarlyn Sister §rshops.")
+    @ConfigOption(name = "Shop Profit", desc = "Helps to identify profitable items to buy at §dStarlyn Sister §rshops.")
     @ConfigEditorBoolean
     @FeatureToggle
     var starlynCouponProfitEnabled = true
