@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
 @JvmInline
-value class SkyblockIcon(val icon: Char) {
+value class SkyblockIcon private constructor(private val icon: Char) {
     override fun toString(): String = icon.toString()
 
     companion object {
