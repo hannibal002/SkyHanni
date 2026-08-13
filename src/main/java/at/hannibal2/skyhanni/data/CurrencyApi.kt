@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.inventory.NpcTradeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
@@ -131,6 +132,19 @@ object CurrencyApi {
             for (line in item.getLoreComponent().map { it.string.removeColor() }) {
                 readCleanLine(line)
             }
+        }
+    }
+
+    /**
+     * Currencies with a live source of their own, like coins or bits, are skipped: they are not in
+     * the storage and reading them already accounts for the purchase.
+     */
+    @HandleEvent
+    private fun onNpcTrade(event: NpcTradeEvent) {
+        for (cost in event.costs) {
+            val currency = SkyblockCurrency.getByInternalNameOrNull(cost.internalName) ?: continue
+            val owned = currency.getFromStorage() ?: continue
+            currency.setAmount((owned - cost.amount * event.amount).coerceAtLeast(0))
         }
     }
 

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.BitsApi
+import at.hannibal2.skyhanni.data.CurrencyApi.getFromStorage
 import at.hannibal2.skyhanni.data.PurseApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -34,8 +35,11 @@ enum class SkyblockCurrency(
     val color: LorenzColor,
     val coinValue: Double? = null,
     private val loreNames: Set<String>,
-    /** How much of this currency the player owns, or null when SkyHanni does not track it. */
-    private val ownedAmount: (() -> Long?),
+    /**
+     * How much of this currency the player owns, or null when SkyHanni does not track it.
+     * There is no default on purpose, every currency has to state where its amount comes from.
+     */
+    private val ownedAmount: SkyblockCurrency.() -> Long?,
 ) {
     // Universal
     COINS(
@@ -53,8 +57,7 @@ enum class SkyblockCurrency(
     // Pesthunter's Wares in Garden
     PESTS(
         "PESTS".toInternalName(), "Pests", DARK_GREEN, loreNames = setOf("pest", "pests"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
 
     // Chocolate Factory
@@ -69,39 +72,39 @@ enum class SkyblockCurrency(
     // SkyMart in Garden
     COPPER(
         NeuInternalName.SKYBLOCK_COPPER, "Copper", RED, loreNames = setOf("copper"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
 
     // Anita in Garden
     GOLD_MEDAL(
         NeuInternalName.SKYBLOCK_GOLD_MEDAL, "Gold medal", GOLD, loreNames = setOf("gold medal", "gold medals"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
     SILVER_MEDAL(
         NeuInternalName.SKYBLOCK_SILVER_MEDAL, "Silver medal", WHITE, loreNames = setOf("silver medal", "silver medals"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
     BRONZE_MEDAL(
         NeuInternalName.SKYBLOCK_BRONZE_MEDAL, "Bronze medal", RED, loreNames = setOf("bronze medal", "bronze medals"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
 
     // Tony's Shop in the Farming Islands
     PELTS(
         "PELTS".toInternalName(), "Pelts", DARK_PURPLE, loreNames = setOf("pelt", "pelts"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
 
     // Cosmetics in various shops
     GEMS(
         "GEMS".toInternalName(), "Gems", GREEN, loreNames = setOf("gem", "gems"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
+    ),
+
+    // no shop sells for sowdust yet, this only tracks the amount
+    SOWDUST(
+        "SOWDUST".toInternalName(), "Sowdust", DARK_GREEN, loreNames = setOf("sowdust"),
+        ownedAmount = { getFromStorage() },
     ),
     ;
 
@@ -113,7 +116,7 @@ enum class SkyblockCurrency(
      */
     fun readAmountOrNull(text: String): Long? = readCurrencyOrNull(text)?.takeIf { it.first == this }?.second
 
-    fun getOwnedAmountOrNull(): Long? = ownedAmount.invoke()
+    fun getOwnedAmountOrNull(): Long? = ownedAmount.invoke(this)
 
     /** Formats an amount the way it appears in a cost lore, for example "§b5,000 Bits". */
     fun formatAmount(amount: Long): String = "${color.getChatColor()}${amount.addSeparators()} $displayName"
