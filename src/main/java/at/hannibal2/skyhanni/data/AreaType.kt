@@ -66,6 +66,7 @@ class AreaType private constructor(
         val FARM = create("Farm")
         val GRAVEYARD = create("Graveyard")
         val REVENANT_CAVE = create("Revenant Cave")
+        val CRYPTS = create("Crypts")
         val SPIDER_MOUND = create("Spider Mound")
         val ARACHNES_BURROW = create("Arachne's Burrow")
         val ARACHNES_SANCTUARY = create("Arachne's Sanctuary")

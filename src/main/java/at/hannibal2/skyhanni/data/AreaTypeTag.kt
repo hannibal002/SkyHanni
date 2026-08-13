@@ -89,6 +89,7 @@ class AreaTypeTag private constructor(
             "REVENANT",
             AreaType.GRAVEYARD,
             AreaType.REVENANT_CAVE,
+            AreaType.CRYPTS,
         )
 
         val TARANTULA = create(
