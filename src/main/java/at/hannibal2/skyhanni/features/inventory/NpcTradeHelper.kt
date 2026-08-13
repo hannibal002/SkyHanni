@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.CurrencyApi
 import at.hannibal2.skyhanni.data.NpcTradeApi
 import at.hannibal2.skyhanni.data.NpcTradeApi.tradeName
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
@@ -105,6 +106,8 @@ object NpcTradeHelper {
         val owned = when {
             internalName == NeuInternalName.MISSING_ITEM -> null
             currency != null -> currency.getOwnedAmountOrNull()
+            // essence is a repo item, but it is not carried in the inventory and cannot be counted
+            internalName.isEssence() -> CurrencyApi.getEssenceOrNull(internalName)
             else -> internalName.getAmountInInventory().toLong()
         }
         val covered = owned != null && owned >= amount

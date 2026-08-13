@@ -9,7 +9,10 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.inventory.NpcTradeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -63,7 +66,31 @@ object CurrencyApi {
         "(?<type>GOLD|SILVER|BRONZE) medals: (?<amount>[\\d,]+)",
     )
 
+    /**
+     * The type is read as written, so a new kind of essence needs no code change.
+     *
+     * REGEX-TEST: Your Undead Essence: 28,439
+     * REGEX-TEST: Your Wither Essence: 1,204
+     */
+    private val essenceAmountPattern by patternGroup.pattern(
+        "essence.amount",
+        "Your (?<type>[\\w ]+) Essence: (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * The widget header has no amount and is skipped by the pattern. A shortened number is
+     * skipped as well, since the group only accepts digits.
+     *
+     * WRAPPED-REGEX-TEST: " Undead: 28,439"
+     * WRAPPED-REGEX-TEST: " Crimson: 12"
+     */
+    private val essenceWidgetPattern by patternGroup.pattern(
+        "essence.widget",
+        "\\s*(?<type>[\\w ]+): (?<amount>[\\d,]+)",
+    )
+
     private val storage get() = ProfileStorageData.profileSpecific?.currencies
+    private val essenceStorage get() = ProfileStorageData.profileSpecific?.essence
 
 
     private fun SkyblockCurrency.setAmount(amount: Long) {
@@ -119,6 +146,19 @@ object CurrencyApi {
             event.isWidget(TabWidget.GEMS) -> TabWidget.GEMS.matchMatcherFirstLine {
                 group("gems").exactAmountOrNull()?.let { SkyblockCurrency.GEMS.setAmount(it) }
             }
+
+            event.isWidget(TabWidget.ESSENCE) -> readEssenceWidget(event.cleanLines)
+        }
+    }
+
+    /** The widget lists one line per essence type below its header. */
+    private fun readEssenceWidget(lines: List<String>) {
+        for (line in lines) {
+            essenceWidgetPattern.matchMatcher(line) {
+                // the pattern is generic, a line that is no essence belongs to an unknown widget
+                val internalName = essenceInternalNameOrNull(group("type")) ?: return@matchMatcher
+                essenceStorage?.put(internalName, group("amount").formatLong())
+            }
         }
     }
 
@@ -162,7 +202,33 @@ object CurrencyApi {
         medalAmountPattern.matchMatcher(line) {
             medalCurrencyOrNull(group("type"))?.setAmount(group("amount").formatLong())
         }
+        // every essence shop menu holds an item that states how much of it the player owns
+        essenceAmountPattern.matchMatcher(line) {
+            val type = group("type")
+            val internalName = essenceInternalNameOrNull(type) ?: run {
+                ErrorManager.logErrorStateWithData(
+                    "Could not read how much essence you own",
+                    "Unknown essence type in an item lore",
+                    "type" to type,
+                    "line" to line,
+                    "inventoryName" to InventoryUtils.openInventoryName(),
+                    betaOnly = true,
+                )
+                return@matchMatcher
+            }
+
+            essenceStorage?.put(internalName, group("amount").formatLong())
+        }
     }
+
+    private fun essenceInternalNameOrNull(type: String): NeuInternalName? =
+        NeuInternalName.fromItemNameOrNull("$type Essence")
+
+    /**
+     * Essence is a regular repo item, but the player does not carry it in the inventory, so the
+     * amount cannot be counted and has to be remembered from the last time a shop was open.
+     */
+    fun getEssenceOrNull(internalName: NeuInternalName): Long? = essenceStorage?.get(internalName)
 
     // null is unreachable, the pattern allows nothing else
     private fun medalCurrencyOrNull(type: String) = when (type) {
@@ -178,6 +244,9 @@ object CurrencyApi {
         event.addIrrelevant {
             for ((currency, amount) in storage.orEmpty()) {
                 add("$currency: $amount")
+            }
+            for ((internalName, amount) in essenceStorage.orEmpty()) {
+                add("${internalName.asString()}: $amount")
             }
         }
     }

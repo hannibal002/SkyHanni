@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -51,6 +52,15 @@ object LoreCostUtils {
         "Click to trade!",
     )
 
+    /**
+     * REGEX-TEST: 50 Safari Essence
+     * REGEX-TEST: 50,000 Undead Essence
+     */
+    private val amountFirstPattern by patternGroup.pattern(
+        "cost.amount-first",
+        "(?<amount>[\\d,]+) (?<name>[\\w' ]+)",
+    )
+
     fun SafeItemStack.readLoreCosts(): List<LoreCostEntry> = getLoreComponent()
         .map { it.formattedTextCompatLessResets() }
         .readLoreCosts(hoverName.formattedTextCompatLeadingWhiteLessResets())
@@ -70,6 +80,7 @@ object LoreCostUtils {
         val line = rawLine.replace("§8 ", " §8")
 
         readCurrencyOrNull(line, rawLine)?.let { return it }
+        readAmountFirstOrNull(line, rawLine)?.let { return it }
 
         val (name, amount) = ItemUtils.readItemAmount(line) ?: run {
             logCostLineError("Could not read the amount of a cost line", rawLine, itemName)
@@ -97,5 +108,15 @@ object LoreCostUtils {
     private fun readCurrencyOrNull(line: String, rawLine: String): LoreCostEntry? =
         SkyblockCurrency.readCurrencyOrNull(line)?.let { (currency, amount) ->
             LoreCostEntry(currency.internalName, amount, rawLine)
+        }
+
+    /**
+     * Items that write the amount in front of the name, like "50,000 Undead Essence".
+     * [ItemUtils.readItemAmount] only reads the other form, where the amount is behind the name.
+     */
+    private fun readAmountFirstOrNull(line: String, rawLine: String): LoreCostEntry? =
+        amountFirstPattern.matchMatcher(line.removeColor()) {
+            val internalName = NeuInternalName.fromItemNameOrNull(group("name")) ?: return@matchMatcher null
+            LoreCostEntry(internalName, group("amount").formatLong(), rawLine)
         }
 }

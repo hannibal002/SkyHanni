@@ -110,6 +110,10 @@ class ProfileSpecificStorage(
     @Expose
     var currencies: MutableMap<SkyblockCurrency, Long> = enumMapOf()
 
+    /** Written and read by [at.hannibal2.skyhanni.data.CurrencyApi]. */
+    @Expose
+    var essence: MutableMap<NeuInternalName, Long> = mutableMapOf()
+
     // features
     // - combat
     @Expose

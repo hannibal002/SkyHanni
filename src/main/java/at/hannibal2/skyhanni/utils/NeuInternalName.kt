@@ -33,6 +33,8 @@ value class NeuInternalName private constructor(private val internalName: String
         internalName.endsWith("_CHESTPLATE") ||
         internalName.endsWith("_LEGGINGS")
 
+    fun isEssence(): Boolean = internalName.startsWith("ESSENCE_")
+
     fun getItemCategoryOrNull(): ItemCategory? =
         categoryCache.getOrPut(this) { getItemStackOrNull()?.getItemCategoryOrNull() ?: return null }
 
