@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.chat
 
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -135,7 +136,7 @@ object TextHelper {
         maxPerPage: Int = 15,
         dividerColor: ChatFormatting = ChatFormatting.BLUE,
         formatter: (T) -> Component,
-    ) {
+    ): Unit = DelayedRun.runOrNextTick("paginated list: $title") {
         val text = mutableListOf<Component>()
 
         val totalPages = (list.size + maxPerPage - 1) / maxPerPage
