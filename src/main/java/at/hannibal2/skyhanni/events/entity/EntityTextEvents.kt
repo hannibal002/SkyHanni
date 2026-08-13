@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.events.entity
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 
@@ -19,7 +20,9 @@ import net.minecraft.world.entity.Entity
 data class EntityTextUpdateEvent(
     val entity: Entity,
     val newName: Component?,
-) : SkyHanniEvent()
+) : SkyHanniEvent() {
+    val cleanName = newName?.string?.removeColor()
+}
 
 /**
  * Event that is fired when a text display entity or an armor stand with a custom name is removed from the world.

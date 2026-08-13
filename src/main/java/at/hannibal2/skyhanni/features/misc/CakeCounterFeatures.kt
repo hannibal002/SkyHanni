@@ -101,7 +101,7 @@ object CakeCounterFeatures {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         val entity = event.entity
-        val name = event.newName?.string?.removeColor() ?: return
+        val name = event.cleanName ?: return
         val entityId = entity.id
 
         if (cakesEatenEntityId == null) {

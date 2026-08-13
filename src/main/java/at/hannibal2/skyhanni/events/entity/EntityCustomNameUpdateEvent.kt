@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.events.entity
 
 import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 
@@ -16,4 +17,6 @@ import net.minecraft.world.entity.Entity
 data class EntityCustomNameUpdateEvent<T : Entity>(
     val entity: T,
     val newName: Component?,
-) : GenericSkyHanniEvent<T>(entity.javaClass)
+) : GenericSkyHanniEvent<T>(entity.javaClass) {
+    val cleanName = newName?.string?.removeColor()
+}

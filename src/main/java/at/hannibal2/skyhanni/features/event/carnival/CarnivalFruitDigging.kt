@@ -374,7 +374,7 @@ object CarnivalFruitDigging {
 
         // Armor stand appears when a fruit is dug or exposed by watermelon
         val entity = event.entity
-        val name = event.newName?.string?.removeColor() ?: return
+        val name = event.cleanName ?: return
         if (name.isBlank()) return
 
         val pos = entity.blockPosition().toLorenzVec()
