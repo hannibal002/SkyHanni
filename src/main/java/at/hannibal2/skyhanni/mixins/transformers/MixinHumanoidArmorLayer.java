@@ -19,7 +19,7 @@ public abstract class MixinHumanoidArmorLayer {
     private void onRenderArmor(
         PoseStack poseStack, SubmitNodeCollector submitNodeCollector, ItemStack itemStack, EquipmentSlot slot, int i, HumanoidRenderState humanoidRenderState, CallbackInfo ci
     ) {
-        if (HideArmorHookKt.shouldHideHead(slot)) {
+        if (HideArmorHookKt.shouldHideSlot(slot)) {
             ci.cancel();
         }
     }

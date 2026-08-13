@@ -209,6 +209,14 @@ enum class GraphNodeTag(
         onlyIsland = IslandType.SAFARI,
     ),
 
+    FLOOR_DROPS(
+        "floor_drops",
+        LorenzColor.GREEN,
+        "Floor Drops",
+        "A location where a Floor Drop can be found.",
+        onlyIsland = IslandType.SAFARI,
+    ),
+
     ;
 
     val displayName: String = color.getChatColor() + cleanName

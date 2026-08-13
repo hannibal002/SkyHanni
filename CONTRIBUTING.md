@@ -321,6 +321,12 @@ Make sure such pull requests have a good explanation in the **What** section.
   preferred, not just tolerated, because the enum class name carries no information there. It covers `when` subjects and
   branches, comparisons, assignments and arguments with a known parameter type. Stay consistent within a block: do not mix
   `MyEnum.ENTRY` and `ENTRY` in the same place.
+    - This governs how code is written, not a cleanup task. Apply it in files you are already changing. Do not open a
+      pull request whose only purpose is stripping qualifiers across the codebase.
+    - Subclasses of a sealed class are a separate case. To use them unqualified, import the subclass
+      (`import some.pkg.Outer.Variant`). That is a normal class import, it costs one line per subclass instead of one
+      per enum entry, and it applies everywhere in the file rather than only where the expected type is known. See
+      `EliteWeightJson.kt` for an example.
 - Use named parameters for boolean and numeric arguments where the meaning is not immediately clear from context (e.g.,
   `findMobHeight(height, above = true)` instead of `findMobHeight(height, true)`).
 - Follow Kotlin conventions for acronym naming:
