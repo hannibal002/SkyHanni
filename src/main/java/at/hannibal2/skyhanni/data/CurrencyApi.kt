@@ -78,8 +78,8 @@ object CurrencyApi {
     )
 
     /**
-     * The widget header has no amount and is skipped by the pattern. A shortened number is
-     * skipped as well, since the group only accepts digits.
+     * The widget header has no amount and is skipped by the pattern. A shortened number like
+     * "17k" is skipped as well, the amount group does not match it.
      *
      * WRAPPED-REGEX-TEST: " Undead: 28,439"
      * WRAPPED-REGEX-TEST: " Crimson: 12"
@@ -90,8 +90,7 @@ object CurrencyApi {
     )
 
     private val storage get() = ProfileStorageData.profileSpecific?.currencies
-    private val essenceStorage get() = ProfileStorageData.profileSpecific?.essence
-
+    private val essenceStorage get() = ProfileStorageData.profileSpecific?.essences
 
     private fun SkyblockCurrency.setAmount(amount: Long) {
         storage?.put(this, amount)
@@ -175,17 +174,26 @@ object CurrencyApi {
         }
     }
 
-    /**
-     * Currencies with a live source of their own, like coins or bits, are skipped: they are not in
-     * the storage and reading them already accounts for the purchase.
-     */
     @HandleEvent
     private fun onNpcTrade(event: NpcTradeEvent) {
         for (cost in event.costs) {
-            val currency = SkyblockCurrency.getByInternalNameOrNull(cost.internalName) ?: continue
-            val owned = currency.getFromStorage() ?: continue
-            currency.setAmount((owned - cost.amount * event.amount).coerceAtLeast(0))
+            subtractCost(cost.internalName, cost.amount * event.amount)
         }
+    }
+
+    /**
+     * Only what is stored here can be corrected. Amounts with a live source of their own, like
+     * coins or bits, are skipped, since reading them already accounts for the purchase.
+     */
+    private fun subtractCost(internalName: NeuInternalName, total: Long) {
+        SkyblockCurrency.getByInternalNameOrNull(internalName)?.let { currency ->
+            val owned = currency.getFromStorage() ?: return
+            currency.setAmount((owned - total).coerceAtLeast(0))
+            return
+        }
+        val essences = essenceStorage ?: return
+        val owned = essences[internalName] ?: return
+        essences[internalName] = (owned - total).coerceAtLeast(0)
     }
 
     /** Lines that read the same in an item lore and in the scoreboard, once the colors are gone. */
@@ -226,7 +234,7 @@ object CurrencyApi {
 
     /**
      * Essence is a regular repo item, but the player does not carry it in the inventory, so the
-     * amount cannot be counted and has to be remembered from the last time a shop was open.
+     * amount cannot be counted and is remembered from the tab list or from an essence shop menu.
      */
     fun getEssenceOrNull(internalName: NeuInternalName): Long? = essenceStorage?.get(internalName)
 

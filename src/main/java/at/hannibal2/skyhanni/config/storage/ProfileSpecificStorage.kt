@@ -112,7 +112,7 @@ class ProfileSpecificStorage(
 
     /** Written and read by [at.hannibal2.skyhanni.data.CurrencyApi]. */
     @Expose
-    var essence: MutableMap<NeuInternalName, Long> = mutableMapOf()
+    var essences: MutableMap<NeuInternalName, Long> = mutableMapOf()
 
     // features
     // - combat
