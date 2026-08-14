@@ -58,7 +58,7 @@ object TreeProgressDisplay {
     }
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    private fun onEntityTextRemoved(event: EntityRemovedEvent<ArmorStand>) {
+    private fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
         if (!config.enabled.get()) return
         if (event.entity.id == displayEntityId) {
             clearData()
@@ -66,7 +66,7 @@ object TreeProgressDisplay {
     }
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    private fun onEntityTextUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+    private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         if (!config.enabled.get()) return
         if (config.onlyHoldingAxe && InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.AXE) {
             display = null
