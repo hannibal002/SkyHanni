@@ -232,15 +232,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
 
         if (!entry.enabled || !entry.isUnlocked) return
 
-        val index = HotxPatterns.itemPreEffectPattern.indexOfFirstMatch(lore)
-            ?: run {
-                ErrorManager.logErrorStateWithData(
-                    "Could not read rotating perk from $name tree",
-                    "itemPreEffectPattern didn't match",
-                    "lore" to lore,
-                )
-                return
-            }
+        // Hypixel sometimes doesn't show the current perk in lore if switching hotx trees layouts
+        val index = HotxPatterns.itemPreEffectPattern.indexOfFirstMatch(lore) ?: return
 
         val singleLine = lore.getOrNull(index + 1) ?: return
         // Long effects wrap over several lines. The single line is tried first because one Sky Mall
