@@ -35,12 +35,13 @@ object FishingHookDisplay {
      * REGEX-TEST: §e§l3.0
      * REGEX-TEST: §e§l1.2
      * REGEX-TEST: §c§l!!!
-     * REGEX-TEST: 3.0
      * REGEX-TEST: !!!
+     * REGEX-FAIL: §736
+     * REGEX-FAIL: §772
      */
     private val timerPattern by RepoPattern.pattern(
         "fishing.hook.timer",
-        "(?:§.)*(?:(?<time>\\d+(?:\\.\\d+)?)|(?<alert>!!!))",
+        "§e§l(?<time>\\d+(?:\\.\\d+)?)|(?:§.)*(?<alert>!!!)",
     )
 
     private var isRendering = false
