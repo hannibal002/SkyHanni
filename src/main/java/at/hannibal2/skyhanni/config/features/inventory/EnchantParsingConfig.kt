@@ -107,8 +107,7 @@ class EnchantParsingConfig {
     @Expose
     @ConfigOption(
         name = "Show max enchant level",
-        desc = "Shows the maximum enchant level for an enchant beside the enchantment level. " +
-            "\n§8Example: §9Efficiency 5 §8/ 10",
+        desc = "Shows the maximum enchant level for an enchant beside the enchantment level. ",
     )
     @ConfigEditorBoolean
     var showMaxEnchantLevel: Boolean = false
