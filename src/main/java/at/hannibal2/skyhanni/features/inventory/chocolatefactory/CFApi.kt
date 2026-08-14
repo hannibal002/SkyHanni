@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.MilestoneJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFUpgrade
@@ -136,7 +137,7 @@ object CFApi {
 
     var specialRabbitTextures = listOf<String>()
     var warningSound = SoundUtils.createSound("block.note_block.pling", 1f)
-    val mainInventory = InventoryDetector { name -> name == "Chocolate Factory" }
+    val mainInventory = InventoryDetector { HoppityApi.chocolateFactoryInvPattern }
 
     private val partyModeRegex = Regex("§[a-fA-F0-9]")
 

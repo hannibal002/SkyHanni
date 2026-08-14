@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -53,7 +52,7 @@ object SackApi {
     private val patternGroup = RepoPattern.group("data.sacks")
     private var lastOpenedInventory = ""
 
-    val inventory = InventoryDetector { name -> sackPattern.matches(name) }
+    val inventory = InventoryDetector { sackPattern }
 
     // <editor-fold desc="Patterns">
     /**

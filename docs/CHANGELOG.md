@@ -108,6 +108,8 @@
 
 + Added Egg Sac highlight during the Tarantula Broodfather boss fight. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5919)
 + Added line to Voidgloom Seraph boss. - Marina (https://github.com/hannibal002/SkyHanni/pull/5669)
++ Added No Gummy Warning. - PuppyGirlAbora (https://github.com/hannibal002/SkyHanni/pull/5871)
+    + Added a warning when killing mobs without a Re-Heated Gummy Polar Bear active.
 
 #### Rift
 
@@ -122,6 +124,8 @@
 + Added support for Minecraft 26.1–26.1.2. - nopo, Daveed, Luna, Alex, Rain (https://github.com/hannibal002/SkyHanni/pull/5763)
 + Added Oringo Pet in Calendar. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5931)
     + Show the future legendary pet Oringo will offer in the Calendar.
++ Re-added the old Glowing Dropped Items feature for the items Hypixel doesn't glow. - Luna (https://github.com/hannibal002/SkyHanni/pull/5758)
+    + This does not glow them through walls, unlike the old feature.
 
 ### Improvements
 
@@ -135,6 +139,8 @@
 + Made warnings from Barn Fishing Timer clearer. - Luna (https://github.com/hannibal002/SkyHanni/pull/5453)
 + Added the Hotspot Tonic Mixin to the Non-Godpot Effect Display Feature. - jani (https://github.com/hannibal002/SkyHanni/pull/5804)
 + Added an option to put the DOUBLE HOOK! from Compact Double Hook after the sea creature catch message. - Luna (https://github.com/hannibal002/SkyHanni/pull/5531)
++ Improved Trophy Fish Display detection for if you're Trophy Fishing. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5886)
+    + Instead of only checking for Trophy Armor it now also checks for Trophy Line, Hot Bait usage, and if you are too low level to fish Sea Creatures.
 
 #### Event
 
@@ -278,6 +284,9 @@
 + Added Way to Pause and Resume Tracker. - Icetrix (https://github.com/hannibal002/SkyHanni/pull/5952)
 + Added Blazetekk Ham Radio warnings to chat filter. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6168)
 + Reduced cases of inflated prices being reported due to Auction House manipulation. - Luna (https://github.com/hannibal002/SkyHanni/pull/5921)
++ Improved performance when handling game events. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5963)
++ Restored REI compatibility for Minecraft 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/6150)
+    + Note: We highly recommend using [SkyBlock Item List](https://modrinth.com/mod/skyblock-item-list) instead.
 
 ### Fixes
 
@@ -350,6 +359,14 @@
 + Fixed SkyHanni not detecting the 4th Harvest Feast in-season crop. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6113)
 + Fixed Pest Spawn Timer giving error when Tab List is still loading when joining the Garden. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6165)
 + Fixed an error message when opening the Visitor menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6135)
++ Fixed detection of completed Jacob's Contests. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6191)
++ Fixed Juicy Sprayonator and Salty Sprayonator not being blocked by the No-Break feature in the Garden. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6173)
++ Fixed not properly detecting overflow Garden XP from the desk. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6190)
++ Fixed Spray usage not being tracked in the Pest Profit Tracker. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6173)
++ Fixed Visitor Supercraft assuming killing a Werewolf Sea Creature is the only way to craft Enchanted Pumpkin. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6178)
++ Fixed Anita's Extra Farming Fortune Helper not showing. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6206)
++ Fixed Jacob Contest Warning Popup always failing to open. - Luna (https://github.com/hannibal002/SkyHanni/pull/6204)
++ Fixed Visitor Logbook statistics either not showing or being inaccurate. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6212)
 
 #### Combat
 
@@ -387,6 +404,7 @@
 + Fixed rare error/crash with Crimson Isle Miniboss Timer (likely a mod conflict). - Avrg (https://github.com/hannibal002/SkyHanni/pull/6096)
 + Fixed the item ability cooldown detection for the Giant's Sword. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/6116)
 + Fixed Fragged Ice Spray Wand not showing item ability cooldown. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6157)
++ Fixed Deployables not being detected sometimes. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6214)
 
 #### GUI
 
@@ -411,6 +429,7 @@
 + Fixed Pet Display visually keeping removed pet items. - Akinsoft (https://github.com/hannibal002/SkyHanni/pull/6066)
 + Fixed tab widget highlight not working in multi-page settings pages. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6103)
 + Fixed changing loadouts not updating Power Stone and tunings in Custom Scoreboard. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6146)
++ Fixed an issue where forging a pet would incorrectly replace your currently equipped pet in the pet display. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6179)
 
 #### Item Ability
 
@@ -435,6 +454,7 @@
 + Fixed Hoppity's Hunt Unclaimed Eggs feature never sending a notification when you restart your game during a hunt and don't collect any eggs. - Luna (https://github.com/hannibal002/SkyHanni/pull/5808)
 + Fixed Hoppity rabbit count not being detected in the collection menu. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5960)
 + Fixed the Century Raffle Task Highlighter for the Year 500 raffle event. - Alex (https://github.com/hannibal002/SkyHanni/pull/5925)
++ Fixed Hoppity's Hunt event stats being shown in chat on login for events where the player did not participate. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6210)
 
 #### Fishing
 
@@ -484,6 +504,7 @@
 + Fixed error in DNA Analyzer Solver. - hannibal2 + nopo (https://github.com/hannibal002/SkyHanni/pull/5337)
 + Fixed a few errors when trying the torrhus canyon on the alpha. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6060)
 + Fixed Beacon Solver not detecting the color correctly. - Luna (https://github.com/hannibal002/SkyHanni/pull/5254)
++ Fixed Tree Progress Display being colorless. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6198)
 
 #### Rift
 
@@ -493,6 +514,7 @@
 + Fixed Rift Odonata, Larva, and Vermin Highlight not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5701)
 + Fixed rift time features not working with the hypixel resource pack. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6050)
 + Fixed rare error while using the Rift Berberis Helper. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6166)
++ Fixed Enigma Soul Helper not detecting the menu. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6187)
 
 #### Inventory
 
@@ -531,6 +553,10 @@
 + Fixed Inferno Profit Tracker detecting Bazaar + recipe menus as minion menu. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6129)
 + Fixed Croesus Chest Tracker thinking you always have already used kismet on a chest. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6164)
 + Fixed future legendary pets for Traveling Zoo not showing when other mods modify the tooltip. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6163)
++ Fixed Attribute Menu paginated inventory not being detected. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6182)
++ Fixed Croesus Chest Tracker not detecting paged Croesus inventory. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/6180)
++ Fixed Hunting Box and Fusion Box not being detected. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6186)
++ Fixed Minion Upgrade Helper not detecting wrapped ingredient line. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6175)
 
 #### Commands
 
@@ -557,6 +583,9 @@
 + Fixed Mineshaft Mayhem perk buff giving an error. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6055)
 + Fixed gemstones not being detected in treasure chests. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6030)
 + Fixed SkyMall/Mayhem perks not being detected from the inventory. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6108)
++ Fixed certain Goblin Eggs, Diamond Essence and Gold Essence from treasure chests not being detected. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6183)
++ Fixed Corpse Loot incorrectly tracking whether a key was consumed after leaving the Mineshaft. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6173)
++ Fixed Flawed Ruby being shown as Flawed Sapphire in Powder Chest Profit Tracker. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6183)
 
 #### Chat
 
@@ -686,6 +715,13 @@
 + Fixed Zorro's Cape protection not working due to Equipment change. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6111)
 + Fixed skill progress features not correctly counting overflow skill XP. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6155)
 + Fixed some text (e.g. Damage Indicator) rendering behind entities on 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/6149)
++ Fixed not being able to update NEU/SkyHanni repo if certain files are corrupted. - Luna (https://github.com/hannibal002/SkyHanni/pull/6097)
++ Fixed not detecting /stats menu due to Hypixel changing the menu name. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6187)
++ Fixed some Magical Power features not working. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6172)
++ Fixed Pest Repellent time not being detected. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6203)
++ Fixed Profile Join Message Hider not working. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6181)
++ Fixed some glow-related SkyHanni features potentially not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/6228)
++ Fixed various GUI-related SkyHanni features being broken because some code was accidentally deleted. - Luna (https://github.com/hannibal002/SkyHanni/pull/6228)
 
 ### Technical Details
 
@@ -1021,6 +1057,19 @@
 + Removed ModernPatterns and moved the patterns into their respective files. - Luna (https://github.com/hannibal002/SkyHanni/pull/5254)
     + We only support modern now, so there is no point in this file existing.
 + Renamed wardrobe and equipment API classes for clarity. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6137)
++ Added Detekt rule to enforce private event listeners. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6211)
++ Added KDoc and `@PrimaryFunction` to `TablistFooterUpdateEvent` and renamed its handlers to `onTabListFooterUpdate`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6219)
++ Added SPIDER_DEN and TORRHUS_CANYON tags for Hotspot. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/6208)
++ Banned `@Overwrite` and `@Redirect` and changed all existing uses of `@Redirect` to safer alternatives. - Luna (https://github.com/hannibal002/SkyHanni/pull/6158)
++ Changed invalid @HandleEvent annotations to fail at compile time instead of only crashing at runtime. - Luna (https://github.com/hannibal002/SkyHanni/pull/5599)
+    + At runtime, it now crashes in the development environment and otherwise skips event handler registration.
++ Fixed Contributor Achievement not counting above 1. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6189)
++ Made EffectApi matching colorless. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6203)
++ Made repo pattern Detekt rule cache the parsing result between the rules. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6174)
++ Renamed `chromafyHoppityStats` to `applyPartyMode` in `HoppityEventSummary`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6210)
++ Renamed `DelayedRun.runNextTickOld` to `DelayedRun.runNextTickEnd` and better documented the difference. - Luna (https://github.com/hannibal002/SkyHanni/pull/5462)
++ Separated listeners by required island type to avoid unnecessary island checks. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5963)
++ Updated Mixin classes to match latest target names, merged duplicate Mixin classes into one file where appropriate, removed GUI and render subfolders, and added Fabric subfolder for Mixins. - Luna (https://github.com/hannibal002/SkyHanni/pull/6145)
 
 ### Removed Features
 

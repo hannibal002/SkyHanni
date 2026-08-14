@@ -610,6 +610,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added line to Tarantula Boss. - SillyGirlMarina (https://github.com/hannibal002/SkyHanni/pull/5392)
 + Added Egg Sac highlight during the Tarantula Broodfather boss fight. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5919)
 + Added line to Voidgloom Seraph boss. - Marina (https://github.com/hannibal002/SkyHanni/pull/5669)
++ Added No Gummy Warning. - PuppyGirlAbora (https://github.com/hannibal002/SkyHanni/pull/5871)
+    + Added a warning when killing mobs without a Re-Heated Gummy Polar Bear active.
 
 </details>
 <details open><summary>
@@ -1903,6 +1905,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added support for Minecraft 26.1–26.1.2. - nopo, Daveed, Luna, Alex, Rain (https://github.com/hannibal002/SkyHanni/pull/5763)
 + Added Oringo Pet in Calendar. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5931)
     + Show the future legendary pet Oringo will offer in the Calendar.
++ Added Deployable Reminder. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5886)
+    + A reminder to place down your power orb for Slayer, umbrella for Trophy Fishing, and lantern for Mineshafts.
++ Re-added the old Glowing Dropped Items feature for the items Hypixel doesn't glow. - Luna (https://github.com/hannibal002/SkyHanni/pull/5758)
+    + This does not glow them through walls, unlike the old feature.
 
 </details>
 <details open><summary>
