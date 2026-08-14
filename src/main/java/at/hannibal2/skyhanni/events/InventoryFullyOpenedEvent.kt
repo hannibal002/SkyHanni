@@ -46,6 +46,9 @@ sealed class InventoryOpenEvent(private val inventory: OtherInventoryData.Invent
  * Since this logic only works via packets, and the player inventory (pressing E) is client side,
  * this event does not get fired when opening the inventory via pressing E.
  *
+ * Posted from the packet handler, so handlers do not run on the main thread. Anything that measures text
+ * width, such as building renderables, has to go through DelayedRun.runOrNextTick.
+ *
  * TODO does not work for inventories with empty slots (e.g. "Teleport to Player" ghost ability in dungeons).
  */
 @PrimaryFunction("onInventoryFullyOpened")
