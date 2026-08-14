@@ -13,7 +13,7 @@ class StereoHarmonyConfig {
     @ConfigOption(name = "Enabled", desc = "Show a display of what pest is being boosted by your vinyl.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var displayEnabled: Boolean = false
+    var displayEnabled: Boolean = true
 
     @Expose
     @ConfigOption(name = "Always Show", desc = "Show the display even while not farming.")
@@ -33,7 +33,7 @@ class StereoHarmonyConfig {
     @Expose
     @ConfigOption(name = "Hide when None", desc = "Hide when no vinyl selected.")
     @ConfigEditorBoolean
-    var hideWhenNone: Boolean = false
+    var hideWhenNone: Boolean = true
 
     @Expose
     @ConfigOption(name = "Replace Menu Icons", desc = "Show pest crops instead of music discs in the selector menu.")
