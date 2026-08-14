@@ -52,9 +52,25 @@ object CroesusChestTracker {
 
     private val patternGroup = RepoPattern.group("dungeon.croesus")
 
-    private val croesusPattern by patternGroup.pattern("inventory", "Croesus")
+    /**
+     * REGEX-TEST: (1/3) Croesus
+     * REGEX-TEST: Croesus
+     */
+    private val croesusPattern by patternGroup.pattern("inventory", "(?:\\(\\d+/\\d+\\) )?Croesus")
+
+    /**
+     * REGEX-TEST: No treasures!
+     */
     private val croesusEmptyPattern by patternGroup.pattern("empty.colorless", "No treasures!")
+
+    /**
+     * REGEX-TEST: Reroll Chest
+     */
     private val kismetPattern by patternGroup.pattern("kismet.reroll.colorless", "Reroll Chest")
+
+    /**
+     * REGEX-TEST: You already rerolled a chest!
+     */
     private val kismetUsedInChestPattern by patternGroup.pattern("kismet.used.colorless", "You already rerolled a chest!")
 
     /**

@@ -21,9 +21,7 @@ import net.minecraft.world.inventory.Slot
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: Collection<Data>)
-    where RotPerkE : Enum<*>,
-          RotPerkE : RotatingPerk {
+abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection<Data>) {
 
     /**
      * Name of the Tree Eg: HotM, HotF
@@ -78,13 +76,18 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
             it.enabled = false
             it.isUnlocked = false
         }
+
+        rotatingPerkSlots.forEach {
+            it.currentPerk = null
+        }
+
         currencyReset()
     }
 
     fun Slot.parse() {
         val item = this.item.takeUnlessEmpty() ?: return
 
-        if (this.handleCurrency()) return
+        if (handleCurrency()) return
 
         val entry = data.firstOrNull { it.guiNamePattern.matches(item.cleanName) } ?: return
         entry.slot = this
@@ -121,9 +124,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         }
         entry.enabled = lore.any { enabledPattern.matches(it) }
 
-        fetchRotatingPerk(entry, lore)?.let {
-            currentRotPerk = it
-        }
+        fetchRotatingPerk(entry, lore)
+
         extraHandling(entry, lore)
     }
 
@@ -179,7 +181,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
     private val treeInventoryDetector by lazy {
         InventoryDetector(
-            pattern = inventoryPattern,
+            repoPattern = { inventoryPattern },
             onOpenInventory = {
                 DelayedRun.runNextTick {
                     InventoryUtils.getItemsInOpenChest().forEach { it.parse() }
@@ -196,11 +198,9 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         )
     }
 
-    protected open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }
-    protected abstract val rotatingPerks: List<RotPerkE>
     protected abstract val islandTypeTag: IslandTypeTag
-    abstract var currentRotPerk: RotPerkE?
-        protected set
+    protected open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }
+    abstract val rotatingPerkSlots: List<RotatingPerkSlot<Data>>
 
     abstract val resetChatPattern: Pattern
 
@@ -219,47 +219,55 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     fun tryReadRotatingPerkChat(event: SkyHanniChatEvent.Allow): Boolean? {
         rotatingPerkPattern.matchMatcher(event.cleanMessage) {
             val perkString = group("perk")
-            val foundPerk = rotatingPerks.firstNotNullOfOrNull { perk ->
-                if (!perk.chatPattern.matches(perkString)) return@firstNotNullOfOrNull null
-                perk
+
+            val result = rotatingPerkSlots.firstNotNullOfOrNull { slot ->
+                val perk = slot.perks.firstOrNull {
+                    it.chatPattern.matches(perkString)
+                }
+
+                if (perk != null) {
+                    slot to perk
+                } else {
+                    null
+                }
             } ?: return false
+
             tryBlock(event)
-            currentRotPerk = foundPerk
+            result.first.currentPerk = result.second
+
             return true
         }
+
         return null
     }
 
-    abstract val rotatingPerkEntry: Data
+    private fun fetchRotatingPerk(entry: Data, lore: List<String>) {
+        val slot = rotatingPerkSlots.firstOrNull {
+            it.entry == entry
+        } ?: return
 
-    private fun fetchRotatingPerk(entry: Data, lore: List<String>): RotPerkE? {
-        if (entry != rotatingPerkEntry || !entry.enabled || !entry.isUnlocked) return null
+        if (!entry.enabled || !entry.isUnlocked) return
 
-        val index = HotxPatterns.itemPreEffectPattern.indexOfFirstMatch(lore) ?: run {
-            ErrorManager.logErrorStateWithData(
-                "Could not read the ${rotatingPerkEntry.guiName} effect from the $name tree",
-                "itemPreEffectPattern didn't match",
-                "lore" to lore,
-            )
-            return null
+        // Hypixel sometimes doesn't show the current perk in lore if switching hotx trees layouts
+        val index = HotxPatterns.itemPreEffectPattern.indexOfFirstMatch(lore) ?: return
+
+        val nextLine = lore.getOrNull(index + 1) ?: return
+
+        val perkLore = HotxPatterns.rotatingPerkPattern
+            .matchGroup(nextLine, "perk")
+            ?: return
+
+        slot.currentPerk = slot.perks.firstOrNull {
+            it.itemPattern.matches(perkLore)
         }
-        val nextLine = lore[index + 1]
-        val perkLore = HotxPatterns.rotatingPerkPattern.matchGroup(nextLine, "perk") ?: return null
-        val perkEnum: RotPerkE? = rotatingPerks.firstNotNullOfOrNull { perk ->
-            if (perk.itemPattern.matches(perkLore)) perk
-            else null
-        }
-        if (perkEnum == null) {
+
+        if (slot.currentPerk == null) {
             ErrorManager.logErrorStateWithData(
-                "Could not read the ${rotatingPerkEntry.guiName} effect from the $name tree",
+                "Could not read rotating perk from $name tree",
                 "no itemPattern matched",
-                "nextLine" to nextLine,
+                "entry" to entry.guiName,
+                "perkLore" to perkLore,
             )
         }
-        return perkEnum
-    }
-
-    interface RotatingPerk {
-        val perkDescription: String
     }
 }

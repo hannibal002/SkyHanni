@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -120,6 +122,7 @@ class ItemResolutionQuery {
             var bestMatch: NeuInternalName? = null
             var bestMatchLength = -1
             loop@ for (internalName in candidateInternalNames.map { it.toInternalName() }) {
+                if (NeuItems.isIgnoredDisplayNameItem(internalName)) continue
                 val unCleanItemDisplayName: String = EnoughUpdatesManager.getDisplayName(internalName)
                 var cleanItemDisplayName = unCleanItemDisplayName.removeColor()
                 if (cleanItemDisplayName.isEmpty()) continue
@@ -357,15 +360,19 @@ class ItemResolutionQuery {
             findInternalNameByDisplayName(displayName, false)
         } else if (guiName.endsWith("Experimentation Table RNG")) {
             resolveEnchantmentByName(displayName)
-        } else if (guiName == "Attribute Menu") {
+        } else if (AttributeShardsData.attributeMenuInventory.isInside()) {
             resolveItemInAttributeMenu(compound.getLore())
-        } else if (guiName == "Hunting Box" || guiName == "Fusion Box" || guiName == "Shard Fusion") {
+        } else if (
+            AttributeShardsData.huntingBoxInventory.isInside() ||
+            AttributeShardsData.fusionBoxInventory.isInside() ||
+            AttributeShardsData.shardFusionInventory.isInside()
+        ) {
             resolveItemInHuntingBoxMenu(displayName)
         } else if (guiName == "Confirm Fusion") {
             compound.getLore().firstOrNull()?.let {
                 shardPattern.matchMatcher(it) {
                     resolveItemInHuntingBoxMenu(
-                        group("name")
+                        group("name"),
                     )
                 }
             }

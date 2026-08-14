@@ -9,7 +9,9 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class EndermanConfig {
     @Expose
@@ -39,6 +41,22 @@ class EndermanConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideParticles: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Line to Voidgloom Boss", desc = "Draws a line to your Voidgloom Seraph Boss.")
+    @SearchTag("enderman")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var lineToBoss: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Line to Voidgloom Width",
+        desc = "The width of the line pointing to your Voidgloom Seraph.",
+    )
+    @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 10f)
+    var slayerLineWidth: Int = 3
+
 
     @SkyHanniModule
     companion object {

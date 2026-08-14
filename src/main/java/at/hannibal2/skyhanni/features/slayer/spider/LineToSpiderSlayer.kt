@@ -47,4 +47,3 @@ object LineToSpiderSlayer {
         }
     }
 }
-
