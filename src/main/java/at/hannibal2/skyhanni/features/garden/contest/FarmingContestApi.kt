@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTag
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -92,27 +94,13 @@ object FarmingContestApi {
 
     private val contests = mutableMapOf<Long, FarmingContest>()
     private var internalContest = false
+    private var scoreboardLines = emptyList<String>()
+    private var contestWidgetLines = emptyList<String>()
+    private var contestActive = false
     val inContest
         get() = internalContest && IslandTypeTag.CONTESTS_SHOWN.isInIsland()
     val isContestActive
-        get() = IslandTypeTag.CONTESTS_SHOWN.isInIsland() && contestWidgetLines.any {
-            contestTimeLeftPattern.matches(it)
-        }
-
-    fun getContestStatusDebug(): List<String> {
-        val lines = contestWidgetLines
-        return buildList {
-            add("§7Contest island allowed: §e${IslandTypeTag.CONTESTS_SHOWN.isInIsland()}")
-            add("§7Jacob tab widget visible: §e${TabWidget.JACOB_CONTEST.isActive}")
-            add("§7Contest active: §e$isContestActive")
-            if (lines.isEmpty()) {
-                add("§cJacob tab widget has no lines.")
-            } else {
-                add("§7Normalized Jacob tab widget lines:")
-                lines.forEachIndexed { index, line -> add("§8[$index] §f'$line'") }
-            }
-        }
-    }
+        get() = contestActive && IslandTypeTag.CONTESTS_SHOWN.isInIsland()
     var contestCrop: CropType? = null
     private var startTime = SimpleTimeMark.farPast()
     var inInventory = false
@@ -128,11 +116,35 @@ object FarmingContestApi {
             FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).post()
             internalContest = false
         }
+    }
 
+    @HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true)
+    private fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+        scoreboardLines = event.new.map { it.removeColor() }
         @Suppress("IsInIslandEarlyReturn")
-        if (!GardenApi.inGarden()) return
+        if (GardenApi.inGarden()) checkActiveContest()
+    }
 
-        checkActiveContest()
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.JACOB_CONTEST)) return
+        contestWidgetLines = event.cleanLines.map { it.trim() }
+        contestActive = contestWidgetLines.any { contestTimeLeftPattern.matches(it) }
+    }
+
+    @HandleEvent
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Farming Contest")
+        event.addData {
+            add("contest island allowed: ${IslandTypeTag.CONTESTS_SHOWN.isInIsland()}")
+            add("Jacob tab widget visible: ${TabWidget.JACOB_CONTEST.isActive}")
+            add("contest active: $isContestActive")
+            add("internal contest: $internalContest")
+            add("contest crop: ${contestCrop?.cropName}")
+            add("Jacob tab widget lines:")
+            if (contestWidgetLines.isEmpty()) add("  none")
+            contestWidgetLines.forEachIndexed { index, line -> add("  [$index] '$line'") }
+        }
     }
 
     private fun checkActiveContest() {
@@ -175,10 +187,6 @@ object FarmingContestApi {
             }
         }
     }
-
-    private val scoreboardLines get() = ScoreboardData.sidebarLinesRaw.map { it.removeColor() }
-    private val contestWidgetLines
-        get() = TabWidget.JACOB_CONTEST.lines.map { it.string.removeColor().trim() }
 
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {

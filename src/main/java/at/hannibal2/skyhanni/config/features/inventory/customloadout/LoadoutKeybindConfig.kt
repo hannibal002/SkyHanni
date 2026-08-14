@@ -84,11 +84,6 @@ class LoadoutKeybindConfig {
                     "inventory.customLoadout.keybinds.slot$slot",
                     "inventory.customLoadout.keybinds.slotKeybinds.slot$slot",
                 )
-                event.move(
-                    143,
-                    "inventory.customLoadout.keybinds.contestSlot$slot",
-                    "inventory.customLoadout.keybinds.contestSlotKeybinds.slot$slot",
-                )
             }
         }
     }
