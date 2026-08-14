@@ -50,7 +50,13 @@ open class Enchant : Comparable<Enchant> {
     val advanced by lazy { config.advancedEnchantColors }
 
     open fun getComponent(level: Int, itemStack: SafeItemStack?, isRoman: Boolean, appendNewline: Boolean = false): Component {
-        val text = "$loreName ${if (isRoman) level.toRoman() else level}${if (appendNewline) "\n" else ""}"
+        val text = buildString {
+            append(loreName)
+            append(" " + if (isRoman) level.toRoman() else level)
+            if (config.showMaxEnchantLevel && level != maxLevel)
+                append(" §8/ ${if (isRoman) maxLevel.toRoman() else maxLevel}")
+            if (appendNewline) append("\n")
+        }
         return Component.literal(text).setStyle(getStyle(level, itemStack))
     }
 
@@ -121,6 +127,7 @@ open class Enchant : Comparable<Enchant> {
                     }.let { if (config.boldPerfectEnchant.get()) it.withBold(true) else it }
                 } else null
             }
+
             else -> null
         }
     }

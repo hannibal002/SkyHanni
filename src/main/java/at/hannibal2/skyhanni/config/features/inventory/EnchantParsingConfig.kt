@@ -15,7 +15,7 @@ class EnchantParsingConfig {
     @Expose
     @ConfigOption(
         name = "Enable",
-        desc = "Toggle for coloring the enchants. Turn this off if you want to use enchant parsing from other mods."
+        desc = "Toggle for coloring the enchants. Turn this off if you want to use enchant parsing from other mods.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -80,7 +80,7 @@ class EnchantParsingConfig {
     @Expose
     @ConfigOption(
         name = "Hide Vanilla Enchants",
-        desc = "Hide the regular vanilla enchants usually found in the first 1-2 lines of lore."
+        desc = "Hide the regular vanilla enchants usually found in the first 1-2 lines of lore.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -89,7 +89,7 @@ class EnchantParsingConfig {
     @Expose
     @ConfigOption(
         name = "Hide Enchant Description",
-        desc = "Hide the enchant description after each enchant if available."
+        desc = "Hide the enchant description after each enchant if available.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -99,8 +99,17 @@ class EnchantParsingConfig {
     @ConfigOption(
         name = "Stacking Enchant Progress",
         desc = "Shows the stacking enchant progress at the bottom of the lore. " +
-            "§eRequires Enchant Parsing to be enabled."
+            "§eRequires Enchant Parsing to be enabled.",
     )
     @ConfigEditorBoolean
     var stackingEnchantProgress: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Show max enchant level",
+        desc = "Shows the maximum enchant level for an enchant beside the enchantment level. " +
+            "\n§8Example: §9Efficiency 5 §8/ 10",
+    )
+    @ConfigEditorBoolean
+    var showMaxEnchantLevel: Boolean = false
 }
