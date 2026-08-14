@@ -15,7 +15,6 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import java.util.Collection
 import java.util.function.IntFunction
-import kotlin.collections.iterator
 
 // TODO: This class should be disambiguated into a NodePath and a Graph class
 @JvmInline
@@ -30,6 +29,8 @@ value class Graph(
         nodes.filter { node -> tag.all { node.hasTag(it) } }
     fun getNodesWithName(name: String): List<GraphNode> =
         nodes.filter { it.name == name }
+    fun getActiveNodeTags(): Set<GraphNodeTag> =
+        nodes.flatMap { it.tags }.toSet()
     fun getNodesWithNameAndTags(name: String, tag: GraphNodeTag): List<GraphNode> =
         getNodesWithTags(tag).filter { it.name == name }
     fun getClosestNode(nodeName: String, tag: GraphNodeTag): GraphNode? =
@@ -96,7 +97,10 @@ value class Graph(
                 if (node.extraWeight != 0) out.name("ExtraWeight").value(node.extraWeight)
                 // JSON key intentionally kept as "Neighbours" for backward compatibility
                 out.name("Neighbours").beginObject()
-                for ((neighbor, weight) in node.neighbors) {
+
+                // sort neighbors by id of the node
+                val sorted = node.neighbors.toList().sortedBy { it.first.id }
+                for ((neighbor, weight) in sorted) {
                     out.name(neighbor.id.toString()).value(weight.roundTo(2))
                 }
                 out.endObject()

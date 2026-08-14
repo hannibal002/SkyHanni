@@ -1,22 +1,22 @@
 package at.hannibal2.skyhanni.utils.render.item.atlas
 
+import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
+import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.Projection
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.client.renderer.state.gui.BlitRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import kotlin.math.roundToInt
-
-//? if >= 26.1
-import org.joml.Matrix4f
 
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,
@@ -31,8 +31,7 @@ internal class SkyHanniItemAtlasRenderer(
         block: () -> Unit,
     ) {
         val size = sizePixels.toFloat()
-        //~ if < 26.1 'Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f)' -> 'size, size'
-        val bufferSlice = projectionBuffer.getBuffer(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))
+        val bufferSlice = projectionBuffer.getBuffer(Projection().apply { this.setupOrtho(-1000f, 1000f, size, size, true) })
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
         RenderSystem.outputDepthTextureOverride = depthTextureView
@@ -93,7 +92,7 @@ internal class SkyHanniItemAtlasRenderer(
 
     fun clearSlot(x: Int, y: Int, size: Int) {
         RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(
-            texture, 0, depthTexture, 1.0,
+            texture, GuiRenderer.CLEAR_COLOR, depthTexture, RenderCompat.CLEAR_DEPTH,
             x, sizePixels - y - size, size, size,
         )
     }
