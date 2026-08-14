@@ -114,10 +114,10 @@ object SprayDisplay {
         val expiredSprayMessages = componentBuilder {
             val wasAwayString = if (wasAway) "While you were away, your" else "Your"
             appendWithColor(wasAwayString, ChatFormatting.GRAY)
-            val sprayString = " spray".pluralize(expiredPlots.size)
-            appendWithColor("$sprayString on ", ChatFormatting.GRAY)
-            appendWithColor("Plot ", ChatFormatting.GREEN)
-            appendWithColor("- ", ChatFormatting.GRAY)
+            val sprayString = "spray".pluralize(expiredPlots.size)
+            appendWithColor(" $sprayString on ", ChatFormatting.GRAY)
+            appendWithColor("Plot", ChatFormatting.GREEN)
+            appendWithColor(" - ", ChatFormatting.GRAY)
             val plotsComponent = expiredPlots.map { it.name.asComponent().withColor(ChatFormatting.AQUA) }
                 .createCommaSeparatedList( ChatFormatting.GRAY)
 

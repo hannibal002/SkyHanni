@@ -38,20 +38,25 @@ class TextHelperTest {
 
         stringList.add(wheatPlotLegacy)
         componentList.add(plotNamedWheat)
-        Assertions.assertTrue(oxfordCommaComparer(componentList, stringList))
+        oxfordCommaComparer(componentList, stringList)
 
         componentList.add(plotNamedWheat)
         stringList.add(wheatPlotLegacy)
-        Assertions.assertTrue(oxfordCommaComparer(componentList, stringList))
+        oxfordCommaComparer(componentList, stringList)
 
         componentList.add(plotNamedWheat)
         stringList.add(wheatPlotLegacy)
-        Assertions.assertTrue(oxfordCommaComparer(componentList, stringList))
+        oxfordCommaComparer(componentList, stringList)
     }
 
     private fun oxfordCommaComparer(
         componentList: List<Component>,
         stringList: List<String>,
-    ): Boolean = componentList.createCommaSeparatedList(ChatFormatting.GRAY)
-        .formattedTextCompatLessResets() == stringList.createCommaSeparatedList("§7")
+    ) {
+        Assertions.assertEquals(
+            componentList.createCommaSeparatedList(ChatFormatting.GRAY)
+                .formattedTextCompatLessResets(),
+            stringList.createCommaSeparatedList("§7"),
+        )
+    }
 }
