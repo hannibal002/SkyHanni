@@ -107,8 +107,9 @@ class EnchantParsingConfig {
     @Expose
     @ConfigOption(
         name = "Show max enchant level",
-        desc = "Shows the maximum enchant level for an enchant beside the enchantment level. ",
+        desc = "",
     )
-    @ConfigEditorBoolean
-    var showMaxEnchantLevel: Boolean = false
+    @Accordion
+    val showMaxEnchantLevel: ShowMaxEnchants = ShowMaxEnchants()
+
 }
