@@ -8,36 +8,39 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object FishingHookDisplay {
 
     private val config get() = SkyHanniMod.feature.fishing.fishingHookDisplay
 
-    private data class TimerEntity(
+    private data class TimerDisplay(
         val id: Int,
-        val display: Renderable,
-        val position: Vec3,
+        val renderable: Renderable,
+        val position: LorenzVec,
     )
 
-    private var timerEntity: TimerEntity? = null
+    private var timerDisplay: TimerDisplay? = null
 
     /**
+     * REGEX-TEST: §e§l3.0
+     * REGEX-TEST: §e§l1.2
+     * REGEX-TEST: §c§l!!!
      * REGEX-TEST: 3.0
-     * REGEX-TEST: 1.2
      * REGEX-TEST: !!!
      */
-    private val fishingHookPattern by RepoPattern.pattern(
-        "fishing.hook-display",
-        "(?:§.)*?(?:(?<time>\\d+(?:\\.\\d+)?)|(?<alert>!!!))"
+    private val timerPattern by RepoPattern.pattern(
+        "fishing.hook.timer",
+        "(?:§.)*(?:(?<time>\\d+(?:\\.\\d+)?)|(?<alert>!!!))",
     )
 
     private var isRendering = false
@@ -53,12 +56,12 @@ object FishingHookDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onEntityTextUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+    private fun onEntityCustomNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         if (!isEnabled()) return
         val newName = event.newName ?: return
         val bobber = FishingApi.bobber ?: return
 
-        val displayText = fishingHookPattern.matchMatcher(newName) {
+        val displayText = timerPattern.matchMatcher(newName) {
             if (groupOrNull("alert") != null) {
                 config.customAlertText.replace("&", "§")
             } else {
@@ -66,17 +69,16 @@ object FishingHookDisplay {
             }
         } ?: return
 
-        val position = event.entity.position()
+        val position = event.entity.getLorenzVec()
 
-        val current = timerEntity
+        val current = timerDisplay
         if (current != null && current.id != event.entity.id) {
             // Prefer the closest entity to the bobber if there are multiple
-            if (current.position.distanceTo(bobber.position()) < position.distanceTo(bobber.position())) {
-                return
-            }
+            val bobberPosition = bobber.getLorenzVec()
+            if (current.position.distance(bobberPosition) < position.distance(bobberPosition)) return
         }
 
-        timerEntity = TimerEntity(
+        timerDisplay = TimerDisplay(
             event.entity.id,
             Renderable.text(displayText),
             position,
@@ -84,19 +86,19 @@ object FishingHookDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onEntityTextRemoved(event: EntityRemovedEvent<ArmorStand>) {
-        if (event.entity.id == timerEntity?.id) {
+    private fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
+        if (event.entity.id == timerDisplay?.id) {
             reset()
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onEntityTextCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
+    private fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!isEnabled()) return
         if (!config.hideArmorStand) return
         if (!isRendering) return
 
-        if (event.entity.id == timerEntity?.id) {
+        if (event.entity.id == timerDisplay?.id) {
             event.cancel()
         }
     }
@@ -105,13 +107,13 @@ object FishingHookDisplay {
     private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         isRendering = false
-        val timerEntity = timerEntity ?: return
+        val timerDisplay = timerDisplay ?: return
         isRendering = true
-        config.position.renderRenderable(timerEntity.display, posLabel = "Fishing Hook Display")
+        config.position.renderRenderable(timerDisplay.renderable, posLabel = "Fishing Hook Display")
     }
 
     private fun reset() {
-        timerEntity = null
+        timerDisplay = null
     }
 
     @HandleEvent
