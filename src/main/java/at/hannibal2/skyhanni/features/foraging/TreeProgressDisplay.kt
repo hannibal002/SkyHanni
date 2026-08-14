@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onDisable
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -39,7 +38,7 @@ object TreeProgressDisplay {
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     private fun onGuiRenderOverlay() {
-        if (!config.enabled.get()) return
+        if (!isEnabled()) return
         display?.let {
             config.position.renderRenderable(it, posLabel = "Tree Progress")
         }
@@ -50,16 +49,9 @@ object TreeProgressDisplay {
         clearData()
     }
 
-    @HandleEvent
-    private fun onConfigLoad() {
-        config.enabled.onDisable {
-            clearData()
-        }
-    }
-
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     private fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
-        if (!config.enabled.get()) return
+        if (!isEnabled()) return
         if (event.entity.id == displayEntityId) {
             clearData()
         }
@@ -67,7 +59,7 @@ object TreeProgressDisplay {
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
-        if (!config.enabled.get()) return
+        if (!isEnabled()) return
         if (config.onlyHoldingAxe && InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.AXE) {
             display = null
             return
@@ -99,4 +91,6 @@ object TreeProgressDisplay {
             }
         }
     }
+
+    private fun isEnabled() = config.enabled
 }
