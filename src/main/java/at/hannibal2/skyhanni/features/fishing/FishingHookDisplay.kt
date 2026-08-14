@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -64,7 +65,7 @@ object FishingHookDisplay {
 
         val displayText = timerPattern.matchMatcher(newName) {
             if (groupOrNull("alert") != null) {
-                config.customAlertText.replace("&", "§")
+                config.customAlertText.replace("&", "§").asComponent()
             } else {
                 newName
             }
