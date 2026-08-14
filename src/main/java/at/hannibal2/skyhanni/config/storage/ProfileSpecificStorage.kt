@@ -752,6 +752,17 @@ class ProfileSpecificStorage(
         var riftSlots: MutableList<SafeItemStack?> = CurrentEquipmentApi.getEmptyEquipment()
     }
 
+    @Expose
+    var bazaarOrders: BazaarOrdersStorage = BazaarOrdersStorage()
+
+    class BazaarOrdersStorage {
+        @Expose
+        var buyOrders: MutableMap<NeuInternalName, Int> = mutableMapOf()
+
+        @Expose
+        var sellOffers: MutableMap<NeuInternalName, Int> = mutableMapOf()
+    }
+
     // - foraging
     @Expose
     val foraging: ForagingStorage = ForagingStorage()
@@ -772,6 +783,9 @@ class ProfileSpecificStorage(
         // todo when we're fully 1.21, change ForagingTrackerLegacy to ForagingTracker
         @Expose
         var trackerData: ForagingTrackerLegacy.BucketData = ForagingTrackerLegacy.BucketData()
+
+        @Expose
+        var honeyhiveRemindTime: SimpleTimeMark = farPast()
     }
 
     // - mining
