@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -39,7 +40,7 @@ object FishyTreatProfit {
     private val inventory = InventoryDetector { inventoryNamePattern }
     private val FISHY_TREAT = "FISHY_TREAT".toInternalName()
 
-    // idk why this fetches price source based on tracker config,
+    // I don't know why this fetches price source based on tracker config,
     // but it already did before I changed how tracker config worked
     val priceSource get() = SkyHanniMod.feature.misc.tracker.priceSource
 
@@ -53,29 +54,31 @@ object FishyTreatProfit {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.fishyTreatProfit || !inventory.isInside()) return
-        val table = mutableListOf<DisplayTableEntry>()
-        for ((slot, item) in event.inventoryItems) {
-            // ignore the last line of menu items
-            if (slot > 44) continue
-            // background items
-            if (item.hoverName.string == " ") continue
-            try {
-                readItem(slot, item, table)
-            } catch (e: Throwable) {
-                ErrorManager.logErrorWithData(
-                    e, "Error in FishyTreatProfit while reading item '${item.repoItemName}'",
-                    "item" to item,
-                    "name" to item.repoItemName,
-                    "inventory name" to InventoryUtils.openInventoryName(),
-                )
-            }
-        }
 
-        val newList = mutableListOf<Renderable>()
-        newList.addString("§eProfit per Fishy Treat")
-        newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
-        display = newList
-        return
+        DelayedRun.runOrNextTick {
+            val table = mutableListOf<DisplayTableEntry>()
+            for ((slot, item) in event.inventoryItems) {
+                // ignore the last line of menu items
+                if (slot > 44) continue
+                // background items, named with a single space
+                if (item.hoverName.string == " ") continue
+                try {
+                    readItem(slot, item, table)
+                } catch (e: Throwable) {
+                    ErrorManager.logErrorWithData(
+                        e, "Error in FishyTreatProfit while reading item '${item.repoItemName}'",
+                        "item" to item,
+                        "name" to item.repoItemName,
+                        "inventory name" to InventoryUtils.openInventoryName(),
+                    )
+                }
+            }
+
+            val newList = mutableListOf<Renderable>()
+            newList.addString("§eProfit per Fishy Treat")
+            newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
+            display = newList
+        }
     }
 
     private fun readItem(slot: Int, item: SafeItemStack, table: MutableList<DisplayTableEntry>) {
