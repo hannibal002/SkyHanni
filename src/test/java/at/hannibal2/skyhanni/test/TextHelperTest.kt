@@ -54,9 +54,9 @@ class TextHelperTest {
         stringList: List<String>,
     ) {
         Assertions.assertEquals(
-            componentList.createCommaSeparatedList(ChatFormatting.GRAY)
-                .formattedTextCompatLessResets(),
             stringList.createCommaSeparatedList("§7"),
+            componentList.createCommaSeparatedList(ChatFormatting.GRAY)
+                .formattedTextCompatLessResets()
         )
     }
 }

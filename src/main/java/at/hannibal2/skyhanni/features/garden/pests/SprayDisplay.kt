@@ -119,7 +119,7 @@ object SprayDisplay {
             appendWithColor("Plot", ChatFormatting.GREEN)
             appendWithColor(" - ", ChatFormatting.GRAY)
             val plotsComponent = expiredPlots.map { it.name.asComponent().withColor(ChatFormatting.AQUA) }
-                .createCommaSeparatedList( ChatFormatting.GRAY)
+                .createCommaSeparatedList(ChatFormatting.GRAY)
 
             append(plotsComponent)
             appendWithColor(" expired.", ChatFormatting.GRAY)

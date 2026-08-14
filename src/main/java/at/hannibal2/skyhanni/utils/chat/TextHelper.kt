@@ -240,7 +240,6 @@ object TextHelper {
     fun split(
         component: Component,
         delimiter: String,
-        delimiterStyle: Style? = null,
     ): List<Component>? {
         val newComponents = mutableListOf<MutableComponent>()
         var currentComponent = Component.empty()
@@ -321,7 +320,7 @@ object TextHelper {
 
         return componentBuilder {
             append(join(allButLast, separator = ", ".asComponent().withColor(delimiterColor)))
-            appendWithColor(", and", delimiterColor)
+            appendWithColor(", and ", delimiterColor)
             append(startingList[lastIndex])
         }
     }
