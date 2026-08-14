@@ -20,7 +20,7 @@ sealed class GardenPlotSprayEvent(val plot: GardenPlot, val type: SprayType) : S
      * @param amount is the amount of the SprayType that was used.
      */
     @PrimaryFunction("onGardenPlotSprayAdded")
-    class GardenPlotSprayAddedEvent(plot: GardenPlot, type: SprayType, val amount: Int) : GardenPlotSprayEvent(plot, type)
+    class SprayAddedEvent(plot: GardenPlot, type: SprayType, val amount: Int) : GardenPlotSprayEvent(plot, type)
 
     /**
      * Fired from GardenPlotApi when the plotSprayExpiredPattern matches a chat message.
@@ -28,5 +28,5 @@ sealed class GardenPlotSprayEvent(val plot: GardenPlot, val type: SprayType) : S
      * @param type is the SprayType that has expired.
      */
     @PrimaryFunction("onGardenPlotSprayExpired")
-    class GardenPlotSprayExpiredEvent(plot: GardenPlot, type: SprayType) : GardenPlotSprayEvent(plot, type)
+    class SprayExpiredEvent(plot: GardenPlot, type: SprayType) : GardenPlotSprayEvent(plot, type)
 }

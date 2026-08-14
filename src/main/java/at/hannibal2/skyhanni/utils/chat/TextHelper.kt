@@ -300,7 +300,7 @@ object TextHelper {
      * Creates a comma-separated list using natural formatting (a, b, and c).
      * this = the list of strings to join into a string, containing 0 or more elements.
      * @param delimiterColor - the ChatFormatting of the delimiter, applied to each delimiter (commas and "and").
-     * @return a string representing the list joined with the Oxford comma and the word "and".
+     * @return a TextComponent of the list joined with the Oxford comma and the word "and".
      */
     fun List<Component>.createCommaSeparatedList(
         delimiterColor: ChatFormatting = ChatFormatting.GRAY,

@@ -27,7 +27,7 @@ import net.minecraft.network.chat.Component
 object SprayDisplay {
 
     private val config get() = PestApi.config.spray
-    private var display: Component = Component.empty()
+    private var staticDisplayLines: Component = Component.empty()
     private var currentSprayPlot: GardenPlot? = null
     private var builtDisplay: Renderable? = null
 
@@ -41,9 +41,10 @@ object SprayDisplay {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     private fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5)) return
+        if (staticDisplayLines == Component.empty()) return
         builtDisplay = Renderable.text(
             componentBuilder {
-                append(display)
+                append(staticDisplayLines)
                 append(buildTimerComponent())
             },
         )
@@ -54,16 +55,16 @@ object SprayDisplay {
         val newPlot = event.plot
         if (newPlot == null) {
             currentSprayPlot = null
-            builtDisplay = null
+            staticDisplayLines = Component.empty()
             return
         }
-        currentSprayPlot = newPlot.takeUnless { it.isBarn() }
-        if (config.displayEnabled) display = buildDisplay()
+        currentSprayPlot = newPlot
+        if (config.displayEnabled) staticDisplayLines = buildDisplay()
     }
 
     @HandleEvent
     private fun onGardenPlotSprayChanged() {
-        if (config.displayEnabled) display = buildDisplay()
+        if (config.displayEnabled) staticDisplayLines = buildDisplay()
     }
 
     @HandleEvent
@@ -90,7 +91,7 @@ object SprayDisplay {
     private fun buildDisplay(): Component {
         val sprayData = currentSprayPlot?.currentSpray
             ?: return if (config.showNotSprayed) componentBuilder {
-                appendWithColor("Not Sprayed!", ChatFormatting.RED)
+                appendWithColor("Not sprayed!", ChatFormatting.RED)
             } else Component.empty()
         return componentBuilder {
             appendWithColor("Sprayed with ", ChatFormatting.YELLOW)
