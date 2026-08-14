@@ -104,7 +104,7 @@ object HotmApi {
         }
     }
 
-    var skymall: SkymallPerk? = null
+    val skymall: SkymallPerk? get() = HotmData.rotatingPerkSlots.find { it.entry == HotmData.SKY_MALL }?.currentPerk as SkymallPerk?
 
     var mineshaftMayhem: MayhemPerk? = null
 

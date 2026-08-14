@@ -7,3 +7,9 @@ interface RotatingPerk {
     val chatPattern: Pattern
     val itemPattern: Pattern
 }
+
+interface RotatingPerkSlot<Data> {
+    val entry: Data
+    val perks: List<RotatingPerk>
+    var currentPerk: RotatingPerk?
+}
