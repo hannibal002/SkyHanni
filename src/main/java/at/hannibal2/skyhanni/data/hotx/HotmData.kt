@@ -419,16 +419,19 @@ enum class HotmData(
     override val totalCostMaxLevel = calculateTotalCost(maxLevel)
 
     override fun getStorage(): HotxTree? = ProfileStorageData.profileSpecific?.mining?.hotmTree
-
     // TODO move all object functions into hotm api?
     @SkyHanniModule
-    companion object : HotxHandler<HotmData, HotmReward, SkymallPerk>(entries) {
+    companion object : HotxHandler<HotmData, HotmReward>(entries) {
 
         override val name: String = "HotM"
-        override val rotatingPerks = SkymallPerk.entries
-        override val rotatingPerkEntry: HotmData = SKY_MALL
-        override var currentRotPerk = HotmApi.skymall
         override val islandTypeTag = IslandTypeTag.MINING
+        override val rotatingPerkSlots = listOf(
+            object : RotatingPerkSlot<HotmData> {
+                override val entry: HotmData = SKY_MALL
+                override val perks = SkymallPerk.entries
+                override var currentPerk: RotatingPerk? = null
+            },
+        )
 
         private val config get() = SkyHanniMod.feature.mining.hotm
         override val position: Position get() = config.skyMallPosition

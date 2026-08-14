@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.NeuRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.features.inventory.loadout.CustomLoadoutKeybinds
-import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeKeybinds
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
@@ -45,11 +44,9 @@ object GuiData {
         if (allowedKeys.any { it.isActive() }) return
         if (GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) return
 
-        if (CustomWardrobeKeybinds.allowKeyboardClick()) return
         if (CustomLoadoutKeybinds.allowKeyboardClick()) return
 
         if (preDrawEventCancelled) event.cancel()
-
     }
 
     @HandleEvent

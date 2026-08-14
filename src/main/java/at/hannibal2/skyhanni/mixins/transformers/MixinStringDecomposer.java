@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -20,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * Implements §#RRGGBB§/ and §#RRGGBBAA§/ hex color codes by hooking into
  * {@link StringDecomposer#iterateFormatted}. Each hex digit is encoded as a
  * §-prefixed character, e.g. §#§6§a§e§e§4§8§/ renders text in RGB(0x6a, 0xee, 0x48).
- *
  * Also includes some chroma handling.
  */
 @Mixin(StringDecomposer.class)
@@ -130,6 +129,6 @@ public abstract class MixinStringDecomposer {
         ordinal = 2
     )
     private static Style onColorCodeCheck(Style style, @Local(argsOnly = true) String text, @Local(index = 9) char colorCode) {
-        return ChromaFontManagerKt.setChromaColorStyle(style, text, colorCode);
+        return ChromaFontManager.setChromaColorStyle(style, text, colorCode);
     }
 }

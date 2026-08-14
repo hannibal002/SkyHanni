@@ -2,10 +2,8 @@
 
 package at.hannibal2.skyhanni.utils
 
-import net.minecraft.world.item.Item
-
-//? if >= 26.1
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.item.Item
 
 /**
  * Central compatibility helpers for Minecraft item component binding.
@@ -18,7 +16,6 @@ object SafeItemStackUtils {
 
     fun canBindComponents(item: Item?): Boolean {
         item ?: return false
-        //~ if < 26.1 'return BuiltInRegistries.ITEM.wrapAsHolder(item).areComponentsBound()' -> 'return true'
         return BuiltInRegistries.ITEM.wrapAsHolder(item).areComponentsBound()
     }
 
@@ -26,7 +23,6 @@ object SafeItemStackUtils {
 }
 
 fun SafeItemStack.ensureComponentsBound(): SafeItemStack {
-    //? if >= 26.1
     (this as? DeferredItemStack)?.bindComponentsIfReady()
     return this
 }

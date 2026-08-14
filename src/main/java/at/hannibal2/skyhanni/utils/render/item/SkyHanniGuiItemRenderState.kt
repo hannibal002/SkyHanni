@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.client.renderer.state.gui.GuiItemRenderState
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
 
@@ -109,7 +110,7 @@ data class SkyHanniGuiItemRenderState(
         )
         if (rotated) setAnimated()
 
-        trackingState.submit(ps, featureRenderDispatcher.submitNodeStorage, 15728880, OverlayTexture.NO_OVERLAY, 0)
+        trackingState.submit(ps, featureRenderDispatcher.submitNodeStorage, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
         featureRenderDispatcher.renderAllFeatures()
         bufferSource.endBatch()
     }

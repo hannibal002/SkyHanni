@@ -1,16 +1,12 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe.clickSlot
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
 object CustomWardrobeKeybinds {
 
     private val config get() = SkyHanniMod.feature.inventory.customWardrobe
@@ -28,13 +24,8 @@ object CustomWardrobeKeybinds {
         )
     private var lastClick = SimpleTimeMark.farPast()
 
-    @HandleEvent
-    fun onGuiKeyPress(event: GuiKeyPressEvent) {
-        if (handlePress()) event.cancel()
-    }
-
-    private fun handlePress(): Boolean {
-        if (!isEnabled()) return false
+    internal fun handlePress() {
+        if (!isEnabled()) return
         val slots = ArmorWardrobeApi.slots.filter { it.isInCurrentPage() }
             .filterNot { config.onlyFavorites && !it.favorite }
             .filterNot { config.hideEmptySlots && it.armor.all { piece -> piece == null } }
@@ -46,14 +37,9 @@ object CustomWardrobeKeybinds {
 
             slot.clickSlot()
             lastClick = SimpleTimeMark.now()
-            return true
         }
-
-        return false
     }
 
-    fun allowKeyboardClick() = isEnabled() && keybinds.filter { it > 0 }.any { it.isKeyHeld() }
-
     private fun isEnabled() =
-        SkyBlockUtils.inSkyBlock && ArmorWardrobeApi.inCustomWardrobe && config.keybinds.slotKeybindsToggle && config.enabled
+        SkyBlockUtils.inSkyBlock && CustomWardrobe.inCustomWardrobe && config.keybinds.slotKeybindsToggle && config.enabled
 }
