@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.SkyblockCurrency
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import java.time.LocalDate
 import kotlin.time.Duration
@@ -44,7 +44,7 @@ class PlayerSpecificStorage {
 
     /** Written and read by [at.hannibal2.skyhanni.data.CurrencyApi], for currencies shared by all profiles. */
     @Expose
-    var currencies: MutableMap<SkyblockCurrency, Long> = CollectionUtils.enumMapOf()
+    var currencies: MutableMap<SkyblockCurrency, Long> = enumMapOf()
 
     @Expose
     var bazaar: BazaarStorage = BazaarStorage()

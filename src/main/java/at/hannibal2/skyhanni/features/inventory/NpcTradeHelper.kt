@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.LoreCostUtils
 import at.hannibal2.skyhanni.utils.LoreCostUtils.LoreCostEntry
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -158,7 +159,7 @@ object NpcTradeHelper {
         for (slot in event.container.slots) {
             // the trades outlive the menu, an item of the same name in the player inventory is not one
             if (!slot.isTopInventory()) continue
-            val item = slot.item.orNull() ?: continue
+            val item = slot.item.takeUnlessEmpty() ?: continue
             if (tradeItems[item.cleanName]?.canAfford == true) {
                 slot.highlight(LorenzColor.GREEN)
             }
