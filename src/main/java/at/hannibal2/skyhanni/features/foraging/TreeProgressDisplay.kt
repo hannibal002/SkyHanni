@@ -27,12 +27,12 @@ object TreeProgressDisplay {
 
     private val config get() = SkyHanniMod.feature.foraging.trees.progress
 
-    private var treeProgressDisplay: TreeProgressDisplay? = null
     private data class TreeProgressDisplay(
         val id: Int,
         val renderable: Renderable,
         val distanceToPlayer: Double,
     )
+    private var progressDisplay: TreeProgressDisplay? = null
 
     /**
      * REGEX-TEST: FIG TREE 88%
@@ -46,21 +46,21 @@ object TreeProgressDisplay {
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
-        treeProgressDisplay?.let {
+        progressDisplay?.let {
             config.position.renderRenderable(it.renderable, posLabel = "Tree Progress")
         }
     }
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     private fun onIslandJoin() {
-        treeProgressDisplay = null
+        progressDisplay = null
     }
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     private fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
         if (!isEnabled()) return
-        if (event.entity.id == treeProgressDisplay?.id) {
-            treeProgressDisplay = null
+        if (event.entity.id == progressDisplay?.id) {
+            progressDisplay = null
         }
     }
 
@@ -70,7 +70,7 @@ object TreeProgressDisplay {
         if (!MinecraftCompat.localPlayerExists) return
 
         if (config.onlyHoldingAxe && InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.AXE) {
-            treeProgressDisplay = null
+            progressDisplay = null
             return
         }
 
@@ -81,7 +81,7 @@ object TreeProgressDisplay {
 
         val newDistance = event.entity.distanceToPlayer()
 
-        val current = treeProgressDisplay
+        val current = progressDisplay
         if (current != null && current.id != event.entity.id) {
             // Prefer the closest tree if there are multiple trees with progress displayed
             val currentDistance = current.distanceToPlayer
@@ -90,7 +90,7 @@ object TreeProgressDisplay {
             }
         }
 
-        treeProgressDisplay = TreeProgressDisplay(
+        progressDisplay = TreeProgressDisplay(
             id = event.entity.id,
             renderable = Renderable.text(displayText),
             distanceToPlayer = newDistance,
