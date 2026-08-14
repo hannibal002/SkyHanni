@@ -34,7 +34,7 @@ object DataWatcherApi {
     fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<Entity>) {
         for (updatedEntry in event.updatedEntries) {
             if (updatedEntry.accessor == Entity.DATA_CUSTOM_NAME) {
-                EntityCustomNameUpdateEvent(event.entity, event.entity.customName.formattedTextCompatLessResets()).post()
+                EntityCustomNameUpdateEvent(event.entity, event.entity.customName).post()
             }
 
             if (updatedEntry.accessor == LivingEntity.DATA_HEALTH_ID) {

@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class TreeProgressConfig {
 
@@ -13,7 +14,7 @@ class TreeProgressConfig {
     @ConfigOption(name = "Tree Progress Display", desc = "Displays your tree progress on screen.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled = true
+    var enabled: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigLink(owner = TreeProgressConfig::class, field = "enabled")
