@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.data.hotx.HotfData
 import at.hannibal2.skyhanni.data.hotx.HotxPatterns.asPatternId
 import at.hannibal2.skyhanni.data.hotx.RotatingPerk
 import at.hannibal2.skyhanni.data.model.SkyblockStat
@@ -10,7 +11,7 @@ import org.intellij.lang.annotations.Language
 @SkyHanniModule
 object HotfApi {
 
-    var lottery: LotteryPerk? = null
+    val lottery: LotteryPerk? get() = HotfData.rotatingPerkSlots.find { it.entry == HotfData.LOTTERY }?.currentPerk as LotteryPerk?
 
     enum class LotteryPerk(
         override val displayDescription: String,
