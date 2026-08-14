@@ -59,9 +59,9 @@ class EndermanBeaconConfig {
             event.move(3, "slayer.endermanBeaconConfig.lneColor", "slayer.endermen.endermanBeaconConfig.lineColor")
             event.move(3, "slayer.endermanBeaconConfig.lineWidth", "slayer.endermen.endermanBeaconConfig.lineWidth")
             event.move(9, "slayer.enderman.endermanBeaconConfig", "slayer.endermen.beacon")
-            event.move(134, "slayer.endermen.beacon.showLine", "slayer.endermen.beacon.line.showLine")
-            event.move(134, "slayer.endermen.beacon.lineColor", "slayer.endermen.beacon.line.color")
-            event.move(134, "slayer.endermen.beacon.lineWidth", "slayer.endermen.beacon.line.lineWidth")
+            event.move(143, "slayer.endermen.beacon.showLine", "slayer.endermen.beacon.line.showLine")
+            event.move(143, "slayer.endermen.beacon.lineColor", "slayer.endermen.beacon.line.color")
+            event.move(143, "slayer.endermen.beacon.lineWidth", "slayer.endermen.beacon.line.lineWidth")
         }
     }
 }

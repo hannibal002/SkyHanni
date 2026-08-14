@@ -182,7 +182,7 @@ class SlayerConfig {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
-            event.transform(134, "slayer") { element ->
+            event.transform(143, "slayer") { element ->
                 val elementObj = element.asJsonObject
                 val oldHighlightEnabled = elementObj.get("slayerMinibossHighlight").asBoolean
 

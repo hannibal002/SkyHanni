@@ -30,6 +30,10 @@ class EndermanConfig {
     @Accordion
     val lineToNukekebi: LineToConfig = LineToConfig(defaultColor = LorenzColor.GOLD.toChromaColor())
 
+    @Expose
+    @ConfigOption(name = "Line To Boss", desc = "")
+    @Accordion
+    val lineToBoss: LineToConfig = LineToConfig(defaultColor = LorenzColor.AQUA.toChromaColor())
 
     @Expose
     @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer.")
@@ -42,28 +46,17 @@ class EndermanConfig {
     @FeatureToggle
     var hideParticles: Boolean = false
 
-    @Expose
-    @ConfigOption(name = "Line to Voidgloom Boss", desc = "Draws a line to your Voidgloom Seraph Boss.")
-    @SearchTag("enderman")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var lineToBoss: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Line to Voidgloom Width",
-        desc = "The width of the line pointing to your Voidgloom Seraph.",
-    )
-    @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 10f)
-    var slayerLineWidth: Int = 3
-
-
     @SkyHanniModule
     companion object {
+
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+
             event.move(3, "slayer.endermanHighlightNukekebi", "slayer.endermen.highlightNukekebi")
-            event.move(134, "slayer.endermen.drawLineToNukekebi", "slayer.endermen.drawLineToNukekebi")
+            event.move(143, "slayer.endermen.drawLineToNukekebi", "slayer.endermen.drawLineToNukekebi")
+            event.move(143, "slayer.endermen.lineToBoss", "slayer.enderman.lineToBoss.showLine")
+            event.move(143, "slayer.enderman.slayerLineWidth", "slayer.enderman.lineToBoss.lineWidth")
+
         }
     }
 }

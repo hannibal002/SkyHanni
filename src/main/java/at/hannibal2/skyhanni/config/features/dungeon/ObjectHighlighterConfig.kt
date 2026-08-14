@@ -67,8 +67,8 @@ class ObjectHighlighterConfig {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             val path = "dungeon.objectHighlighter"
-            event.move(134, "$path.fel.line", "$path.fel.line.showLine")
-            event.move(134, "$path.fel.color", "$path.fel.line.color")
+            event.move(143, "$path.fel.line", "$path.fel.line.showLine")
+            event.move(143, "$path.fel.color", "$path.fel.line.color")
         }
     }
 }
