@@ -79,10 +79,11 @@ object TreeProgressDisplay {
             if (config.compact) formatCompact() else newName
         } ?: return
 
-        val newDistance = event.entity.distanceToPlayer()
+        val entity = event.entity
+        val newDistance = entity.distanceToPlayer()
 
         val current = progressDisplay
-        if (current != null && current.id != event.entity.id) {
+        if (current != null && current.id != entity.id) {
             // Prefer the closest tree if there are multiple trees with progress displayed
             val currentDistance = current.distanceToPlayer
             if (newDistance >= currentDistance) {
@@ -91,7 +92,7 @@ object TreeProgressDisplay {
         }
 
         progressDisplay = TreeProgressDisplay(
-            id = event.entity.id,
+            id = entity.id,
             renderable = Renderable.text(displayText),
             distanceToPlayer = newDistance,
         )
