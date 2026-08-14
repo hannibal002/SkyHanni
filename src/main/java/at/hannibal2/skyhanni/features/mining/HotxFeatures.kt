@@ -67,7 +67,7 @@ object HotxFeatures {
         )
     }
 
-    @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true)
     private fun onBackgroundDrawn() {
         val handler: HotxHandler<*, *> = when {
             HotmData.inInventory && configHotm.highlightEnabledPerks -> HotmData
