@@ -1,9 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory.customloadout
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -70,21 +67,5 @@ class LoadoutKeybindConfig {
         ;
 
         override fun toString() = displayName
-    }
-
-    @SkyHanniModule
-    companion object {
-        @HandleEvent
-        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) = migrateSlotKeybinds(event)
-
-        internal fun migrateSlotKeybinds(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-            for (slot in 1..12) {
-                event.move(
-                    143,
-                    "inventory.customLoadout.keybinds.slot$slot",
-                    "inventory.customLoadout.keybinds.slotKeybinds.slot$slot",
-                )
-            }
-        }
     }
 }
