@@ -34,6 +34,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.contents.PlainTextContents
+import org.lwjgl.glfw.GLFW
 import java.util.TreeSet
 
 /**
@@ -178,7 +179,7 @@ object EnchantParser {
                     "SkyHanni's enchant parsing breaks with Aaron's Mod's 'Rainbow Max Enchants'",
                     config::colorParsing,
                     "turn off Aaron's Mod's Rainbow Max Enchants",
-                    { removeAaronMaxEnchant() }
+                    { removeAaronMaxEnchant() },
                 )
             }
             if (config.hideEnchantDescriptions.get()) {
@@ -186,7 +187,7 @@ object EnchantParser {
                     "SkyHanni's hide enchant descriptions breaks with Aaron's Mod's 'Rainbow Max Enchants'",
                     config::hideEnchantDescriptions,
                     "turn off Aaron's Mod's Rainbow Max Enchants",
-                    { removeAaronMaxEnchant() }
+                    { removeAaronMaxEnchant() },
                 )
             }
         }
@@ -207,17 +208,22 @@ object EnchantParser {
         enchants: Map<String, Int>,
         chatComponent: Component?,
     ) {
-        // Check if the lore is already cached so continuous hover isn't 1 fps
-        if (loreCache.isCached(loreList)) {
-            loreList.clear()
-            if (loreCache.cachedLoreAfter.isNotEmpty()) {
-                loreList.addAll(loreCache.cachedLoreAfter)
-            } else {
-                loreList.addAll(loreCache.cachedLoreBefore)
+        // Only do loreCaching checks if showMaxEnchantLevel is not enabled
+        if (!config.showMaxEnchantLevel.enabled &&
+            config.showMaxEnchantLevel.keybind == GLFW.GLFW_KEY_UNKNOWN
+        ) {
+            // Check if the lore is already cached so continuous hover isn't 1 fps
+            if (loreCache.isCached(loreList)) {
+                loreList.clear()
+                if (loreCache.cachedLoreAfter.isNotEmpty()) {
+                    loreList.addAll(loreCache.cachedLoreAfter)
+                } else {
+                    loreList.addAll(loreCache.cachedLoreBefore)
+                }
+                // Need to still set replacement component even if its cached
+                if (chatComponent != null) editChatComponent(chatComponent, loreList)
+                return
             }
-            // Need to still set replacement component even if its cached
-            if (chatComponent != null) editChatComponent(chatComponent, loreList)
-            return
         }
         loreCache.updateBefore(loreList)
 
@@ -430,7 +436,7 @@ object EnchantParser {
             val notLastEnchantOnLine = (i % maxEnchantsPerLine != maxEnchantsPerLine - 1 && orderedEnchant != lastElement)
 
             component = component.append(
-                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent)
+                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent),
             )
 
             if (notLastEnchantOnLine) {
@@ -458,7 +464,7 @@ object EnchantParser {
             val notLastEnchantOnLine = (i % 3 != 2 && orderedEnchant != lastElement)
 
             component = component.append(
-                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent)
+                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent),
             )
 
             if (itemIsBook() && maxEnchantsPerLine == 1) {

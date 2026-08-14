@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -23,6 +24,7 @@ import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
+import org.lwjgl.glfw.GLFW
 
 private val PROMISING_SHOVEL = "PROMISING_SHOVEL".toInternalName()
 private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
@@ -50,11 +52,17 @@ open class Enchant : Comparable<Enchant> {
     val advanced by lazy { config.advancedEnchantColors }
 
     open fun getComponent(level: Int, itemStack: SafeItemStack?, isRoman: Boolean, appendNewline: Boolean = false): Component {
+        val enchantLevelTarget = if (config.showMaxEnchantLevel.useGoodEnchantLevel && goodLevel > 0) goodLevel else maxLevel
+        val canShowMaxLevel = (config.showMaxEnchantLevel.enabled &&
+            (if (config.showMaxEnchantLevel.keybind != GLFW.GLFW_KEY_UNKNOWN)
+                config.showMaxEnchantLevel.keybind.isKeyHeld() else true
+                )
+            && level < enchantLevelTarget)
+
         val text = buildString {
             append(loreName)
             append(" " + if (isRoman) level.toRoman() else level)
-            if (config.showMaxEnchantLevel && level != maxLevel)
-                append(" §8/ ${if (isRoman) maxLevel.toRoman() else maxLevel}")
+            if (canShowMaxLevel) append(" §8/ ${if (isRoman) enchantLevelTarget.toRoman() else enchantLevelTarget}")
             if (appendNewline) append("\n")
         }
         return Component.literal(text).setStyle(getStyle(level, itemStack))
