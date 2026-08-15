@@ -226,8 +226,8 @@ object CustomScoreboard {
     private fun showDeprecatedWarning() {
         if (!isEnabled() || warningSilenced) return
 
-        // Custom scoreboard mod has a way to override skyhanni's custom scoreboard,
-        // Also there is an option to compare them side by side.
+        // Nothing to advertise if the replacement is already installed.
+        // It can override this scoreboard itself and offers a side by side comparison, so we leave it enabled.
         if (customScoreboardModLoaded) return
 
         ChatUtils.clickableLinkChat(
