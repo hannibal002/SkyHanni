@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -227,8 +228,15 @@ object PestApi {
         PestUpdateEvent.post()
     }
 
+    @HandleEvent(onlyOnIslandTypeTag = [HAS_OWN_PESTS])
+    private fun onPlaySound(event: PlaySoundEvent) {
+        if (config.muteVacuum && event.soundName == "entity.wither.shoot") {
+            event.cancel()
+        }
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onPestSpawn(event: PestSpawnEvent) {
+    private fun onPestSpawn(event: PestSpawnEvent) {
         val plotNames = event.plotNames
         for (plotName in plotNames) {
             val plot = GardenPlotApi.getPlotByName(plotName)
@@ -246,7 +254,7 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in GardenPlotApi.plots) {
@@ -262,7 +270,7 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
 
         infestedPlotsTabListPattern.firstMatcher(event.widget.lines.map { it.string }) {
@@ -286,27 +294,27 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+    private fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!firstScoreboardCheck) return
         checkScoreboardLines(event.added)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
         }
     }
 
     @HandleEvent
-    fun onPestKill(event: PestKillEvent) {
+    private fun onPestKill(event: PestKillEvent) {
         lastPestKillTime = SimpleTimeMark.now()
         removeNearestPest()
         GardenPlotApi.getCurrentPlot()?.let { gardenPestTypes.removeFromPlot(it, event.pestType) }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick() {
+    private fun onTick() {
         if (!firstScoreboardCheck && gardenJoinTime.passedSince() > 5.seconds) {
             checkScoreboardLines(ScoreboardData.sidebarLinesFormatted)
             firstScoreboardCheck = true
@@ -315,7 +323,7 @@ object PestApi {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         lastPestKillTime = SimpleTimeMark.farPast()
         lastTimeVacuumHeld = SimpleTimeMark.farPast()
         lastTimeLassoHeld = SimpleTimeMark.farPast()
@@ -324,7 +332,7 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+    private fun onItemInHandChange(event: ItemInHandChangeEvent) {
         if (event.oldStack.getItemCategoryOrNull() == ItemCategory.VACUUM) {
             lastTimeVacuumHeld = SimpleTimeMark.now()
         }
@@ -334,7 +342,7 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
+    private fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
         val type = PestType.getByNameOrNull(event.mob.name) ?: return
         val plot = GardenPlotApi.plots.find { it.box.isInside(event.mob.centerCords) } ?: return
         if (lastCheckedPlot != plot.id) gardenPestTypes[plot] = listOf()
@@ -451,7 +459,7 @@ object PestApi {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Pests")
 
         if (!GardenApi.inGarden()) {
@@ -480,7 +488,7 @@ object PestApi {
     }
 
     @HandleEvent
-    fun onCommand(event: CommandRegistrationEvent) {
+    private fun onCommand(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestpestkill") {
             description = "Simulates a pest kill"
             category = CommandCategory.DEVELOPER_TEST
