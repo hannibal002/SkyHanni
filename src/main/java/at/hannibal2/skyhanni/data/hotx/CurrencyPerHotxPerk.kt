@@ -11,8 +11,10 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import com.mojang.blaze3d.platform.InputConstants
 
-abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val hotx: HotxType, private val displayText: String) {
-
+abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *>>(
+    private val hotx: HotxType,
+    private val displayText: String,
+) {
     fun handleHotxCurrency(
         event: ToolTipTextEvent,
         showCurrencySpent: Boolean,

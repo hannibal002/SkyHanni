@@ -14,18 +14,15 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
@@ -48,21 +45,13 @@ object FishyTreatProfit {
 
     private val patternGroup = RepoPattern.group("event.year-of-the-seal.fishy-treat")
 
-    /**
-     * REGEX-TEST: §62,000,000 Coins
-     */
-    private val coinsPattern by patternGroup.pattern(
-        "coins",
-        "§6(?<coins>.*) Coins",
-    )
-
     private val inventoryNamePattern by patternGroup.pattern(
         "inventory",
         "Lukas the Aquarist",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.fishyTreatProfit || !inventory.isInside()) return
         val table = mutableListOf<DisplayTableEntry>()
         for ((slot, item) in event.inventoryItems) {
@@ -91,7 +80,7 @@ object FishyTreatProfit {
 
     private fun readItem(slot: Int, item: SafeItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = getItemName(item)
-        val allMaterials = getAdditionalMaterials(getRequiredItems(item))
+        val allMaterials = item.readLoreCosts().associate { it.internalName to it.amount }
         val additionalMaterials = allMaterials.filter { it.key != FISHY_TREAT }
         val amountOfFishyTreat = allMaterials[FISHY_TREAT] ?: run {
             ErrorManager.logErrorStateWithData(
@@ -151,7 +140,7 @@ object FishyTreatProfit {
         )
     }
 
-    private fun MutableList<Any>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Int>) {
+    private fun MutableList<Any>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Long>) {
         for ((internalName, amount) in additionalMaterials) {
             add(internalName.getPriceName(amount, internalName.getPrice(priceSource)))
         }
@@ -165,57 +154,12 @@ object FishyTreatProfit {
         } else name
     }
 
-    private fun getAdditionalMaterials(requiredItems: Map<String, Int>): Map<NeuInternalName, Int> {
-        val additionalMaterials = mutableMapOf<NeuInternalName, Int>()
-        for ((name, amount) in requiredItems) {
-            coinsPattern.matchMatcher(name) {
-                additionalMaterials[NeuInternalName.SKYBLOCK_COIN] = group("coins").formatInt()
-            } ?: run {
-                additionalMaterials[NeuInternalName.fromItemName(name)] = amount
-            }
-        }
-        return additionalMaterials
-    }
-
-    private fun getAdditionalCost(requiredItems: Map<NeuInternalName, Int>): Double {
+    private fun getAdditionalCost(requiredItems: Map<NeuInternalName, Long>): Double {
         var otherItemsPrice = 0.0
         for ((name, amount) in requiredItems) {
             otherItemsPrice += name.getPrice(priceSource) * amount
         }
         return otherItemsPrice
-    }
-
-    private fun getRequiredItems(item: SafeItemStack): MutableMap<String, Int> {
-        val items = mutableMapOf<String, Int>()
-        var next = false
-        val lore = item.getLore()
-        for (line in lore) {
-            if (line == "§7Cost") {
-                next = true
-                continue
-            }
-            if (next) {
-                if (line == "") {
-                    next = false
-                    continue
-                }
-
-                val rawItemName = line.replace("§8 ", " §8")
-
-                val pair = ItemUtils.readItemAmount(rawItemName)
-                if (pair == null) {
-                    ErrorManager.logErrorStateWithData(
-                        "Error in FishyTreat Profit", "Could not read item amount",
-                        "rawItemName" to rawItemName,
-                        "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
-                        "lore" to lore,
-                    )
-                    continue
-                }
-                items.add(pair)
-            }
-        }
-        return items
     }
 
     init {

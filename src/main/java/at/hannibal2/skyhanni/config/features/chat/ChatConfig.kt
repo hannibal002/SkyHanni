@@ -201,9 +201,14 @@ class ChatConfig {
     @FeatureToggle
     var showEffectivePowder: Boolean = false
 
+    // TODO rename to hideForagingBuffMessages
     @Expose
-    @ConfigOption(name = "Hide Lottery Messages", desc = "Hide the Lottery messages outside of Foraging Islands.")
+    @ConfigOption(
+        name = "Hide Foraging Buff Messages",
+        desc = "Hide the Lottery and Beekeeper messages outside of Foraging Islands.",
+    )
     @ConfigEditorBoolean
+    @SearchTag("Lottery Beekeeper")
     @FeatureToggle
     var hideLottery: Boolean = true
 
