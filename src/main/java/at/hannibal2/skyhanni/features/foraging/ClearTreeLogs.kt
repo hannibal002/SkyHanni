@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DisplayEntityUtils.isInitialized
 import at.hannibal2.skyhanni.utils.DisplayEntityUtils.isRotated
 import at.hannibal2.skyhanni.utils.DisplayEntityUtils.transformation
 import at.hannibal2.skyhanni.utils.DisplayEntityUtils.uniformScale
@@ -33,16 +34,23 @@ object ClearTreeLogs {
     private fun onRender(event: CheckRenderEntityEvent<Display.BlockDisplay>) {
         if (!isEnabled()) return
         val entity = event.entity
-        val block = entity.blockState
-
-        // TODO: Make it always not cache block displays if their air, not just for this feature
-        if (block.isAir) {
+        // TODO: Make this check run for all display entities, not just for this feature
+        if (!entity.isInitialized) {
             event.doNotCache()
             return
         }
 
-        if (block !in treeBlocks) return
-        if (shouldHide(entity)) {
+        if (entity.blockState !in treeBlocks) return
+
+        if ((config.hideTreeBlocks == config.hideRuneEffects) && config.hideTreeBlocks) {
+            event.cancel()
+            return
+        }
+
+        val transformation = entity.transformation ?: return
+        val floatingTree = isFloatingTreeBlock(transformation)
+        if ((config.hideTreeBlocks && floatingTree) ||
+            (config.hideRuneEffects && !floatingTree)) {
             event.cancel()
         }
     }
@@ -57,18 +65,6 @@ object ClearTreeLogs {
             obj.addProperty("hideRuneEffects", false)
             obj
         }
-    }
-
-    private fun shouldHide(entity: Display.BlockDisplay): Boolean {
-        if (config.hideTreeBlocks == config.hideRuneEffects) {
-            return config.hideTreeBlocks
-        }
-
-        val transformation = entity.transformation
-        val floatingTree = isFloatingTreeBlock(transformation)
-
-        return (config.hideTreeBlocks && floatingTree) ||
-            (config.hideRuneEffects && !floatingTree)
     }
 
     private fun isFloatingTreeBlock(transformation: Transformation): Boolean {

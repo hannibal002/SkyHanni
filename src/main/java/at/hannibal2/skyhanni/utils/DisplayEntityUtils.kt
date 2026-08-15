@@ -6,15 +6,19 @@ import org.joml.Quaternionfc
 import org.joml.Vector3f
 
 object DisplayEntityUtils {
-    val Display.transformation: Transformation
+    val Display.isInitialized: Boolean
         get() {
-            // Stuff like "CheckRenderEntityEvent" is called before the entity is ticked,
-            // so the renderState may be null. In that case, we create a fresh renderState and use that.
-            val currentRenderState = this.renderState ?: run {
-                createFreshRenderState().also { this.renderState = it }
-            }
+            return renderState() != null
+        }
 
-            return currentRenderState.transformation.get(0f)
+    val Display.BlockDisplay.isInitialized: Boolean
+        get() {
+            return !blockState.isAir && renderState() != null
+        }
+
+    val Display.transformation: Transformation?
+        get() {
+            return renderState()?.transformation?.get(0f)
         }
 
     val Transformation.uniformScale: Float?
@@ -30,7 +34,7 @@ object DisplayEntityUtils {
         }
 
     fun Display.TextDisplay.arrowForwardVec(): LorenzVec {
-        val quat = transformation.leftRotation()
+        val quat = transformation?.leftRotation() ?: return LorenzVec(0, 0, 1)
         val localY = Vector3f(0f, 1f, 0f)
         quat.transform(localY)
         return LorenzVec(localY.x.toDouble(), 0.0, localY.z.toDouble()).normalize()
