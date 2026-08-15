@@ -252,7 +252,7 @@ object CopyNearbyEntitiesCommand {
     private fun MutableList<String>.addDisplayEntity(entity: Display) {
         add("EntityDisplay:")
         val rotation = entity.lookAngle
-        val transformation = entity.transformation ?: return
+        val transformation = entity.transformation
 
         add("-  rotation: $rotation")
         add("-  transformation scale: ${transformation.scale()}")

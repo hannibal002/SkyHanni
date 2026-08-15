@@ -6,8 +6,14 @@ import org.joml.Quaternionfc
 import org.joml.Vector3f
 
 object DisplayEntityUtils {
-    val Display.transformation: Transformation?
-        get() = this.renderState()?.transformation?.get(0f)
+    val Display.transformation: Transformation
+        get() {
+            val currentRenderState = this.renderState ?: run {
+                createFreshRenderState().also { this.renderState = it }
+            }
+
+            return currentRenderState.transformation.get(0f)
+        }
 
     val Transformation.uniformScale: Float?
         get() {
@@ -22,7 +28,7 @@ object DisplayEntityUtils {
         }
 
     fun Display.TextDisplay.arrowForwardVec(): LorenzVec {
-        val quat = transformation?.leftRotation() ?: return LorenzVec(0, 0, 1)
+        val quat = transformation.leftRotation()
         val localY = Vector3f(0f, 1f, 0f)
         quat.transform(localY)
         return LorenzVec(localY.x.toDouble(), 0.0, localY.z.toDouble()).normalize()

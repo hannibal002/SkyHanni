@@ -56,7 +56,7 @@ object ClearTreeLogs {
             return config.hideTreeBlocks
         }
 
-        val transformation = entity.transformation ?: return false
+        val transformation = entity.transformation
         val floatingTree = isFloatingTreeBlock(transformation)
 
         return (config.hideTreeBlocks && floatingTree) ||
