@@ -14,14 +14,14 @@ enum class SkyblockSeason(
 
     SPRING(
         "§dSpring",
-        "§7Gain §6+25${SkyblockStat.FARMING_FORTUNE} Farming Fortune§7.",
-        "§6+25${SkyblockStat.FARMING_FORTUNE}",
+        "§7Gain §6+25${SkyblockStat.FARMING_FORTUNE.hypixelIcon} Farming Fortune§7.",
+        "§6+25${SkyblockStat.FARMING_FORTUNE.hypixelIcon}",
         1
     ),
     SUMMER(
         "§6Summer",
-        "§7Gain §3+20${SkyblockStat.FARMING_WISDOM} Farming Wisdom§7.",
-        "§3+20${SkyblockStat.FARMING_WISDOM}",
+        "§7Gain §3+20${SkyblockStat.FARMING_WISDOM.hypixelIcon} Farming Wisdom§7.",
+        "§3+20${SkyblockStat.FARMING_WISDOM.hypixelIcon}",
         4
     ),
     AUTUMN(
