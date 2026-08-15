@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.gui
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
 import at.hannibal2.skyhanni.config.features.gui.moveablehud.ActionBarConfig
@@ -15,11 +16,13 @@ import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListC
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig
 import at.hannibal2.skyhanni.data.GuiEditManager.openGuiPositionEditor
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.features.gui.StatOverlay.SkyblockStatUI
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -203,6 +206,32 @@ class GuiConfig {
     @ConfigOption(name = "Legion/Bobbin Overlay", desc = "")
     @Accordion
     val legionBobbinOverlay: LegionBobbinOverlayConfig = LegionBobbinOverlayConfig()
+
+    @Expose
+    @ConfigOption(name = "Stat Display", desc = "")
+    @Accordion
+    val statDisplayer: StatDisplay = StatDisplay()
+
+    class StatDisplay {
+        @Expose
+        @ConfigOption(name = "Stats", desc = "Add stats to list to render as a UI Element.")
+        @ConfigEditorDraggableList
+        val displayStats: MutableList<SkyblockStatUI> = mutableListOf()
+
+        @Expose
+        @ConfigOption(name = "Show Shortened", desc = "Stats in this List will only show Icon and Value.")
+        @ConfigEditorDraggableList
+        val shortenedStats: MutableList<SkyblockStatUI> = mutableListOf()
+
+        @Expose
+        @ConfigOption(name = "Stats To Round", desc = "Stats that are present in this list will have their number rounded.")
+        @ConfigEditorDraggableList
+        val integerStats: MutableList<SkyblockStatUI> = mutableListOf()
+
+        @Expose
+        @ConfigLink(owner = StatDisplay::class, field = "enabled")
+        val displayPositions: PositionList = PositionList(SkyblockStatUI.entries.size)
+    }
 
     @Expose
     @ConfigOption(

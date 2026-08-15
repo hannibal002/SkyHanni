@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.json.asIntOrNull
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.json.shDeepCopy
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -179,6 +181,18 @@ object ConfigUpdaterMigrator {
                 return
             }
             oldParentElement.remove(op.last())
+        }
+
+        fun oldBoolean(path: String): Boolean =
+            oldElement(path)?.asBoolean == true
+
+        fun oldPosition(path: String): Position? =
+            oldElement(path)?.let { ConfigManager.gson.fromJson<Position>(Position.migrate(it.shDeepCopy())) }
+
+        fun oldElement(path: String): JsonElement? {
+            return with(ConfigUpdaterMigrator) {
+                old.at(path.split("."), init = false)
+            }
         }
     }
 

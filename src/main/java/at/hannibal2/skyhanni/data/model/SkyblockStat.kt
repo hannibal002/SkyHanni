@@ -174,7 +174,9 @@ enum class SkyblockStat(
 
     private val keyName = name.lowercase().replace('_', '.')
 
-    val displayValue get() = lastKnownValue?.let { icon + it.roundToInt() }
+    val displayValueInt get() = lastKnownValue?.roundToInt()
+
+    val displayValueDouble get() = lastKnownValue
 
     val tablistPattern by patternGroup.pattern(
         "tablist.no-color.$keyName",

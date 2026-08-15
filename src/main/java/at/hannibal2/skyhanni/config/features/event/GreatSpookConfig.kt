@@ -26,20 +26,6 @@ class GreatSpookConfig {
     val positionTimer: Position = Position(20, 20)
 
     @Expose
-    @ConfigOption(
-        name = "Fear Stat Display",
-        desc = "Show Fear stat as single GUI element.\n" +
-            "§eRequires tab list widget enabled and Fear selected to update live."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var fearStatDisplay: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = GreatSpookConfig::class, field = "fearStatDisplay")
-    val positionFear: Position = Position(30, 30)
-
-    @Expose
     @ConfigOption(name = "IRL Time Left", desc = "Show the IRL time left before The Great Spook ends.")
     @ConfigEditorBoolean
     @FeatureToggle
