@@ -305,7 +305,7 @@ object BlockStrengthGuide {
     // TODO Dwarven Equip (Needs a Equipment API) , Goblin Pet and Mithril Pet (need the PetAPI v2)
     private fun requestSpeed(): SpeedClass {
         val itemInHand = InventoryUtils.getItemInHand()
-        val newSpeed = SpeedClass(
+        return SpeedClass(
             base = (
                 SkyblockStat.MINING_SPEED.lastKnownValue ?: 0.0
                 ) + if (inMineshaft) HotmData.EAGER_ADVENTURER.getReward()[HotmReward.MINING_SPEED] ?: 0.0 else 0.0,
@@ -321,7 +321,6 @@ object BlockStrengthGuide {
             ore = 0.0,
             block = 0.0,
         )
-        return newSpeed
     }
 
     private data class SpeedClass(
