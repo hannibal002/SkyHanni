@@ -31,6 +31,9 @@ value class SkyblockIcon private constructor(private val icon: Char) {
         val FARMING_FORTUNE = SkyblockIcon('\uE051')
         val SWEEP = SkyblockIcon('\uE023')
         val FORAGING_FORTUNE = SkyblockIcon('\uE054')
+        val FIG_FORTUNE = FORAGING_FORTUNE
+        val MANGROVE_FORTUNE = FORAGING_FORTUNE
+        val HELIX_FORTUNE = FORAGING_FORTUNE
         val FISHING_SPEED = SkyblockIcon('\uE00C')
         val SEA_CREATURE_CHANCE = SkyblockIcon('\uE021')
         val DOUBLE_HOOK_CHANCE = SkyblockIcon('\uE009')

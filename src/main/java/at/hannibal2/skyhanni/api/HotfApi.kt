@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.api
 import at.hannibal2.skyhanni.data.hotx.HotfData
 import at.hannibal2.skyhanni.data.hotx.HotxPatterns.asPatternId
 import at.hannibal2.skyhanni.data.hotx.RotatingPerk
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -21,24 +22,24 @@ object HotfApi {
         @field:Language("RegExp") val itemFallback: String,
     ) : RotatingPerk {
         SWEEP(
-            displayDescription = "§2+10${SkyblockStat.SWEEP} Sweep",
-            chatFallback = "Gain \\+10${SkyblockStat.SWEEP} Sweep\\.",
-            itemFallback = "Gain \\+10${SkyblockStat.SWEEP} Sweep\\.",
+            displayDescription = "§2+10${SkyblockIcon.SWEEP} Sweep",
+            chatFallback = "Gain \\+10${SkyblockIcon.SWEEP} Sweep\\.",
+            itemFallback = "Gain \\+10${SkyblockIcon.SWEEP} Sweep\\.",
         ),
         MANGROVE_FORTUNE(
-            displayDescription = "§6+50${SkyblockStat.MANGROVE_FORTUNE} Mangrove Fortune",
-            chatFallback = "Gain \\+50${SkyblockStat.MANGROVE_FORTUNE} Mangrove Fortune\\.",
-            itemFallback = "Gain \\+50${SkyblockStat.MANGROVE_FORTUNE} Mangrove Fortune\\.",
+            displayDescription = "§6+50${SkyblockIcon.MANGROVE_FORTUNE} Mangrove Fortune",
+            chatFallback = "Gain \\+50${SkyblockIcon.MANGROVE_FORTUNE} Mangrove Fortune\\.",
+            itemFallback = "Gain \\+50${SkyblockIcon.MANGROVE_FORTUNE} Mangrove Fortune\\.",
         ),
         FIG_FORTUNE(
-            displayDescription = "§6+50${SkyblockStat.FIG_FORTUNE} Fig Fortune",
-            chatFallback = "Gain \\+50${SkyblockStat.FIG_FORTUNE} Fig Fortune\\.",
+            displayDescription = "§6+50${SkyblockIcon.FIG_FORTUNE} Fig Fortune",
+            chatFallback = "Gain \\+50${SkyblockIcon.FIG_FORTUNE} Fig Fortune\\.",
             itemFallback = "Gain \\+50${SkyblockStat.FIG_FORTUNE} Fig Fortune\\.",
         ),
         HELIX_FORTUNE(
-            displayDescription = "§6+50${SkyblockStat.HELIX_FORTUNE} Helix Fortune",
-            chatFallback = "Gain \\+50${SkyblockStat.HELIX_FORTUNE} Helix Fortune\\.",
-            itemFallback = "Gain \\+50${SkyblockStat.HELIX_FORTUNE} Helix Fortune\\.",
+            displayDescription = "§6+50${SkyblockIcon.HELIX_FORTUNE} Helix Fortune",
+            chatFallback = "Gain \\+50${SkyblockIcon.HELIX_FORTUNE} Helix Fortune\\.",
+            itemFallback = "Gain \\+50${SkyblockIcon.HELIX_FORTUNE} Helix Fortune\\.",
         ),
         ;
 
