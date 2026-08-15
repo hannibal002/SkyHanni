@@ -90,7 +90,7 @@ object NpcTradeApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        itemBoughtPattern.matchMatcher(event.message.removeColor()) {
+        itemBoughtPattern.matchMatcher(event.cleanMessage) {
             val trade = trades[group("name")] ?: return
             NpcTradeEvent(trade.internalName, groupOrNull("amount")?.formatLong() ?: 1, trade.costs).post()
         }
