@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features
 import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDeprecatedDisplay
 import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDisplay
 import at.hannibal2.skyhanni.utils.OSUtils.openBrowser
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
@@ -27,7 +28,7 @@ class About {
     @ConfigOption(name = "Update Stream", desc = "How frequently you want updates for SkyHanni")
     @Expose
     @ConfigEditorDropdown
-    val updateStream: Property<UpdateStream> = Property.of(UpdateStream.RELEASES)
+    val updateStream: Property<UpdateStream> = Property.of(UpdateStream.forInstalledVersion())
 
     @Suppress("unused")
     @ConfigOption(name = "Used Software", desc = "Information about used software and licenses")
@@ -40,6 +41,16 @@ class About {
         RELEASES("Full", "full");
 
         override fun toString() = label
+
+        companion object {
+            /**
+             * The stream matching the installed version, used as the default on a clean install.
+             *
+             * Reads [ModVersion.installed] and not `SkyHanniMod.isBetaVersion`, because the config is also
+             * constructed while `SkyHanniMod` is still initialising, where that property may be unset.
+             */
+            fun forInstalledVersion(): UpdateStream = if (ModVersion.installed.isBeta) BETA else RELEASES
+        }
     }
 
     class Licenses {
