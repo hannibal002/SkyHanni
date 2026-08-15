@@ -80,8 +80,11 @@ object EntityData {
         lastVisibilityCheck[entity.id]?.let { result ->
             return result
         }
-        val result = !CheckRenderEntityEvent(entity, camX, camY, camZ).post().isCancelled
-        lastVisibilityCheck[entity.id] = result
+        val event = CheckRenderEntityEvent(entity, camX, camY, camZ)
+        val result = !event.post().isCancelled
+        if (!event.skipCache) {
+            lastVisibilityCheck[entity.id] = result
+        }
         return result
     }
 }

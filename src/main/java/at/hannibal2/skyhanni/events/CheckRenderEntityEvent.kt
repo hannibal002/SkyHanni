@@ -15,4 +15,11 @@ data class CheckRenderEntityEvent<T : Entity>(
     val camX: Double,
     val camY: Double,
     val camZ: Double,
-) : GenericSkyHanniEvent<T>(entity.javaClass)
+) : GenericSkyHanniEvent<T>(entity.javaClass) {
+    var skipCache: Boolean = false
+        private set
+
+    fun doNotCache() {
+        skipCache = true
+    }
+}

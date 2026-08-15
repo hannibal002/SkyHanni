@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.Blocks
 object ClearTreeLogs {
     private val config get() = SkyHanniMod.feature.foraging.trees.cleanView
     private val SCALE_RANGE = 0.4f..1.0f
+    private val AIR = Blocks.AIR.defaultBlockState()
 
     private val treeBlocks = buildList {
         add(Blocks.STRIPPED_SPRUCE_WOOD.defaultBlockState())
@@ -33,6 +34,13 @@ object ClearTreeLogs {
     private fun onRender(event: CheckRenderEntityEvent<Display.BlockDisplay>) {
         if (!isEnabled()) return
         val entity = event.entity
+
+        // TODO: Make it always not cache block displays if their air, not just for this feature
+        if (entity.blockState == AIR) {
+            event.doNotCache()
+            return
+        }
+
         if (entity.blockState !in treeBlocks) return
         if (shouldHide(entity)) {
             event.cancel()
