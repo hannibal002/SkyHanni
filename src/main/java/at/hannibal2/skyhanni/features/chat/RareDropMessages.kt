@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandType.Companion.isInAnyIsland
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.model.SkyblockStat.MAGIC_FIND
+import at.hannibal2.skyhanni.data.model.SkyblockIcon.MAGIC_FIND
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown

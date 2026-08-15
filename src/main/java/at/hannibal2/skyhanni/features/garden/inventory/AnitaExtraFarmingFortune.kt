@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.AnitaUpgradeCostsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.AnitaUpgradePrice
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
@@ -61,7 +61,7 @@ object AnitaExtraFarmingFortune {
      */
     private val farmingFortunePattern by patternGroup.pattern(
         "farmingfortune",
-        "You have: \\+(?<farmingFortune>\\d+)${SkyblockStat.FARMING_FORTUNE} Farming Fortune",
+        "You have: \\+(?<farmingFortune>\\d+)${SkyblockIcon.FARMING_FORTUNE} Farming Fortune",
     )
 
     /**

@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.data.model.SkyblockStat.FARMING_FORTUNE
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -61,13 +61,13 @@ object FarmingFortuneDisplay {
      */
     private val universalTabFortunePattern by patternGroup.pattern(
         "tablist.universal-no-color",
-        " Farming Fortune: ${FARMING_FORTUNE}(?<fortune>\\d+)",
+        " Farming Fortune: ${SkyblockIcon.FARMING_FORTUNE}(?<fortune>\\d+)",
     )
 
     @Suppress("MaxLineLength")
     private val cropSpecificTabFortunePattern by patternGroup.pattern(
         "tablist.cropspecific-no-color",
-        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: ${FARMING_FORTUNE}(?<fortune>\\d+)",
+        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: ${SkyblockIcon.FARMING_FORTUNE}(?<fortune>\\d+)",
     )
 
     /**
@@ -75,7 +75,7 @@ object FarmingFortuneDisplay {
      */
     private val collectionPattern by patternGroup.pattern(
         "collection",
-        "§7You have §6\\+(?<ff>\\d{1,3})${FARMING_FORTUNE} .*",
+        "§7You have §6\\+(?<ff>\\d{1,3})${SkyblockIcon.FARMING_FORTUNE} .*",
     )
 
     @Suppress("MaxLineLength")
@@ -93,7 +93,7 @@ object FarmingFortuneDisplay {
      */
     private val lotusAbilityPattern by patternGroup.pattern(
         "lotusability",
-        "§7Piece Bonus: §6+(?<bonus>.*)${FARMING_FORTUNE}",
+        "§7Piece Bonus: §6+(?<bonus>.*)${SkyblockIcon.FARMING_FORTUNE}",
     )
 
     /**
@@ -102,7 +102,7 @@ object FarmingFortuneDisplay {
     // todo make pattern work on Melon and Cropie armor
     private val armorAbilityFortunePattern by patternGroup.pattern(
         "armorabilityfortune",
-        "§7.*§7Grants §6(?<bonus>.*)${FARMING_FORTUNE}.*",
+        "§7.*§7Grants §6(?<bonus>.*)${SkyblockIcon.FARMING_FORTUNE}.*",
     )
 
     /**
@@ -113,7 +113,7 @@ object FarmingFortuneDisplay {
      */
     private val pestFortuneBuffPattern by patternGroup.pattern(
         "pestfortunebuff-no-color",
-        " Bonus: (?<inactive>INACTIVE)?(?:\\+(?<fortune>\\d+)${FARMING_FORTUNE} (?<time>.*))?.*",
+        " Bonus: (?<inactive>INACTIVE)?(?:\\+(?<fortune>\\d+)${SkyblockIcon.FARMING_FORTUNE} (?<time>.*))?.*",
     )
 
     private var display = emptyList<Renderable>()

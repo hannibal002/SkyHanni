@@ -31,7 +31,7 @@ private val patternGroup = RepoPattern.group("stats")
 
 enum class SkyblockStat(
     val color: LorenzColor,
-    val hypixelIcon: SkyblockIcon,
+    private val hypixelIcon: SkyblockIcon,
     displayName: String? = null,
     private val hypixelId: String? = null,
     generatePatterns: Boolean = true,
@@ -155,18 +155,18 @@ enum class SkyblockStat(
     // </editor-fold>
 
     // <editor-fold desc="Wisdom Stats">
-    COMBAT_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
-    FARMING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
-    FISHING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
-    MINING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
-    FORAGING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
-    ENCHANTING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
-    ALCHEMY_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
-    CARPENTRY_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
-    RUNECRAFTING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
-    TAMING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
-    SOCIAL_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
-    HUNTING_WISDOM(DARK_AQUA, SkyblockIcon.WISDOM),
+    COMBAT_WISDOM(DARK_AQUA, SkyblockIcon.COMBAT_WISDOM),
+    FARMING_WISDOM(DARK_AQUA, SkyblockIcon.FARMING_WISDOM),
+    FISHING_WISDOM(DARK_AQUA, SkyblockIcon.FISHING_WISDOM),
+    MINING_WISDOM(DARK_AQUA, SkyblockIcon.MINING_WISDOM),
+    FORAGING_WISDOM(DARK_AQUA, SkyblockIcon.FORAGING_WISDOM),
+    ENCHANTING_WISDOM(DARK_AQUA, SkyblockIcon.ENCHANTING_WISDOM),
+    ALCHEMY_WISDOM(DARK_AQUA, SkyblockIcon.ALCHEMY_WISDOM),
+    CARPENTRY_WISDOM(DARK_AQUA, SkyblockIcon.CARPENTRY_WISDOM),
+    RUNECRAFTING_WISDOM(DARK_AQUA, SkyblockIcon.RUNECRAFTING_WISDOM),
+    TAMING_WISDOM(DARK_AQUA, SkyblockIcon.TAMING_WISDOM),
+    SOCIAL_WISDOM(DARK_AQUA, SkyblockIcon.SOCIAL_WISDOM),
+    HUNTING_WISDOM(DARK_AQUA, SkyblockIcon.HUNTING_WISDOM),
     // </editor-fold>
 
     // <editor-fold desc="Rift Stats">
@@ -230,8 +230,6 @@ enum class SkyblockStat(
     )
 
     fun asString(value: Int) = (if (value > 0) "+" else "") + value.toString() + " " + this.icon
-
-    override fun toString(): String = hypixelIcon.toString()
 
     @SkyHanniModule
     companion object {

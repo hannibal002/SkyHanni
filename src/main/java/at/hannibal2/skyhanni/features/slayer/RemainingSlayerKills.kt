@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -70,7 +71,7 @@ object RemainingSlayerKills {
      */
     private val killCombatWisdomPattern by patternGroup.pattern(
         "kill-combat-wisdom",
-        "\\+\\d+ Kill Combo \\+(?<wisdom>\\d+)${SkyblockStat.COMBAT_WISDOM} Combat Wisdom",
+        "\\+\\d+ Kill Combo \\+(?<wisdom>\\d+)${SkyblockIcon.COMBAT_WISDOM} Combat Wisdom",
     )
 
     data class SlayerData(

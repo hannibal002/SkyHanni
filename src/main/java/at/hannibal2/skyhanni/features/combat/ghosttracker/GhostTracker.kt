@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDropsJson
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -125,7 +125,7 @@ object GhostTracker {
      */
     private val itemDropPattern by patternGroup.pattern(
         "itemdrop.colorless",
-        "RARE DROP! (?<item>.+) \\(\\+(?<mf>\\d+)%? ${SkyblockStat.MAGIC_FIND} Magic Find\\)",
+        "RARE DROP! (?<item>.+) \\(\\+(?<mf>\\d+)%? ${SkyblockIcon.MAGIC_FIND} Magic Find\\)",
     )
 
     /**

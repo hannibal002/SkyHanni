@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -50,7 +50,7 @@ object ItemAbilityCooldown {
     )
     private val youBuffedYourselfPattern by patternGroup.pattern(
         "buffedyourself",
-        "§aYou buffed yourself for §r§c\\+\\d+${SkyblockStat.STRENGTH} Strength",
+        "§aYou buffed yourself for §r§c\\+\\d+${SkyblockIcon.STRENGTH} Strength",
     )
 
     /**

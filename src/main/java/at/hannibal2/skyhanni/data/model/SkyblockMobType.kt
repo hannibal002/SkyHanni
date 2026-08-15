@@ -96,6 +96,4 @@ enum class SkyblockMobType(
     ;
 
     val displayName = displayName ?: toFormattedName()
-
-    override fun toString(): String = hypixelIcon.toString()
 }

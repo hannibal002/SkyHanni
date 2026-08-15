@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
-import at.hannibal2.skyhanni.data.model.SkyblockStat.FARMING_FORTUNE
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -51,7 +51,7 @@ object FarmingPersonalBestGain {
      */
     private val newFFPattern by patternGroup.pattern(
         "ff.new.colorless",
-        "\\[NPC] Jacob: Your Personal Bests perk is now granting you \\+(?<ff>.*)${FARMING_FORTUNE} (?<crop>.*) Fortune!",
+        "\\[NPC] Jacob: Your Personal Bests perk is now granting you \\+(?<ff>.*)${SkyblockIcon.FARMING_FORTUNE} (?<crop>.*) Fortune!",
     )
 
     /**
@@ -61,7 +61,7 @@ object FarmingPersonalBestGain {
     @Suppress("MaxLineLength")
     private val unused by patternGroup.pattern(
         "ff.new",
-        "§e\\[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6\\+(?<ff>.*)${FARMING_FORTUNE} (?<crop>.*) Fortune§f!",
+        "§e\\[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6\\+(?<ff>.*)${SkyblockIcon.FARMING_FORTUNE} (?<crop>.*) Fortune§f!",
     )
     // </editor-fold>
 

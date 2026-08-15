@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.rift.area.colosseum
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -23,7 +23,7 @@ object BacteApi {
     @Suppress("MaxLineLength")
     private val namePattern by group.pattern(
         "name",
-        "§2﴾ §8\\[§7Lv\\d+§8\\] §l§a(?<name>.*)§r §.[\\d.,]+§f\\/§a[\\d.,]+§c${SkyblockStat.HEALTH} §2﴿",
+        "§2﴾ §8\\[§7Lv\\d+§8\\] §l§a(?<name>.*)§r §.[\\d.,]+§f\\/§a[\\d.,]+§c${SkyblockIcon.HEALTH} §2﴿",
     )
 
     /**

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.Perk.Companion.toPerk
-import at.hannibal2.skyhanni.data.model.SkyblockStat.MAGIC_FIND
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -96,7 +96,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
 private fun renderPerson(title: String, name: String?, perks: List<Perk>?): Renderable {
     val colorCode = ElectionApi.mayorNameToColorCode(name.orEmpty())
     val perkLines = perks?.takeIf { config.showPerks }?.map { perk ->
-        " ${if (perk.minister) "§6${MAGIC_FIND} " else ""}§e${perk.perkName}" to "§7${perk.description}"
+        " ${if (perk.minister) "§6${SkyblockIcon.MAGIC_FIND} " else ""}§e${perk.perkName}" to "§7${perk.description}"
     }.orEmpty()
 
     return Renderable.vertical(

@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -146,7 +146,7 @@ object DragonFeatures {
      */
     private val tabDamagePattern by tabListGroup.pattern(
         "fight.player",
-        "\\s(?<name>.+): (?<damage>[\\d.]+[kM]?)${SkyblockStat.HEALTH}",
+        "\\s(?<name>.+): (?<damage>[\\d.]+[kM]?)${SkyblockIcon.HEALTH}",
     )
 
     private var yourEyes = 0

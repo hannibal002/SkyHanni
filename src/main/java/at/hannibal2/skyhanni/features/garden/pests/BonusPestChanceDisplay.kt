@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -31,7 +31,7 @@ object BonusPestChanceDisplay {
      */
     private val bonusPestChancePattern by patternGroup.pattern(
         "widget-no-color",
-        "\\s+Bonus Pest Chance: ${SkyblockStat.BONUS_PEST_CHANCE}(?<amount>[\\d,.]+)",
+        "\\s+Bonus Pest Chance: ${SkyblockIcon.BONUS_PEST_CHANCE}(?<amount>[\\d,.]+)",
     )
     private var display: Renderable? = null
 
@@ -49,7 +49,7 @@ object BonusPestChanceDisplay {
             val amount = group("amount").formatInt()
 
             display = Renderable.text {
-                append("§2${SkyblockStat.BONUS_PEST_CHANCE}")
+                append("§2${SkyblockIcon.BONUS_PEST_CHANCE}")
                 if (compact) append(" BPC ") else append(" Bonus Pest Chance ")
                 if (disabled) append("§c§m") else append("§f")
                 append("$amount%")

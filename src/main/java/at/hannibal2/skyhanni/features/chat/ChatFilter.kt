@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTag
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
@@ -341,7 +341,7 @@ object ChatFilter {
     @Suppress("MaxLineLength")
     private val anitaFortunePattern by RepoPattern.pattern(
         "chat.jacobevent.accessory",
-        "§e\\[NPC] Jacob§f: §rYour §9Anita's \\w+ §fis giving you §6\\+\\d{1,2}${SkyblockStat.FARMING_FORTUNE} .+ Fortune §fduring the contest!",
+        "§e\\[NPC] Jacob§f: §rYour §9Anita's \\w+ §fis giving you §6\\+\\d{1,2}${SkyblockIcon.FARMING_FORTUNE} .+ Fortune §fduring the contest!",
     )
 
     // Winter Gift

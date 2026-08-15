@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -208,7 +208,7 @@ object ScoreboardPattern {
      */
     val m7dragonsPattern by dungeonSB.pattern(
         "m7dragons",
-        "§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+(?:§.${SkyblockStat.HEALTH})?",
+        "§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+(?:§.${SkyblockIcon.HEALTH})?",
     )
     val keysPattern by dungeonSB.pattern(
         "keys",
@@ -238,7 +238,7 @@ object ScoreboardPattern {
      */
     val floor3GuardiansPattern by dungeonSB.pattern(
         "floor3guardians",
-        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a [\\w,.]*(?:§c${SkyblockStat.HEALTH})?",
+        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a [\\w,.]*(?:§c${SkyblockIcon.HEALTH})?",
     )
 
     // kuudra
@@ -475,7 +475,7 @@ object ScoreboardPattern {
      */
     val fortunateFreezingBonusPattern by miningSB.pattern(
         "fortunatefreezing.bonus",
-        "Event Bonus: §6\\+\\d+${SkyblockStat.MINING_FORTUNE}",
+        "Event Bonus: §6\\+\\d+${SkyblockIcon.MINING_FORTUNE}",
     )
 
     /**
@@ -537,7 +537,7 @@ object ScoreboardPattern {
      */
     val bossHealthBarPattern by combatSB.pattern(
         "magmabosshealthbar",
-        "§.[\\w,.]+§f/§a10M§c${SkyblockStat.HEALTH}",
+        "§.[\\w,.]+§f/§a10M§c${SkyblockIcon.HEALTH}",
     )
 
     /**
@@ -546,7 +546,7 @@ object ScoreboardPattern {
      */
     val bossHPPattern by combatSB.pattern(
         "bosshp",
-        "(?:Protector|Dragon) HP: §a[\\d,.]* §c${SkyblockStat.HEALTH}",
+        "(?:Protector|Dragon) HP: §a[\\d,.]* §c${SkyblockIcon.HEALTH}",
     )
 
     /**

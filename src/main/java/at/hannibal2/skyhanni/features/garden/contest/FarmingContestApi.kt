@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.contest
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -51,7 +51,7 @@ object FarmingContestApi {
      */
     private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop.colorless",
-        "\\s*(?:○|${SkyblockStat.FARMING_FORTUNE}) (?<crop>.*) .*",
+        "\\s*(?:○|${SkyblockIcon.FARMING_FORTUNE}) (?<crop>.*) .*",
     )
 
     /**
