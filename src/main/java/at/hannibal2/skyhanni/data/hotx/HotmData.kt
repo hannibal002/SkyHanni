@@ -643,8 +643,8 @@ enum class HotmData(
         @HandleEvent
         private fun onWidgetUpdate(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.POWDER)) return
-            event.lines.forEach { line ->
-                widgetPowderPattern.matchMatcher(line.string.removeColor()) {
+            event.cleanLines.forEach { line ->
+                widgetPowderPattern.matchMatcher(line) {
                     val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                     val amount = group("amount").formatLong()
                     type.setAmount(amount, postEvent = true)
