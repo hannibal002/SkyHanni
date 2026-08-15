@@ -8,6 +8,8 @@ import org.joml.Vector3f
 object DisplayEntityUtils {
     val Display.transformation: Transformation
         get() {
+            // Stuff like "CheckRenderEntityEvent" is called before the entity is ticked,
+            // so the renderState may be null. In that case, we create a fresh renderState and use that.
             val currentRenderState = this.renderState ?: run {
                 createFreshRenderState().also { this.renderState = it }
             }
