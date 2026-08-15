@@ -51,7 +51,7 @@ object ClearTreeLogs {
         val floatingTree = isFloatingTreeBlock(transformation)
         if ((config.hideTreeBlocks && floatingTree) ||
             (config.hideRuneEffects && !floatingTree)
-           ) {
+        ) {
             event.cancel()
         }
     }
