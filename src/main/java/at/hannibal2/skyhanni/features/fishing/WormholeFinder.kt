@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DisplayEntityUtils.arrowForwardVec
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.world.entity.Display
-import org.joml.Vector3f
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -73,13 +73,6 @@ object WormholeFinder {
         lastPlayerPos = playerPos
     }
 
-    @Suppress("UnnecessarySafeCall")
-    private fun Display.TextDisplay.arrowForwardVec(): LorenzVec {
-        val quat = renderState()?.transformation()?.get(0f)?.leftRotation() ?: return LorenzVec(0, 0, 1)
-        val localY = Vector3f(0f, 1f, 0f)
-        quat.transform(localY)
-        return LorenzVec(localY.x.toDouble(), 0.0, localY.z.toDouble()).normalize()
-    }
 
     private fun matchArrow(arrow: Display.TextDisplay): GraphNode? {
         val graph = IslandGraphs.currentIslandGraph ?: return null
