@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.data.hotx.HotfData
 import at.hannibal2.skyhanni.data.hotx.HotxPatterns.asPatternId
 import at.hannibal2.skyhanni.data.hotx.RotatingPerk
 import at.hannibal2.skyhanni.data.model.SkyblockIcon
-import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import org.intellij.lang.annotations.Language
@@ -34,7 +33,7 @@ object HotfApi {
         FIG_FORTUNE(
             displayDescription = "§6+50${SkyblockIcon.FIG_FORTUNE} Fig Fortune",
             chatFallback = "Gain \\+50${SkyblockIcon.FIG_FORTUNE} Fig Fortune\\.",
-            itemFallback = "Gain \\+50${SkyblockStat.FIG_FORTUNE} Fig Fortune\\.",
+            itemFallback = "Gain \\+50${SkyblockIcon.FIG_FORTUNE} Fig Fortune\\.",
         ),
         HELIX_FORTUNE(
             displayDescription = "§6+50${SkyblockIcon.HELIX_FORTUNE} Helix Fortune",
