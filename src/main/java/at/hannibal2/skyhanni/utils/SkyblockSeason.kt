@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.model.SkyblockIcon
-import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.UtilsPatterns.seasonPattern
 import kotlin.time.Duration.Companion.seconds
@@ -15,14 +14,14 @@ enum class SkyblockSeason(
 
     SPRING(
         "§dSpring",
-        "§7Gain §6+25${SkyblockStat.FARMING_FORTUNE} Farming Fortune§7.",
-        "§6+25${SkyblockStat.FARMING_FORTUNE}",
+        "§7Gain §6+25${SkyblockIcon.FARMING_FORTUNE} Farming Fortune§7.",
+        "§6+25${SkyblockIcon.FARMING_FORTUNE}",
         1
     ),
     SUMMER(
         "§6Summer",
-        "§7Gain §3+20${SkyblockStat.FARMING_WISDOM} Farming Wisdom§7.",
-        "§3+20${SkyblockStat.FARMING_WISDOM}",
+        "§7Gain §3+20${SkyblockIcon.FARMING_WISDOM} Farming Wisdom§7.",
+        "§3+20${SkyblockIcon.FARMING_WISDOM}",
         4
     ),
     AUTUMN(
