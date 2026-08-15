@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -67,7 +67,7 @@ object MobFilter {
      */
     val mobNameFilter by patternGroup.pattern(
         "filter.basic",
-        "$level$mobType(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,${SkyblockStat.HEALTH}]+",
+        "$level$mobType(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,${SkyblockIcon.HEALTH}]+",
     )
 
     /**
@@ -94,7 +94,7 @@ object MobFilter {
      */
     val bossMobNameFilter by patternGroup.pattern(
         "filter.boss",
-        "^. $level$mobType(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,${SkyblockStat.HEALTH}]+| █+)? .$",
+        "^. $level$mobType(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,${SkyblockIcon.HEALTH}]+| █+)? .$",
     )
 
     @Suppress("MaxLineLength")
@@ -118,7 +118,7 @@ object MobFilter {
      */
     val jerryPattern by patternGroup.pattern(
         "jerry",
-        "(?:\\[\\w+(?<level>\\d+)] )?.. (?:(?:a(?=a ))?(?<owner>\\w+)'s (?<name>\\w+ Jerrya?)) \\d+ Hits",
+        "(?:\\[\\w+(?<level>\\d+)] )?${SkyblockIcon.HUMANOID}${SkyblockIcon.SHIELDED} (?:(?:a(?=a ))?(?<owner>\\w+)'s (?<name>\\w+ Jerrya?)) \\d+ Hits",
     )
     val petCareNamePattern by patternGroup.pattern(
         "pattern.petcare",
@@ -132,7 +132,7 @@ object MobFilter {
     )
     val jerryMagmaCubePattern by patternGroup.pattern(
         "pattern.jerry.magma.cube",
-        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c${SkyblockStat.HEALTH}",
+        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c${SkyblockIcon.HEALTH}",
     )
     val summonOwnerPattern by patternGroup.pattern(
         "pattern.summon.owner",
