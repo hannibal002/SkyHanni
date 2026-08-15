@@ -32,7 +32,7 @@ class BaseBrigadierBuilder(
     override val descriptor: String
         get() = description
 
-    lateinit var node: CommandNode<FabricClientCommandSource>
+    var node: CommandNode<FabricClientCommandSource>? = null
 }
 
 open class BrigadierBuilder<B : ArgumentBuilder<FabricClientCommandSource, B>>(

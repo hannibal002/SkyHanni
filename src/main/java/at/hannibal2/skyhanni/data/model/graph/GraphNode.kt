@@ -31,6 +31,7 @@ class GraphNode(
         }
 
     /** Keys are the neighbors and value the edge weight (e.g. distance) */
+    @Suppress("LateinitUsage")
     lateinit var neighbors: Map<GraphNode, Double>
 
     fun hasTag(tag: GraphNodeTag): Boolean = tag in tags

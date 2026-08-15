@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SafeItemStack
 
@@ -8,7 +9,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 class UserLuckCalculateEvent : SkyHanniEvent() {
 
     private var totalLuck = 0f
-    lateinit var mainLuckStack: SafeItemStack
+    val mainLuckStack: SafeItemStack by lazy { UserLuckBreakdown.getUserLuckStack(totalLuck) }
     private val stacks = mutableMapOf<Int, SafeItemStack>()
     private val validItemSlots = (10..53).filter { it !in listOf(17, 18, 26, 27, 35, 36) && it !in 44..53 }.sorted()
 

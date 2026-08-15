@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bingo.card.goals
 
 import com.google.gson.annotations.Expose
 
+@Suppress("LateinitUsage")
 class BingoGoal {
 
     @Expose

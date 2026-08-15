@@ -63,6 +63,7 @@ import java.awt.Color
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("LateinitUsage")
 @SkyHanniModule
 object TunnelsMaps {
 

@@ -30,20 +30,7 @@ object HelpCommand {
         val categoryDescription = category.description.splitLines(200).replace("§r", "§7")
         val aliases = command.aliases
 
-        val usage = if (command is BaseBrigadierBuilder) {
-            val node = command.node
-            val map = dispatcher.getSmartUsage(node, null)
-            if (map.isEmpty()) null
-            else buildString {
-                appendLine()
-                append("§7Usage:")
-                if (map.size == 1) append(map.entries.first().format())
-                else {
-                    appendLine()
-                    append(map.entries.joinToString("\n") { it.format() })
-                }
-            }
-        } else null
+        val usage = getUsage(command, dispatcher)
 
         return TextHelper.text("§7 - $color${command.name}") {
             this.hover = TextHelper.multiline(
@@ -56,6 +43,21 @@ object HelpCommand {
                 categoryDescription.prependIndent("  "),
             )
             this.suggest = "/${command.name}"
+        }
+    }
+
+    private fun getUsage(command: CommandData, dispatcher: CommandDispatcher<FabricClientCommandSource>): String? {
+        if (command !is BaseBrigadierBuilder) return null
+        val node = command.node ?: return null
+        val map = dispatcher.getSmartUsage(node, null)
+        if (map.isEmpty()) return null
+        return buildString {
+            appendLine("§7Usage:")
+            if (map.size == 1) append(map.entries.first().format())
+            else {
+                appendLine()
+                append(map.entries.joinToString("\n") { it.format() })
+            }
         }
     }
 

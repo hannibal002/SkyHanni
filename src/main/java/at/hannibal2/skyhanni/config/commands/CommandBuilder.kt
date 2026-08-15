@@ -23,7 +23,7 @@ sealed class CommandBuilderBase(override val name: String) : CommandData {
 }
 
 class ComplexCommandBuilder<O : CommandContextAwareObject, A : CommandArgument<O>>(name: String) : CommandBuilderBase(name) {
-    lateinit var specifiers: Collection<A>
+    var specifiers: Collection<A> = emptyList()
 
     private var realDescription: String = ""
 

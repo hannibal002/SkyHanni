@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.data.jsonobjects.repo.Wiki
 import at.hannibal2.skyhanni.data.jsonobjects.repo.WikiJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,7 +23,13 @@ import java.net.URLEncoder
 
 @SkyHanniModule
 object WikiManager {
-    private lateinit var data: WikiJson
+    private var data: WikiJson = WikiJson(
+        unofficial = Wiki(
+            name = "Independent SkyBlock Wiki",
+            urlPrefix = "https://hypixelskyblock.minecraft.wiki/w/",
+            fullSearchPrefix = "https://hypixelskyblock.minecraft.wiki/?title=Special:Search&search="
+        )
+    )
 
     private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
 

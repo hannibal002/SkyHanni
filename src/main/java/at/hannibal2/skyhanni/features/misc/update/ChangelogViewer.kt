@@ -34,7 +34,10 @@ object ChangelogViewer {
 
     internal var openTime = SimpleTimeMark.farPast()
 
+    // Used for lazy initialization of the changelog viewer
+    @Suppress("LateinitUsage")
     internal lateinit var startVersion: ModVersion
+    @Suppress("LateinitUsage")
     internal lateinit var endVersion: ModVersion
 
     internal var shouldMakeNewList = false

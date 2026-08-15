@@ -57,6 +57,7 @@ class ConfigManager {
 
     private val jsonHolder: Map<ConfigFileType, Any> = enumMapOf()
 
+    @Suppress("LateinitUsage")
     lateinit var processor: BlockingMoulConfigProcessor
     private var disableSaving = false
 

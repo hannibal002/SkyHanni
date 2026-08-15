@@ -300,14 +300,12 @@ object BlockStrengthGuide {
 
     private var showExtraInfos = false
 
-    private lateinit var speed: SpeedClass
-
     private var inMineshaft = false
 
     // TODO Dwarven Equip (Needs a Equipment API) , Goblin Pet and Mithril Pet (need the PetAPI v2)
     private fun requestSpeed(): SpeedClass {
         val itemInHand = InventoryUtils.getItemInHand()
-        speed = SpeedClass(
+        val newSpeed = SpeedClass(
             base = (
                 SkyblockStat.MINING_SPEED.lastKnownValue ?: 0.0
                 ) + if (inMineshaft) HotmData.EAGER_ADVENTURER.getReward()[HotmReward.MINING_SPEED] ?: 0.0 else 0.0,
@@ -323,8 +321,7 @@ object BlockStrengthGuide {
             ore = 0.0,
             block = 0.0,
         )
-
-        return speed
+        return newSpeed
     }
 
     private data class SpeedClass(
@@ -352,15 +349,15 @@ object BlockStrengthGuide {
     private var display: Renderable? = null
 
     private fun createDisplay(): Renderable {
-        requestSpeed()
+        val speed = requestSpeed()
         return Renderable.drawInsideRoundedRectWithOutline(
             Renderable.vertical(
                 Renderable.vertical(
-                    createHeader(),
+                    createHeader(speed),
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 ),
                 Renderable.table(
-                    createTableContent(), 5, 3,
+                    createTableContent(speed), 5, 3,
                 ),
                 spacing = 8,
             ),
@@ -373,11 +370,11 @@ object BlockStrengthGuide {
         )
     }
 
-    private fun createTableContent(): List<List<Renderable>> = DisplayOres.entries.map {
+    private fun createTableContent(speed: SpeedClass): List<List<Renderable>> = DisplayOres.entries.map {
         it.renderable(speed)
     }.distribute(3)
 
-    private fun createHeader(): List<Renderable> = listOf(
+    private fun createHeader(speed: SpeedClass): List<Renderable> = listOf(
         Renderable.text(
             SkyblockStat.MINING_SPEED.iconWithName,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

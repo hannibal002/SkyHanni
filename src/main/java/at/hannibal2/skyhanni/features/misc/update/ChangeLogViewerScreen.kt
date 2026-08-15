@@ -25,7 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 class ChangeLogViewerScreen : SkyHanniBaseScreen() {
     private val changelogScroll = ScrollValue()
 
-    private lateinit var scrollList: Renderable
+    private var scrollList: Renderable = Renderable.text("Loading...")
     private var lastWidth: Int = 0
     private var lastHeight: Int = 0
 

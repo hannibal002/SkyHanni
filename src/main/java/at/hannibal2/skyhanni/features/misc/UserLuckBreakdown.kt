@@ -410,15 +410,11 @@ object UserLuckBreakdown {
         event.addItem(stack)
     }
 
-    @HandleEvent(priority = 100)
-    fun totalLuck(event: UserLuckCalculateEvent) {
-        val totalLuck = event.getTotalLuck()
-        event.mainLuckStack = ItemUtils.createItemStack(
-            mainLuckID,
-            "$MAIN_LUCK_NAME §f${tryTruncateFloat(totalLuck)}",
-            createItemLore("mainMenu", totalLuck),
-        )
-    }
+    internal fun getUserLuckStack(totalLuck: Float) = ItemUtils.createItemStack(
+        mainLuckID,
+        "$MAIN_LUCK_NAME §f${tryTruncateFloat(totalLuck)}",
+        createItemLore("mainMenu", totalLuck),
+    )
 
     fun getTotalUserLuck(): Float {
         val luckEvent = getOrPostLuckEvent()

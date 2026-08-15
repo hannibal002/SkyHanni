@@ -24,8 +24,10 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.SimpleContainer
 import kotlin.time.Duration.Companion.seconds
 
+// TODO: Remove lateinit usage
 @SkyHanniModule
 object LimboPlaytime {
+    @Suppress("LateinitUsage")
     private lateinit var modifiedList: MutableList<Component>
     private var setMinutes = false
     private val patternGroup = RepoPattern.group("misc.limbo.tooltip")
@@ -59,6 +61,7 @@ object LimboPlaytime {
 
     private val itemID = "ENDER_PEARL".toInternalName()
     private const val ITEM_NAME = "§aLimbo"
+    @Suppress("LateinitUsage")
     private lateinit var limboItem: SafeItemStack
     private var lastCreateCooldown = SimpleTimeMark.farPast()
 
