@@ -58,11 +58,8 @@ object ClearTreeLogs {
     @HandleEvent
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(144, "foraging.trees.cleanView") { element ->
-            val current = element.asBoolean
             val obj = JsonObject()
-            obj.addProperty("enabled", current)
-            obj.addProperty("hideTreeBlocks", current)
-            obj.addProperty("hideRuneEffects", false)
+            obj.addProperty("enabled", element.asBoolean)
             obj
         }
     }
