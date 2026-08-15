@@ -263,12 +263,16 @@ enum class HotfData(
     override fun getStorage(): HotxTree? = ProfileStorageData.profileSpecific?.foraging?.hotFTree
 
     @SkyHanniModule
-    companion object : HotxHandler<HotfData, HotfReward, HotfApi.LotteryPerk>(entries) {
+    companion object : HotxHandler<HotfData, HotfReward>(entries) {
         override val name: String = "HotF"
         override val core: HotfData = CENTER_OF_THE_FOREST
-        override val rotatingPerks = HotfApi.LotteryPerk.entries
-        override val rotatingPerkEntry = LOTTERY
-        override var currentRotPerk = HotfApi.lottery
+        override val rotatingPerkSlots = listOf(
+            object : RotatingPerkSlot<HotfData> {
+                override val entry: HotfData = LOTTERY
+                override val perks = HotfApi.LotteryPerk.entries
+                override var currentPerk: RotatingPerk? = null
+            },
+        )
         override val islandTypeTag = IslandTypeTag.FORAGING
         private val config get() = SkyHanniMod.feature.foraging.hotf
 
