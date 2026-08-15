@@ -145,7 +145,7 @@ object KeyboardManager {
         )
 
         this == -1 -> false
-        this in 0..5 -> MouseCompat.isButtonDown(this)
+        MouseCompat.isMouseButton(this) -> MouseCompat.isButtonDown(this)
         else -> InputConstants.isKeyDown(Minecraft.getInstance().window, this)
     }
 
