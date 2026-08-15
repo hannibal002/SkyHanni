@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.data.model.SkyblockMobType
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.UtilsPatterns.seasonPattern
@@ -28,7 +28,7 @@ enum class SkyblockSeason(
     AUTUMN(
         "§eAutumn",
         "§4Pests §7spawn §a15% §7more often.",
-        "§a15%+§${SkyblockMobType.PEST}",
+        "§a15%+§${SkyblockIcon.PEST}",
         7
     ),
     WINTER(

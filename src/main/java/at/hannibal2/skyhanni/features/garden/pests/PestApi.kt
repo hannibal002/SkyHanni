@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.model.SkyblockMobType
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -110,7 +110,7 @@ object PestApi {
      */
     private val pestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*${SkyblockMobType.PEST}(?:§.)* x(?<pests>\\d+)",
+        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*${SkyblockIcon.PEST}(?:§.)* x(?<pests>\\d+)",
     )
 
     /**
@@ -126,7 +126,7 @@ object PestApi {
      */
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
-        "§4§l${SkyblockMobType.PEST} §cThis plot has §.(?<amount>\\d+) §2${SkyblockMobType.PEST} Pests?§c!",
+        "§4§l${SkyblockIcon.PEST} §cThis plot has §.(?<amount>\\d+) §2${SkyblockIcon.PEST} Pests?§c!",
     )
 
     /**

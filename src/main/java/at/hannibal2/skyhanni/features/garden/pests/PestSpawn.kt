@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestSpawnConfig
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.SkyblockMobType
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
@@ -32,8 +32,8 @@ object PestSpawn {
      */
     private val onePestPattern by patternGroup.list(
         "one.colorless",
-        "^\\w+! A ${SkyblockMobType.PEST} Pest has appeared in Plot - (?<plot>.*)!",
-        "^\\w+! A ${SkyblockMobType.PEST} Pest has appeared in (?<plot>The Barn)!",
+        "^\\w+! A ${SkyblockIcon.PEST} Pest has appeared in Plot - (?<plot>.*)!",
+        "^\\w+! A ${SkyblockIcon.PEST} Pest has appeared in (?<plot>The Barn)!",
     )
 
     /**
@@ -43,8 +43,8 @@ object PestSpawn {
      */
     private val multiplePestsPattern by patternGroup.list(
         "multiple.colorless",
-        "^\\w+! (?<amount>\\d) ${SkyblockMobType.PEST} Pests? have spawned in Plot - (?<plot>.*)!",
-        "^\\w+! (?<amount>\\d) ${SkyblockMobType.PEST} Pests? have spawned in (?<plot>The Barn)!",
+        "^\\w+! (?<amount>\\d) ${SkyblockIcon.PEST} Pests? have spawned in Plot - (?<plot>.*)!",
+        "^\\w+! (?<amount>\\d) ${SkyblockIcon.PEST} Pests? have spawned in (?<plot>The Barn)!",
     )
 
     /**
@@ -53,7 +53,7 @@ object PestSpawn {
      */
     private val offlinePestsPattern by patternGroup.pattern(
         "offline.colorless",
-        "^\\w+! While you were offline, ${SkyblockMobType.PEST} Pests? spawned in Plots (?<plots>.*)!",
+        "^\\w+! While you were offline, ${SkyblockIcon.PEST} Pests? spawned in Plots (?<plots>.*)!",
     )
 
     /**
