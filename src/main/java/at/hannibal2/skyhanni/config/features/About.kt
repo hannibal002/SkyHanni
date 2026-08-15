@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features
 import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDeprecatedDisplay
 import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDisplay
 import at.hannibal2.skyhanni.utils.OSUtils.openBrowser
-import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -45,13 +44,12 @@ class About {
 
         companion object {
             /**
-             * The stream matching the currently installed version, used as the default on a clean install.
+             * The stream matching the installed version, used as the default on a clean install.
              *
-             * This reads [VersionConstants] instead of `SkyHanniMod.isBetaVersion` because the config is
-             * constructed while `SkyHanniMod` is still initialising.
+             * Reads [ModVersion.installed] and not `SkyHanniMod.isBetaVersion`, because the config is also
+             * constructed while `SkyHanniMod` is still initialising, where that property may be unset.
              */
-            fun forInstalledVersion(): UpdateStream =
-                if (ModVersion.fromString(VersionConstants.MOD_VERSION).isBeta) BETA else RELEASES
+            fun forInstalledVersion(): UpdateStream = if (ModVersion.installed.isBeta) BETA else RELEASES
         }
     }
 
