@@ -31,7 +31,7 @@ private val patternGroup = RepoPattern.group("stats")
 
 enum class SkyblockStat(
     val color: LorenzColor,
-    private val hypixelIcon: SkyblockIcon,
+    val hypixelIcon: SkyblockIcon,
     displayName: String? = null,
     private val hypixelId: String? = null,
     generatePatterns: Boolean = true,
