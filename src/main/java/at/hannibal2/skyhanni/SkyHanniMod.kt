@@ -51,6 +51,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 
+@Suppress("LateinitUsage")
 @SkyHanniModule
 object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     CoroutineScope(CoroutineName("SkyHanni") + SupervisorJob(Job(null))),

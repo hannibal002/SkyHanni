@@ -197,6 +197,8 @@ potential-bugs:
         active: true
     UnreachableCode:
         active: false
+    LateinitUsage:
+        active: true
     IgnoredReturnValue:
         active: true
         ignoreFunctionCall:

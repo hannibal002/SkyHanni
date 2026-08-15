@@ -9,15 +9,14 @@ import kotlin.reflect.KProperty
 class RepoPatternExclusiveGroupInfo internal constructor(val prefix: String, val parent: RepoPatternKeyOwner?) :
     ReadOnlyProperty<Any?, RepoPatternExclusiveGroup> {
 
-    internal var hasObtainedLock = false
-    private lateinit var owner: RepoPatternKeyOwner
+    private var owner: RepoPatternKeyOwner? = null
 
     init {
         RepoPatternManager.verifyKeyShape(prefix)
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): RepoPatternExclusiveGroup {
-        verifyLock(thisRef, property)
+        owner = verifyLock(thisRef, property)
         return RepoPatternExclusiveGroup(prefix, owner)
     }
 
@@ -25,10 +24,11 @@ class RepoPatternExclusiveGroupInfo internal constructor(val prefix: String, val
      * Try to lock the [key] to this key location.
      * @see RepoPatternManager.checkExclusivity
      */
-    private fun verifyLock(thisRef: Any?, property: KProperty<*>) {
-        if (hasObtainedLock) return
-        hasObtainedLock = true
-        owner = RepoPatternKeyOwner(thisRef?.javaClass, property, false, parent)
-        RepoPatternManager.checkNameSpaceExclusivity(owner, prefix)
+    private fun verifyLock(thisRef: Any?, property: KProperty<*>): RepoPatternKeyOwner {
+        val currentOwner = owner
+        if (currentOwner != null) return currentOwner
+        val newOwner = RepoPatternKeyOwner(thisRef?.javaClass, property, false, parent)
+        RepoPatternManager.checkNameSpaceExclusivity(newOwner, prefix)
+        return newOwner
     }
 }
