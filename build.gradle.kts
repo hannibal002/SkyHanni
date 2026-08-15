@@ -209,7 +209,6 @@ afterEvaluate {
     ksp {
         arg("skyhanni.modver", version.toString())
         arg("skyhanni.mcver", target.minecraftVersion.versionName)
-        arg("skyhanni.buildpaths", project.file("buildpaths-excluded.txt").absolutePath)
     }
 }
 
@@ -310,8 +309,6 @@ fun excludeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
         }
     }
 }
-excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
-excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
