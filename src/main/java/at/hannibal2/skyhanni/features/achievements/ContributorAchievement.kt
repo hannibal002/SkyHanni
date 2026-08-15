@@ -132,7 +132,8 @@ object ContributorAchievement {
     }
 
     fun onUniqueContributorSeen(profile: GameProfile) {
-        if (showContributorAchievement(profile)) return
+        val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
+        if (showContributorAchievement(profile, completed)) return
         showContributorDiscovered(profile)
     }
 
@@ -146,9 +147,8 @@ object ContributorAchievement {
         }
     }
 
-    private fun showContributorAchievement(profile: GameProfile): Boolean {
-        val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
-        if (!completed && !shouldShowMessages) return false
+    private fun showContributorAchievement(profile: GameProfile, completed: Boolean): Boolean {
+        if (!completed || !shouldShowMessages) return false
         val message = getDiscoverComponent(profile)
         ChatUtils.chat(message)
         return true
