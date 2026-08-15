@@ -91,6 +91,12 @@ style:
         maxDestructuringEntries: 5
     AbstractClassCanBeConcreteClass: # this is usually intentional
         active: false
+    UnnecessaryFullyQualifiedName:
+        active: true
+        # The Kotlin compiler will yell at you if you try to import these, but sometimes you need to use them
+        ignoredFullyQualifiedNames:
+            - 'java.lang.Boolean'
+            - 'java.lang.Enum'
 
 ktlint:
     MaximumLineLength: # ktlint - handled by detekt

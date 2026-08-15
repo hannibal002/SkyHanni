@@ -1,17 +1,18 @@
 package at.hannibal2.skyhanni.utils.render
 
+import com.mojang.blaze3d.pipeline.RenderPipeline
 import net.minecraft.client.renderer.rendertype.LayeringTransform
 import net.minecraft.client.renderer.rendertype.RenderSetup
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.resources.Identifier
 import net.minecraft.util.Util
+import java.util.function.Function
 
 //? if < 26.2 {
 /*import at.hannibal2.skyhanni.utils.render.layers.ChromaRenderLayer
 *///?}
 
 object SkyHanniRenderLayers {
-
     private val FILLED: RenderType = RenderType.create(
         "skyhanni_filled",
         RenderSetup.builder(SkyHanniRenderPipeline.FILLED()).createRenderSetup(),
@@ -52,7 +53,7 @@ object SkyHanniRenderLayers {
         RenderSetup.builder(SkyHanniRenderPipeline.QUADS_XRAY()).createRenderSetup(),
     )
 
-    private val CHROMA_TEXTURED: java.util.function.Function<Identifier, RenderType> = Util.memoize { texture ->
+    private val CHROMA_TEXTURED: Function<Identifier, RenderType> = Util.memoize { texture ->
         //~ if < 26.2 'RenderType.create' -> 'ChromaRenderLayer'
         RenderType.create(
             "skyhanni_text_chroma",
@@ -101,7 +102,6 @@ object SkyHanniRenderLayers {
 
     fun getChromaTexturedWithIdentifier(identifier: Identifier) = CHROMA_TEXTURED.apply(identifier)
 
-    fun getChromaStandard(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
-    fun getChromaTextured(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_TEXT()
-
+    fun getChromaStandard(): RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
+    fun getChromaTextured(): RenderPipeline = SkyHanniRenderPipeline.CHROMA_TEXT()
 }
