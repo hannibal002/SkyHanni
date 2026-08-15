@@ -33,9 +33,8 @@ object ClearTreeLogs {
     private fun onRender(event: CheckRenderEntityEvent<Display.BlockDisplay>) {
         if (!isEnabled()) return
         val entity = event.entity
-        if (!shouldHide(entity)) return
-
-        if (entity.blockState in treeBlocks) {
+        if (entity.blockState !in treeBlocks) return
+        if (shouldHide(entity)) {
             event.cancel()
         }
     }
@@ -57,9 +56,9 @@ object ClearTreeLogs {
             return config.hideTreeBlocks
         }
 
-        // Getting the transformation is expensive
         val transformation = entity.transformation ?: return false
         val floatingTree = isFloatingTreeBlock(transformation)
+
         return (config.hideTreeBlocks && floatingTree) ||
             (config.hideRuneEffects && !floatingTree)
     }
