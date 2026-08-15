@@ -34,14 +34,15 @@ object ClearTreeLogs {
     private fun onRender(event: CheckRenderEntityEvent<Display.BlockDisplay>) {
         if (!isEnabled()) return
         val entity = event.entity
+        val block = entity.blockState
 
         // TODO: Make it always not cache block displays if their air, not just for this feature
-        if (entity.blockState == AIR) {
+        if (block.isAir) {
             event.doNotCache()
             return
         }
 
-        if (entity.blockState !in treeBlocks) return
+        if (block !in treeBlocks) return
         if (shouldHide(entity)) {
             event.cancel()
         }
