@@ -9,6 +9,7 @@ class ModuleProvider : SymbolProcessorProvider {
         environment.logger,
         environment.options["skyhanni.modver"] ?: "0.0.0",
         environment.options["skyhanni.mcver"] ?: "26.1",
+        environment.options["skyhanni.buildpaths"],
         environment.options["skyhanni.cachedir"],
     )
 }

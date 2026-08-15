@@ -15,6 +15,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.validate
+import java.io.File
 import java.io.OutputStreamWriter
 
 // These annotations live in the main source set rather than here, so they can only be matched by name.
@@ -27,6 +28,7 @@ class ModuleProcessor(
     logger: KSPLogger,
     modVersion: String,
     private val mcVersion: String,
+    private val buildPaths: String?,
     cacheDir: String?,
 ) : BaseProcessor(codeGenerator, logger, modVersion) {
 
@@ -41,7 +43,9 @@ class ModuleProcessor(
             "at.hannibal2.skyhanni.api.event.SkyHanniEvent",
         )?.asStarProjectedType()
 
-        val symbols = resolver.getSymbolsWithAnnotation(SKYHANNI_MODULE).toList()
+        val symbols = processBuildPaths(
+            resolver.getSymbolsWithAnnotation(SKYHANNI_MODULE).toList(),
+        )
         val primaryFunctionNames = resolver.getSymbolsWithAnnotation(PrimaryFunction::class.qualifiedName!!)
             .filterIsInstance<KSClassDeclaration>()
             .mapNotNull { symbol ->
@@ -81,6 +85,18 @@ class ModuleProcessor(
         return emptyList()
     }
 
+    private fun <T : KSAnnotated> processBuildPaths(symbols: List<T>): List<T> {
+        val buildPathsFile = buildPaths?.let { File(it) }?.takeIf { it.exists() } ?: return symbols
+        val validPaths = buildPathsFile.readText().lineSequence()
+            .map { it.substringBefore("#").replace(Regex("\\.(?!kt|java|\\()"), "/").trim() }
+            .filter { it.isNotBlank() }
+            .toSet()
+        return symbols.filter {
+            val path = it.containingFile?.filePath ?: return@filter false
+            path.substringAfter("/main/java/") !in validPaths
+        }
+    }
+
     /**
      * Validates that every `@HandleEvent` function is declared directly inside a `@SkyHanniModule` class.
      *
@@ -91,10 +107,11 @@ class ModuleProcessor(
      * but no `@SkyHanniModule` are never tracked by the cache and could therefore never be reported.
      */
     private fun validateModuleMembership(resolver: Resolver) {
-        val functions = resolver.getSymbolsWithAnnotation(HANDLE_EVENT)
-            .filterIsInstance<KSFunctionDeclaration>()
-            .toList()
-
+        val functions = processBuildPaths(
+            resolver.getSymbolsWithAnnotation(HANDLE_EVENT)
+                .filterIsInstance<KSFunctionDeclaration>()
+                .toList(),
+        )
         for (function in functions) {
             val parent = function.parentDeclaration as? KSClassDeclaration
             if (parent?.annotations.orEmpty().any { it.getQualifiedName() == SKYHANNI_MODULE }) continue
