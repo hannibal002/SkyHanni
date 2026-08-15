@@ -18,7 +18,6 @@ import net.minecraft.world.level.block.Blocks
 object ClearTreeLogs {
     private val config get() = SkyHanniMod.feature.foraging.trees.cleanView
     private val SCALE_RANGE = 0.4f..1.0f
-    private val AIR = Blocks.AIR.defaultBlockState()
 
     private val treeBlocks = buildList {
         add(Blocks.STRIPPED_SPRUCE_WOOD.defaultBlockState())
