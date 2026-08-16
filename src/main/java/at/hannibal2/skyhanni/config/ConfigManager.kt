@@ -294,8 +294,6 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
 }
 
 class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanniMod.feature) {
-    val isDev by lazy { ContributorManager.isSelfDeveloper() }
-
     override fun createOptionGui(
         processedOption: ProcessedOption,
         field: Field,
@@ -317,8 +315,8 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanni
             return GuiOptionEditorBlocked(default, extraMessage)
         }
 
-        if (!isDev) {
-            if (field.isAnnotationPresent(OnlyDebug::class.java)) {
+        if (!PlatformUtils.isDevEnvironment) {
+            if (field.isAnnotationPresent(OnlyDevEnv::class.java)) {
                 return GuiOptionEditorHidden(default)
             }
         }

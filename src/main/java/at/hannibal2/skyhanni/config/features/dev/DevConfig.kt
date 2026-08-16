@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
+import at.hannibal2.skyhanni.config.OnlyDevEnv
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig
 import com.google.gson.annotations.Expose
@@ -157,6 +158,7 @@ class DevConfig {
 
     // TODO move into Debug Config?
     @Expose
+    @OnlyDevEnv
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
     val mobDebug: DebugMobConfig = DebugMobConfig()
 }
