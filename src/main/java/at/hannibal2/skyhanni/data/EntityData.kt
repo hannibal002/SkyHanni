@@ -16,7 +16,6 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.level.block.state.BlockState
 import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 
