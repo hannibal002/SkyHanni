@@ -33,6 +33,8 @@ value class NeuInternalName private constructor(private val internalName: String
         internalName.endsWith("_CHESTPLATE") ||
         internalName.endsWith("_LEGGINGS")
 
+    fun isEssence(): Boolean = internalName.startsWith("ESSENCE_")
+
     fun getItemCategoryOrNull(): ItemCategory? =
         categoryCache.getOrPut(this) { getItemStackOrNull()?.getItemCategoryOrNull() ?: return null }
 
@@ -73,6 +75,7 @@ value class NeuInternalName private constructor(private val internalName: String
         val SKYBLOCK_SILVER_MEDAL = "SKYBLOCK_SILVER_MEDAL".toInternalName()
         val SKYBLOCK_BRONZE_MEDAL = "SKYBLOCK_BRONZE_MEDAL".toInternalName()
         val SKYBLOCK_COPPER = "SKYBLOCK_COPPER".toInternalName()
+        val SKYBLOCK_MOTE = "SKYBLOCK_MOTE".toInternalName()
 
         val WISP_POTION = "WISP_POTION".toInternalName()
         val ENCHANTED_HAY_BLOCK = "ENCHANTED_HAY_BLOCK".toInternalName()
