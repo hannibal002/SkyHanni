@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.percen
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.items.enchants.Enchant
 import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
@@ -28,7 +27,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -121,12 +119,12 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
     PURSE(
         {
             val coins = PurseApi.getPurse()
-            val motes = CustomScoreboardUtils.getMotes().formatInt() // TODO put this in RiftApi instead of CustomScoreboardUtils
+            val motes = RiftApi.motes ?: 0
 
             if (RiftApi.inRift()) {
                 "${motes.addSeparators()} ${StringUtils.pluralize(motes, "Mote")}"
             } else {
-                "${coins.addSeparators()} ${StringUtils.pluralize(coins.toInt(), "Coin")}"
+                "${coins.addSeparators()} ${StringUtils.pluralize(coins, "Coin")}"
             }
         },
     ),
