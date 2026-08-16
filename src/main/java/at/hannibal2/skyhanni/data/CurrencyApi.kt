@@ -103,15 +103,15 @@ object CurrencyApi {
      */
     val sowdustPattern by patternGroup.pattern(
         "sowdust.amount",
-        "Sowdust: (?<sowdust>[\\d,]+)",
+        "\\s*Sowdust: (?<sowdust>[\\d,]+)",
     )
 
     /**
-     * REGEX-TEST: Gems: §a350
+     * REGEX-TEST: Gems: 350
      */
     val gemsPattern by patternGroup.pattern(
         "gems.amount",
-        "(?:§.)*Gems: (?:§.)*(?<gems>[\\d,]+).*",
+        "Gems: (?<gems>[\\d,]+).*",
     )
 
     /**
