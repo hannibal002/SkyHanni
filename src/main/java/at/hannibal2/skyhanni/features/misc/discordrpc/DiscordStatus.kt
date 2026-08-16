@@ -118,7 +118,7 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
 
     PURSE(
         {
-            val coins = PurseApi.getPurse()
+            val coins = PurseApi.getPurse().toLong()
             val motes = RiftApi.motes ?: 0
 
             if (RiftApi.inRift()) {
