@@ -179,7 +179,7 @@ object CurrencyApi {
             tokensPattern.matchMatcher(message) {
                 groupOrNull("tokens")?.formatLongOrNull()?.let { SkyblockCurrency.KUUDRA_TOKEN.setAmount(it) }
             }
-            readCleanLine(message.removeColor())
+            readCleanLine(message)
         }
     }
 
