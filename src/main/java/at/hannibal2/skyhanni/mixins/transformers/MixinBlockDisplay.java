@@ -18,7 +18,6 @@ public abstract class MixinBlockDisplay {
         index = 0
     )
     private BlockState onBlockRenderStateCreated(BlockState state) {
-        EntityData.onBlockDisplayRenderState((Display.BlockDisplay) (Object) this, state);
-        return state;
+        return EntityData.onBlockDisplayRenderState((Display.BlockDisplay) (Object) this, state);
     }
 }
