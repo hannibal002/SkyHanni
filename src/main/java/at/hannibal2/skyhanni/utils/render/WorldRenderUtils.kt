@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.rgb
@@ -228,8 +227,7 @@ object WorldRenderUtils {
 
     fun SkyHanniRenderWorldEvent.drawString(
         location: LorenzVec,
-        text: String?,
-        component: Component?,
+        text: String,
         seeThroughBlocks: Boolean = false,
         color: Color? = null,
         scale: Double = 0.53333333,
@@ -238,25 +236,6 @@ object WorldRenderUtils {
          * Screen-space vertical offset applied after camera-facing rotation.
          * Positive values move text up on screen, independent of camera angle.
          */
-        yOffset: Float = 0f,
-        backgroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
-    ) {
-        if (text != null) {
-            drawString(location, text, seeThroughBlocks, color, scale, shadow, yOffset, backgroundColor)
-        } else if (component != null) {
-            drawString(location, component, seeThroughBlocks, color, scale, shadow, yOffset, backgroundColor)
-        } else {
-            ErrorManager.skyHanniError("Both string and Component are null")
-        }
-    }
-
-    fun SkyHanniRenderWorldEvent.drawString(
-        location: LorenzVec,
-        text: String,
-        seeThroughBlocks: Boolean = false,
-        color: Color? = null,
-        scale: Double = 0.53333333,
-        shadow: Boolean = false,
         yOffset: Float = 0f,
         backgroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) = drawString(location, text.asComponent(), seeThroughBlocks, color, scale, shadow, yOffset, backgroundColor)
