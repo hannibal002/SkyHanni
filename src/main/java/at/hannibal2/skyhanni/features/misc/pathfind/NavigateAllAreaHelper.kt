@@ -15,29 +15,23 @@ import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 
 /**
- * A variation of [NavigateAllHelper] ("/shnavall") that only navigates to nodes belonging to the
- * SkyBlock area (or small area) the player is currently standing in, instead of navigating to
- * every node of the requested type on the whole island.
+ * Like [NavigateAllHelper] ("/shnavall"), but scoped to the player's current area.
  *
- * The player's current area is already tracked continuously by [IslandAreaBackend] (it's what
- * powers the on-screen area list). To know which area an arbitrary *target* node belongs to, we
- * do the same thing [IslandAreaBackend] does for the player: walk the node graph outwards from
- * that node until the closest node tagged [GraphNodeTag.AREA]/[GraphNodeTag.SMALL_AREA] is found,
- * and treat that as the node's "owning area".
+ * To find which area a target node belongs to, we walk the graph outward from it
+ * until we hit the nearest [GraphNodeTag.AREA]/[GraphNodeTag.SMALL_AREA] node.
  */
 @SkyHanniModule
 object NavigateAllAreaHelper {
 
-    // Cache so we don't run a fresh Dijkstra search per target node on every single command call.
-    // Cleared whenever the graph reloads, since node ids/neighbors may have changed.
+    // Caches owning area per node; cleared on graph reload.
     private val ownerAreaCache = mutableMapOf<GraphNode, String?>()
 
     @HandleEvent(IslandGraphReloadEvent::class)
-    fun onIslandGraphReload() {
+    private fun onIslandGraphReload() {
         ownerAreaCache.clear()
     }
 
-    /** The name of the area/small-area node that is closest (by graph distance) to [this] node. */
+    /** Nearest area/small-area node name to [this] node by graph distance. */
     private fun GraphNode.ownerArea(): String? = ownerAreaCache.getOrPut(this) {
         GraphUtils.findDijkstraDistances(this) { it.getAreaTag(useConfig = true) != null }
             .lastVisitedNode
@@ -54,13 +48,13 @@ object NavigateAllAreaHelper {
         val graph = IslandGraphs.currentIslandGraph ?: return
         val allNodes = graph.getNodesWithTags(nodeType)
 
-        // IslandAreaBackend keeps this updated live as the player walks around.
+        // Tracked live by IslandAreaBackend.
         val currentArea = IslandAreaBackend.currentArea.takeIf { it.isNotEmpty() && it != AreaNode.NO_AREA }
 
         val targetNodes = if (currentArea != null) {
             allNodes.filter { it.ownerArea() == currentArea }
         } else {
-            // Not standing inside any tracked area right now - fall back to every node, same as /shnavall.
+            // No tracked area — fall back to all nodes like /shnavall.
             allNodes
         }
 
@@ -80,7 +74,7 @@ object NavigateAllAreaHelper {
             nodeType.displayName,
             nodeType.color.toColor(),
             onFinish = {
-                val location = currentArea?.let { " in §r$it" } ?: ""
+                val location = currentArea?.let { " in §r$it" }.orEmpty()
                 ChatUtils.chat(
                     "Reached all ${StringUtils.pluralize(targetNodes.size, nodeType.displayName, withNumber = true)}$location§e.",
                 )
