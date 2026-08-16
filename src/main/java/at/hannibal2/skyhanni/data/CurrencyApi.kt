@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.inventory.NpcTradeEvent
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -90,6 +89,55 @@ object CurrencyApi {
         "\\s*(?<type>[\\w ]+): (?<amount>[\\d,]+)",
     )
 
+    /**
+     * REGEX-TEST: Copper: 3,416
+     */
+    val copperPattern by patternGroup.pattern(
+        "copper.amount",
+        "Copper: (?<copper>[\\d,]+).*",
+    )
+
+    /**
+     * REGEX-TEST: Sowdust: 30,210,307
+     * WRAPPED-REGEX-TEST: " Sowdust: 30,120,093"
+     */
+    val sowdustPattern by patternGroup.pattern(
+        "sowdust.amount",
+        "Sowdust: (?<sowdust>[\\d,]+)",
+    )
+
+    /**
+     * REGEX-TEST: Gems: §a350
+     */
+    val gemsPattern by patternGroup.pattern(
+        "gems.amount",
+        "(?:§.)*Gems: (?:§.)*(?<gems>[\\d,]+).*",
+    )
+
+    /**
+     * REGEX-TEST: Motes: 137,242
+     */
+    private val motesPattern by patternGroup.pattern(
+        "motes.amount",
+        "Motes: (?<motes>[\\d,]+).*",
+    )
+
+    /**
+     * REGEX-TEST: Pelts: 160
+     */
+    val peltsPattern by patternGroup.pattern(
+        "pelts.amount",
+        "Pelts: (?<pelts>[\\d,]+).*",
+    )
+
+    /**
+     * REGEX-TEST: Tokens: 65
+     */
+    val tokensPattern by patternGroup.pattern(
+        "tokens.amount",
+        "Tokens: (?<tokens>[\\w,]+)",
+    )
+
     private val profileStorage get() = ProfileStorageData.profileSpecific?.currencies
     private val accountStorage get() = ProfileStorageData.playerSpecific?.currencies
     private val essenceStorage get() = ProfileStorageData.profileSpecific?.essences
@@ -107,28 +155,28 @@ object CurrencyApi {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         for (line in event.new) {
-            val message = line.trimWhiteSpace().removeResets()
+            val message = line.trimWhiteSpace().removeResets().removeColor()
 
-            ScoreboardPattern.copperPattern.matchMatcher(message) {
+            copperPattern.matchMatcher(message) {
                 SkyblockCurrency.COPPER.setAmount(group("copper").formatLong())
             }
             // while sowdust is gained, hypixel shortens the number, those lines are skipped on purpose
-            ScoreboardPattern.sowdustPattern.matchMatcher(message) {
+            sowdustPattern.matchMatcher(message) {
                 SkyblockCurrency.SOWDUST.setAmount(group("sowdust").formatLong())
             }
-            ScoreboardPattern.gemsPattern.matchMatcher(message) {
+            gemsPattern.matchMatcher(message) {
                 SkyblockCurrency.GEMS.setAmount(group("gems").formatLong())
             }
-            ScoreboardPattern.motesPattern.matchMatcher(message) {
+            motesPattern.matchMatcher(message) {
                 SkyblockCurrency.MOTES.setAmount(group("motes").formatLong())
             }
 
             // these patterns are shared with the custom scoreboard, a repo override may still lack the group
-            ScoreboardPattern.peltsPattern.matchMatcher(message) {
+            peltsPattern.matchMatcher(message) {
                 groupOrNull("pelts")?.formatLongOrNull()?.let { SkyblockCurrency.PELTS.setAmount(it) }
             }
             // the group also matches shortened numbers, those are dropped by formatLongOrNull
-            ScoreboardPattern.tokensPattern.matchMatcher(message) {
+            tokensPattern.matchMatcher(message) {
                 groupOrNull("tokens")?.formatLongOrNull()?.let { SkyblockCurrency.KUUDRA_TOKEN.setAmount(it) }
             }
             readCleanLine(message.removeColor())
@@ -187,8 +235,8 @@ object CurrencyApi {
 
     @HandleEvent
     private fun onNpcTrade(event: NpcTradeEvent) {
-        for (cost in event.costs) {
-            subtractCost(cost.internalName, cost.amount * event.amount)
+        for ((internalName, amount) in event.costs) {
+            subtractCost(internalName, amount * event.amount)
         }
     }
 

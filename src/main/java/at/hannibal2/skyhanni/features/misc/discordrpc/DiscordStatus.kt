@@ -124,7 +124,7 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
             if (RiftApi.inRift()) {
                 "${motes.addSeparators()} ${StringUtils.pluralize(motes, "Mote")}"
             } else {
-                "${coins.addSeparators()} ${StringUtils.pluralize(coins.toInt(), "Coin")}"
+                "${coins.addSeparators()} ${StringUtils.pluralize(coins, "Coin")}"
             }
         },
     ),

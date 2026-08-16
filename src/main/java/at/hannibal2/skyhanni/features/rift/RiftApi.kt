@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
@@ -13,29 +12,15 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
+import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object RiftApi {
-
-    /**
-     * REGEX-TEST: Motes: 137,242
-     */
-    private val motesPattern by RepoPattern.pattern(
-        "rift-api.motes",
-        "Motes: (?<motes>[\\d,]+).*",
-    )
-
     fun inRift() = IslandType.THE_RIFT.isInIsland()
 
     val config: RiftConfig get() = SkyHanniMod.feature.rift
@@ -67,13 +52,7 @@ object RiftApi {
     var trackingButtons = false
     var allButtonsHit = false
 
-    // TODO: Cache this value and only update it when the scoreboard changes
-    val motes: Int? get() {
-        val scoreboardLines = ScoreboardData.sidebarLinesFormatted.map { it.removeColor().trimWhiteSpace() }
-        return motesPattern.firstMatcher(scoreboardLines) {
-            groupOrNull("motes")?.formatIntOrNull()
-        }
-    }
+    val motes: Long? = SkyblockCurrency.MOTES.getOwnedAmountOrNull()
 
     @HandleEvent
     private fun onAreaChange(event: GraphAreaChangeEvent) {
