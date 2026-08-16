@@ -94,9 +94,9 @@ object EntityData {
 
     @JvmStatic
     fun onBlockDisplayRenderState(display: Display.BlockDisplay, state: BlockState) {
-        val previous = display.blockRenderState()
+        val previous = display.blockRenderState()?.blockState
 
-        if (!state.isAir && (previous == null || previous.blockState().isAir)) {
+        if (!state.isAir && (previous == null || previous.isAir)) {
             lastVisibilityCheck.remove(display.id)
         }
     }
