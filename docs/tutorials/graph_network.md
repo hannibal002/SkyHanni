@@ -120,6 +120,7 @@ A non-exhaustive list of features:
 
 To enable the Graph Editor, run the command `/shgraph`.
 To exit the Graph Editor, run the command again or press the **Exit Key** (by default `Enter`).
+To get back to this page from in game, run `/shgraphtutorial` or press the **Open Tutorial** button at the top of the Graph Tools config.
 To load the Graph Editor with the existing [Repo data](https://github.com/hannibal002/SkyHanni-REPO/tree/main/constants/island_graphs) of
 the current island, run `/shgraphloadthisisland`.
 

@@ -239,8 +239,7 @@ object GraphEditorInput {
             saveAndExitTextMode()
             return true
         }
-        config.enabled = false
-        GraphEditor.chatAtDisable()
+        GraphEditor.disable()
         return true
     }
 

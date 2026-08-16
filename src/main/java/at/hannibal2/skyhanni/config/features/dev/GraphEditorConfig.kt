@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -11,6 +13,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
 class GraphEditorConfig {
+
+    @ConfigOption(name = "Open Tutorial", desc = "Open the Graph Network and Graph Editor tutorial in your browser.")
+    @ConfigEditorButton(buttonText = "Open")
+    val openTutorial: Runnable = Runnable { GraphEditor.openTutorial() }
+
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enable the Graph Editor. Can also be toggled via /shgraph")
     @ConfigEditorBoolean

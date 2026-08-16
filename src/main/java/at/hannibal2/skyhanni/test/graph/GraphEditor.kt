@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.test.graph
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -23,6 +24,8 @@ import kotlin.time.Duration.Companion.seconds
 object GraphEditor {
 
     val config: GraphEditorConfig get() = DevApi.config.devTool.graph
+
+    private const val TUTORIAL_URL = "https://github.com/hannibal002/SkyHanni/blob/beta/docs/tutorials/graph_network.md"
 
     var state = GraphEditorState()
         set(value) {
@@ -53,7 +56,7 @@ object GraphEditor {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         handleDisabled()
         GraphEditorInput.input()
@@ -80,7 +83,7 @@ object GraphEditor {
     }
 
     @HandleEvent
-    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
+    private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
 
         if (event.distance > 20) {
@@ -101,11 +104,17 @@ object GraphEditor {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shgraph") {
-            description = "Enables the graph editor"
+            description = "Toggles the Graph Editor."
             category = CommandCategory.DEVELOPER_TEST
-            simpleCallback { toggleFeature() }
+            simpleCallback {
+                if (config.enabled) {
+                    disable()
+                } else {
+                    enable()
+                }
+            }
         }
         event.registerBrigadier("shgraphfindall") {
             description = "Navigate over the whole graph network"
@@ -172,6 +181,12 @@ object GraphEditor {
                 GraphNodeEditor.getWeight()
             }
         }
+
+        event.registerBrigadier("shgraphtutorial") {
+            description = "Opens the Graph Network and Graph Editor tutorial in the browser."
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback { openTutorial() }
+        }
     }
 
     fun toggleDisabledVisibility() {
@@ -182,18 +197,28 @@ object GraphEditor {
 
     var bypassTempRemoveTimer = SimpleTimeMark.farPast()
 
-    private fun toggleFeature() {
-        config.enabled = !config.enabled
-        if (config.enabled) {
-            ChatUtils.chat("Graph Editor is now active.")
-        } else {
-            chatAtDisable()
-        }
+    fun disable() {
+        config.enabled = false
+        ChatUtils.clickableChat(
+            "Graph Editor is now inactive. §lClick to activate.",
+            GraphEditor::enable,
+        )
     }
 
-    fun chatAtDisable() = ChatUtils.clickableChat(
-        "Graph Editor is now inactive. §lClick to activate.",
-        GraphEditor::toggleFeature,
+    fun enable() {
+        if (config.enabled) return
+        config.enabled = true
+        ChatUtils.chat("Graph Editor is now active.")
+        val storage = SkyHanniMod.feature.storage
+        if (storage.graphEditorTutorialSeen) return
+        storage.graphEditorTutorialSeen = true
+        ChatUtils.clickableLinkChat("New to the Graph Editor? Click here to read the tutorial.", TUTORIAL_URL)
+    }
+
+    fun openTutorial() = ChatUtils.clickableLinkChat(
+        "Opening the Graph Editor tutorial in your browser.",
+        TUTORIAL_URL,
+        autoOpen = true,
     )
 
     fun onMinecraftInput(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
@@ -206,13 +231,6 @@ object GraphEditor {
     fun clear() {
         GraphEditorHistory.save("clear graph")
         state = GraphEditorState()
-    }
-
-    fun enable() {
-        if (!config.enabled) {
-            config.enabled = true
-            ChatUtils.chat("Graph Editor is now active.")
-        }
     }
 }
 
