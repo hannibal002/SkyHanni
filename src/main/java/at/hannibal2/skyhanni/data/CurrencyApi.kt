@@ -92,8 +92,8 @@ object CurrencyApi {
     /**
      * REGEX-TEST: Copper: 3,416
      */
-    val copperPattern by patternGroup.pattern(
-        "copper.amount",
+    val copperScoreboardPattern by patternGroup.pattern(
+        "copper.scoreboard.amount",
         "Copper: (?<copper>[\\d,]+).*",
     )
 
@@ -101,41 +101,41 @@ object CurrencyApi {
      * REGEX-TEST: Sowdust: 30,210,307
      * WRAPPED-REGEX-TEST: " Sowdust: 30,120,093"
      */
-    val sowdustPattern by patternGroup.pattern(
-        "sowdust.amount",
-        "Sowdust: (?<sowdust>[\\d,]+)",
+    val sowdustScoreboardPattern by patternGroup.pattern(
+        "sowdust.scoreboard.amount",
+        "\\s*Sowdust: (?<sowdust>[\\d,]+).*",
     )
 
     /**
-     * REGEX-TEST: Gems: §a350
+     * REGEX-TEST: Gems: 350
      */
-    val gemsPattern by patternGroup.pattern(
-        "gems.amount",
-        "(?:§.)*Gems: (?:§.)*(?<gems>[\\d,]+).*",
+    val gemsScoreboardPattern by patternGroup.pattern(
+        "gems.scoreboard.amount",
+        "\\s*Gems: (?<gems>[\\d,]+).*",
     )
 
     /**
      * REGEX-TEST: Motes: 137,242
      */
-    private val motesPattern by patternGroup.pattern(
-        "motes.amount",
-        "Motes: (?<motes>[\\d,]+).*",
+    private val motesScoreboardPattern by patternGroup.pattern(
+        "motes.scoreboard.amount",
+        "\\s*Motes: (?<motes>[\\d,]+).*",
     )
 
     /**
      * REGEX-TEST: Pelts: 160
      */
-    val peltsPattern by patternGroup.pattern(
-        "pelts.amount",
-        "Pelts: (?<pelts>[\\d,]+).*",
+    val peltsScoreboardPattern by patternGroup.pattern(
+        "pelts.scoreboard.amount",
+        "\\s*Pelts: (?<pelts>[\\d,]+).*",
     )
 
     /**
      * REGEX-TEST: Tokens: 65
      */
-    val tokensPattern by patternGroup.pattern(
+    val tokensScoreboardPattern by patternGroup.pattern(
         "tokens.amount",
-        "Tokens: (?<tokens>[\\w,]+)",
+        "\\s*Tokens: (?<tokens>[\\d,]+).*",
     )
 
     private val profileStorage get() = ProfileStorageData.profileSpecific?.currencies
@@ -157,26 +157,26 @@ object CurrencyApi {
         for (line in event.new) {
             val message = line.trimWhiteSpace().removeResets().removeColor()
 
-            copperPattern.matchMatcher(message) {
+            copperScoreboardPattern.matchMatcher(message) {
                 SkyblockCurrency.COPPER.setAmount(group("copper").formatLong())
             }
             // while sowdust is gained, hypixel shortens the number, those lines are skipped on purpose
-            sowdustPattern.matchMatcher(message) {
+            sowdustScoreboardPattern.matchMatcher(message) {
                 SkyblockCurrency.SOWDUST.setAmount(group("sowdust").formatLong())
             }
-            gemsPattern.matchMatcher(message) {
+            gemsScoreboardPattern.matchMatcher(message) {
                 SkyblockCurrency.GEMS.setAmount(group("gems").formatLong())
             }
-            motesPattern.matchMatcher(message) {
+            motesScoreboardPattern.matchMatcher(message) {
                 SkyblockCurrency.MOTES.setAmount(group("motes").formatLong())
             }
 
             // these patterns are shared with the custom scoreboard, a repo override may still lack the group
-            peltsPattern.matchMatcher(message) {
+            peltsScoreboardPattern.matchMatcher(message) {
                 groupOrNull("pelts")?.formatLongOrNull()?.let { SkyblockCurrency.PELTS.setAmount(it) }
             }
             // the group also matches shortened numbers, those are dropped by formatLongOrNull
-            tokensPattern.matchMatcher(message) {
+            tokensScoreboardPattern.matchMatcher(message) {
                 groupOrNull("tokens")?.formatLongOrNull()?.let { SkyblockCurrency.KUUDRA_TOKEN.setAmount(it) }
             }
             readCleanLine(message)

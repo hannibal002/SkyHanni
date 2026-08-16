@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.compat.IrisCompat
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.PosColorNormal
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChromaUniforms
-import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.getCommonRoundedUniforms
 import com.mojang.blaze3d.pipeline.BlendFunction
 import com.mojang.blaze3d.pipeline.ColorTargetState
 import com.mojang.blaze3d.pipeline.RenderPipeline
@@ -74,51 +73,6 @@ enum class SkyHanniRenderPipeline(
     QUADS_XRAY(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         depthWrite = false,
-    ),
-    ROUNDED_RECT(
-        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
-        blend = BlendFunction.TRANSLUCENT,
-        vertexShaderPath = "rounded_rect",
-        uniforms = getCommonRoundedUniforms(),
-        depthWrite = false,
-    ),
-    ROUNDED_TEXTURED_RECT(
-        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
-        vFormat = DefaultVertexFormat.POSITION_TEX,
-        blend = BlendFunction.TRANSLUCENT,
-        vertexShaderPath = "rounded_texture",
-        sampler = "textureSampler",
-        uniforms = getCommonRoundedUniforms(),
-        depthWrite = false,
-        irisProgram = IrisCompat.IrisProgram.TEXTURED,
-    ),
-    ROUNDED_RECT_OUTLINE(
-        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
-        vFormat = DefaultVertexFormat.POSITION_COLOR,
-        blend = BlendFunction.TRANSLUCENT,
-        vertexShaderPath = "rounded_rect_outline",
-        uniforms = getCommonRoundedUniforms() + mapOf(
-            "SkyHanniRoundedOutlineUniforms" to UniformType.UNIFORM_BUFFER
-        ),
-        depthWrite = false,
-    ),
-    CIRCLE(
-        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
-        vFormat = DefaultVertexFormat.POSITION_COLOR,
-        blend = BlendFunction.TRANSLUCENT,
-        vertexShaderPath = "circle",
-        uniforms = getCommonRoundedUniforms() + mapOf(
-            "SkyHanniCircleUniforms" to UniformType.UNIFORM_BUFFER
-        ),
-    ),
-    RADIAL_GRADIENT_CIRCLE(
-        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
-        vFormat = DefaultVertexFormat.POSITION_COLOR,
-        blend = BlendFunction.TRANSLUCENT,
-        vertexShaderPath = "radial_gradient_circle",
-        uniforms = getCommonRoundedUniforms() + mapOf(
-            "SkyHanniRadialGradientCircleUniforms" to UniformType.UNIFORM_BUFFER
-        ),
     ),
     CHROMA_STANDARD(
         snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
@@ -210,7 +164,6 @@ enum class SkyHanniRenderPipeline(
 }
 
 private object SkyHanniRenderPipelineUtils {
-    fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     val commonChromaUniforms = mapOf("SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER)
     val PosColorNormal: VertexFormat = DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH
 }
