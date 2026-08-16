@@ -31,6 +31,7 @@ import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
+import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
@@ -44,7 +45,6 @@ import kotlin.math.sqrt
 import net.minecraft.util.FormattedCharSequence
 //?} else {
 /*import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import org.joml.Matrix4f
 *///?}
 
@@ -333,7 +333,7 @@ object WorldRenderUtils {
             text.visualOrderText,
             shadow,
             if (seeThroughBlocks) SEE_THROUGH else POLYGON_OFFSET,
-            15728880,
+            FULL_BRIGHT,
             color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
             backgroundColor,
             0,

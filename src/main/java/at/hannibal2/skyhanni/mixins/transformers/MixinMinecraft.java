@@ -37,8 +37,6 @@ public abstract class MixinMinecraft {
         if (MinecraftInputHook.shouldCancelMouseRightClick(this.hitResult)) ci.cancel();
     }
 
-    // onSetScreen moved to MixinGui_Minecraft
-
     @Inject(
         at = @At("HEAD"),
         method = "startAttack",

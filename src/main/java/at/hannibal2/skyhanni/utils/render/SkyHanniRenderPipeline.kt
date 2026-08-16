@@ -22,7 +22,7 @@ import net.minecraft.client.renderer.BindGroupLayouts
 //?}
 
 //? if < 26.2
-//typealias PrimitiveTopology = VertexFormat.Mode
+//private typealias PrimitiveTopology = VertexFormat.Mode
 
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
