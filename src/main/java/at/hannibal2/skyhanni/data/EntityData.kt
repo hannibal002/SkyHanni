@@ -88,7 +88,7 @@ object EntityData {
     }
 
     @JvmStatic
-    fun onFreshDisplayRenderState(display: Display) {
+    fun onDisplayRenderStateUpdate(display: Display) {
         lastVisibilityCheck.remove(display.id)
     }
 
