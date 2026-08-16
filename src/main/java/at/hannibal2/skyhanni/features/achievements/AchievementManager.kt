@@ -40,7 +40,7 @@ import net.minecraft.world.item.Items
 object AchievementManager {
 
     private val config get() = SkyHanniMod.achievementStorage.achievements
-    private val shouldShowMessages get() = SkyHanniMod.feature.misc.achievementMessages
+    val shouldShowMessages get() = SkyHanniMod.feature.misc.achievementMessages
     val group = RepoPattern.group("achievements")
     private val achievementSound = SoundUtils.createSound("ui.toast.challenge_complete", 1f, .8f)
 
@@ -93,15 +93,17 @@ object AchievementManager {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievement progress update")
     }
 
-    fun completeAchievement(id: String) {
-        if (HypixelData.hypixelAlpha) return
+    // This function returns true if the achievement was completed, false if it was already completed or if you're in Hypixel Alpha
+    fun completeAchievement(id: String): Boolean {
+        if (HypixelData.hypixelAlpha) return false
         val achievement = config[id] ?: ErrorManager.skyHanniError("Achievement with unknown id", "id" to id)
-        if (achievement.data.achieved) return
+        if (achievement.data.achieved) return false
         achievement.data.achieved = true
         config[id] = achievement
         displayMessage(achievement)
 
         SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievement completed")
+        return true
     }
 
     private fun displayMessage(achievement: Achievement, newProgress: Int? = null) {

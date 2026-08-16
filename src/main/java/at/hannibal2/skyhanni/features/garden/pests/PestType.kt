@@ -15,6 +15,7 @@ enum class PestType(
     val vinyl: VinylType?,
     val internalName: NeuInternalName,
     val crop: CropType?,
+    val attributeShard: NeuInternalName?,
     val pluralName: String? = "${displayName}s",
     val eliteLbName: String = displayName.lowercase(),
 ) {
@@ -25,6 +26,7 @@ enum class PestType(
         VinylType.NOT_JUST_A_PEST,
         "PEST_BEETLE_MONSTER".toInternalName(),
         CropType.NETHER_WART,
+        "ATTRIBUTE_SHARD_CROP_BUG;1".toInternalName(),
     ),
     CRICKET(
         "Cricket",
@@ -33,6 +35,7 @@ enum class PestType(
         VinylType.CRICKET_CHOIR,
         "PEST_CRICKET_MONSTER".toInternalName(),
         CropType.CARROT,
+        "ATTRIBUTE_SHARD_PEST_FORTUNE;1".toInternalName(),
     ),
     EARTHWORM(
         "Earthworm",
@@ -41,6 +44,7 @@ enum class PestType(
         VinylType.EARTHWORM_ENSEMBLE,
         "PEST_EARTHWORM_MONSTER".toInternalName(),
         CropType.MELON,
+        "ATTRIBUTE_SHARD_INFILTRATION;1".toInternalName(),
     ),
     FIELD_MOUSE(
         "Field Mouse",
@@ -49,6 +53,7 @@ enum class PestType(
         vinyl = null,
         "PEST_FIELD_MOUSE_MONSTER".toInternalName(),
         crop = null,
+        "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName(),
         pluralName = "Field Mice",
         eliteLbName = "mouse",
     ),
@@ -59,6 +64,7 @@ enum class PestType(
         VinylType.PRETTY_FLY,
         "PEST_FLY_MONSTER".toInternalName(),
         CropType.WHEAT,
+        "ATTRIBUTE_SHARD_FORTUNATE_FARMER;1".toInternalName(),
         pluralName = "Flies",
     ),
     LOCUST(
@@ -68,6 +74,7 @@ enum class PestType(
         VinylType.CICADA_SYMPHONY,
         "PEST_LOCUST_MONSTER".toInternalName(),
         CropType.POTATO,
+        "ATTRIBUTE_SHARD_CROP_SPEED;1".toInternalName(),
     ),
     LUNAR_MOTH(
         "Lunar Moth",
@@ -76,6 +83,7 @@ enum class PestType(
         vinyl = null,
         "PEST_LUNAR_MOTH_MONSTER".toInternalName(),
         crop = null, // Always drops Sunflower, Moonflower, *and* Wild Rose
+        "ATTRIBUTE_SHARD_LUNAR_POWER;1".toInternalName(),
         eliteLbName = "lunar-moth",
     ),
     MITE(
@@ -85,6 +93,7 @@ enum class PestType(
         VinylType.DYNAMITES,
         "PEST_MITE_MONSTER".toInternalName(),
         CropType.CACTUS,
+        "ATTRIBUTE_SHARD_FILTER_UPGRADE;1".toInternalName(),
     ),
     MOSQUITO(
         "Mosquito",
@@ -93,6 +102,7 @@ enum class PestType(
         VinylType.BUZZIN_BEATS,
         "PEST_MOSQUITO_MONSTER".toInternalName(),
         CropType.SUGAR_CANE,
+        "ATTRIBUTE_SHARD_ENCHANTED_FARMER;1".toInternalName(),
         pluralName = "Mosquitoes",
     ),
     MOTH(
@@ -102,6 +112,7 @@ enum class PestType(
         VinylType.WINGS_OF_HARMONY,
         "PEST_MOTH_MONSTER".toInternalName(),
         CropType.COCOA_BEANS,
+        "ATTRIBUTE_SHARD_PEST_COOLDOWN;1".toInternalName(),
     ),
     RAT(
         "Rat",
@@ -110,6 +121,7 @@ enum class PestType(
         VinylType.RODENT_REVOLUTION,
         "PEST_RAT_MONSTER".toInternalName(),
         CropType.PUMPKIN,
+        "ATTRIBUTE_SHARD_SPRAYONATOR_SERENDIPITY;1".toInternalName(),
     ),
     SLUG(
         "Slug",
@@ -118,6 +130,7 @@ enum class PestType(
         VinylType.SLOW_AND_GROOVY,
         "PEST_SLUG_MONSTER".toInternalName(),
         CropType.MUSHROOM,
+        "ATTRIBUTE_SHARD_BONUS_PEST_CHANCE;1".toInternalName(),
     ),
     PRAYING_MANTIS(
         "Praying Mantis",
@@ -126,6 +139,7 @@ enum class PestType(
         VinylType.PRAY_FOR_ME,
         "PEST_PRAYING_MANTIS_MONSTER".toInternalName(),
         CropType.WILD_ROSE,
+        "ATTRIBUTE_SHARD_INSECT_POWER;1".toInternalName(),
         pluralName = "Praying Mantises",
         eliteLbName = "mantis",
     ),
@@ -136,6 +150,7 @@ enum class PestType(
         VinylType.FIREFLY_IN_THE_HOLE,
         "PEST_FIREFLY_MONSTER".toInternalName(),
         CropType.MOONFLOWER,
+        "ATTRIBUTE_SHARD_SOLAR_POWER;1".toInternalName(),
     ),
     DRAGONFLY(
         "Dragonfly",
@@ -144,6 +159,7 @@ enum class PestType(
         VinylType.IMAGINE_DRAGONFLIES,
         "PEST_DRAGONFLY_MONSTER".toInternalName(),
         CropType.SUNFLOWER,
+        "ATTRIBUTE_SHARD_GARDEN_WISDOM;1".toInternalName(),
     ),
 
     // TODO replace with null
@@ -155,6 +171,7 @@ enum class PestType(
         spray = null,
         vinyl = null,
         "DUMMY".toInternalName(),
+        attributeShard = null,
         crop = null,
     ),
     ;
@@ -285,6 +302,10 @@ enum class PestType(
             it.key.toInternalName() to it.value
         }.toMap()
 
-        fun getByItemInternalNameOrNull(internalName: NeuInternalName): PestType? = internalNameRareDropMap[internalName]
+        fun getByItemInternalNameOrNull(internalName: NeuInternalName): PestType? = when {
+            internalName.asString().startsWith("ATTRIBUTE_SHARD_") ->
+                PestType.entries.firstOrNull { it.attributeShard == internalName }
+            else -> internalNameRareDropMap[internalName]
+        }
     }
 }
