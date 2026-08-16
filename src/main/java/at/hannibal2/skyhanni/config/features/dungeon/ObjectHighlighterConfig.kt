@@ -65,7 +65,7 @@ class ObjectHighlighterConfig {
     @SkyHanniModule
     companion object {
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             val path = "dungeon.objectHighlighter"
             event.move(143, "$path.fel.line", "$path.fel.line.showLine")
             event.move(143, "$path.fel.color", "$path.fel.line.color")

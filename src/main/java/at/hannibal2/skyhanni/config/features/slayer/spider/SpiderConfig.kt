@@ -61,7 +61,7 @@ class SpiderConfig {
     @SkyHanniModule
     companion object {
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(143, "slayer.spider.lineToBoss", "slayer.spider.lineToBoss.showLine")
             event.move(143, "slayer.spider.slayerLineWidth", "slayer.spider.lineToBoss.slayerLineWidth")
         }

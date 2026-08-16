@@ -81,7 +81,7 @@ class ArachneConfig {
     @SkyHanniModule
     companion object {
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             val oldArachnePath = "combat.mobs"
             val newArachneBossPath = "$oldArachnePath.arachneSettings.boss"
             val newArachneKeeperPath = "$oldArachnePath.arachneSettings.keeper"

@@ -47,7 +47,7 @@ class EndermanBeaconConfig {
     @SkyHanniModule
     companion object {
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(
                 3,
                 "slayer.endermanBeaconConfig.highlightBeacon",

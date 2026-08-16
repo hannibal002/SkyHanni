@@ -68,7 +68,7 @@ class VampireConfig {
     @SkyHanniModule
     companion object {
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             val path = "slayer.vampire"
             event.move(143, "$path.drawLine", "$path.line.showLine")
             event.move(143, "$path.lineColor", "$path.line.color")

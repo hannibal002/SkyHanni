@@ -14,7 +14,7 @@ object ArachneBroodNametagHider {
     private val config get() = SkyHanniMod.feature.combat.mobs.arachneSettings.boss
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.SPIDER_DEN)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStand>) {
+    private fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStand>) {
         if (!config.hideNameTagOfBroods) return
 
         val entity = event.entity
