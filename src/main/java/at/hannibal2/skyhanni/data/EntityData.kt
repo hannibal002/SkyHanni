@@ -100,4 +100,6 @@ object EntityData {
             lastVisibilityCheck.remove(display.id)
         }
     }
+
+    // TODO: add a hook for TextDisplay render state changes
 }
