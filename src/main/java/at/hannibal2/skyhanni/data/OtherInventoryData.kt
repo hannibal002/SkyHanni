@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
@@ -41,13 +42,23 @@ object OtherInventoryData {
         }
     }
 
+    // TEMP DEBUG, remove before committing
+    private var debugTick = 0
+
     fun close(title: String = currentInventoryName, reopenSameName: Boolean = false) {
+        // TEMP DEBUG, remove before committing
+        println(
+            "SH-INV-ORDER | CLOSE | tick $debugTick | window ${currentInventory?.windowId} " +
+                "| title '$title' | reopen $reopenSameName | thread ${Thread.currentThread().name}",
+        )
         InventoryCloseEvent(title, reopenSameName).post()
         currentInventory = null
     }
 
     @HandleEvent
     fun onTick() {
+        // TEMP DEBUG, remove before committing
+        debugTick++
         lateEvent?.let {
             it.post()
             lateEvent = null
@@ -163,6 +174,19 @@ object OtherInventoryData {
     }
 
     private fun done(inventory: Inventory) {
+        // TEMP DEBUG, remove before committing
+        val debugWindowId = inventory.windowId
+        println(
+            "SH-INV-ORDER | OPEN  | tick $debugTick | window $debugWindowId " +
+                "| title '${inventory.title}' | thread ${Thread.currentThread().name}",
+        )
+        DelayedRun.runOrNextTick {
+            println(
+                "SH-INV-ORDER | BLOCK | tick $debugTick | window $debugWindowId " +
+                    "| current window ${currentInventory?.windowId} | thread ${Thread.currentThread().name}",
+            )
+        }
+
         InventoryFullyOpenedEvent(inventory).post()
         inventory.fullyOpenedOnce = true
         InventoryUpdatedEvent(inventory).post()
