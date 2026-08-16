@@ -80,7 +80,7 @@ object GraphEditorIO {
         val compileGraph = compileGraph()
         val json = compileGraph.toJson()
         val copied = OSUtils.copyToClipboardAsync(json) ?: false
-        if (!copied) return@launch ChatUtils.chat("Failed to copy graph to clipboard.")
+        if (!copied) return@launch ChatUtils.chat("§cFailed to copy graph to clipboard.")
 
         ChatUtils.chat("Copied Graph to Clipboard.")
         val networkCount = GraphEditorNetworks.recalculate()

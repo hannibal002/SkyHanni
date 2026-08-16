@@ -103,6 +103,14 @@ object GraphEditor {
         }
     }
 
+    private fun blockDisabled(): Boolean {
+        if (!isEnabled()) {
+            ChatUtils.userError("Graph Editor is not active!")
+            return true
+        }
+        return false
+    }
+
     @HandleEvent
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shgraph") {
@@ -119,7 +127,10 @@ object GraphEditor {
         event.registerBrigadier("shgraphfindall") {
             description = "Navigate over the whole graph network"
             category = CommandCategory.DEVELOPER_TEST
-            simpleCallback { GraphEditorNodeFinder.toggleFindAll() }
+            simpleCallback {
+                if (blockDisabled()) return@simpleCallback
+                GraphEditorNodeFinder.toggleFindAll()
+            }
         }
         event.registerBrigadier("shgraphloadthisisland") {
             description = "Loads the current island data into the graph editor."
@@ -129,16 +140,16 @@ object GraphEditor {
         event.registerBrigadier("shgraphcopynetwork") {
             description = "Copies the closest network to the clipboard."
             category = CommandCategory.DEVELOPER_TEST
-            simpleCallback { GraphEditorNetworks.copyClosestNetwork() }
+            simpleCallback {
+                if (blockDisabled()) return@simpleCallback
+                GraphEditorNetworks.copyClosestNetwork()
+            }
         }
         event.registerBrigadier("shgraphmerge") {
             description = "Merges graph data from the clipboard into the current graph."
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                if (!isEnabled()) {
-                    ChatUtils.userError("Graph Editor is not active!")
-                    return@simpleCallback
-                }
+                if (blockDisabled()) return@simpleCallback
                 GraphEditorIO.mergeFromClipboard()
             }
         }
@@ -146,10 +157,7 @@ object GraphEditor {
             description = "Lists all networks and allows navigation between them."
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                if (!isEnabled()) {
-                    ChatUtils.userError("Graph Editor is not active!")
-                    return@simpleCallback
-                }
+                if (blockDisabled()) return@simpleCallback
                 GraphEditorNetworks.findNetworks()
             }
         }
@@ -157,6 +165,7 @@ object GraphEditor {
             description = "Show or hide disabled nodes."
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
+                if (blockDisabled()) return@simpleCallback
                 toggleDisabledVisibility()
             }
         }
@@ -166,18 +175,12 @@ object GraphEditor {
             category = CommandCategory.DEVELOPER_TEST
             arg("weight", BrigadierArguments.integer()) { weight ->
                 callback {
-                    if (!isEnabled()) {
-                        ChatUtils.userError("Graph Editor is not active!")
-                        return@callback
-                    }
+                    if (blockDisabled()) return@callback
                     GraphNodeEditor.setWeight(getArg(weight))
                 }
             }
             simpleCallback {
-                if (!isEnabled()) {
-                    ChatUtils.userError("Graph Editor is not active!")
-                    return@simpleCallback
-                }
+                if (blockDisabled()) return@simpleCallback
                 GraphNodeEditor.getWeight()
             }
         }
@@ -209,6 +212,7 @@ object GraphEditor {
         if (config.enabled) return
         config.enabled = true
         ChatUtils.chat("Graph Editor is now active.")
+        GraphEditorNodeFinder.resumeIfActive()
         val storage = SkyHanniMod.feature.storage
         if (storage.graphEditorTutorialSeen) return
         storage.graphEditorTutorialSeen = true
