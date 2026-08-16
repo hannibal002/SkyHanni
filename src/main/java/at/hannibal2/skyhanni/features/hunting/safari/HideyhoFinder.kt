@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.misc.pathfind.NavigationCondition
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -128,7 +129,9 @@ object HideyhoFinder {
 
     private fun LorenzVec.nearbyLocation(radius: Double): LorenzVec? {
         val nearbyEntities = this.getEntitiesNearby<RemotePlayer>(radius)
-        return nearbyEntities.firstOrNull { it.getSkinTexture() == SKIN_TEXTURE }?.getLorenzVec()
+        return nearbyEntities.firstOrNull {
+            it.getSkinTexture() == SKIN_TEXTURE && it.canBeSeen()
+        }?.getLorenzVec()
     }
 
     @HandleEvent
