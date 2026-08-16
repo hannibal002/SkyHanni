@@ -91,17 +91,4 @@ object EntityData {
     fun onDisplayRenderStateUpdate(display: Display) {
         lastVisibilityCheck.remove(display.id)
     }
-
-    // TODO: Add event to allow the block in the block display to be modified
-    @JvmStatic
-    fun onBlockDisplayRenderState(display: Display.BlockDisplay, state: BlockState): BlockState {
-        val previous = display.blockRenderState()?.blockState
-
-        if (!state.isAir && (previous == null || previous.isAir)) {
-            lastVisibilityCheck.remove(display.id)
-        }
-        return state
-    }
-
-    // TODO: add a hook for TextDisplay render state changes
 }
