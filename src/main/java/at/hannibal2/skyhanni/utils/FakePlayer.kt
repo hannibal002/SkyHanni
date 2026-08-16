@@ -9,10 +9,6 @@ import net.minecraft.world.entity.player.PlayerSkin
 import net.minecraft.world.scores.PlayerTeam
 import net.minecraft.world.scores.Scoreboard
 
-//? if >= 26.2 {
-import at.hannibal2.skyhanni.utils.FakeEntityIdProvider
-//?}
-
 class FakePlayer(val player: AbstractClientPlayer) : ClientMannequin(
     player.level(),
     Minecraft.getInstance().playerSkinRenderCache(),
