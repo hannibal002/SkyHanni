@@ -34,12 +34,6 @@ object ClearTreeLogs {
     private fun onRender(event: CheckRenderEntityEvent<Display.BlockDisplay>) {
         if (!isEnabled()) return
         val entity = event.entity
-        // TODO: Make this check run for all display entities, not just for this feature
-        if (!entity.isInitialized) {
-            event.doNotCache()
-            return
-        }
-
         if (entity.blockState !in treeBlocks) return
 
         if ((config.hideTreeBlocks == config.hideRuneEffects) && config.hideTreeBlocks) {

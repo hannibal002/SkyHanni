@@ -7,12 +7,19 @@ import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import com.mojang.blaze3d.systems.RenderSystem
+import it.unimi.dsi.fastutil.ints.IntSet
 import net.minecraft.network.chat.Component
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
+import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import java.util.UUID
@@ -80,11 +87,13 @@ object EntityData {
         lastVisibilityCheck[entity.id]?.let { result ->
             return result
         }
-        val event = CheckRenderEntityEvent(entity, camX, camY, camZ)
-        val result = !event.post().isCancelled
-        if (!event.skipCache) {
-            lastVisibilityCheck[entity.id] = result
-        }
+        val result = !CheckRenderEntityEvent(entity, camX, camY, camZ).post().isCancelled
+        lastVisibilityCheck[entity.id] = result
         return result
+    }
+
+    @JvmStatic
+    fun displayDataChanged(display: Display) {
+        lastVisibilityCheck.remove(display.id)
     }
 }
