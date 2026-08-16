@@ -10,5 +10,4 @@ object FrustumUtils {
     private val frustum get() = Minecraft.getInstance().gameRenderer.getMainCamera().getCullFrustum()
 
     fun isVisible(box: AABB): Boolean = frustum.isVisible(box)
-
 }
