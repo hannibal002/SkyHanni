@@ -341,19 +341,13 @@ Make sure such pull requests have a good explanation in the **What** section.
 
 SkyHanni wraps the places where the game calls into our code in a try-catch: posting events, running commands, and the consumers for delayed
 responses. Every catch goes through our own `ErrorManager`, which turns a failure into a red chat message and keeps the client running.
-Leaving as little code as possible outside that protection is a deliberate goal, so new code paths need the same treatment. The codebase has
-many examples to follow.
+Leaving as little code as possible outside that protection is a deliberate goal, so new code paths need the same treatment.
 
 An exception in SkyHanni code therefore does not crash the game. Only unprotected code can, in practice a mixin hook. Treat any path that is
 not known to be protected as unprotected.
 
-Name the two cases correctly and never use them interchangeably:
-
-- **crash**: the Minecraft client actually terminates.
-- **error**: an exception is caught and shown as a red chat message, the client keeps running.
-
-This applies wherever others read it: pull request titles and descriptions, changelog entries, issues, and review comments. Calling an error
-a crash overstates the severity and hides the cases that really do crash.
+Because of that, a "crash" means the client actually terminated, while a caught exception shown as a red chat message is an "error". Keep
+the two apart in pull request titles, changelog entries and issues, since calling an error a crash overstates how bad it is.
 
 ## Additional Useful Development Tools
 
