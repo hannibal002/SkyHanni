@@ -18,7 +18,6 @@ class CleanTreeViewConfig {
         desc = "Hides floating blocks when breaking tree blocks."
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     var hideTreeBlocks = true
 
     @Expose
@@ -27,6 +26,5 @@ class CleanTreeViewConfig {
         desc = "Hides other Non Default Floating Tree blocks e.g. Barkshatter Rune's effect."
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     var hideRuneEffects = false
 }
