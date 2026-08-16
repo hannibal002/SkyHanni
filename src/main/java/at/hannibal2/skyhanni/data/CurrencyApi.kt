@@ -103,7 +103,7 @@ object CurrencyApi {
      */
     val sowdustPattern by patternGroup.pattern(
         "sowdust.amount",
-        "\\s*Sowdust: (?<sowdust>[\\d,]+)",
+        "\\s*Sowdust: (?<sowdust>[\\d,]+).*",
     )
 
     /**
@@ -111,7 +111,7 @@ object CurrencyApi {
      */
     val gemsPattern by patternGroup.pattern(
         "gems.amount",
-        "Gems: (?<gems>[\\d,]+).*",
+        "\\s*Gems: (?<gems>[\\d,]+).*",
     )
 
     /**
@@ -119,7 +119,7 @@ object CurrencyApi {
      */
     private val motesPattern by patternGroup.pattern(
         "motes.amount",
-        "Motes: (?<motes>[\\d,]+).*",
+        "\\s*Motes: (?<motes>[\\d,]+).*",
     )
 
     /**
@@ -127,7 +127,7 @@ object CurrencyApi {
      */
     val peltsPattern by patternGroup.pattern(
         "pelts.amount",
-        "Pelts: (?<pelts>[\\d,]+).*",
+        "\\s*Pelts: (?<pelts>[\\d,]+).*",
     )
 
     /**
@@ -135,7 +135,7 @@ object CurrencyApi {
      */
     val tokensPattern by patternGroup.pattern(
         "tokens.amount",
-        "Tokens: (?<tokens>[\\w,]+)",
+        "\\s*Tokens: (?<tokens>[\\d,]+).*",
     )
 
     private val profileStorage get() = ProfileStorageData.profileSpecific?.currencies
