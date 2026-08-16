@@ -6,20 +6,17 @@ import org.joml.Quaternionfc
 import org.joml.Vector3f
 
 object DisplayEntityUtils {
-    val Display.isInitialized: Boolean
-        get() {
-            return renderState() != null
-        }
-
-    val Display.BlockDisplay.isInitialized: Boolean
-        get() {
-            return !blockState.isAir && renderState() != null
-        }
-
     val Display.transformation: Transformation?
         get() {
             return renderState()?.transformation?.get(0f)
         }
+
+    fun Display.TextDisplay.arrowForwardVec(): LorenzVec {
+        val quat = transformation?.leftRotation() ?: return LorenzVec(0, 0, 1)
+        val localY = Vector3f(0f, 1f, 0f)
+        quat.transform(localY)
+        return LorenzVec(localY.x.toDouble(), 0.0, localY.z.toDouble()).normalize()
+    }
 
     val Transformation.uniformScale: Float?
         get() {
@@ -32,13 +29,6 @@ object DisplayEntityUtils {
         get() {
             return !leftRotation().isIdentity || !rightRotation().isIdentity
         }
-
-    fun Display.TextDisplay.arrowForwardVec(): LorenzVec {
-        val quat = transformation?.leftRotation() ?: return LorenzVec(0, 0, 1)
-        val localY = Vector3f(0f, 1f, 0f)
-        quat.transform(localY)
-        return LorenzVec(localY.x.toDouble(), 0.0, localY.z.toDouble()).normalize()
-    }
 
     val Quaternionfc.isIdentity: Boolean
         get() = this.w() == 1f && this.x() == 0f && this.y() == 0f && this.z() == 0f
