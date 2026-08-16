@@ -6,19 +6,14 @@ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.PosColorNo
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChromaUniforms
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.getCommonRoundedUniforms
 import com.mojang.blaze3d.pipeline.BlendFunction
+import com.mojang.blaze3d.pipeline.ColorTargetState
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
-
-//? if >= 26.1 {
-import com.mojang.blaze3d.pipeline.ColorTargetState
 import java.util.Optional
-//?} else {
-/*import com.mojang.blaze3d.platform.DepthTestFunction
-*///?}
 
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
@@ -194,7 +189,6 @@ enum class SkyHanniRenderPipeline(
             .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
             .withVertexFormat(vFormat, vDrawMode).apply {
                 // One or the other, never both
-                //~ if < 26.1 'withColorTargetState(ColorTargetState(it))' -> 'withBlend(it)'
                 blend?.let { withColorTargetState(ColorTargetState(it)) } ?: withCull?.let(this::withCull)
                 vertexShaderPath?.let { withVertexShader(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
                 fragmentShaderPath?.let {
@@ -207,12 +201,7 @@ enum class SkyHanniRenderPipeline(
                 sampler?.let(this::withSampler)
                 uniforms.forEach(this::withUniform)
                 if (!depthWrite) {
-                    //? if >= 26.1 {
                     withDepthStencilState(Optional.empty())
-                    //?} else {
-                    /*withDepthWrite(depthWrite)
-                    withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-                    *///?}
                 }
             }.build(),
     )

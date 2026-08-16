@@ -64,11 +64,11 @@ data class CustomTodo(
 
     fun setDoneNow() {
         if (!SkyBlockUtils.inSkyBlock) return
-        val now = SimpleTimeMark.now()
         val triggersLeft = this.triggersLeftOnCurrentProfile ?: 1
         if (triggersLeft > 1 && !this.cronEnabled) {
             this.triggersLeftOnCurrentProfile = triggersLeft - 1
         } else {
+            val now = SimpleTimeMark.now()
             this.triggersLeftOnCurrentProfile = this.totalTriggers
             readyAt[HypixelData.profileName] =
                 if (isResetOffset) {
@@ -85,17 +85,22 @@ data class CustomTodo(
 
     fun antiTriggered() {
         if (!SkyBlockUtils.inSkyBlock) return
+        if (this.cronEnabled) return
 
         val profile = HypixelData.profileName
         val triggersLeft = this.triggersLeftOnCurrentProfile ?: this.totalTriggers
 
-        if (!this.cronEnabled) {
-            if (readyAt[profile]?.isInFuture() == true) {
+        when {
+            readyAt[profile]?.isInFuture() == true -> {
                 readyAt[profile] = SimpleTimeMark.farPast()
                 this.triggersLeftOnCurrentProfile = 1
-            } else if (triggersLeft < this.totalTriggers) {
+            }
+
+            triggersLeft < this.totalTriggers -> {
                 this.triggersLeftOnCurrentProfile = triggersLeft + 1
             }
+
+            else -> return
         }
 
         CustomTodos.save()

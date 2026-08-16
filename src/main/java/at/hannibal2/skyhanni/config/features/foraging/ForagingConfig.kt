@@ -40,13 +40,18 @@ class ForagingConfig {
     val tracker = ForagingTrackerConfig()
 
     @Expose
-    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in the Moonglade Marsh.")
+    @ConfigOption(name = "Honeyhive Reminder", desc = "")
+    @Accordion
+    val honeyhiveReminder = HoneyhiveReminderConfig()
+
+    @Expose
+    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in Moonglade Marsh.")
     @ConfigEditorBoolean
     @FeatureToggle
     var mutePhantoms = true
 
     @Expose
-    @ConfigOption(name = "Mute Fusion Machine", desc = "Silences Fusion Machine sounds in the Moonglade Marsh.")
+    @ConfigOption(name = "Mute Fusion Machine", desc = "Silences Fusion Machine sounds in Moonglade Marsh.")
     @ConfigEditorBoolean
     @FeatureToggle
     @SearchTag("box firework")

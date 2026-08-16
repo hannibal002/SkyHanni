@@ -5,12 +5,8 @@ import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderPass;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -26,32 +22,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Map;
-import java.util.function.Supplier;
 
 @Mixin(GuiRenderer.class)
 public abstract class MixinGuiRenderer {
 
-    @Inject(method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V", at = @At("HEAD"))
+    @Inject(method = "executeDrawRange", at = @At("HEAD"))
     public void computeChromaBufferSlice(
-        Supplier<String> nameSupplier,
-        RenderTarget framebuffer,
-        GpuBufferSlice fogBuffer,
-        GpuBufferSlice dynamicTransformsBuffer,
-        GpuBuffer buffer,
-        VertexFormat.IndexType indexType,
-        int from, int _to, CallbackInfo ci) {
+        CallbackInfo ci) {
         GuiRendererHook.INSTANCE.computeChromaBufferSlice();
     }
 
-    @Inject(method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", ordinal = 1))
+    @Inject(method = "executeDrawRange", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", ordinal = 1))
     public void insertChromaSetUniform(
-        Supplier<String> nameSupplier,
-        RenderTarget framebuffer,
-        GpuBufferSlice fogBuffer,
-        GpuBufferSlice dynamicTransformsBuffer,
-        GpuBuffer buffer,
-        VertexFormat.IndexType indexType,
-        int from, int _to, CallbackInfo ci,
+        CallbackInfo ci,
         @Local RenderPass renderPass) {
         GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass);
     }
@@ -64,17 +47,13 @@ public abstract class MixinGuiRenderer {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);
     }
 
-    //~ if < 26.1 'Unique' -> 'Shadow'
     @Unique
-    //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
     private int skyhanni$frameNumber;
 
-    //? if >= 26.1 {
     @Inject(method = "render", at = @At("HEAD"))
-    private void skyhanni$trackFrameNumber(GpuBufferSlice fogBuffer, CallbackInfo ci) {
+    private void skyhanni$trackFrameNumber(CallbackInfo ci) {
         skyhanni$frameNumber++;
     }
-    //?}
 
     @Shadow
     @Final
@@ -106,7 +85,6 @@ public abstract class MixinGuiRenderer {
             pictureInPictureRenderers,
             getBufferSource(),
             featureRenderDispatcher,
-            //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
             skyhanni$frameNumber
         );
     }
@@ -124,7 +102,6 @@ public abstract class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.submitBlitForState(
             skyHanniState,
             renderState,
-            //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
             skyhanni$frameNumber
         );
     }
