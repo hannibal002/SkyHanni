@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.garden.GardenPlotSprayDataTablistReadEvent
 import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.sprayonator.SprayType
+import at.hannibal2.skyhanni.features.garden.pests.SprayonatorType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -250,7 +251,9 @@ object GardenPlotApi {
             val plot = getPlotByName(plotName) ?: return
             val spray = SprayType.getByNameOrNull(sprayName) ?: return
 
-            plot.setSpray(spray, 30.minutes)
+            // estimate, the pests tab widget may replace this with the real remaining time
+            val type = SprayonatorType.getRecentlyHeldOrNull() ?: SprayonatorType.BASIC
+            plot.setSpray(spray, type.duration)
             GardenPlotSprayEvent.SprayAddedEvent(plot, spray, amount).post()
         }
         plotSprayExpiredPattern.matchMatcher(event.cleanMessage) {
