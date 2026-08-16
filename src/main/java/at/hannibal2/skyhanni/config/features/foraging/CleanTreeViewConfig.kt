@@ -8,8 +8,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class CleanTreeViewConfig {
     @Expose
     @ConfigOption(
-        name = "Hide Breaking Tree Blocks",
-        desc = "Hides floating blocks when breaking tree blocks."
+        name = "Hide Block Break Effects",
+        desc = "Hides floating blocks created when breaking tree blocks."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -18,7 +18,7 @@ class CleanTreeViewConfig {
     @Expose
     @ConfigOption(
         name = "Hide Rune Effects",
-        desc = "Hides other Non Default Floating Tree blocks e.g. Barkshatter Rune's effect."
+        desc = "Hides floating blocks created by rune effects, such as Barkshatter."
     )
     @ConfigEditorBoolean
     @FeatureToggle
