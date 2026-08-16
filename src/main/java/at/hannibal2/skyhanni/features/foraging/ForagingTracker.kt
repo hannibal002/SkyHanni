@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.foraging.ForagingTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -36,6 +37,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -43,14 +45,15 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.TextColor
 import kotlin.time.Duration.Companion.seconds
 
 private typealias DropCategory = ForagingTrackerConfig.TreeGiftBonusDropCategory
 
 @SkyHanniModule
-object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeType, ForagingTrackerLegacy.BucketData>(
+object ForagingTracker : SkyHanniBucketedItemTracker<TreeGiftTracker.TreeType, TreeGiftTracker.BucketData>(
     "Foraging Tracker",
-    { ForagingTrackerLegacy.BucketData() },
+    { TreeGiftTracker.BucketData() },
     { it.foraging.trackerData },
     { drawDisplay(it) },
     trackerConfig = { SkyHanniMod.feature.foraging.tracker.perTrackerConfig },
@@ -69,7 +72,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private var lastAxeHeldTime: SimpleTimeMark = SimpleTimeMark.farPast()
     private var hasHeldAxe: Boolean = false
 
-    private fun drawDisplay(bucketData: ForagingTrackerLegacy.BucketData): List<Searchable> = buildList {
+    private fun drawDisplay(bucketData: TreeGiftTracker.BucketData): List<Searchable> = buildList {
         addSearchString("§a§lForaging Tracker")
         addBucketSelector(this, bucketData, "Tree Type")
 
@@ -118,19 +121,19 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     }
 
     @HandleEvent
-    fun onItemAdd(event: ItemAddEvent) {
+    private fun onItemAdd(event: ItemAddEvent) {
         if (!isInIsland() || event.source != ItemAddManager.Source.COMMAND) return
         event.addItemFromEvent()
     }
 
     @HandleEvent
-    fun onSackChange(event: SackChangeEvent) {
+    private fun onSackChange(event: SackChangeEvent) {
         if (!isInIsland()) return
         event.addLogs()
     }
 
     private data class LogSackChange(
-        val treeType: ForagingTrackerLegacy.TreeType,
+        val treeType: TreeGiftTracker.TreeType,
         val delta: Int,
         val deltaEnchanted: Int,
     )
@@ -153,8 +156,8 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
 
     private fun SackChangeEvent.extractLogs(): List<LogSackChange> = sackChanges.asSequence()
         .filter { it.delta > 0 }.mapNotNull { change ->
-            ForagingTrackerLegacy.logInternalNamePattern.matchMatcher(change.internalName.asString()) {
-                val type = ForagingTrackerLegacy.TreeType.byNameOrNull(group("treeType"))
+            TreeGiftTracker.logInternalNamePattern.matchMatcher(change.internalName.asString()) {
+                val type = TreeGiftTracker.TreeType.byNameOrNull(group("treeType"))
                     ?: return@matchMatcher null
                 val enchanted = groupOrNull("enchanted") != null
                 LogSackChange(
@@ -168,12 +171,12 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     // Chat FSM
     private var openLootLoop = false
     private var openBonusGiftLoop = false
-    private var treeType: ForagingTrackerLegacy.TreeType? = null
+    private var treeType: TreeGiftTracker.TreeType? = null
     private var lastTreeGiftAt: SimpleTimeMark = SimpleTimeMark.farPast()
     private val loot = mutableMapOf<NeuInternalName, Int>()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isInIsland()) return
         event.tryReadLoot()
         event.tryBlock()
@@ -183,7 +186,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private var currentStretchingSticks = 0
 
     @HandleEvent(OwnInventoryItemUpdateEvent::class)
-    fun onOwnInventoryItemUpdate() {
+    private fun onOwnInventoryItemUpdate() {
         if (!isInIsland()) return
         val treeType = treeType ?: return
 
@@ -206,7 +209,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private var dropsJsonCategories: List<DropCategoryData> = emptyList()
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         dropsJson = event.getConstant<TreeGiftBonusDropsJson>("foraging/TreeGiftBonusDrops")
         val dropsJson = dropsJson ?: return
         dropsJsonCategories = buildList {
@@ -219,17 +222,23 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         }
     }
 
+    // TODO split up
+    @Suppress("CyclomaticComplexMethod")
     private fun SkyHanniChatEvent.Allow.tryReadLoot() {
         val dropsJson = dropsJson ?: return
 
-        ForagingTrackerLegacy.openCloseRewardPattern.matchMatcher(message) {
+        TreeGiftTracker.openCloseRewardPattern.matchStyledMatcher(chatComponent) {
+            val style = groupOrThrow("line").sampleStyleAtStart()
+            if (!style.isBold) return@matchStyledMatcher
+            if (style.color != TextColor.fromLegacyFormat(DARK_GREEN)) return@matchStyledMatcher
+
             openLootLoop = !openLootLoop
             if (openLootLoop) {
                 openBonusGiftLoop = false
                 lastTreeGiftAt = SimpleTimeMark.now()
             } else {
                 sendTreeGiftStats()
-                val treeType = treeType ?: ForagingTrackerLegacy.TreeType.FIG
+                val treeType = treeType ?: TreeGiftTracker.TreeType.FIG
                 loot.forEach { (item, count) ->
                     addItem(treeType, item, count, command = false)
                 }
@@ -239,17 +248,22 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         }
         if (!openLootLoop) return
 
-        ForagingTrackerLegacy.bonusGiftSeparatorPattern.matchMatcher(message) {
+        TreeGiftTracker.bonusGiftSeparatorPattern.matchMatcher(cleanMessage) {
             openBonusGiftLoop = true
             return
         }
 
-        ForagingTrackerLegacy.percentageContributedPattern.matchMatcher(message) {
+        TreeGiftTracker.percentageContributedPattern.matchMatcher(cleanMessage) {
             val percentage = group("percentage").formatDoubleOrNull() ?: return@matchMatcher
-            val percentColor = group("percentColor")
-            lastPercentString = "$percentColor$percentage%"
+            val percentColor = when (percentage) {
+                in 0.0..<20.0 -> 'c'
+                in 20.0..<33.0 -> 'e'
+                in 33.0..100.0 -> 'a'
+                else -> error("Invalid tree cut percentage: $percentage")
+            }
+            lastPercentString = "§$percentColor$percentage%"
             val type = group("type")
-            treeType = ForagingTrackerLegacy.TreeType.byNameOrNull(type)
+            treeType = TreeGiftTracker.TreeType.byNameOrNull(type)
             val treeType = treeType ?: return@matchMatcher
             modify {
                 it.treesCut.addOrPut(treeType, 1)
@@ -257,7 +271,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
             }
         }
 
-        ForagingTrackerLegacy.rewardsGainedPattern.matchMatcher(message) {
+        TreeGiftTracker.rewardsGainedPattern.matchMatcher(cleanMessage) {
             group("count").formatIntOrNull()?.let { lastRewardCount = it }
             val dataSibling = chatComponent.siblings.firstOrNull() ?: return@matchMatcher
             dataSibling.getHoverLootPairs().forEach { (item, amount) ->
@@ -265,30 +279,29 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
             }
         }
 
-        ForagingTrackerLegacy.phantomSpawnPattern.matchMatcher(message) {
-            val mob = group("phantom")
+        TreeGiftTracker.mobSpawnPattern.matchMatcher(cleanMessage) {
+            val mob = group("mob")
 
-            if (dropsJson.mobs.contains(mob) && config.compactGiftBonusDropsList.contains(DropCategory.MOBS))
+            if (dropsJson.mobs.contains(mob) && config.compactGiftBonusDropsList.contains(DropCategory.MOBS)) {
                 rareDrops.add("A wild §d$mob §fappeared!")
+            }
         }
 
-        if (!openBonusGiftLoop)
-            return
+        if (!openBonusGiftLoop) return
 
-        val item = ForagingTrackerLegacy.bonusGiftRewardPattern.matchMatcher(message) { group("item") } ?: return
-        var itemInternalName = ForagingTrackerLegacy.enchantedBookPattern.matchMatcher(item) {
-            val book = group("book")
-            val tier = group("tier").romanToDecimal()
+        val item = TreeGiftTracker.bonusGiftRewardPattern.matchStyledMatcher(chatComponent) {
+            componentOrThrow("item")
+        } ?: return
+        var itemInternalName = TreeGiftTracker.enchantedBookPattern.matchStyledMatcher(item) {
+            val book = componentOrThrow("book").formattedTextCompatLeadingWhiteLessResets()
+            val tier = groupOrThrow("tier").getText().romanToDecimal()
             NeuInternalName.fromItemNameOrNull("$book $tier")
         } ?: NeuInternalName.fromItemNameOrNull(item) ?: return
 
-        /**
-         * this is a failsafe in the event of runes lacking sufficient NEU repo data to automagically
-         * fetch their correct internal names, and thus translating their in-game names into internal
-         * names literally
-         */
-        if (itemInternalName.startsWith(("◆_")))
-            itemInternalName = itemInternalName.replace("◆_", "AXE_")
+        // this is a failsafe in the event of runes lacking sufficient NEU repo data to automagically
+        // fetch their correct internal names, and thus translating their in-game names into internal
+        // names literally
+        if (itemInternalName.startsWith(("◆_"))) itemInternalName = itemInternalName.replace("◆_", "AXE_")
 
         loot.addOrPut(itemInternalName, 1)
 
@@ -296,7 +309,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         val inCategoryList = dropsJsonCategories.any {
             it.category in bonusDropTypeList && it.items.contains(itemInternalName)
         }
-        if (inCategoryList) rareDrops.add(item)
+        if (inCategoryList) rareDrops.add(item.formattedTextCompat())
     }
 
     private fun SkyHanniChatEvent.Allow.tryBlock() {
@@ -307,10 +320,10 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private fun Component.getHoverLootPairs(): Set<Pair<NeuInternalName, Int>> = buildSet {
         val treeType = treeType ?: return this
         lastHover = hover
-        val lootLines = hover?.formattedTextCompat()?.split("\n")?.takeIfNotEmpty() ?: return this
-        ChatUtils.debug("found loot lines:\n${lootLines.joinToString("\n").replace("§", "&")}")
+        val lootLines = hover?.string?.split("\n")?.takeIfNotEmpty() ?: return this
+        ChatUtils.debug("found loot lines:\n${lootLines.joinToString("\n")}")
         lootLines.forEach { line ->
-            val (item, amountString) = ForagingTrackerLegacy.hoverRewardPattern.matchMatcher(line) {
+            val (item, amountString) = TreeGiftTracker.hoverRewardPattern.matchMatcher(line) {
                 val amountString = if (groupOrNull("percentage") != null) "1" else group("amount")
                 group("item") to amountString
             } ?: return@forEach
@@ -358,7 +371,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     }
 
     @HandleEvent
-    fun onIslandLeave() {
+    private fun onIslandLeave() {
         if (!isInIsland()) return
         firstUpdate()
     }
@@ -366,7 +379,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private fun isInIsland() = IslandTypeTag.FORAGING_CUSTOM_TREES.isInIsland()
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetforagingtracker") {
             description = "Resets the Foraging Tracker."
             category = CommandCategory.USERS_RESET
@@ -375,7 +388,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     }
 
     @HandleEvent
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+    private fun onItemInHandChange(event: ItemInHandChangeEvent) {
         if (!isInIsland()) return
         val isAxe = event.newItem.getItemStack().getItemCategoryOrNull() == ItemCategory.AXE
         if (isAxe != hasHeldAxe) {
