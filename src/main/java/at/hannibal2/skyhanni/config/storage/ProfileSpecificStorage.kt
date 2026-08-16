@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
+import at.hannibal2.skyhanni.features.foraging.ForagingTracker
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
@@ -789,9 +789,8 @@ class ProfileSpecificStorage(
         @Expose
         var whispers: PowderStorage = PowderStorage()
 
-        // todo when we're fully 1.21, change ForagingTrackerLegacy to ForagingTracker
         @Expose
-        var trackerData: ForagingTrackerLegacy.BucketData = ForagingTrackerLegacy.BucketData()
+        var trackerData: ForagingTracker.BucketData = ForagingTracker.BucketData()
 
         @Expose
         var honeyhiveRemindTime: SimpleTimeMark = farPast()
