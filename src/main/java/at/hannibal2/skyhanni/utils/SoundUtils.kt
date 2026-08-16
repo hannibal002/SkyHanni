@@ -60,7 +60,7 @@ object SoundUtils {
 
     fun createSound(name: String, pitch: Float, volume: Float = 1f, bypassVolumeMaximum: Boolean = false): SoundInstance {
         val newSound = SoundCompat.getModernSoundName(name)
-        val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
+        val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9:/._-]"), ""))
         val sound = SimpleSoundInstance(
             identifier,
             SoundSource.UI,

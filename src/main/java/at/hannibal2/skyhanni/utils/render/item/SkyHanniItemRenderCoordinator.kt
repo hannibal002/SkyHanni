@@ -33,16 +33,7 @@ internal object SkyHanniItemRenderCoordinator {
     // items actively spinning re-render every frame, same as Mojang's isAnimated path.
     // items that have been stable for this many frames are committed to the atlas.
     private const val SETTLE_FRAMES = 4
-    private val projectionBuffer by lazy {
-        ProjectionMatrixBuffer(
-            "SkyHanni items",
-            //? if < 26.1 {
-            /*-1000.0f,
-            1000.0f,
-            true,
-            *///?}
-        )
-    }
+    private val projectionBuffer by lazy { ProjectionMatrixBuffer("SkyHanni items") }
     private val realtimeSlots = LinkedHashMap<Int, SkyHanniRealtimeItemSlot>()
     private val realtimeSlotLastSeen = HashMap<Int, Int>() // stableId -> frameNumber
     private val settleTracker = HashMap<Int, SettleEntry>() // keyed by stableId, NOT atlasKey

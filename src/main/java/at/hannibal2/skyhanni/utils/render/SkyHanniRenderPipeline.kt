@@ -4,21 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.compat.IrisCompat
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.PosColorNormal
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChromaUniforms
-import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.getCommonRoundedUniforms
 import com.mojang.blaze3d.pipeline.BlendFunction
+import com.mojang.blaze3d.pipeline.ColorTargetState
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
-
-//? if >= 26.1 {
-import com.mojang.blaze3d.pipeline.ColorTargetState
 import java.util.Optional
-//?} else {
-/*import com.mojang.blaze3d.platform.DepthTestFunction
-*///?}
 
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
@@ -79,51 +73,6 @@ enum class SkyHanniRenderPipeline(
     QUADS_XRAY(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         depthWrite = false,
-    ),
-    ROUNDED_RECT(
-        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
-        blend = BlendFunction.TRANSLUCENT,
-        vertexShaderPath = "rounded_rect",
-        uniforms = getCommonRoundedUniforms(),
-        depthWrite = false,
-    ),
-    ROUNDED_TEXTURED_RECT(
-        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
-        vFormat = DefaultVertexFormat.POSITION_TEX,
-        blend = BlendFunction.TRANSLUCENT,
-        vertexShaderPath = "rounded_texture",
-        sampler = "textureSampler",
-        uniforms = getCommonRoundedUniforms(),
-        depthWrite = false,
-        irisProgram = IrisCompat.IrisProgram.TEXTURED,
-    ),
-    ROUNDED_RECT_OUTLINE(
-        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
-        vFormat = DefaultVertexFormat.POSITION_COLOR,
-        blend = BlendFunction.TRANSLUCENT,
-        vertexShaderPath = "rounded_rect_outline",
-        uniforms = getCommonRoundedUniforms() + mapOf(
-            "SkyHanniRoundedOutlineUniforms" to UniformType.UNIFORM_BUFFER
-        ),
-        depthWrite = false,
-    ),
-    CIRCLE(
-        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
-        vFormat = DefaultVertexFormat.POSITION_COLOR,
-        blend = BlendFunction.TRANSLUCENT,
-        vertexShaderPath = "circle",
-        uniforms = getCommonRoundedUniforms() + mapOf(
-            "SkyHanniCircleUniforms" to UniformType.UNIFORM_BUFFER
-        ),
-    ),
-    RADIAL_GRADIENT_CIRCLE(
-        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
-        vFormat = DefaultVertexFormat.POSITION_COLOR,
-        blend = BlendFunction.TRANSLUCENT,
-        vertexShaderPath = "radial_gradient_circle",
-        uniforms = getCommonRoundedUniforms() + mapOf(
-            "SkyHanniRadialGradientCircleUniforms" to UniformType.UNIFORM_BUFFER
-        ),
     ),
     CHROMA_STANDARD(
         snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
@@ -194,7 +143,6 @@ enum class SkyHanniRenderPipeline(
             .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
             .withVertexFormat(vFormat, vDrawMode).apply {
                 // One or the other, never both
-                //~ if < 26.1 'withColorTargetState(ColorTargetState(it))' -> 'withBlend(it)'
                 blend?.let { withColorTargetState(ColorTargetState(it)) } ?: withCull?.let(this::withCull)
                 vertexShaderPath?.let { withVertexShader(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
                 fragmentShaderPath?.let {
@@ -207,12 +155,7 @@ enum class SkyHanniRenderPipeline(
                 sampler?.let(this::withSampler)
                 uniforms.forEach(this::withUniform)
                 if (!depthWrite) {
-                    //? if >= 26.1 {
                     withDepthStencilState(Optional.empty())
-                    //?} else {
-                    /*withDepthWrite(depthWrite)
-                    withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-                    *///?}
                 }
             }.build(),
     )
@@ -221,7 +164,6 @@ enum class SkyHanniRenderPipeline(
 }
 
 private object SkyHanniRenderPipelineUtils {
-    fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     val commonChromaUniforms = mapOf("SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER)
     val PosColorNormal: VertexFormat = DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH
 }
