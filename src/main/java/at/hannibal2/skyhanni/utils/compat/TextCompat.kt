@@ -37,23 +37,11 @@ import kotlin.time.Duration.Companion.minutes
 private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)
 private val formattedTextCache = TimeLimitedCache<TextCacheKey, String>(3.minutes)
 
-private enum class FormattedTextSettings {
+private enum class FormattedTextSettings(val noExtraResets: Boolean = false, val leadingWhite: Boolean = false) {
     DEFAULT,
-    LESS_RESETS,
-    LEADING_WHITE,
-    LEADING_WHITE_LESS_RESETS,
-    ;
-
-    companion object {
-        fun getByArgs(noExtraResets: Boolean, leadingWhite: Boolean): FormattedTextSettings {
-            return when {
-                noExtraResets && leadingWhite -> LEADING_WHITE_LESS_RESETS
-                noExtraResets -> LESS_RESETS
-                leadingWhite -> LEADING_WHITE
-                else -> DEFAULT
-            }
-        }
-    }
+    LESS_RESETS(noExtraResets = true),
+    LEADING_WHITE(leadingWhite = true),
+    LEADING_WHITE_LESS_RESETS(noExtraResets = true, leadingWhite = true),
 }
 
 private data class TextCacheKey(val settings: FormattedTextSettings, val component: Component)
@@ -76,41 +64,41 @@ private fun Component.computeUnformattedTextCompat(): String {
 fun Component.unformattedTextCompat(): String =
     iterator().joinToString(separator = "") { it.unformattedTextForChatCompat() }
 
-@JvmOverloads
-@Deprecated("Use string unless you really need color codes")
-fun Component?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite: Boolean = false): String {
+private fun Component?.formattedTextCompatInternal(settings: FormattedTextSettings): String {
     this ?: return ""
-    val cacheKey = TextCacheKey(FormattedTextSettings.getByArgs(noExtraResets, leadingWhite), this)
+    val cacheKey = TextCacheKey(settings, this)
     return formattedTextCache.getOrPut(cacheKey) {
-        computeFormattedTextCompat(noExtraResets, leadingWhite)
+        computeFormattedTextCompat(settings)
     }
 }
 
 @Deprecated("Use string unless you really need color codes")
-@Suppress("DEPRECATION")
-fun Component?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
+fun Component?.formattedTextCompat(): String = formattedTextCompatInternal(DEFAULT)
 
 @Deprecated("Use string unless you really need color codes")
-@Suppress("DEPRECATION")
-fun Component?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
+fun Component?.formattedTextCompatLessResets(): String = formattedTextCompatInternal(LESS_RESETS)
 
 @Deprecated("Use string unless you really need color codes")
-@Suppress("DEPRECATION")
+fun Component?.formattedTextCompatLeadingWhite(): String = formattedTextCompatInternal(LEADING_WHITE)
+
+@Deprecated("Use string unless you really need color codes")
 fun Component?.formattedTextCompatLeadingWhiteLessResets(): String =
-    this.formattedTextCompat(noExtraResets = true, leadingWhite = true)
+    formattedTextCompatInternal(LEADING_WHITE_LESS_RESETS)
 
-private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhite: Boolean): String {
+private fun Component?.computeFormattedTextCompat(settings: FormattedTextSettings): String {
     this ?: return ""
     val sb = StringBuilder(50)
     var wasFormatted = false
     for (component in iterator()) {
         val chatStyle = component.style.chatStyle()
-        if (chatStyle.isNotEmpty() && (leadingWhite || (wasFormatted && (sb.length != 2 || sb[0] != '§' || sb[1] != 'r')) || chatStyle != "§f")) {
+        if (chatStyle.isNotEmpty() &&
+            (settings.leadingWhite || (wasFormatted && !sb.contentEquals("§r")) || chatStyle != "§f")
+        ) {
             sb.append(chatStyle)
             wasFormatted = true
         }
         sb.append(component.unformattedTextForChatCompat())
-        if (!noExtraResets) {
+        if (!settings.noExtraResets) {
             sb.append("§r")
             wasFormatted = true
         } else if (component == Component.empty()) {
@@ -314,7 +302,6 @@ fun ClickEvent.value(): String {
         // todo use error manager here probably, not doing it now because it doesn't compile on 1.21
         else -> ""
     }
-
 }
 
 fun HoverEvent.value(): Component = when (action()) {
