@@ -97,7 +97,7 @@ object EntityData {
         val previous = display.blockRenderState()
 
         if (!state.isAir && (previous == null || previous.blockState().isAir)) {
-            onFreshDisplayRenderState(display)
+            lastVisibilityCheck.remove(display.id)
         }
     }
 }
