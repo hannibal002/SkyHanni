@@ -35,7 +35,7 @@ object ClearTreeLogs {
         val entity = event.entity
         if (entity.blockState !in treeBlocks) return
 
-        if ((config.hideTreeBlocks == config.hideRuneEffects) && config.hideTreeBlocks) {
+        if (config.hideTreeBlocks && config.hideRuneEffects) {
             event.cancel()
             return
         }
@@ -56,7 +56,7 @@ object ClearTreeLogs {
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(144, "foraging.trees.cleanView") { element ->
             val obj = JsonObject()
-            obj.addProperty("enabled", element.asBoolean)
+            obj.addProperty("hideTreeBlocks", element.asBoolean)
             obj
         }
     }
@@ -67,5 +67,5 @@ object ClearTreeLogs {
         return scale in SCALE_RANGE
     }
 
-    private fun isEnabled() = config.enabled
+    private fun isEnabled() = config.hideTreeBlocks || config.hideRuneEffects
 }
