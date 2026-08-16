@@ -11,6 +11,10 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 /**
  * Sealed base class for inventory events that provide access to the current inventory's slot data.
  *
+ * These events are posted from the packet handler, so handlers do not run on the main thread.
+ * Anything that measures text width, such as building renderables, has to go through
+ * DelayedRun.runOrNextTick.
+ *
  * @see InventoryFullyOpenedEvent
  * @see InventoryUpdatedEvent
  */
@@ -46,9 +50,6 @@ sealed class InventoryOpenEvent(private val inventory: OtherInventoryData.Invent
  * Since this logic only works via packets, and the player inventory (pressing E) is client side,
  * this event does not get fired when opening the inventory via pressing E.
  *
- * Posted from the packet handler, so handlers do not run on the main thread. Anything that measures text
- * width, such as building renderables, has to go through DelayedRun.runOrNextTick.
- *
  * TODO does not work for inventories with empty slots (e.g. "Teleport to Player" ghost ability in dungeons).
  */
 @PrimaryFunction("onInventoryFullyOpened")
@@ -59,7 +60,8 @@ class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : Inven
  *
  * This fires once immediately after [InventoryFullyOpenedEvent] on initial open,
  * and again on any subsequent slot update while the inventory remains open.
- * Updates after the initial open are delayed by one tick.
+ * Updates after the initial open are delayed by one tick and therefore run on the main thread,
+ * only the initial post comes from the packet handler.
  */
 @PrimaryFunction("onInventoryUpdated")
 class InventoryUpdatedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
