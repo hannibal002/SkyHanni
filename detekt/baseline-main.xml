@@ -246,13 +246,6 @@
     <ID>PrivateEventListener:BarnFishingTimer.kt:BarnFishingTimer$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:BarnFishingTimer.kt:BarnFishingTimer$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
     <ID>PrivateEventListener:BarnFishingTimer.kt:BarnFishingTimer$@Suppress("UNUSED_PARAMETER") @HandleEvent(onlyOnIsland = IslandType.HUB) fun onPlayerMove</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent fun onSlotClick</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent fun onTick</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent(onlyOnSkyblock = true) fun onBackgroundDrawn</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent(priority = HandleEvent.HIGHEST) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:BazaarBestSellMethod.kt:BazaarBestSellMethod$@HandleEvent fun onBazaarOpenedProduct</ID>
     <ID>PrivateEventListener:BazaarBestSellMethod.kt:BazaarBestSellMethod$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:BazaarBestSellMethod.kt:BazaarBestSellMethod$@HandleEvent fun onInventoryClose</ID>
@@ -1795,11 +1788,6 @@
     <ID>PrivateEventListener:InGameDateDisplay.kt:InGameDateDisplay$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:InGameDateDisplay.kt:InGameDateDisplay$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed: Unit</ID>
     <ID>PrivateEventListener:InWaterDisplay.kt:InWaterDisplay$@HandleEvent fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:InfernoMinionFeatures.kt:InfernoMinionFeatures$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:InfernoMinionFeatures.kt:InfernoMinionFeatures$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:InfernoMinionFeatures.kt:InfernoMinionFeatures$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:InfernoMinionFeatures.kt:InfernoMinionFeatures$@HandleEvent fun onToolTip</ID>
-    <ID>PrivateEventListener:InfernoMinionFeatures.kt:InfernoMinionFeatures$@HandleEvent(onlyOnSkyblock = true) fun onSlotClick</ID>
     <ID>PrivateEventListener:InfernoMinionProfitTracker.kt:InfernoMinionProfitTracker$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:InfernoMinionProfitTracker.kt:InfernoMinionProfitTracker$@HandleEvent fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:InfernoMinionProfitTracker.kt:InfernoMinionProfitTracker$@HandleEvent fun onMinionOpen</ID>
@@ -2903,10 +2891,6 @@
     <ID>PrivateEventListener:SpringBootsHelper.kt:SpringBootsHelper$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onPlaySound</ID>
     <ID>PrivateEventListener:StarCultAchievement.kt:StarCultAchievement$@HandleEvent fun onAchievementRegistration</ID>
     <ID>PrivateEventListener:StarCultAchievement.kt:StarCultAchievement$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:StarlynSisterCouponProfit.kt:StarlynSisterCouponProfit$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:StarlynSisterCouponProfit.kt:StarlynSisterCouponProfit$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:StarlynSisterCouponProfit.kt:StarlynSisterCouponProfit$@HandleEvent(onlyOnSkyblock = true) fun onChestGuiRender</ID>
-    <ID>PrivateEventListener:StarlynSisterCouponProfit.kt:StarlynSisterCouponProfit$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:StashCompact.kt:StashCompact$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:StashCompact.kt:StashCompact$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:StashCompact.kt:StashCompact$@HandleEvent fun onIslandChange</ID>

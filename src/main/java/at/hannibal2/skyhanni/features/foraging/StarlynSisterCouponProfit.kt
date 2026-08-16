@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -30,7 +29,6 @@ import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object StarlynSisterCouponProfit {
-
     private val config get() = SkyHanniMod.feature.foraging.starlynContest
 
     private var display = emptyList<Renderable>()
@@ -124,7 +122,7 @@ object StarlynSisterCouponProfit {
             val internalName = item.getInternalNameOrNull() ?: return null
             internalName to item.repoItemName.asComponent()
         } else {
-            val internalName = NeuInternalName.fromItemNameOrNull(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) ?: return null
+            val internalName = NeuInternalName.fromItemNameOrNull(item.hoverName) ?: return null
             internalName to item.hoverName
         }
     }
