@@ -92,7 +92,7 @@ object EntityData {
         lastVisibilityCheck.remove(display.id)
     }
 
-    // TODO: Add event to allow the block to be modified before it is rendered
+    // TODO: Add event to allow the block in the block display to be modified
     @JvmStatic
     fun onBlockDisplayRenderState(display: Display.BlockDisplay, state: BlockState): BlockState {
         val previous = display.blockRenderState()?.blockState
