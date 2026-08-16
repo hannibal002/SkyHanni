@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
@@ -23,8 +24,8 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
@@ -172,7 +173,7 @@ object TunnelsMaps {
         clickTranslate = mapOf()
         if (!commissionInvPattern.matches(event.inventoryName)) return
         clickTranslate = event.inventoryItems.mapNotNull { (slotId, item) ->
-            val lore = item.getCleanLore()
+            val lore = item.getLoreComponent().map { it.string.removeColor() }
             if (!glacitePattern.anyMatches(lore)) return@mapNotNull null
             if (completedPattern.anyMatches(lore)) return@mapNotNull null
             val type = collectorCommissionPattern.firstMatcher(lore) {
@@ -483,8 +484,9 @@ object TunnelsMaps {
     private fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (MinecraftCompat.screen != null) return
-        event.campfireKey()
-        event.nextSpotKey()
+        val keyCode = event.keyCode
+        campfireKey(keyCode)
+        nextSpotKey(keyCode)
     }
 
     @HandleEvent
@@ -495,7 +497,7 @@ object TunnelsMaps {
         nextSpot()
     }
 
-    private fun KeyPressEvent.campfireKey() {
+    private fun campfireKey(keyCode: Int) {
         if (keyCode != config.campfireKey) return
         if (lastBaseCampWarp.passedSince() < 2.seconds) return
         lastBaseCampWarp = SimpleTimeMark.now()
@@ -503,14 +505,14 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    private fun onWarp() {
+    private fun onWarp(event: SkyHanniWarpEvent) {
         if (!isEnabled() || goal == null) return
         DelayedRun.runNextTick { setNextGoal() }
     }
 
     @HandleEvent
-    private fun onIslandChange() {
-        if (closestNode == null) return // Value that must be none null if it was active
+    private fun onIslandLeave() {
+        if (closestNode == null) return // value that must be non null if it was active
         closestNode = null
         clearPath()
         cooldowns.clear()
@@ -519,7 +521,7 @@ object TunnelsMaps {
 
     private var nextSpotDelay = SimpleTimeMark.farPast()
 
-    private fun KeyPressEvent.nextSpotKey() {
+    private fun nextSpotKey(keyCode: Int) {
         if (keyCode == config.nextSpotHotkey) {
             nextSpot()
         }
