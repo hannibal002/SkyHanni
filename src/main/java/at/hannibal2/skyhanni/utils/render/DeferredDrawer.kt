@@ -110,17 +110,6 @@ object DeferredDrawer {
 
     fun deferString(
         location: LorenzVec,
-        text: String,
-        color: Color?,
-        scale: Double,
-        shadow: Boolean,
-        yOffset: Float,
-        backgroundColor: Int,
-        depth: Boolean,
-    ) = deferString(location, text.asComponent(), color, scale, shadow, yOffset, backgroundColor, depth)
-
-    fun deferString(
-        location: LorenzVec,
         component: Component,
         color: Color?,
         scale: Double,

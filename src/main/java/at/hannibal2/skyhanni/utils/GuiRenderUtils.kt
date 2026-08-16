@@ -38,14 +38,6 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.text(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
-    @Suppress("SameParameterValue")
-    private fun drawStringCentered(str: Component, x: Float, y: Float, shadow: Boolean, color: Int) {
-        val strLen = fr.width(str)
-        val x2 = x - strLen / 2f
-        val y2 = y - fr.lineHeight / 2f
-        DrawContextUtils.drawContext.text(fr, str, x2.toInt(), y2.toInt(), color, shadow)
-    }
-
     fun drawStringCentered(str: String, x: Int, y: Int) {
         drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
     }
