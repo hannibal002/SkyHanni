@@ -23,7 +23,6 @@ import net.minecraft.network.chat.Component
 @SkyHanniModule
 object ContributorAchievement {
     private val config get() = SkyHanniMod.feature.dev
-    private val shouldShowMessages get() = AchievementManager.shouldShowMessages
 
     private const val CONTRIBUTOR_ACHIEVEMENT = "Contrib Achievement"
     private const val CONTRIBUTOR_FRIEND_ACHIEVEMENT = "Contrib Friend"
@@ -148,7 +147,7 @@ object ContributorAchievement {
     }
 
     private fun showContributorAchievement(profile: GameProfile, completed: Boolean): Boolean {
-        if (!completed || !shouldShowMessages) return false
+        if (!completed || !AchievementManager.shouldShowMessages) return false
         val message = getDiscoverComponent(profile)
         ChatUtils.chat(message)
         return true
