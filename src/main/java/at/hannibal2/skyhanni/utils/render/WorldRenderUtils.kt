@@ -232,6 +232,10 @@ object WorldRenderUtils {
         color: Color? = null,
         scale: Double = 0.53333333,
         shadow: Boolean = false,
+        /**
+         * Screen-space vertical offset applied after camera-facing rotation.
+         * Positive values move text up on screen, independent of camera angle.
+         */
         yOffset: Float = 0f,
         backgroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) = drawString(location, text.asComponent(), seeThroughBlocks, color, scale, shadow, yOffset, backgroundColor)
