@@ -10,12 +10,14 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import com.mojang.serialization.JsonOps
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.MessageSignature
 import net.minecraft.network.chat.MutableComponent
@@ -37,23 +39,11 @@ import kotlin.time.Duration.Companion.minutes
 private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)
 private val formattedTextCache = TimeLimitedCache<TextCacheKey, String>(3.minutes)
 
-private enum class FormattedTextSettings {
+private enum class FormattedTextSettings(val noExtraResets: Boolean = false, val leadingWhite: Boolean = false) {
     DEFAULT,
-    LESS_RESETS,
-    LEADING_WHITE,
-    LEADING_WHITE_LESS_RESETS,
-    ;
-
-    companion object {
-        fun getByArgs(noExtraResets: Boolean, leadingWhite: Boolean): FormattedTextSettings {
-            return when {
-                noExtraResets && leadingWhite -> LEADING_WHITE_LESS_RESETS
-                noExtraResets -> LESS_RESETS
-                leadingWhite -> LEADING_WHITE
-                else -> DEFAULT
-            }
-        }
-    }
+    LESS_RESETS(noExtraResets = true),
+    LEADING_WHITE(leadingWhite = true),
+    LEADING_WHITE_LESS_RESETS(noExtraResets = true, leadingWhite = true),
 }
 
 private data class TextCacheKey(val settings: FormattedTextSettings, val component: Component)
@@ -76,41 +66,41 @@ private fun Component.computeUnformattedTextCompat(): String {
 fun Component.unformattedTextCompat(): String =
     iterator().joinToString(separator = "") { it.unformattedTextForChatCompat() }
 
-@JvmOverloads
-@Deprecated("Use string unless you really need color codes")
-fun Component?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite: Boolean = false): String {
+private fun Component?.formattedTextCompatInternal(settings: FormattedTextSettings): String {
     this ?: return ""
-    val cacheKey = TextCacheKey(FormattedTextSettings.getByArgs(noExtraResets, leadingWhite), this)
+    val cacheKey = TextCacheKey(settings, this)
     return formattedTextCache.getOrPut(cacheKey) {
-        computeFormattedTextCompat(noExtraResets, leadingWhite)
+        computeFormattedTextCompat(settings)
     }
 }
 
 @Deprecated("Use string unless you really need color codes")
-@Suppress("DEPRECATION")
-fun Component?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
+fun Component?.formattedTextCompat(): String = formattedTextCompatInternal(DEFAULT)
 
 @Deprecated("Use string unless you really need color codes")
-@Suppress("DEPRECATION")
-fun Component?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
+fun Component?.formattedTextCompatLessResets(): String = formattedTextCompatInternal(LESS_RESETS)
 
 @Deprecated("Use string unless you really need color codes")
-@Suppress("DEPRECATION")
+fun Component?.formattedTextCompatLeadingWhite(): String = formattedTextCompatInternal(LEADING_WHITE)
+
+@Deprecated("Use string unless you really need color codes")
 fun Component?.formattedTextCompatLeadingWhiteLessResets(): String =
-    this.formattedTextCompat(noExtraResets = true, leadingWhite = true)
+    formattedTextCompatInternal(LEADING_WHITE_LESS_RESETS)
 
-private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhite: Boolean): String {
+private fun Component?.computeFormattedTextCompat(settings: FormattedTextSettings): String {
     this ?: return ""
     val sb = StringBuilder(50)
     var wasFormatted = false
     for (component in iterator()) {
         val chatStyle = component.style.chatStyle()
-        if (chatStyle.isNotEmpty() && (leadingWhite || (wasFormatted && (sb.length != 2 || sb[0] != '§' || sb[1] != 'r')) || chatStyle != "§f")) {
+        if (chatStyle.isNotEmpty() &&
+            (settings.leadingWhite || (wasFormatted && !sb.contentEquals("§r")) || chatStyle != "§f")
+        ) {
             sb.append(chatStyle)
             wasFormatted = true
         }
         sb.append(component.unformattedTextForChatCompat())
-        if (!noExtraResets) {
+        if (!settings.noExtraResets) {
             sb.append("§r")
             wasFormatted = true
         } else if (component == Component.empty()) {
@@ -174,7 +164,7 @@ fun createResourceLocation(path: String): Identifier {
 
 var Component.hover: Component?
     get() = this.style.hoverEvent?.takeIf {
-        it.action() == HoverEvent.Action.SHOW_TEXT
+        it.action() == SHOW_TEXT
     }?.let { (it as HoverEvent.ShowText).value }
     set(value) {
         value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
@@ -182,7 +172,7 @@ var Component.hover: Component?
 
 var Component.stackHover: SafeItemStack?
     get() = this.style.hoverEvent?.takeIf {
-        it.action() == HoverEvent.Action.SHOW_ITEM
+        it.action() == SHOW_ITEM
     }?.let {
         (it as HoverEvent.ShowItem).item.create()
     }
@@ -196,7 +186,7 @@ var Component.stackHover: SafeItemStack?
 
 var Component.command: String?
     get() = this.style.clickEvent?.takeIf {
-        it.action() == ClickEvent.Action.RUN_COMMAND
+        it.action() == RUN_COMMAND
     }?.let { (it as ClickEvent.RunCommand).command }
     set(value) {
         this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
@@ -204,7 +194,7 @@ var Component.command: String?
 
 var Component.suggest: String?
     get() = this.style.clickEvent?.takeIf {
-        it.action() == ClickEvent.Action.SUGGEST_COMMAND
+        it.action() == SUGGEST_COMMAND
     }?.let { (it as ClickEvent.SuggestCommand).command }
     set(value) {
         this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
@@ -212,7 +202,7 @@ var Component.suggest: String?
 
 var Component.url: String?
     get() = this.style.clickEvent?.takeIf {
-        it.action() == ClickEvent.Action.OPEN_URL
+        it.action() == OPEN_URL
     }?.let { (it as ClickEvent.OpenUrl).uri.toString() }
     set(value) {
         this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
@@ -302,30 +292,26 @@ val defaultStyleConstructor: Style
     get() =
         Style.EMPTY
 
-fun ClickEvent.value(): String {
-    return when (this.action()) {
-        ClickEvent.Action.OPEN_URL -> (this as ClickEvent.OpenUrl).uri.toString()
-        ClickEvent.Action.RUN_COMMAND -> (this as ClickEvent.RunCommand).command
-        ClickEvent.Action.SUGGEST_COMMAND -> (this as ClickEvent.SuggestCommand).command
-        // we don't use these bottom 3 but might as well have them here
-        ClickEvent.Action.CHANGE_PAGE -> (this as ClickEvent.ChangePage).page.toString()
-        ClickEvent.Action.COPY_TO_CLIPBOARD -> (this as ClickEvent.CopyToClipboard).value
-        ClickEvent.Action.OPEN_FILE -> (this as ClickEvent.OpenFile).path
-        // todo use error manager here probably, not doing it now because it doesn't compile on 1.21
-        else -> ""
-    }
-
+fun ClickEvent.value(): String = when (action()) {
+    OPEN_URL -> (this as ClickEvent.OpenUrl).uri.toString()
+    RUN_COMMAND -> (this as ClickEvent.RunCommand).command
+    SUGGEST_COMMAND -> (this as ClickEvent.SuggestCommand).command
+    // we don't use these bottom 3 but might as well have them here
+    CHANGE_PAGE -> (this as ClickEvent.ChangePage).page.toString()
+    COPY_TO_CLIPBOARD -> (this as ClickEvent.CopyToClipboard).value
+    OPEN_FILE -> (this as ClickEvent.OpenFile).path
+    else -> throw NotImplementedError("Action ${action().name} is not implemented")
 }
 
 fun HoverEvent.value(): Component = when (action()) {
-    HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
-    HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.create().hoverName
-    HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
+    SHOW_TEXT -> (this as HoverEvent.ShowText).value
+    SHOW_ITEM -> (this as HoverEvent.ShowItem).item.create().hoverName
+    SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
 }
 
 fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): HoverEvent? = when (action) {
     null -> null
-    HoverEvent.Action.SHOW_TEXT -> HoverEvent.ShowText(component)
+    SHOW_TEXT -> HoverEvent.ShowText(component)
     // I really don't think anyone is using the other 2 lol
     else -> throw NotImplementedError("Action ${action.name} is not implemented")
 }
@@ -344,8 +330,8 @@ fun Component.changeColor(color: LorenzColor): Component {
 }
 
 fun Component.convertToJsonString(): String {
-    return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(
-        com.mojang.serialization.JsonOps.INSTANCE,
+    return ComponentSerialization.CODEC.encodeStart(
+        JsonOps.INSTANCE,
         this,
     ).orThrow.toString()
 }
