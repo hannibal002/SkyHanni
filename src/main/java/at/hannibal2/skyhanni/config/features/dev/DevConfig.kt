@@ -18,6 +18,7 @@ class DevConfig {
 
     // new config values
 
+    @Transient
     @Category(name = "Main Toggles", desc = "Main Toggles")
     val mainToggles: MainTogglesConfig = MainTogglesConfig()
 

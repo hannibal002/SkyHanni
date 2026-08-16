@@ -35,5 +35,9 @@ object DevApi {
         event.move(127, "dev.damageIndicatorBackend", "dev.mainToggles.damageIndicator")
         event.move(127, "dev.mobDebug.enable", "dev.mainToggles.mobDetection")
         event.move(127, "dev.pingApi", "dev.mainToggles.pingApi")
+
+        event.remove(144, "dev.mainToggles.damageIndicator")
+        event.remove(144, "dev.mainToggles.mobDetection")
+        event.remove(144, "dev.mainToggles.pingApi")
     }
 }
