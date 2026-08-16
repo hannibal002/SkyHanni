@@ -24,7 +24,7 @@ class CleanTreeViewConfig {
     @Expose
     @ConfigOption(
         name = "Hide Rune Effects",
-        desc = "Hides floating blocks from the Barkshatter Rune's effect."
+        desc = "Hides other Non Default Floating Tree blocks e.g. Barkshatter Rune's effect."
     )
     @ConfigEditorBoolean
     @FeatureToggle
