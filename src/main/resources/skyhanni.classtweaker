@@ -72,7 +72,6 @@ accessible method net/minecraft/client/renderer/rendertype/RenderType <init> (Lj
 accessible method net/minecraft/network/chat/TextColor <init> (ILjava/lang/String;)V
 extendable class net/minecraft/world/item/ItemStack
 inject-interface net/minecraft/client/renderer/block/FluidModel at/hannibal2/skyhanni/mixins/hooks/FluidModelTransparencyOverride
-inject-interface net/minecraft/client/renderer/entity/state/EntityRenderState at/hannibal2/skyhanni/mixins/hooks/EntityRenderStateStore
 inject-interface net/minecraft/network/chat/MutableComponent at/hannibal2/skyhanni/mixins/hooks/ComponentCreatedStore
 mutable field net/minecraft/client/gui/components/ChatComponent allMessages Ljava/util/List;
 mutable field net/minecraft/client/gui/components/ChatComponent trimmedMessages Ljava/util/List;

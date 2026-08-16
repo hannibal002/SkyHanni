@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.data.EntityData;
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
+import at.hannibal2.skyhanni.mixins.hooks.SkyHanniRenderStateData;
 import at.hannibal2.skyhanni.utils.SkyBlockUtils;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -25,7 +25,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityRenderer.class)
 public abstract class MixinEntityRenderer {
-
     @Inject(method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At("HEAD"), cancellable = true)
     public void onRenderLabelHead(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
@@ -45,12 +44,11 @@ public abstract class MixinEntityRenderer {
     }
 
     @WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;shouldEntityAppearGlowing(Lnet/minecraft/world/entity/Entity;)Z"))
-    public boolean shouldAlsoGlow(Minecraft client, Entity entity, Operation<Boolean> original, @Local(argsOnly = true) EntityRenderState state) {
+    public boolean shouldAlsoGlow(Minecraft client, Entity entity, Operation<Boolean> original) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
         if (glowColor == null) {
             return original.call(client, entity);
         }
-        state.skyhanni$setUsingCustomOutline();
         return true;
     }
 
@@ -65,7 +63,7 @@ public abstract class MixinEntityRenderer {
 
     @Inject(method = "extractRenderState", at = @At("TAIL"))
     public void setEntity(Entity entity, EntityRenderState state, float tickProgress, CallbackInfo ci) {
-        state.skyhanni$setEntity(entity);
+        SkyHanniRenderStateData.setFromEntity(state, entity);
     }
 
     // See modifyRenderLabelIfPresentArgs in MixinPlayerEntityRenderer.

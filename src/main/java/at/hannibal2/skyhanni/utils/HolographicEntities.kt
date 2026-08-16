@@ -4,9 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.mixins.hooks.activeHolographicEntities
+import at.hannibal2.skyhanni.mixins.hooks.SkyHanniRenderStateData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
@@ -74,7 +73,6 @@ object HolographicEntities {
         debugHologram = (base as HolographicBase<Zombie>).instance(pos, player.yRot)
         debugHologramTransparency = transparency
     }
-
 
     @HandleEvent
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
@@ -195,28 +193,22 @@ object HolographicEntities {
         val cameraRenderState = gameRenderer.gameRenderState().levelRenderState.cameraRenderState
         val cameraPos = cameraRenderState.pos
         renderer.extractRenderState(entity, entityRenderState, partialTicks)
-        entityRenderState.`skyhanni$setEntity`(entity)
+        SkyHanniRenderStateData.clearEntityId(entityRenderState)
+        SkyHanniRenderStateData.setEntityTransparency(entityRenderState, (opacity * 255).toInt())
         (entityRenderState as? LivingEntityRenderState)?.isBaby = holographicEntity.isChild
         client.level?.let { level ->
             //~ if < 26.2 'LightCoordsUtil' -> 'LevelRenderer'
             entityRenderState.lightCoords = LightCoordsUtil.getLightCoords(level, mobPosition.toBlockPos())
         }
 
-        activeHolographicEntities.add(entity)
-        try {
-            EntityTransparencyManager.withHolographicTransparency(entity, opacity) {
-                client.entityRenderDispatcher.submit(
-                    entityRenderState,
-                    cameraRenderState,
-                    mobPosition.x - cameraPos.x,
-                    mobPosition.y - cameraPos.y,
-                    mobPosition.z - cameraPos.z,
-                    matrices,
-                    submitNodeCollector,
-                )
-            }
-        } finally {
-            activeHolographicEntities.remove(entity)
-        }
+        client.entityRenderDispatcher.submit(
+            entityRenderState,
+            cameraRenderState,
+            mobPosition.x - cameraPos.x,
+            mobPosition.y - cameraPos.y,
+            mobPosition.z - cameraPos.z,
+            matrices,
+            submitNodeCollector,
+        )
     }
 }

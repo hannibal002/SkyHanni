@@ -19,16 +19,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityRenderDispatcher.class)
 public abstract class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRenderState> {
-
     @Inject(method = "submit", at = @At(value = "HEAD"), cancellable = true)
     public void onRenderPre(EntityRenderState renderState, CameraRenderState cameraRenderState, double d, double e, double f, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
         EntityRenderDispatcherHookKt.setEntity(renderState);
         Entity entity = EntityRenderDispatcherHookKt.getEntity();
-        if (entity instanceof LivingEntity livingEntity
-            && !EntityRenderDispatcherHookKt.getActiveHolographicEntities().contains(livingEntity)) {
+        if (entity instanceof LivingEntity livingEntity) {
             //noinspection deprecation
             if (new SkyHanniRenderEntityEvent.Pre<>(livingEntity, d, e, f).post().isCancelled()) {
                 ci.cancel();
+                EntityRenderDispatcherHookKt.clearEntity();
             }
         }
     }

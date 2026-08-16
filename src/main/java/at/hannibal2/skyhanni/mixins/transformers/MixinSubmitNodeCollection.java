@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
+import at.hannibal2.skyhanni.mixins.hooks.SkyHanniRenderStateData;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.renderer.SubmitNodeCollection;
@@ -25,7 +26,6 @@ import java.util.List;
 
 @Mixin(SubmitNodeCollection.class)
 public abstract class MixinSubmitNodeCollection<E> {
-
     //? if >= 26.2 {
     @Shadow
     @Final
@@ -93,7 +93,7 @@ public abstract class MixinSubmitNodeCollection<E> {
     @Unique
     private void skyhanni$markCustomOutline(Object submit) {
         EntityRenderState currentState = EntityRenderDispatcherHookKt.getEntityRenderState();
-        if (submit instanceof GlowingStateStore casted && currentState != null && currentState.skyhanni$isUsingCustomOutline()) {
+        if (submit instanceof GlowingStateStore casted && currentState != null && SkyHanniRenderStateData.isUsingCustomOutline(currentState)) {
             casted.skyhanni$setUsingCustomOutline();
         }
     }

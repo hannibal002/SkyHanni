@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook;
+import at.hannibal2.skyhanni.mixins.hooks.SkyHanniRenderStateData;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.EntityModel;
@@ -56,10 +56,8 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
         index = 6
     )
     private int modifyRenderAlpha(int argb) {
-        if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
-            Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);
-            if (entityAlpha == null) return argb;
-
+        Integer entityAlpha = EntityRenderDispatcherHookKt.getEntityTransparency();
+        if (entityAlpha != null) {
             int oldAlpha = (argb >> 24) & 0xFF;
             int newAlpha = Math.min(oldAlpha, entityAlpha);
 
@@ -88,13 +86,12 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
     ) {
         return !(state instanceof LivingEntityRenderState livingState &&
             livingState.isInvisible &&
-            livingState.skyhanni$isUsingCustomOutline());
+            SkyHanniRenderStateData.isUsingCustomOutline(livingState));
     }
 
     @Inject(method = "getRenderType", at = @At("HEAD"), cancellable = true)
     public void getRenderState(LivingEntityRenderState state, boolean showBody, boolean translucent, boolean showOutline, CallbackInfoReturnable<RenderType> cir) {
-        if (showBody && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
-            if (EntityTransparencyManager.getEntityTransparency(livingEntity) == null) return;
+        if (showBody && EntityRenderDispatcherHookKt.getEntityTransparency() != null) {
             cir.setReturnValue(RenderTypes.entityTranslucentCullItemTarget(this.getTextureLocation(state)));
         }
     }

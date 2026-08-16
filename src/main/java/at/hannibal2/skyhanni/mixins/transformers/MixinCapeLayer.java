@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.HideArmorHookKt;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
@@ -10,7 +9,6 @@ import net.minecraft.client.renderer.entity.layers.CapeLayer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.PlayerSkin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,7 +16,6 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(CapeLayer.class)
 public abstract class MixinCapeLayer {
-
     // Vanilla shifts the cape onto the chestplate to stop it from clipping. With the chestplate hidden,
     // that offset leaves the cape floating, so it is skipped to put the cape back onto the shoulders.
     @WrapWithCondition(
@@ -31,9 +28,7 @@ public abstract class MixinCapeLayer {
 
     @ModifyArg(method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/AvatarRenderState;FF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"), index = 3)
     private RenderType replaceRenderLayer(RenderType original, @Local PlayerSkin skinTextures) {
-        if (skinTextures.cape() != null && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
-            Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);
-            if (entityAlpha == null) return original;
+        if (skinTextures.cape() != null && EntityRenderDispatcherHookKt.getEntityTransparency() != null) {
             return RenderTypes.entityTranslucentCullItemTarget(skinTextures.cape().texturePath());
         }
         return original;
