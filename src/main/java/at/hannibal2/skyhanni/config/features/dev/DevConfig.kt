@@ -158,7 +158,6 @@ class DevConfig {
 
     // TODO move into Debug Config?
     @Expose
-    @OnlyDevEnv
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
     val mobDebug: DebugMobConfig = DebugMobConfig()
 }
