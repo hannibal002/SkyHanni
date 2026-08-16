@@ -1,25 +1,26 @@
 package at.hannibal2.skyhanni.config.features.misc.tracker.individual
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.IndividualTrackerConfigGuiManager
 import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import at.hannibal2.skyhanni.utils.ChatUtils
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-// have to make this an abstract class and make subclasses that specify the types and add buttons
-// or else moulconfig causes a crash when the user clicks a button
 open class GenericIndividualTrackerConfig<out Type : TrackerGenericConfig>(
     createType: () -> Type
 ) {
     @Expose
+    val trackerConfig: Type = createType()
+
     @ConfigOption(
         name = "Individual Tracker Settings",
-        desc = ""
+        desc = "Click to open the settings that only apply to this tracker."
     )
-    @Accordion
-    val trackerConfig: Type = createType()
+    @ConfigEditorButton(buttonText = "OPEN")
+    val openTrackerSettings: Runnable = Runnable { IndividualTrackerConfigGuiManager.open(this) }
 
     // the first time a user launches the game with a build that includes individual tracker configs,
     // we sync every individual tracker with the universal tracker,
@@ -27,7 +28,7 @@ open class GenericIndividualTrackerConfig<out Type : TrackerGenericConfig>(
     @Expose
     @ConfigOption(
         name = "Use Universal Settings",
-        desc = "Use the config options listed in the universal tracker config instead of the ones above."
+        desc = "Use the config options listed in the universal tracker config instead of the individual ones."
     )
     @ConfigEditorBoolean
     var useUniversalConfig = false
