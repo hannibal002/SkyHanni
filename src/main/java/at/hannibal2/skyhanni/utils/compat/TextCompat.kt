@@ -40,7 +40,6 @@ private val formattedTextCache = TimeLimitedCache<TextCacheKey, String>(3.minute
 private enum class FormattedTextSettings(val noExtraResets: Boolean = false, val leadingWhite: Boolean = false) {
     DEFAULT,
     LESS_RESETS(noExtraResets = true),
-    LEADING_WHITE(leadingWhite = true),
     LEADING_WHITE_LESS_RESETS(noExtraResets = true, leadingWhite = true),
 }
 
@@ -77,9 +76,6 @@ fun Component?.formattedTextCompat(): String = formattedTextCompatInternal(DEFAU
 
 @Deprecated("Use string unless you really need color codes")
 fun Component?.formattedTextCompatLessResets(): String = formattedTextCompatInternal(LESS_RESETS)
-
-@Deprecated("Use string unless you really need color codes")
-fun Component?.formattedTextCompatLeadingWhite(): String = formattedTextCompatInternal(LEADING_WHITE)
 
 @Deprecated("Use string unless you really need color codes")
 fun Component?.formattedTextCompatLeadingWhiteLessResets(): String =

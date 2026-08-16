@@ -1807,14 +1807,6 @@
     <ID>PrivateEventListener:InfernoMinionProfitTracker.kt:InfernoMinionProfitTracker$@HandleEvent(MinionCloseEvent::class) fun onMinionClose</ID>
     <ID>PrivateEventListener:InfernoMinionProfitTracker.kt:InfernoMinionProfitTracker$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onChat</ID>
     <ID>PrivateEventListener:InfernoMinionProfitTracker.kt:InfernoMinionProfitTracker$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onItemAdd</ID>
-    <ID>PrivateEventListener:InstanceChestProfit.kt:InstanceChestProfit$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:InstanceChestProfit.kt:InstanceChestProfit$@HandleEvent(DungeonEnterEvent::class) fun onDungeonEnter</ID>
-    <ID>PrivateEventListener:InstanceChestProfit.kt:InstanceChestProfit$@HandleEvent(GuiKeyPressEvent::class) fun onGuiKeyPress</ID>
-    <ID>PrivateEventListener:InstanceChestProfit.kt:InstanceChestProfit$@HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class) fun onChestGuiRender</ID>
-    <ID>PrivateEventListener:InstanceChestProfit.kt:InstanceChestProfit$@HandleEvent(InventoryCloseEvent::class) fun onInventoryClose</ID>
-    <ID>PrivateEventListener:InstanceChestProfit.kt:InstanceChestProfit$@HandleEvent(KuudraEnterEvent::class) fun onKuudraEnter</ID>
-    <ID>PrivateEventListener:InstanceChestProfit.kt:InstanceChestProfit$@HandleEvent(onlyOnSkyblock = true) fun onRenderItemTip</ID>
-    <ID>PrivateEventListener:InstanceChestProfit.kt:InstanceChestProfit$@HandleEvent(priority = HandleEvent.LOWEST, onlyOnSkyblock = true) fun onBackgroundDrawn</ID>
     <ID>PrivateEventListener:InventoryDetector.kt:InventoryDetector.Companion$@HandleEvent(priority = HandleEvent.HIGHEST) fun onInventoryClose</ID>
     <ID>PrivateEventListener:InventoryDetector.kt:InventoryDetector.Companion$@HandleEvent(priority = HandleEvent.HIGHEST) fun onInventoryOpen</ID>
     <ID>PrivateEventListener:InvisibugHighlighter.kt:InvisibugHighlighter$@HandleEvent fun onConfigFixEvent</ID>
