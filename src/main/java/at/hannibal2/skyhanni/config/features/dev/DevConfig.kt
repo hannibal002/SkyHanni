@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
-import at.hannibal2.skyhanni.config.OnlyDevEnv
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig
 import com.google.gson.annotations.Expose
