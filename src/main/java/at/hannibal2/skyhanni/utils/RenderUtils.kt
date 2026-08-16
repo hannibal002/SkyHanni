@@ -57,15 +57,6 @@ object RenderUtils {
     }
 
     /**
-     * Returns a [Thread] that schedules a block on the Render Thread when started.
-     * Useful for [Runtime.addShutdownHook].
-     */
-    fun threadOnRenderThread(
-        setupFor: Lighting.Entry? = null,
-        block: () -> Any,
-    ) = Thread { scheduleOnRenderThread(setupFor, block) }
-
-    /**
      * Runs or schedules a block on the Render Thread.
      * - If already on the render thread, executes immediately and returns a completed future.
      * - Otherwise, queues and returns a pending future.
@@ -120,19 +111,7 @@ object RenderUtils {
         GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
     }
 
-    fun Slot.drawBorder(color: LorenzColor) {
-        drawBorder(color.toColor())
-    }
-
     fun Slot.drawBorder(color: Color) {
-        drawBorder(color, x, y)
-    }
-
-    fun RenderGuiItemOverlayEvent.drawBorder(color: LorenzColor) {
-        drawBorder(color.toColor())
-    }
-
-    fun RenderGuiItemOverlayEvent.drawBorder(color: Color) {
         drawBorder(color, x, y)
     }
 
