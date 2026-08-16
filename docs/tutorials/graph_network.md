@@ -36,9 +36,13 @@ The node tags **Area** and **Small Area** define the current area for other SkyH
 The feature first finds the closest node to the player. Next, the graph network is traversed starting from this node until an area tag is
 found.
 
-Nodes without a specific area tag are considered to be in the default `no_area`, which covers the whole island.
-Some islands do not have any area at all. On those islands, the API will return `no_area`. Consequently, mod features that strictly require
-defined areas will not function on these islands.
+`no_area` is a reserved name. You place such a node like any other area node, with the **Area** tag and that exact name, but the name itself
+is recognized by the code: a spot that resolves to `no_area` counts as belonging to no named area, and features hide it instead of offering
+it as a destination. Use it to mark the stretches of an island that deliberately have no name of their own. When the traversal ends on such
+a node, the player counts as being in `no_area`.
+
+Some islands have no area nodes at all. There the API always returns `no_area`, so mod features that strictly require a defined area do not
+work on those islands.
 
 #### Current Area
 
@@ -109,7 +113,8 @@ A non-exhaustive list of features:
 - `/shnavigateall <target type>`
     - This allows you to navigate in a circle to all waypoints of a given category, e.g., fairy souls, hoppity eggs, fishing
       hotspots/wormholes.
-    - On Torrhus Canyon, those categories exist additionally: Hideonsun, Honeyhive, Pangolin, Sanger, Tree Protection Order.
+    - Some categories only exist on some islands, for example Honeyhive and Pangolin on Torrhus Canyon, or Safari Bell in the Safari.
+      `GraphNodeTag` in the code holds the full list.
 
 ## Graph Editor
 
@@ -119,6 +124,9 @@ To load the Graph Editor with the existing [Repo data](https://github.com/hannib
 the current island, run `/shgraphloadthisisland`.
 
 Press the **Vision Key** (by default `M`) to toggle visibility of nodes and edges behind blocks.
+
+Nodes further away than the **Max Node Distance** option (50 blocks by default) are not rendered at all. Raise it to see more of the
+network at once.
 
 Once the graph is loaded, you see two GUIs:
 
@@ -163,12 +171,15 @@ If you are more than 3 blocks away, two other things will happen:
 Press the **Select Nearest Node** key after creating a new node, then move around and keep pressing the Place and Select Keys to quickly
 create a new line of nodes in the world.
 
+Enable the **Auto Select Node** option in the config to skip the select step entirely. Every node you place then becomes the active node
+right away, so laying down a path is just the Place Key over and over.
+
 #### Adding and Deleting Edges
 
 When pressing the **Connect Key** (by default `C`), a connection between the selected node (green) and the next closest node (yellow) gets
 created.
 Press **Connect Key** again to delete the edge.
-The normal edge color is blue, the edge between the selected and the nearest node is red.
+The normal edge color is gold, the edge between the selected and the nearest node is red.
 
 #### Moving a Node
 
@@ -188,9 +199,9 @@ the [Repo file](https://github.com/hannibal002/SkyHanni-REPO/tree/main/constants
 
 Additionally, while saving, these three things happen as well:
 
-- The **Error Finder** gets activated.
 - The current graph is applied as the island’s active graph network (optional, toggleable). This serves as the primary way to test changes
   locally right away.
+- The **Error Finder** gets activated. (only if the graph gets used as active network)
 - It shows stats in chat.
 
 ### Named Nodes and Tags
@@ -246,6 +257,9 @@ Apart from adding, deleting and moving nodes and edges, the Graph Editor has a n
 Every action you do in the Graph Editor (adding and removing nodes or edges, renaming nodes, adding and removing tags, node weight changes,
 direction changes of edges), even big actions (loading, unloading the whole graph) can be undone via `Control` + `Z`. It also supports
 Redo via `Control` + `Y`.
+
+Both are bound to the physical key position, which follows the US layout. On a QWERTY keyboard the two are therefore swapped: Undo is
+`Control` + `Y` and Redo is `Control` + `Z`.
 
 #### Select Node by Looking
 
@@ -355,8 +369,8 @@ again minutes later, and it can differ from one player to the next. The files in
 through a pull request, so a state like this has no place in them.
 
 For mapping that means two things. The disabled state is never part of what you save, and `/shgraphloadthisisland` refuses to load the
-island while parts of it are disabled, so a reduced graph does not end up in a PR by accident. Run the command again within 5 seconds if
-you want to load it anyway.
+island while parts of it are disabled, so a reduced graph does not end up in a PR by accident. Run the command again within 5 seconds and
+it re-enables every node first, then loads the complete island.
 
 ### Debug Tools
 
