@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.plot
 
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.pests.SprayType
+import at.hannibal2.skyhanni.features.garden.pests.sprayonator.SprayType
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -73,7 +73,7 @@ class GardenPlot(val id: Int, var inventorySlot: Int, val box: AABB, val middle:
     fun setSpray(spray: SprayType, duration: Duration) {
         getData()?.apply {
             sprayType = spray
-            sprayExpiryTime = SimpleTimeMark.Companion.now() + duration
+            sprayExpiryTime = SimpleTimeMark.now() + duration
             sprayHasNotified = false
         }
     }
@@ -83,7 +83,7 @@ class GardenPlot(val id: Int, var inventorySlot: Int, val box: AABB, val middle:
     fun removeSpray() {
         getData()?.apply {
             sprayType = null
-            sprayExpiryTime = SimpleTimeMark.Companion.now()
+            sprayExpiryTime = SimpleTimeMark.now()
             sprayHasNotified = true
         }
     }

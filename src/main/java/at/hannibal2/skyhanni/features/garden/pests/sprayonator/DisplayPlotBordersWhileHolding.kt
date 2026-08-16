@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.pests
+package at.hannibal2.skyhanni.features.garden.pests.sprayonator
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 
 @SkyHanniModule
-object SprayFeatures {
+object DisplayPlotBordersWhileHolding {
 
     private val config get() = PestApi.config.spray
 

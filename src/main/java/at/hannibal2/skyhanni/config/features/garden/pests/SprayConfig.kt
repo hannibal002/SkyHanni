@@ -1,8 +1,12 @@
 package at.hannibal2.skyhanni.config.features.garden.pests
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -10,22 +14,15 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class SprayConfig {
 
     @Expose
+    @ConfigOption(name = "Spray Display", desc = "")
+    @Accordion
+    val SprayDisplay: SprayDisplayConfig = SprayDisplayConfig()
+
+    @Expose
     @ConfigOption(name = "Draw Plot Border", desc = "Draw plots border when holding the Sprayonator.")
     @ConfigEditorBoolean
     @FeatureToggle
     var drawPlotsBorderWhenInHands: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Spray Display", desc = "Show the active spray and duration for your current plot.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var displayEnabled: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Show If Not Sprayed", desc = "Also show if current plot is not sprayed.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var showNotSprayed: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -42,7 +39,15 @@ class SprayConfig {
     @FeatureToggle
     var newSprayNotification: Boolean = false
 
-    @Expose
-    @ConfigLink(owner = SprayConfig::class, field = "displayEnabled")
-    val displayPosition: Position = Position(390, 75)
+    @SkyHanniModule
+    companion object {
+
+        @HandleEvent
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            val path = "garden.pests.spray."
+            event.move(144, "${path}displayEnabled", "${path}SprayDisplay.displayEnabled")
+            event.move(144, "${path}showNotSprayed", "${path}SprayDisplay.showNotSprayed")
+            event.move(144, "${path}displayPosition", "${path}SprayDisplay.displayPosition")
+        }
+    }
 }
