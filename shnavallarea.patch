@@ -1,0 +1,157 @@
+diff --git a/src/main/java/at/hannibal2/skyhanni/features/misc/pathfind/NavigateAllAreaHelper.kt b/src/main/java/at/hannibal2/skyhanni/features/misc/pathfind/NavigateAllAreaHelper.kt
+new file mode 100644
+index 0000000..474de31
+--- /dev/null
++++ b/src/main/java/at/hannibal2/skyhanni/features/misc/pathfind/NavigateAllAreaHelper.kt
+@@ -0,0 +1,120 @@
++package at.hannibal2.skyhanni.features.misc.pathfind
++
++import at.hannibal2.skyhanni.api.event.HandleEvent
++import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
++import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
++import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
++import at.hannibal2.skyhanni.data.IslandGraphs
++import at.hannibal2.skyhanni.data.model.graph.GraphNode
++import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
++import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
++import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend.getAreaTag
++import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
++import at.hannibal2.skyhanni.utils.ChatUtils
++import at.hannibal2.skyhanni.utils.GraphUtils
++import at.hannibal2.skyhanni.utils.StringUtils
++
++/**
++ * A variation of [NavigateAllHelper] ("/shnavall") that only navigates to nodes belonging to the
++ * SkyBlock area (or small area) the player is currently standing in, instead of navigating to
++ * every node of the requested type on the whole island.
++ *
++ * The player's current area is already tracked continuously by [IslandAreaBackend] (it's what
++ * powers the on-screen area list). To know which area an arbitrary *target* node belongs to, we
++ * do the same thing [IslandAreaBackend] does for the player: walk the node graph outwards from
++ * that node until the closest node tagged [GraphNodeTag.AREA]/[GraphNodeTag.SMALL_AREA] is found,
++ * and treat that as the node's "owning area".
++ */
++@SkyHanniModule
++object NavigateAllAreaHelper {
++
++    // Cache so we don't run a fresh Dijkstra search per target node on every single command call.
++    // Cleared whenever the graph reloads, since node ids/neighbors may have changed.
++    private val ownerAreaCache = mutableMapOf<GraphNode, String?>()
++
++    @HandleEvent(IslandGraphReloadEvent::class)
++    fun onIslandGraphReload() {
++        ownerAreaCache.clear()
++    }
++
++    /** The name of the area/small-area node that is closest (by graph distance) to [this] node. */
++    private fun GraphNode.ownerArea(): String? = ownerAreaCache.getOrPut(this) {
++        GraphUtils.findDijkstraDistances(this) { it.getAreaTag(useConfig = true) != null }
++            .lastVisitedNode
++            .takeIf { it.getAreaTag(useConfig = true) != null }
++            ?.name
++    }
++
++    private fun navigateAllAreaCommand(nodeType: GraphNodeTag) {
++        if (nodeType !in NavigateAllHelper.getValidTagNames()) {
++            ChatUtils.userError("${nodeType.displayName} §cis invalid for navigation on this island!")
++            return
++        }
++
++        val graph = IslandGraphs.currentIslandGraph ?: return
++        val allNodes = graph.getNodesWithTags(nodeType)
++
++        // IslandAreaBackend keeps this updated live as the player walks around.
++        val currentArea = IslandAreaBackend.currentArea.takeIf { it.isNotEmpty() && it != AreaNode.NO_AREA }
++
++        val targetNodes = if (currentArea != null) {
++            allNodes.filter { it.ownerArea() == currentArea }
++        } else {
++            // Not standing inside any tracked area right now - fall back to every node, same as /shnavall.
++            allNodes
++        }
++
++        if (targetNodes.isEmpty()) {
++            ChatUtils.userError(
++                if (currentArea != null) {
++                    "No ${nodeType.displayName} found in your current area (§r$currentArea§c)!"
++                } else {
++                    "No ${nodeType.displayName} found on this island!"
++                },
++            )
++            return
++        }
++
++        NavigateAllHelper.navigateAll(
++            targetNodes,
++            nodeType.displayName,
++            nodeType.color.toColor(),
++            onFinish = {
++                val location = currentArea?.let { " in §r$it" } ?: ""
++                ChatUtils.chat(
++                    "Reached all ${StringUtils.pluralize(targetNodes.size, nodeType.displayName, withNumber = true)}$location§e.",
++                )
++            },
++            continueNavigationCondition = NavigationCondition.None,
++            condition = { true },
++        )
++    }
++
++    @HandleEvent
++    private fun onCommandRegistration(event: CommandRegistrationEvent) {
++        event.registerBrigadier("shnavigateallarea") {
++            description = "Use the path finder to go to all locations of a type inside your current area"
++            aliases = listOf("shnavallarea")
++
++            argCallback(
++                "nodeType",
++                EnumArgumentType.filtered<GraphNodeTag>(
++                    { it.cleanName.replace(" ", "_") },
++                    isGreedy = true,
++                ) { it in NavigateAllHelper.allowedMultiNavigationTags },
++                BrigadierUtils.dynamicSuggestionProvider { NavigateAllHelper.getValidTagNames().map { it.cleanName } },
++            ) { nodeType ->
++                navigateAllAreaCommand(nodeType)
++            }
++            literalCallback("skip") {
++                NavigateAllHelper.handleSkip()
++            }
++            literalCallback("stop") {
++                NavigateAllHelper.handleStop(manual = true)
++            }
++            simpleCallback {
++                ChatUtils.userError("Usage: /shnavigateallarea <location type>")
++            }
++        }
++    }
++}
+diff --git a/src/main/java/at/hannibal2/skyhanni/features/misc/pathfind/NavigateAllHelper.kt b/src/main/java/at/hannibal2/skyhanni/features/misc/pathfind/NavigateAllHelper.kt
+index 2f728d0..af70e5d 100644
+--- a/src/main/java/at/hannibal2/skyhanni/features/misc/pathfind/NavigateAllHelper.kt
++++ b/src/main/java/at/hannibal2/skyhanni/features/misc/pathfind/NavigateAllHelper.kt
+@@ -23,7 +23,7 @@ object NavigateAllHelper {
+ 
+     private const val NAVIGATE_AGAIN_DISTANCE = 5
+ 
+-    private val allowedMultiNavigationTags = setOf(
++    internal val allowedMultiNavigationTags = setOf(
+         GraphNodeTag.HOPPITY,
+         GraphNodeTag.RIFT_EFFIGY,
+         GraphNodeTag.RIFT_MONTEZUMA,
+@@ -193,7 +193,7 @@ object NavigateAllHelper {
+         }
+     }
+ 
+-    private fun handleSkip() {
++    internal fun handleSkip() {
+         if (!currentlyNavigating) {
+             ChatUtils.userError("No current navigation to skip. §eUse /shnavigateall to start navigation")
+             return
+@@ -259,7 +259,7 @@ object NavigateAllHelper {
+         }
+     }
+ 
+-    private fun getValidTagNames(): Set<GraphNodeTag> {
++    internal fun getValidTagNames(): Set<GraphNodeTag> {
+         val activeTags = IslandGraphs.currentIslandGraph?.getActiveNodeTags() ?: return emptySet()
+         return activeTags.filter { it in allowedMultiNavigationTags }.toSet()
+     }
