@@ -16,6 +16,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.level.block.state.BlockState
 import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -89,5 +90,14 @@ object EntityData {
     @JvmStatic
     fun onFreshDisplayRenderState(display: Display) {
         lastVisibilityCheck.remove(display.id)
+    }
+
+    @JvmStatic
+    fun onBlockDisplayRenderState(display: Display.BlockDisplay, state: BlockState) {
+        val previous = display.blockRenderState()
+
+        if (!state.isAir && (previous == null || previous.blockState().isAir)) {
+            onFreshDisplayRenderState(display)
+        }
     }
 }

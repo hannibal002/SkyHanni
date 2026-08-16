@@ -18,13 +18,7 @@ public abstract class MixinBlockDisplay {
         index = 0
     )
     private BlockState onBlockRenderStateCreated(BlockState state) {
-        var self = (Display.BlockDisplay) (Object) this;
-        var previous = self.blockRenderState();
-
-        if (!state.isAir() && (previous == null || previous.blockState().isAir())) {
-            EntityData.onFreshDisplayRenderState(self);
-        }
-
+        EntityData.onBlockDisplayRenderState((Display.BlockDisplay) (Object) this, state);
         return state;
     }
 }
