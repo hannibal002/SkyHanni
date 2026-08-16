@@ -64,7 +64,6 @@ object SkyHanniVertexFormats {
     /*/**
      * Registers a VertexFormatElement with the given parameters, automatically finding an available ID if the desired one is taken.
      * Logs an error if the desired ID was already taken, but still registers the element with a valid ID.
-     *
      * @param desiredId The preferred ID for the VertexFormatElement.
      * @param index The index of the element in the vertex format (default is 0).
      * @param type The data type of the element (default is FLOAT).
