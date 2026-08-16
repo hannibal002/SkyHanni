@@ -13,11 +13,11 @@ public abstract class MixinDisplay {
         method = "tick",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/Display;updateRenderSubState(ZF)V",
+            target = "Lnet/minecraft/world/entity/Display;createFreshRenderState()Lnet/minecraft/world/entity/Display$RenderState;",
             shift = At.Shift.AFTER
         )
     )
-    private void onRenderSubStateUpdated(CallbackInfo ci) {
-        EntityData.displayDataChanged((Display) (Object) this);
+    private void onFreshRenderStateCreated(CallbackInfo ci) {
+        EntityData.onFreshDisplayRenderState((Display) (Object) this);
     }
 }
