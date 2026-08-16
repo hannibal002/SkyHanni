@@ -3,12 +3,10 @@ package at.hannibal2.skyhanni.config.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SprayConfig {
@@ -16,7 +14,7 @@ class SprayConfig {
     @Expose
     @ConfigOption(name = "Spray Display", desc = "")
     @Accordion
-    val SprayDisplay: SprayDisplayConfig = SprayDisplayConfig()
+    val sprayDisplay: SprayDisplayConfig = SprayDisplayConfig()
 
     @Expose
     @ConfigOption(name = "Draw Plot Border", desc = "Draw plots border when holding the Sprayonator.")
@@ -45,9 +43,9 @@ class SprayConfig {
         @HandleEvent
         private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             val path = "garden.pests.spray."
-            event.move(144, "${path}displayEnabled", "${path}SprayDisplay.displayEnabled")
-            event.move(144, "${path}showNotSprayed", "${path}SprayDisplay.showNotSprayed")
-            event.move(144, "${path}displayPosition", "${path}SprayDisplay.displayPosition")
+            event.move(144, "${path}displayEnabled", "${path}sprayDisplay.displayEnabled")
+            event.move(144, "${path}showNotSprayed", "${path}sprayDisplay.showNotSprayed")
+            event.move(144, "${path}displayPosition", "${path}sprayDisplay.displayPosition")
         }
     }
 }

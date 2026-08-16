@@ -15,7 +15,7 @@ object DisplayPlotBordersWhileHolding {
     private val config get() = PestApi.config.spray
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.drawPlotsBorderWhenInHands) return
         if (!PestApi.hasSprayonatorInHand()) return
         val plot = GardenPlotApi.currentPlot ?: return

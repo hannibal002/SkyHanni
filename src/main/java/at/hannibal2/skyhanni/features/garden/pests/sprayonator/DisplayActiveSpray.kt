@@ -8,18 +8,12 @@ import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.plot.GardenPlot
-import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColorChatFormatting
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
-import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.ChatFormatting
@@ -28,7 +22,7 @@ import net.minecraft.network.chat.Component
 @SkyHanniModule
 object DisplayActiveSpray {
 
-    private val config get() = PestApi.config.spray.SprayDisplay
+    private val config get() = PestApi.config.spray.sprayDisplay
     private var staticDisplayLines: Component? = null
     private var currentSprayPlot: GardenPlot? = null
     private var builtDisplay: Renderable? = null

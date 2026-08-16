@@ -11,10 +11,8 @@ import at.hannibal2.skyhanni.events.garden.GardenPlotSprayEvent
 import at.hannibal2.skyhanni.events.garden.GardenPlotSprayDataTablistReadEvent
 import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.sprayonator.SprayType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
@@ -23,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.getTablistEndTime
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
@@ -125,7 +122,7 @@ object GardenPlotApi {
      */
     private val plotSprayExpiredPattern by patternGroup.pattern(
         "spray.expired",
-        "SPRAYONATOR! The smell of (?<spray>[\\w+ ]+) on Plot - (?<plot>.+) ran out!"
+        "SPRAYONATOR! The smell of (?<spray>[\\w+ ]+) on Plot - (?<plot>.+) ran out!",
     )
 
     /**
@@ -207,7 +204,6 @@ object GardenPlotApi {
         val expiry: SimpleTimeMark,
         val type: SprayType,
     )
-
 
 
     fun getPlot(location: LorenzVec): GardenPlot? {
