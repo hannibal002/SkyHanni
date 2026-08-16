@@ -14,7 +14,6 @@ class MainTogglesConfig {
     @ConfigEditorInfoText
     val note: String = ""
 
-    @Expose
     @ConfigOption(
         name = "Damage Indicator",
         desc = "Enable the backend of the Damage Indicator.",
@@ -22,12 +21,10 @@ class MainTogglesConfig {
     @ConfigEditorBoolean
     var damageIndicator: Boolean = true
 
-    @Expose
     @ConfigOption(name = "Mob Detection Enable", desc = "Turn off and on again to reset all mobs.")
     @ConfigEditorBoolean
     var mobDetection: Boolean = true
 
-    @Expose
     @ConfigOption(
         name = "Ping API",
         desc = "Make the client always send ping packets to the server as if the debug HUD was open so that we can calculate your ping.",

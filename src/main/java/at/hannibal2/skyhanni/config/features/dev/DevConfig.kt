@@ -18,7 +18,6 @@ class DevConfig {
 
     // new config values
 
-    @Expose
     @Category(name = "Main Toggles", desc = "Main Toggles")
     val mainToggles: MainTogglesConfig = MainTogglesConfig()
 
