@@ -41,7 +41,7 @@ object WormholeFinder {
     private var lastPlayerPos: LorenzVec? = null
 
     @HandleEvent(onlyOnIslands = [IslandType.LOTUS_ATOLL, IslandType.CRIMSON_ISLE])
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!config.enabled) return
         if (!event.isMod(10)) return
         if (!wearingFroggles()) return
@@ -73,7 +73,6 @@ object WormholeFinder {
         lastPlayerPos = playerPos
     }
 
-
     private fun matchArrow(arrow: Display.TextDisplay): GraphNode? {
         val graph = IslandGraphs.currentIslandGraph ?: return null
         val origin = arrow.getLorenzVec()
@@ -91,7 +90,7 @@ object WormholeFinder {
     }
 
     @HandleEvent(onlyOnIslands = [IslandType.LOTUS_ATOLL, IslandType.CRIMSON_ISLE])
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.enabled) return
         if (!wearingFroggles()) return
         for (wormhole in matchedWormholes) {
@@ -101,7 +100,7 @@ object WormholeFinder {
     }
 
     @HandleEvent(onlyOnIslands = [IslandType.LOTUS_ATOLL, IslandType.CRIMSON_ISLE])
-    fun onPlaySound(event: PlaySoundEvent) {
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (!config.enabled || !config.departureAlert) return
         if (!wearingFroggles()) return
         if (!(event.soundName == "entity.enderman.teleport" && event.pitch == 0.6984127f)) return
@@ -111,7 +110,7 @@ object WormholeFinder {
     }
 
     @HandleEvent
-    fun onIslandLeave() {
+    private fun onIslandLeave() {
         matchedWormholes = emptyList()
         currentTarget = null
         lastPlayerPos = null

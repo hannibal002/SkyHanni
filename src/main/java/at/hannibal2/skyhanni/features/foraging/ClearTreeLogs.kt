@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.DisplayEntityUtils.rotation
 import at.hannibal2.skyhanni.utils.DisplayEntityUtils.transformation
 import at.hannibal2.skyhanni.utils.DisplayEntityUtils.uniformScale
 import com.google.gson.JsonObject
@@ -63,7 +62,7 @@ object ClearTreeLogs {
     }
 
     private fun isFloatingTreeBlock(entity: Display): Boolean? {
-        val rotation = entity.rotation
+        val rotation = entity.lookAngle
         if (abs(rotation.y()) > EPSILON) return false
         val transformation = entity.transformation ?: return null
         val scale = transformation.uniformScale ?: return false

@@ -11,8 +11,6 @@ object DisplayEntityUtils {
             return renderState()?.transformation?.get(0f)
         }
 
-    inline val Display.rotation: Vec3 get() = this.lookAngle
-
     fun Display.TextDisplay.arrowForwardVec(): LorenzVec {
         val quat = transformation?.leftRotation() ?: return LorenzVec(0, 0, 1)
         val localY = Vector3f(0f, 1f, 0f)
