@@ -41,6 +41,14 @@ data class SkyBlockTime(
         return fromTimeMark(SimpleTimeMark(millis))
     }
 
+    fun isSunny(): Boolean {
+        return hour <= 12
+    }
+
+    fun isNight(): Boolean {
+        return !isSunny()
+    }
+
     companion object {
         const val SKYBLOCK_EPOCH_START_MILLIS = 1559829300000L // Day 1, Year 1
         const val SKYBLOCK_YEAR_MILLIS = 124 * 60 * 60 * 1000L
