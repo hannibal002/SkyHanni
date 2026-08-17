@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DisplayEntityUtils.rotation
 import at.hannibal2.skyhanni.utils.DisplayEntityUtils.transformation
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
@@ -251,7 +252,7 @@ object CopyNearbyEntitiesCommand {
     @Suppress("UnnecessarySafeCall")
     private fun MutableList<String>.addDisplayEntity(entity: Display) {
         add("EntityDisplay:")
-        val rotation = entity.lookAngle
+        val rotation = entity.rotation
         val transformation = entity.transformation ?: return
 
         add("-  rotation: $rotation")

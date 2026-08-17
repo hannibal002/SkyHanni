@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.DisplayEntityUtils.isRotated
 import at.hannibal2.skyhanni.utils.DisplayEntityUtils.transformation
 import at.hannibal2.skyhanni.utils.DisplayEntityUtils.uniformScale
 import com.google.gson.JsonObject
-import com.mojang.math.Transformation
 import net.minecraft.world.entity.Display
 import net.minecraft.world.level.block.Blocks
 
@@ -40,8 +39,8 @@ object ClearTreeLogs {
             return
         }
 
-        val transformation = entity.transformation ?: return
-        val shouldCancel = if (isFloatingTreeBlock(transformation)) {
+        val isFloating = isFloatingTreeBlock(entity) ?: return
+        val shouldCancel = if (isFloating) {
             config.hideTreeBlocks
         } else {
             config.hideRuneEffects
@@ -61,8 +60,9 @@ object ClearTreeLogs {
         }
     }
 
-    private fun isFloatingTreeBlock(transformation: Transformation): Boolean {
-        if (transformation.isRotated) return false
+    private fun isFloatingTreeBlock(entity: Display): Boolean? {
+        if (entity.isRotated) return false
+        val transformation = entity.transformation ?: return null
         val scale = transformation.uniformScale ?: return false
         return scale in SCALE_RANGE
     }
