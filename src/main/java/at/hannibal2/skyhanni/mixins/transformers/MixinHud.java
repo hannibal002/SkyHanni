@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.minecraftevents.RenderEvents;
 import at.hannibal2.skyhanni.data.ScoreboardData;
 import at.hannibal2.skyhanni.events.TitleReceivedEvent;
 import at.hannibal2.skyhanni.features.chat.ChatPeek;
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard;
 import at.hannibal2.skyhanni.utils.compat.TextCompatKt;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -28,13 +27,6 @@ import net.minecraft.client.gui.Hud;
 //~ if < 26.2 'Hud' -> 'Gui'
 @Mixin(Hud.class)
 public abstract class MixinHud {
-
-    @Inject(method = "displayScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/scores/Objective;)V", at = @At("HEAD"), cancellable = true)
-    public void renderScoreboard(GuiGraphicsExtractor drawContext, Objective objective, CallbackInfo ci) {
-        if (CustomScoreboard.isHideVanillaScoreboardEnabled()) {
-            ci.cancel();
-        }
-    }
 
     @Inject(method = "extractItemHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
