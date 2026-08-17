@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -33,7 +34,7 @@ object DungeonHideItems {
 
     private val config get() = SkyHanniMod.feature.dungeon.objectHider
 
-    private val hideParticles = mutableMapOf<ArmorStand, SimpleTimeMark>()
+    private val hideParticles = TimeLimitedSet<ArmorStand>(expireAfterWrite = 100.milliseconds, useWeakKeys = true)
     private val movingSkeletonSkulls = mutableMapOf<ArmorStand, SimpleTimeMark>()
 
     private val SOUL_WEAVER_HIDER by SkullTextureHolder.texture("DUNGEONS_SOUL_WEAVER")
@@ -134,7 +135,7 @@ object DungeonHideItems {
 
         return when {
             config.hideSuperboomTNT && headName != null && superboomTntPattern.matches(headName) -> {
-                hideParticles[entity] = SimpleTimeMark.now()
+                hideParticles.add(entity)
                 true
             }
             config.hideSuperboomTNT && superboomTntPattern.matches(entityName) -> true
@@ -143,14 +144,14 @@ object DungeonHideItems {
             config.hideBlessing && blessingPattern.matches(entityName) -> true
 
             config.hideReviveStone && skullTexture.matchesTexture(REVIVE_STONE_TEXTURE) -> {
-                hideParticles[entity] = SimpleTimeMark.now()
+                hideParticles.add(entity)
                 true
             }
             config.hideReviveStone && reviveStonePattern.matches(entityName) -> true
 
             config.hidePremiumFlesh && skullTexture.matchesTexture(PREMIUM_FLESH_TEXTURE) -> true
             config.hidePremiumFlesh && premiumFleshPattern.matches(entityName) -> {
-                hideParticles[entity] = SimpleTimeMark.now()
+                hideParticles.add(entity)
                 true
             }
 
@@ -164,7 +165,7 @@ object DungeonHideItems {
                     skullTexture.matchesTexture(SUPPORT_ORB_TEXTURE) ||
                     skullTexture.matchesTexture(DAMAGE_ORB_TEXTURE)
                 ) -> {
-                hideParticles[entity] = SimpleTimeMark.now()
+                hideParticles.add(entity)
                 true
             }
             config.hideHealerOrbs && (
@@ -186,7 +187,7 @@ object DungeonHideItems {
         if (!config.hideSuperboomTNT && !config.hideReviveStone) return
 
         val packetLocation = event.location
-        for (armorStand in hideParticles.filterValues { it.passedSince() < 100.milliseconds }.keys) {
+        for (armorStand in hideParticles) {
             val distance = packetLocation.distance(armorStand.getLorenzVec())
             if (distance < 2) {
                 if (event.type == ParticleTypes.FIREWORK) {
