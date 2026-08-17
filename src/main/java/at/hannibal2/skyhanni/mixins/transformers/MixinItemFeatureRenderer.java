@@ -92,7 +92,7 @@ public abstract class MixinItemFeatureRenderer {
         Object obj = (Object) itemCommand;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
             //? if >= 26.2 {
-            SkyHanniOutlineHook.wrapCustomOutlineBuild(original, instance, renderType);
+            return SkyHanniOutlineHook.wrapCustomOutlineBuild(original, instance, renderType);
             //?} else
             //return SkyHanniOutlineHook.getVertexConsumers().getBuffer(renderType);
         }

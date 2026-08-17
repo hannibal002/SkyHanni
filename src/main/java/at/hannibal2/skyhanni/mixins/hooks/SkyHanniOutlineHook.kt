@@ -95,7 +95,7 @@ object SkyHanniOutlineHook {
         try {
             original.call(renderType, executeInfo)
         } finally {
-            finishRendering()
+            if (hasCustomOutline) finishRendering()
         }
     }
     //?}
