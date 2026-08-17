@@ -15,13 +15,12 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onEnable
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -30,6 +29,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
@@ -58,17 +58,21 @@ object FarmingWeightData {
     private var hasFetchedCropWeights = false
     private var shouldRecalculateWeight = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = GARDEN)
     private fun onConfigLoad() {
-        ConditionalUtils.onToggle(config.enabled) {
-            if (!isEnabled()) return@onToggle
+        config.enabled.onEnable {
             ChatUtils.debug("Updating EliteSkyBlock collections because leaderboard features were toggled on")
             updateCollections()
         }
     }
 
+    @HandleEvent
+    private fun onProfileJoin() {
+        reset()
+    }
+
     @HandleEvent(onlyOnIsland = GARDEN)
-    private fun onIslandJoin(event: IslandJoinEvent) {
+    private fun onIslandJoin() {
         if (!isEnabled()) return
         ChatUtils.debug("Updating EliteSkyBlock collections on Garden join")
         updateCollections()
@@ -86,8 +90,9 @@ object FarmingWeightData {
         if (weightGain >= 5.0) shouldRecalculateWeight = true // weight desyncs over time due to mushroom weight calc
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIsland = GARDEN)
     private fun onTick(event: SkyHanniTickEvent) {
+        if (!isEnabled()) return
         if (!event.isMod(5)) return
 
         SkyHanniMod.launchIOCoroutine("get crop weights") {
@@ -110,7 +115,7 @@ object FarmingWeightData {
             }
         }
         if (shouldRecalculateWeight) {
-            weightMap[EliteLeaderboardMode.ALL_TIME] = recalculateTotalWeight()
+            weightMap[ALL_TIME] = recalculateTotalWeight()
         }
         val weight = weightMap[leaderboardMode]
         if (cropWeightOnly) {
