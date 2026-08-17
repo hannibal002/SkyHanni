@@ -4,9 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.fishing.BaitUpdateEvent
-import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import kotlin.time.Duration.Companion.seconds
 
@@ -18,14 +19,17 @@ object FishingBaitWarnings {
     private var lastBait: FishingApi.BaitType? = null
     private var wasUsingBait = true
 
+    private val DARK_BAIT = "DARK_BAIT".toInternalName()
+    private val LIGHT_BAIT = "LIGHT_BAIT".toInternalName()
+
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         lastBait = null
         wasUsingBait = true
     }
 
     @HandleEvent
-    fun onBaitUpdate(event: BaitUpdateEvent) {
+    private fun onBaitUpdate(event: BaitUpdateEvent) {
         if (!FishingApi.holdingRod) {
             wasUsingBait = false
             lastBait = null
@@ -46,8 +50,25 @@ object FishingBaitWarnings {
     }
 
     @HandleEvent
-    fun onBobberCast(event: FishingBobberCastEvent) {
+    private fun onBobberCast() {
         if (config.noBaitWarning && !wasUsingBait) showNoBaitWarning()
+        if (config.darkAndLightWarning) showDarkAndLightBaitWarning()
+    }
+
+    private fun showDarkAndLightBaitWarning() {
+        val currentBait = FishingApi.currentBait ?: return
+        val shouldBeDay = when (currentBait.internalName) {
+            LIGHT_BAIT -> true
+            DARK_BAIT -> false
+            else -> return
+        }
+        val hasSun = isSunny()
+        if (shouldBeDay != hasSun) {
+            SoundUtils.playClickSound()
+            TitleManager.sendTitle("§eWrong Bait!", duration = 2.seconds)
+            val timeText = if (hasSun) "Day" else "Night"
+            ChatUtils.chat("You are using ${currentBait.displayName} while it is $timeText")
+        }
     }
 
     private fun showBaitChangeWarning(before: String, after: String) {
@@ -60,5 +81,9 @@ object FishingBaitWarnings {
         SoundUtils.playErrorSound()
         TitleManager.sendTitle("§cNo bait is used!", duration = 2.seconds)
         ChatUtils.chat("You're not using any fishing baits!")
+    }
+
+    private fun isSunny(): Boolean {
+        return SkyBlockTime.now().hour <= 12
     }
 }
