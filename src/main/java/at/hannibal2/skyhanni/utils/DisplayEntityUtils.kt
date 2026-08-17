@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import com.mojang.math.Transformation
 import net.minecraft.world.entity.Display
-import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
 
 object DisplayEntityUtils {
