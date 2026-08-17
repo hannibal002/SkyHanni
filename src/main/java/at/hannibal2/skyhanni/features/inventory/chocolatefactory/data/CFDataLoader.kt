@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -327,8 +328,8 @@ object CFDataLoader {
     private fun processChocolateItem(item: SafeItemStack) {
         val profileStorage = profileStorage ?: return
 
-        CFApi.chocolateAmountPattern.matchMatcher(item.cleanName) {
-            profileStorage.currentChocolate = group("amount").formatLong()
+        SkyblockCurrency.CHOCOLATE.readAmountOrNull(item.cleanName)?.let {
+            profileStorage.currentChocolate = it
         }
         for (line in item.getLore()) {
             chocolatePerSecondPattern.matchMatcher(line) {
