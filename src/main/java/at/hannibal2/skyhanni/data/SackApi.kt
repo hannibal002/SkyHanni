@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.events.SackOpenEvent
@@ -33,9 +32,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -46,7 +45,6 @@ private typealias GemstoneType = SkyBlockItemModifierUtils.GemstoneType
 
 @SkyHanniModule
 object SackApi {
-
     private val sackDisplayConfig get() = SkyHanniMod.feature.inventory.sackDisplay
     private val chatConfig get() = SkyHanniMod.feature.chat
     private val patternGroup = RepoPattern.group("data.sacks")
@@ -155,7 +153,7 @@ object SackApi {
         private set
 
     @HandleEvent
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         isRuneSack = false
         isGemstoneSack = false
         gemstoneStackFilter = null
@@ -167,7 +165,7 @@ object SackApi {
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         val isNewInventory = inventoryName != lastOpenedInventory
         lastOpenedInventory = inventoryName
@@ -323,16 +321,16 @@ object SackApi {
     private val sackChangeRegex = Regex("""([+-][\d,]+) (.+) \((.+)\)""")
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!event.cleanMessage.startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
-            sibling.hover?.string?.removeColor()?.takeIf {
+            sibling.hover?.stripped?.takeIf {
                 it.startsWith("Added")
             }
         }.orEmpty()
         val sackRemoveText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
-            sibling.hover?.string?.removeColor()?.takeIf {
+            sibling.hover?.stripped?.takeIf {
                 it.startsWith("Removed")
             }
         }.orEmpty()
@@ -363,7 +361,7 @@ object SackApi {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val sacksData = event.getConstant<NeuSacksJson>("sacks").sacks
         uniqueSackItems = sacksData.values.flatMap { it.contents }.toSet()
         sacks = sacksData.mapValues { it.value.contents }
@@ -377,8 +375,8 @@ object SackApi {
         }.toSet()
     }
 
-    @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
-    fun onProfileJoin() {
+    @HandleEvent(priority = HandleEvent.HIGH)
+    private fun onProfileJoin() {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
     }
 
@@ -489,7 +487,7 @@ object SackApi {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestsackapi") {
             description = "Get the amount of an item in sacks according to internal feature SackAPI"
             category = CommandCategory.DEVELOPER_DEBUG
@@ -512,7 +510,6 @@ data class SackItem(
     @Expose val lastChange: Int,
     @Expose private val status: SackStatus?,
 ) {
-
     fun getStatus() = status ?: SackStatus.MISSING
     fun statusIsCorrectOrAlright() = getStatus().let { it == SackStatus.CORRECT || it == SackStatus.ALRIGHT }
 }
