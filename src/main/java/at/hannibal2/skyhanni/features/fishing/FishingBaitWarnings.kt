@@ -52,10 +52,10 @@ object FishingBaitWarnings {
     @HandleEvent
     private fun onBobberCast() {
         if (config.noBaitWarning && !wasUsingBait) showNoBaitWarning()
-        if (config.darkAndLightWarning) showDarkAndLightBaitWarning()
+        if (config.darkAndLightWarning) checkDarkAndLightWarning()
     }
 
-    private fun showDarkAndLightBaitWarning() {
+    private fun checkDarkAndLightWarning() {
         val currentBait = FishingApi.currentBait ?: return
         val shouldBeDaytime = when (currentBait.internalName) {
             LIGHT_BAIT -> true
