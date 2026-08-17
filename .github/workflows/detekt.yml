@@ -41,14 +41,14 @@ jobs:
                 uses: ./.github/actions/gradle-retry
                 continue-on-error: true
                 with:
-                    gradle-command: :26.1:detektMain --stacktrace
+                    gradle-command: :26.2:detektMain --stacktrace
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 id: run_detekt_fork
                 if: github.repository != 'hannibal002/SkyHanni'
                 uses: ./.github/actions/gradle-retry
                 continue-on-error: true
                 with:
-                    gradle-command: :26.1:detektMain --stacktrace
+                    gradle-command: :26.2:detektMain --stacktrace
 
             -   name: Check if SARIF file exists
                 if: always()
