@@ -191,7 +191,8 @@ object DungeonHideItems {
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     private fun onParticle(event: ParticleEvent) {
         if (!config.hideSuperboomTNT && !config.hideReviveStone &&
-            !config.hidePremiumFlesh && !config.hideHealerOrbs) return
+            !config.hidePremiumFlesh && !config.hideHealerOrbs
+        ) return
 
         val packetLocation = event.location
         for (armorStand in hideParticles) {
