@@ -57,11 +57,11 @@ object MiningCommissionsBlocksColor {
 
     private var oldSneakState = false
     private var dirty = false
-    private var replaceBlocksMapCache = mutableMapOf<BlockState, BlockState>()
+    private val replaceBlocksMapCache = mutableMapOf<BlockState, BlockState>()
 
     // TODO Commission API
-    @HandleEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    @HandleEvent(onlyOnIslandTypeTag = [ADVANCED_MINING])
+    private fun onTabListUpdate(event: TabListUpdateEvent) {
         for (block in CommissionBlock.entries) {
             val tabList = " ${block.commissionName}: "
             val newValue = event.tabList.any { it.string.startsWith(tabList) && !it.string.contains("DONE") }
@@ -76,8 +76,8 @@ object MiningCommissionsBlocksColor {
     private val ignoredTabListCommissions = TimeLimitedSet<CommissionBlock>(5.seconds)
 
     // TODO Commission API
-    @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    @HandleEvent(onlyOnIslandTypeTag = [ADVANCED_MINING])
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!enabled) return
         commissionCompletePattern.matchMatcher(event.message) {
             val name = group("name")
@@ -89,7 +89,7 @@ object MiningCommissionsBlocksColor {
     }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         val newEnabled = (inCrystalHollows || inGlacite) && config.enabled
         var reload = false
         if (newEnabled != enabled) {
@@ -117,14 +117,14 @@ object MiningCommissionsBlocksColor {
         }
 
         if (reload) {
-            replaceBlocksMapCache = mutableMapOf()
+            replaceBlocksMapCache.clear()
             MinecraftCompat.reloadChunks()
             dirty = false
         }
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad(event: ConfigLoadEvent) {
         color = config.color.get().toDyeColor()
         config.sneakQuickToggle.onToggle {
             oldSneakState = false
@@ -140,13 +140,13 @@ object MiningCommissionsBlocksColor {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         enabled = false
-        replaceBlocksMapCache = mutableMapOf()
+        replaceBlocksMapCache.clear()
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mining Commissions Blocks Color")
         if (!enabled) {
             event.addIrrelevant("not enabled")
