@@ -5,9 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MiningApi.inCrystalHollows
 import at.hannibal2.skyhanni.data.MiningApi.inDwarvenMines
 import at.hannibal2.skyhanni.data.MiningApi.inGlacite
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor.CommissionBlock.Companion.onColor
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.isOreType
@@ -15,6 +16,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.firstComponentMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
@@ -34,12 +37,16 @@ object MiningCommissionsBlocksColor {
 
     private val patternGroup = RepoPattern.group("mining.commissions")
 
+    init {
+        CommissionBlock.entries.forEach { it.commissionPattern }
+    }
+
     /**
-     * REGEX-TEST: §a§lCITRINE GEMSTONE COLLECTOR §r§eCommission Complete! Visit the King §r§eto claim your rewards!
+     * REGEX-TEST: CITRINE GEMSTONE COLLECTOR Commission Complete! Visit the King to claim your rewards!
      */
     private val commissionCompletePattern by patternGroup.pattern(
-        "complete",
-        "§a§l(?<name>.*) §r§eCommission Complete! Visit the King §r§eto claim your rewards!",
+        "complete.colorless",
+        "(?<name>.*) Commission Complete! Visit the King to claim your rewards!",
     )
 
     private var color = DyeColor.RED
@@ -61,13 +68,15 @@ object MiningCommissionsBlocksColor {
 
     // TODO Commission API
     @HandleEvent(onlyOnIslandTypeTag = [ADVANCED_MINING])
-    private fun onTabListUpdate(event: TabListUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.COMMISSIONS)) return
         for (block in CommissionBlock.entries) {
-            val tabList = " ${block.commissionName}: "
-            val newValue = event.tabList.any { it.string.startsWith(tabList) && !it.string.contains("DONE") }
-            if (block.highlight != newValue) {
-                if (newValue && block in ignoredTabListCommissions) continue
-                block.highlight = newValue
+            val shouldHighlight = block.commissionPattern.firstComponentMatcher(event.widget.lines) {
+                groupOrNull("done") == null
+            } ?: continue
+            if (block.highlight != shouldHighlight) {
+                if (shouldHighlight && block in ignoredTabListCommissions) continue
+                block.highlight = shouldHighlight
                 dirty = true
             }
         }
@@ -79,7 +88,7 @@ object MiningCommissionsBlocksColor {
     @HandleEvent(onlyOnIslandTypeTag = [ADVANCED_MINING])
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!enabled) return
-        commissionCompletePattern.matchMatcher(event.message) {
+        commissionCompletePattern.matchMatcher(event.cleanMessage) {
             val name = group("name")
             val block = CommissionBlock.entries.find { it.commissionName.equals(name, ignoreCase = true) } ?: return
             block.highlight = false
@@ -228,6 +237,11 @@ object MiningCommissionsBlocksColor {
             OreType.ONYX,
         ),
         ;
+
+        val commissionPattern by patternGroup.pattern(
+            "commission",
+            " $commissionName: .*?(?<done>DONE)?"
+        )
 
         companion object {
             fun CommissionBlock.onColor(state: BlockState): BlockState =
