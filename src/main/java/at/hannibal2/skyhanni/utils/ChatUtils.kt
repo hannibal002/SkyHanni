@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import at.hannibal2.skyhanni.utils.compat.addChatMessageToChat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
@@ -42,7 +43,6 @@ private const val CHAT_PREFIX = "[SkyHanni] "
 
 @SkyHanniModule
 object ChatUtils {
-
     // TODO log based on chat category (error, warning, debug, user error, normal)
     private val log = SkyHanniLogger("chat/mod_sent")
     var lastButtonClicked = 0L
@@ -172,7 +172,7 @@ object ChatUtils {
         log.log(formattedMessage)
 
         if (!MinecraftCompat.localPlayerExists) {
-            consoleLog(message.string.removeColor())
+            consoleLog(message.stripped)
             return false
         }
 
@@ -351,7 +351,7 @@ object ChatUtils {
     private var deleteNext: Pair<String, (Component) -> Boolean>? = null
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         val (reason, predicate) = deleteNext ?: return
         this.deleteNext = null
 
@@ -361,7 +361,7 @@ object ChatUtils {
     }
 
     @HandleEvent
-    fun onSendMessage(event: MessageSendToServerEvent) {
+    private fun onSendMessage(event: MessageSendToServerEvent) {
         if (event.senderIsSkyhanni()) return
         lastMessageSent = SimpleTimeMark.now()
     }
@@ -381,7 +381,7 @@ object ChatUtils {
         (lastMessageSent + sendQueue.size * messageDelay).takeIf { !it.isInPast() } ?: SimpleTimeMark.now()
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (lastMessageSent.passedSince() > messageDelay) {
             val message = sendQueue.poll() ?: return
             MinecraftCompat.localPlayerOrThrow.connection.dispatchMessage(message)

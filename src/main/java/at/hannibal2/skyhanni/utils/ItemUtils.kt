@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -51,6 +50,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
@@ -97,7 +97,6 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 @Suppress("LargeClass")
 object ItemUtils {
-
     private val patternGroup = RepoPattern.group("utils.item")
 
     // <editor-fold desc="Patterns">
@@ -160,7 +159,7 @@ object ItemUtils {
 
     fun NeuInternalName.getRawBaseStats(): Map<String, Int> = itemBaseStatsRaw[this].orEmpty()
 
-    @HandleEvent(ConfigLoadEvent::class)
+    @HandleEvent
     private fun onConfigLoad() {
         ConditionalUtils.onToggle(SkyHanniMod.feature.misc.replaceRomanNumerals) {
             itemNameCache.clear()
@@ -171,7 +170,7 @@ object ItemUtils {
     private val SKYBLOCK_MENU = "SKYBLOCK_MENU".toInternalName()
 
     val SafeItemStack.cleanName
-        get() = hoverName.string.removeColor()
+        get() = hoverName.stripped
 
     fun isSack(stack: SafeItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName.endsWith(" Sack")
 
@@ -196,7 +195,7 @@ object ItemUtils {
         }
 
     fun DataComponentMap.getCleanLore(): List<String> =
-        getLoreComponent().map { it.string.removeColor() }
+        getLoreComponent().map { it.stripped }
 
     @Deprecated("Use getLoreComponent or getCleanLore unless you really need color codes")
     fun DataComponentMap.getLore(): List<String> =
@@ -406,7 +405,6 @@ object ItemUtils {
         private val lore: List<String>,
         private val extraOps: (SafeItemStack.() -> Unit)?,
     ) : ItemStackProvider {
-
         private val value = StableOrTransientValue(1.seconds) {
             val texture = SkullTextureHolder.getTexture(repoSkullId)
             val stack = createSkull(
