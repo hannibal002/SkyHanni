@@ -30,7 +30,6 @@ import com.google.gson.annotations.Expose
 import net.minecraft.client.player.LocalPlayer
 import java.awt.Color
 import kotlin.math.floor
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
