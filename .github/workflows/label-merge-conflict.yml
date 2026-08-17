@@ -15,6 +15,7 @@ permissions:
     contents: read
     issues: write
     pull-requests: write
+    statuses: write
 
 jobs:
     conflicts:
@@ -42,5 +43,5 @@ jobs:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
                     PR_NUMBER: ${{ github.event.pull_request.number }}
-                    MODE: mergeconflict
+                    MODE: merge_conflict
                 run: kotlinc -script .github/scripts/pr_review.main.kts

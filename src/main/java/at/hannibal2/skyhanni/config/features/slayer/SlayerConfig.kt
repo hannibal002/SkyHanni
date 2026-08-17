@@ -183,7 +183,11 @@ class SlayerConfig {
     var damageSplashHider: Boolean = false
 
     @Expose
-    @ConfigOption(name = "No Gummy Warning", desc = "Send a warning when you don't have a Re-Heated Gummy Polar Bear active.")
+    @ConfigOption(
+        name = "No Gummy Warning",
+        desc = "Sends a warning when you don't have a Re-Heated Gummy Polar Bear active " +
+            "while you have Habanero Tactics on your gear, or are in the Smoldering Tomb."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var gummyWarning: Boolean = true
