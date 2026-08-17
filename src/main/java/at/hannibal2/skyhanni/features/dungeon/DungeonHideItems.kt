@@ -28,8 +28,6 @@ import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.item.ItemEntity
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO: Add repo pattern tests
-@Suppress("RepoPatternRegexTestMissing")
 @SkyHanniModule
 object DungeonHideItems {
 
@@ -49,14 +47,49 @@ object DungeonHideItems {
 
     private val patternGroup = RepoPattern.group("dungeon.item-hider")
 
+    /**
+     * REGEX-TEST: Revive Stone
+     */
     private val reviveStonePattern by patternGroup.pattern("revive-stone", "^Revive Stone$")
+
+    /**
+     * REGEX-TEST: Journal Entry
+     */
     private val journalEntryPattern by patternGroup.pattern("journal-entry", "^Journal Entry$")
-    private val superboomTntPattern by patternGroup.pattern("superboom-tnt", "^Superboom TNT.*$")
-    private val blessingPattern by patternGroup.pattern("blessing", "^Blessing of .*$")
+
+    /**
+     * REGEX-TEST: Premium Flesh
+     */
     private val premiumFleshPattern by patternGroup.pattern("premium-flesh", "^Premium Flesh$")
+
+    /**
+     * REGEX-TEST: Skeleton Skull
+     */
     private val skeletonSkullPattern by patternGroup.pattern("skeleton-skull", "^Skeleton Skull$")
+
+    /**
+     * REGEX-TEST: Superboom TNT
+     */
+    private val superboomTntPattern by patternGroup.pattern("superboom-tnt", "^Superboom TNT.*$")
+
+    /**
+     * REGEX-TEST: Blessing of Time
+     */
+    private val blessingPattern by patternGroup.pattern("blessing", "^Blessing of .*$")
+
+    /**
+     * REGEX-TEST: DAMAGE 30s
+     */
     private val damageOrbPattern by patternGroup.pattern("healer-orbs.damage", "^DAMAGE .*$")
+
+    /**
+     * REGEX-TEST: ABILITY DAMAGE 30s
+     */
     private val abilityDamageOrbPattern by patternGroup.pattern("healer-orbs.ability-damage", "^ABILITY DAMAGE .*$")
+
+    /**
+     * REGEX-TEST: DEFENSE 30s
+     */
     private val defenseOrbPattern by patternGroup.pattern("healer-orbs.defense", "^DEFENSE .*$")
 
     private fun String?.matchesTexture(texture: String?) = texture != null && this == texture
