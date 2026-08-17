@@ -45,12 +45,7 @@ public abstract class MixinModelFeatureRenderer {
     ) {
         if (skyhanni$usesCustomOutline(model)) {
             //? if >= 26.2 {
-            SkyHanniOutlineHook.beginCustomOutlineBuild();
-            try {
-                return original.call(instance, layer);
-            } finally {
-                SkyHanniOutlineHook.finishCustomOutlineBuild();
-            }
+            return SkyHanniOutlineHook.wrapCustomOutlineBuild(original, instance, layer);
             //?} else
             //return original.call(SkyHanniOutlineHook.getVertexConsumers(), layer);
         } else {

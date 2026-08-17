@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation
+import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.rendertype.RenderType
 
 //? if >= 26.2 {
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import com.mojang.blaze3d.GpuFormat
 import com.mojang.blaze3d.PrimitiveTopology
 import com.mojang.blaze3d.pipeline.DepthStencilState
@@ -16,15 +20,16 @@ import com.mojang.blaze3d.textures.GpuTextureView
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import net.minecraft.client.renderer.BindGroupLayouts
 import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.client.renderer.StagedVertexBuffer
+import net.minecraft.client.renderer.feature.RenderTypeFeatureRenderer
+import net.minecraft.client.renderer.rendertype.PreparedRenderType
 import net.minecraft.resources.Identifier
 //?} else {
 /*import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
 import com.mojang.blaze3d.textures.TextureFormat
-import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.renderer.OutlineBufferSource
-import net.minecraft.client.renderer.rendertype.RenderType
 *///?}
 
 // The idea and implementation for this class was inspired by Skyblocker.
@@ -64,18 +69,36 @@ object SkyHanniOutlineHook {
     var isCurrentlyActive = false
         private set
 
-    @JvmStatic
-    fun beginRendering() {
+    private fun beginRendering() {
         val depthAttachmentView = customDepthAttachmentView ?: return
         isCurrentlyActive = true
         RenderSystem.outputDepthTextureOverride = depthAttachmentView
     }
 
-    @JvmStatic
-    fun finishRendering() {
+    private fun finishRendering() {
         isCurrentlyActive = false
         RenderSystem.outputDepthTextureOverride = null
     }
+
+    //? if >= 26.2 {
+    @JvmStatic
+    fun wrapRendering(
+        // Required for Java interop with Operation<Void>
+        @Suppress("ForbiddenVoid")
+        original: Operation<Void>,
+        renderType: PreparedRenderType,
+        executeInfo: StagedVertexBuffer.ExecuteInfo,
+    ) {
+        val hasCustomOutline = renderType.pipeline().isCustomOutlinePipeline
+
+        if (hasCustomOutline) beginRendering()
+        try {
+            original.call(renderType, executeInfo)
+        } finally {
+            finishRendering()
+        }
+    }
+    //?}
 
     private var lastWidth = 0
     private var lastHeight = 0
@@ -149,13 +172,18 @@ object SkyHanniOutlineHook {
     private var customOutlineBuildDepth = 0
 
     @JvmStatic
-    fun beginCustomOutlineBuild() {
+    fun wrapCustomOutlineBuild(
+        original: Operation<VertexConsumer>,
+        //~ if < 26.2 'RenderTypeFeatureRenderer<*>' -> 'OutlineBufferSource'
+        instance: RenderTypeFeatureRenderer<*>,
+        renderType: RenderType,
+    ): VertexConsumer {
         customOutlineBuildDepth++
-    }
-
-    @JvmStatic
-    fun finishCustomOutlineBuild() {
-        customOutlineBuildDepth--
+        try {
+            return original.call(instance, renderType)
+        } finally {
+            customOutlineBuildDepth--
+        }
     }
 
     @JvmStatic
@@ -168,9 +196,10 @@ object SkyHanniOutlineHook {
         }
     }
 
-    @JvmStatic
-    fun isCustomOutlinePipeline(pipeline: RenderPipeline): Boolean =
-        pipeline == customOutlineCullPipeline || pipeline == customOutlineNoCullPipeline
+    //? if >= 26.2 {
+    private val RenderPipeline.isCustomOutlinePipeline: Boolean get() =
+        equalsOneOf(customOutlineCullPipeline, customOutlineNoCullPipeline)
+    //?}
 
     @JvmStatic
     fun ensureCustomOutlinePipelinesRegistered() {

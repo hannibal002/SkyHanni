@@ -25,13 +25,7 @@ public abstract class MixinRenderTypeFeatureRenderer {
         StagedVertexBuffer.ExecuteInfo executeInfo,
         Operation<Void> original
     ) {
-        boolean hasCustomOutline = SkyHanniOutlineHook.isCustomOutlinePipeline(renderType.pipeline());
-        if (hasCustomOutline) SkyHanniOutlineHook.beginRendering();
-        try {
-            original.call(renderType, executeInfo);
-        } finally {
-            if (hasCustomOutline) SkyHanniOutlineHook.finishRendering();
-        }
+        SkyHanniOutlineHook.wrapRendering(original, renderType, executeInfo);
     }
 }
 //?}
