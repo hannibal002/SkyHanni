@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.FriendRequestSentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -191,7 +192,7 @@ object FriendApi {
                     }
                 }
             }
-            val bestFriend = sibling.unformattedTextCompat().split(" ").firstOrNull()?.contains("§l") ?: false
+            val bestFriend = sibling.intoSpan().sampleStyleAtStart().isBold
             val name = readName(sibling)
             if (uuid != null && name != null) {
                 getFriends()[uuid] = Friend(
