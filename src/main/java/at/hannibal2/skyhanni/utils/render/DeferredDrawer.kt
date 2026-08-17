@@ -18,8 +18,7 @@ object DeferredDrawer {
     private val boxesDepth = mutableListOf<DeferredBox>()
     private val pyramidsNoDepth = mutableListOf<DeferredPyramid>()
     private val pyramidsDepth = mutableListOf<DeferredPyramid>()
-    private val stringsNoDepth = mutableListOf<DeferredString>()
-    private val stringsDepth = mutableListOf<DeferredString>()
+    private val strings = mutableListOf<DeferredString>()
 
     @HandleEvent(priority = 999)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
@@ -64,11 +63,11 @@ object DeferredDrawer {
             )
         }
         pyramidsDepth.clear()
-        stringsNoDepth.forEach { string ->
+        strings.forEach { string ->
             event.drawString(
                 string.location,
                 string.component,
-                seeThroughBlocks = true,
+                seeThroughBlocks = !string.depth,
                 string.color,
                 string.scale,
                 string.shadow,
@@ -76,20 +75,7 @@ object DeferredDrawer {
                 string.backgroundColor,
             )
         }
-        stringsNoDepth.clear()
-        stringsDepth.forEach { string ->
-            event.drawString(
-                string.location,
-                string.component,
-                seeThroughBlocks = false,
-                string.color,
-                string.scale,
-                string.shadow,
-                string.yOffset,
-                string.backgroundColor,
-            )
-        }
-        stringsDepth.clear()
+        strings.clear()
     }
 
     fun deferBox(
@@ -131,12 +117,8 @@ object DeferredDrawer {
         backgroundColor: Int,
         depth: Boolean,
     ) {
-        val deferredString = DeferredString(location, component, color, scale, shadow, yOffset, backgroundColor)
-        if (depth) {
-            stringsDepth.add(deferredString)
-        } else {
-            stringsNoDepth.add(deferredString)
-        }
+        val deferredString = DeferredString(location, component, color, scale, shadow, yOffset, backgroundColor, depth)
+        strings.add(deferredString)
     }
 
     data class DeferredBox(
@@ -160,5 +142,6 @@ object DeferredDrawer {
         val shadow: Boolean,
         val yOffset: Float,
         val backgroundColor: Int,
+        val depth: Boolean,
     )
 }
