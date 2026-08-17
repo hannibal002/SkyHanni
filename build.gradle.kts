@@ -181,11 +181,11 @@ dependencies {
     "minecraftTestClientRuntimeLibraries"(libs.basicMath)
 
     // getting clock offset
-    includeImplementation(libs.commons.net)
+    shadowImpl(libs.commons.net)
     "minecraftTestClientRuntimeLibraries"(libs.commons.net)
 
     // Calculator
-    includeImplementation(libs.keval) {
+    shadowImpl(libs.keval) {
         exclude(group = "org.jetbrains.kotlin")
     }
     "minecraftTestClientRuntimeLibraries"(libs.keval)
@@ -196,10 +196,6 @@ dependencies {
 
     shadowImpl(libs.httpclient)
     "minecraftTestClientRuntimeLibraries"(libs.httpclient)
-}
-
-fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit = {}) {
-    add("shadowImpl", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
 }
 
 afterEvaluate {
