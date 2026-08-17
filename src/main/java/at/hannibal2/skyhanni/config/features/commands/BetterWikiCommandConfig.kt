@@ -5,7 +5,6 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import org.lwjgl.glfw.GLFW
 
 class BetterWikiCommandConfig {
@@ -25,16 +24,6 @@ class BetterWikiCommandConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var skyblockGuide: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Use Independent Wiki",
-        desc = "Use the independent wiki instead of the official one in most wiki-related chat messages.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    @SearchTag("fandom hypixel")
-    var useIndependent: Boolean = true
 
     @Expose
     @ConfigOption(
