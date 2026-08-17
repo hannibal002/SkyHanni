@@ -121,7 +121,7 @@ allprojects {
     }
 }
 
-stonecutter active "26.1"
+stonecutter active "26.2"
 
 stonecutter handlers {
     configure("fsh", "vsh") {
@@ -130,5 +130,38 @@ stonecutter handlers {
 }
 
 stonecutter parameters {
+    replacements {
+        string(current.parsed < "26.2") {
+            replace("net.minecraft.world.entity.monster.cubemob.MagmaCube", "net.minecraft.world.entity.monster.MagmaCube")
+            replace("net.minecraft.world.entity.monster.cubemob.Slime", "net.minecraft.world.entity.monster.Slime")
+
+            val dyeColors = mapOf(
+                "black" to "BLACK",
+                "blue" to "BLUE",
+                "brown" to "BROWN",
+                "cyan" to "CYAN",
+                "gray" to "GRAY",
+                "green" to "GREEN",
+                "lightBlue" to "LIGHT_BLUE",
+                "lightGray" to "LIGHT_GRAY",
+                "lime" to "LIME",
+                "magenta" to "MAGENTA",
+                "orange" to "ORANGE",
+                "pink" to "PINK",
+                "purple" to "PURPLE",
+                "red" to "RED",
+                "white" to "WHITE",
+                "yellow" to "YELLOW",
+            )
+            dyeColors.forEach { (lower, upper) ->
+                replace("DYE.$lower()", "${upper}_DYE")
+                replace("WOOL.$lower()", "${upper}_WOOL")
+                replace("STAINED_GLASS.$lower()", "${upper}_STAINED_GLASS")
+                replace("STAINED_GLASS_PANE.$lower()", "${upper}_STAINED_GLASS_PANE")
+                replace("DYED_TERRACOTTA.$lower()", "${upper}_TERRACOTTA")
+            }
+        }
+    }
+
     filters.include("**/*.fsh", "**/*.vsh")
 }
