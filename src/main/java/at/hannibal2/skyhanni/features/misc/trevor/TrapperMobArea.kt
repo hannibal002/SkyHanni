@@ -11,4 +11,9 @@ enum class TrapperMobArea(val location: String, val coordinates: LorenzVec) {
     MOUNTAIN("Desert Mountain", LorenzVec(255.0, 148.0, -518.0)),
     FOUND("    ", LorenzVec(0.0, 0.0, 0.0)),
     NONE("   ", LorenzVec(0.0, 0.0, 0.0)),
+
+    val widgetPattern by TrevorFeatures.patternGroup.pattern(
+        "widget.${name.lowercase()}",
+        "\\s*$location"
+    )
 }

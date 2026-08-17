@@ -5,12 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
@@ -52,7 +50,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object TrevorFeatures {
 
-    private val patternGroup = RepoPattern.group("misc.trevor")
+    val patternGroup = RepoPattern.group("misc.trevor")
 
     // <editor-fold desc="Patterns">
     /**
@@ -85,10 +83,11 @@ object TrevorFeatures {
 
     /**
      * REGEX-TEST: Location: Mushroom Gorge
+     * WRAPPED-REGEX-TEST: " Location: Mushroom Gorge"
      */
     private val locationPattern by patternGroup.pattern(
         "zone",
-        "Location: (?<zone>.*)",
+        "\\s*Location: (?<zone>.*)",
     )
     private val mobDiedPattern by patternGroup.pattern(
         "mob.died.colorless",
@@ -109,6 +108,15 @@ object TrevorFeatures {
     private val clickArmorStandPattern by patternGroup.pattern(
         "click.armorstand",
         "CLICK",
+    )
+
+    /**
+     * REGEX-TEST: Time Left: 15 seconds
+     * WRAPPED-REGEX-TEST: " Time Left: 15 seconds"
+     */
+    private val timeLeftPattern by patternGroup.pattern(
+        "timeleft",
+        "\\s*Time Left: (?<time>.*)",
     )
     // </editor-fold>
 
@@ -132,12 +140,12 @@ object TrevorFeatures {
     var inTrapperDen = false
     var lastTitle: TitleContext? = null
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(onlyOnIsland = THE_FARMING_ISLANDS)
     private fun onTick() {
         updateTrapper()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(onlyOnIsland = THE_FARMING_ISLANDS)
     private fun onSecondPassed() {
         TrevorTracker.update()
         TrevorTracker.calculatePeltsPerHour()
@@ -146,11 +154,11 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(onlyOnIsland = THE_FARMING_ISLANDS)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        val formattedMessage = event.cleanMessage
+        val message = event.cleanMessage
 
-        mobDiedPattern.matchMatcher(formattedMessage) {
+        mobDiedPattern.matchMatcher(message) {
             TrevorSolver.resetLocation()
             TalbotCircles.resetCircles()
             if (config.mobDiedMessage) {
@@ -170,7 +178,7 @@ object TrevorFeatures {
             TrevorSolver.mobLocation = TrapperMobArea.NONE
         }
 
-        trapperPattern.matchMatcher(formattedMessage) {
+        trapperPattern.matchMatcher(message) {
             nextReadyTime = 20.seconds.fromNow()
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
@@ -179,27 +187,27 @@ object TrevorFeatures {
             lastChatPromptTime = SimpleTimeMark.farPast()
         }
 
-        talbotPatternAbove.matchMatcher(formattedMessage) {
+        talbotPatternAbove.matchMatcher(message) {
             val height = group("height").toInt()
             val angle = group("angle").toInt()
             TrevorSolver.findMobHeight(height, true)
             TalbotCircles.addResult(height, angle)
         }
-        talbotPatternBelow.matchMatcher(formattedMessage) {
+        talbotPatternBelow.matchMatcher(message) {
             val height = group("height").toInt()
             val angle = group("angle").toInt()
             TrevorSolver.findMobHeight(height, false)
             TalbotCircles.addResult(-height, angle)
         }
-        talbotPatternAt.matchMatcher(formattedMessage) {
+        talbotPatternAt.matchMatcher(message) {
             TrevorSolver.averageHeight = LocationUtils.playerLocation().y
         }
 
-        outOfTimePattern.matchMatcher(formattedMessage) {
+        outOfTimePattern.matchMatcher(message) {
             resetTrapper()
         }
 
-        clickOptionPattern.findMatcher(formattedMessage) {
+        clickOptionPattern.findMatcher(message) {
             for (sibling in event.chatComponent.siblings) {
                 val clickEvent = sibling.command ?: continue
 
@@ -211,26 +219,25 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent
-    private fun onTabListUpdate(event: TabListUpdateEvent) {
+    @HandleEvent(onlyOnIsland = THE_FARMING_ISLANDS)
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         var found = false
         var active = false
         val previousLocation = TrevorSolver.mobLocation
-        // TODO work with trapper widget, widget api, repo patterns, when not found, warn in chat and don't update
-        event.tabList.forEach { line ->
-            val formattedLine = line.string.drop(1)
-            if (formattedLine.startsWith("Time Left: ")) {
+        // TODO when not found, warn in chat and don't update
+        event.cleanLines.forEach { line ->
+            if (timeLeftPattern.matches(line)) {
                 trapperReady = false
                 currentStatus = TrapperStatus.ACTIVE
                 currentLabel = "§cActive Quest"
                 active = true
             }
 
-            TrapperMobArea.entries.firstOrNull { it.location == formattedLine }?.let {
+            TrapperMobArea.entries.firstOrNull { it.widgetPattern.matches(line) }?.let {
                 TrevorSolver.mobLocation = it
                 found = true
             }
-            locationPattern.matchMatcher(formattedLine) {
+            locationPattern.matchMatcher(line) {
                 val zone = group("zone")
                 TrevorSolver.mobLocation = TrapperMobArea.entries.firstOrNull { it.location == zone } ?: TrapperMobArea.NONE
                 found = true
@@ -241,13 +248,13 @@ object TrevorFeatures {
         if (!active) trapperReady = true
         else inBetweenQuests = true
 
-        if (TrevorSolver.mobCoordinates != LorenzVec(0.0, 0.0, 0.0) && active) {
+        if (!TrevorSolver.mobCoordinates.isZero() && active) {
             TrevorSolver.mobLocation = previousLocation
         }
         questActive = active
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, priority = HandleEvent.LOWEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(priority = HandleEvent.LOWEST, onlyOnIsland = THE_FARMING_ISLANDS)
     private fun onGuiRenderOverlay() {
         if (!config.cooldownGui) return
 
@@ -279,17 +286,17 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(onlyOnIsland = THE_FARMING_ISLANDS)
     private fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         if (trevorTexture != null && event.entity.getSkinTexture() == trevorTexture) trevorEntity = event.entity
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(onlyOnIsland = THE_FARMING_ISLANDS)
     private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<RemotePlayer>) {
         if (event.entity == trevorEntity) trevorEntity = null
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(onlyOnIsland = THE_FARMING_ISLANDS)
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (config.cooldown) event.renderCooldown()
         val mobFound = event.findMob()
@@ -332,7 +339,7 @@ object TrevorFeatures {
         return found
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(onlyOnIsland = THE_FARMING_ISLANDS)
     private fun onKeyPress(event: KeyPressEvent) {
         if (MinecraftCompat.screen != null) return
 
@@ -355,7 +362,7 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnIsland = THE_FARMING_ISLANDS)
     private fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!inTrapperDen || !config.cooldown) return
         if (clickArmorStandPattern.matches(event.entity.name.string)) event.cancel()
