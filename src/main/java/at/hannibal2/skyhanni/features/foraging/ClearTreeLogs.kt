@@ -18,6 +18,7 @@ import kotlin.math.abs
 object ClearTreeLogs {
     private val config get() = SkyHanniMod.feature.foraging.trees.cleanView
     private val SCALE_RANGE = 0.4f..1.0f
+    private const val EPSILON = 1e-6
 
     private val treeBlocks = buildList {
         add(Blocks.STRIPPED_SPRUCE_WOOD.defaultBlockState())
@@ -63,7 +64,7 @@ object ClearTreeLogs {
 
     private fun isFloatingTreeBlock(entity: Display): Boolean? {
         val rotation = entity.rotation
-        if (abs(rotation.y()) > 1e-6) return false
+        if (abs(rotation.y()) > EPSILON) return false
         val transformation = entity.transformation ?: return null
         val scale = transformation.uniformScale ?: return false
         return scale in SCALE_RANGE
