@@ -120,6 +120,10 @@ object TrevorFeatures {
     )
     // </editor-fold>
 
+    init {
+        TrapperMobArea.entries.forEach { it.widgetPattern }
+    }
+
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
     // TODO form to data class, use Resettable
