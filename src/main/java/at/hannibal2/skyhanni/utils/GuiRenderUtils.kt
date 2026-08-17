@@ -332,7 +332,8 @@ object GuiRenderUtils {
             frameNumber = frameNumber,
             alpha = alpha,
         )
-        Minecraft.getInstance().gameRenderer.gameRenderState.guiRenderState.addPicturesInPictureState(newRenderState)
+        //~ if < 26.2 'gameRenderState()' -> 'gameRenderState'
+        Minecraft.getInstance().gameRenderer.gameRenderState().guiRenderState.addPicturesInPictureState(newRenderState)
 
         return newRenderState.stableId
     }
