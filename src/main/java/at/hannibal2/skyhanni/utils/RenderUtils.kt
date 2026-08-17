@@ -52,7 +52,8 @@ object RenderUtils {
         block: () -> T,
     ): T {
         RenderSystem.assertOnRenderThread()
-        setupFor?.let { Minecraft.getInstance().gameRenderer.lighting.setupFor(it) }
+        //~ if < 26.2 'lighting()' -> 'lighting'
+        setupFor?.let { Minecraft.getInstance().gameRenderer.lighting().setupFor(it) }
         return block()
     }
 
