@@ -33,9 +33,11 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -53,6 +55,7 @@ object AttributeShardsData {
     private var attributeInfo = mapOf<String, NeuAttributeShardData>()
     private var internalNameToShard = mapOf<NeuInternalName, String>()
     private var attributeAbilityNameToShard = mapOf<String, String>()
+    private val validItemSlots = 9..44
 
     var maxShards = 0
         private set
@@ -71,6 +74,9 @@ object AttributeShardsData {
     val shardFusionInventory = InventoryDetector { shardFusionPattern }
 
     private var lastSyphonedMessage = SimpleTimeMark.farPast()
+
+    private val huntingBoxSeenShards = mutableSetOf<String>()
+    private val huntingBoxSeenPages = mutableSetOf<Int>()
 
     private val patternGroup = RepoPattern.group("inventory.attributeshards")
 
@@ -101,6 +107,25 @@ object AttributeShardsData {
     private val huntingBoxPattern by patternGroup.pattern(
         "hunting-box",
         "(?:\\(\\d+/\\d+\\) )?Hunting Box",
+    )
+
+    /**
+     * REGEX-TEST: Hunting Box
+     * REGEX-TEST: (1/3) Hunting Box
+     * REGEX-TEST: (10/13) Hunting Box
+     */
+    private val huntingBoxPagePattern by patternGroup.pattern(
+        "hunting-box.page",
+        "(?:\\((?<page>\\d+)/(?<pages>\\d+)\\) )?Hunting Box",
+    )
+
+    /**
+     * REGEX-TEST: Query: hey
+     * REGEX-TEST: Query: Voracious Spider
+     */
+    private val huntingBoxSearchQueryPattern by patternGroup.pattern(
+        "hunting-box.search-query.colorless",
+        "Query: .+",
     )
 
     /**
@@ -496,39 +521,75 @@ object AttributeShardsData {
     private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!huntingBoxInventory.isInside()) return
         val items = event.inventoryItems
-        for ((_, item) in items) {
+        val shardsInBox = mutableSetOf<String>()
+        var searchActive = false
+
+        for ((slot, item) in items) {
+            if (!isValidSlotNumber(slot)) {
+                if (huntingBoxSearchQueryPattern.anyMatches(item.getCleanLore())) searchActive = true
+                continue
+            }
             val internalName = item.getInternalNameOrNull() ?: continue
             if (!isAttributeShard(internalName)) continue
-            var tier = 0
-            var toNextTier = 0
-            for (line in item.getCleanLore()) {
-                attributeShardNameLorePattern.matchMatcher(line) {
-                    tier = groupOrNull("tier")?.romanToDecimal() ?: 0
-                }
-                syphonAmountPattern.matchMatcher(line) {
-                    toNextTier = group("amount").toInt()
-                }
-                amountOwnedPattern.matchMatcher(line) {
-                    val amount = group("amount").formatInt()
-                    val attributeName = shardInternalNameToShardName(internalName)
-                    storage?.getOrPut(attributeName) {
-                        ProfileSpecificStorage.AttributeShardData()
-                    }?.amountInBox = amount
-                }
-            }
-            processShard(internalName, tier, toNextTier)
+            shardsInBox.add(readShardInHuntingBox(internalName, item))
         }
+
+        syncHuntingBoxAmounts(event.inventoryName, shardsInBox, searchActive)
         HuntingBoxValue.processInventory(items)
+    }
+
+    private fun readShardInHuntingBox(internalName: NeuInternalName, item: SafeItemStack): String {
+        val attributeName = shardInternalNameToShardName(internalName)
+        var tier = 0
+        var toNextTier = 0
+        for (line in item.getCleanLore()) {
+            attributeShardNameLorePattern.matchMatcher(line) {
+                tier = groupOrNull("tier")?.romanToDecimal() ?: 0
+            }
+            syphonAmountPattern.matchMatcher(line) {
+                toNextTier = group("amount").toInt()
+            }
+            amountOwnedPattern.matchMatcher(line) {
+                setAmountInBox(attributeName, group("amount").formatInt())
+            }
+        }
+        processShard(internalName, tier, toNextTier)
+        return attributeName
+    }
+
+    /**
+     * Shards missing from the box are gone, not unknown. Skipped while a search or an unvisited page hides shards.
+     */
+    private fun syncHuntingBoxAmounts(inventoryName: String, shardsInBox: Set<String>, searchActive: Boolean) {
+        if (searchActive) return
+        val (page, totalPages) = huntingBoxPagePattern.matchMatcher(inventoryName) {
+            (groupOrNull("page")?.toInt() ?: 1) to (groupOrNull("pages")?.toInt() ?: 1)
+        } ?: return
+
+        if (page == 1) {
+            huntingBoxSeenShards.clear()
+            huntingBoxSeenPages.clear()
+        }
+        huntingBoxSeenShards.addAll(shardsInBox)
+        huntingBoxSeenPages.add(page)
+        if (huntingBoxSeenPages.size < totalPages) return
+
+        storage?.forEach { (shardName, shardData) ->
+            if (shardName !in huntingBoxSeenShards) shardData.amountInBox = 0
+        }
+    }
+
+    private fun setAmountInBox(attributeName: String, amount: Int) {
+        storage?.getOrPut(attributeName) {
+            ProfileSpecificStorage.AttributeShardData()
+        }?.amountInBox = amount
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     private fun onShardGain(event: ShardEvent) {
         val attributeName = shardInternalNameToShardName(event.shardInternalName)
         val existing = storage?.get(attributeName)?.amountInBox ?: 0
-        val newAmount = (existing + event.amount).coerceAtLeast(0)
-        storage?.getOrPut(attributeName) {
-            ProfileSpecificStorage.AttributeShardData()
-        }?.amountInBox = newAmount
+        setAmountInBox(attributeName, (existing + event.amount).coerceAtLeast(0))
     }
 
     private fun processShard(
@@ -611,12 +672,10 @@ object AttributeShardsData {
         return internalName
     }
 
-    fun shardNameToAttributeInformation(shardName: String): NeuAttributeShardData? {
-        val info = attributeInfo[shardName]
-        if (info == null) {
-            ItemUtils.addMissingRepoItem(shardName, "Could not find information for attribute shard: $shardName")
-        }
-        return info
+    fun isValidSlotNumber(slot: Int): Boolean {
+        if (slot !in validItemSlots) return false
+        val modNine = slot % 9
+        return modNine != 0 && modNine != 8
     }
 
     fun isAttributeShard(internalName: NeuInternalName): Boolean =

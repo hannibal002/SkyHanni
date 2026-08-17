@@ -40,7 +40,7 @@ object HuntingBoxValue {
         val table = mutableListOf<DisplayTableEntry>()
 
         for ((slotNumber, stack) in items) {
-            if (!isValidSlotNumber(slotNumber)) continue
+            if (!AttributeShardsData.isValidSlotNumber(slotNumber)) continue
             processAttributeShardSlot(slotNumber, stack, table)
         }
 
@@ -104,12 +104,6 @@ object HuntingBoxValue {
                 highlightsOnHoverSlots = listOf(slotNumber),
             ),
         )
-    }
-
-    private fun isValidSlotNumber(slot: Int): Boolean {
-        if (slot !in 9..44) return false
-        val modNine = slot % 9
-        return modNine != 0 && modNine != 8
     }
 
     @HandleEvent(onlyOnSkyblock = true)
