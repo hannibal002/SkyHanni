@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.firstComponentMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
@@ -71,7 +71,7 @@ object MiningCommissionsBlocksColor {
     private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.COMMISSIONS)) return
         for (block in CommissionBlock.entries) {
-            val shouldHighlight = block.commissionPattern.firstComponentMatcher(event.widget.lines) {
+            val shouldHighlight = block.commissionPattern.firstMatcher(event.cleanLines) {
                 groupOrNull("done") == null
             } ?: continue
             if (block.highlight != shouldHighlight) {
