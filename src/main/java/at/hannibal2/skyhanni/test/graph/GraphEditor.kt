@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.test.graph
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.features.dev.GraphConfig
+import at.hannibal2.skyhanni.config.features.dev.GraphEditorConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -21,7 +22,9 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GraphEditor {
 
-    val config: GraphConfig get() = DevApi.config.devTool.graph
+    val config: GraphEditorConfig get() = DevApi.config.devTool.graph
+
+    private const val TUTORIAL_URL = "https://github.com/hannibal002/SkyHanni/blob/beta/docs/tutorials/graph_network.md"
 
     var state = GraphEditorState()
         set(value) {
@@ -37,8 +40,6 @@ object GraphEditor {
     fun isEnabled(): Boolean = config.enabled
 
     private val nodes get() = state.nodes
-    private val inTutorialMode get() = state.inTutorialMode
-    private val inEditMode get() = state.inEditMode
     private var disabledDirty = false
     var hideDisabled = false
         private set
@@ -47,14 +48,14 @@ object GraphEditor {
         disabledDirty = true
     }
 
-    fun feedBackInTutorial(text: String) {
-        if (inTutorialMode) {
+    fun feedback(text: String) {
+        if (state.inFeedbackMode) {
             ChatUtils.chat(text)
         }
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         handleDisabled()
         GraphEditorInput.input()
@@ -81,7 +82,7 @@ object GraphEditor {
     }
 
     @HandleEvent
-    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
+    private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
 
         if (event.distance > 20) {
@@ -101,17 +102,34 @@ object GraphEditor {
         }
     }
 
+    private fun blockDisabled(): Boolean {
+        if (!isEnabled()) {
+            ChatUtils.userError("Graph Editor is not active!")
+            return true
+        }
+        return false
+    }
+
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shgraph") {
-            description = "Enables the graph editor"
+            description = "Toggles the Graph Editor."
             category = CommandCategory.DEVELOPER_TEST
-            simpleCallback { toggleFeature() }
+            simpleCallback {
+                if (config.enabled) {
+                    disable()
+                } else {
+                    enable()
+                }
+            }
         }
         event.registerBrigadier("shgraphfindall") {
             description = "Navigate over the whole graph network"
             category = CommandCategory.DEVELOPER_TEST
-            simpleCallback { GraphEditorNodeFinder.toggleFindAll() }
+            simpleCallback {
+                if (blockDisabled()) return@simpleCallback
+                GraphEditorNodeFinder.toggleFindAll()
+            }
         }
         event.registerBrigadier("shgraphloadthisisland") {
             description = "Loads the current island data into the graph editor."
@@ -121,16 +139,16 @@ object GraphEditor {
         event.registerBrigadier("shgraphcopynetwork") {
             description = "Copies the closest network to the clipboard."
             category = CommandCategory.DEVELOPER_TEST
-            simpleCallback { GraphEditorNetworks.copyClosestNetwork() }
+            simpleCallback {
+                if (blockDisabled()) return@simpleCallback
+                GraphEditorNetworks.copyClosestNetwork()
+            }
         }
         event.registerBrigadier("shgraphmerge") {
             description = "Merges graph data from the clipboard into the current graph."
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                if (!isEnabled()) {
-                    ChatUtils.userError("Graph Editor is not active!")
-                    return@simpleCallback
-                }
+                if (blockDisabled()) return@simpleCallback
                 GraphEditorIO.mergeFromClipboard()
             }
         }
@@ -138,10 +156,7 @@ object GraphEditor {
             description = "Lists all networks and allows navigation between them."
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                if (!isEnabled()) {
-                    ChatUtils.userError("Graph Editor is not active!")
-                    return@simpleCallback
-                }
+                if (blockDisabled()) return@simpleCallback
                 GraphEditorNetworks.findNetworks()
             }
         }
@@ -149,6 +164,7 @@ object GraphEditor {
             description = "Show or hide disabled nodes."
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
+                if (blockDisabled()) return@simpleCallback
                 toggleDisabledVisibility()
             }
         }
@@ -158,20 +174,20 @@ object GraphEditor {
             category = CommandCategory.DEVELOPER_TEST
             arg("weight", BrigadierArguments.integer()) { weight ->
                 callback {
-                    if (!isEnabled()) {
-                        ChatUtils.userError("Graph Editor is not active!")
-                        return@callback
-                    }
+                    if (blockDisabled()) return@callback
                     GraphNodeEditor.setWeight(getArg(weight))
                 }
             }
             simpleCallback {
-                if (!isEnabled()) {
-                    ChatUtils.userError("Graph Editor is not active!")
-                    return@simpleCallback
-                }
+                if (blockDisabled()) return@simpleCallback
                 GraphNodeEditor.getWeight()
             }
+        }
+
+        event.registerBrigadier("shgraphtutorial") {
+            description = "Opens the Graph Network and Graph Editor tutorial in the browser."
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback { openTutorial() }
         }
     }
 
@@ -183,34 +199,55 @@ object GraphEditor {
 
     var bypassTempRemoveTimer = SimpleTimeMark.farPast()
 
-    private fun toggleFeature() {
-        config.enabled = !config.enabled
-        if (config.enabled) {
-            ChatUtils.chat("Graph Editor is now active.")
-        } else {
-            chatAtDisable()
-        }
+    fun disable() {
+        config.enabled = false
+        ChatUtils.clickableChat(
+            "Graph Editor is now inactive. §lClick to activate.",
+            GraphEditor::enable,
+        )
     }
 
-    fun chatAtDisable() = ChatUtils.clickableChat(
-        "Graph Editor is now inactive. §lClick to activate.",
-        GraphEditor::toggleFeature,
+    fun enable() {
+        if (config.enabled) return
+        config.enabled = true
+        ChatUtils.chat("Graph Editor is now active.")
+        GraphEditorNodeFinder.resumeIfActive()
+        sendTutorialReminder()
+    }
+
+    private fun sendTutorialReminder() {
+        val storage = SkyHanniMod.feature.storage
+        if (storage.graphEditorTutorialAcknowledged) return
+        ChatUtils.clickableLinkChat(
+            "New to the Graph Editor? Click here to read the tutorial!",
+            TUTORIAL_URL,
+            replaceSameMessage = true,
+        )
+        ChatUtils.clickableChat(
+            message = "§2§l[I GET IT]",
+            prefix = false,
+            replaceSameMessage = true,
+            oneTimeClick = true,
+            onClick = {
+                storage.graphEditorTutorialAcknowledged = true
+                ChatUtils.chat("§aYou will no longer be reminded about the Graph Editor tutorial.")
+            },
+        )
+    }
+
+    fun openTutorial() = ChatUtils.clickableLinkChat(
+        "Opening the Graph Editor tutorial in your browser.",
+        TUTORIAL_URL,
+        autoOpen = true,
     )
 
     @JvmStatic
     fun shouldCancelMinecraftInput(keyMapping: KeyMapping): Boolean =
-        isEnabled() && inEditMode && keyMapping in KeyboardManager.WasdInputMatrix
+        isEnabled() && state.inNodeMoveMode && keyMapping in KeyboardManager.WasdInputMatrix
 
     fun clear() {
         GraphEditorHistory.save("clear graph")
         state = GraphEditorState()
-    }
-
-    fun enable() {
-        if (!config.enabled) {
-            config.enabled = true
-            ChatUtils.chat("Graph Editor is now active.")
-        }
     }
 }
 

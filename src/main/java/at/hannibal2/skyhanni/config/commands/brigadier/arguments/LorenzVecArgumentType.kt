@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.mojang.brigadier.LiteralMessage
 import com.mojang.brigadier.StringReader
@@ -21,14 +20,16 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
         return parseCoords(input)
     }
 
+    /**
+     * Everything left of the coordinates is ignored, so that chat lines can be pasted directly.
+     * Skipping to the end of the match keeps the reader positioned behind the coordinates.
+     */
     private fun consumeMatch(reader: StringReader): String {
         val remaining = reader.remaining
         for (pattern in patterns) {
-            val matched = pattern.findMatcher(remaining) {
-                if (start() == 0) group() else null
-            } ?: continue
-            repeat(matched.length) { reader.skip() }
-            return matched
+            val (coords, end) = pattern.findMatcher(remaining) { group() to end() } ?: continue
+            repeat(end) { reader.skip() }
+            return coords
         }
         throw invalidCoordinates.createWithContext(reader)
     }
@@ -36,7 +37,7 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
     private fun parseCoords(input: String): LorenzVec {
         val playerPos = LocationUtils.playerLocation()
         for (pattern in patterns) {
-            pattern.matchMatcher(input) {
+            pattern.findMatcher(input) {
                 val x = if (group("x") == "~") playerPos.x else group("x").toDouble()
                 val y = if (group("y") == "~") playerPos.y else group("y").toDouble()
                 val z = if (group("z") == "~") playerPos.z else group("z").toDouble()
@@ -46,20 +47,26 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
         throw invalidCoordinates.create()
     }
 
-
     data object Int : LorenzVecArgumentType() {
         override fun toVec(x: kotlin.Double, y: kotlin.Double, z: kotlin.Double) =
             LorenzVec(x.toInt(), y.toInt(), z.toInt())
 
         override fun getExamples(): Collection<String> =
-            listOf("1 2 3", "-4 0 5", "~ 64 ~", "1:2:3", "LorenzVec(1, 2, 3), x=-262, y=58, z=117")
+            listOf("1 2 3", "-4 0 5", "~ 64 ~", "1:2:3", "-4, 0, 5", "-541,, 94,, 227", "LorenzVec(1, 2, 3)", "x: -262, y: 58, z: 117")
     }
 
     data object Double : LorenzVecArgumentType() {
         override fun toVec(x: kotlin.Double, y: kotlin.Double, z: kotlin.Double) = LorenzVec(x, y, z)
 
-        override fun getExamples(): Collection<String> =
-            listOf("1.0 2.5 -3", "0.0 0.0 0.0", "-1.7 ~ ~", "-78.8:68.0:-28.7", "LorenzVec(-91.7, 70.0, 29.3)", "x=-262.0, y=58.0, z=117.0")
+        override fun getExamples(): Collection<String> = listOf(
+            "1.0 2.5 -3",
+            "0.0 0.0 0.0",
+            "-1.7 ~ ~",
+            "-78.8:68.0:-28.7",
+            "-1.7, 2.5, -3.0",
+            "LorenzVec(-91.7, 70.0, 29.3)",
+            "x: -262.0, y: 58.0, z: 117.0",
+        )
     }
 
     @SkyHanniModule
@@ -79,14 +86,29 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
         )
 
         /**
-         * REGEX-TEST: -78.8:68.0:-28.7
-         * REGEX-TEST: 1:2:3
-         * REGEX-TEST: ~:64:~
-         * REGEX-TEST: ~:~:~
+         * REGEX-TEST: x=-262.0, y=58.0, z=117.0
+         * REGEX-TEST: x: -598, y: 138, z: 235
+         * REGEX-TEST: x:-598,y:138,z:235
+         * REGEX-TEST: x=-49, y=79, z=-151
          */
-        private val colonPattern by patternGroup.pattern(
-            "colon",
-            "(?<x>~|-?\\d+(?:\\.\\d+)?):(?<y>~|-?\\d+(?:\\.\\d+)?):(?<z>~|-?\\d+(?:\\.\\d+)?)",
+        private val namedParameterPattern by patternGroup.pattern(
+            "named-parameter",
+            "x[=:]\\s*(?<x>-?\\d+(?:\\.\\d+)?),\\s*y[=:]\\s*(?<y>-?\\d+(?:\\.\\d+)?),\\s*z[=:]\\s*(?<z>-?\\d+(?:\\.\\d+)?)",
+        )
+
+        /**
+         * The coordinate format used by the SkyBlock Wiki. Values are separated by a comma followed
+         * by a narrow no-break space (U+202F), not by a regular space. The separator is written as
+         * `\u202f` in the pattern so it stays readable, but the regex tests below have to contain
+         * the literal character. Do not replace it with a normal space, the pattern would stop
+         * matching what the wiki actually produces.
+         *
+         * REGEX-TEST: -541, 94, 227
+         * REGEX-TEST: 1, 2, 3
+         */
+        private val wikiPattern by patternGroup.pattern(
+            "wiki",
+            "(?<x>-?\\d+),\\u202f(?<y>-?\\d+),\\u202f(?<z>-?\\d+)",
         )
 
         /**
@@ -103,14 +125,34 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
         )
 
         /**
-         * REGEX-TEST: x=-262.0, y=58.0, z=117.0
+         * REGEX-TEST: -49, 79, -151
+         * REGEX-TEST: -49,79,-151
+         * REGEX-TEST: 1.5, 2, -3.25
          */
-        private val namedParameterPattern by patternGroup.pattern(
-            "named-parameter",
-            "x=(?<x>-?\\d+(?:\\.\\d+)?),\\s*y=(?<y>-?\\d+(?:\\.\\d+)?),\\s*z=(?<z>-?\\d+(?:\\.\\d+)?)",
+        private val commaPattern by patternGroup.pattern(
+            "comma",
+            "(?<x>-?\\d+(?:\\.\\d+)?),\\s*(?<y>-?\\d+(?:\\.\\d+)?),\\s*(?<z>-?\\d+(?:\\.\\d+)?)",
         )
 
-        private val patterns = listOf(lorenzVecPattern, colonPattern, spacePattern, namedParameterPattern)
+        /**
+         * Last in [patterns], because a bare colon triple is indistinguishable from a chat timestamp.
+         *
+         * REGEX-TEST: -78.8:68.0:-28.7
+         * REGEX-TEST: 1:2:3
+         * REGEX-TEST: ~:64:~
+         * REGEX-TEST: ~:~:~
+         */
+        private val colonPattern by patternGroup.pattern(
+            "colon",
+            "(?<x>~|-?\\d+(?:\\.\\d+)?):(?<y>~|-?\\d+(?:\\.\\d+)?):(?<z>~|-?\\d+(?:\\.\\d+)?)",
+        )
+
+        /**
+         * The order matters. [consumeMatch] takes the first pattern that matches anywhere in the input, not the
+         * match closest to the start. Patterns that identify themselves through a keyword or a separator come
+         * first, ambiguous ones last, so that unrelated text next to the coordinates cannot win.
+         */
+        private val patterns = listOf(lorenzVecPattern, namedParameterPattern, spacePattern, commaPattern, colonPattern, wikiPattern)
 
         private val invalidCoordinates = SimpleCommandExceptionType(LiteralMessage("Invalid coordinates"))
 
