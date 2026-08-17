@@ -24,6 +24,26 @@ class BazaarConfig {
     var orderHelper: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "Hide Order Owner",
+        desc = "Hide the §eBy: §7line in the Bazaar order inventory, but only while every order and offer in it is your own.\n" +
+            "Hypixel only sends that line while you are in a co-op.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideOrderOwner: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Hide Trade Partners",
+        desc = "Hide the list of players that traded with your orders in the Bazaar order inventory.\n" +
+            "Buy orders show them under §eVendors§7, sell offers under §eCustomers§7.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideTradePartners: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Best Sell Method", desc = "Show the price difference between sell instantly and sell offer.")
     @ConfigEditorBoolean
     @FeatureToggle
