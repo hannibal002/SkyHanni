@@ -12,7 +12,10 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.associateNotNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import com.mojang.authlib.GameProfile
 import net.minecraft.client.Minecraft
+import net.minecraft.client.player.AbstractClientPlayer
+import net.minecraft.client.player.RemotePlayer
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.state.EntityRenderState
@@ -109,6 +112,8 @@ object HolographicEntities {
             }
             this.position = position
             this.yaw = yaw
+
+            this.entity.updateWalkAnimation(this.position.distance(this.lastPosition).toFloat())
         }
 
         fun interpolatedPosition(partialTicks: Float): LorenzVec =
@@ -156,12 +161,25 @@ object HolographicEntities {
         return last + progress * direction
     }
 
+    fun createPlayerHologram(
+        position: LorenzVec,
+        yaw: Float,
+        profile: GameProfile,
+    ): HolographicEntity<AbstractClientPlayer>? {
+        val level = Minecraft.getInstance().level ?: return null
+        val player = RemotePlayer(level, profile)
+
+        return HolographicEntity(player, position, yaw)
+    }
+
     /**
      * Render a fake [HolographicEntity]. To render a fully opaque entity, set [opacity] to `1F`.
      */
     fun <T : LivingEntity> SkyHanniRenderWorldEvent.renderHolographicEntity(
         holographicEntity: HolographicEntity<T>,
         opacity: Float = 0.3f,
+        preExtractHook: ((LivingEntity) -> Unit) = {},
+        postExtractHook: ((EntityRenderState) -> Unit) = {},
     ) {
         val entity = holographicEntity.entity
         val mobPosition = holographicEntity.interpolatedPosition(partialTicks)
@@ -175,6 +193,8 @@ object HolographicEntities {
         entity.yBodyRotO = interpolatedYaw
         entity.yHeadRot = interpolatedYaw
         entity.yHeadRotO = interpolatedYaw
+
+        preExtractHook(entity)
 
         val client = Minecraft.getInstance()
         @Suppress("UNCHECKED_CAST")
@@ -191,6 +211,8 @@ object HolographicEntities {
         client.level?.let { level ->
             entityRenderState.lightCoords = LevelRenderer.getLightCoords(level, mobPosition.toBlockPos())
         }
+
+        postExtractHook(entityRenderState)
 
         activeHolographicEntities.add(entity)
         try {

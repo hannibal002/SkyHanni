@@ -85,3 +85,4 @@ mutable field net/minecraft/client/gui/components/ChatComponent trimmedMessages 
 mutable field net/minecraft/core/particles/ColorParticleOption color I
 mutable field net/minecraft/world/item/ItemStack components Lnet/minecraft/core/component/PatchedDataComponentMap;
 mutable field net/minecraft/world/item/ItemStack item Lnet/minecraft/core/Holder;
+accessible method net/minecraft/world/entity/LivingEntity updateWalkAnimation (F)V
