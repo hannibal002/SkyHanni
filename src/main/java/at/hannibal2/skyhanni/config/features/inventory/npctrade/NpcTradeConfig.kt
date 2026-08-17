@@ -14,7 +14,7 @@ class NpcTradeConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var highlightAffordable: Boolean = true
+    var highlightAffordable: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -23,5 +23,5 @@ class NpcTradeConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var costBreakdown: Boolean = true
+    var costBreakdown: Boolean = false
 }

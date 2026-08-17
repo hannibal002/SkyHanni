@@ -2,15 +2,10 @@ package at.hannibal2.skyhanni.utils.renderables.animated.bounce
 
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SnappedVec3
 import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemRenderableConfig
-import at.hannibal2.skyhanni.utils.renderables.animated.TimeDependentRenderable
-import at.hannibal2.skyhanni.utils.renderables.animated.framed.AnimatedFrame
-import at.hannibal2.skyhanni.utils.renderables.decorators.RenderableDecorator
 import net.minecraft.core.Direction.Axis
 import kotlin.math.sin
-import kotlin.time.Duration
 
 internal interface BouncingBehavior : AnimatedBounceStorage {
     val config: AnimatedItemRenderableConfig<*>
@@ -23,9 +18,6 @@ internal interface BouncingBehavior : AnimatedBounceStorage {
         set(value) {
             bounceStorage.currentBounce = value
         }
-
-    val bounceExtraHeight: Int get() = bounceDefinition.getTotalBounceOffset(Axis.Y)
-    val bounceExtraWidth: Int get() = bounceDefinition.getTotalBounceOffset(Axis.X)
 
     fun applyBounce() {
         currentBounce = generateBounce()
@@ -43,28 +35,5 @@ internal interface BouncingBehavior : AnimatedBounceStorage {
             val bounceCoordinate = (bounceOffset / 2.0) + bounceCoordinateOffset
             vec.applyAxisValue(axis, bounceCoordinate)
         }
-    }
-}
-
-class BouncingRenderable private constructor(
-    override val root: Renderable,
-    override val config: AnimatedItemRenderableConfig<*>,
-) : RenderableDecorator, TimeDependentRenderable, BouncingBehavior {
-    override val bounceStartTime: SimpleTimeMark = SimpleTimeMark.now()
-    override val height: Int get() = root.height + bounceExtraHeight
-    override val width: Int get() = root.width + bounceExtraWidth
-    override val horizontalAlign get() = root.horizontalAlign
-    override val verticalAlign get() = root.verticalAlign
-    override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
-
-    override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
-        applyBounce()
-    }
-
-    companion object {
-        fun <C : AnimatedFrame> Renderable.Companion.bouncing(
-            root: Renderable,
-            config: AnimatedItemRenderableConfig<C>.() -> Unit = { }
-        ) = BouncingRenderable(root, AnimatedItemRenderableConfig<C>().apply(config))
     }
 }

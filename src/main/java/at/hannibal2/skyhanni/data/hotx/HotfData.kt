@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.HotfApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.foraging.HotfConfig.LotteryDisplayVisibility
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
@@ -29,11 +28,13 @@ private fun calculateCenterOfTheForestLoot(level: Int): Map<HotfReward, Double> 
                 addOrPut(HotfReward.ABILITY_LEVEL, 1.0)
                 addOrPut(HotfReward.EXTRA_TOKENS, 1.0)
             }
+
             2 -> addOrPut(HotfReward.SWEEP_PERCENT, 5.0)
             3 -> {
                 addOrPut(HotfReward.BONUS_WHISPERS_TREE_GIFTS, 20.0)
                 addOrPut(HotfReward.BONUS_WHISPERS_LOGS, 2.0)
             }
+
             4 -> addOrPut(HotfReward.SWEEP_PERCENT, 10.0)
             5 -> addOrPut(HotfReward.EXTRA_TOKENS, 1.0)
         }
@@ -184,6 +185,11 @@ enum class HotfData(
             )
         },
     ),
+    BEEKEEPER(
+        "Beekeeper", 2,
+        { null },
+        { emptyMap() },
+    ),
     HUNTERS_LUCK(
         "Hunter's Luck", 50,
         { level -> (level + 1.0).pow(3.2) },
@@ -232,7 +238,7 @@ enum class HotfData(
     RICOCHET(
         "Ricochet", 10,
         { level -> (level + 1.0).pow(5.5) },
-        { level -> mapOf(HotfReward.AXE_BOUNCE_CHANCE to level * 1.0) }
+        { level -> mapOf(HotfReward.AXE_BOUNCE_CHANCE to level * 1.0) },
     ),
     HALF_FULL(
         "Half Full", 25,
@@ -266,13 +272,9 @@ enum class HotfData(
     companion object : HotxHandler<HotfData, HotfReward>(entries) {
         override val name: String = "HotF"
         override val core: HotfData = CENTER_OF_THE_FOREST
-        override val rotatingPerkSlots = listOf(
-            object : RotatingPerkSlot<HotfData> {
-                override val entry: HotfData = LOTTERY
-                override val perks = HotfApi.LotteryPerk.entries
-                override var currentPerk: RotatingPerk? = null
-            },
-        )
+        val lotterySlot = RotatingPerkSlot(LOTTERY, HotfApi.LotteryPerk.entries)
+        val beekeeperSlot = RotatingPerkSlot(BEEKEEPER, HotfApi.BeekeeperPerk.entries)
+        override val rotatingPerkSlots: List<RotatingPerkSlot<HotfData, *>> = listOf(lotterySlot, beekeeperSlot)
         override val islandTypeTag = IslandTypeTag.FORAGING
         private val config get() = SkyHanniMod.feature.foraging.hotf
 
@@ -280,9 +282,9 @@ enum class HotfData(
 
         override val shouldShowDisplay
             get() = when (config.lotteryDisplay) {
-                LotteryDisplayVisibility.OFF -> false
-                LotteryDisplayVisibility.FORAGING_ONLY -> inApplicableIsland
-                LotteryDisplayVisibility.EVERYWHERE -> true
+                OFF -> false
+                FORAGING_ONLY -> inApplicableIsland
+                EVERYWHERE -> true
             }
 
         override var tokens: Int
@@ -291,9 +293,9 @@ enum class HotfData(
                 ProfileStorageData.profileSpecific?.foraging?.tokens = value
             }
         override var availableTokens: Int
-            get() = ProfileStorageData.profileSpecific?.mining?.availableTokens ?: 0
+            get() = ProfileStorageData.profileSpecific?.foraging?.availableTokens ?: 0
             set(value) {
-                ProfileStorageData.profileSpecific?.mining?.availableTokens = value
+                ProfileStorageData.profileSpecific?.foraging?.availableTokens = value
             }
 
         var whispersCurrent: Long
@@ -315,7 +317,7 @@ enum class HotfData(
          */
         override val enabledPattern: Pattern by patternGroup.pattern(
             "perk.enable",
-            """ENABLED|SELECTED"""
+            """ENABLED|SELECTED""",
         )
 
         /**
@@ -323,7 +325,7 @@ enum class HotfData(
          */
         override val inventoryPattern: Pattern by patternGroup.pattern(
             "inventory",
-            """Heart of the Forest"""
+            """Heart of the Forest""",
         )
 
         /**
@@ -331,7 +333,7 @@ enum class HotfData(
          */
         override val levelPattern: Pattern by patternGroup.pattern(
             "perk.level",
-            "(?:§.)*Level (?<level>\\d+).*"
+            "(?:§.)*Level (?<level>\\d+).*",
         )
 
         /**
@@ -343,7 +345,7 @@ enum class HotfData(
          */
         override val notUnlockedPattern: Pattern by patternGroup.pattern(
             "perk.notunlocked",
-            """Requires.*|.*Forest!|Click to unlock!"""
+            """Requires.*|.*Forest!|Click to unlock!""",
         )
 
         /**
@@ -351,7 +353,7 @@ enum class HotfData(
          */
         override val heartItemPattern: Pattern by patternGroup.pattern(
             "inventory.heart",
-            """Heart of the Forest"""
+            """Heart of the Forest""",
         )
 
         /**
@@ -359,7 +361,7 @@ enum class HotfData(
          */
         override val resetItemPattern: Pattern by patternGroup.pattern(
             "inventory.reset",
-            """Reset Heart of the Forest"""
+            """Reset Heart of the Forest""",
         )
 
         /**
@@ -367,7 +369,7 @@ enum class HotfData(
          */
         override val heartTokensPattern: Pattern by patternGroup.pattern(
             "inventory.heart.token",
-            """Tokens of the Forest: (?<token>\d+)"""
+            """Tokens of the Forest: (?<token>\d+)""",
         )
 
         /**
@@ -375,7 +377,7 @@ enum class HotfData(
          */
         override val resetTokensPattern: Pattern by patternGroup.pattern(
             "inventory.reset.token",
-            """\s*-\s*(?<token>\d+) Token of the Forest"""
+            """\s*-\s*(?<token>\d+) Token of the Forest""",
         )
 
         /**
@@ -383,7 +385,7 @@ enum class HotfData(
          */
         override val resetChatPattern by patternGroup.pattern(
             "reset.chat",
-            """\s*You have reset your Heart of the Forest! Your Perks and Abilities have been reset\."""
+            """\s*You have reset your Heart of the Forest! Your Perks and Abilities have been reset\.""",
         )
 
         /**
@@ -391,7 +393,7 @@ enum class HotfData(
          */
         private val whisperHeartPattern by patternGroup.pattern(
             "whisper.heart",
-            """Forest Whispers: (?<whisper>[\d,]*)"""
+            """Forest Whispers: (?<whisper>[\d,]*)""",
         )
 
         /**
@@ -399,7 +401,7 @@ enum class HotfData(
          */
         private val whisperResetPattern by patternGroup.pattern(
             "whisper.reset",
-            """\s+-\s*(?<whisper>[\d,]*) Forest Whispers"""
+            """\s+-\s*(?<whisper>[\d,]*) Forest Whispers""",
         )
         // </editor-fold>
 
@@ -421,7 +423,7 @@ enum class HotfData(
 
         override fun tryBlock(event: SkyHanniChatEvent.Allow) {
             if (!chatConfig.hideLottery || IslandTypeTag.FORAGING.isInIsland()) return
-            event.blockedReason = "lottery"
+            event.blockedReason = "foraging_buff"
         }
 
         override fun readFromHeartOrReset(line: String, isHeartItem: Boolean) {
@@ -446,18 +448,19 @@ enum class HotfData(
         }
 
         @HandleEvent(onlyOnSkyblock = true)
-        override fun onChat(event: SkyHanniChatEvent.Allow) = super.onChat(event)
+        private fun onChat(event: SkyHanniChatEvent.Allow) = handleChat(event)
 
         @HandleEvent
-        fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        private fun onDebugDataCollect(event: DebugDataCollectEvent) {
             event.title("HotF")
             event.addIrrelevant {
                 add("Tokens : $availableTokens/$tokens")
                 add("Whisper : $whispersCurrent/$whispersTotal")
+                add("Lottery: ${HotfApi.lottery}")
+                add("Beekeeper: ${HotfApi.beekeeper}")
             }
             debugTree(event)
         }
-
     }
 }
 
