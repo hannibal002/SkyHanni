@@ -48,7 +48,7 @@ object StarlynSisterCouponProfit {
     private data class ItemProfitData(
         val slot: Int,
         val internalName: NeuInternalName,
-        val itemName: Component,
+        val itemName: String,
         val price: Double,
         val totalCost: Double,
         val requiredItems: Map<NeuInternalName, Int>,
@@ -65,6 +65,7 @@ object StarlynSisterCouponProfit {
                 sisterTypeMap[event.inventoryName]?.let { sister ->
                     currentSisterType = sister
                     cachedItemData = buildItemData(event, sister)
+                    updateDisplay()
                 }
             }
         },
@@ -106,7 +107,7 @@ object StarlynSisterCouponProfit {
     private fun toDisplayEntry(data: ItemProfitData): DisplayTableEntry {
         val displayedProfit = if (currentDisplayMode == DisplayMode.PER_COUPON) data.profitPerCoupon else data.profit
         return DisplayTableEntry(
-            data.itemName,
+            data.itemName.asComponent(),
             "§6${displayedProfit.shortFormat()}".asComponent(),
             displayedProfit,
             data.internalName,
@@ -120,7 +121,7 @@ object StarlynSisterCouponProfit {
                 readItem(slot, item, sister)
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
-                    e, "Error in StarlynSisterCouponProfit while reading item '${item.repoItemName}'",
+                    e, "Error while reading item '${item.repoItemName}'",
                     "item" to item,
                     "name" to item.repoItemName,
                     "inventory name" to event.inventoryName,
@@ -131,8 +132,13 @@ object StarlynSisterCouponProfit {
 
     private fun readItem(slot: Int, item: SafeItemStack, sister: StarlynSisterType): ItemProfitData? {
         if (!isValidSlotNumber(slot)) return null
-        val (internalName, itemName) = workOutInternalNameOrNull(item) ?: return null
-        internalName.getItemCategoryOrNull() ?: return null
+
+        val internalName = item.getInternalNameOrNull()
+        //needed for attribute shards to work correctly
+            ?: ItemResolutionQuery.attributeNameToInternalName(item.hoverName.string)
+                ?.let { NeuInternalName.fromItemNameOrInternalName(it) }
+            ?: return null
+        val itemName = internalName.repoItemName
 
         val requiredItems = getRequiredItems(item)
         val price = internalName.getPrice()
@@ -173,20 +179,6 @@ object StarlynSisterCouponProfit {
         }
     }
 
-    // TODO merge logic into core item utils logic, I think
-    private fun workOutInternalNameOrNull(item: SafeItemStack): Pair<NeuInternalName, Component>? {
-        //Logic for attribute shards
-        ItemResolutionQuery.attributeNameToInternalName(item.hoverName.string)?.let { name ->
-            return NeuInternalName.fromItemNameOrInternalName(name) to item.hoverName
-        }
-
-        return if (item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {
-            item.getInternalNameOrNull()?.let { it to item.repoItemName.asComponent() }
-        } else {
-            NeuInternalName.fromItemNameOrNull(item.hoverName.formattedTextCompatLeadingWhiteLessResets())?.let { it to item.hoverName }
-        }
-    }
-
     private fun getRequiredItems(item: SafeItemStack): Map<NeuInternalName, Int> {
         val lore = item.getLore()
         return lore
@@ -198,7 +190,8 @@ object StarlynSisterCouponProfit {
                     NeuInternalName.fromItemName(name) to amount
                 } ?: run {
                     ErrorManager.logErrorStateWithData(
-                        "Error in StarlynSisterCouponProfit", "Could not read item amount",
+                        "Error getting required item cost for item '${item.repoItemName}'",
+                        "Could not parse required item cost from lore ",
                         "rawItemName" to rawItemName,
                         "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                         "lore" to lore,
@@ -211,7 +204,6 @@ object StarlynSisterCouponProfit {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onChestGuiRender() {
         if (!config.starlynCouponProfitEnabled || !starlynInventory.isInside()) return
-        updateDisplay()
 
         display.let {
             config.starlynCouponProfitPos.renderRenderables(it, posLabel = "Starlyn Sister's Shop Profit")
