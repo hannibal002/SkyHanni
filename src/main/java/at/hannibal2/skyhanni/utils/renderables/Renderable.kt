@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
@@ -315,7 +314,7 @@ interface Renderable {
 
             val inMenu = MinecraftCompat.screen !is PauseScreen
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
-            val isNotInSignAndOnSlot = if (guiScreen !is SignEditScreen && guiScreen !is GuideGui<*>) {
+            val isNotInSignAndOnSlot = if (guiScreen !is SignEditScreen) {
                 ToolTipData.lastSlot == null
                     || GuiData.preDrawEventCancelled
             } else true
@@ -643,52 +642,6 @@ interface Renderable {
                 this@renderBounds.render(mouseOffsetX, mouseOffsetY)
             }
 
-        }
-
-        fun rectButton(
-            content: Renderable,
-            activeColor: Color,
-            inActiveColor: Color = activeColor.darker(0.4),
-            hoveredColor: (Color) -> Color = { it.darker(0.5) },
-            onClick: (Boolean) -> Unit,
-            onHover: (Boolean) -> Unit = {},
-            button: Int = LEFT_MOUSE,
-            bypassChecks: Boolean = false,
-            condition: (Boolean) -> Boolean = { true },
-            startState: Boolean = false,
-            padding: Int = 2,
-            radius: Int = 10,
-            smoothness: Int = 2,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = object : Renderable {
-
-            var state = startState
-
-            val color get() = if (state) activeColor else inActiveColor
-
-            override val width = content.width + padding * 2
-            override val height = content.height + padding * 2
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-
-            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                val realColor: Color
-                if (isHovered(mouseOffsetX, mouseOffsetY) && condition(state) && shouldAllowLink(true, bypassChecks)) {
-                    if (button.isKeyClicked()) {
-                        state = !state
-                        onClick(state)
-                    }
-                    onHover(state)
-                    realColor = hoveredColor(color)
-                } else {
-                    realColor = color
-                }
-                ShaderRenderUtils.drawRoundRect(0, 0, width, height, realColor.rgb, radius, smoothness.toFloat())
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
-                content.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
-            }
         }
 
         fun darkRectButton(
