@@ -51,10 +51,16 @@ object GraphEditorNodeFinder {
         val node = GraphUtils.nearestNodeOnCurrentIsland(next)
         node.pathFind(
             "Progress: ${done.addSeparators()}/${max.addSeparators()} (${percentage.roundTo(2)}%)",
-            condition = { active },
+            condition = { GraphEditor.isEnabled() && active },
         )
         currentNodeToFind = next
         return next
+    }
+
+    fun resumeIfActive() {
+        if (!active) return
+        if (IslandGraphs.currentIslandGraph == null) return
+        calculateNewAllNodeFind()
     }
 
     fun toggleFindAll() {
