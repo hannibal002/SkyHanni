@@ -94,109 +94,89 @@ object DungeonHideItems {
 
     private fun String?.matchesTexture(texture: String?) = texture != null && this == texture
 
-    private fun isSkeletonSkull(headName: String?): Boolean = headName != null && skeletonSkullPattern.matches(headName)
+    private fun isSkeletonSkull(headName: String?): Boolean =
+        headName != null && skeletonSkullPattern.matches(headName)
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     private fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         val entity = event.entity
-
-        if (entity is ItemEntity) {
-            val stack = entity.item
-            val stackName = stack.cleanName
-
-            if (config.hideReviveStone && reviveStonePattern.matches(stackName)) {
-                event.cancel()
-            }
-
-            if (config.hideJournalEntry && journalEntryPattern.matches(stackName)) {
-                event.cancel()
-            }
-            return
+        val shouldCancel = when (entity) {
+            is ItemEntity -> onRenderItem(entity)
+            is ArmorStand -> onRenderArmorStand(entity)
+            else -> return
         }
+        if (shouldCancel) {
+            event.cancel()
+        }
+    }
 
-        if (entity !is ArmorStand) return
+    private fun onRenderItem(entity: ItemEntity): Boolean {
+        val stack = entity.item
+        val stackName = stack.cleanName
 
+        return when {
+            config.hideReviveStone && reviveStonePattern.matches(stackName) -> true
+            config.hideJournalEntry && journalEntryPattern.matches(stackName) -> true
+            else -> false
+        }
+    }
+
+    private fun onRenderArmorStand(entity: ArmorStand): Boolean {
         val head = entity.getStandHelmet()
         val skullTexture = head?.getSkullTexture()
         val headName = head?.cleanName
         val entityName by lazy { entity.cleanName }
-
-        if (config.hideSuperboomTNT) {
-            if (headName != null && superboomTntPattern.matches(headName)) {
-                event.cancel()
-                hideParticles[entity] = SimpleTimeMark.now()
-            } else if (superboomTntPattern.matches(entityName)) {
-                event.cancel()
-            }
-        }
-
-        if (config.hideBlessing) {
-            if (skullTexture.matchesTexture(BLESSING_TEXTURE)) {
-                event.cancel()
-            } else if (blessingPattern.matches(entityName)) {
-                event.cancel()
-            }
-        }
-
-        if (config.hideReviveStone) {
-            if (skullTexture.matchesTexture(REVIVE_STONE_TEXTURE)) {
-                event.cancel()
-                hideParticles[entity] = SimpleTimeMark.now()
-            } else if (reviveStonePattern.matches(entityName)) {
-                event.cancel()
-            }
-        }
-
-        if (config.hidePremiumFlesh) {
-            if (skullTexture.matchesTexture(PREMIUM_FLESH_TEXTURE)) {
-                event.cancel()
-            } else if (premiumFleshPattern.matches(entityName)) {
-                event.cancel()
-                hideParticles[entity] = SimpleTimeMark.now()
-            }
-        }
-
-        if (isSkeletonSkull(headName)) {
+        val skeletonHead = isSkeletonSkull(headName)
+        if (skeletonHead) {
             EntityMovementData.addToTrack(entity)
-            if (config.hideSkeletonSkull) {
-                val lastMove = movingSkeletonSkulls[entity] ?: SimpleTimeMark.farPast()
-                if (lastMove.passedSince() < 100.milliseconds) return
-                event.cancel()
-            }
         }
 
-        if (config.hideHealerOrbs) {
-            if (
-                skullTexture.matchesTexture(ABILITY_ORB_TEXTURE) ||
-                skullTexture.matchesTexture(SUPPORT_ORB_TEXTURE) ||
-                skullTexture.matchesTexture(DAMAGE_ORB_TEXTURE)
-            ) {
-                event.cancel()
+        return when {
+            config.hideSuperboomTNT && headName != null && superboomTntPattern.matches(headName) -> {
                 hideParticles[entity] = SimpleTimeMark.now()
-                return
+                true
+            }
+            config.hideSuperboomTNT && superboomTntPattern.matches(entityName) -> true
+
+            config.hideBlessing && skullTexture.matchesTexture(BLESSING_TEXTURE) -> true
+            config.hideBlessing && blessingPattern.matches(entityName) -> true
+
+            config.hideReviveStone && skullTexture.matchesTexture(REVIVE_STONE_TEXTURE) -> {
+                hideParticles[entity] = SimpleTimeMark.now()
+                true
+            }
+            config.hideReviveStone && reviveStonePattern.matches(entityName) -> true
+
+            config.hidePremiumFlesh && skullTexture.matchesTexture(PREMIUM_FLESH_TEXTURE) -> true
+            config.hidePremiumFlesh && premiumFleshPattern.matches(entityName) -> {
+                hideParticles[entity] = SimpleTimeMark.now()
+                true
             }
 
-            if (
+            config.hideSkeletonSkull && skeletonHead -> {
+                val lastMove = movingSkeletonSkulls[entity] ?: SimpleTimeMark.farPast()
+                lastMove.passedSince() >= 100.milliseconds
+            }
+
+            config.hideHealerOrbs && (
+                skullTexture.matchesTexture(ABILITY_ORB_TEXTURE) ||
+                    skullTexture.matchesTexture(SUPPORT_ORB_TEXTURE) ||
+                    skullTexture.matchesTexture(DAMAGE_ORB_TEXTURE)
+                ) -> {
+                hideParticles[entity] = SimpleTimeMark.now()
+                true
+            }
+            config.hideHealerOrbs && (
                 damageOrbPattern.matches(entityName) ||
-                abilityDamageOrbPattern.matches(entityName) ||
-                defenseOrbPattern.matches(entityName)
-            ) {
-                event.cancel()
-            }
-        }
+                    abilityDamageOrbPattern.matches(entityName) ||
+                    defenseOrbPattern.matches(entityName)
+                ) -> true
 
-        if (config.hideHealerFairy) {
-            if (entity.holdingSkullTexture(HEALER_FAIRY_TEXTURE)) {
-                event.cancel()
-                return
-            }
-        }
+            config.hideHealerFairy && entity.holdingSkullTexture(HEALER_FAIRY_TEXTURE) -> true
 
-        if (config.hideSoulweaverSkulls) {
-            if (skullTexture.matchesTexture(SOUL_WEAVER_HIDER)) {
-                event.cancel()
-                return
-            }
+            config.hideSoulweaverSkulls && skullTexture.matchesTexture(SOUL_WEAVER_HIDER) -> true
+
+            else -> false
         }
     }
 
