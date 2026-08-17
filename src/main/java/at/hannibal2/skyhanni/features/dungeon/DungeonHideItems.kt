@@ -209,13 +209,14 @@ object DungeonHideItems {
     private fun onArmorStandMove(event: EntityMoveEvent<ArmorStand>) {
         val entity = event.entity
         val headName = entity.getStandHelmet()?.cleanName
-        if (!isSkeletonSkull(headName)) return
 
-        movingSkeletonSkulls[entity] = SimpleTimeMark.now()
-        RenderLivingEntityHelper.setEntityColor(
-            entity,
-            LorenzColor.GOLD.toColor().addAlpha(60),
-        ) { shouldColorMovingSkull(entity) }
+        if (isSkeletonSkull(headName)) {
+            movingSkeletonSkulls[entity] = SimpleTimeMark.now()
+            RenderLivingEntityHelper.setEntityColor(
+                entity,
+                LorenzColor.GOLD.toColor().addAlpha(60),
+            ) { shouldColorMovingSkull(entity) }
+        }
     }
 
     private fun shouldColorMovingSkull(entity: ArmorStand): Boolean =
