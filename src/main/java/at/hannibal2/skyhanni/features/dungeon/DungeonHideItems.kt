@@ -121,11 +121,12 @@ object DungeonHideItems {
         }
     }
 
+    @Suppress("CyclomaticComplexMethod")
     private fun onRenderArmorStand(entity: ArmorStand): Boolean {
         val head = entity.getStandHelmet()
         val skullTexture = head?.getSkullTexture()
         val headName = head?.cleanName
-        val entityName by lazy { entity.cleanName }
+        val entityName = entity.cleanName
         val skeletonHead = isSkeletonSkull(headName)
         if (skeletonHead) {
             EntityMovementData.addToTrack(entity)
