@@ -2812,7 +2812,6 @@
     <ID>PrivateEventListener:SkyHanniMod.kt:SkyHanniMod$@HandleEvent fun onTick</ID>
     <ID>PrivateEventListener:SkyHanniRepoManager.kt:SkyHanniRepoManager$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:SkyHanniRepoManager.kt:SkyHanniRepoManager$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:SkyHanniRoundedShapeRenderManager.kt:SkyHanniRoundedShapeRenderManager$@HandleEvent fun onDebugDataCollect</ID>
     <ID>PrivateEventListener:SkyHanniTracker.kt:SkyHanniTracker.Companion$@HandleEvent fun onTick</ID>
     <ID>PrivateEventListener:SkyMartCopperPrice.kt:SkyMartCopperPrice$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:SkyMartCopperPrice.kt:SkyMartCopperPrice$@HandleEvent fun onConfigFix</ID>
@@ -3467,7 +3466,6 @@
     <ID>TrailingCommaOnDeclarationSite:BetterContainers.kt:BetterContainers$( backgroundStyle: LegacyBetterContainers.BackgroundStyle )</ID>
     <ID>TrailingCommaOnDeclarationSite:BetterContainers.kt:BetterContainers$( handlerInventory: Container, horizontalTexMult: Int, verticalTexMult: Int, bufferedImageNew: BufferedImage )</ID>
     <ID>TrailingCommaOnDeclarationSite:BlockStrengthGuide.kt:BlockStrengthGuide$DisplayOres</ID>
-    <ID>TrailingCommaOnDeclarationSite:BouncingRenderable.kt:BouncingRenderable.Companion$( root: Renderable, config: AnimatedItemRenderableConfig&lt;C&gt;.() -&gt; Unit = { } )</ID>
     <ID>TrailingCommaOnDeclarationSite:BroodmotherFeatures.kt:BroodmotherFeatures$StageEntry</ID>
     <ID>TrailingCommaOnDeclarationSite:CTMUtils.kt:CTMUtils.CTMData$( val up: Boolean, val right: Boolean, val down: Boolean, val left: Boolean, val upLeft: Boolean, val upRight: Boolean, val downRight: Boolean, val downLeft: Boolean )</ID>
     <ID>TrailingCommaOnDeclarationSite:CakeCounterConfig.kt:CakeCounterConfig$OfflineStatsMode</ID>
@@ -3523,13 +3521,11 @@
     <ID>TrailingCommaOnDeclarationSite:ForagingTrackerConfig.kt:ForagingTrackerConfig$TreeGiftBonusDropCategory</ID>
     <ID>TrailingCommaOnDeclarationSite:FossilMutation.kt:FossilMutation</ID>
     <ID>TrailingCommaOnDeclarationSite:FossilType.kt:FossilType$( val displayName: String, val totalTiles: Int, val firstPercentage: String, val fossilShape: FossilShape, val possibleMutations: List&lt;FossilMutation&gt; )</ID>
-    <ID>TrailingCommaOnDeclarationSite:FramedRenderable.kt:FramedRenderable.Companion$( root: Renderable, config: AnimatedItemRenderableConfig&lt;T&gt;.() -&gt; Unit = { } )</ID>
     <ID>TrailingCommaOnDeclarationSite:FrogMaskWarningConfig.kt:FrogMaskWarningConfig$WarningType</ID>
     <ID>TrailingCommaOnDeclarationSite:GenericIndividualTrackerConfig.kt:GenericIndividualTrackerConfig$( createType: () -&gt; Type )</ID>
     <ID>TrailingCommaOnDeclarationSite:GetFromSackApi.kt:GetFromSackApi$CommandResult</ID>
     <ID>TrailingCommaOnDeclarationSite:GriffinBurrowParticleFinder.kt:GriffinBurrowParticleFinder$ParticleType</ID>
     <ID>TrailingCommaOnDeclarationSite:GuiRenderUtils.kt:GuiRenderUtils$( translateX: Float, translateY: Float, scale: Float )</ID>
-    <ID>TrailingCommaOnDeclarationSite:GuideRenderablePage.kt:GuideRenderablePage$( val paddingX: Int = 0, val paddingY: Int = 0 )</ID>
     <ID>TrailingCommaOnDeclarationSite:HideSlayerSpawnParticles.kt:HideSlayerSpawnParticles$SpawnParticles</ID>
     <ID>TrailingCommaOnDeclarationSite:HolographicEntities.kt:HolographicEntities$( vararg classes: KClass&lt;out T&gt; )</ID>
     <ID>TrailingCommaOnDeclarationSite:HoppityCollectionStats.kt:HoppityCollectionStats$HighlightRabbitTypes</ID>

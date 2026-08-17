@@ -28,7 +28,7 @@ class EliteFarmersLeaderboardsConfig {
     )
     @ConfigEditorDraggableList
     val display: Property<MutableList<EliteLeaderboards>> = Property.of(
-        mutableListOf(EliteLeaderboards.CROP, EliteLeaderboards.PEST, EliteLeaderboards.WEIGHT)
+        mutableListOf(EliteLeaderboards.PEST, EliteLeaderboards.WEIGHT)
     )
 
     @Expose
