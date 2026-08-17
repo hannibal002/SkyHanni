@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -58,6 +59,8 @@ object FarmingWeightData {
     private var hasFetchedCropWeights = false
     private var shouldRecalculateWeight = false
 
+    private val cropWeightsCoroutine = CoroutineSettings("get crop weights")
+
     @HandleEvent(onlyOnIsland = GARDEN)
     private fun onConfigLoad() {
         config.enabled.onEnable {
@@ -95,7 +98,7 @@ object FarmingWeightData {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
 
-        SkyHanniMod.launchIOCoroutine("get crop weights") {
+        cropWeightsCoroutine.launch {
             getCropWeights()
         }
     }
