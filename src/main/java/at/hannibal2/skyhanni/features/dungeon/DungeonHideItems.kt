@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -34,8 +35,14 @@ object DungeonHideItems {
 
     private val config get() = SkyHanniMod.feature.dungeon.objectHider
 
-    private val hideParticles = TimeLimitedSet<ArmorStand>(expireAfterWrite = 100.milliseconds, useWeakKeys = true)
-    private val movingSkeletonSkulls = mutableMapOf<ArmorStand, SimpleTimeMark>()
+    private val hideParticles = TimeLimitedSet<ArmorStand>(
+        expireAfterWrite = 100.milliseconds,
+        useWeakKeys = true
+    )
+    private val movingSkeletonSkulls = TimeLimitedCache<ArmorStand, SimpleTimeMark>(
+        expireAfterWrite = 200.milliseconds,
+        useWeakKeys = true
+    )
 
     private val SOUL_WEAVER_HIDER by SkullTextureHolder.texture("DUNGEONS_SOUL_WEAVER")
     private val BLESSING_TEXTURE by SkullTextureHolder.texture("DUNGEONS_BLESSING")
@@ -100,8 +107,7 @@ object DungeonHideItems {
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     private fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
-        val entity = event.entity
-        val shouldCancel = when (entity) {
+        val shouldCancel = when (val entity = event.entity) {
             is ItemEntity -> onRenderItem(entity)
             is ArmorStand -> onRenderArmorStand(entity)
             else -> return
@@ -184,16 +190,14 @@ object DungeonHideItems {
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     private fun onParticle(event: ParticleEvent) {
-        if (!config.hideSuperboomTNT && !config.hideReviveStone) return
+        if (!config.hideSuperboomTNT && !config.hideReviveStone &&
+            !config.hidePremiumFlesh && !config.hideHealerOrbs) return
 
         val packetLocation = event.location
         for (armorStand in hideParticles) {
             val distance = packetLocation.distance(armorStand.getLorenzVec())
             if (distance < 2) {
-                if (event.type == ParticleTypes.FIREWORK) {
-                    event.cancel()
-                }
-                if (event.type == ParticleTypes.DUST) {
+                if (event.type == ParticleTypes.FIREWORK || event.type == ParticleTypes.DUST) {
                     event.cancel()
                 }
             }
@@ -214,7 +218,7 @@ object DungeonHideItems {
         }
     }
 
-    private fun shouldColorMovingSkull(entity: Entity) =
+    private fun shouldColorMovingSkull(entity: ArmorStand): Boolean =
         SkyHanniMod.feature.dungeon.highlightSkeletonSkull &&
             movingSkeletonSkulls[entity]?.let {
                 it.passedSince() < 200.milliseconds
