@@ -213,10 +213,27 @@ object GraphEditor {
         config.enabled = true
         ChatUtils.chat("Graph Editor is now active.")
         GraphEditorNodeFinder.resumeIfActive()
+        sendTutorialReminder()
+    }
+
+    private fun sendTutorialReminder() {
         val storage = SkyHanniMod.feature.storage
-        if (storage.graphEditorTutorialSeen) return
-        storage.graphEditorTutorialSeen = true
-        ChatUtils.clickableLinkChat("New to the Graph Editor? Click here to read the tutorial.", TUTORIAL_URL)
+        if (storage.graphEditorTutorialAcknowledged) return
+        ChatUtils.clickableLinkChat(
+            "New to the Graph Editor? Click here to read the tutorial!",
+            TUTORIAL_URL,
+            replaceSameMessage = true,
+        )
+        ChatUtils.clickableChat(
+            message = "§2§l[I GET IT]",
+            prefix = false,
+            replaceSameMessage = true,
+            oneTimeClick = true,
+            onClick = {
+                storage.graphEditorTutorialAcknowledged = true
+                ChatUtils.chat("§aYou will no longer be reminded about the Graph Editor tutorial.")
+            },
+        )
     }
 
     fun openTutorial() = ChatUtils.clickableLinkChat(

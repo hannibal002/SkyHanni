@@ -18,7 +18,7 @@ class Storage {
     var contestSendingAsked: Boolean = false
 
     @Expose
-    var graphEditorTutorialSeen: Boolean = false
+    var graphEditorTutorialAcknowledged: Boolean = false
 
     @Expose
     var harvestFeastStorage: HarvestFeastStorage = HarvestFeastStorage()
