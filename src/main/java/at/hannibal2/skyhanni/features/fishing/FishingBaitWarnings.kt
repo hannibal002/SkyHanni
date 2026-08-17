@@ -57,13 +57,13 @@ object FishingBaitWarnings {
 
     private fun showDarkAndLightBaitWarning() {
         val currentBait = FishingApi.currentBait ?: return
-        val shouldBeSunny = when (currentBait.internalName) {
+        val shouldBeDaytime = when (currentBait.internalName) {
             LIGHT_BAIT -> true
             DARK_BAIT -> false
             else -> return
         }
-        val hasSun = SkyBlockTime.now().isSunny()
-        if (shouldBeSunny != SkyBlockTime.now().isSunny()) {
+        val hasSun = SkyBlockTime.now().isDayTime()
+        if (shouldBeDaytime != hasSun) {
             SoundUtils.playClickSound()
             TitleManager.sendTitle("§eWrong Bait!", duration = 2.seconds)
             val timeText = if (hasSun) "Day" else "Night"

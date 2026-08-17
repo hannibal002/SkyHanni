@@ -41,12 +41,12 @@ data class SkyBlockTime(
         return fromTimeMark(SimpleTimeMark(millis))
     }
 
-    fun isSunny(): Boolean {
-        return hour <= 12
+    fun isDayTime(): Boolean {
+        return hour in 6..18
     }
 
-    fun isNight(): Boolean {
-        return !isSunny()
+    fun isNightTime(): Boolean {
+        return !isDayTime()
     }
 
     companion object {
