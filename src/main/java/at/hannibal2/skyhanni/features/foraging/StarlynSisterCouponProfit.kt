@@ -8,12 +8,13 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.foraging.StarlynSisterDetector.createStarlynDetector
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.readItemAmount
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -65,7 +66,7 @@ object StarlynSisterCouponProfit {
         onClose = {
             cachedItemData = emptyList()
             display = emptyList()
-        }
+        },
     )
 
     enum class DisplayMode(val display: String) {
@@ -107,6 +108,7 @@ object StarlynSisterCouponProfit {
             highlightsOnHoverSlots = listOf(data.slot),
         )
     }
+
     private fun buildItemData(event: InventoryFullyOpenedEvent, sister: StarlynSisterType): List<ItemProfitData> =
         event.inventoryItems.mapNotNull { (slot, item) ->
             try {
@@ -125,11 +127,20 @@ object StarlynSisterCouponProfit {
     private fun readItem(slot: Int, item: SafeItemStack, sister: StarlynSisterType): ItemProfitData? {
         if (!isValidSlotNumber(slot)) return null
 
-        val internalName = item.getInternalNameOrNull()
-        //required for attribute shards to work correctly
-            ?: ItemResolutionQuery.attributeNameToInternalName(item.hoverName.string)
+        val hoverName = item.hoverName.string
+        val fixedDisplayName = hoverName.replace("[Lvl 100]", "[Lvl {LVL}]")
+
+        val internalName = item.run {
+            //Attribute Shards
+            ItemResolutionQuery.attributeNameToInternalName(fixedDisplayName)
                 ?.let { NeuInternalName.fromItemNameOrInternalName(it) }
-            ?: return null
+            //Enchanted Books
+                ?: if (getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) getInternalNameOrNull()
+                //Rest of the items
+                else NeuInternalName.fromItemNameOrNull(fixedDisplayName)
+
+        } ?: return null
+
         val itemName = internalName.repoItemName
 
         val requiredItems = getRequiredItems(item)
