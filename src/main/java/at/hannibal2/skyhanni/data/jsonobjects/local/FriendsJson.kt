@@ -6,12 +6,12 @@ import java.util.UUID
 
 data class FriendsJson(
     @Expose
-    val players: MutableMap<UUID, PlayerFriends> = mutableMapOf()
+    val players: MutableMap<UUID, PlayerFriends> = mutableMapOf(),
 )
 
 data class PlayerFriends(
     @Expose
-    val friends: MutableMap<UUID, Friend> = mutableMapOf()
+    val friends: MutableMap<UUID, Friend> = mutableMapOf(),
 )
 
 data class Friend(
@@ -19,5 +19,5 @@ data class Friend(
     var name: String = "",
 
     @Expose
-    var bestFriend: Boolean = false
+    var bestFriend: Boolean = false,
 )
