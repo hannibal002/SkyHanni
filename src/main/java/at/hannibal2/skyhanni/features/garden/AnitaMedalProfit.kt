@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -70,26 +71,28 @@ object AnitaMedalProfit {
         if (event.inventoryName != "Anita") return
         if (VisitorApi.inInventory) return
 
-        inInventory = true
+        DelayedRun.runOrNextTick {
+            inInventory = true
 
-        val table = mutableListOf<DisplayTableEntry>()
-        for ((slot, item) in event.inventoryItems) {
-            try {
-                readItem(slot, item, table)
-            } catch (e: Throwable) {
-                ErrorManager.logErrorWithData(
-                    e, "Error in AnitaMedalProfit while reading item '${item.repoItemName}'",
-                    "item" to item,
-                    "name" to item.repoItemName,
-                    "inventory name" to InventoryUtils.openInventoryName(),
-                )
+            val table = mutableListOf<DisplayTableEntry>()
+            for ((slot, item) in event.inventoryItems) {
+                try {
+                    readItem(slot, item, table)
+                } catch (e: Throwable) {
+                    ErrorManager.logErrorWithData(
+                        e, "Error in AnitaMedalProfit while reading item '${item.repoItemName}'",
+                        "item" to item,
+                        "name" to item.repoItemName,
+                        "inventory name" to InventoryUtils.openInventoryName(),
+                    )
+                }
             }
-        }
 
-        val newList = mutableListOf<Renderable>()
-        newList.addString("§eProfit per Bronze Medal")
-        newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
-        display = newList
+            val newList = mutableListOf<Renderable>()
+            newList.addString("§eProfit per Bronze Medal")
+            newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
+            display = newList
+        }
     }
 
     private fun readItem(slot: Int, item: SafeItemStack, table: MutableList<DisplayTableEntry>) {

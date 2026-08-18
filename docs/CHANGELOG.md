@@ -144,6 +144,7 @@
 + Added /shnavall. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6251)
     + Navigate to all occurrences of a target on an island.
     + May be useful for new points of interest on Honey Hives (Torrhus Canyon), and the Bells and Hideyho (Safari).
++ Added support for Minecraft 26.2. - Luna (https://github.com/hannibal002/SkyHanni/pull/5894)
 
 ### Improvements
 
@@ -241,6 +242,8 @@
 
 + Improved `/shmarkplayer` player completion. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5787)
 + Improved Command Tab Completion to include Carry Customers. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5787)
++ Improved the contributor discovery message to show who the contributor is. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6265)
+    + Now includes a player head sprite.
 
 #### Inventory
 
@@ -333,6 +336,7 @@
 + Added support for coordinates copied from the SkyBlock Wiki in commands that take coordinates, for example /shnav. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6299)
 + Marked Custom Scoreboard as deprecated. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6177)
     + The built-in version is no longer maintained and will be removed in favor of the standalone mod.
++ Improved default settings for Garden features when using SkyHanni for the first time. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6357)
 
 ### Fixes
 
@@ -420,6 +424,9 @@
     + The option is now called "Exclude Unfarmable Plots".
 + Fixed Atmospheric Filter Display not detecting the Farming Fortune buff. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6369)
 + Fixed new Attribute Shards from Pests not being tracked by Pest Profit Tracker. - Luna (https://github.com/hannibal002/SkyHanni/pull/6386)
++ Fixed the New Spray Notice showing up after spraying with an upgraded Sprayonator. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6389)
++ Fixed the Spray Display always showing 30 minutes for upgraded Sprayonators. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6389)
+    + The Juicy Sprayonator lasts 45 minutes, the Salty Sprayonator 60 minutes.
 
 #### Combat
 
@@ -639,6 +646,10 @@
 + Fixed additional cost in the Chocolate Shop and SkyMart overlays ignoring the number of items. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6365)
 + Fixed an error when opening the HOTM/HOTF menu with a rotating perk. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6317)
     + When switching HOTM/HOTF layouts, the current perk line is missing from the item lore.
++ Fixed an error when opening a shop profit overlay as the first inventory after starting the game. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6377)
+    + Affects Anita Medal Profit, Pesthunter Profit, Starlyn Sister Coupon Profit and Fishy Treat Profit.
++ Fixed completely filled large Bazaar orders not being highlighted green. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6387)
++ Fixed the Attribute Shard Overlay showing Enough in Hunting Box for shards that are no longer in the Hunting Box. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6392)
 
 #### Commands
 
@@ -1220,6 +1231,11 @@
 + Added a console log for duplicate item display names. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6352)
 + Moved the display name lookup exclusions into the repo. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6352)
 + Removed the unused getInternalNameFromHypixelId. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6352)
++ Added a tutorial for the Graph Network and Graph Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6312)
++ Added the ability to disable event listeners and invokers per Minecraft version. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6303)
++ Removed some unused and duplicated rendering-related code. - Luna (https://github.com/hannibal002/SkyHanni/pull/6359)
++ Renamed /shtestreseterrorcache to /shreseterrorcache. - Luna (https://github.com/hannibal002/SkyHanni/pull/6400)
++ Replaced the deprecated IslandChangeEvent with IslandJoinEvent and IslandLeaveEvent in EntityMovementData and TunnelsMaps. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6378)
 
 ### Removed Features
 

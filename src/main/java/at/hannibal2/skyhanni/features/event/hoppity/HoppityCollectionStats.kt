@@ -367,7 +367,9 @@ object HoppityCollectionStats {
 
         inInventory = true
         if (collectionConfig.enabled) {
-            display = event.buildDisplay()
+            DelayedRun.runOrNextTick {
+                display = event.buildDisplay()
+            }
         }
 
         if (collectionConfig.showResidentSummary) {
