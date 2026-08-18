@@ -8,7 +8,7 @@ object StarlynSisterDetector {
         isEnabled: () -> Boolean,
         setSisterType: (StarlynSisterType?) -> Unit,
         onOpen: (event: InventoryFullyOpenedEvent, sister: StarlynSisterType) -> Unit,
-        onClose: () -> Unit
+        onClose: () -> Unit,
     ): InventoryDetector {
         val sisterTypeMap = StarlynSisterType.entries.associateBy { it.inventoryName }
 

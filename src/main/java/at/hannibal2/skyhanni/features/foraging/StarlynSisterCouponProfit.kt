@@ -131,12 +131,9 @@ object StarlynSisterCouponProfit {
         val fixedDisplayName = hoverName.replace("[Lvl 100]", "[Lvl {LVL}]")
 
         val internalName = item.run {
-            //Attribute Shards
             ItemResolutionQuery.attributeNameToInternalName(fixedDisplayName)
                 ?.let { NeuInternalName.fromItemNameOrInternalName(it) }
-            //Enchanted Books
                 ?: if (getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) getInternalNameOrNull()
-                //Rest of the items
                 else NeuInternalName.fromItemNameOrNull(fixedDisplayName)
 
         } ?: return null
@@ -184,24 +181,21 @@ object StarlynSisterCouponProfit {
 
     private fun getRequiredItems(item: SafeItemStack): Map<NeuInternalName, Int> {
         val lore = item.getLore()
-        return lore
-            .sublistAfter({ it == "§7Cost" }, skip = 1, amount = lore.size)
-            .takeWhile { it.isNotEmpty() }
-            .mapNotNull { line ->
-                val rawItemName = line.replace("§8 ", " §8")
-                readItemAmount(rawItemName)?.let { (name, amount) ->
-                    NeuInternalName.fromItemName(name) to amount
-                } ?: run {
-                    ErrorManager.logErrorStateWithData(
-                        "Error getting required item cost for item '${item.repoItemName}'",
-                        "Could not parse required item cost from lore ",
-                        "rawItemName" to rawItemName,
-                        "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
-                        "lore" to lore,
-                    )
-                    null
-                }
-            }.toMap()
+        return lore.sublistAfter({ it == "§7Cost" }, skip = 1, amount = lore.size).takeWhile { it.isNotEmpty() }.mapNotNull { line ->
+            val rawItemName = line.replace("§8 ", " §8")
+            readItemAmount(rawItemName)?.let { (name, amount) ->
+                NeuInternalName.fromItemName(name) to amount
+            } ?: run {
+                ErrorManager.logErrorStateWithData(
+                    "Error getting required item cost for item '${item.repoItemName}'",
+                    "Could not parse required item cost from lore ",
+                    "rawItemName" to rawItemName,
+                    "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                    "lore" to lore,
+                )
+                null
+            }
+        }.toMap()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
