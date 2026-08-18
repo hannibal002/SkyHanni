@@ -155,7 +155,7 @@ object FriendApi {
     }
 
     private fun addFriend(name: String) {
-        tempFriends.add(Friend().also { it.name = name })
+        tempFriends.add(Friend(name = name))
         FriendAddEvent(name).post()
     }
 
@@ -194,10 +194,10 @@ object FriendApi {
             val bestFriend = sibling.unformattedTextCompat().split(" ").firstOrNull()?.contains("§l") ?: false
             val name = readName(sibling)
             if (uuid != null && name != null) {
-                getFriends()[uuid] = Friend().also {
-                    it.name = name
-                    it.bestFriend = bestFriend
-                }
+                getFriends()[uuid] = Friend(
+                    name = name,
+                    bestFriend = bestFriend,
+                )
             }
         }
 

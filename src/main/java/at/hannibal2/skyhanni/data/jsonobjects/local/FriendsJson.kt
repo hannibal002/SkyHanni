@@ -16,7 +16,7 @@ data class PlayerFriends(
 
 data class Friend(
     @Expose
-    var name: String = "",
+    val name: String = "",
 
     @Expose
     var bestFriend: Boolean = false,
