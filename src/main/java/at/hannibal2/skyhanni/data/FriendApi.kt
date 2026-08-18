@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.data.jsonobjects.local.Friend
-import at.hannibal2.skyhanni.data.jsonobjects.local.PlayerFriends
+import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.Friend
+import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.PlayerFriends
 import at.hannibal2.skyhanni.events.FriendAddEvent
 import at.hannibal2.skyhanni.events.FriendRemoveEvent
 import at.hannibal2.skyhanni.events.FriendRequestDeclinedEvent
