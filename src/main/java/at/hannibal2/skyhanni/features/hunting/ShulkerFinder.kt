@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.collection.CircularList
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import net.minecraft.world.entity.monster.Shulker
@@ -20,8 +21,7 @@ import net.minecraft.world.entity.monster.Shulker
 object ShulkerFinder {
     private val config get() = SkyHanniMod.feature.hunting
 
-    private val route: MutableList<LorenzVec> = mutableListOf()
-    private val storedRoute: MutableList<LorenzVec> = mutableListOf()
+    private var storedRoute: CircularList<LorenzVec>? = null
 
     private var navigating = false
 
@@ -32,24 +32,15 @@ object ShulkerFinder {
         if (!config.shulkerFinder) return
 
         val shulkerType = ShulkerType.entries.firstOrNull { it.island.isInIsland() } ?: return
-
-        if (route.isEmpty()) {
-            // TODO add generic repo outdated error logic here
-            val newRoute = calculateRoute(shulkerType) ?: error("Current island graph is null and there is a mistake")
-            route.addAll(newRoute)
-            storedRoute.clear()
-            storedRoute.addAll(newRoute)
-        }
-
         navigateToNextShulker(shulkerType)
     }
 
     private fun navigateToNextShulker(shulkerType: ShulkerType) {
-        val goal = route.removeFirstOrNull() ?: error("No shulker route found!")
+        // TODO add generic repo outdated error logic here
+        val route = storedRoute ?: calculateRoute(shulkerType)
+        storedRoute = route
 
-        if (route.isEmpty()) {
-            route.addAll(storedRoute)
-        }
+        val goal = route.next()
 
         navigating = true
         IslandGraphs.pathFind(
@@ -69,17 +60,16 @@ object ShulkerFinder {
     }
 
     @HandleEvent
-    private fun onIslandChange() {
+    private fun onWorldChange() {
         navigating = false
-        route.clear()
-        storedRoute.clear()
+        storedRoute = null
     }
 
-    private fun calculateRoute(shulkerType: ShulkerType): MutableList<LorenzVec>? {
-        val graph = IslandGraphs.currentIslandGraph ?: return null
+    private fun calculateRoute(shulkerType: ShulkerType): CircularList<LorenzVec> {
+        val graph = IslandGraphs.currentIslandGraph ?: error("Current island graph is null and there is a mistake")
         val list = graph.getNodesWithTags(shulkerType.nodeTag)
 
-        return NavigationUtils.getRouteLocations(list).toMutableList()
+        return CircularList(NavigationUtils.getRouteLocations(list))
     }
 
     @HandleEvent
