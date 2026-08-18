@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -48,8 +49,10 @@ object PesthunterProfit {
         if (!config.profitEnabled) return
         if (event.inventoryName != "Pesthunter's Wares") return
 
-        inInventory = true
-        display = buildRenderables(event.inventoryItems)
+        DelayedRun.runOrNextTick {
+            inInventory = true
+            display = buildRenderables(event.inventoryItems)
+        }
     }
 
     private fun buildRenderables(items: Map<Int, SafeItemStack>) = buildList {
