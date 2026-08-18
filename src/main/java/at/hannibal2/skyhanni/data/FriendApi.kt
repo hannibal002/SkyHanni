@@ -114,7 +114,7 @@ object FriendApi {
     }
 
     @HandleEvent
-    private fun onSystemMessage(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         readFriendsList(event)
 
         removedFriendPattern.matchMatcher(event.message) {
