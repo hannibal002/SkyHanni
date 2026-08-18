@@ -14,11 +14,10 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 object UpdateKeybinds {
 
     var keybinds: MutableSet<String> = mutableSetOf()
+    private val logger = SkyHanniLogger("keybind_upgrader")
 
     private var GLFW_TO_SDL_KEYS: MutableMap<Int, Int> = mutableMapOf()
     private var SDL_TO_GLFW_KEYS: MutableMap<Int, Int> = mutableMapOf()
-
-    private val logger = SkyHanniLogger("keybind_upgrader")
 
     private var hasUpdated = false
 
