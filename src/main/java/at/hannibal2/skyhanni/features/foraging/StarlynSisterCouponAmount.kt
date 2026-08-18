@@ -23,7 +23,6 @@ import kotlin.time.Duration.Companion.seconds
 object StarlynSisterCouponAmount {
 
     private val config get() = SkyHanniMod.feature.foraging.starlynContest
-    private val patternGroup = RepoPattern.group("foraging.starlyn-shop")
 
     private val sisterTypeMap = StarlynSisterType.entries.associateBy { it.inventoryName }
     private var currentSisterType: StarlynSisterType? = null
@@ -34,14 +33,6 @@ object StarlynSisterCouponAmount {
     private var couponAmountItemStack: SafeItemStack? = null
 
     fun isEnabled() = config.starlynCouponAmount && starlynInventory.isInside()
-
-    /**
-     * REGEX-TEST: "§aYou bought §r§fFrog Pet§r§a!"
-     */
-    private val shopPurchasePattern by patternGroup.pattern(
-        "purchase",
-        "§aYou bought .*?§a!",
-    )
 
     private val starlynInventory = InventoryDetector(
         checkInventoryName = sisterTypeMap.keys::contains,
