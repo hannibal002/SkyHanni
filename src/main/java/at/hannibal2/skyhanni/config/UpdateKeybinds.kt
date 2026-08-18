@@ -2,7 +2,10 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -81,6 +84,21 @@ object UpdateKeybinds {
 
         GLFW_TO_SDL_KEYS[oldKeyCode] = newKeyCode
         SDL_TO_GLFW_KEYS[newKeyCode] = oldKeyCode
+    }
+
+    @HandleEvent
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetkeybinds") {
+            category = USERS_RESET
+            description = "Resets all of your skyhanni keybinds"
+            aliases = listOf("shkeybindreset")
+            simpleCallback {
+                for (keybind in keybinds) {
+                    SkyHanniConfigSearchResetCommand.resetCommand(arrayOf("reset", "config.$keybind"))
+                }
+                ChatUtils.chat("§aSuccessfully reset all SkyHanni Keybinds")
+            }
+        }
     }
 
     // Has been prefiltered to not include any keybinds that are the same in both versions
