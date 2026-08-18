@@ -120,6 +120,7 @@ object StarlynSisterCouponProfit {
                 )
                 null
             }
+        }
 
     private fun readItem(slot: Int, item: SafeItemStack, sister: StarlynSisterType): ItemProfitData? {
         if (!isValidSlotNumber(slot)) return null
