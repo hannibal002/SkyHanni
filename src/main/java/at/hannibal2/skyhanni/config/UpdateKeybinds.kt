@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -19,12 +20,9 @@ object UpdateKeybinds {
     private val glfwToSdlKeys: MutableMap<Int, Int> = mutableMapOf()
     private val sdlToGlfwKeys: MutableMap<Int, Int> = mutableMapOf()
 
-    private var hasUpdated = false
-
     @HandleEvent(priority = HandleEvent.HIGH)
-    private fun onConfigLoad() {
-        if (hasUpdated) return
-        hasUpdated = true
+    private fun onConfigLoad(event: ConfigLoadEvent) {
+        if (!event.firstLoad) return
 
         val config = SkyHanniMod.feature
         val lastMcVersion = config.lastMinecraftVersion
