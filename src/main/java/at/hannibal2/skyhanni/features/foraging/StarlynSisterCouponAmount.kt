@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -12,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
@@ -20,20 +23,31 @@ import kotlin.time.Duration.Companion.seconds
 object StarlynSisterCouponAmount {
 
     private val config get() = SkyHanniMod.feature.foraging.starlynContest
-    private val sisterInventoryNames = StarlynSisterType.entries.map { it.inventoryName }.toSet()
+    private val patternGroup = RepoPattern.group("foraging.starlyn-shop")
+
+    private val sisterTypeMap = StarlynSisterType.entries.associateBy { it.inventoryName }
     private var currentSisterType: StarlynSisterType? = null
+
     private var lastClick = SimpleTimeMark.farPast()
     private const val CUSTOM_STACK_LOCATION = 4
-    private inline val NAME_TAG_ITEM get() = Items.NAME_TAG
     private val DEBOUNCE_DELAY = 0.3.seconds
     private var couponAmountItemStack: SafeItemStack? = null
 
+    fun isEnabled() = config.starlynCouponAmount && starlynInventory.isInside()
+
+    /**
+     * REGEX-TEST: "§aYou bought §r§fFrog Pet§r§a!"
+     */
+    private val shopPurchasePattern by patternGroup.pattern(
+        "purchase",
+        "§aYou bought .*?§a!",
+    )
 
     private val starlynInventory = InventoryDetector(
-        checkInventoryName = sisterInventoryNames::contains,
+        checkInventoryName = sisterTypeMap.keys::contains,
         onOpenInventory = { event ->
             if (config.starlynCouponAmount) {
-                StarlynSisterType.entries.find { it.inventoryName == event.inventoryName }?.let { sister ->
+                sisterTypeMap[event.inventoryName]?.let { sister ->
                     currentSisterType = sister
                     generateCouponAmountItemStack(sister)
                 }
@@ -52,28 +66,41 @@ object StarlynSisterCouponAmount {
             add("§eClick to open Bazaar!")
         }
         couponAmountItemStack = createItemStack(
-            NAME_TAG_ITEM,
+            Items.NAME_TAG,
             "${sisterType.couponName.repoItemName}s§7: §f${sisterType.couponName.getAmountInInventoryAndSacks()}",
             lore,
         )
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     private fun replaceItem(event: ReplaceItemEvent) {
-        if (!starlynInventory.isInside() || event.slot != CUSTOM_STACK_LOCATION) return
+        if (!isEnabled() || event.slot != CUSTOM_STACK_LOCATION) return
+        if (!event.hasItem) return
         couponAmountItemStack?.let { event.replace(it) }
     }
 
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        val sisterType = currentSisterType
-        if (event.slotId != CUSTOM_STACK_LOCATION || sisterType == null) return
+        if (!isEnabled() || event.slotId != CUSTOM_STACK_LOCATION) return
 
         event.cancel()
         if (lastClick.passedSince() > DEBOUNCE_DELAY) {
-            BazaarApi.searchForBazaarItem(sisterType.couponName)
+            BazaarApi.searchForBazaarItem(currentSisterType?.couponName ?: return)
             lastClick = SimpleTimeMark.now()
         }
+    }
+
+
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onSackChange(event: SackChangeEvent) {
+        if (!isEnabled()) return
+        generateCouponAmountItemStack(currentSisterType ?: return)
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+        if (!isEnabled()) return
+        generateCouponAmountItemStack(currentSisterType ?: return)
     }
 }
