@@ -29,9 +29,9 @@ object UpdateKeybinds {
         val config = SkyHanniMod.feature
         val lastMcVersion = config.lastMinecraftVersion
         val currentMcVersion = PlatformUtils.MC_VERSION
-        config.lastMinecraftVersion = currentMcVersion
         if (!config.storage.hasPlayedBefore) {
             logger.log("User has never used SkyHanni before!")
+            config.lastMinecraftVersion = currentMcVersion
             return
         }
         if (lastMcVersion == currentMcVersion) return
