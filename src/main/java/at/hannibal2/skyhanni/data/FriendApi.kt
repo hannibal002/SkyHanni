@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.FriendRequestDeclinedEvent
 import at.hannibal2.skyhanni.events.FriendRequestExpiredEvent
 import at.hannibal2.skyhanni.events.FriendRequestSentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -102,11 +101,6 @@ object FriendApi {
     private fun getFriends() = SkyHanniMod.friendsData.players.getOrPut(PlayerUtils.getRawUuid()) {
         PlayerFriends()
     }.friends
-
-    @HandleEvent
-    private fun onHypixelJoin(event: HypixelJoinEvent) {
-        saveConfig()
-    }
 
     fun getAllFriends(): List<Friend> {
         val list = mutableListOf<Friend>()
