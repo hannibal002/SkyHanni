@@ -44,7 +44,8 @@ public abstract class MixinEntityRenderer {
         }
     }
 
-    @WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;shouldEntityAppearGlowing(Lnet/minecraft/world/entity/Entity;)Z"))
+//? if < 26.2 {
+/*    @WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;shouldEntityAppearGlowing(Lnet/minecraft/world/entity/Entity;)Z"))
     public boolean shouldAlsoGlow(Minecraft client, Entity entity, Operation<Boolean> original, @Local(argsOnly = true) EntityRenderState state) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
         if (glowColor == null) {
@@ -62,6 +63,7 @@ public abstract class MixinEntityRenderer {
         }
         return glowColor;
     }
+*///?}
 
     @Inject(method = "extractRenderState", at = @At("TAIL"))
     public void setEntity(Entity entity, EntityRenderState state, float tickProgress, CallbackInfo ci) {

@@ -196,6 +196,12 @@ dependencies {
 
     shadowImpl(libs.httpclient)
     "minecraftTestClientRuntimeLibraries"(libs.httpclient)
+
+    if (target.renderChestVersion != null) {
+        include("net.azureaaron:render-chest:${target.renderChestVersion}")
+        implementation("net.azureaaron:render-chest:${target.renderChestVersion}")
+        "minecraftTestClientRuntimeLibraries"("net.azureaaron:render-chest:${target.renderChestVersion}")
+    }
 }
 
 fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit = {}) {

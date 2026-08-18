@@ -11,6 +11,11 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import java.awt.Color
 
+//? if >= 26.2 {
+import net.azureaaron.renderchest.api.CustomGlowCallback
+import net.azureaaron.renderchest.api.GlowConstants
+//?}
+
 @SkyHanniModule
 object RenderLivingEntityHelper {
     private data class EntityGlowData(val rgb: Int, val condition: () -> Boolean)
@@ -18,15 +23,24 @@ object RenderLivingEntityHelper {
     private val entityGlowMap = mutableMapOf<Int, EntityGlowData>()
     private var currentGlowEvent: RenderEntityOutlineEvent? = null
 
-    @JvmStatic
+    //? if >= 26.2 {
+    init {
+        CustomGlowCallback.EVENT.register { entity, _ ->
+            getEntityGlowColor(entity) ?: GlowConstants.NO_GLOW
+        }
+    }
+    //?} else {
+    /*@JvmStatic
     var isUsingCustomGlow = false
         private set
+    *///?}
 
     @JvmStatic
     fun postNoXrayOutlineEvent() {
-        isUsingCustomGlow = entityGlowMap.values.any { it.condition() } ||
+        //? if < 26.2 {
+        /*isUsingCustomGlow = entityGlowMap.values.any { it.condition() } ||
             currentGlowEvent?.entitiesToOutline.orEmpty().isNotEmpty()
-
+        *///?}
         val event = RenderEntityOutlineEvent()
         currentGlowEvent = event
         event.post()
@@ -34,7 +48,6 @@ object RenderLivingEntityHelper {
 
     @JvmStatic
     fun getEntityGlowColor(entity: Entity): Int? {
-        if (GlobalRender.renderDisabled) return null
         if (entity is LivingEntity) {
             if (entity.isInvisible && !entity.hasVisibleEquipment()) return null
             getLivingEntityGlowColor(entity)?.let { return it }
@@ -46,6 +59,7 @@ object RenderLivingEntityHelper {
         currentGlowEvent?.entitiesToOutline?.get(entity)
 
     private fun getLivingEntityGlowColor(entity: LivingEntity): Int? {
+        if (GlobalRender.renderDisabled) return null
         val entityGlowData = entityGlowMap[entity.id] ?: return null
         if (!entityGlowData.condition()) return null
         return entityGlowData.rgb
