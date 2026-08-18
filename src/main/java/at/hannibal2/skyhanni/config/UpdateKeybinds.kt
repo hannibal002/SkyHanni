@@ -80,8 +80,6 @@ object UpdateKeybinds {
     }
 
     private fun mapKeyCode(oldKeyCode: Int, newKeyCode: Int) {
-        if (oldKeyCode == newKeyCode) return
-
         GLFW_TO_SDL_KEYS[oldKeyCode] = newKeyCode
         SDL_TO_GLFW_KEYS[newKeyCode] = oldKeyCode
     }
