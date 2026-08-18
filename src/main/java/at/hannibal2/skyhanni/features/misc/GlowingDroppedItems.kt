@@ -16,9 +16,8 @@ object GlowingDroppedItems {
     private val config get() = SkyHanniMod.feature.misc
 
     @HandleEvent
-    fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
+    private fun onRenderEntityOutline(event: RenderEntityOutlineEvent) {
         if (!isEnabled()) return
-        if (event.type != RenderEntityOutlineEvent.Type.NO_XRAY) return
 
         event.queueEntitiesToOutline(::getGlowColor)
     }
