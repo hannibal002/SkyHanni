@@ -1,0 +1,31 @@
+package at.hannibal2.skyhanni.features.foraging
+
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.utils.InventoryDetector
+
+object StarlynSisterDetector {
+    fun createStarlynDetector(
+        isEnabled: () -> Boolean,
+        setSisterType: (StarlynSisterType?) -> Unit,
+        onOpen: (event: InventoryFullyOpenedEvent, sister: StarlynSisterType) -> Unit,
+        onClose: () -> Unit
+    ): InventoryDetector {
+        val sisterTypeMap = StarlynSisterType.entries.associateBy { it.inventoryName }
+
+        return InventoryDetector(
+            checkInventoryName = sisterTypeMap.keys::contains,
+            onOpenInventory = { event ->
+                if (isEnabled()) {
+                    sisterTypeMap[event.inventoryName]?.let { sister ->
+                        setSisterType(sister)
+                        onOpen(event, sister)
+                    }
+                }
+            },
+            onCloseInventory = {
+                setSisterType(null)
+                onClose()
+            }
+        )
+    }
+}

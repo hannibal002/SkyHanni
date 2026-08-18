@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.features.foraging.StarlynSisterDetector.createStarlynDetector
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
-import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
@@ -34,7 +34,6 @@ import kotlin.math.round
 object StarlynSisterCouponProfit {
 
     private val config get() = SkyHanniMod.feature.foraging.starlynContest
-    private val sisterTypeMap = StarlynSisterType.entries.associateBy { it.inventoryName }
 
     private var display = emptyList<Renderable>()
     private var currentDisplayMode = DisplayMode.PER_COUPON
@@ -55,22 +54,17 @@ object StarlynSisterCouponProfit {
         val isCouponPrizeItem: Boolean,
     )
 
-    private val starlynInventory = InventoryDetector(
-        checkInventoryName = sisterTypeMap.keys::contains,
-        onOpenInventory = { event ->
-            if (config.starlynCouponProfitEnabled) {
-                sisterTypeMap[event.inventoryName]?.let { sister ->
-                    currentSisterType = sister
-                    cachedItemData = buildItemData(event, sister)
-                    updateDisplay()
-                }
-            }
+    private val starlynInventory = createStarlynDetector(
+        isEnabled = { config.starlynCouponProfitEnabled },
+        setSisterType = { currentSisterType = it },
+        onOpen = { event, sister ->
+            cachedItemData = buildItemData(event, sister)
+            updateDisplay()
         },
-        onCloseInventory = {
-            currentSisterType = null
+        onClose = {
             cachedItemData = emptyList()
             display = emptyList()
-        },
+        }
     )
 
     enum class DisplayMode(val display: String) {
@@ -131,7 +125,7 @@ object StarlynSisterCouponProfit {
         if (!isValidSlotNumber(slot)) return null
 
         val internalName = item.getInternalNameOrNull()
-        //needed for attribute shards to work correctly
+        //required for attribute shards to work correctly
             ?: ItemResolutionQuery.attributeNameToInternalName(item.hoverName.string)
                 ?.let { NeuInternalName.fromItemNameOrInternalName(it) }
             ?: return null

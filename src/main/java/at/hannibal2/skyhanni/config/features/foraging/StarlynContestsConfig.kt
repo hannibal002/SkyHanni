@@ -30,7 +30,7 @@ class StarlynContestsConfig {
     var compactResults = false
 
     @Expose
-    @ConfigOption(name = "Compact Personal Bests", desc = "Compact messages from log collection §dpersonal bests §rduring contests.")
+    @ConfigOption(name = "Compact Personal Bests", desc = "Compact messages from log collection §dPersonal Bests §rduring contests.")
     @SearchTag("Agatha Miria")
     @ConfigEditorBoolean
     @FeatureToggle

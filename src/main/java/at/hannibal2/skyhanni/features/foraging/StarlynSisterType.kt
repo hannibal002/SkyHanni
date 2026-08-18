@@ -7,3 +7,4 @@ enum class StarlynSisterType(val inventoryName: String, val couponName: NeuInter
     AGATHA("Agatha's Shop", "AGATHA_COUPON".toInternalName(), "STARLYN_PRIZE".toInternalName()),
     MIRIA("Miria's Shop", "MIRIA_COUPON".toInternalName(), "MIRIA_PRIZE".toInternalName()),
 }
+

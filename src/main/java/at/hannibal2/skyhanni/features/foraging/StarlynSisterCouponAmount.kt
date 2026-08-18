@@ -6,15 +6,14 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.skyhanni.features.foraging.StarlynSisterDetector.createStarlynDetector
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventoryAndSacks
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
@@ -24,7 +23,6 @@ object StarlynSisterCouponAmount {
 
     private val config get() = SkyHanniMod.feature.foraging.starlynContest
 
-    private val sisterTypeMap = StarlynSisterType.entries.associateBy { it.inventoryName }
     private var currentSisterType: StarlynSisterType? = null
 
     private var lastClick = SimpleTimeMark.farPast()
@@ -34,20 +32,15 @@ object StarlynSisterCouponAmount {
 
     fun isEnabled() = config.starlynCouponAmount && starlynInventory.isInside()
 
-    private val starlynInventory = InventoryDetector(
-        checkInventoryName = sisterTypeMap.keys::contains,
-        onOpenInventory = { event ->
-            if (config.starlynCouponAmount) {
-                sisterTypeMap[event.inventoryName]?.let { sister ->
-                    currentSisterType = sister
-                    generateCouponAmountItemStack(sister)
-                }
-            }
+    private val starlynInventory = createStarlynDetector(
+        isEnabled = { config.starlynCouponAmount },
+        setSisterType = { currentSisterType = it },
+        onOpen = { _, sister ->
+            generateCouponAmountItemStack(sister)
         },
-        onCloseInventory = {
-            currentSisterType = null
+        onClose = {
             couponAmountItemStack = null
-        },
+        }
     )
 
     private fun generateCouponAmountItemStack(sisterType: StarlynSisterType) {
