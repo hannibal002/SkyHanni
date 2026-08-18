@@ -397,10 +397,11 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Maintain Volume During Warnings",
-        desc = "Do not change game volume levels when warning sounds are played.",
+        desc = "Respect game volume settings for warning sounds instead of always playing them at 100%.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
+    @SearchTag("levels loud quiet")
     var maintainGameVolume: Boolean = false
 
     @Expose
