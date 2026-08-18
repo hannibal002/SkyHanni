@@ -45,8 +45,8 @@ import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.monster.Creeper
 import net.minecraft.world.entity.monster.EnderMan
-import net.minecraft.world.entity.monster.MagmaCube
 import net.minecraft.world.entity.monster.Shulker
+import net.minecraft.world.entity.monster.cubemob.MagmaCube
 import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
