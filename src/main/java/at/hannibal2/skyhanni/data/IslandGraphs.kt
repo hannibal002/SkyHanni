@@ -454,19 +454,24 @@ object IslandGraphs {
     }
 
     fun stopNavigation(manual: Boolean = false) {
-        if (currentTarget != null) {
-            NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
-            currentTarget = null
-        }
         if (manual) {
+            if (currentTarget == null) {
+                ChatUtils.userError("No navigation is currently active.")
+                return
+            }
             ChatUtils.userError("Manually stopped navigation")
         }
+
+        NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
+
+        currentTarget = null
         goal = null
         pathRenderer = null
         currentTargetNode = null
         navigationLabel = ""
         totalDistance = 0.0
         lastDisplayedDistance = 0.0
+
         NavigationFeedback.setNavInactive()
     }
 
@@ -612,11 +617,7 @@ object IslandGraphs {
             description = "Stops the current pathfinding."
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
-                if (currentTarget != null) {
-                    stopNavigation(manual = true)
-                } else {
-                    ChatUtils.userError("No navigation is currently active.")
-                }
+                stopNavigation(manual = true)
             }
         }
     }
