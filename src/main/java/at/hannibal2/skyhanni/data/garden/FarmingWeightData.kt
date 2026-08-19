@@ -99,6 +99,7 @@ object FarmingWeightData {
     private fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
+        if (attemptingCropWeightFetch || hasFetchedCropWeights) return
 
         cropWeightsCoroutine.launch {
             getCropWeights()
@@ -261,7 +262,6 @@ object FarmingWeightData {
     )
 
     private suspend fun getCropWeights() {
-        if (attemptingCropWeightFetch || hasFetchedCropWeights) return
         attemptingCropWeightFetch = true
         val apiResponse = ApiUtils.getJsonResponse(weightStatic).assertSuccess() ?: return
         val apiResponseData = apiResponse.data ?: return
