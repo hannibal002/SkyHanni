@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.foraging
 
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 
 object StarlynSisterDetector {
@@ -16,16 +17,18 @@ object StarlynSisterDetector {
             checkInventoryName = sisterTypeMap.keys::contains,
             onOpenInventory = { event ->
                 if (isEnabled()) {
-                    sisterTypeMap[event.inventoryName]?.let { sister ->
-                        setSisterType(sister)
-                        onOpen(event, sister)
+                    DelayedRun.runOrNextTick {
+                        sisterTypeMap[event.inventoryName]?.let { sister ->
+                            setSisterType(sister)
+                            onOpen(event, sister)
+                        }
                     }
                 }
             },
             onCloseInventory = {
                 setSisterType(null)
                 onClose()
-            }
+            },
         )
     }
 }

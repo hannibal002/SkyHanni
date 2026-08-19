@@ -190,7 +190,7 @@ object StarlynSisterCouponProfit {
                     "Error getting required item cost for item '${item.repoItemName}'",
                     "Could not parse required item cost from lore ",
                     "rawItemName" to rawItemName,
-                    "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                    "name" to item.hoverName,
                     "lore" to lore,
                 )
                 null
@@ -202,9 +202,7 @@ object StarlynSisterCouponProfit {
     private fun onChestGuiRender() {
         if (!config.starlynCouponProfitEnabled || !starlynInventory.isInside()) return
 
-        display.let {
-            config.starlynCouponProfitPos.renderRenderables(it, posLabel = "Starlyn Sister's Shop Profit")
-        }
+        config.starlynCouponProfitPos.renderRenderables(display, posLabel = "Starlyn Sister's Shop Profit")
     }
 
     private fun isValidSlotNumber(slot: Int): Boolean {
