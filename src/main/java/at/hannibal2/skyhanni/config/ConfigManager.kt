@@ -3,6 +3,11 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.config.core.dependency.ConfigBannerProvider
+import at.hannibal2.skyhanni.config.core.dependency.FeatureDependencyResolver
+import at.hannibal2.skyhanni.config.core.dependency.GuiOptionEditorBigDescription
+import at.hannibal2.skyhanni.config.core.dependency.GuiOptionEditorDependencies
+import at.hannibal2.skyhanni.config.core.dependency.GuiOptionEditorUsedBy
 import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
@@ -31,8 +36,9 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.common.RenderContext
+import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
-import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybind
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
@@ -293,15 +299,21 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     val backupFile get() = getBackupFile(file)
 }
 
-class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanniMod.feature) {
+open class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanniMod.feature) {
     val isDev by lazy { ContributorManager.isSelfDeveloper() }
 
+    @Suppress("ReturnCount")
     override fun createOptionGui(
         processedOption: ProcessedOption,
         field: Field,
         option: ConfigOption,
     ): GuiOptionEditor? {
-        val default = super.createOptionGui(processedOption, field, option) ?: return null
+        var default: GuiOptionEditor
+        try {
+            default = super.createOptionGui(processedOption, field, option) ?: return null
+        } catch (e: Exception) {
+            throw Exception("field: ${field.name} appearing class: ${field.declaringClass.simpleName}", e)
+        }
         if (processedOption !is ProcessedOptionImpl) return default
         var extraPath = ""
         val categoryParent = processedOption.category.parentCategoryId
@@ -309,20 +321,103 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanni
             extraPath = categoryParent.split(".").last() + "."
         }
         extraPath += processedOption.getPath()
-        if (default is GuiOptionEditorKeybind) {
-            UpdateKeybinds.keybinds.add(extraPath)
+
+        if (!isDev) {
+            if (field.isAnnotationPresent(OnlyDebug::class.java)) {
+                default = GuiOptionEditorHidden(default)
+            }
         }
 
         EnforcedConfigValues.isBlockedFromEditing(extraPath)?.let { extraMessage ->
             return GuiOptionEditorBlocked(default, extraMessage)
         }
 
-        if (!isDev) {
-            if (field.isAnnotationPresent(OnlyDebug::class.java)) {
-                return GuiOptionEditorHidden(default)
+        // Defer heavy dependency/third-party resolution so UI renders immediately.
+        return GuiOptionEditorBigDescription(GuiOptionEditorUsedBy(DeferredDependencyEditor(default, field), field), field)
+    }
+
+    private inner class DeferredDependencyEditor(
+        private val base: GuiOptionEditor,
+        private val field: Field,
+    ) : GuiOptionEditor(base.getOption()), ConfigBannerProvider {
+        @Volatile
+        private var resolved: GuiOptionEditor? = null
+        @Volatile
+        private var started = false
+
+        override fun bannerOffset(): Int =
+            ((resolved ?: base) as? ConfigBannerProvider)?.bannerOffset() ?: 0
+
+        private fun ensureStarted() {
+            if (started) return
+            synchronized(this) {
+                if (started) return
+                started = true
+                Thread({
+                    resolved = runCatching { buildDependencyAwareEditor() }.getOrElse { base }
+                }, "skyhanni-config-dep-resolver").apply { isDaemon = true }.start()
             }
         }
 
-        return default
+        private fun buildDependencyAwareEditor(): GuiOptionEditor {
+            val dependencyRequirements = FeatureDependencyResolver.resolve(field)
+            if (dependencyRequirements.isEmpty) return base
+            if (!dependencyRequirements.isEmpty) {
+                return GuiOptionEditorDependencies(base, dependencyRequirements, field)
+            }
+            return base
+        }
+
+        override fun render(context: RenderContext, x: Int, y: Int, width: Int) {
+            ensureStarted()
+            (resolved ?: base).render(context, x, y, width)
+        }
+
+        override fun renderOverlay(context: RenderContext, x: Int, y: Int, width: Int) {
+            (resolved ?: base).renderOverlay(context, x, y, width)
+        }
+
+        override fun mouseInput(
+            x: Int,
+            y: Int,
+            width: Int,
+            mouseX: Int,
+            mouseY: Int,
+            mouseEvent: io.github.notenoughupdates.moulconfig.gui.MouseEvent?,
+        ): Boolean {
+            ensureStarted()
+            return (resolved ?: base).mouseInput(x, y, width, mouseX, mouseY, mouseEvent)
+        }
+
+        override fun mouseInputOverlay(
+            x: Int,
+            y: Int,
+            width: Int,
+            mouseX: Int,
+            mouseY: Int,
+            mouseEvent: io.github.notenoughupdates.moulconfig.gui.MouseEvent?,
+        ): Boolean {
+            return (resolved ?: base).mouseInputOverlay(x, y, width, mouseX, mouseY, mouseEvent)
+        }
+
+        override fun keyboardInput(event: io.github.notenoughupdates.moulconfig.gui.KeyboardEvent?): Boolean {
+            return (resolved ?: base).keyboardInput(event)
+        }
+
+        override fun getHeight(): Int {
+            return (resolved ?: base).height
+        }
+
+        override fun setGuiContext(guiContext: GuiContext) {
+            (resolved ?: base).setGuiContext(guiContext)
+        }
     }
+
+    private data class ResolvedThirdParty(
+        val usesMainToggle: Boolean,
+        val requiresMainToggle: Boolean,
+        val message: String,
+        val overrideOwner: Class<*>?,
+        val overrideFieldName: String?,
+    )
 }
