@@ -613,7 +613,7 @@ object IslandGraphs {
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
                 if (currentTarget != null) {
-                    stopNavigation()
+                    stopNavigation(manual = true)
                 } else {
                     ChatUtils.userError("No navigation is currently active.")
                 }

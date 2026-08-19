@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.LorenzVecArgumentType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
+import at.hannibal2.skyhanni.data.IslandGraphs.stopNavigation
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -47,7 +48,7 @@ object NavigationHelper {
 
         val goBack = {
             doCommandAsync(searchTerm)
-            IslandGraphs.stopNavigation()
+            stopNavigation()
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
@@ -153,7 +154,7 @@ object NavigationHelper {
                 }
             }
             literalCallback("stop") {
-                IslandGraphs.stopNavigation(manual = true)
+                stopNavigation(manual = true)
             }
             simpleCallback {
                 doCommandAsync("")
