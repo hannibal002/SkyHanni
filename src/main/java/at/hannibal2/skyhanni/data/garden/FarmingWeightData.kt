@@ -65,6 +65,8 @@ object FarmingWeightData {
     @HandleEvent
     private fun onConfigLoad() {
         config.enabled.onEnable {
+            // This is intentionally checked inside onEnable, using onlyOnIsland would be wrong here.
+            @Suppress("IsInIslandEarlyReturn")
             if (!IslandType.GARDEN.isInIsland()) return@onEnable
             ChatUtils.debug("Updating EliteSkyBlock collections because leaderboard features were toggled on")
             updateCollections()
