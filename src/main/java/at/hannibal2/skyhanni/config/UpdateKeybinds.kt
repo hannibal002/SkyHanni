@@ -91,6 +91,7 @@ object UpdateKeybinds {
     }
 
     // Has been prefiltered to not include any keybinds that are the same in both versions
+    @Suppress("LongMethod")
     private fun createKeyMapping() {
         mapKeyCode(-1, 0) // UNKNOWN
         mapKeyCode(0, 1) // MOUSE_LEFT
