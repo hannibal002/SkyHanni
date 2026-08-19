@@ -28,8 +28,6 @@ object ConfigGuiManager {
     fun openConfigGui(search: String? = null) {
         val editor = getEditorInstance()
 
-        // A fresh config open always starts from the unfiltered view
-        ConfigUtils.clearSearchFilter()
         if (search != null) {
             editor.search(search)
         }
