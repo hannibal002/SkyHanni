@@ -2,23 +2,28 @@ package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
+import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllApi.handleSkip
-import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllApi.handleStop
-import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllApi.navigateAll
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.getBoxCenter
+import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.skyhanni.utils.toLorenzVec
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
@@ -26,13 +31,17 @@ import kotlin.time.Duration.Companion.seconds
  * Drives a navigation over a list of nodes, one after the other.
  *
  * Holds the state of the single navigation that can run at a time. Features start one via `navigateAll` and
- * add their own command entry points that delegate to `handleSkip` and `handleStop`.
+ * add their own command entry points that delegate to `handleSkip`, `handleStop` and `handleUndo`.
+ *
+ * The route stays untouched once it is calculated, the position inside it is tracked by an index. Skipping and
+ * going back therefore only move that index, and a skipped node can be returned to.
  */
 @SkyHanniModule
 object NavigateAllApi {
 
     private const val NAVIGATE_AGAIN_DISTANCE = 5
     private const val NODE_REACHED_DISTANCE = 3.0
+    private const val CLICK_RANGE = 5.0
 
     private val unreachableWarningDelay = 10.seconds
     private val pathfindCoroutine = CoroutineSettings("navigate all pathfind")
@@ -40,11 +49,11 @@ object NavigateAllApi {
     private val defaultTargetLocation: (GraphNode) -> LorenzVec = { it.position }
 
     private val currentlyNavigating get() = currentTargetName != null
+    private val currentTarget get() = route.getOrNull(currentIndex)
 
     private var navigationId = 0
     private var route: List<GraphNode> = listOf()
-    private var total = 0
-    private var currentTarget: GraphNode? = null
+    private var currentIndex = 0
     private var currentTargetName: String? = null
     private var color = LorenzColor.WHITE.toColor()
     private var waitingOnCondition: Boolean = false
@@ -77,8 +86,8 @@ object NavigateAllApi {
      *  [targetLocation]. Only useful together with a [targetLocation] that differs from the node position.
      * @param targetLocation The location that is navigated to for a node, by default the node itself. Callers
      *  with locations outside the island graph map them to the closest node and pass the original location here.
-     * @param skipCommand The command shown to the player for skipping a target. Every command that delegates to
-     *  `handleSkip` works, so the default fits callers without a command of their own.
+     * @param usageHint The line shown to the player after the navigation started, explaining how to control it.
+     *  The default names the skip command, which works for every caller because they all share one navigation.
      *
      * Existing features should be switched to use a more abstract version of this
      * These features include: Fast Fairy Souls, Spider Relic Pathfind, Shulker Finder
@@ -95,7 +104,7 @@ object NavigateAllApi {
         renderNumber: Boolean = false,
         warnWhenUnreachable: Boolean = false,
         targetLocation: (GraphNode) -> LorenzVec = defaultTargetLocation,
-        skipCommand: String = "/shnavall skip",
+        usageHint: String = "§aUse §e/shnavall skip §ato skip a target.",
     ) {
         currentTargetName = targetName
         this.color = color
@@ -108,7 +117,8 @@ object NavigateAllApi {
         this.warnWhenUnreachable = warnWhenUnreachable
         this.targetLocation = targetLocation
 
-        currentTarget = null
+        route = emptyList()
+        currentIndex = 0
         val id = ++navigationId
 
         // Coroutine for calculateRoute()
@@ -117,12 +127,11 @@ object NavigateAllApi {
             if (id != navigationId) return@launch
 
             route = newRoute
-            total = route.size
 
-            ChatUtils.chat("§aNavigating to ${StringUtils.pluralize(total, targetName, withNumber = true)}§a.")
-            ChatUtils.chat("§aUse §e$skipCommand §ato skip a target.")
+            ChatUtils.chat("§aNavigating to ${StringUtils.pluralize(route.size, targetName, withNumber = true)}§a.")
+            ChatUtils.chat(usageHint)
 
-            recursiveNavigate()
+            navigateToCurrent()
         }
     }
 
@@ -137,17 +146,36 @@ object NavigateAllApi {
         val id = ++navigationId
 
         if (!optimizeRoute) {
-            recursiveNavigate()
+            advance()
             return
         }
 
+        val visited = route.take(currentIndex + 1)
+        val remaining = route.drop(currentIndex + 1)
+
         pathfindCoroutine.launch {
-            val newRoute = calculateRoute(route)
+            val newRemaining = calculateRoute(remaining)
             if (id != navigationId) return@launch
 
-            route = newRoute
-            recursiveNavigate()
+            route = visited + newRemaining
+            advance()
         }
+    }
+
+    fun handleUndo() {
+        if (!currentlyNavigating) {
+            ChatUtils.userError("No current navigation to go back in. §eUse /shnavigateall to start navigation")
+            return
+        }
+
+        if (currentIndex == 0) {
+            ChatUtils.userError("Already at the first $currentTargetName§c.")
+            return
+        }
+
+        currentIndex--
+        ChatUtils.chat("Going back to $currentTargetName ${currentIndex + 1}/${route.size}§e.")
+        navigateToCurrent()
     }
 
     fun handleStop(manual: Boolean = false) {
@@ -165,35 +193,37 @@ object NavigateAllApi {
         IslandGraphs.stopNavigation()
     }
 
-    private fun recursiveNavigate() {
+    private fun advance() {
+        currentIndex++
+        navigateToCurrent()
+    }
+
+    private fun navigateToCurrent() {
         waitingOnCondition = false
 
-        if (route.isEmpty()) {
+        val target = currentTarget ?: run {
             onFinish()
             resetState()
             return
         }
-
-        val target = route.first()
-        currentTarget = target
-        route = route.drop(1)
 
         unreachableWarningSent = false
         nodeReachedAt = null
 
         IslandGraphs.pathFind(
             targetLocation(target),
-            "$currentTargetName ${total - route.size}/$total",
+            "$currentTargetName ${currentIndex + 1}/${route.size}",
             color = color,
             onFound = {
                 onFound(target)
 
                 when (continueNavigationCondition) {
-                    NavigationCondition.None -> recursiveNavigate()
+                    NavigationCondition.None -> advance()
+                    NavigationCondition.Manual -> waitingOnCondition = true
                     is NavigationCondition.ChatMessage -> waitingOnCondition = true
                     is NavigationCondition.SecondPassed -> {
                         if ((continueNavigationCondition as NavigationCondition.SecondPassed).condition(target)) {
-                            recursiveNavigate()
+                            advance()
                         } else {
                             if (currentlyNavigating) {
                                 waitingOnCondition = true
@@ -223,9 +253,10 @@ object NavigateAllApi {
         if (reachedAt.passedSince() < unreachableWarningDelay) return
 
         unreachableWarningSent = true
+        val index = currentIndex
         ChatUtils.clickableChat(
-            "Could not get to $currentTargetName ${total - route.size}/$total§e. Click to skip it.",
-            onClick = { if (currentTarget === target) handleSkip() },
+            "Could not get to $currentTargetName ${index + 1}/${route.size}§e. Click to skip it.",
+            onClick = { if (currentIndex == index) handleSkip() },
             hover = "§eClick to skip this waypoint!",
             oneTimeClick = true,
         )
@@ -234,8 +265,7 @@ object NavigateAllApi {
     private fun resetState() {
         navigationId++
         route = emptyList()
-        total = 0
-        currentTarget = null
+        currentIndex = 0
         currentTargetName = null
         color = LorenzColor.WHITE.toColor()
         waitingOnCondition = false
@@ -252,11 +282,29 @@ object NavigateAllApi {
     }
 
     @HandleEvent
+    private fun onItemClick(event: ItemClickEvent) {
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
+        if (continueNavigationCondition != NavigationCondition.Manual) return
+        if (!currentlyNavigating) return
+        val target = currentTarget ?: return
+
+        val location = targetLocation(target)
+        val box = AABB(location.x, location.y, location.z, location.x + 1, location.y + 1, location.z + 1)
+        if (box.getBoxCenter().distanceToPlayer() > CLICK_RANGE) return
+
+        val direction = MinecraftCompat.localPlayerOrThrow.lookAngle.toLorenzVec()
+        if (!box.rayIntersects(LocationUtils.playerEyeLocation(), direction)) return
+
+        event.cancel()
+        advance()
+    }
+
+    @HandleEvent
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!renderNumber || !currentlyNavigating) return
         val target = currentTarget ?: return
 
-        event.drawString(targetLocation(target).add(0.5, 1.5, 0.5), "§e${total - route.size}", seeThroughBlocks = true)
+        event.drawString(targetLocation(target).add(0.5, 1.5, 0.5), "§e${currentIndex + 1}", seeThroughBlocks = true)
     }
 
     @HandleEvent
@@ -265,7 +313,7 @@ object NavigateAllApi {
         val messageCondition = (continueNavigationCondition as? NavigationCondition.ChatMessage)?.condition ?: return
 
         if (messageCondition(event.cleanMessage)) {
-            recursiveNavigate()
+            advance()
         }
     }
 
@@ -279,15 +327,14 @@ object NavigateAllApi {
         val target = currentTarget ?: return
 
         if (currentlyNavigating && targetLocation(target).distanceToPlayer() > NAVIGATE_AGAIN_DISTANCE) {
-            route = listOf(target) + route
-            recursiveNavigate()
+            navigateToCurrent()
             return
         }
 
         val secondPassedCondition = (continueNavigationCondition as? NavigationCondition.SecondPassed)?.condition ?: return
 
         if (secondPassedCondition(target)) {
-            recursiveNavigate()
+            advance()
         }
     }
 

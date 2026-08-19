@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.misc.pathfind
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.graph.Graph
@@ -14,18 +13,15 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object NavigateClipboardCommand {
 
     private const val CLIPBOARD_TARGET_NAME = "Clipboard Waypoint"
     private const val MAX_SNAP_DISTANCE = 20
-
-    private val defaultClipboardWaitTime = 5.seconds
+    private const val USAGE_HINT =
+        "§aLeft click a waypoint to mark it as done, §e/shnavclipboard skip §ato skip it, §e/shnavclipboard undo §ato go back."
 
     private enum class ClipboardRouteMode {
         ORDERED,
@@ -45,10 +41,11 @@ object NavigateClipboardCommand {
      * The navigation still targets the original location, the node is only used to order the route and to tell
      * apart "the path finder is done" from "the location itself is reached".
      *
+     * A waypoint is only marked as done by left clicking it, so the player decides when to move on.
+     *
      * @param mode Whether the locations are reordered into the shortest route or visited as they were pasted.
-     * @param waitTime How long the player has to stand at a waypoint before the next one is targeted.
      */
-    private fun navigateAllClipboardCommand(mode: ClipboardRouteMode, waitTime: Duration) {
+    private fun startNavigation(mode: ClipboardRouteMode) {
         val graph = IslandGraphs.currentIslandGraph
         if (graph == null || graph.none { it.enabled }) {
             ChatUtils.userError("There is no path finder network on this island.")
@@ -84,27 +81,23 @@ object NavigateClipboardCommand {
         val noteSuffix = if (notes.isEmpty()) "" else " §7(${notes.joinToString("§7, ")}§7)"
         ChatUtils.chat("Read ${StringUtils.pluralize(nodes.size, "location", withNumber = true)} from the clipboard.$noteSuffix")
 
-        var arrivedAt = SimpleTimeMark.farPast()
-
         NavigateAllApi.navigateAll(
             nodes,
             CLIPBOARD_TARGET_NAME,
             LorenzColor.AQUA.toColor(),
-            onFound = { arrivedAt = SimpleTimeMark.now() },
             onFinish = {
                 ChatUtils.chat("Reached all ${StringUtils.pluralize(nodes.size, CLIPBOARD_TARGET_NAME, withNumber = true)}§e.")
             },
-            continueNavigationCondition = NavigationCondition.SecondPassed { arrivedAt.passedSince() >= waitTime },
+            continueNavigationCondition = NavigationCondition.Manual,
             condition = { true },
             optimizeRoute = mode == ClipboardRouteMode.OPTIMIZED,
             renderNumber = true,
             warnWhenUnreachable = true,
             targetLocation = { snapped.byNode[it] ?: it.position },
-            skipCommand = "/shnavclipboard skip",
+            usageHint = USAGE_HINT,
         )
     }
 
-    // TODO add a Skyblocker waypoint format
     private fun readLocations(clipboard: String): ParsedLocations {
         WaypointFormats.load(clipboard)?.let { (waypoints, format) ->
             return ParsedLocations(waypoints.map { it.location }, unreadableLines = 0, format = format)
@@ -145,13 +138,8 @@ object NavigateClipboardCommand {
             description = "Use the path finder to go to all locations read from the clipboard"
             category = CommandCategory.DEVELOPER_TEST
 
-            arg("mode", EnumArgumentType.lowercase<ClipboardRouteMode>()) { mode ->
-                argCallback("seconds", BrigadierArguments.integer(min = 0)) { seconds ->
-                    navigateAllClipboardCommand(getArg(mode), seconds.seconds)
-                }
-                callback {
-                    navigateAllClipboardCommand(getArg(mode), defaultClipboardWaitTime)
-                }
+            argCallback("mode", EnumArgumentType.lowercase<ClipboardRouteMode>()) { mode ->
+                startNavigation(mode)
             }
             literalCallback("skip") {
                 NavigateAllApi.handleSkip()
@@ -159,8 +147,11 @@ object NavigateClipboardCommand {
             literalCallback("stop") {
                 NavigateAllApi.handleStop(manual = true)
             }
+            literalCallback("undo") {
+                NavigateAllApi.handleUndo()
+            }
             simpleCallback {
-                navigateAllClipboardCommand(ClipboardRouteMode.OPTIMIZED, defaultClipboardWaitTime)
+                startNavigation(ClipboardRouteMode.OPTIMIZED)
             }
         }
     }

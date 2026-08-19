@@ -4,6 +4,7 @@ import java.util.ServiceLoader
 
 object WaypointFormats {
 
+    // TODO add Skyblocker waypoint format
     fun load(data: String): Pair<Waypoints<SkyHanniWaypoint>, String>? =
         ServiceLoader.load(WaypointFormat::class.java).firstNotNullOfOrNull { format ->
             format.load(data)?.let { it to format.name }

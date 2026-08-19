@@ -37,7 +37,7 @@ object NavigateAllCommand {
     /**
      * Navigate to all nodes with the selected [GraphNodeTag]
      */
-    private fun navigateAllCommand(nodeType: GraphNodeTag) {
+    private fun startNavigation(nodeType: GraphNodeTag) {
         if (nodeType !in getValidTagNames()) {
             ChatUtils.userError("${nodeType.displayName} §cis invalid for navigation on this island!")
             return
@@ -72,13 +72,16 @@ object NavigateAllCommand {
                 ) { it in allowedMultiNavigationTags },
                 BrigadierUtils.dynamicSuggestionProvider { getValidTagNames().map { it.cleanName } },
             ) { nodeType ->
-                navigateAllCommand(nodeType)
+                startNavigation(nodeType)
             }
             literalCallback("skip") {
                 NavigateAllApi.handleSkip()
             }
             literalCallback("stop") {
                 NavigateAllApi.handleStop(manual = true)
+            }
+            literalCallback("undo") {
+                NavigateAllApi.handleUndo()
             }
             simpleCallback {
                 ChatUtils.userError("Usage: /shnavigateall <location type>")
