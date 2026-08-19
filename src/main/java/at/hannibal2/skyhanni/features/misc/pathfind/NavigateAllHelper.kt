@@ -33,6 +33,7 @@ object NavigateAllHelper {
 
     private const val NAVIGATE_AGAIN_DISTANCE = 5
     private const val CLIPBOARD_TARGET_NAME = "Clipboard Waypoint"
+    private const val PATH_END_DISTANCE = 3.0
     private val defaultClipboardWaitTime = 5.seconds
 
     private val allowedMultiNavigationTags = setOf(
@@ -68,6 +69,8 @@ object NavigateAllHelper {
     private var waitingOnCondition: Boolean = false
     private var optimizeRoute = true
     private var renderWaypoint = false
+    private var warnWhenUnreachable = false
+    private var unreachableWarningSent = false
 
     private var onFound: (GraphNode) -> Unit = {}
     private var onFinish: () -> Unit = {}
@@ -147,6 +150,7 @@ object NavigateAllHelper {
             condition = { true },
             optimizeRoute = false,
             renderWaypoint = true,
+            warnWhenUnreachable = true,
         )
     }
 
@@ -171,6 +175,8 @@ object NavigateAllHelper {
      *  are visited in the order they were passed in. Required for nodes that are not part of the island graph,
      *  since the route calculation needs their neighbors.
      * @param renderWaypoint Whether a filled block with the node id should be drawn at the current target.
+     * @param warnWhenUnreachable Offer a clickable skip once the player stands at the end of the path and the
+     *  node is still not reached. Only useful for nodes that are not part of the island graph.
      *
      * Existing features should be switched to use a more abstract version of this
      * These features include: Fast Fairy Souls, Spider Relic Pathfind, Shulker Finder
@@ -185,6 +191,7 @@ object NavigateAllHelper {
         condition: () -> Boolean,
         optimizeRoute: Boolean = true,
         renderWaypoint: Boolean = false,
+        warnWhenUnreachable: Boolean = false,
     ) {
         currentTargetName = targetName
         this.color = color
@@ -194,6 +201,7 @@ object NavigateAllHelper {
         this.condition = condition
         this.optimizeRoute = optimizeRoute
         this.renderWaypoint = renderWaypoint
+        this.warnWhenUnreachable = warnWhenUnreachable
 
         // Coroutine for calculateRoute()
         pathfindCoroutine.launch {
@@ -219,6 +227,8 @@ object NavigateAllHelper {
         val target = route.first()
         currentTarget = target
         route = route.drop(1)
+
+        unreachableWarningSent = false
 
         IslandGraphs.pathFind(
             target.position,
@@ -268,7 +278,10 @@ object NavigateAllHelper {
 
     @HandleEvent
     private fun onSecondPassed() {
-        if (!waitingOnCondition) return
+        if (!waitingOnCondition) {
+            checkUnreachable()
+            return
+        }
 
         val target = currentTarget ?: return
 
@@ -283,6 +296,29 @@ object NavigateAllHelper {
         if (secondPassedCondition(target)) {
             recursiveNavigate()
         }
+    }
+
+    /**
+     * Offers a skip once the path is walked to its end and the node is still not reached, which only happens
+     * for nodes that are not part of the island graph.
+     */
+    private fun checkUnreachable() {
+        if (!warnWhenUnreachable || unreachableWarningSent) return
+        if (!currentlyNavigating) return
+        val target = currentTarget ?: return
+        if (target.position.distanceToPlayer() <= NAVIGATE_AGAIN_DISTANCE) return
+
+        val pathEnd = IslandGraphs.findClosestNode(target.position, { true }, radius = Double.POSITIVE_INFINITY) ?: return
+
+        if (pathEnd.position.distanceToPlayer() > PATH_END_DISTANCE) return
+
+        unreachableWarningSent = true
+        ChatUtils.clickableChat(
+            "The path finder can not get closer to $currentTargetName ${total - route.size}/$total§e. Click to skip it.",
+            onClick = { if (currentTarget === target) handleSkip() },
+            hover = "§eClick to skip this waypoint!",
+            oneTimeClick = true,
+        )
     }
 
     private fun handleSkip() {
@@ -318,6 +354,7 @@ object NavigateAllHelper {
         currentTargetName = null
         waitingOnCondition = false
         renderWaypoint = false
+        warnWhenUnreachable = false
 
         IslandGraphs.stopNavigation()
     }
@@ -328,6 +365,7 @@ object NavigateAllHelper {
         currentTargetName = null
         waitingOnCondition = false
         renderWaypoint = false
+        warnWhenUnreachable = false
     }
 
     @HandleEvent
