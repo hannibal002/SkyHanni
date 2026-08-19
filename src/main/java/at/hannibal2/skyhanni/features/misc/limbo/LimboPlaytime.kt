@@ -15,9 +15,11 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
@@ -26,7 +28,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object LimboPlaytime {
-    private lateinit var modifiedList: MutableList<Component>
+    private var modifiedList = listOf<Component>()
     private var setMinutes = false
     private val patternGroup = RepoPattern.group("misc.limbo.tooltip")
 
@@ -49,7 +51,7 @@ object LimboPlaytime {
         "(?<hours>[\\d.,]+) hours.*$",
     )
 
-    private var tooltipPlaytime = mutableListOf<Component>()
+    private var tooltipPlaytime = listOf<Component>()
 
     private var wholeMinutes = 0
     private var hoursString: String = ""
@@ -59,11 +61,11 @@ object LimboPlaytime {
 
     private val itemID = "ENDER_PEARL".toInternalName()
     private const val ITEM_NAME = "§aLimbo"
-    private lateinit var limboItem: SafeItemStack
+    private var limboItem: SafeItemStack? = null
     private var lastCreateCooldown = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun replaceItem(event: ReplaceItemEvent) {
+    private fun replaceItem(event: ReplaceItemEvent) {
         if (!enabled) return
         if (event.inventory !is SimpleContainer) return
         // TODO replace with InventoryDetector
@@ -72,15 +74,16 @@ object LimboPlaytime {
         val playtime = storage?.playtime ?: 0
         if (playtime < 60) return
 
-        if (lastCreateCooldown.passedSince() > 3.seconds) {
+        val item = limboItem?.takeIf { lastCreateCooldown.passedSince() > 3.seconds } ?: run {
             lastCreateCooldown = SimpleTimeMark.now()
-            limboItem = ItemUtils.createItemStack(
+            ItemUtils.createItemStack(
                 itemID.getItemStack().itemType,
                 ITEM_NAME,
                 createItemLore(),
             )
         }
-        event.replace(limboItem)
+        limboItem = item
+        event.replace(item)
     }
 
     private fun createItemLore(): Array<String> = when {
@@ -95,7 +98,7 @@ object LimboPlaytime {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onToolTip(event: ToolTipTextEvent) {
+    private fun onToolTip(event: ToolTipTextEvent) {
         if (!enabled) return
         // TODO replace with InventoryDetector
         if (!InventoryUtils.openInventoryName().startsWith("Detailed /playtime")) return
@@ -112,7 +115,7 @@ object LimboPlaytime {
     }
 
     @HandleEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventoryName != "Detailed /playtime") return
         val playtime = (storage?.playtime ?: 0).seconds
         if (playtime < 60.seconds) return
@@ -130,28 +133,28 @@ object LimboPlaytime {
         }
     }
 
-    private fun addLimbo(hoursList: MutableList<Component>, minutesList: MutableList<Component>) {
+    private fun addLimbo(hoursList: List<Component>, minutesList: List<Component>) {
         val storedPlaytime = storage?.playtime ?: 0
         if (wholeMinutes >= 60) {
-            modifiedList = hoursList
-            modifiedList.add("§5§o§b$hoursString hours §7on Limbo")
-            modifiedList = modifiedList.sortedByDescending {
-                val matcher = hoursPattern.matcher(it.string)
-                if (matcher.find()) {
-                    matcher.group("hours").formatDoubleOrNull() ?: 0.0
-                } else 0.0
-            }.toMutableList()
+            modifiedList = buildList {
+                addAll(hoursList)
+                add("§5§o§b$hoursString hours §7on Limbo".asComponent())
+            }.sortedByDescending {
+                hoursPattern.matchMatcher(it.string) {
+                    group("hours").formatDoubleOrNull() ?: 0.0
+                } ?: 0.0
+            }
             setMinutes = false
         } else {
             val minutes = storedPlaytime.seconds.inWholeMinutes
-            modifiedList = minutesList
-            modifiedList.add("§5§o§a$minutes minutes §7on Limbo")
-            modifiedList = modifiedList.sortedByDescending {
-                val matcher = minutesPattern.matcher(it.string)
-                if (matcher.find()) {
-                    matcher.group("minutes").toDoubleOrNull() ?: 0.0
-                } else 0.0
-            }.toMutableList()
+            modifiedList = buildList {
+                addAll(minutesList)
+                add("§5§o§a$minutes minutes §7on Limbo".asComponent())
+            }.sortedByDescending {
+                minutesPattern.matchMatcher(it.string) {
+                    group("minutes").toDoubleOrNull() ?: 0.0
+                } ?: 0.0
+            }
             setMinutes = true
         }
     }
