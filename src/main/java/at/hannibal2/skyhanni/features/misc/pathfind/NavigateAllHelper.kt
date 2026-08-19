@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
@@ -346,14 +347,6 @@ object NavigateAllHelper {
             ) { nodeType ->
                 navigateAllCommand(nodeType)
             }
-            literal("clipboard") {
-                argCallback("seconds", BrigadierArguments.integer(min = 0)) { seconds ->
-                    navigateAllClipboardCommand(seconds.seconds)
-                }
-                simpleCallback {
-                    navigateAllClipboardCommand(defaultClipboardWaitTime)
-                }
-            }
             literalCallback("skip") {
                 handleSkip()
             }
@@ -362,6 +355,23 @@ object NavigateAllHelper {
             }
             simpleCallback {
                 ChatUtils.userError("Usage: /shnavigateall <location type>")
+            }
+        }
+        event.registerBrigadier("shnavigateallclipboard") {
+            description = "Use the path finder to go to all locations read from the clipboard"
+            category = CommandCategory.DEVELOPER_TEST
+
+            argCallback("seconds", BrigadierArguments.integer(min = 0)) { seconds ->
+                navigateAllClipboardCommand(seconds.seconds)
+            }
+            literalCallback("skip") {
+                handleSkip()
+            }
+            literalCallback("stop") {
+                handleStop(manual = true)
+            }
+            simpleCallback {
+                navigateAllClipboardCommand(defaultClipboardWaitTime)
             }
         }
     }
