@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.resources.sounds.SoundInstance
-import net.minecraft.sounds.SoundEvent
+import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundSource
 
 /**
@@ -11,11 +11,11 @@ import net.minecraft.sounds.SoundSource
  * See `MixinSoundEngine` and [at.hannibal2.skyhanni.mixins.hooks.SoundEngineHook].
  */
 class SkyHanniSoundInstance(
-    soundEvent: SoundEvent,
+    identifier: Identifier,
     pitch: Float,
     volume: Float,
 ) : SimpleSoundInstance(
-    soundEvent.location(),
+    identifier,
     SoundSource.UI,
     volume,
     pitch,
