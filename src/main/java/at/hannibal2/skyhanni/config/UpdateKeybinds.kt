@@ -37,38 +37,32 @@ object UpdateKeybinds {
         when (lastMcVersion) {
             "26.2" if currentMcVersion == "26.3" -> {
                 logger.log("Migrating keybinds from 26.2 to 26.3")
-                migrateKeybinds(forward = true)
+                createKeyMapping()
+                migrateKeybinds(olderToNewerKeys)
             }
             "26.3" if currentMcVersion == "26.2" -> {
                 logger.log("Migrating keybinds from 26.3 to 26.2")
-                migrateKeybinds(forward = false)
+                createKeyMapping()
+                migrateKeybinds(newerToOlderKeys)
             }
         }
 
         config.lastMinecraftVersion = currentMcVersion
     }
 
-    private fun migrateKeybinds(forward: Boolean) {
-        createKeyMapping()
-
+    private fun migrateKeybinds(map: Map<Int, Int>) {
         for (keybind in keybinds) {
-            migrateKeybind(keybind, forward)
+            migrateKeybind(keybind, map)
         }
     }
 
-    private fun migrateKeybind(key: String, forward: Boolean) {
+    private fun migrateKeybind(key: String, map: Map<Int, Int>) {
         val shimmy = Shimmy(SkyHanniMod.feature, key.split(".")) ?: return
         val value = shimmy.getJson()
 
         if (!value.isJsonPrimitive || !value.asJsonPrimitive.isNumber) return
 
         val oldKeyCode = value.asInt
-
-        val map = if (forward) {
-            olderToNewerKeys
-        } else {
-            newerToOlderKeys
-        }
 
         if (!map.containsKey(oldKeyCode)) return
         val newKeyCode = map[oldKeyCode]
