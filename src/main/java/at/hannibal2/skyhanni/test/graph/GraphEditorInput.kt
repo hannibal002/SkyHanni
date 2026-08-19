@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.dev.GraphConfig
+import at.hannibal2.skyhanni.config.features.dev.GraphEditorConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
@@ -23,16 +23,16 @@ import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import net.minecraft.client.KeyMapping
-import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule
 object GraphEditorInput {
 
-    val config: GraphConfig get() = GraphEditor.config
+    val config: GraphEditorConfig get() = GraphEditor.config
 
     private var lastGuiTime = SimpleTimeMark.farPast()
 
@@ -51,12 +51,12 @@ object GraphEditorInput {
         if (handleExit()) return
         if (handleTextMode()) return
         if (handleText()) return
-        if (state.inEditMode) {
-            editModeClicks()
-            state.inEditMode = false
+        if (state.inNodeMoveMode) {
+            nodeMoveClicks()
+            state.inNodeMoveMode = false
         }
         if ((state.activeNode != null) && config.editKey.isKeyHeld()) {
-            state.inEditMode = true
+            state.inNodeMoveMode = true
             return
         }
         if (config.saveKey.isKeyClicked()) {
@@ -69,23 +69,23 @@ object GraphEditorInput {
             GraphEditorNodeOperations.addNode()
             return
         }
-        if (handleSelect()) return
-        if (handleRayCast()) return
+        if (handleSelectNearest()) return
+        if (handleSelectLookingAt()) return
 
         if (config.connectKey.isKeyClicked()) {
-            GraphEditorNodeOperations.handleConnect()
+            GraphEditorNodeOperations.handleConnectNodes()
             return
         }
         if (handleThroughBlocks()) return
         if (config.dijkstraKey.isKeyClicked()) {
-            ChatUtils.debug("testDijkstra")
-            GraphEditor.feedBackInTutorial("Calculated shortest route and cleared active node.")
-            testDijkstra()
+            ChatUtils.debug("navigateToNode")
+            GraphEditor.feedback("Calculated shortest route to active node and cleared active node.")
+            navigateToNode()
             return
         }
         if (config.tutorialKey.isKeyClicked()) {
-            state.inTutorialMode = !state.inTutorialMode
-            ChatUtils.chat("Tutorial mode is now ${if (state.inTutorialMode) "active" else "inactive"}.")
+            state.inFeedbackMode = !state.inFeedbackMode
+            ChatUtils.chat("Feedback mode is now ${if (state.inFeedbackMode) "active" else "inactive"}.")
             return
         }
         val selectedEdge = selectedEdge
@@ -103,7 +103,7 @@ object GraphEditorInput {
     private fun handleText(): Boolean {
         if (state.activeNode != null && config.textKey.isKeyClicked()) {
             state.inTextMode = true
-            GraphEditor.feedBackInTutorial("Entered Text Mode.")
+            GraphEditor.feedback("Entered Text Mode.")
             return true
         }
         return false
@@ -113,12 +113,12 @@ object GraphEditorInput {
         if (!config.edgeCycle.isKeyClicked()) return
         GraphEditorHistory.save("cycled direction")
         selectedEdge.cycleDirection(state.activeNode)
-        GraphEditor.feedBackInTutorial("Cycled Direction to: ${selectedEdge.cycleText(state.activeNode)}")
+        GraphEditor.feedback("Cycled Direction to: ${selectedEdge.cycleText(state.activeNode)}")
     }
 
     private fun handleSplit(selectedEdge: GraphingEdge) {
         if (!config.splitKey.isKeyClicked()) return
-        GraphEditor.feedBackInTutorial("Split Edge into a Node and two edges.")
+        GraphEditor.feedback("Split Edge into a Node and two edges.")
         val middle = selectedEdge.node1.position.middle(selectedEdge.node2.position).roundToBlock()
         val node = GraphingNode(state.id++, middle)
         GraphEditorHistory.save("split node")
@@ -133,7 +133,7 @@ object GraphEditorInput {
         if (!config.throughBlocksKey.isKeyClicked()) return false
         ChatUtils.debug("handleThroughBlocks")
         state.seeThroughBlocks = !state.seeThroughBlocks
-        GraphEditor.feedBackInTutorial(
+        GraphEditor.feedback(
             if (state.seeThroughBlocks) "Graph is visible though walls." else "Graph is invisible behind walls.",
         )
 
@@ -149,20 +149,20 @@ object GraphEditorInput {
         return true
     }
 
-    private fun handleSelect(): Boolean {
+    private fun handleSelectNearest(): Boolean {
         if (!config.selectKey.isKeyClicked()) return false
         state.activeNode = if (state.activeNode == closestNode) {
-            GraphEditor.feedBackInTutorial("De-selected active node.")
+            GraphEditor.feedback("De-selected nearest node as active node.")
             null
         } else {
-            GraphEditor.feedBackInTutorial("Selected new active node.")
+            GraphEditor.feedback("Selected nearest node as new active node.")
             closestNode
         }
         return true
     }
 
     private fun handleUndoRedo(): Boolean {
-        if (Minecraft.getInstance().screen == null) {
+        if (MinecraftCompat.screen == null) {
             if (KeyboardManager.isControlKeyDown() && GLFW.GLFW_KEY_Y.isKeyClicked()) {
                 GraphEditorHistory.undo()
                 return true
@@ -175,7 +175,7 @@ object GraphEditorInput {
         return false
     }
 
-    private fun handleRayCast(): Boolean {
+    private fun handleSelectLookingAt(): Boolean {
         if (!config.selectRaycastKey.isKeyClicked()) return false
         val playerRay = RaycastUtils.createPlayerLookDirectionRay()
         var minimumDistance = Double.MAX_VALUE
@@ -239,13 +239,7 @@ object GraphEditorInput {
             saveAndExitTextMode()
             return true
         }
-        if (state.inEditMode) {
-            state.inEditMode = false
-            GraphEditor.feedBackInTutorial("Exited Edit Mode.")
-            return true
-        }
-        config.enabled = false
-        GraphEditor.chatAtDisable()
+        GraphEditor.disable()
         return true
     }
 
@@ -259,7 +253,7 @@ object GraphEditorInput {
         }
 
         state.inTextMode = false
-        GraphEditor.feedBackInTutorial("Exited Text Mode.")
+        GraphEditor.feedback("Exited Text Mode.")
         activeNode?.let {
             GraphEditorNodeOperations.handleNameShortcut(it.name)?.let { (tag, name) ->
                 it.tags.add(tag)
@@ -287,7 +281,7 @@ object GraphEditorInput {
         moveToStart = null
     }
 
-    private fun testDijkstra() {
+    private fun navigateToNode() {
         val location = state.activeNode?.position ?: return
         if (location.distanceToPlayer() < 5) {
             ChatUtils.chat("Graph Test starts once you move away.")
@@ -297,12 +291,12 @@ object GraphEditorInput {
 
         IslandGraphs.pathFind(
             location,
-            "Graph Test",
+            "Graph Editor Navigation Test",
             condition = { GraphEditor.isEnabled() },
         )
     }
 
-    private fun editModeClicks() {
+    private fun nodeMoveClicks() {
         val vector = LocationUtils.calculatePlayerFacingDirection()
         KeyboardManager.WasdInputMatrix.w.handleEditClicks(vector)
         KeyboardManager.WasdInputMatrix.a.handleEditClicks(vector.rotateXZ(Math.toRadians(90.0)))
@@ -322,7 +316,7 @@ object GraphEditorInput {
     }
 
     private fun isAnyGuiActive(): Boolean {
-        val gui = Minecraft.getInstance().screen != null
+        val gui = MinecraftCompat.screen != null
         if (gui) {
             lastGuiTime = 3.ticks.fromNow()
         }

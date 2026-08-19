@@ -20,6 +20,8 @@ import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -33,23 +35,30 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.bold
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
 import net.minecraft.world.level.block.Blocks
 
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object DungeonApi {
-    private val patternGroup = RepoPattern.group("dungeon")
+    val patternGroup = RepoPattern.group("dungeon")
 
+    // TODO: move to SkyblockIcons class
     /**
      * WRAPPED-REGEX-TEST: " ⏣ The Catacombs (F7)"
+     * WRAPPED-REGEX-TEST: "  The Catacombs (F7)"
      */
     private val floorPattern by patternGroup.pattern(
         "floor",
-        " . The Catacombs \\((?<floor>.*)\\)",
+        " [⏣\uE067] The Catacombs \\((?<floor>.*)\\)",
     )
 
     /**
@@ -165,6 +174,14 @@ object DungeonApi {
         "^(?<sbLevel>\\[\\d+]) (?<rank>\\[[^]]+])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) \\((?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))\\)\$",
     )
 
+    /**
+     * REGEX-TEST: Boss Collections
+     */
+    val bossCollectionsInventoryPattern by patternGroup.pattern(
+        "boss.collections.inventory",
+        "Boss Collections",
+    )
+
     enum class DungeonBlessings(var power: Int) {
         LIFE(0),
         POWER(0),
@@ -220,6 +237,7 @@ object DungeonApi {
     private const val WATER_ROOM_ID = "-60,-60"
     val inWaterRoom: Boolean get() = roomId == WATER_ROOM_ID
 
+    @Deprecated("Use getLevelComponent instead for better formatting", replaceWith = ReplaceWith("getLevelComponent(level)"))
     fun getColor(level: Int): String = when {
         level >= 50 -> "§c§l"
         level >= 45 -> "§c"
@@ -234,8 +252,29 @@ object DungeonApi {
         else -> "§7"
     }
 
+    fun getLevelComponent(level: Int): Component {
+        val formatting: ChatFormatting = when {
+            level >= 45 -> RED
+            level >= 40 -> GOLD
+            level >= 35 -> DARK_PURPLE
+            level >= 30 -> BLUE
+            level >= 25 -> AQUA
+            level >= 20 -> DARK_GREEN
+            level >= 15 -> GREEN
+            level >= 10 -> YELLOW
+            level >= 5 -> WHITE
+            else -> GRAY
+        }
+        return componentBuilder {
+            append("$level") {
+                withColor(formatting)
+                if (level >= 50) bold = true
+            }
+        }
+    }
+
     @HandleEvent
-    fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+    private fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         val cleanAdded = event.added.map { it.removeColor() }
         // TODO: move this under inDungeon check when we use Hypixel's ModAPI for island detection
         floorPattern.firstMatcher(cleanAdded) {
@@ -257,13 +296,13 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onTablistChange(event: TabListUpdateEvent) {
+    private fun onTablistChange(event: TabListUpdateEvent) {
         if (!inDungeon()) return
         if (dungeonFloor == null || playerClass != null) return
 
         val playerTeam = event.tabList.find { it.string.contains(PlayerUtils.getName()) }?.string ?: return
         for (dungeonClass in DungeonClass.entries) {
-            if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
+            if (playerTeam.contains("(${dungeonClass.displayName} ")) {
                 val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
                 playerClass = dungeonClass
                 playerClassLevel = level
@@ -273,10 +312,9 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onTabUpdate(event: TablistFooterUpdateEvent) {
+    private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
-        val lines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
-        for (line in lines) {
+        for (line in event.footer) {
             if (noBlessingPattern.matches(line)) {
                 DungeonBlessings.reset()
                 return
@@ -294,7 +332,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         dungeonFloor = null
         started = false
         inBossRoom = false
@@ -309,7 +347,7 @@ object DungeonApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         val floor = dungeonFloor ?: return
         if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
             started = true
@@ -336,10 +374,10 @@ object DungeonApi {
 
     // This returns a map of boss name to the integer for the amount of kills the user has in the collection
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val bossCollections = bossStorage ?: return
 
-        if (event.inventoryName == "Boss Collections") {
+        if (bossCollectionsInventoryPattern.matches(event.inventoryName)) {
             readAllCollections(bossCollections, event.inventoryItems)
         } else if (event.inventoryName.endsWith(" Collection")) {
             readOneMaxCollection(bossCollections, event.inventoryItems, event.inventoryName)
@@ -352,12 +390,12 @@ object DungeonApi {
         inventoryName: String,
     ) {
         inventoryItems[48]?.let { item ->
-            if (item.hoverName.string == "Go Back") {
-                item.getLoreComponent().map { it.string.removeColor() }.getOrNull(0)?.let { firstLine ->
+            if (item.cleanName == "Go Back") {
+                item.getCleanLore().getOrNull(0)?.let { firstLine ->
                     if (firstLine == "To Boss Collections") {
                         val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
                         val floor = DungeonFloor.byBossName(name) ?: return
-                        val lore = inventoryItems[4]?.getLoreComponent()?.map { it.string.removeColor() } ?: return
+                        val lore = inventoryItems[4]?.getCleanLore() ?: return
                         val line = lore.find { it.contains("Total Kills:") } ?: return
                         val kills = totalKillsPattern.matchMatcher(line) {
                             group("kills").formatInt()
@@ -396,7 +434,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Dungeon")
 
         if (!inDungeon()) {
@@ -422,7 +460,7 @@ object DungeonApi {
         }
     }
 
-    enum class DungeonClass(val scoreboardName: String) {
+    enum class DungeonClass(val displayName: String) {
         ARCHER("Archer"),
         BERSERK("Berserk"),
         HEALER("Healer"),
@@ -432,7 +470,7 @@ object DungeonApi {
 
         companion object {
             fun getByClassName(className: String): DungeonClass? {
-                return DungeonClass.entries.firstOrNull { it.scoreboardName.equals(className, ignoreCase = true) }
+                return DungeonClass.entries.firstOrNull { it.displayName.equals(className, ignoreCase = true) }
             }
         }
     }
@@ -452,7 +490,7 @@ object DungeonApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onBlockClick(event: BlockClickEvent) {
+    private fun onBlockClick(event: BlockClickEvent) {
         if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         val position = event.position
@@ -487,7 +525,7 @@ object DungeonApi {
         playerTeamClasses.find { it.username == username.removeColor() } ?: TeamMember(username)
 
     @HandleEvent
-    fun onTabUpdate(event: TabListUpdateEvent) {
+    private fun onTabUpdate(event: TabListUpdateEvent) {
         if (!inDungeon() || !started || completed) return
 
         playerDungeonTeamPattern.matchAllComponents(event.tabList) {

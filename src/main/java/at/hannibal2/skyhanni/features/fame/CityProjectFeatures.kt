@@ -10,19 +10,16 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -36,14 +33,16 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import net.minecraft.world.inventory.ChestMenu
@@ -71,7 +70,7 @@ object CityProjectFeatures {
     )
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed() {
         if (!config.dailyReminder) return
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
         if (ReminderUtils.isBusy()) return
@@ -102,15 +101,15 @@ object CityProjectFeatures {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         inInventory = false
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
 
         inInventory = false
-        if (!inCityProject(event)) return
+        if (!inCityProject(event.inventoryItems)) return
         inInventory = true
 
         if (config.showMaterials) {
@@ -125,37 +124,41 @@ object CityProjectFeatures {
         }
 
         if (config.showReady) {
-            var nextTime = SimpleTimeMark.farFuture()
-            val now = SimpleTimeMark.now()
-            for ((_, item) in event.inventoryItems) {
-
-                val lore = item.getLore()
-                val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
-                if (completed) continue
-                contributeAgainPattern.firstMatcher(lore) {
-                    val rawTime = group("time")
-                    val duration = if (rawTime.contains("Soon!")) {
-                        5.seconds
-                    } else {
-                        // hypixel rounds down to the next full minute, it shows "1m" when it is in fact 1-2 minutes, and "0m" for the last 60s
-                        TimeUtils.getDuration(rawTime).let {
-                            if (it < 1.hours) it + 1.minutes else it
-                        }
-                    }
-                    val endTime = now + duration
-                    if (endTime < nextTime) {
-                        nextTime = endTime
-                    }
-                }
-                if (item.hoverName.string != "Contribute this component!") continue
-                nextTime = now
-            }
-            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
+            showWhenReady(event.inventoryItems)
         }
     }
 
-    private fun inCityProject(event: InventoryFullyOpenedEvent): Boolean {
-        val lore = event.inventoryItems[4]?.getLore() ?: return false
+    private fun showWhenReady(inventoryItems: Map<Int, SafeItemStack>) {
+        var nextTime = SimpleTimeMark.farFuture()
+        val now = SimpleTimeMark.now()
+        for ((_, item) in inventoryItems) {
+
+            val lore = item.getLore()
+            val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
+            if (completed) continue
+            contributeAgainPattern.firstMatcher(lore) {
+                val rawTime = group("time")
+                val duration = if (rawTime.contains("Soon!")) {
+                    5.seconds
+                } else {
+                    // hypixel rounds down to the next full minute, it shows "1m" when it is in fact 1-2 minutes, and "0m" for the last 60s
+                    TimeUtils.getDuration(rawTime).let {
+                        if (it < 1.hours) it + 1.minutes else it
+                    }
+                }
+                val endTime = now + duration
+                if (endTime < nextTime) {
+                    nextTime = endTime
+                }
+            }
+            if (item.hoverName.string != "Contribute this component!") continue
+            nextTime = now
+        }
+        ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
+    }
+
+    private fun inCityProject(inventoryItems: Map<Int, SafeItemStack>): Boolean {
+        val lore = inventoryItems[4]?.getLore() ?: return false
         if (lore.isEmpty()) return false
         if (lore[0] != "§8City Project") return false
         return true
@@ -190,7 +193,7 @@ object CityProjectFeatures {
     private fun materialLink(name: String, amount: Int): Renderable = Renderable.optionalLink(
         "$name §ex${amount.addSeparators()}",
         {
-            if (Minecraft.getInstance().screen is SignEditScreen) {
+            if (MinecraftCompat.screen is SignEditScreen) {
                 SignUtils.setTextIntoSign("$amount")
             } else {
                 BazaarApi.searchForBazaarItemOrRecipe(name, amount)
@@ -199,29 +202,17 @@ object CityProjectFeatures {
     ) { inInventory }
 
     private fun fetchMaterials(item: SafeItemStack, materials: MutableMap<NeuInternalName, Int>) {
-        var next = false
-        val lore = item.getLore()
-        val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
+        val completed = item.getLore().lastOrNull()?.let { completedPattern.matches(it) } ?: false
         if (completed) return
-        // TODO: Refactor this loop to not have so many jumps
-        @Suppress("LoopWithTooManyJumpStatements")
-        for (line in lore) {
-            if (line == "§7Cost") {
-                next = true
-                continue
-            }
-            if (!next) continue
-            if (line == "" || line.contains("Bits")) break
 
-            val (name, amount) = ItemUtils.readItemAmount(line) ?: continue
-            val internalName = NeuInternalName.fromItemName(name)
-            val old = materials.getOrPut(internalName) { 0 }
-            materials[internalName] = old + amount
+        for ((internalName, amount) in item.readLoreCosts()) {
+            if (internalName == SkyblockCurrency.BITS.internalName) continue
+            materials.addOrPut(internalName, amount.toInt())
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    private fun onChestGuiRender() {
         if (!config.showMaterials) return
         if (!inInventory) return
 
@@ -231,7 +222,7 @@ object CityProjectFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!config.showReady) return
         if (!inInventory) return
 
@@ -249,7 +240,7 @@ object CityProjectFeatures {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.cityProject", "event.cityProject")
     }
 }

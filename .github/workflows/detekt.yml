@@ -41,14 +41,14 @@ jobs:
                 uses: ./.github/actions/gradle-retry
                 continue-on-error: true
                 with:
-                    gradle-command: detektMain --stacktrace
+                    gradle-command: :26.2:detektMain --stacktrace
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 id: run_detekt_fork
                 if: github.repository != 'hannibal002/SkyHanni'
                 uses: ./.github/actions/gradle-retry
                 continue-on-error: true
                 with:
-                    gradle-command: detektMain --stacktrace
+                    gradle-command: :26.2:detektMain --stacktrace
 
             -   name: Check if SARIF file exists
                 if: always()
@@ -66,6 +66,9 @@ jobs:
                     mkdir -p detekt-artifact
                     if [ -f "build/reports/detekt/main.sarif" ]; then
                         cp build/reports/detekt/main.sarif detekt-artifact/main.sarif
+                    fi
+                    if [ "${{ steps.run_detekt.outcome }}" == "failure" ] || [ "${{ steps.run_detekt_fork.outcome }}" == "failure" ]; then
+                        cp "$GITHUB_WORKSPACE/gradle-output.log" detekt-artifact/detekt-run.log 2>/dev/null || true
                     fi
 
             -   name: Annotate detekt failures

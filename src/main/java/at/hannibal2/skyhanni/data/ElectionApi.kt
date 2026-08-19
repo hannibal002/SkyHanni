@@ -65,14 +65,6 @@ object ElectionApi {
     )
 
     /**
-     * REGEX-TEST: Calendar and Events
-     */
-    val calendarGuiPattern by group.pattern(
-        "calendar.gui",
-        "Calendar and Events",
-    )
-
-    /**
      * REGEX-TEST: §dMayor Jerry
      * REGEX-TEST: §cMayor Aatrox
      */
@@ -147,6 +139,8 @@ object ElectionApi {
         if (!ElectionCandidate.JERRY.isActive()) return
         if (jerryExtraMayor.first != null && jerryExtraMayor.second.isInPast()) {
             jerryExtraMayor = null to SimpleTimeMark.farPast()
+            lastJerryExtraMayorReminder = SimpleTimeMark.now()
+
             ChatUtils.clickableChat(
                 "The Perkpocalypse Mayor has expired! Click here to update the new temporary Mayor.",
                 onClick = { HypixelCommands.calendar() },
@@ -176,8 +170,7 @@ object ElectionApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-
-        if (!calendarGuiPattern.matches(event.inventoryName)) return
+        if (!CalendarApi.inCalendar) return
 
         val stack: SafeItemStack = event.inventoryItems.values.firstOrNull {
             mayorHeadPattern.matchMatcher(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) {

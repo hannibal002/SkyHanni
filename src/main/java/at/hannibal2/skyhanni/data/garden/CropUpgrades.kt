@@ -7,11 +7,12 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -35,6 +36,14 @@ object CropUpgrades {
         "\\s+§r§6§lCROP UPGRADE §e(?<crop>[\\w ]+)§7 #(?<tier>\\d)",
     )
 
+    /**
+     * REGEX-TEST: Crop Upgrades
+     */
+    private val inventoryNamePattern by patternGroup.pattern(
+        "inventory",
+        "Crop Upgrades",
+    )
+
     private val cropUpgradesStorage: MutableMap<CropType, Int>? get() = GardenApi.storage?.cropUpgrades
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -49,10 +58,10 @@ object CropUpgrades {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Crop Upgrades") return
+        if (!inventoryNamePattern.matches(event.inventoryName)) return
 
         for (item in event.inventoryItems.values) {
-            val crop = CropType.getByNameOrNull(item.hoverName.string.removeColor()) ?: continue
+            val crop = CropType.getByNameOrNull(item.cleanName) ?: continue
             tierPattern.firstMatcher(item.getLore()) {
                 val level = group("level").formatInt()
                 crop.setUpgradeLevel(level)

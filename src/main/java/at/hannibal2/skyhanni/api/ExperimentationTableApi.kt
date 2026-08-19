@@ -42,7 +42,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.subtract
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -217,9 +216,17 @@ object ExperimentationTableApi {
         "inventory.experiment-over",
         "Experiment [Oo]ver|Superpairs Rewards",
     )
+
+    /**
+     * REGEX-TEST: Bottles of Enchanting
+     */
+    val bottlesOfEnchantingInventoryPattern by patternGroup.pattern(
+        "inventory.bottles-of-enchanting",
+        "Bottles of Enchanting",
+    )
     // </editor-fold>
 
-    val experimentationTableInventory = InventoryDetector(inventoriesPattern)
+    val experimentationTableInventory = InventoryDetector { inventoriesPattern }
     val inTable get() = experimentationTableInventory.isInside()
     val isActive get() = currentExperimentData.tier != null
     val currentExperimentTier get() = currentExperimentData.tier
@@ -495,7 +502,7 @@ object ExperimentationTableApi {
             it != lastExpOverHash && it != currentExpOverHash && it != 0
         } ?: return
 
-        currentExperimentData.type = ExperimentationTaskType.fromStringOrNull(item.hoverName.string.removeColor()) ?: return
+        currentExperimentData.type = ExperimentationTaskType.fromStringOrNull(item.cleanName) ?: return
         currentExperimentData.tier = expOverStakesLorePattern.firstMatcher(lore) {
             ExperimentationTier.byNameOrNull(group("stakes"))
         } ?: return

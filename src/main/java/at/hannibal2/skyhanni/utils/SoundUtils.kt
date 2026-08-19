@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.SoundCompat
-import kotlinx.coroutines.delay
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.resources.sounds.SoundInstance
 import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundEvent
+import kotlinx.coroutines.delay
 
 @SkyHanniModule
 object SoundUtils {
@@ -57,7 +57,7 @@ object SoundUtils {
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {
         val newSound = SoundCompat.getModernSoundName(name)
-        val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
+        val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9:/._-]"), ""))
         return SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(identifier), pitch, volume)
     }
 

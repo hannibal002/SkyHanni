@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaFeatures
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
@@ -169,7 +168,7 @@ object IslandGraphs {
     )
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<IslandGraphSettingsJson>("misc/IslandGraphSettings")
         ignoredIslandTypes = data.ignoredIslandTypes
 
@@ -179,7 +178,7 @@ object IslandGraphs {
     }
 
     @HandleEvent
-    fun onIslandJoin(event: IslandJoinEvent) {
+    private fun onIslandJoin(event: IslandJoinEvent) {
         enableAllNodes()
         if (currentIslandGraph != null) return
         if (event.island == IslandType.NONE) return
@@ -187,7 +186,7 @@ object IslandGraphs {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         currentIslandGraph = null
         if (currentTarget != null) NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped because of world switch!")
         resetNavigation()
@@ -195,8 +194,8 @@ object IslandGraphs {
 
     private fun isGlaciteTunnelsArea(area: String?): Boolean = glaciteTunnelsPattern.matches(area)
 
-    @HandleEvent(ScoreboardAreaChangeEvent::class)
-    fun onAreaChange() {
+    @HandleEvent
+    private fun onScoreboardAreaChange() {
         if (!IslandType.DWARVEN_MINES.isInIsland()) {
             inGlaciteTunnels = null
             return
@@ -237,7 +236,7 @@ object IslandGraphs {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Island Graphs")
         val islandType = SkyBlockUtils.currentIsland.name
         val isPersonal = IslandTypeTag.PERSONAL_ISLAND.isInIsland()
@@ -323,7 +322,7 @@ object IslandGraphs {
      * calling before [at.hannibal2.skyhanni.test.graph.GraphEditor], so that we always have the latest playerPosition.
      */
     @HandleEvent(priority = -1)
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         GraphUtils.updatePlayerPosition()
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
@@ -413,9 +412,8 @@ object IslandGraphs {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        val graph = currentIslandGraph
-        if (graph == null) return
+    private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
+        val graph = currentIslandGraph ?: return
         hasMoved = true
 
         if (event.distance > FAST_MOVEMENT_THRESHOLD) {
@@ -573,7 +571,7 @@ object IslandGraphs {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (currentIslandGraph == null) return
         pathRenderer?.render(event)
     }
@@ -586,7 +584,7 @@ object IslandGraphs {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shreportlocation") {
             description = "Allows the user to report an error with pathfinding at the current location."
             category = CommandCategory.USERS_BUG_FIX

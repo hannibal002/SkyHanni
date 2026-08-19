@@ -2,17 +2,18 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
+import at.hannibal2.skyhanni.config.MoulConfigEditorComponent
 import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
-import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
-import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import java.lang.reflect.Field
 import kotlin.jvm.internal.CallableReference
@@ -102,11 +103,14 @@ object ConfigUtils {
     }
 
     fun openEditor(editor: MoulConfigEditor<*>) {
-        SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Component.empty(), GuiContext(GuiElementComponent(editor)), null)
+        SkyHanniMod.screenToOpen = createConfigScreen(editor)
     }
 
+    internal fun createConfigScreen(editor: MoulConfigEditor<*>, previousScreen: Screen? = null) =
+        MoulConfigScreenComponent(Component.empty(), GuiContext(MoulConfigEditorComponent(editor)), previousScreen)
+
     val configScreenCurrentlyOpen: Boolean
-        get() = Minecraft.getInstance().screen is MoulConfigScreenComponent
+        get() = MinecraftCompat.screen is MoulConfigScreenComponent
 
     fun String.asStructuredText() = StructuredText.of(this)
 }

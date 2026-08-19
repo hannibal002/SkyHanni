@@ -16,6 +16,7 @@ import net.minecraft.core.registries.BuiltInRegistries
  * had a chance to process it.
  *
  * Runs on the network thread.
+ * Will only fire if the player is in the world
  *
  * @param type the particle type
  * @param location the particle spawn location

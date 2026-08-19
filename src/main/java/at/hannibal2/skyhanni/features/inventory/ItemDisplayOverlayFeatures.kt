@@ -57,7 +57,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSecondsHeld
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
@@ -176,9 +175,7 @@ object ItemDisplayOverlayFeatures {
             item.getPetInfo()?.takeIf {
                 // 0.0 Would probably work, but rounding errors can occur
                 // due to hypixel's imprecision in storage.
-                it.exp > 10.0 || PetStorageApi.isMainPetMenuName(
-                    InventoryUtils.openInventoryName(),
-                )
+                it.exp > 10.0 || PetStorageApi.inMainPetMenuName()
             } ?: return null
             val level = item.getPetLevel()
             val maxLevel = item.getMaxPetLevel()
@@ -264,7 +261,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (DUNGEON_POTION_LEVEL.isSelected() && itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
-            dungeonPotionPattern.matchMatcher(item.hoverName.string.removeColor()) {
+            dungeonPotionPattern.matchMatcher(item.cleanName) {
                 return when (val level = group("level").romanToDecimal()) {
                     in 1..2 -> "§f$level"
                     in 3..4 -> "§a$level"
