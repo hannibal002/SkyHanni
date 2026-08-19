@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.lastGainedCrop
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
@@ -61,9 +62,10 @@ object FarmingWeightData {
 
     private val cropWeightsCoroutine = CoroutineSettings("get crop weights")
 
-    @HandleEvent(onlyOnIsland = GARDEN)
+    @HandleEvent
     private fun onConfigLoad() {
         config.enabled.onEnable {
+            if (!IslandType.GARDEN.isInIsland()) return@onEnable
             ChatUtils.debug("Updating EliteSkyBlock collections because leaderboard features were toggled on")
             updateCollections()
         }
