@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllHelper.handleStop
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
@@ -151,6 +152,9 @@ object NavigationHelper {
                 SkyHanniMod.launchCoroutine("shnavigate command") {
                     doCommandAsync(it.lowercase().removeColor())
                 }
+            }
+            literalCallback("stop") {
+                IslandGraphs.stopNavigation(manual = true)
             }
             simpleCallback {
                 doCommandAsync("")

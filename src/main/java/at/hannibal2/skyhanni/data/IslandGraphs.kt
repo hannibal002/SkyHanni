@@ -453,10 +453,13 @@ object IslandGraphs {
         }
     }
 
-    fun stopNavigation() {
+    fun stopNavigation(manual: Boolean = false) {
         if (currentTarget != null) {
             NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
             currentTarget = null
+        }
+        if (manual) {
+            ChatUtils.userError("Manually stopped navigation")
         }
         goal = null
         pathRenderer = null
