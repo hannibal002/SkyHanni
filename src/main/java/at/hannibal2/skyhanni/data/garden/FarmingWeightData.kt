@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.lastGainedCrop
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
@@ -20,6 +19,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onEnable
@@ -67,7 +67,7 @@ object FarmingWeightData {
         config.enabled.onEnable {
             // This is intentionally checked inside onEnable, using onlyOnIsland would be wrong here.
             @Suppress("IsInIslandEarlyReturn")
-            if (!IslandType.GARDEN.isInIsland()) return@onEnable
+            if (!GardenApi.inGarden()) return@onEnable
             ChatUtils.debug("Updating EliteSkyBlock collections because leaderboard features were toggled on")
             updateCollections()
         }
