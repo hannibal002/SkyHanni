@@ -17,8 +17,8 @@ object UpdateKeybinds {
     var keybinds: MutableSet<String> = mutableSetOf()
     private val logger = SkyHanniLogger("keybind_upgrader")
 
-    private val glfwToSdlKeys: MutableMap<Int, Int> = mutableMapOf()
-    private val sdlToGlfwKeys: MutableMap<Int, Int> = mutableMapOf()
+    private val olderToNewerKeys: MutableMap<Int, Int> = mutableMapOf()
+    private val newerToOlderKeys: MutableMap<Int, Int> = mutableMapOf()
 
     @HandleEvent(priority = HandleEvent.HIGH)
     private fun onConfigLoad(event: ConfigLoadEvent) {
@@ -65,9 +65,9 @@ object UpdateKeybinds {
         val oldKeyCode = value.asInt
 
         val map = if (forward) {
-            glfwToSdlKeys
+            olderToNewerKeys
         } else {
-            sdlToGlfwKeys
+            newerToOlderKeys
         }
 
         if (!map.containsKey(oldKeyCode)) return
@@ -77,8 +77,8 @@ object UpdateKeybinds {
     }
 
     private fun mapKeyCode(oldKeyCode: Int, newKeyCode: Int) {
-        glfwToSdlKeys[oldKeyCode] = newKeyCode
-        sdlToGlfwKeys[newKeyCode] = oldKeyCode
+        olderToNewerKeys[oldKeyCode] = newKeyCode
+        newerToOlderKeys[newKeyCode] = oldKeyCode
     }
 
     @HandleEvent
