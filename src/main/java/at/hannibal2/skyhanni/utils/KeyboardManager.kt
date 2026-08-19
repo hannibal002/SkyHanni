@@ -27,18 +27,18 @@ object KeyboardManager {
         if (InputConstants.KEY_RETURN.isKeyHeld()) lockedKeys.add(InputConstants.KEY_RETURN)
         if (InputConstants.KEY_NUMPADENTER.isKeyHeld()) lockedKeys.add(InputConstants.KEY_NUMPADENTER)
     }
+
     // InputConstants.UNKNOWN exists, but is not a compile time constant
+    // TODO: For 26.3 This is 0
     const val KEY_UNKNOWN: Int = -1
 
-    // FIXME: mouse button != slot click button codes in SDL, so conversion is needed where this is used
     const val LEFT_MOUSE = InputConstants.MOUSE_BUTTON_LEFT
     const val RIGHT_MOUSE = InputConstants.MOUSE_BUTTON_RIGHT
     const val MIDDLE_MOUSE = InputConstants.MOUSE_BUTTON_MIDDLE
 
+    const val KEY_ADD = InputConstants.KEY_ADD
     // This constant isn't defined in InputConstants for some reason
-    const val KEY_KP_SUBTRACT = InputConstants.KEY_ADD - 1
-    // This constant is renamed in 26.3
-    const val KEY_KP_ADD = InputConstants.KEY_ADD
+    const val KEY_SUBTRACT = InputConstants.KEY_ADD - 1
 
     /**
      * Represents whether either the left or right Super key (also known as Windows key) is down.

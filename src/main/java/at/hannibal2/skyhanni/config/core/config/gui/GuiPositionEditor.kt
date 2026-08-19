@@ -215,8 +215,8 @@ class GuiPositionEditor(
                 InputConstants.KEY_UP -> position.moveY(-dist, elementHeight)
                 InputConstants.KEY_LEFT -> position.moveX(-dist, elementWidth)
                 InputConstants.KEY_RIGHT -> position.moveX(dist, elementWidth)
-                InputConstants.KEY_MINUS, KeyboardManager.KEY_KP_SUBTRACT -> position.scale -= .1F
-                InputConstants.KEY_EQUALS, KeyboardManager.KEY_KP_ADD -> position.scale += .1F
+                InputConstants.KEY_MINUS, KeyboardManager.KEY_SUBTRACT -> position.scale -= .1F
+                InputConstants.KEY_EQUALS, KeyboardManager.KEY_ADD -> position.scale += .1F
             }
         }
     }
