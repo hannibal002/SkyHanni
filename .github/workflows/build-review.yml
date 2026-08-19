@@ -34,6 +34,16 @@ jobs:
                     path: ${{ runner.temp }}/build-failure-26.1/
                 continue-on-error: true
 
+            -   name: Download build failure artifact (26.2)
+                id: download_2
+                uses: actions/download-artifact@v8
+                with:
+                    name: build-failure-output-26.2
+                    run-id: ${{ github.event.workflow_run.id }}
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    path: ${{ runner.temp }}/build-failure-26.2/
+                continue-on-error: true
+
             -   name: Resolve PR number
                 id: pr
                 env:
@@ -81,7 +91,9 @@ jobs:
                     GITHUB_REPOSITORY: ${{ github.repository }}
                     PR_NUMBER: ${{ steps.pr.outputs.number }}
                     ARTIFACT_DIR_1: ${{ runner.temp }}/build-failure-26.1
+                    ARTIFACT_DIR_2: ${{ runner.temp }}/build-failure-26.2
                     WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
                     HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+                    WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
                     MODE: build
                 run: kotlinc -script .github/scripts/pr_review.main.kts

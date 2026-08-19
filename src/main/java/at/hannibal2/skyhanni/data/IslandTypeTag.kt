@@ -21,7 +21,7 @@ enum class IslandTypeTag(vararg types: Any) {
 
     IS_COLD(IslandType.DWARVEN_MINES, IslandType.MINESHAFT, IslandType.SAFARI),
     NORMAL_MINING(IslandType.GOLD_MINES, IslandType.DEEP_CAVERNS),
-    ADVANCED_MINING(IS_COLD, IslandType.CRYSTAL_HOLLOWS),
+    ADVANCED_MINING(IslandType.DWARVEN_MINES, IslandType.MINESHAFT, IslandType.CRYSTAL_HOLLOWS),
     MINING(NORMAL_MINING, ADVANCED_MINING),
     CUSTOM_MINING(ADVANCED_MINING, IslandType.THE_END, IslandType.CRIMSON_ISLE, IslandType.SPIDER_DEN),
 
@@ -31,6 +31,7 @@ enum class IslandTypeTag(vararg types: Any) {
     HOPPITY_DISALLOWED(IslandType.THE_RIFT, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.MINESHAFT, IslandType.SAFARI),
     HAS_SHOWCASES(PRIVATE_ISLAND, IslandType.HUB, IslandType.CRIMSON_ISLE),
     CONTESTS_SHOWN(IslandType.GARDEN, IslandType.HUB, IslandType.THE_FARMING_ISLANDS),
+    HAS_OWN_PESTS(IslandType.GARDEN, IslandType.TORRHUS_CANYON),
 
     /** Busy islands are islands where a player is doing something considered 'important'. */
     BUSY(IslandType.DARK_AUCTION, IslandType.MINESHAFT, IslandType.THE_RIFT, IslandType.SAFARI, IslandType.NONE, IslandType.UNKNOWN),

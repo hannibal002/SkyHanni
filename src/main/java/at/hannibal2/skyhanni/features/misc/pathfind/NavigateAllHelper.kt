@@ -53,6 +53,7 @@ object NavigateAllHelper {
         GraphNodeTag.HIDEYHO_LOCATION,
         GraphNodeTag.PANGOLIN,
         GraphNodeTag.SANGER,
+        GraphNodeTag.FLOOR_DROPS,
     )
 
     private val pathfindCoroutine = CoroutineSettings("navigate all pathfind")
