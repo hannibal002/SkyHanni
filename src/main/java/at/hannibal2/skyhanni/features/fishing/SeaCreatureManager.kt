@@ -28,37 +28,37 @@ object SeaCreatureManager {
     private val patternGroup = RepoPattern.group("fishing.seacreature")
 
     /**
-     * REGEX-TEST: §eIt's a §r§aDouble Hook§r§e! Woot woot!
-     * REGEX-TEST: §eIt's a §r§aDouble Hook§r§e!
+     * REGEX-TEST: It's a Double Hook! Woot woot!
+     * REGEX-TEST: It's a Double Hook!
      */
     private val doubleHookPattern by patternGroup.pattern(
-        "doublehook",
-        "§eIt's a §r§aDouble Hook§r§e!(?: Woot woot!)?",
+        "doublehook.colorless",
+        "It's a Double Hook!(?: Woot woot!)?",
     )
 
     /**
-     * REGEX-TEST: §e> Your bottle of thunder has fully charged!
+     * REGEX-TEST: > Your bottle of thunder has fully charged!
      */
     private val thunderBottleChargedPattern by patternGroup.pattern(
-        "thundercharged",
-        "§e> Your bottle of thunder has fully charged!",
+        "thundercharged.colorless",
+        "> Your bottle of thunder has fully charged!",
     )
 
     private val config get() = SkyHanniMod.feature.fishing
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (doubleHookPattern.matches(event.message)) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
+        val message = event.cleanMessage
+        if (doubleHookPattern.matches(message)) {
             if (config.compactDoubleHook) {
                 event.blockedReason = "double_hook"
             }
             doubleHook = true
             return
         }
-        if (isInterceptingColorCodeMessage(event.message)) return
-        if (isInterceptingCleanMessage(event.cleanMessage)) return
+        if (isInterceptingMessage(message)) return
 
-        getSeaCreatureFromMessage(event.cleanMessage)?.let {
+        getSeaCreatureFromMessage(message)?.let {
             SeaCreatureFishEvent(it, doubleHook).post()
             if (config.seaCreatureTracker.hideChat) {
                 event.blockedReason = "sea_creature_tracker"
@@ -71,16 +71,16 @@ object SeaCreatureManager {
 
     // if you can do it better make a pr
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Modify) {
-        if (doubleHookPattern.matches(event.message)) {
+    private fun onChat(event: SkyHanniChatEvent.Modify) {
+        val message = event.cleanMessage
+        if (doubleHookPattern.matches(message)) {
             doubleHook = true
             return
         }
 
-        if (isInterceptingColorCodeMessage(event.message)) return
-        if (isInterceptingCleanMessage(event.cleanMessage)) return
+        if (isInterceptingMessage(message)) return
 
-        getSeaCreatureFromMessage(event.cleanMessage)?.let {
+        getSeaCreatureFromMessage(message)?.let {
             val original = event.chatComponent.copy()
             var edited = original
 
@@ -109,20 +109,14 @@ object SeaCreatureManager {
     /**
      * Autopet can be triggered via Sinkers as rod parts (Sponge, Prismarine, Icy) to trigger collection gain which goes between Double Hook! and the Catch message.
      * The Thunder sea Creature gives charge when hooked, which can cause thunder bottles to charge and send the full charge message between Double Hook! and Catch message.
-     */
-    private fun isInterceptingColorCodeMessage(message: String): Boolean =
-        (PetStorageApi.isAutopetMessage(message) || thunderBottleChargedPattern.matches(message))
-
-    // TODO Unify when both use CleanMessage.
-
-    /**
      * Reindrakes send an empty line, the global message & another empty line between Double Hook! and Catch message.
      */
-    private fun isInterceptingCleanMessage(message: String): Boolean =
-        (WinterApi.isReindrakeSpawnMessage(message) || message.isEmpty())
+    private fun isInterceptingMessage(message: String): Boolean =
+        (WinterApi.isReindrakeSpawnMessage(message) || message.isEmpty() ||
+            PetStorageApi.isAutopetMessage(message) || thunderBottleChargedPattern.matches(message))
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         seaCreatureMap.clear()
         allFishingMobs = emptyMap()
         var counter = 0

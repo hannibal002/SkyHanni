@@ -714,7 +714,7 @@ object PetStorageApi {
         this.skinTag == skinTag
 
     fun isAutopetMessage(message: String): Boolean =
-        PetStoragePatterns.autoPetMessageColorlessPattern.matches(message.removeColor().removeResets())
+        PetStoragePatterns.autoPetMessageColorlessPattern.matches(message)
 
     fun markDirty() {
         jsonNeedsSave = true
