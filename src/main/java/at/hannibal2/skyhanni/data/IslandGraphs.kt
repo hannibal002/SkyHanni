@@ -460,9 +460,8 @@ object IslandGraphs {
                 return
             }
             ChatUtils.userError("Manually stopped navigation")
+            NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
         }
-
-        NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
 
         currentTarget = null
         goal = null
@@ -574,7 +573,7 @@ object IslandGraphs {
     }
 
     fun cancelClick() {
-        stopNavigation()
+        stopNavigation(manual = true)
         onManualCancel()
     }
 
@@ -611,13 +610,6 @@ object IslandGraphs {
                         "pathfinding goes through wall, ignores obvious shortcut, " +
                         "missing npc/fishing hotspot/skyblock area name in /shnavigate..",
                 )
-            }
-        }
-        event.registerBrigadier("shstopnavigation") {
-            description = "Stops the current pathfinding."
-            category = CommandCategory.USERS_ACTIVE
-            simpleCallback {
-                stopNavigation(manual = true)
             }
         }
     }
