@@ -113,8 +113,10 @@ object SeaCreatureManager {
      * Reindrakes send an empty line, the global message & another empty line between Double Hook! and Catch message.
      */
     private fun isInterceptingMessage(message: String): Boolean =
-        (WinterApi.isReindrakeSpawnMessage(message) || message.isEmpty() ||
-            PetStorageApi.isAutopetMessage(message) || thunderBottleChargedPattern.matches(message))
+        WinterApi.isReindrakeSpawnMessage(message) ||
+            message.isEmpty() ||
+            PetStorageApi.isAutopetMessage(message) ||
+            thunderBottleChargedPattern.matches(message)
 
     @HandleEvent
     private fun onRepoReload(event: RepositoryReloadEvent) {
