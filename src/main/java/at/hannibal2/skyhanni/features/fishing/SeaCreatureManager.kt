@@ -99,6 +99,7 @@ object SeaCreatureManager {
                 }
             }
 
+            doubleHook = false
             if (original == edited) return
             event.replaceComponent(edited, "sea_creature")
         }
