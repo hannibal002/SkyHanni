@@ -56,4 +56,13 @@ class GreenhouseConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var phantomleafSolver: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Hide Magic Jelly Beans",
+        desc = "Hides the Magic Jelly Beans in the Greenhouse.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var magicJellyBeanHider: Boolean = false
 }
