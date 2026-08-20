@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 
 enum class SkyblockMobType(
     displayName: String? = null,
