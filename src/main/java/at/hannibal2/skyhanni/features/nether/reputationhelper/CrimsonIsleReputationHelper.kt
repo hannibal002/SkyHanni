@@ -178,7 +178,7 @@ object CrimsonIsleReputationHelper {
         return LorenzVec(x, y, z).add(-1, 0, -1)
     }
 
-    fun showLocations() = when (config.showLocation) {
+    fun showLocations(): Boolean = when (config.showLocation) {
         ShowLocationEntry.ALWAYS -> true
         ShowLocationEntry.ONLY_HOTKEY -> isHotkeyHeld()
         else -> false

@@ -181,5 +181,5 @@ object WoodenButtonsHelper {
     }
 
     private fun checkButtons() = RiftApi.inRift() && !RiftApi.allButtonsHit
-    fun showButtons() = checkButtons() && RiftApi.trackingButtons && config.showButtonsHelper
+    fun showButtons(): Boolean = checkButtons() && RiftApi.trackingButtons && config.showButtonsHelper
 }

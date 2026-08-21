@@ -124,7 +124,7 @@ object ElectionApi {
      * @param input: The name of the mayor
      * @return: The NotEnoughUpdates color of the mayor with the name of the mayor; If no mayor was found, it will return "§c[input]"
      */
-    fun mayorNameWithColorCode(input: String) = mayorNameToColorCode(input) + input
+    fun mayorNameWithColorCode(input: String): String = mayorNameToColorCode(input) + input
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {

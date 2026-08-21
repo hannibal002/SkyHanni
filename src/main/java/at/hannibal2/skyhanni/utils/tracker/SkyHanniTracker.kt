@@ -120,8 +120,8 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     }
 
     // used for Item tracker
-    open fun hideInEstimatedItemValue() = false
-    open fun hideOutsideInventory() = false
+    open fun hideInEstimatedItemValue(): Boolean = false
+    open fun hideOutsideInventory(): Boolean = false
 
     fun renderDisplay(position: Position) {
         if (hideInEstimatedItemValue() && EstimatedItemValue.isCurrentlyShowing()) return

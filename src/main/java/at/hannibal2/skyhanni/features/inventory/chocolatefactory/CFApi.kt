@@ -232,7 +232,7 @@ object CFApi {
 
     fun isMaxPrestige() = currentPrestige >= maxPrestige
 
-    fun timeTowerChargeDuration() = if (HoppityCollectionStats.hasFoundRabbit("Einstein")) 7.hours else 8.hours
+    fun timeTowerChargeDuration(): Duration = if (HoppityCollectionStats.hasFoundRabbit("Einstein")) 7.hours else 8.hours
 
     fun timeTowerMultiplier(): Double {
         var multiplier = (profileStorage?.timeTowerLevel ?: 0) * 0.1

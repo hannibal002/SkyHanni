@@ -35,8 +35,9 @@ object DelayedServerRun {
         return time to run
     }
 
-    fun runNextTick(label: String? = null, run: () -> Unit) =
+    fun runNextTick(label: String? = null, run: () -> Unit) {
         futureTasks.add(run.withErrorHandling("DelayedServerRun.runNextTick", label) to ServerTimeMark.farPast())
+    }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     private fun onServerTick() {

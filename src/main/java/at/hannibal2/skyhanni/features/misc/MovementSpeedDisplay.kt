@@ -50,6 +50,6 @@ object MovementSpeedDisplay {
         config.playerMovementSpeedPos.renderRenderable(display, posLabel = "Movement Speed")
     }
 
-    fun sbEnabled() = SkyBlockUtils.inSkyBlock || OutsideSBFeature.MOVEMENT_SPEED.isSelected()
-    fun isEnabled() = SkyBlockUtils.onHypixel && sbEnabled() && config.playerMovementSpeed
+    private fun sbEnabled() = SkyBlockUtils.inSkyBlock || OutsideSBFeature.MOVEMENT_SPEED.isSelected()
+    private fun isEnabled() = SkyBlockUtils.onHypixel && sbEnabled() && config.playerMovementSpeed
 }

@@ -23,9 +23,9 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     operator fun minus(other: Duration) = plus(-other)
 
-    fun passedSince() = now() - this
+    fun passedSince(): Duration = now() - this
 
-    fun timeUntil() = -passedSince()
+    fun timeUntil(): Duration = -passedSince()
 
     fun isInPast() = timeUntil().isNegative()
 
@@ -35,9 +35,9 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun isFarFuture() = millis >= FAR_FUTURE_MS
 
-    fun takeIfInitialized() = if (isFarPast() || isFarFuture()) null else this
+    fun takeIfInitialized(): SimpleTimeMark? = if (isFarPast() || isFarFuture()) null else this
 
-    fun absoluteDifference(other: SimpleTimeMark) = abs(millis - other.millis).milliseconds
+    fun absoluteDifference(other: SimpleTimeMark): Duration = abs(millis - other.millis).milliseconds
 
     override fun compareTo(other: SimpleTimeMark): Int = millis.compareTo(other.millis)
 
@@ -80,8 +80,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         private val FAR_PAST = SimpleTimeMark(FAR_PAST_MS)
         private val FAR_FUTURE = SimpleTimeMark(FAR_FUTURE_MS)
 
-        fun farPast() = FAR_PAST
-        fun farFuture() = FAR_FUTURE
+        fun farPast(): SimpleTimeMark = FAR_PAST
+        fun farFuture(): SimpleTimeMark = FAR_FUTURE
 
         fun fromUnixSeconds(seconds: Long) = SimpleTimeMark(seconds * 1000)
 

@@ -21,21 +21,21 @@ open class TextInput {
     var textBox: String = ""
     private var carriage: Int? = null
 
-    fun editText(textColor: LorenzColor = LorenzColor.WHITE, carriageColor: LorenzColor = LorenzColor.GREEN) = textBox.let {
+    fun editText(textColor: LorenzColor = LorenzColor.WHITE, carriageColor: LorenzColor = LorenzColor.GREEN): String = textBox.let {
         with(carriage) {
             if (this == null) it
             else it.insert(this, "${carriageColor.getChatColor()}|${textColor.getChatColor()}")
         }
     }.replace("(?<!§.\\|)§(?!.\\|§.)".toRegex(), "&&")
 
-    fun editTextWithAlwaysCarriage() = textBox.let {
+    fun editTextWithAlwaysCarriage(): String = textBox.let {
         with(carriage) {
             if (this == null) it.plus('|')
             else it.insert(this, '|')
         }
     }.replace("§", "&&")
 
-    fun finalText() = textBox.replace("&&", "§")
+    fun finalText(): String = textBox.replace("&&", "§")
 
     fun makeActive() = if (!isActive) activate(this) else Unit
     fun disable() = if (isActive) Companion.disable() else Unit

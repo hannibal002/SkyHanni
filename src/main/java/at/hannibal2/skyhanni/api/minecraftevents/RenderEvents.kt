@@ -9,13 +9,19 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
-import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.resources.Identifier
 
+//? if >= 26.1 {
+import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
+//?} else {
+/*import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
+*///?}
+
+@Suppress("PublicFunctionMustSpecifyReturnType")
 @SkyHanniModule
 object RenderEvents {
     private val config get() = SkyHanniMod.feature.gui

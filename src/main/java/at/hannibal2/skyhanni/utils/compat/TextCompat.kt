@@ -127,7 +127,7 @@ private val textColorLUT = ChatFormatting.entries
 
 fun Style?.orEmpty(): Style = this ?: Style.EMPTY
 
-fun Style.chatStyle() = buildString {
+fun Style.chatStyle(): String = buildString {
     color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.serialize()}>") }
     if (isBold) append("§l")
     if (isItalic) append("§o")

@@ -7,11 +7,11 @@ package at.hannibal2.skyhanni.utils
 class MarkdownBuilder {
     private val builder = StringBuilder().apply { append("```md\n") }
 
-    fun category(name: String) = apply {
+    fun category(name: String): MarkdownBuilder = apply {
         builder.append("# $name\n")
     }
 
-    fun append(key: String, value: Any) = apply {
+    fun append(key: String, value: Any): MarkdownBuilder = apply {
         if (key.isNotEmpty()) builder.append("[$key]")
         builder.append("[$value]\n")
     }

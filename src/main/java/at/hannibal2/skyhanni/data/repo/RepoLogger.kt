@@ -28,7 +28,7 @@ class RepoLogger(manager: AbstractRepoManager<*>) : SkyHanniLogger(manager.commo
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
-    ) = ErrorManager.logErrorStateWithData(
+    ): Boolean = ErrorManager.logErrorStateWithData(
         userMessage,
         "$loggingPrefix $internalMessage",
         *extraData,

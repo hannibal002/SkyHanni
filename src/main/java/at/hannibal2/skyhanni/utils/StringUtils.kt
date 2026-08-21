@@ -196,7 +196,7 @@ object StringUtils {
 
     fun encodeBase64(input: String): String = Base64.getEncoder().encodeToString(input.toByteArray())
 
-    fun decodeBase64(input: String) = Base64.getDecoder().decode(input).decodeToString()
+    fun decodeBase64(input: String): String = Base64.getDecoder().decode(input).decodeToString()
 
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
     fun Double.removeUnusedDecimal() = if (this % 1 == 0.0) toInt().toString() else toString()
@@ -257,7 +257,7 @@ object StringUtils {
         return "$allButLast$delimiterColor, and ${this[lastIndex]}"
     }
 
-    fun String.pluralize(number: Int) = pluralize(number, this)
+    fun String.pluralize(number: Int): String = pluralize(number, this)
 
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
         val pluralForm = plural ?: "${singular}s"
@@ -289,7 +289,7 @@ object StringUtils {
         return builder.toString()
     }
 
-    fun String.capAtMinecraftLength(limit: Int) = capAtLength(limit) {
+    fun String.capAtMinecraftLength(limit: Int): String = capAtLength(limit) {
         Minecraft.getInstance().font.width(it.toString())
     }
 
@@ -342,7 +342,7 @@ object StringUtils {
     fun isEmpty(message: String): Boolean =
         message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
-    fun generateRandomId() = UUID.randomUUID().toString()
+    fun generateRandomId(): String = UUID.randomUUID().toString()
 
     fun String.insert(pos: Int, chars: CharSequence): String =
         substring(0, pos) + chars + substring(pos)
@@ -521,7 +521,7 @@ object StringUtils {
 
     fun String.lastColorCode(): String? = minecraftColorCodesPattern.findAll(this).lastOrNull()
 
-    fun String.splitCamelCase() = replace("([a-z])([A-Z])".toRegex(), "$1 $2")
+    fun String.splitCamelCase(): String = replace("([a-z])([A-Z])".toRegex(), "$1 $2")
 
     fun String.isValidUuid(): Boolean = runCatching(UUID::fromString).isSuccess
 

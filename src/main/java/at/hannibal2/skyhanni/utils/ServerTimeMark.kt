@@ -39,7 +39,7 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
 
     fun takeIfInitialized() = if (isFarPast() || isFarFuture()) null else this
 
-    fun absoluteDifference(other: ServerTimeMark) = abs(millis - other.millis).milliseconds
+    fun absoluteDifference(other: ServerTimeMark): Duration = abs(millis - other.millis).milliseconds
 
     override fun compareTo(other: ServerTimeMark): Int = millis.compareTo(other.millis)
 
@@ -60,8 +60,8 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
         private val FAR_PAST = ServerTimeMark(FAR_PAST_MS)
         private val FAR_FUTURE = ServerTimeMark(FAR_FUTURE_MS)
 
-        fun farPast() = FAR_PAST
-        fun farFuture() = FAR_FUTURE
+        fun farPast(): ServerTimeMark = FAR_PAST
+        fun farFuture(): ServerTimeMark = FAR_FUTURE
 
         fun Duration.fromServerNow() = now() + this
     }

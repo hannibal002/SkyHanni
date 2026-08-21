@@ -45,7 +45,7 @@ object InGameDateDisplay {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent): Unit = with(config) {
-        if (!enabled || (!useScoreboard && !event.repeatSeconds(refreshSeconds))) return
+        if (!isEnabled() || (!useScoreboard && !event.repeatSeconds(refreshSeconds))) return
         checkDate()
     }
 
@@ -79,11 +79,11 @@ object InGameDateDisplay {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.enabled) return
+        if (!isEnabled()) return
 
         val display = display ?: return
         config.position.renderRenderable(display, posLabel = "In-game Date Display")
     }
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }

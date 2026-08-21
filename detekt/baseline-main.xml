@@ -370,9 +370,6 @@
     <ID>PrivateEventListener:CFApi.kt:CFApi$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:CFBarnManager.kt:CFBarnManager$@HandleEvent(InventoryCloseEvent::class) fun onInventoryClose</ID>
     <ID>PrivateEventListener:CFBarnManager.kt:CFBarnManager$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:CFBlockOpen.kt:CFBlockOpen$@HandleEvent fun onEffectUpdate</ID>
-    <ID>PrivateEventListener:CFBlockOpen.kt:CFBlockOpen$@HandleEvent(onlyOnSkyblock = true) fun onCommandSend</ID>
-    <ID>PrivateEventListener:CFBlockOpen.kt:CFBlockOpen$@HandleEvent(onlyOnSkyblock = true) fun onSlotClick</ID>
     <ID>PrivateEventListener:CFCustomReminder.kt:CFCustomReminder$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:CFCustomReminder.kt:CFCustomReminder$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:CFCustomReminder.kt:CFCustomReminder$@HandleEvent fun onConfigFix</ID>
@@ -897,10 +894,7 @@
     <ID>PrivateEventListener:DragonProfitTracker.kt:DragonProfitTracker$@HandleEvent fun onRepoReload</ID>
     <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onDebugDataCollect</ID>
     <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onScoreboardUpdate</ID>
     <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onTabUpdate</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onTablistChange</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onBlockClick</ID>
     <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:DungeonArchitectFeatures.kt:DungeonArchitectFeatures$@HandleEvent fun onChat</ID>
@@ -997,13 +991,6 @@
     <ID>PrivateEventListener:EasterEggWaypoints.kt:EasterEggWaypoints$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:EasterEggWaypoints.kt:EasterEggWaypoints$@HandleEvent fun onRenderWorld</ID>
     <ID>PrivateEventListener:EasterEggWaypoints.kt:EasterEggWaypoints$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun readPestRepellent</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES]) fun readSalts</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onInventoryUpdated</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onTabUpdate</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun readEffects</ID>
     <ID>PrivateEventListener:EggAchievement.kt:EggAchievement$@HandleEvent fun onAchievementRegistration</ID>
     <ID>PrivateEventListener:EggAchievement.kt:EggAchievement$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:ElectionApi.kt:ElectionApi$@HandleEvent fun onConfigLoad</ID>
@@ -1730,13 +1717,6 @@
     <ID>PrivateEventListener:HoppityEggsManager.kt:HoppityEggsManager$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
     <ID>PrivateEventListener:HoppityEggsManager.kt:HoppityEggsManager$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:HoppityEggsShared.kt:HoppityEggsShared$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onEggSpawned</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onProfileJoin</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onRabbitFound</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
     <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderTop</ID>
     <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent(onlyOnSkyblock = true) fun onKeyPress</ID>
@@ -2241,14 +2221,6 @@
     <ID>PrivateEventListener:NoBitsWarning.kt:NoBitsWarning$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:NoBreak.kt:NoBreak$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:NoBreak.kt:NoBreak$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onBlockClick</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onEffectUpdate</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onProfileJoin</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onSecondPassed</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent(onlyOnSkyblock = true) fun onTabUpdate</ID>
     <ID>PrivateEventListener:NotificationManager.kt:NotificationManager$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:NotificationManager.kt:NotificationManager$@HandleEvent fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:NotificationManager.kt:NotificationManager$@HandleEvent fun onKeyPress</ID>
@@ -2973,12 +2945,6 @@
     <ID>PrivateEventListener:SuperpairsClicksAlert.kt:SuperpairsClicksAlert$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onInventoryOpen</ID>
     <ID>PrivateEventListener:SuperpairsClicksAlert.kt:SuperpairsClicksAlert$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:TabComplete.kt:TabComplete$@HandleEvent fun handleTabComplete</ID>
-    <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent fun onTick</ID>
-    <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent(receiveCancelled = true) fun onPacketReceive</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent fun onConfigLoad</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent(onlyOnSkyblock = true) fun onTabListFooterUpdate</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent(onlyOnSkyblock = true) fun onTabListUpdate</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent fun onSkipTablistLine</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent(onlyOnSkyblock = true) fun onRenderOverlayPre</ID>
@@ -3330,6 +3296,533 @@
     <ID>PropertyName:WorldEdit.kt:WorldEdit$private const val legacyBlockPos = "net.minecraft.util.BlockPos"</ID>
     <ID>PropertyName:WorldEdit.kt:WorldEdit$private const val modernAABB = "net.minecraft.util.math.Box"</ID>
     <ID>PropertyName:WorldEdit.kt:WorldEdit$private const val modernBlockPos = "net.minecraft.util.math.BlockPos"</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AbstractRepoLocationConfig.kt:AbstractRepoLocationConfig$fun hasDefaultSettings</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AbstractRepoManager.kt:AbstractRepoManager$fun addSuccessfulConstant</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AbstractRepoManager.kt:AbstractRepoManager$fun getFailedConstants</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AbstractWardrobeApi.kt:AbstractWardrobeApi$fun inWardrobe</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:Achievement.kt:Achievement$fun getName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ActionBarData.kt:ActionBarData$fun getActionBar</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ActiveBeaconEffect.kt:ActiveBeaconEffect$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AdvancedPlayerList.kt:AdvancedPlayerList$fun createTabLine</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AnimatedBounceStorage.kt:AnimatedBounceDefinition$fun isAxisEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AnimatedBounceStorage.kt:AnimatedBounceDefinition$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AnimatedBounceStorage.kt:AxisBounceDefinition$fun getOffset</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AnimatedBounceStorage.kt:AxisBounceDefinition$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AnimatedRotationStorage.kt:AnimatedRotationDefinition$fun getStaticRotation</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AnimatedRotationStorage.kt:AnimatedRotationDefinition$fun isAxisEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AnimatedRotationStorage.kt:AnimatedRotationDefinition$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AnimatedRotationStorage.kt:AxisRotationDefinition$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AnitaMedalProfit.kt:AnitaMedalProfit.MedalType.Companion$fun bySimpleNameOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AnvilCombineHelper.kt:AnvilCombineHelper$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ApiStaticPath.kt:ApiStaticGetPath$fun buildGetRequest</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ApiStaticPath.kt:ApiStaticPostPath$fun buildPostRequest</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ApiUtils.kt:ApiUtils$fun isBazaarDisabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ApiUtils.kt:ApiUtils$fun isHypixelItemsDisabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ApiUtils.kt:ApiUtils$fun isLegacyHoppityLocationCountingDisabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ApiUtils.kt:ApiUtils$fun isLowestBinApiDisabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ArachneChatMessageHider.kt:ArachneChatMessageHider$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ArachneKillTimer.kt:ArachneKillTimer$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ArachneSpawnTimer.kt:ArachneSpawnTimer$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AshfangFreezeCooldown.kt:AshfangFreezeCooldown$fun isCurrentlyFrozen</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AtomHitBox.kt:AtomHitBox.AtomType.Companion$fun fromTexture</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AttributeApi.kt:AttributeApi.AttributeType.Companion$fun getByInternalName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AttributeApi.kt:AttributeApi.AttributeType.Companion$fun getByInternalNameOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:AuctionHouseOpenPriceWebsite.kt:AuctionHouseOpenPriceWebsite$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BacteApi.kt:BacteApi.Phase.Companion$fun fromNumber</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BazaarApi.kt:BazaarApi$fun NeuInternalName.isBazaarItem</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BazaarCancelledBuyOrderClipboard.kt:BazaarCancelledBuyOrderClipboard$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BazaarOpenPriceWebsite.kt:BazaarOpenPriceWebsite$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BazaarTransactionEvent.kt:BazaarTransactionEvent.TransactionType.Companion$fun getByMessageOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BestiaryData.kt:BestiaryData.BestiaryMob$fun getNextLevel</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BestiaryData.kt:BestiaryData.BestiaryMob$fun percentToMax</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BestiaryData.kt:BestiaryData.BestiaryMob$fun percentToMaxFormatted</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BestiaryData.kt:BestiaryData.BestiaryMob$fun percentToTier</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BestiaryData.kt:BestiaryData.BestiaryMob$fun percentToTierFormatted</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BingoApi.kt:BingoApi$fun getData</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BingoApi.kt:BingoApi$fun getIcon</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BingoApi.kt:BingoApi$fun getIconFromScoreboard</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BingoApi.kt:BingoApi$fun getRank</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BingoCardTips.kt:BingoCardTips$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BirriesHighlighter.kt:BirriesHighlighter$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BitsApi.kt:BitsApi$fun hasCookieBuff</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BitsApi.kt:BitsApi$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BlobbercystsHighlight.kt:BlobbercystsHighlight$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BlockStrengthGuide.kt:BlockStrengthGuide.SpeedClass$fun toRenderables</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BlockUtils.kt:BlockUtils$fun getTargetedBlockAtDistance</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BossbarData.kt:BossbarData$fun getBossbar</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:BucketedItemTrackerData.kt:BucketedItemTrackerData$open fun getBucketedItems</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CFApi.kt:CFApi$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CFApi.kt:CFApi$fun isMaxPrestige</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CFCustomReminder.kt:CFCustomReminder$fun isActive</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CFCustomReminder.kt:CFCustomReminder$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CarnivalFruitDigging.kt:CarnivalFruitDigging.GamePos$fun isValid</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CarnivalFruitDigging.kt:CarnivalFruitDigging.GamePos$fun label</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CarnivalGoal.kt:CarnivalGoal.Companion$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CarrolynHelper.kt:CarrolynHelper$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ChatManager.kt:ChatManager$fun addReplacementContext</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ChatSoundResponse.kt:ChatSoundResponse$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ChatUtils.kt:ChatUtils$fun getTimeWhenNewlyQueuedMessageGetsExecuted</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ChatUtils.kt:ChatUtils$fun getUniqueMessageId</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ChunkedStatsLine.kt:ChunkedStatsLine.Companion$fun shouldShowChunkedStats</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CollectionApi.kt:CollectionApi$fun NeuInternalName.getCorrectedName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CollectionApi.kt:CollectionApi$fun isCollectionTier0</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CollectionUtils.kt:CollectionUtils$fun &lt;K, V&gt; Map&lt;K, V&gt;.containsKeys</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CollectionUtils.kt:CollectionUtils$fun &lt;T&gt; MutableList&lt;T&gt;.addNotNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CollectionUtils.kt:CollectionUtils$fun &lt;T&gt; Pair&lt;T, T&gt;.equalsIgnoreOrder</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ColorHexInLore.kt:ColorHexInLore$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ColorParticleFix.kt:ColorParticleFix$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ColorUtils.kt:ColorUtils$fun ChromaColour.toInt</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ColorUtils.kt:ColorUtils$fun String.getFirstColorCode</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ColorUtils.kt:ColorUtils$fun getAlpha</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ColorUtils.kt:ColorUtils$fun getBlue</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ColorUtils.kt:ColorUtils$fun getGreen</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ColorUtils.kt:ColorUtils$fun getRed</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CommandUtils.kt:CommandArgument$fun getResult</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CommonSeaCreatureHider.kt:CommonSeaCreatureHider$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CompactExperimentRewards.kt:CompactExperimentRewards$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ComponentMatcherUtils.kt:ComponentMatcherUtils$inline fun &lt;T&gt; Pattern.findStyledMatcher</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ComponentMatcherUtils.kt:ComponentMatcherUtils$inline fun &lt;T&gt; Pattern.matchStyledMatcher</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ComponentMatcherUtils.kt:ComponentSpan$fun getText</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ComposterApi.kt:ComposterApi$fun ComposterUpgrade.getLevel</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ComposterApi.kt:ComposterApi$fun getFuel</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ComposterApi.kt:ComposterApi$fun getOrganicMatter</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ComposterDisplay.kt:ComposterDisplay.DataType$fun label</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ComposterUpgrade.kt:ComposterUpgrade.Companion$fun getByName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ConfigGuiManager.kt:ConfigGuiManager$fun getEditorInstance</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ConfigUtils.kt:ConfigUtils$fun String.asStructuredText</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CountdownTitleContext.kt:CountdownTitleContext.Companion$fun TitleContext.fromTitleData</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CraftMaterialCollector.kt:CraftMaterialCollector$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CraftableItemList.kt:CraftableItemList$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CropAccessory.kt:CropAccessory.Companion$fun getByName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CropCollectionApi.kt:CropCollectionApi$fun CropType.getCollection</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CropCollectionType.kt:CropCollectionType.Companion$fun getByName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CropMilestonesApi.kt:CropMilestonesApi$fun CropType.getMilestoneCounter</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CropSpeedMeter.kt:CropSpeedMeter$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CropType.kt:CropType.Companion$fun CropType.getTurboCrop</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CropType.kt:CropType.Companion$fun getByName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CropUpgrades.kt:CropUpgrades$fun CropType.getUpgradeLevel</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CruxTalismanDisplay.kt:CruxTalismanDisplay$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CrystalHollowsNamesInCore.kt:CrystalHollowsNamesInCore$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CrystalNucleusApi.kt:CrystalNucleusApi$fun getPrecursorRunPrice</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CurrentChatDisplay.kt:CurrentChatDisplay.ChatType.Companion$fun fromName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CurrentPetApi.kt:CurrentPetApi$fun isCurrentPet</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CurrentPing.kt:CurrentPing$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CustomGoals.kt:CustomGoals$fun CropType.getCustomGoal</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CustomLoadoutKeybinds.kt:CustomLoadoutKeybinds$fun allowKeyboardClick</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CustomLoadoutKeybinds.kt:CustomLoadoutKeybinds$fun allowMouseClick</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CustomScoreboard.kt:CustomScoreboard$@JvmStatic fun isHideVanillaScoreboardEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CustomScoreboardUtils.kt:CustomScoreboardUtils$fun getProfileTypeSymbol</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CustomWardrobeKeybinds.kt:CustomWardrobeKeybinds$fun allowKeyboardClick</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:CustomWardrobeKeybinds.kt:CustomWardrobeKeybinds$fun allowMouseClick</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:DailyQuestHelper.kt:DailyQuestHelper$inline fun &lt;reified T : Quest&gt; getQuest</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:DamageIndicatorManager.kt:DamageIndicatorManager$fun isBossSpawned</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:DianaApi.kt:DianaApi$fun getCreatureByTrackerName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:DianaApi.kt:DianaApi$fun hasGriffinPet</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:DianaApi.kt:DianaApi$fun hasSpadeInHand</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:DianaApi.kt:DianaApi$fun isDoingDiana</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:DiscordIPC.kt:DiscordIPC.Opcode.Companion$fun fromId</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:DragNDrop.kt:fun SafeItemStack.toDragItem</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:DragonFightAPI.kt:DragonFightAPI$fun inNestArea</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:DungeonApi.kt:DungeonApi.DungeonChest.Companion$fun getByInventoryName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:DungeonFinderFeatures.kt:DungeonFinderFeatures$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:DungeonFloor.kt:DungeonFloor.Companion$fun byBossName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:DungeonRankTabListColor.kt:DungeonRankTabListColor$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EliteLeaderboards.kt:EliteLeaderboards.EliteLeaderboardDisplayManager$fun getFromTypeOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EnchantParser.kt:EnchantParser$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EnchantedClockHelper.kt:EnchantedClockHelper$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EnchantedClockHelper.kt:EnchantedClockHelper.BoostType$fun getCooldownFromNow</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EnchantedClockHelper.kt:EnchantedClockHelper.BoostType.Companion$fun byItemStackOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EnchantedClockHelper.kt:EnchantedClockHelper.BoostType.Companion$fun bySimpleBoostType</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EnchantedClockHelper.kt:EnchantedClockHelper.BoostType.Companion$fun byUsageStringOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EnchantsJson.kt:EnchantsJson$fun hasEnchantData</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EndermanSlayerHideParticles.kt:EndermanSlayerHideParticles$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EnigmaSoulWaypoints.kt:EnigmaSoulWaypoints$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EnoughUpdatesManager.kt:EnoughUpdatesManager$fun getInternalNames</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EnoughUpdatesManager.kt:EnoughUpdatesManager$fun getItemInformation</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EnoughUpdatesManager.kt:EnoughUpdatesManager$fun inLoadingState</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EntityCompat.kt:@Deprecated("use EntityCompat directly") fun LivingEntity.getAllEquipment</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EntityCompat.kt:EntityCompat$fun LivingEntity.getAllEquipment</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EntityData.kt:EntityData$@JvmStatic fun getHealthDisplay</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EntityTransparencyActiveEvent.kt:EntityTransparencyActiveEvent$fun isActive</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EntityUtils.kt:EntityUtils$fun LivingEntity.isAtFullHealth</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EntityUtils.kt:EntityUtils$fun LivingEntity.isCorrupted</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EntityUtils.kt:EntityUtils$fun LivingEntity.isRunic</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EntityUtils.kt:EntityUtils$fun LivingEntity.isRunicAndCorrupt</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:EstimatedItemValue.kt:EstimatedItemValue$fun isCurrentlyShowing</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ExcavatorTooltipHider.kt:ExcavatorTooltipHider$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ExperimentationTableApi.kt:ExperimentationTableApi.ExperimentationTaskType.Companion$fun fromStringOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FameRanks.kt:FameRanks$fun getByInternalName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FameRanks.kt:FameRanks$fun getByName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FarmingContestApi.kt:FarmingContestApi$fun getContestAtTime</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FarmingContestApi.kt:FarmingContestApi$fun getContestsOfType</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FarmingFortuneDisplay.kt:FarmingFortuneDisplay$fun CropType.getLatestTrueFarmingFortune</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FarmingFortuneDisplay.kt:FarmingFortuneDisplay$fun getCultivatingFortune</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FarmingFortuneDisplay.kt:FarmingFortuneDisplay$fun getCurrentFarmingFortune</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FarmingFortuneDisplay.kt:FarmingFortuneDisplay$fun getHarvestingFortune</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FarmingFortuneDisplay.kt:FarmingFortuneDisplay$fun getPesterminatorFortune</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FarmingFortuneDisplay.kt:FarmingFortuneDisplay$fun getSunderFortune</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FarmingPersonalBestGain.kt:FarmingPersonalBestGain$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FerocityDisplay.kt:FerocityDisplay$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FishingApi.kt:FishingApi$fun NeuInternalName.isFishingRod</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FishingApi.kt:FishingApi$fun NeuInternalName.isLavaRod</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FishingApi.kt:FishingApi$fun NeuInternalName.isWaterRod</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FishingApi.kt:FishingApi$fun SafeItemStack.isFishingRod</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FishingApi.kt:FishingApi$fun isFishing</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FishingBaitDisplay.kt:FishingBaitDisplay$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FishingHookDisplay.kt:FishingHookDisplay$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FocusMode.kt:FocusMode$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ForagingBeaconSolver.kt:ForagingBeaconSolver.BeaconSpeed.Companion$fun byClosestTickSpeed</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ForagingBeaconSolver.kt:ForagingBeaconSolver.BeaconTuneData$fun getRenderables</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ForagingBeaconWarning.kt:ForagingBeaconWarning$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ForagingTrackerLegacy.kt:ForagingTrackerLegacy.TreeType$fun getBaseLog</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ForagingTrackerLegacy.kt:ForagingTrackerLegacy.TreeType$fun getEnchantedLog</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FormattedEnchant.kt:FormattedEnchant$fun addLore</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FormattedEnchant.kt:FormattedEnchant$fun getLore</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FossilShape.kt:FossilShape$fun height</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FossilShape.kt:FossilShape$fun width</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:FossilTile.kt:FossilTile$fun toSlotIndex</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenApi.kt:GardenApi$fun NeuInternalName.isFarmingTool</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenApi.kt:GardenApi$fun SafeItemStack.getCropType</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenApi.kt:GardenApi$fun hasFarmingToolInHand</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenApi.kt:GardenApi$fun inGarden</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenApi.kt:GardenApi$fun isCurrentlyFarming</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenCropSpeed.kt:GardenCropSpeed$fun CropType.getLatestBlocksPerSecond</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenCropSpeed.kt:GardenCropSpeed$fun CropType.getSpeed</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenCropSpeed.kt:GardenCropSpeed$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenCropSpeed.kt:GardenCropSpeed$fun isSpeedDataEmpty</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenInventoryTooltipOverflow.kt:GardenInventoryTooltipOverflow$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenNextJacobContest.kt:GardenNextJacobContest$fun isNextCrop</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenPlot.kt:GardenPlot$fun isBarn</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenPlot.kt:GardenPlot$fun isPlayerInside</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenPlotApi.kt:GardenPlotApi$fun getPlotByName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenPlotIcon.kt:GardenPlotIcon$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenStartLocation.kt:GardenStartLocation$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GardenVisitorDropStatistics.kt:GardenVisitorDropStatistics$fun format</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GiftApi.kt:GiftApi$fun isHoldingGift</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GiftProfitTracker.kt:GiftProfitTracker.GiftRewardRarityType.Companion$fun getByNameOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GiftProfitTracker.kt:GiftProfitTracker.GiftType$fun toInternalName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GiftProfitTracker.kt:GiftProfitTracker.GiftType.Companion$fun byUserInput</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GlacitePowderFeatures.kt:GlacitePowderFeatures$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GraphEditorBugFinder.kt:GraphEditorBugFinder$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GraphEditorState.kt:GraphEditorState$fun getEdgeIndex</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GraphingEdge.kt:GraphingEdge$fun isInEdge</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GraphingEdge.kt:GraphingEdge$fun isValidDirectionFrom</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GuiEditManager.kt:GuiEditManager$fun isInGui</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GuiRenderUtils.kt:GuiRenderUtils$fun isPointInRect</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GuideTab.kt:GuideTab$fun isSelected</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GuildApi.kt:GuildApi$fun getAllMembers</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:GuildApi.kt:GuildApi$fun isInGuild</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HideArmorHook.kt:fun shouldHideHead</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HideFarEntities.kt:HideFarEntities$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HighlightMiningCommissionMobs.kt:HighlightMiningCommissionMobs$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HighlightRiftGuide.kt:HighlightRiftGuide$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HoeLevelDisplay.kt:HoeLevelDisplay$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HoppityApi.kt:HoppityApi$fun filterMayBeStray</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HoppityApi.kt:HoppityApi$fun getEventEndMark</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HoppityApi.kt:HoppityApi$fun getEventStartMark</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HoppityApi.kt:HoppityApi$fun isHoppityEvent</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HoppityApi.kt:HoppityApi$fun onHoppityIsland</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HoppityCollectionData.kt:HoppityCollectionData$fun isKnownRabbit</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HoppityCollectionStats.kt:HoppityCollectionStats.RabbitCollectionRarity.Companion$fun fromDisplayName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HoppityEggLocator.kt:HoppityEggLocator$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HoppityEggType.kt:HoppityEggType$fun isClaimed</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HoppityEggsManager.kt:HoppityEggsManager$fun isActive</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HoppityEggsShared.kt:HoppityEggsShared$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HotmApi.kt:HotmApi$fun copyCurrentTree</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HotmApi.kt:HotmApi.PowderType$fun pattern</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HotxData.kt:HotxData$fun getReward</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:HypixelItemApi.kt:HypixelItemApi.Companion$fun getNpcPrice</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:InstanceChestAPI.kt:InstanceChestAPI$fun isInCroesusMenu</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:InstanceChestAPI.kt:InstanceChestAPI$fun isInstanceChestGUI</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:InventoryDetector.kt:InventoryDetector$fun isInside</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:InventoryUtils.kt:InventoryUtils$fun Container.isTopInventory</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:InventoryUtils.kt:InventoryUtils$fun Slot.isTopInventory</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:InventoryUtils.kt:InventoryUtils$fun inAnyInventory</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:InventoryUtils.kt:InventoryUtils$fun inContainer</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:InventoryUtils.kt:InventoryUtils$fun inInventory</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:InventoryUtils.kt:InventoryUtils$fun inOwnInventory</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:InventoryUtils.kt:InventoryUtils$fun inStorage</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:InventoryUtils.kt:InventoryUtils$fun isItemInInventory</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:IslandType.kt:IslandType$fun isInIsland</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ItemBuyApi.kt:ItemBuyApi$fun NeuInternalName.createBuyTipLine</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ItemCategory.kt:ItemCategory.Companion$fun Collection&lt;ItemCategory&gt;.containsItem</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ItemDisplayOverlayFeatures.kt:ItemDisplayOverlayFeatures$fun ItemNumberEntry.isSelected</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ItemPickupLog.kt:ItemPickupLog.PickupEntry$fun isExpired</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ItemPriceUtils.kt:ItemPriceUtils$fun NeuInternalName.getPrice</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ItemStackRenderable.kt:ItemStackRenderable$fun withTip</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ItemStackRenderable.kt:ItemStackRenderable$open fun getStableId</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ItemTrackerData.kt:ItemTrackerData$open fun getCustomPricePer</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ItemUtils.kt:ItemUtils$fun SafeItemStack.getItemRarityOrCommon</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ItemUtils.kt:ItemUtils$fun SafeItemStack.isVanilla</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ItemUtils.kt:ItemUtils$fun isRecombobulated</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ItemUtils.kt:ItemUtils$fun isSack</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:JoinCrystalHollows.kt:JoinCrystalHollows$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:KeyboardManager.kt:KeyboardManager$fun isControlKeyDown</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:KeyboardManager.kt:KeyboardManager$fun isCopyingKeysDown</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:KeyboardManager.kt:KeyboardManager$fun isDeleteLineDown</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:KeyboardManager.kt:KeyboardManager$fun isDeleteWordDown</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:KeyboardManager.kt:KeyboardManager$fun isMenuKeyDown</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:KeyboardManager.kt:KeyboardManager$fun isModifierKeyDown</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:KeyboardManager.kt:KeyboardManager$fun isPastingKeysDown</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:KeyboardManager.kt:KeyboardManager$fun isShiftKeyDown</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:KillZoneWarning.kt:KillZoneWarning$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:KingTalismanHelper.kt:KingTalismanHelper$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:KuudraTier.kt:KuudraTier$fun getTieredDisplayName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LaunchersJson.kt:LauncherEntry$fun getIdPair</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LavaReplacement.kt:LavaReplacement.IslandsToReplace$fun inIsland</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LivingCaveDefenseBlocks.kt:LivingCaveDefenseBlocks$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LivingCaveLivingMetalHelper.kt:LivingCaveLivingMetalHelper$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LoadoutApi.kt:LoadoutApi$fun inLoadouts</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LoadoutSlot.kt:LoadoutSlot$fun getData</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LoadoutSlot.kt:LoadoutSlot$fun isCurrentSlot</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LoadoutSlot.kt:LoadoutSlot$fun isInCurrentPage</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LoadoutSlotHighlight.kt:LoadoutSlotHighlight$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LocationUtils.kt:LocationUtils$fun AABB.getBoxCenter</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LocationUtils.kt:LocationUtils$fun AABB.getEdgeLengths</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LocationUtils.kt:LocationUtils$fun AABB.getTopCenter</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LorenzColor.kt:LorenzColor.Companion$fun DyeColor.toLorenzColor</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LorenzRarity.kt:LorenzRarity.Companion$fun getById</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LorenzVec.kt:LorenzVec$fun angleAsCos</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LorenzVec.kt:LorenzVec$fun angleInDeg</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LorenzVec.kt:LorenzVec$fun blockCenter</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LorenzVec.kt:LorenzVec$fun equalsIgnoreY</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LorenzVec.kt:LorenzVec$fun isNormalized</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LorenzVec.kt:LorenzVec$fun normalize</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LorenzVec.kt:LorenzVec$fun scaledTo</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:LorenzVec.kt:LorenzVec$fun slope</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MaxwellApi.kt:MaxwellApi$fun getPowerByNameOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MaxwellApi.kt:MaxwellApi$fun isThaumaturgyInventory</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MayorData.kt:ElectionCandidate$fun isActive</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MetalDetectorMute.kt:MetalDetectorMute$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MetalDetectorSolver.kt:MetalDetectorSolver$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MiddleClickFix.kt:MiddleClickFix$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MineshaftPityDisplay.kt:MineshaftPityDisplay.PityBlock.Companion$fun PityBlock.getPity</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MiningApi.kt:MiningApi$fun inCrystalHollows</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MiningApi.kt:MiningApi$fun inDwarvenBaseCamp</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MiningApi.kt:MiningApi$fun inGlacialTunnels</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MiningApi.kt:MiningApi$fun inGlaciteArea</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MiningApi.kt:MiningApi$fun inMinesOfDivan</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MiningApi.kt:MiningApi$fun inMineshaft</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MiningApi.kt:MiningApi$fun inRegularDwarven</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MiningEventTracker.kt:MiningEventTracker$fun isMiningIsland</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MinisterInCalendar.kt:MinisterInCalendar$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:Mob.kt:Mob$fun canBeSeen</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:Mob.kt:Mob$fun getLorenzVec</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:Mob.kt:Mob$fun isInRender</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:Mob.kt:Mob$fun isInvisible</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:Mob.kt:Mob$fun makeEntityToMobAssociation</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:Mob.kt:MobCategory$fun isSkyblockMob</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobData.kt:MobData.MobResult.Companion$fun ArmorStand?.makeMobResult</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobData.kt:MobData.MobResult.Companion$fun List&lt;ArmorStand?&gt;.makeMobResult</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobData.kt:MobData.RetryEntityInstancing$fun toKeyValuePair</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobDetection.kt:MobDetection$fun postMobHurtEvent</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobFilter.kt:MobFilter$fun LivingEntity.isDisplayNpc</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobFilter.kt:MobFilter$fun LivingEntity.isFarmMob</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobFilter.kt:MobFilter$fun Player.isRealPlayer</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobUtils.kt:MobUtils$fun ArmorStand.hasEmptyInventory</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobUtils.kt:MobUtils$fun ArmorStand.isCompletelyDefault</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobUtils.kt:MobUtils$fun ArmorStand.isDefaultValue</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobUtils.kt:MobUtils$fun ArmorStand?.takeNonDefault</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobUtils.kt:MobUtils$fun getArmorStand</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobUtils.kt:MobUtils$fun getArmorStandByRangeAll</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobUtils.kt:MobUtils$fun getClosestArmorStand</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MobUtils.kt:MobUtils$fun getClosestArmorStandWithName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ModVersion.kt:ModVersion$fun isValid</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:MoveInsertIntoSackButton.kt:MoveInsertIntoSackButton$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:NeuItems.kt:NeuItems$fun findItemNameStartingWith</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:NeuRecipeComponent.kt:NeuRecipeComponent$fun toJsonString</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:NeuRecipeComponent.kt:NeuRecipeComponent$fun toPrimitiveIngredientOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:NeuRecipeType.kt:NeuRecipeType.Companion$fun fromNeuId</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:OdgerWaypoint.kt:OdgerWaypoint$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:OpenLastStorage.kt:OpenLastStorage.StorageType$fun isValidPage</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:OreBlock.kt:OreBlock.Companion$fun getByNameOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:OutsideSBFeature.kt:OutsideSBFeature$@Deprecated("Use onlyOnSkyblockOrFeatures instead") fun isSelected</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PabloHelper.kt:PabloHelper$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PageScrolling.kt:PageScrolling$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ParkourHelper.kt:ParkourHelper$fun inParkour</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ParticleHider.kt:ParticleHider$@JvmStatic fun shouldHideBlazeParticles</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ParticleHider.kt:ParticleHider$@JvmStatic fun shouldHideFireParticles</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ParticleHider.kt:ParticleHider$@JvmStatic fun shouldHideFireballParticles</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PartyApi.kt:PartyApi$fun isInParty</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PestApi.kt:PestApi$fun GardenPlot.getPestTypesInPlot</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PestApi.kt:PestApi$fun SprayType.getPests</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PestApi.kt:PestApi$fun getInfestedPlots</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PestApi.kt:PestApi$fun getNearestInfestedPlot</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PestApi.kt:PestApi$fun getPlotsWithoutPests</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PestApi.kt:PestApi$fun hasLassoInHand</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PestApi.kt:PestApi$fun hasVacuumInHand</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PestApi.kt:PestApi$fun hasVacuumOrLassoInHand</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PestApi.kt:PestApi$fun isNearPestTrap</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PestType.kt:PestType.Companion$fun getByName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PesthunterProfit.kt:PesthunterProfit$fun isInInventory</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PetUtils.kt:PetUtils$fun NeuInternalName.hasValidHigherTier</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PetUtils.kt:PetUtils$fun isKnownPetInternalName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PlaceholderRenderable.kt:fun Renderable.Companion.empty</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PlaceholderRenderable.kt:fun Renderable.Companion.emptyText</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PlayerNameFormatter.kt:PlayerNameFormatter$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PolynomialFitter.kt:BezierFitter$fun count</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PowerStoneGuideFeatures.kt:PowerStoneGuideFeatures$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PreciseGuessBurrow.kt:PreciseGuessBurrow$fun getBezierFitterCount</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PrecisionMiningHighlight.kt:PrecisionMiningHighlight$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PrimitiveIngredient.kt:PrimitiveIngredient$fun isCoin</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PrimitiveItemStack.kt:PrimitiveItemStack.Companion$fun SafeItemStack.toPrimitiveStackOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:PrimitiveRecipe.kt:PrimitiveRecipe$fun isCraftingRecipe</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ProfileSpecificStorage.kt:ProfileSpecificStorage.GardenStorage.VisitorDrops$fun getTotalVisitors</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ProfileViewerDataLoadedEvent.kt:ProfileViewerDataLoadedEvent$fun getCurrentPlayerData</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ProfileViewerDataLoadedEvent.kt:ProfileViewerDataLoadedEvent$fun getCurrentProfileData</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:QuickModMenuSwitch.kt:QuickModMenuSwitch.Mod$fun isInGui</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:QuiverApi.kt:QuiverApi$fun Int.asArrowPercentage</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:QuiverApi.kt:QuiverApi$fun hasBowInInventory</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:QuiverApi.kt:QuiverApi$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:QuiverDisplay.kt:QuiverDisplay$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ReforgeApi.kt:ReforgeApi.Reforge$fun isValid</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RegexUtils.kt:RegexUtils$fun Pattern.find</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RegexUtils.kt:RegexUtils$inline fun &lt;T&gt; Pattern.findMatcher</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RegexUtils.kt:RegexUtils$inline fun &lt;T&gt; Pattern.matchMatcher</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ReindrakeWarpHelper.kt:ReindrakeWarpHelper$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:Relay.kt:Relay$fun checkChatMessage</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:Reminder.kt:Reminder$fun shouldRemind</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RenderableInventory.kt:RenderableInventory.SlotsUv$fun height</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RenderableInventory.kt:RenderableInventory.SlotsUv$fun width</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ReplaceHoppityWithContributor.kt:ReplaceHoppityWithContributor$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftAgaricusCap.kt:RiftAgaricusCap$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftApi.kt:RiftApi$fun inColosseum</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftApi.kt:RiftApi$fun inDreadfarm</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftApi.kt:RiftApi$fun inLivingCave</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftApi.kt:RiftApi$fun inLivingStillness</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftApi.kt:RiftApi$fun inMountainTop</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftApi.kt:RiftApi$fun inRift</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftApi.kt:RiftApi$fun inStillgoreChateau</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftApi.kt:RiftApi$fun inWestVillage</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftBloodEffigies.kt:RiftBloodEffigies$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftGunthersRace.kt:RiftGunthersRace$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftLavaMazeParkour.kt:RiftLavaMazeParkour$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftTimer.kt:RiftTimer$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftUpsideDownParkour.kt:RiftUpsideDownParkour$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:RiftWiltedBerberisHelper.kt:RiftWiltedBerberisHelper.BerberisSequence$fun isAtCurrent</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ScoreboardConfigElement.kt:ScoreboardConfigElement.Companion$fun getElements</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ScoreboardConfigEventElement.kt:ScoreboardConfigEventElement.Companion$fun getEvents</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ScrollInput.kt:ScrollInput$fun asDirection</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ScrollInput.kt:ScrollInput$fun asDouble</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ScrollInput.kt:ScrollInput$fun asInt</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SearchTextInput.kt:SearchTextInput.Companion$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:Searchable.kt:fun Searchable.toRenderable</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ServerTimeMark.kt:ServerTimeMark$fun isFarFuture</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ServerTimeMark.kt:ServerTimeMark$fun isFarPast</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ServerTimeMark.kt:ServerTimeMark$fun takeIfInitialized</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ServerTimeMark.kt:ServerTimeMark$fun toMillis</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ServerTimeMark.kt:ServerTimeMark.Companion$fun Duration.fromServerNow</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ShiftClickNpcSell.kt:ShiftClickNpcSell$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:ShowFishingItemName.kt:ShowFishingItemName$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SimpleTimeMark.kt:SimpleTimeMark$fun isFarFuture</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SimpleTimeMark.kt:SimpleTimeMark$fun isFarPast</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SimpleTimeMark.kt:SimpleTimeMark$fun isInFuture</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SimpleTimeMark.kt:SimpleTimeMark$fun isInPast</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SimpleTimeMark.kt:SimpleTimeMark$fun toMillis</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SimpleTimeMark.kt:SimpleTimeMark$fun toSeconds</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SimpleTimeMark.kt:SimpleTimeMark.Companion$fun Duration.fromNow</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SirihHelper.kt:SirihHelper$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkillExperience.kt:SkillExperience$fun getExpForNextLevel</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkillExperience.kt:SkillExperience$fun getExpForSkill</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkillType.kt:SkillType.Companion$fun getByName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkillType.kt:SkillType.Companion$fun getByNameOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getAbilityScrolls</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getArmorDye</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getAttributeString</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getAttributes</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getDrillUpgrades</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getDungeonStarCount</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getGemstones</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getHelmetSkin</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getHoeExp</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getMinecraftId</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getPersonalCompactorActive</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getPowerScroll</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getSecondsHeld</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.getSilexCount</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.hasArtOfWar</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.hasAttributes</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.hasBookOfStats</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.hasJalapenoBook</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.hasWoodSingularity</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$fun SafeItemStack.isRecombobulated</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils.GemstoneQuality$fun toDisplayString</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils.GemstoneQuality.Companion$fun getByNameOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils.GemstoneSlot$fun getInternalName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils.GemstoneSlotType.Companion$fun getColorCode</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils.GemstoneType$fun toDisplayString</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils.GemstoneType.Companion$fun getByNameOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils.PetInfo$fun getSkinVariantIndex</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyBlockUtils.kt:SkyBlockUtils$fun inAnyIsland</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyHanniGuiItemRenderState.kt:SkyHanniGuiItemRenderState.Companion$fun nextStableId</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyHanniRenderLayers.kt:SkyHanniRenderLayers$fun getChromaTexturedWithIdentifier</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyHanniTickEvents.kt:ServerTickEvent$fun isMod</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyHanniTickEvents.kt:SkyHanniTickEvent$fun isMod</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyHanniTracker.kt:SkyHanniTracker$fun getPricePer</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyHanniTracker.kt:SkyHanniTracker$fun getPricePerOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyHanniTracker.kt:SkyHanniTracker$fun isInventoryOpen</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyHanniTracker.kt:SkyHanniTracker.SharedTracker$fun get</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyblockStat.kt:SkyblockStat$fun asString</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SkyblockStat.kt:SkyblockStatList.Companion$fun mapOf</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SlayerApi.kt:SlayerApi$fun hasActiveQuest</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SlayerApi.kt:SlayerApi$fun isInBossFight</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SlayerBossSpawnSoon.kt:SlayerBossSpawnSoon$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SlayerItemsOnGround.kt:SlayerItemsOnGround$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SlayerProfitTracker.kt:SlayerProfitTracker$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SlayerRngMeterDisplay.kt:SlayerRngMeterDisplay$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SlayerType.kt:SlayerMiniBossType.Companion$fun isMiniboss</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SpidersDenApi.kt:SpidersDenApi$fun inSpidersDen</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SpidersDenApi.kt:SpidersDenApi$fun isAtTopOfNest</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SprayType.kt:SprayType.Companion$fun getByNameOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SprayType.kt:SprayType.Companion$fun getByPestTypeOrAll</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:StashCompact.kt:StashCompact.StashType.Companion$fun Matcher.fromGroup</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:StereoHarmonyDisplay.kt:StereoHarmonyDisplay$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:StringUtils.kt:StringUtils$fun Double.removeUnusedDecimal</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:StringUtils.kt:StringUtils$fun String.allLettersFirstUppercase</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:StringUtils.kt:StringUtils$fun String.isPlayerName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:StringUtils.kt:StringUtils$fun String.removeWordsAtEnd</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:StringUtils.kt:StringUtils$fun String?.equalsIgnoreColor</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:SulphurSkitterBox.kt:SulphurSkitterBox$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TabColumn.kt:TabColumn$fun size</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TabSection.kt:TabSection$fun size</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TabWidget.kt:TabWidget$inline fun &lt;T&gt; matchMatcherFirstLine</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TestCanSeeFace.kt:TestCanSeeFace.FaceCheckContext$fun buildSummaryRenderable</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TextInput.kt:TextInput.Companion$fun isActive</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TextPetDisplayConfig.kt:TextPetDisplayConfig.TextElement$fun getFormattedLabel</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TimeUtils.kt:TimeUnit$fun format</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TimeUtils.kt:TimeUnit$fun getName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TimeUtils.kt:TimeUnit.Companion$fun getByName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TotemOfCorruption.kt:Totem$fun isOwn</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TrackerData.kt:TrackerData$fun getSessionMap</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TrackerUtils.kt:TrackerUtils$fun MutableList&lt;Searchable&gt;.addSkillXpInfo</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TranslatorCommand.kt:TranslatorCommand$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TrevorMob.kt:TrevorMob.Companion$fun findByName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TrophyFishManager.kt:TrophyFishManager$fun getInfoByName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TrophyRarity.kt:TrophyRarity.Companion$fun getByName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:TubulatorParkour.kt:TubulatorParkour$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:VampireSlayerFeatures.kt:VampireSlayerFeatures$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:VerminHighlighter.kt:VerminHighlighter$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:VisitorApi.kt:VisitorApi$fun getVisitor</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:VisitorApi.kt:VisitorApi$fun getVisitors</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:VisitorApi.kt:VisitorApi$fun getVisitorsMap</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:VisitorApi.kt:VisitorApi.Visitor$fun getEntity</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:VisitorApi.kt:VisitorApi.Visitor$fun getNameTagEntity</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:VisitorReward.kt:VisitorReward$fun toStatsTextEntryOrNull</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:VisitorReward.kt:VisitorReward.Companion$fun getByInternalName</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:VisualWord.kt:VisualWord$fun isCaseSensitive</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:WardrobeSlot.kt:WardrobeSlot$fun getData</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:WardrobeSlot.kt:WardrobeSlot$fun isCurrentSlot</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:WardrobeSlot.kt:WardrobeSlot$fun isInCurrentPage</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:WarpTabComplete.kt:WarpTabComplete$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:WidgetUpdateEvent.kt:WidgetUpdateEvent$fun isClear</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:WidgetUpdateEvent.kt:WidgetUpdateEvent$fun isWidget</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:WinterApi.kt:WinterApi$fun inGlacialCave</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:WinterApi.kt:WinterApi$fun inWorkshop</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:WinterApi.kt:WinterApi$fun isDecember</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:WinterApi.kt:WinterApi$fun isReindrakeSpawnMessage</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:WorldEdit.kt:WorldEdit$fun isEnabled</ID>
+    <ID>PublicFunctionMustSpecifyReturnType:WorldRenderUtils.kt:WorldRenderUtils$fun isRenderingUnderwater</ID>
     <ID>RepoPatternRegexTestMissing:AshfangFreezeCooldown.kt:AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
     <ID>RepoPatternRegexTestMissing:BingoCardReader.kt:BingoCardReader$by patternGroup.pattern( "goalcomplete", "§6§lBINGO GOAL COMPLETE! §r§e(?&lt;name&gt;.*)" )</ID>
     <ID>RepoPatternRegexTestMissing:BingoCardReader.kt:BingoCardReader$by patternGroup.pattern( "hiddengoal", ".*§7§eThe next hint will unlock in (?&lt;time&gt;.*)" )</ID>

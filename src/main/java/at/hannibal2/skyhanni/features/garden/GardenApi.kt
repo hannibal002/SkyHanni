@@ -213,7 +213,7 @@ object GardenApi {
 
     fun CropType.getItemStackCopy(iconId: String): SafeItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
 
-    fun hideExtraGuis() = ComposterOverlay.inInventory ||
+    fun hideExtraGuis(): Boolean = ComposterOverlay.inInventory ||
         AnitaMedalProfit.inInventory ||
         SkyMartCopperPrice.inInventory ||
         FarmingContestApi.inInventory ||

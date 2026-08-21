@@ -73,7 +73,7 @@ interface HotxData<Reward> {
 
     fun getReward() = if (enabled) rewardFun(activeLevel) else emptyMap()
 
-    fun calculateTotalCost(desiredLevel: Int) = (2..desiredLevel).sumOf { level -> costFun(level)?.toInt() ?: 0 }
+    fun calculateTotalCost(desiredLevel: Int): Int = (2..desiredLevel).sumOf { level -> costFun(level)?.toInt() ?: 0 }
 
     /**
      * `calculateTotalCost(maxLevel)`

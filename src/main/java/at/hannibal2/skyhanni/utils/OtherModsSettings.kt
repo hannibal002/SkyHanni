@@ -9,7 +9,7 @@ class OtherModsSettings private constructor(private val modConfigPath: String) {
         private val classCache = ConcurrentHashMap<String, Class<*>>()
         private val fieldCache = ConcurrentHashMap<Triple<String, Class<*>, String>, Field>()
 
-        fun aaron() = OtherModsSettings("net.azureaaron.mod.config.AaronModConfigManager")
+        fun aaron(): OtherModsSettings = OtherModsSettings("net.azureaaron.mod.config.AaronModConfigManager")
 
         internal fun loadClass(path: String): Class<*>? =
             runCatching { classCache.getOrPut(path) { Class.forName(path) } }

@@ -50,7 +50,7 @@ class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode, var directi
         }
     }
 
-    fun cycleText(standpoint: GraphingNode?) = when (direction) {
+    fun cycleText(standpoint: GraphingNode?): String = when (direction) {
         EdgeDirection.BOTH -> "Bidirectional"
         EdgeDirection.ONE_TO_TWO -> if (standpoint != node1) {
             "AwayFromYou"

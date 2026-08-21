@@ -235,8 +235,8 @@ object BeachBallCatchHelper {
         abstract fun getT3(start: Int, current: Int, minY: Double): Int
 
         open fun yTransform(t: Int): Double = given[t].y
-        open fun dX(start: Int, current: Int, minY: Double) = given[current].x - given[current - 1].x
-        open fun dZ(start: Int, current: Int, minY: Double) = given[current].z - given[current - 1].z
+        open fun dX(start: Int, current: Int, minY: Double): Double = given[current].x - given[current - 1].x
+        open fun dZ(start: Int, current: Int, minY: Double): Double = given[current].z - given[current - 1].z
 
         override fun predict(start: Int, current: Int, minY: Double): List<LorenzVec> {
             val t1 = getT1(start, current, minY)

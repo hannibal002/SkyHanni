@@ -39,7 +39,7 @@ object PlayerUtils {
         return (speed * 1000).roundTo(2).toFloat()
     }
 
-    fun getUuid() = getRawUuid().toUnDashedUUID()
+    fun getUuid(): String = getRawUuid().toUnDashedUUID()
 
     fun getRawUuid(): UUID = MinecraftCompat.localUser.profileId
 
@@ -54,7 +54,7 @@ object PlayerUtils {
             !MinecraftCompat.localPlayerOrThrow.isPassenger &&
             !MinecraftCompat.localPlayerOrThrow.isFallFlying
 
-    fun blockPosition() = MinecraftCompat.localPlayerOrThrow.blockPosition().toLorenzVec()
+    fun blockPosition(): LorenzVec = MinecraftCompat.localPlayerOrThrow.blockPosition().toLorenzVec()
 
     fun isSneaking(): Boolean = MinecraftCompat.localPlayerOrThrow.isShiftKeyDown
 }

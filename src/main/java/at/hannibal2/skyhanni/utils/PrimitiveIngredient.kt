@@ -15,7 +15,7 @@ class PrimitiveIngredient(val internalName: NeuInternalName, val count: Double =
     )
 
     companion object {
-        fun coinIngredient(count: Double = 1.0) = PrimitiveIngredient(SKYBLOCK_COIN, count)
+        fun coinIngredient(count: Double = 1.0): PrimitiveIngredient = PrimitiveIngredient(SKYBLOCK_COIN, count)
 
         fun Set<PrimitiveIngredient>.toPrimitiveItemStacks(): List<PrimitiveItemStack> =
             map { it.toPrimitiveItemStack() }

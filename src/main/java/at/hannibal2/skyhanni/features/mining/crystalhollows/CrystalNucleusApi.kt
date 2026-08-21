@@ -145,7 +145,7 @@ object CrystalNucleusApi {
         return Pair(item, amount)
     }
 
-    fun usesApparatus() =
+    fun usesApparatus(): Boolean =
         config.professorUsage.get() == CrystalNucleusTrackerConfig.ProfessorUsageType.PRECURSOR_APPARATUS
 
     fun getPrecursorRunPrice(priceSource: (NeuInternalName) -> Double) = if (usesApparatus()) {

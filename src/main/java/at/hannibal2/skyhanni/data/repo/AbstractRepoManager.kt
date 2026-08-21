@@ -242,7 +242,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         )
     }
 
-    fun initRepo() = progressCategory.startBlock("auto loading on init") { progress ->
+    fun initRepo(): ChatProgressUpdates = progressCategory.startBlock("auto loading on init") { progress ->
         shouldManuallyReload = true
         repoInitCoroutineConfig.launch {
             if (config.repoAutoUpdate) {

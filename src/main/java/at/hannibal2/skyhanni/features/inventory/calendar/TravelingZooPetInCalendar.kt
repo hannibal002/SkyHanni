@@ -69,5 +69,5 @@ object TravelingZooPetInCalendar {
         return time.year * 2 + zooOfYear
     }
 
-    fun isEnabled() = SkyHanniMod.feature.inventory.oringoPetInCalendar
+    private fun isEnabled() = SkyHanniMod.feature.inventory.oringoPetInCalendar
 }

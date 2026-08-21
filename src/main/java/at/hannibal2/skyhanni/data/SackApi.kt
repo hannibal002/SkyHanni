@@ -513,8 +513,8 @@ data class SackItem(
     @Expose private val status: SackStatus?,
 ) {
 
-    fun getStatus() = status ?: SackStatus.MISSING
-    fun statusIsCorrectOrAlright() = getStatus().let { it == SackStatus.CORRECT || it == SackStatus.ALRIGHT }
+    fun getStatus(): SackStatus = status ?: SackStatus.MISSING
+    fun statusIsCorrectOrAlright(): Boolean = getStatus().let { it == SackStatus.CORRECT || it == SackStatus.ALRIGHT }
 }
 
 // ideally should be correct but using alright should also be fine unless they sold their whole sacks

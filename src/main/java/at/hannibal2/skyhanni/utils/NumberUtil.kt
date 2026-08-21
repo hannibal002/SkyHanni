@@ -187,9 +187,9 @@ object NumberUtil {
         } else romanSymbols[l] + (this - l).toRoman()
     }
 
-    fun Number.toStringWithPlus() = (if (this.toDouble() >= 0.0) "+" else "") + this.toString()
+    fun Number.toStringWithPlus(): String = (if (this.toDouble() >= 0.0) "+" else "") + this.toString()
 
-    private fun processDecimal(decimal: Int, lastNumber: Int, lastDecimal: Int) = if (lastNumber > decimal) {
+    private fun processDecimal(decimal: Int, lastNumber: Int, lastDecimal: Int): Int = if (lastNumber > decimal) {
         lastDecimal - decimal
     } else {
         lastDecimal + decimal
@@ -206,7 +206,7 @@ object NumberUtil {
         return isNotEmpty() && formatPattern.matches(this)
     }
 
-    fun percentageColor(percentage: Double) = when {
+    fun percentageColor(percentage: Double): LorenzColor = when {
         percentage > 0.9 -> LorenzColor.DARK_GREEN
         percentage > 0.75 -> LorenzColor.GREEN
         percentage > 0.5 -> LorenzColor.YELLOW
@@ -283,7 +283,7 @@ object NumberUtil {
     val Double.million get() = (this * 1_000_000.0).toLong()
 
     /** @return clamped to [0.0, 1.0]**/
-    fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
+    fun Number.fractionOf(maxValue: Number): Double = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
         this.toDouble() / max
     }?.coerceIn(0.0, 1.0) ?: 1.0
 
@@ -306,7 +306,7 @@ object NumberUtil {
     private fun formatPercentage(percentage: Double, format: String?): String =
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
-    fun Double.oneDecimal() = "%.1f".format(this)
+    fun Double.oneDecimal(): String = "%.1f".format(this)
 }
 
 class MinMaxNumber(val min: Double, val max: Double) {

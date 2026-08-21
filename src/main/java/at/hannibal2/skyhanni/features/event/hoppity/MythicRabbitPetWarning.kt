@@ -25,7 +25,7 @@ object MythicRabbitPetWarning {
         }
     }
 
-    fun correctPet() = CurrentPetApi.isCurrentPet(MYTHIC_RABBIT)
+    fun correctPet(): Boolean = CurrentPetApi.isCurrentPet(MYTHIC_RABBIT)
 
     private fun warn() {
         ChatUtils.chat(

@@ -46,6 +46,8 @@ SkyHanniStyle:
         active: true
     OnlyOnIslandSpecificity:
         active: true
+    PublicFunctionMustSpecifyReturnType:
+        active: true
     PrivateEventListener:
         active: true
 

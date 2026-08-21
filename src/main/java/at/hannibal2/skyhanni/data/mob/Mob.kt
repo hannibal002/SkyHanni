@@ -220,7 +220,7 @@ class Mob(
             .mapNotNull { it.boundingBox },
     )?.move(-baseEntity.position().x, -baseEntity.position().y, -baseEntity.position().z)
 
-    fun fullEntityList() =
+    fun fullEntityList(): List<LivingEntity> =
         baseEntity.toSingletonListOrEmpty() +
             armorStand.toSingletonListOrEmpty() +
             extraEntities
