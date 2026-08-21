@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addCollectionCounter
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStat.FARMING_FORTUNE
 import at.hannibal2.skyhanni.data.model.SkyblockStat.OVERBLOOM
 import at.hannibal2.skyhanni.events.IslandJoinEvent
@@ -80,11 +81,9 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
     /**
      * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §8x9 §e(§e+134)
-     * REGEX-TEST: §6§lRARE DROP! §9Enchanted Cookie §8x9 §6(§6+1,810)
-     * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300)
      * REGEX-TEST: §6§lPET DROP! §r§6Slug §e(§e+78)
-     * REGEX-TEST: §6§lRARE DROP! §9Squeaky Toy §6(§6+1,549)
-     * REGEX-TEST: §6§lRARE DROP! §6Squeaky Mousemat §6(§6+1,549)
+     * REGEX-TEST: §r§6§lPET DROP! §r§6Slug §r§e(+140)
+     * REGEX-TEST: §6§lPET DROP! §6Slug §e(§e+145)
      * REGEX-TEST: §6§lRARE DROP! §aWings of Harmony Vinyl §e(§e+139.5)
      * REGEX-TEST: §6§lRARE DROP! §r§aNot Just a Pest Vinyl §r§6(Cocoaleech)
      * REGEX-FAIL: §6§lRARE CROP! §aCane Knot §e(§e+139.5)
@@ -94,7 +93,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     @Suppress("MaxLineLength")
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>\\d+))? (?:§.)*\\((?:§.)?(?:\\+[\\d.,]+[${FARMING_FORTUNE.hypixelIcon}${OVERBLOOM.hypixelIcon}]|Cocoaleech)\\)",
+        "(?:§.)*(?:RARE|PET) DROP! (?:§r)*(?<item>§[^r].+?)(?: §8x(?<amount>\\d+))? (?:§.)*\\((?:§.)?(?:\\+[\\d.,]+${SkyblockStat.OVERBLOOM.hypixelIcon}|Cocoaleech)\\)",
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
