@@ -196,7 +196,8 @@ object GreenhouseMutationBlueprint {
         ItemRenderTransparency.withOpacity(MUTATION_GHOST_OPACITY) {
             renderState.submit(
                 event.matrices,
-                minecraft.gameRenderer.featureRenderDispatcher.submitNodeStorage,
+                //~ if < 26.2 'event.submitNodeStorage' -> 'minecraft.gameRenderer.featureRenderDispatcher.submitNodeStorage'
+                event.submitNodeStorage,
                 FULL_BRIGHT,
                 OverlayTexture.pack(0.8f, false),
                 0,
