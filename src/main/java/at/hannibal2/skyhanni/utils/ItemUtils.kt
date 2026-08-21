@@ -475,7 +475,7 @@ object ItemUtils {
     private fun SafeItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         if (this.getPetInfo() != null) return getPetRarity(this) to ItemCategory.PET
 
-        val cleanLore = this.getLoreComponent().map { it.string.removeColor() }
+        val cleanLore = getCleanLore()
         for (line in cleanLore.reversed()) {
             if (UtilsPatterns.notRarityLoreLinePattern.matches(line)) continue
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
