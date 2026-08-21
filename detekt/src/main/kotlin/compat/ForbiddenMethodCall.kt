@@ -19,12 +19,15 @@ import org.jetbrains.kotlin.analysis.api.resolution.KaForLoopCall
 import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaPropertyAccessorSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaPropertySymbol
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.KtOperationReferenceExpression
 import org.jetbrains.kotlin.psi.KtPostfixExpression
 import org.jetbrains.kotlin.psi.KtPrefixExpression
 import org.jetbrains.kotlin.psi.psiUtil.isDotSelector
@@ -123,7 +126,7 @@ class ForbiddenMethodCall(config: Config) :
             val successfulCall = call.successfulCallOrNull<KaCall>()
                 ?: return
 
-            getCallInfos(successfulCall).forEach { (_, symbol) ->
+            getCallInfos(successfulCall, expression).forEach { (_, symbol) ->
                 val symbol = symbol ?: return@forEach
                 val forbiddenMethod = methods.find { method ->
                     method.value.match(null, symbol)
@@ -146,6 +149,7 @@ class ForbiddenMethodCall(config: Config) :
     @OptIn(KaExperimentalApi::class)
     private fun KaSession.getCallInfos(
         kaCall: KaCall,
+        expression: KtExpression,
     ): Sequence<Pair<KaPropertySymbol?, KaCallableSymbol?>> =
         sequence {
             val symbols = when (kaCall) {
@@ -157,7 +161,13 @@ class ForbiddenMethodCall(config: Config) :
                         .map {
                             // SKYHANNI: Made it support direct property access (java field access) as well as getter/setter access
                             if (it is KaPropertySymbol) {
-                                it to it
+                                if (it.isGetterOrSetter() &&
+                                    expression !is KtOperationReferenceExpression
+                                ) {
+                                    it to getPropertyAccessorSymbol(it, expression)
+                                } else {
+                                    it to it
+                                }
                             } else {
                                 null to it
                             }
@@ -176,6 +186,19 @@ class ForbiddenMethodCall(config: Config) :
 
             yieldAll(symbols)
         }
+
+    private fun KaPropertySymbol.isGetterOrSetter(): Boolean = hasSetter || hasGetter
+
+    private fun getPropertyAccessorSymbol(
+        appliedSymbol: KaPropertySymbol,
+        expression: KtExpression,
+    ): KaPropertyAccessorSymbol? {
+        val parent = expression.parent
+        return when {
+            parent is KtBinaryExpression && parent.operationToken == KtTokens.EQ -> appliedSymbol.setter
+            else -> appliedSymbol.getter
+        }
+    }
 
     internal data class ForbiddenMethod(
         val value: FunctionMatcher,
