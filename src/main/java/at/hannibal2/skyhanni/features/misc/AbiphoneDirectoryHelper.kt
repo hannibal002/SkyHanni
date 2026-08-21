@@ -50,7 +50,7 @@ object AbiphoneDirectoryHelper {
         val stack = slot.item.takeUnlessBlank() ?: return
 
         val name = stack.cleanName
-        WikiManager.sendWikiMessage(name)
+        WikiManager.sendWikiMessage(name, autoOpen = config.autoOpenWiki)
         event.cancel()
     }
 
