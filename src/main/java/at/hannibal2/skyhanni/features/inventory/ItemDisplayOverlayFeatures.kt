@@ -69,6 +69,7 @@ object ItemDisplayOverlayFeatures {
 
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
     private var lastSize = 0
+    private const val OVERFLOW_STACK_DIAMOND_LEVEL = 100
 
     /**
      * REGEX-TEST: MASTER_SKULL_TIER_1
@@ -130,6 +131,11 @@ object ItemDisplayOverlayFeatures {
         val cachedData = stack.cachedData
         val tip = cachedData.stackTip ?: getStackTip(stack).also { cachedData.stackTip = it.orEmpty() }
         tip?.takeIf { it.isNotEmpty() }?.let { event.stackTip = it }
+    }
+
+    private fun overflowSkillStackTip(overflowLevel: Int): String {
+        val digits = overflowLevel.toString()
+        return if (overflowLevel >= OVERFLOW_STACK_DIAMOND_LEVEL) "§b$digits" else digits
     }
 
     private fun getStackTip(item: SafeItemStack): String? {
@@ -219,8 +225,11 @@ object ItemDisplayOverlayFeatures {
                 val level = "" + text.romanToDecimalIfNecessary()
                 val skill = SkillType.getByNameOrNull(skillName) ?: return level
                 val skillInfo = SkillApi.storage?.get(skill) ?: return level
-                return if (SkillProgress.config.overflowConfig.enableInSkillMenuAsStackSize)
-                    "" + skillInfo.overflowLevel else level
+                return if (SkillProgress.config.overflowConfig.enableInSkillMenuAsStackSize) {
+                    overflowSkillStackTip(skillInfo.overflowLevel)
+                } else {
+                    level
+                }
             }
         }
 
