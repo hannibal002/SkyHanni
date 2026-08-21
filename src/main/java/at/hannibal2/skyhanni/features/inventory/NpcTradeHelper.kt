@@ -43,7 +43,8 @@ object NpcTradeHelper {
 
     /**
      * [evaluable] is false when the owned amount is unknown, for example a currency SkyHanni
-     * does not track. Such an item is never marked as affordable.
+     * does not track. Such an item is never marked as affordable and shows a question mark
+     * instead of an amount.
      */
     private class CostLine(val rawLine: String, val text: String, val covered: Boolean, val evaluable: Boolean) {
         /** The tooltip adds color codes of its own to the lore line, so the lookup ignores them. */
@@ -113,7 +114,8 @@ object NpcTradeHelper {
         val covered = owned != null && owned >= amount
 
         val suffix = when {
-            owned == null -> ""
+            internalName == NeuInternalName.MISSING_ITEM -> "§c!"
+            owned == null -> " §8?§7/§8${amount.addSeparators()}"
             covered -> " §a✔"
             else -> " §8${owned.addSeparators()}§7/§8${amount.addSeparators()}"
         }
