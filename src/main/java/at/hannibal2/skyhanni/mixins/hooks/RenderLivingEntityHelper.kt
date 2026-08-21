@@ -48,6 +48,7 @@ object RenderLivingEntityHelper {
 
     @JvmStatic
     fun getEntityGlowColor(entity: Entity): Int? {
+        if (GlobalRender.renderDisabled) return null
         if (entity is LivingEntity) {
             if (entity.isInvisible && !entity.hasVisibleEquipment()) return null
             getLivingEntityGlowColor(entity)?.let { return it }
@@ -59,7 +60,6 @@ object RenderLivingEntityHelper {
         currentGlowEvent?.entitiesToOutline?.get(entity)
 
     private fun getLivingEntityGlowColor(entity: LivingEntity): Int? {
-        if (GlobalRender.renderDisabled) return null
         val entityGlowData = entityGlowMap[entity.id] ?: return null
         if (!entityGlowData.condition()) return null
         return entityGlowData.rgb
