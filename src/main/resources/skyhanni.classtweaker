@@ -91,8 +91,6 @@ accessible field net/minecraft/client/renderer/state/gui/GuiTextRenderState font
 accessible field net/minecraft/client/renderer/state/gui/GuiTextRenderState text Lnet/minecraft/util/FormattedCharSequence;
 accessible field net/minecraft/client/renderer/state/gui/GuiTextRenderState x I
 accessible field net/minecraft/client/renderer/state/gui/GuiTextRenderState y I
-inject-interface net/minecraft/client/renderer/feature/ItemFeatureRenderer$Submit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
-inject-interface net/minecraft/client/renderer/feature/ModelFeatureRenderer$Submit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
 #?} else {
 #accessible field net/minecraft/client/renderer/RenderPipelines FOG_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 #accessible field net/minecraft/client/renderer/RenderPipelines MATRICES_PROJECTION_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
