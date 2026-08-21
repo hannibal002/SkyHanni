@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.HideArmorHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.HideArmorHook;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
@@ -19,7 +19,7 @@ public abstract class MixinHumanoidArmorLayer {
     private void onRenderArmor(
         PoseStack poseStack, SubmitNodeCollector submitNodeCollector, ItemStack itemStack, EquipmentSlot slot, int i, HumanoidRenderState humanoidRenderState, CallbackInfo ci
     ) {
-        if (HideArmorHookKt.shouldHideSlot(slot)) {
+        if (HideArmorHook.shouldHideSlot(slot)) {
             ci.cancel();
         }
     }

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
-import at.hannibal2.skyhanni.mixins.hooks.HideArmorHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.HideArmorHook;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -26,7 +26,7 @@ public abstract class MixinCapeLayer {
         at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V")
     )
     private boolean wrapChestplateCapeOffset(PoseStack instance, float x, float y, float z) {
-        return !HideArmorHookKt.shouldHideSlot(EquipmentSlot.CHEST);
+        return !HideArmorHook.shouldHideSlot(EquipmentSlot.CHEST);
     }
 
     @ModifyArg(method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/AvatarRenderState;FF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"), index = 3)
