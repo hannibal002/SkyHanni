@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeScreen
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
-import net.minecraft.client.Minecraft
+import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.AbstractContainerMenu
@@ -19,16 +19,15 @@ object MenuScreensHook {
     fun <T : AbstractContainerMenu> openCustomMenu(
         name: Component,
         type: MenuType<T>,
-        client: Minecraft,
         id: Int,
     ): Boolean {
         if (!SkyBlockUtils.inSkyBlock) return false
 
-        val player = client.player ?: return false
+        val player = MinecraftCompat.localPlayerOrNull ?: return false
         val inventory = player.inventory
         val inventoryName = name.unformattedTextCompat()
 
-        if (openCustomWardrobe(inventoryName, name, type, client, id, inventory)) {
+        if (openCustomWardrobe(inventoryName, name, type, id, inventory, player)) {
             return true
         }
 
@@ -39,15 +38,15 @@ object MenuScreensHook {
         inventoryName: String,
         name: Component,
         type: MenuType<T>,
-        client: Minecraft,
         id: Int,
         inventory: Inventory,
+        player: LocalPlayer,
     ): Boolean {
         if (!CustomWardrobe.shouldReplace(inventoryName)) return false
 
         val menu = type.create(id, inventory) as? ChestMenu ?: return false
 
-        client.player?.containerMenu = menu
+        player.containerMenu = menu
 
         when (val screen = MinecraftCompat.screen) {
             is CustomWardrobeScreen -> screen.changeHandler(menu)

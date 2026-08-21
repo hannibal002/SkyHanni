@@ -23,7 +23,7 @@ public interface MenuScreensConstructorMixin<T extends AbstractContainerMenu> {
         int id,
         CallbackInfo ci
     ) {
-        if (MenuScreensHook.openCustomMenu(name, type, client, id)) {
+        if (MenuScreensHook.openCustomMenu(name, type, id)) {
             ci.cancel();
         }
     }
