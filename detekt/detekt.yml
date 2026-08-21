@@ -19,14 +19,16 @@ CompatRules:
               reason: "Use MinecraftCompat.localPlayerOrNull instead."
             - value: "net.minecraft.client.Minecraft.user"
               reason: "Use MinecraftCompat.localUser instead."
-            - value: "net.minecraft.client.Minecraft.screen"
-              reason: "Use MinecraftCompat.screen instead."
-            - value: "net.minecraft.client.Minecraft.gui"
+            - value: "net.minecraft.client.gui.Gui.hud"
               reason: "Use MinecraftCompat.hud instead."
-            - value: "net.minecraft.client.Options.hideGui"
+            - value: "net.minecraft.client.gui.Hud.isHidden()"
               reason: "Use MinecraftCompat.hideGui instead."
-            - value: "net.minecraft.client.renderer.LevelRenderer.allChanged()"
+            - value: "net.minecraft.client.renderer.LevelExtractor.allChanged()"
               reason: "Use MinecraftCompat.reloadChunks instead."
+            - value: "net.minecraft.client.gui.Gui.screen()"
+              reason: "Use MinecraftCompat.screen instead."
+            - value: "net.minecraft.client.gui.Gui.setScreen()"
+              reason: "Use MinecraftCompat.screen instead."
     VanillaItemStackImport:
         active: true
 
