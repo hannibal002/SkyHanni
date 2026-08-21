@@ -131,11 +131,30 @@ object BazaarApi {
 
     fun NeuInternalName.isBazaarItem() = getBazaarData() != null
 
-    fun searchForBazaarItem(internalName: NeuInternalName, amount: Int? = null) {
+    /**
+     * The amount of this item the player has ordered but not received yet, summed over all
+     * open buy orders.
+     *
+     * Refreshed whenever a bazaar order inventory is opened. Kept roughly current in between
+     * by the bazaar chat messages.
+     */
+    fun NeuInternalName.getOpenBuyOrderAmount(): Int =
+        BazaarOrderApi.getOpenAmount(this, SimpleTransactionType.BUY_ORDER)
+
+    /**
+     * The amount of this item the player has offered for sale but not sold yet.
+     *
+     * Only refreshed while a bazaar order inventory is open. No chat message updates this in
+     * between, unlike the buy side, so the value can be out of date.
+     */
+    fun NeuInternalName.getOpenSellOfferAmount(): Int =
+        BazaarOrderApi.getOpenAmount(this, SimpleTransactionType.SELL_OFFER)
+
+    fun searchForBazaarItem(internalName: NeuInternalName, amount: Number? = null) {
         searchForBazaarItem(internalName.itemNameWithoutColor, amount)
     }
 
-    fun searchForBazaarItem(displayName: String, amount: Int? = null) {
+    fun searchForBazaarItem(displayName: String, amount: Number? = null) {
         if (!SkyBlockUtils.inSkyBlock) return
         if (SkyBlockUtils.noTradeMode) return
         if (DungeonApi.inDungeon() || KuudraApi.inKuudra) return
@@ -144,11 +163,11 @@ object BazaarApi {
         currentSearchedItem = displayName.removeColor()
     }
 
-    fun searchForBazaarItemOrRecipe(internalName: NeuInternalName, amount: Int? = null) {
+    fun searchForBazaarItemOrRecipe(internalName: NeuInternalName, amount: Number? = null) {
         searchForBazaarItemOrRecipe(internalName.itemNameWithoutColor, amount)
     }
 
-    fun searchForBazaarItemOrRecipe(displayName: String, amount: Int? = null) {
+    fun searchForBazaarItemOrRecipe(displayName: String, amount: Number? = null) {
         if (!SkyBlockUtils.noTradeMode) searchForBazaarItem(displayName, amount)
         else HypixelCommands.recipe(displayName)
     }

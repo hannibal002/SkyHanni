@@ -161,7 +161,7 @@ object ItemUtils {
     fun NeuInternalName.getRawBaseStats(): Map<String, Int> = itemBaseStatsRaw[this].orEmpty()
 
     @HandleEvent(ConfigLoadEvent::class)
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         ConditionalUtils.onToggle(SkyHanniMod.feature.misc.replaceRomanNumerals) {
             itemNameCache.clear()
             compactItemNameCache.clear()
@@ -409,7 +409,7 @@ object ItemUtils {
 
         private val value = StableOrTransientValue(1.seconds) {
             val texture = SkullTextureHolder.getTexture(repoSkullId)
-            val stack = ItemUtils.createSkull(
+            val stack = createSkull(
                 displayName,
                 uuid,
                 texture ?: SkullTextureHolder.getTextureOrFallback(repoSkullId),
@@ -475,7 +475,7 @@ object ItemUtils {
     private fun SafeItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         if (this.getPetInfo() != null) return getPetRarity(this) to ItemCategory.PET
 
-        val cleanLore = this.getLoreComponent().map { it.string.removeColor() }
+        val cleanLore = getCleanLore()
         for (line in cleanLore.reversed()) {
             if (UtilsPatterns.notRarityLoreLinePattern.matches(line)) continue
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
@@ -699,7 +699,7 @@ object ItemUtils {
     )
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         compactItemNameCache.clear()
         repoSkullProviders.forEach { it.reset() }
         coinSkullCache.clear()
@@ -710,7 +710,7 @@ object ItemUtils {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         bazaarOverrides = event.getConstant<List<BazaarOverride>>("bazaarstocks").associate {
             it.bazaarInternalName to it.neuInternalName
         }
@@ -766,9 +766,7 @@ object ItemUtils {
         if (this == NeuInternalName.WISP_POTION) {
             return "§fWisp's Ice-Flavored Water"
         }
-        if (this == NeuInternalName.SKYBLOCK_COIN) {
-            return "§6Coins"
-        }
+        SkyblockCurrency.getByInternalNameOrNull(this)?.let { return it.coloredName }
         if (this == NeuInternalName.NONE) {
             error("NEUInternalName.NONE has no name!")
         }
@@ -832,25 +830,6 @@ object ItemUtils {
         }
     }
 
-    fun SafeItemStack.loreCosts(): MutableList<NeuInternalName> {
-        var found = false
-        val list = mutableListOf<NeuInternalName>()
-        for (lines in getLore()) {
-            if (lines == "§7Cost") {
-                found = true
-                continue
-            }
-
-            if (!found) continue
-            if (lines.isEmpty()) return list
-
-            NeuInternalName.fromItemNameOrNull(lines)?.let {
-                list.add(it)
-            }
-        }
-        return list
-    }
-
     fun neededItems(recipe: PrimitiveRecipe): Map<NeuInternalName, Int> {
         val neededItems = mutableMapOf<NeuInternalName, Int>()
         for ((material, amount) in recipe.ingredients.toPrimitiveItemStacks()) {
@@ -867,7 +846,7 @@ object ItemUtils {
     }.sum()
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestitem") {
             description = "test item internal name resolving"
             category = CommandCategory.DEVELOPER_TEST
@@ -969,7 +948,7 @@ object ItemUtils {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Missing Repo Items")
 
         if (missingRepoItems.isNotEmpty()) {

@@ -228,10 +228,10 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Open `Settings → Tools → Detekt` and set:
         - `Configuration Files` to `detekt/detekt.yml`
         - `Baseline File` to `detekt/baseline-main.xml`
-  - Both `detekt.yml` and `baseline-main.xml` are committed to the repository, but the plugin's reference to them
-    is stored per machine, not shared through git. Every contributor needs to set this link once after cloning the
-    repository. Without it, the plugin flags issues that CI does not (rules disabled in `detekt.yml`, or issues
-    already covered by the baseline).
+    - Both `detekt.yml` and `baseline-main.xml` are committed to the repository, but the plugin's reference to them
+      is stored per machine, not shared through git. Every contributor needs to set this link once after cloning the
+      repository. Without it, the plugin flags issues that CI does not (rules disabled in `detekt.yml`, or issues
+      already covered by the baseline).
 - When the SkyHanni IntelliJ plugin flags issues in a file you are already editing, fix those issues in the
   same PR. Do not create standalone PRs to sweep plugin warnings across the entire codebase.
 - Do not copy features from other mods. Exceptions:
@@ -297,6 +297,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - This will most likely not be possible to avoid when working with objects from java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
+  See the **Errors and Crashes** section for why every catch goes through `ErrorManager`.
 - Do not use `toRegex()` or `toPattern()`. Use `RepoPattern` instead.
   RepoPattern allows regex patterns to be updated remotely via the repo without requiring a mod update.
   Each pattern has a local fallback defined in code, but can be overridden by the repo at runtime.
@@ -321,6 +322,12 @@ Make sure such pull requests have a good explanation in the **What** section.
   preferred, not just tolerated, because the enum class name carries no information there. It covers `when` subjects and
   branches, comparisons, assignments and arguments with a known parameter type. Stay consistent within a block: do not mix
   `MyEnum.ENTRY` and `ENTRY` in the same place.
+    - This governs how code is written, not a cleanup task. Apply it in files you are already changing. Do not open a
+      pull request whose only purpose is stripping qualifiers across the codebase.
+    - Subclasses of a sealed class are a separate case. To use them unqualified, import the subclass
+      (`import some.pkg.Outer.Variant`). That is a normal class import, it costs one line per subclass instead of one
+      per enum entry, and it applies everywhere in the file rather than only where the expected type is known. See
+      `EliteWeightJson.kt` for an example.
 - Use named parameters for boolean and numeric arguments where the meaning is not immediately clear from context (e.g.,
   `findMobHeight(height, above = true)` instead of `findMobHeight(height, true)`).
 - Follow Kotlin conventions for acronym naming:
@@ -329,6 +336,18 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Always combine title messages with chat message.
     - This way users know what feature and what mod sends the title, if they want to disable it.
     - Also, we can include more information on why the title just showed up, as the title should not be too long.
+
+## Errors and Crashes
+
+SkyHanni wraps the places where the game calls into our code in a try-catch: posting events, running commands, and the consumers for delayed
+responses. Every catch goes through our own `ErrorManager`, which turns a failure into a red chat message and keeps the client running.
+Leaving as little code as possible outside that protection is a deliberate goal, so new code paths need the same treatment.
+
+An exception in SkyHanni code therefore does not crash the game. Only unprotected code can, in practice a mixin hook. Treat any path that is
+not known to be protected as unprotected.
+
+Because of that, a "crash" means the client actually terminated, while a caught exception shown as a red chat message is an "error". Keep
+the two apart in pull request titles, changelog entries and issues, since calling an error a crash overstates how bad it is.
 
 ## Additional Useful Development Tools
 
