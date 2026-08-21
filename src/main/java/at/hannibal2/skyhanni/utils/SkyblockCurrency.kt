@@ -130,6 +130,29 @@ enum class SkyblockCurrency(
         ownedAmount = { getFromStorage() },
     ),
 
+    // Ticket Exchange from the Safari Manager, a ticket starts one Critter Safari
+    // and the lower tiers are spent to upgrade into the higher ones
+    SAFARI_TICKET_BASIC(
+        "SAFARI_TICKET_BASIC".toInternalName(), "Basic Safari Ticket", DARK_GREEN,
+        loreNames = setOf("basic safari ticket", "basic safari tickets"),
+        ownedAmount = { getFromStorage() },
+    ),
+    SAFARI_TICKET_ECONOMY(
+        "SAFARI_TICKET_ECONOMY".toInternalName(), "Economy Safari Ticket", BLUE,
+        loreNames = setOf("economy safari ticket", "economy safari tickets"),
+        ownedAmount = { getFromStorage() },
+    ),
+    SAFARI_TICKET_PREMIUM(
+        "SAFARI_TICKET_PREMIUM".toInternalName(), "Premium Safari Ticket", DARK_PURPLE,
+        loreNames = setOf("premium safari ticket", "premium safari tickets"),
+        ownedAmount = { getFromStorage() },
+    ),
+    SAFARI_TICKET_FIRST_CLASS(
+        "SAFARI_TICKET_FIRST_CLASS".toInternalName(), "First-Class Safari Ticket", GOLD,
+        loreNames = setOf("first-class safari ticket", "first-class safari tickets"),
+        ownedAmount = { getFromStorage() },
+    ),
+
     // TODO add these currencies, each one needs a real cost line from its shop first
     //  - North Stars, waiting on the winter event
     //  - Carnival Tokens, waiting on the carnival event, the item is SKYBLOCK_CARNIVAL_POINT
