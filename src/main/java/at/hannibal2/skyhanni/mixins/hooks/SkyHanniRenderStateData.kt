@@ -8,9 +8,6 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 
 object SkyHanniRenderStateData {
-    private const val NO_ENTITY_ID = -1
-    private const val NO_ENTITY_TRANSPARENCY = -1
-
     private val ENTITY_ID: RenderStateDataKey<Int> =
         RenderStateDataKey.create { "skyhanni:entity_id" }
 
@@ -25,27 +22,22 @@ object SkyHanniRenderStateData {
         state.setData(ENTITY_ID, entity.id)
         setUsingCustomOutline(state, RenderLivingEntityHelper.getEntityGlowColor(entity) != null)
         val transparency = (entity as? LivingEntity)?.let { EntityTransparencyManager.getEntityTransparency(it) }
-        state.setData(ENTITY_TRANSPARENCY, transparency ?: NO_ENTITY_TRANSPARENCY)
+        state.setData(ENTITY_TRANSPARENCY, transparency)
     }
 
     @JvmStatic
     fun clearEntityId(state: EntityRenderState) {
-        state.setData(ENTITY_ID, NO_ENTITY_ID)
+        state.setData(ENTITY_ID, null)
     }
 
     @JvmStatic
     fun getEntity(state: EntityRenderState): Entity? {
-        val entityId = state.getDataOrDefault(ENTITY_ID, NO_ENTITY_ID)
-        if (entityId == NO_ENTITY_ID) return null
+        val entityId = state.getData(ENTITY_ID) ?: return null
         return EntityUtils.getEntityByID(entityId)
     }
 
     @JvmStatic
-    fun getEntityTransparency(state: EntityRenderState): Int? {
-        val alpha = state.getDataOrDefault(ENTITY_TRANSPARENCY, NO_ENTITY_TRANSPARENCY)
-        if (alpha == NO_ENTITY_TRANSPARENCY) return null
-        return alpha
-    }
+    fun getEntityTransparency(state: EntityRenderState): Int? = state.getData(ENTITY_TRANSPARENCY)
 
     @JvmStatic
     fun setEntityTransparency(state: EntityRenderState, alpha: Int) {
