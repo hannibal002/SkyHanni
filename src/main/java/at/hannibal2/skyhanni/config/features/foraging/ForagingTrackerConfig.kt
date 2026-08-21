@@ -3,13 +3,18 @@ package at.hannibal2.skyhanni.config.features.foraging
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualItemTrackerConfig
+import at.hannibal2.skyhanni.utils.inPartialHours
+import at.hannibal2.skyhanni.utils.inPartialMinutes
+import at.hannibal2.skyhanni.utils.inPartialSeconds
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import kotlin.time.Duration
 
 class ForagingTrackerConfig {
 
@@ -33,7 +38,7 @@ class ForagingTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Compact Gifts Bonus Drops",
-        desc = "Lets you decide what types of bonus drops should be included in Compact Gifts messages."
+        desc = "Lets you decide what types of bonus drops should be included in Compact Gifts messages.",
     )
     @ConfigEditorDraggableList
     val compactGiftBonusDropsList: MutableList<TreeGiftBonusDropCategory> = mutableListOf(
@@ -67,7 +72,7 @@ class ForagingTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Disappearing Delay",
-        desc = "The delay in seconds before the tracker disappears after you stop holding an axe."
+        desc = "The delay in seconds before the tracker disappears after you stop holding an axe.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 60f, minStep = 1f)
     var disappearingDelay: Int = 15
@@ -79,8 +84,56 @@ class ForagingTrackerConfig {
 
     @Expose
     @ConfigOption(
+        name = "Show Tree Gifts per Time",
+        desc = "Adds a bracket after the 'Trees Felled' Line with the amount cut within the lower timescale"
+    )
+    @ConfigEditorBoolean
+    var showTreeGiftsPerTimescale: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Timescale",
+        desc = "Defines the Timescale (Per Second, Minute, Hour) for Tree Gift Line in Tracker."
+    )
+    @ConfigEditorDropdown
+    var treeGiftsPerTimescale: Timescale = Timescale.HOUR
+
+    @Expose
+    @ConfigOption(
+        name = "Show Tree Gifts per Time",
+        desc = "Adds a bracket after the 'Trees Felled' Line with the amount cut within the lower timescale"
+    )
+    @ConfigEditorBoolean
+    var showWholeTreeGiftsPerTimescale: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Timescale",
+        desc = "Defines the Timescale (Per Second, Minute, Hour) for Tree Gift Line in Tracker."
+    )
+    @ConfigEditorDropdown
+    var wholeTreeGiftsPerTimescale: Timescale = Timescale.HOUR
+
+    enum class Timescale(private val displayName: String, val uptimeAsTimescale: Duration.() -> Double) {
+        SECOND("Per Second", { this.inPartialSeconds }),
+        MINUTE("Per Minute", { this.inPartialMinutes }),
+        HOUR("Per Hour", { this.inPartialHours });
+
+        override fun toString() = displayName
+
+        fun divideByTime(numberToDivide: Double, uptime: Duration): Double = numberToDivide / this.uptimeAsTimescale(uptime)
+
+        fun createLegacyText(baseValue: Double, uptime: Duration, thingString: String): String {
+            val perHourObtained = divideByTime(baseValue, uptime)
+            return " ($perHourObtained $thingString ${this.displayName})"
+        }
+    }
+    // TODO This makes no sense here, TimeScaleUtils?
+
+    @Expose
+    @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "",
     )
     @Accordion
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()

@@ -93,11 +93,16 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeGiftTracker.TreeType, T
         val bucketFormat = bucketData.selectedBucket?.let { "$it " }.orEmpty()
         val baseFormat = "${bucketFormat}Trees Felled:"
 
+        val duration = bucketData.getTotalUptime()
+
         val wholeTreesFelled = bucketData.getWholeTreeCount()
+        val wholeTreeGiftsPerHour = if (config.showWholeTreeGiftsPerTimescale) {
+            config.wholeTreeGiftsPerTimescale.createLegacyText(treesContributedTo.toDouble(), duration, "Tree contributions")
+        } else ""
         if (config.showWholeTrees && wholeTreesFelled > 0.0) {
             val preambleFormat = "Whole $baseFormat"
             val wholeRenderable = Renderable.hoverTips(
-                Renderable.text("§e$preambleFormat ${wholeTreesFelled.addSeparators()}"),
+                Renderable.text("§e$preambleFormat ${wholeTreesFelled.addSeparators()}${wholeTreeGiftsPerHour}"),
                 tips = bucketData.wholeTreesCut.mapNotNull { (treeType, count) ->
                     if (count <= 0.0) return@mapNotNull null
                     "§7Whole $treeType Trees cut: §a${count.addSeparators()}"
@@ -106,8 +111,12 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeGiftTracker.TreeType, T
             add(wholeRenderable)
         }
 
+        val treeGiftsPerHour = if (config.showTreeGiftsPerTimescale) {
+            config.treeGiftsPerTimescale.createLegacyText(treesContributedTo.toDouble(), duration, "Tree contributions")
+        } else ""
+
         val totalRenderable = Renderable.hoverTips(
-            Renderable.text("§e$baseFormat ${treesContributedTo.addSeparators()}"),
+            Renderable.text("§e$baseFormat ${treesContributedTo.addSeparators()}${treeGiftsPerHour}"),
             tips = bucketData.treesCut.mapNotNull { (treeType, count) ->
                 if (count <= 0) return@mapNotNull null
                 "$treeType Tree contributions: §a${count.addSeparators()}"
@@ -115,7 +124,6 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeGiftTracker.TreeType, T
         ).toSearchable("trees felled")
         add(totalRenderable)
 
-        val duration = bucketData.getTotalUptime()
         addAll(addTotalProfit(profit, treesContributedTo, "gift", duration, "Gifts"))
         addPriceFromButton(this)
     }
