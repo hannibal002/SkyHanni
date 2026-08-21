@@ -50,7 +50,6 @@ import org.joml.Matrix4f
 
 @Suppress("LargeClass")
 object WorldRenderUtils {
-
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
     //? if >= 26.2 {
@@ -927,11 +926,8 @@ object WorldRenderUtils {
     }
 
     internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec {
-        //? if >= 26.2 {
         val look = Vector3f(0f, 0f, -1f).rotate(camera.rotation())
         return camera.position.toLorenzVec() + LorenzVec(look.x.toDouble(), look.y.toDouble(), look.z.toDouble()).times(2)
-        //?} else
-        //return exactPlayerEyeLocation() + MinecraftCompat.localPlayerOrThrow.lookAngle.toLorenzVec().times(2)
     }
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {
