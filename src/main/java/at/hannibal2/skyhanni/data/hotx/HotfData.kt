@@ -422,7 +422,7 @@ enum class HotfData(
         }
 
         override fun tryBlock(event: SkyHanniChatEvent.Allow) {
-            if (!chatConfig.hideLottery || IslandTypeTag.FORAGING.isInIsland()) return
+            if (!chatConfig.hideLottery.get() || IslandTypeTag.FORAGING.isInIsland()) return
             event.blockedReason = "foraging_buff"
         }
 

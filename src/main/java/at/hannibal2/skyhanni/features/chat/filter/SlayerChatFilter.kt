@@ -33,6 +33,7 @@ object SlayerChatFilter : ChatFilterGroup() {
             BOSS_FIGHT,
             FAILED,
             SLAIN,
+            COCOONED,
             -> ChatFilterManager.register(filters)
             NO_ACTIVE_QUEST -> ChatFilterManager.unregister(filters)
         }
