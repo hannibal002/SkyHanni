@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import java.util.UUID
@@ -83,5 +84,10 @@ object EntityData {
         val result = !CheckRenderEntityEvent(entity, camX, camY, camZ).post().isCancelled
         lastVisibilityCheck[entity.id] = result
         return result
+    }
+
+    @JvmStatic
+    fun onDisplayRenderStateUpdate(display: Display) {
+        lastVisibilityCheck.remove(display.id)
     }
 }
