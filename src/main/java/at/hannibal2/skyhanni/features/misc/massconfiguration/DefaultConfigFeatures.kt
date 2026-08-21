@@ -19,7 +19,7 @@ object DefaultConfigFeatures {
     private var didNotifyOnce = false
 
     @HandleEvent
-    fun onHypixelJoin(event: HypixelJoinEvent) {
+    private fun onHypixelJoin(event: HypixelJoinEvent) {
         if (didNotifyOnce) return
         didNotifyOnce = true
 
@@ -116,7 +116,7 @@ object DefaultConfigFeatures {
     private val autocomplete get() = SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null")
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shdefaultoptions") {
             description = "Select default options"
             arg("oldVersion", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { autocomplete }) { oldVersion ->
