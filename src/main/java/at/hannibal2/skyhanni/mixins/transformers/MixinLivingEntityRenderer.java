@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHook;
 import at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook;
 import at.hannibal2.skyhanni.mixins.hooks.SkyHanniRenderStateData;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
@@ -56,7 +56,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
         index = 6
     )
     private int modifyRenderAlpha(int argb) {
-        Integer entityAlpha = EntityRenderDispatcherHookKt.getEntityTransparency();
+        Integer entityAlpha = EntityRenderDispatcherHook.getEntityTransparency();
         if (entityAlpha != null) {
             int oldAlpha = (argb >> 24) & 0xFF;
             int newAlpha = Math.min(oldAlpha, entityAlpha);
@@ -91,7 +91,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
 
     @Inject(method = "getRenderType", at = @At("HEAD"), cancellable = true)
     public void getRenderState(LivingEntityRenderState state, boolean showBody, boolean translucent, boolean showOutline, CallbackInfoReturnable<RenderType> cir) {
-        if (showBody && EntityRenderDispatcherHookKt.getEntityTransparency() != null) {
+        if (showBody && EntityRenderDispatcherHook.getEntityTransparency() != null) {
             cir.setReturnValue(RenderTypes.entityTranslucentCullItemTarget(this.getTextureLocation(state)));
         }
     }

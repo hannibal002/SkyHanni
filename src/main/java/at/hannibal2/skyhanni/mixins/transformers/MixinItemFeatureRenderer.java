@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
-import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHook;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import at.hannibal2.skyhanni.mixins.hooks.SkyHanniOutlineHook;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -34,7 +34,7 @@ public abstract class MixinItemFeatureRenderer {
         method = "prepareOutlineSubmit",
         at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/QuadInstance;setColor(I)V"), index = 0)
     private int modifyAlpha(int originalColor) {
-        if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
+        if (EntityRenderDispatcherHook.getEntity() instanceof LivingEntity livingEntity) {
             Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);
             if (entityAlpha == null) return originalColor;
             int newAlpha = Math.min(ARGB.alpha(originalColor), entityAlpha);
@@ -48,7 +48,7 @@ public abstract class MixinItemFeatureRenderer {
         method = "prepareOutlineSubmit",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo;itemRenderType()Lnet/minecraft/client/renderer/rendertype/RenderType;"))
     private RenderType modifyRenderLayer(RenderType layer) {
-        if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
+        if (EntityRenderDispatcherHook.getEntity() instanceof LivingEntity livingEntity) {
             if (EntityTransparencyManager.getEntityTransparency(livingEntity) == null) return layer;
             return RenderTypes.glintTranslucent();
         }

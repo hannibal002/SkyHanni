@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.EntityData;
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent;
-import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHook;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import at.hannibal2.skyhanni.mixins.hooks.SkyHanniRenderStateData;
 import at.hannibal2.skyhanni.utils.SkyBlockUtils;
@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinEntityRenderer {
     @Inject(method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At("HEAD"), cancellable = true)
     public void onRenderLabelHead(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
-        if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
+        if (EntityRenderDispatcherHook.getEntity() instanceof LivingEntity livingEntity) {
             //noinspection deprecation
             if (new SkyHanniRenderEntityEvent.Specials.Pre<>(livingEntity, state.x, state.y, state.z).post().isCancelled()) {
                 ci.cancel();
@@ -37,7 +37,7 @@ public abstract class MixinEntityRenderer {
 
     @Inject(method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At("TAIL"))
     public void onRenderLabelTail(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
-        if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
+        if (EntityRenderDispatcherHook.getEntity() instanceof LivingEntity livingEntity) {
             //noinspection deprecation
             new SkyHanniRenderEntityEvent.Specials.Post<>(livingEntity, state.x, state.y, state.z).post();
         }

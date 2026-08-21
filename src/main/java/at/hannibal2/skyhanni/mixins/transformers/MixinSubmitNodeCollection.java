@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHook;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import at.hannibal2.skyhanni.mixins.hooks.SkyHanniRenderStateData;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -92,7 +92,7 @@ public abstract class MixinSubmitNodeCollection<E> {
 
     @Unique
     private void skyhanni$markCustomOutline(Object submit) {
-        EntityRenderState currentState = EntityRenderDispatcherHookKt.getEntityRenderState();
+        EntityRenderState currentState = EntityRenderDispatcherHook.getEntityRenderState();
         if (submit instanceof GlowingStateStore casted && currentState != null && SkyHanniRenderStateData.isUsingCustomOutline(currentState)) {
             casted.skyhanni$setUsingCustomOutline();
         }
