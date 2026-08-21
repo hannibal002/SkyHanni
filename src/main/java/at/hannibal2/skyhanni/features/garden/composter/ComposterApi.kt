@@ -57,12 +57,12 @@ object ComposterApi {
 
     fun getOrganicMatter() = tabListData[ComposterDisplay.DataType.ORGANIC_MATTER]?.string?.removeColor()?.formatLong() ?: 0
 
-    fun maxOrganicMatter(addOne: ComposterUpgrade?): Int =
+    fun maxOrganicMatter(addOne: ComposterUpgrade?) =
         40_000 + ComposterUpgrade.ORGANIC_MATTER_CAP.getLevel(addOne) * 30_000
 
-    fun multiDropChance(addOne: ComposterUpgrade?): Double = ComposterUpgrade.MULTI_DROP.getLevel(addOne) * 0.03
+    fun multiDropChance(addOne: ComposterUpgrade?) = ComposterUpgrade.MULTI_DROP.getLevel(addOne) * 0.03
 
-    fun maxFuel(addOne: ComposterUpgrade?): Int = 100_000 + ComposterUpgrade.FUEL_CAP.getLevel(addOne) * 30_000
+    fun maxFuel(addOne: ComposterUpgrade?) = 100_000 + ComposterUpgrade.FUEL_CAP.getLevel(addOne) * 30_000
 
     fun timePerCompost(addOne: ComposterUpgrade?): Duration {
         val speedUpgrade = ComposterUpgrade.COMPOSTER_SPEED.getLevel(addOne)

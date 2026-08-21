@@ -56,7 +56,7 @@ internal object RenderableUtils {
     }
 
     /** Calculates the absolute x position of the columns in a table*/
-    fun calculateTableXOffsets(content: Collection<Collection<Renderable?>>, xPadding: Int): List<Int> = run {
+    fun calculateTableXOffsets(content: Collection<Collection<Renderable?>>, xPadding: Int) = run {
         val rows: List<List<Renderable?>> = content.map { it.toList() }
         var buffer = 0
         var index = 0
@@ -76,7 +76,7 @@ internal object RenderableUtils {
     }
 
     /** Calculates the absolute y position of the rows in a table*/
-    fun calculateTableYOffsets(content: Collection<Collection<Renderable?>>, yPadding: Int): List<Int> = run {
+    fun calculateTableYOffsets(content: Collection<Collection<Renderable?>>, yPadding: Int) = run {
         var buffer = 0
         listOf(0) + (
             content.takeIf { it.isNotEmpty() }?.map { row ->
@@ -86,26 +86,26 @@ internal object RenderableUtils {
             )
     }
 
-    fun calculateAlignmentXOffset(width: Int, xSpace: Int, alignment: HorizontalAlignment): Int = when (alignment) {
+    fun calculateAlignmentXOffset(width: Int, xSpace: Int, alignment: HorizontalAlignment) = when (alignment) {
         HorizontalAlignment.CENTER -> (xSpace - width) / 2
         HorizontalAlignment.RIGHT -> xSpace - width
         else -> 0
     }
 
-    fun calculateAlignmentYOffset(height: Int, ySpace: Int, alignment: VerticalAlignment): Int = when (alignment) {
+    fun calculateAlignmentYOffset(height: Int, ySpace: Int, alignment: VerticalAlignment) = when (alignment) {
         VerticalAlignment.CENTER -> (ySpace - height) / 2
         VerticalAlignment.BOTTOM -> ySpace - height
         else -> 0
     }
 
-    fun calculateAlignmentXOffset(renderable: Renderable, xSpace: Int): Int = when (renderable.horizontalAlign) {
+    fun calculateAlignmentXOffset(renderable: Renderable, xSpace: Int) = when (renderable.horizontalAlign) {
         HorizontalAlignment.LEFT -> 0
         HorizontalAlignment.CENTER -> (xSpace - renderable.width) / 2
         HorizontalAlignment.RIGHT -> xSpace - renderable.width
         else -> 0
     }
 
-    fun calculateAlignmentYOffset(renderable: Renderable, ySpace: Int): Int = when (renderable.verticalAlign) {
+    fun calculateAlignmentYOffset(renderable: Renderable, ySpace: Int) = when (renderable.verticalAlign) {
         VerticalAlignment.TOP -> 0
         VerticalAlignment.CENTER -> (ySpace - renderable.height) / 2
         VerticalAlignment.BOTTOM -> ySpace - renderable.height

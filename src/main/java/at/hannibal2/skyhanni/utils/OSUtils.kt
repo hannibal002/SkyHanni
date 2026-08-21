@@ -63,10 +63,11 @@ object OSUtils {
         "Use copyToClipboardAsync instead for a success boolean return",
         ReplaceWith("copyToClipboardAsync(text)"),
     )
-    fun copyToClipboard(text: String): Boolean = ClipboardUtils.copyToClipboard(text)
+    fun copyToClipboard(text: String) = ClipboardUtils.copyToClipboard(text)
+
     suspend fun copyToClipboardAsync(text: String): Boolean? = ClipboardUtils.copyToClipboardAsync(text).await()
 
-    fun readFromClipboard(): String? = ClipboardUtils.readFromClipboard()
+    fun readFromClipboard() = ClipboardUtils.readFromClipboard()
 
     private fun File.isExpired(
         expiryDuration: Duration,

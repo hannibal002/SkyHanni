@@ -164,8 +164,8 @@ object EntityUtils {
     }
 
     fun ArmorStand.getWornSkullTexture(): String? = getStandHelmet()?.getSkullTexture()
-    fun ArmorStand.wearingSkullTexture(skin: String?): Boolean = skin != null && getWornSkullTexture() == skin
-    fun ArmorStand.holdingSkullTexture(skin: String?): Boolean = skin != null && getHandItem()?.getSkullTexture() == skin
+    fun ArmorStand.wearingSkullTexture(skin: String?) = skin != null && getWornSkullTexture() == skin
+    fun ArmorStand.holdingSkullTexture(skin: String?) = skin != null && getHandItem()?.getSkullTexture() == skin
 
     internal fun Player.isNpc() = !isRealPlayer()
 

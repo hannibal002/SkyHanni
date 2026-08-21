@@ -74,20 +74,18 @@ object GraphEditorIO {
         return newState
     }
 
-    fun save() {
-        copyGraphCoroutine.launch {
-            if (nodes.isEmpty()) return@launch ChatUtils.chat("Copied nothing since the graph is empty.")
+    fun save() = copyGraphCoroutine.launch {
+        if (nodes.isEmpty()) return@launch ChatUtils.chat("Copied nothing since the graph is empty.")
 
-            val compileGraph = compileGraph()
-            val json = compileGraph.toJson()
-            val copied = OSUtils.copyToClipboardAsync(json) ?: false
-            if (!copied) return@launch ChatUtils.chat("Failed to copy graph to clipboard.")
+        val compileGraph = compileGraph()
+        val json = compileGraph.toJson()
+        val copied = OSUtils.copyToClipboardAsync(json) ?: false
+        if (!copied) return@launch ChatUtils.chat("§cFailed to copy graph to clipboard.")
 
-            ChatUtils.chat("Copied Graph to Clipboard.")
-            val networkCount = GraphEditorNetworks.recalculate()
-            useAsIslandArea(compileGraph)
-            showStats(networkCount)
-        }
+        ChatUtils.chat("Copied Graph to Clipboard.")
+        val networkCount = GraphEditorNetworks.recalculate()
+        useAsIslandArea(compileGraph)
+        showStats(networkCount)
     }
 
     private fun useAsIslandArea(compileGraph: Graph) {
@@ -143,17 +141,15 @@ object GraphEditorIO {
         ChatUtils.chat("Graph Editor loaded this island!")
     }
 
-    fun mergeFromClipboard() {
-        mergeJsonCoroutine.launch {
-            val json = OSUtils.readFromClipboard() ?: return@launch ChatUtils.userError("Clipboard is empty!")
-            try {
-                val graph = Graph.fromJson(json)
-                DelayedRun.runOrNextTick {
-                    merging(graph)
-                }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Merge failed", "json" to json, ignoreErrorCache = true)
+    fun mergeFromClipboard() = mergeJsonCoroutine.launch {
+        val json = OSUtils.readFromClipboard() ?: return@launch ChatUtils.userError("Clipboard is empty!")
+        try {
+            val graph = Graph.fromJson(json)
+            DelayedRun.runOrNextTick {
+                merging(graph)
             }
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Merge failed", "json" to json, ignoreErrorCache = true)
         }
     }
 

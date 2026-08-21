@@ -34,11 +34,11 @@ object TextHelper {
     val EMPTY = "".asComponent()
     val chromaStyle by lazy { TextColor(0xFFFFFE, "chroma") }
 
-    fun text(text: String, init: MutableComponent.() -> Unit = {}): MutableComponent = text.asComponent(init)
+    fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
     fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent =
         Component.literal(this).also(init)
 
-    fun multiline(vararg lines: Any?): Component = join(*lines, separator = NEWLINE)
+    fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
     fun join(vararg components: Any?, separator: Component? = null): Component {
         val result = "".asComponent()
         components.forEachIndexed { index, component ->
@@ -64,7 +64,7 @@ object TextHelper {
 
     fun Component.prefix(prefix: String): Component = join(prefix, this)
     fun Component.suffix(suffix: String): Component = join(this, suffix)
-    fun Component.wrap(prefix: String, suffix: String): Component = this.prefix(prefix).suffix(suffix)
+    fun Component.wrap(prefix: String, suffix: String) = this.prefix(prefix).suffix(suffix)
 
     fun Component.width(): Int = Minecraft.getInstance().font.width(this.string)
 
@@ -113,7 +113,7 @@ object TextHelper {
         this.hover = tips.joinToString("\n").asComponent()
     }
 
-    fun createDivider(dividerColor: ChatFormatting = ChatFormatting.BLUE): Component = HYPHEN.fitToChat().style {
+    fun createDivider(dividerColor: ChatFormatting = ChatFormatting.BLUE) = HYPHEN.fitToChat().style {
         withStrikethrough(true)
         withColor(dividerColor)
     }

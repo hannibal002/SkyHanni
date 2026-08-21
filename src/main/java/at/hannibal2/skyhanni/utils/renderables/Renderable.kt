@@ -49,7 +49,7 @@ import java.awt.Color
 import kotlin.math.floor
 import kotlin.math.max
 
-@Suppress("TooManyFunctions", "PublicFunctionMustSpecifyReturnType")
+@Suppress("TooManyFunctions")
 interface Renderable {
 
     val width: Int

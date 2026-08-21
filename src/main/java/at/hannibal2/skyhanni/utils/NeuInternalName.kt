@@ -13,15 +13,15 @@ value class NeuInternalName private constructor(private val internalName: String
 
     override fun compareTo(other: NeuInternalName): Int = internalName.compareTo(other.internalName)
 
-    fun asString(): String = internalName
+    fun asString() = internalName
 
     override fun toString(): String = "internalName:$internalName"
 
-    fun contains(other: String): Boolean = internalName.contains(other)
+    fun contains(other: String) = internalName.contains(other)
 
-    fun startsWith(other: String): Boolean = internalName.startsWith(other)
+    fun startsWith(other: String) = internalName.startsWith(other)
 
-    fun endsWith(other: String): Boolean = internalName.endsWith(other)
+    fun endsWith(other: String) = internalName.endsWith(other)
 
     fun replace(oldValue: String, newValue: String): NeuInternalName =
         internalName.replace(oldValue, newValue, ignoreCase = true).toInternalName()

@@ -42,7 +42,7 @@ object NavigationFeedback {
         navActive = false
     }
 
-    fun sendPathFindMessage(message: String): Boolean = sendPathFindMessage(message.asComponent())
+    fun sendPathFindMessage(message: String) = sendPathFindMessage(message.asComponent())
     fun sendPathFindMessage(component: Component): Boolean {
         navActive = true
         navLastActive = SimpleTimeMark.now()

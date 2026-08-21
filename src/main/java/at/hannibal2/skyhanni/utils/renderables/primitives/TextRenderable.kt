@@ -25,7 +25,7 @@ fun Renderable.Companion.text(
     horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
     builder: StringBuilder.() -> Unit = {},
-): StringRenderable = StringBuilder().let {
+) = StringBuilder().let {
     builder.invoke(it)
     StringRenderable(it.toString(), scale, color, horizontalAlign, verticalAlign)
 }

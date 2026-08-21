@@ -22,7 +22,7 @@ fun Renderable.Companion.fakePlayer(
     padding: Int = 5,
     color: Color? = null,
     colorCondition: () -> Boolean = { true },
-): Renderable = object : Renderable {
+) = object : Renderable {
     override val width = width + 2 * padding
     override val height = height + 2 * padding
     override val horizontalAlign = HorizontalAlignment.LEFT

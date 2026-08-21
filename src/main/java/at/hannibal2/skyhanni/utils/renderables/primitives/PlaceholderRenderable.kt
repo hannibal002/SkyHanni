@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
-fun Renderable.Companion.placeholder(width: Int, height: Int = 10): Renderable = object : Renderable {
+fun Renderable.Companion.placeholder(width: Int, height: Int = 10) = object : Renderable {
     override val width = width
     override val height = height
     override val horizontalAlign = HorizontalAlignment.LEFT

@@ -7,10 +7,10 @@ object EnumUtils {
         return enums.firstOrNull { it.name == name }
     }
 
-    inline fun <reified T : Enum<T>> enumValueOf(name: String): T =
+    inline fun <reified T : Enum<T>> enumValueOf(name: String) =
         enumValueOfOrNull<T>(name) ?: error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
-    inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }): String =
+    inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
         enumValues<T>().joinToString("|", transform = transform)
 
     inline fun <reified T : Enum<T>> T.isAnyOf(vararg array: T): Boolean = array.contains(this)

@@ -387,7 +387,7 @@ object ItemUtils {
         repoSkullId: String,
         vararg lore: String,
         extraOps: (SafeItemStack.() -> Unit)? = null,
-    ): AutoUpdatingRepoSkullItemStack = repoSkullProvider(displayName, uuid, repoSkullId, lore.toList(), extraOps)
+    ) = repoSkullProvider(displayName, uuid, repoSkullId, lore.toList(), extraOps)
 
     fun repoSkullProvider(
         displayName: String,
@@ -395,7 +395,7 @@ object ItemUtils {
         repoSkullId: String,
         lore: Collection<String>,
         extraOps: (SafeItemStack.() -> Unit)? = null,
-    ): AutoUpdatingRepoSkullItemStack = AutoUpdatingRepoSkullItemStack(displayName, uuid, repoSkullId, lore.toList(), extraOps).also {
+    ) = AutoUpdatingRepoSkullItemStack(displayName, uuid, repoSkullId, lore.toList(), extraOps).also {
         repoSkullProviders.add(it)
     }
 

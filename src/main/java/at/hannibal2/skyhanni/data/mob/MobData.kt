@@ -57,7 +57,7 @@ object MobData {
             val illegal = MobResult(Result.Illegal, null)
             val notYetFound = MobResult(Result.NotYetFound, null)
             val somethingWentWrong = MobResult(Result.SomethingWentWrong, null)
-            fun found(mob: Mob): MobResult = MobResult(Result.Found, mob)
+            fun found(mob: Mob) = MobResult(Result.Found, mob)
 
             fun ArmorStand?.makeMobResult(mob: (ArmorStand) -> Mob?) =
                 this?.let { armor ->
@@ -80,7 +80,7 @@ object MobData {
         override fun equals(other: Any?) = (other as? RetryEntityInstancing).hashCode() == this.hashCode()
         fun toKeyValuePair() = entity.id to this
 
-        fun outsideRange(): Boolean =
+        fun outsideRange() =
             entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > when (roughCategory) {
                 MobCategory.DISPLAY_NPC -> DISPLAY_NPC_DETECTION_RANGE
                 MobCategory.PLAYER -> Double.POSITIVE_INFINITY

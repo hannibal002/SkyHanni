@@ -30,9 +30,8 @@ abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedI
     trackerConfig = { trackerConfig() },
 ) {
 
-    final override fun addCoins(amount: Int, command: Boolean) {
+    final override fun addCoins(amount: Int, command: Boolean) =
         throw UnsupportedOperationException("Use addCoins(bucket, coins, command) instead")
-    }
 
     fun addCoins(bucket: E, coins: Int, command: Boolean) {
         addItem(bucket, SKYBLOCK_COIN, coins, command)
@@ -62,9 +61,8 @@ abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedI
         }
     }
 
-    final override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean) {
+    final override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean) =
         throw UnsupportedOperationException("Use addItem(bucket, internalName, amount, command, message) instead")
-    }
 
     fun addItem(bucket: E, internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean = true) {
         modify {

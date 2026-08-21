@@ -44,7 +44,7 @@ class SnappedVec3(
         fun Vec3.toSnapped(snapValue: Double = 1.0, maxValue: Double = 360.0) =
             SnappedVec3(x, y, z, snapValue, maxValue)
 
-        private fun snap(value: Double, snapValue: Double): Double =
+        private fun snap(value: Double, snapValue: Double) =
             if (snapValue <= 0.0) value
             else (value / snapValue).roundToInt() * snapValue
     }

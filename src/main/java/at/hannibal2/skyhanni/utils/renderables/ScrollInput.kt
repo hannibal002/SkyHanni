@@ -22,9 +22,8 @@ abstract class ScrollInput(
         }
         get() = scrollValue.getValue()
 
-
-    fun atMinimum(): Boolean = scroll <= minValue
-    fun atMaximum(): Boolean = scroll >= maxValue
+    fun atMinimum() = scroll <= minValue
+    fun atMaximum() = scroll >= maxValue
     fun asInt() = scroll.toInt()
     fun asDouble() = scroll
     fun asDirection() =

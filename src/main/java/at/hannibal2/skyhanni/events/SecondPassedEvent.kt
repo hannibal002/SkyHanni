@@ -5,5 +5,5 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
 @PrimaryFunction("onSecondPassed")
 class SecondPassedEvent(private val totalSeconds: Int) : SkyHanniEvent() {
-    fun repeatSeconds(i: Int): Boolean = totalSeconds % i == 0
+    fun repeatSeconds(i: Int) = totalSeconds % i == 0
 }

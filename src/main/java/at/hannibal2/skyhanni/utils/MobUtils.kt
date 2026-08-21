@@ -61,7 +61,7 @@ object MobUtils {
         distance: Double,
         partialTicks: Float,
         offset: LorenzVec = LorenzVec(),
-    ): Mob? = raycastForMob(entity, partialTicks, offset)?.takeIf {
+    ) = raycastForMob(entity, partialTicks, offset)?.takeIf {
         it.baseEntity.distanceTo(entity.getLorenzVec()) <= distance
     }
 
@@ -70,11 +70,11 @@ object MobUtils {
         distance: Double,
         partialTicks: Float,
         offset: LorenzVec = LorenzVec(),
-    ): List<Mob>? = raycastForMobs(entity, partialTicks, offset)?.filter {
+    ) = raycastForMobs(entity, partialTicks, offset)?.filter {
         it.baseEntity.distanceTo(entity.getLorenzVec()) <= distance
     }.takeIf { it?.isNotEmpty() ?: false }
 
-    fun raycastForMob(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): Mob? =
+    fun raycastForMob(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()) =
         raycastForMobs(entity, partialTicks, offset)?.firstOrNull()
 
     fun raycastForMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {

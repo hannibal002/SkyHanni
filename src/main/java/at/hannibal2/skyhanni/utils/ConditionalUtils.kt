@@ -10,10 +10,10 @@ import kotlin.reflect.jvm.javaGetter
 
 object ConditionalUtils {
 
-    fun <T> T.transformIf(condition: T.() -> Boolean, transformation: T.() -> T): T =
+    fun <T> T.transformIf(condition: T.() -> Boolean, transformation: T.() -> T) =
         if (condition()) transformation(this) else this
 
-    fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any): Any =
+    fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
         if (condition) ifTrue(this) else ifFalse(this)
 
     // MoulConfig is in Java, I don't want to downgrade this logic

@@ -160,5 +160,5 @@ object ClientEvents {
         currentMessage = null
     }
 
-    private fun rainbowConfig() = SkyHanniMod.feature.misc.rainbowActionBar
+    fun rainbowConfig() = SkyHanniMod.feature.misc.rainbowActionBar
 }

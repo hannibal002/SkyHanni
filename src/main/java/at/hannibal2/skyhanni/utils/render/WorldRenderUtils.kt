@@ -935,10 +935,10 @@ object WorldRenderUtils {
     }
 
     //~ if < 26.2 'mainCamera()' -> 'mainCamera'
-    fun getViewerPos(): LorenzVec = exactLocation(Minecraft.getInstance().gameRenderer.mainCamera())
+    fun getViewerPos() = exactLocation(Minecraft.getInstance().gameRenderer.mainCamera())
 
-    fun AABB.expandBlock(n: Int = 1): AABB = expand(LorenzVec.expandVector * n)
-    fun AABB.inflateBlock(n: Int = 1): AABB = expand(LorenzVec.expandVector * -n)
+    fun AABB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
+    fun AABB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
 
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
         if (!entity.isAlive) return entity.getLorenzVec()
@@ -948,14 +948,14 @@ object WorldRenderUtils {
         return LorenzVec(x, y, z)
     }
 
-    fun SkyHanniRenderWorldEvent.exactLocation(mob: Mob): LorenzVec = exactLocation(mob.baseEntity)
+    fun SkyHanniRenderWorldEvent.exactLocation(mob: Mob) = exactLocation(mob.baseEntity)
 
     fun exactLocation(camera: Camera): LorenzVec {
         val pos = camera.position
         return LorenzVec(pos.x, pos.y, pos.z)
     }
 
-    fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity): LorenzVec = exactLocation(entity, partialTicks)
+    fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
     internal fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayerOrThrow

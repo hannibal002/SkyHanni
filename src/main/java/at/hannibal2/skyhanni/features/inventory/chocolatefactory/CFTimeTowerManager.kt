@@ -121,7 +121,7 @@ object CFTimeTowerManager {
         return profileStorage?.maxTimeTowerUses ?: 3
     }
 
-    fun timeTowerFull(): Boolean = currentCharges() >= maxCharges()
+    fun timeTowerFull() = currentCharges() >= maxCharges()
 
     fun timeTowerActive(): Boolean {
         val currentTime = profileStorage?.lastDataSave ?: SimpleTimeMark.farPast()

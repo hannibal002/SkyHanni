@@ -33,7 +33,6 @@ import java.util.Queue
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.fetchAndIncrement
 import kotlin.reflect.KProperty0
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
 
@@ -474,7 +473,7 @@ object ChatUtils {
         }
 
     val GuiMessage.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
-    fun GuiMessage.passedSinceSent(): Duration = (MinecraftCompat.hud.guiTicks - addedTime()).ticks
+    fun GuiMessage.passedSinceSent() = (MinecraftCompat.hud.guiTicks - addedTime()).ticks
 
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)
