@@ -9,7 +9,7 @@ import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
 import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.gui.render.TextureSetup
-import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.Projection
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
@@ -17,8 +17,11 @@ import net.minecraft.client.renderer.state.gui.BlitRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import kotlin.math.roundToInt
 
-//? if >= 26.1
-import net.minecraft.client.renderer.Projection
+//? if >= 26.2 {
+import net.minecraft.client.renderer.SubmitNodeStorage
+//?} else {
+/*import net.minecraft.client.renderer.MultiBufferSource
+*///?}
 
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,
@@ -33,7 +36,6 @@ internal class SkyHanniItemAtlasRenderer(
         block: () -> Unit,
     ) {
         val size = sizePixels.toFloat()
-        //~ if < 26.1 'Projection().apply { this.setupOrtho(-1000f, 1000f, size, size, true) }' -> 'size, size'
         val bufferSlice = projectionBuffer.getBuffer(Projection().apply { this.setupOrtho(-1000f, 1000f, size, size, true) })
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
@@ -48,14 +50,16 @@ internal class SkyHanniItemAtlasRenderer(
         slotX: Int,
         slotY: Int,
         pixelSize: Int,
-        bufferSource: MultiBufferSource.BufferSource,
+        //~ if < 26.2 'submitNodeStorage: SubmitNodeStorage' -> 'bufferSource: MultiBufferSource.BufferSource'
+        submitNodeStorage: SubmitNodeStorage,
         featureRenderDispatcher: FeatureRenderDispatcher,
     ) {
         RenderSystem.enableScissorForRenderTypeDraws(
             slotX, sizePixels - slotY - pixelSize, pixelSize, pixelSize,
         )
         shState.renderItemToTexture(
-            bufferSource, featureRenderDispatcher,
+            //~ if < 26.2 'submitNodeStorage' -> 'bufferSource'
+            submitNodeStorage, featureRenderDispatcher,
             centerX = slotX.toFloat() + pixelSize / 2.0f,
             centerY = slotY.toFloat() + pixelSize / 2.0f,
             pixelSize = pixelSize,

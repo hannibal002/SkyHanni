@@ -10,18 +10,18 @@ import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.navigation.ScreenRectangle
-import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.client.renderer.state.gui.GuiItemRenderState
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
 
-//? if >= 26.1 {
-import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
+//? if >= 26.2 {
+import net.minecraft.client.renderer.SubmitNodeStorage
 //?} else {
-/*import net.minecraft.client.renderer.LightTexture.FULL_BRIGHT
+/*import net.minecraft.client.renderer.MultiBufferSource
 *///?}
 
 data class SkyHanniGuiItemRenderState(
@@ -95,7 +95,8 @@ data class SkyHanniGuiItemRenderState(
     private fun setAnimated() = trackingState.setAnimated()
 
     internal fun renderItemToTexture(
-        bufferSource: MultiBufferSource.BufferSource,
+        //~ if < 26.2 'submitNodeStorage: SubmitNodeStorage' -> 'bufferSource: MultiBufferSource.BufferSource'
+        submitNodeStorage: SubmitNodeStorage,
         featureRenderDispatcher: FeatureRenderDispatcher,
         centerX: Float,
         centerY: Float,
@@ -110,13 +111,19 @@ data class SkyHanniGuiItemRenderState(
         val rotated = ps.mulPose(rotationVector)
         ps.translate(0.0f, 0.03f, 0.125f)
 
-        Minecraft.getInstance().gameRenderer.lighting.setupFor(
+        //~ if < 26.2 'lighting()' -> 'lighting'
+        Minecraft.getInstance().gameRenderer.lighting().setupFor(
             if (trackingState.usesBlockLight()) Lighting.Entry.ITEMS_3D else Lighting.Entry.ITEMS_FLAT,
         )
         if (rotated) setAnimated()
 
-        trackingState.submit(ps, featureRenderDispatcher.submitNodeStorage, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
-        featureRenderDispatcher.renderAllFeatures()
+        //~ if < 26.2 'submitNodeStorage' -> 'featureRenderDispatcher.submitNodeStorage'
+        trackingState.submit(ps, submitNodeStorage, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
+        //? if >= 26.2 {
+        featureRenderDispatcher.renderAllFeatures(submitNodeStorage)
+        //?} else {
+        /*featureRenderDispatcher.renderAllFeatures()
         bufferSource.endBatch()
+        *///?}
     }
 }
