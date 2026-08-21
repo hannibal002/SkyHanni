@@ -96,10 +96,13 @@ object LoreCostUtils {
             return LoreCostEntry(NeuInternalName.MISSING_ITEM, 1, rawLine)
         }
 
-        val internalName = NeuInternalName.fromItemNameOrNull(name) ?: run {
-            logCostLineError("Unknown item in a cost line", rawLine, itemName)
-            NeuInternalName.MISSING_ITEM
-        }
+        // currencies without a repo item only arrive here, their amount is written behind the name or not at all
+        val internalName = NeuInternalName.fromItemNameOrNull(name)
+            ?: SkyblockCurrency.getByLoreNameOrNull(name)?.internalName
+            ?: run {
+                logCostLineError("Unknown item in a cost line", rawLine, itemName)
+                NeuInternalName.MISSING_ITEM
+            }
         return LoreCostEntry(internalName, amount.toLong(), rawLine)
     }
 
