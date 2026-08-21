@@ -220,6 +220,7 @@ object GreenhouseMutationBlueprint {
             literal("target") {
                 argCallback("mutation", BrigadierArguments.greedyString()) { mutation -> setTarget(mutation) }
             }
+            literalCallback("rotate") { rotateActiveLayout() }
             literalCallback("clear") { clearCurrentBlueprint() }
             literalCallback("status") { showStatus() }
         }
@@ -458,6 +459,18 @@ object GreenhouseMutationBlueprint {
         )
     }
 
+    private fun rotateActiveLayout() {
+        val plot = currentGreenhousePlot() ?: run {
+            ChatUtils.chat("§cYou must be standing in a Greenhouse plot.")
+            return
+        }
+        val name = activeLayoutMap()?.get(plot.id) ?: run {
+            ChatUtils.chat("§eThere is no mutation layout loaded for Greenhouse Plot §6${plot.id}§e.")
+            return
+        }
+        rotateLayout(name)
+    }
+
     internal fun layouts(): Map<String, GreenHouseStorage.MutationBlueprintStorage> = layoutMap().orEmpty()
 
     internal fun targetMutation(blueprint: GreenHouseStorage.MutationBlueprintStorage): GreenhouseMutation? =
@@ -514,6 +527,45 @@ object GreenhouseMutationBlueprint {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "rename-greenhouse-mutation-layout")
         ChatUtils.chat("§aRenamed Greenhouse layout §e$oldName §ato §e$newName§a.")
         return true
+    }
+
+    internal fun rotateLayout(name: String): Boolean {
+        val blueprint = layoutMap()?.get(name) ?: run {
+            ChatUtils.chat("§cThe Greenhouse layout §e$name §cno longer exists.")
+            return false
+        }
+        rotateLayoutClockwise(blueprint)
+        resetMissingState()
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "rotate-greenhouse-mutation-layout")
+        ChatUtils.chat("§aRotated Greenhouse layout §e$name §a90° clockwise.")
+        return true
+    }
+
+    internal fun rotateLayoutClockwise(blueprint: GreenHouseStorage.MutationBlueprintStorage) {
+        val oldMinX = blueprint.minXOffset
+        val oldMinZ = blueprint.minZOffset
+        val oldMaxX = blueprint.maxXOffset
+        val oldMaxZ = blueprint.maxZOffset
+        blueprint.minXOffset = -oldMaxZ - 1
+        blueprint.minZOffset = oldMinX
+        blueprint.maxXOffset = -oldMinZ - 1
+        blueprint.maxZOffset = oldMaxX
+
+        blueprint.mutations.forEach { placement ->
+            val oldOffset = placement.offset
+            val size = GreenhouseMutation.fromInternalId(placement.mutationId)?.size ?: placement.size
+            placement.offset = LorenzVec(
+                x = -oldOffset.z - size % 2,
+                y = oldOffset.y,
+                z = oldOffset.x,
+            )
+        }
+        blueprint.importedCells.forEach { cell ->
+            val size = GreenhouseMutation.fromSkyShardsId(cell.cropId)?.size ?: 1
+            val oldRow = cell.row
+            cell.row = cell.column
+            cell.column = GRID_SIZE - size - oldRow
+        }
     }
 
     internal fun exportLayout(name: String) {
@@ -708,6 +760,7 @@ object GreenhouseMutationBlueprint {
     )
 
     private const val GREENHOUSE_GRID_RADIUS = GreenhouseGridScanner.GRID_RADIUS
+    private const val GRID_SIZE = GREENHOUSE_GRID_RADIUS * 2
     private const val REQUIRED_STABLE_CHECKS = 3
     private const val ANCHOR_HORIZONTAL_TOLERANCE = 0.1
     private const val ANCHOR_VERTICAL_TOLERANCE = 3.0

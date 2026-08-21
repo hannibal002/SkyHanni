@@ -165,9 +165,14 @@ internal class GreenhouseBlueprintScreen(private val plotId: Int) : SkyHanniBase
             cancelRename()
             GreenhouseMutationBlueprint.exportLayout(name)
         }
+        drawButton(x + 225, buttonY, 48, 14, "§bRotate") {
+            pendingDelete = null
+            cancelRename()
+            GreenhouseMutationBlueprint.rotateLayout(name)
+        }
         val confirmingDelete = pendingDelete == name
         drawButton(
-            x + 225,
+            x + 278,
             buttonY,
             if (confirmingDelete) 65 else 45,
             14,
