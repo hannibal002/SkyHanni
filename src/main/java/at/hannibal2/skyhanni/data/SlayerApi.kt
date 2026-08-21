@@ -400,11 +400,11 @@ object SlayerApi {
         // and using getCurrentData is ambiguous while changing worlds (inside/outside rift)
         val data = outsideRiftData
         if (data.currentState != COCOONED) return
-            ChatUtils.debug("SlayerApi: World change detected, resetting cocooned state")
-            data.currentState = NO_ACTIVE_QUEST
-            data.currentStateRaw = null
-            latestCocoonTime = ServerTimeMark.farPast()
-            SlayerStateChangeEvent(NO_ACTIVE_QUEST).post()
+        ChatUtils.debug("SlayerApi: World change detected, resetting cocooned state")
+        data.currentState = NO_ACTIVE_QUEST
+        data.currentStateRaw = null
+        latestCocoonTime = ServerTimeMark.farPast()
+        SlayerStateChangeEvent(NO_ACTIVE_QUEST).post()
     }
 
     private fun checkTypeForCurrentArea(): Type? {
