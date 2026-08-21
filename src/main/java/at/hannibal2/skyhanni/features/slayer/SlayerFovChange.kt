@@ -10,7 +10,7 @@ object SlayerFovChange {
     private val config get() = SlayerApi.config.fovChange
 
     @HandleEvent
-    fun onFov(event: FovEvent) {
+    private fun onFov(event: FovEvent) {
         if (!isEnabled()) return
         event.setFov(config.targetFov)
     }
