@@ -8,14 +8,10 @@ import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
@@ -28,8 +24,8 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
@@ -171,12 +167,12 @@ object TunnelsMaps {
     private var display: List<Renderable> = listOf()
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         clickTranslate = mapOf()
         if (!commissionInvPattern.matches(event.inventoryName)) return
         clickTranslate = event.inventoryItems.mapNotNull { (slotId, item) ->
-            val lore = item.getLoreComponent().map { it.string.removeColor() }
+            val lore = item.getCleanLore()
             if (!glacitePattern.anyMatches(lore)) return@mapNotNull null
             if (completedPattern.anyMatches(lore)) return@mapNotNull null
             val type = collectorCommissionPattern.firstMatcher(lore) {
@@ -211,12 +207,12 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         clickTranslate = mapOf()
     }
 
     @HandleEvent
-    fun onTooltip(event: ToolTipTextEvent) {
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         event.slot ?: return
         clickTranslate[event.slot.containerSlot]?.let {
@@ -225,7 +221,7 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.clickedButton != 1) return
         clickTranslate[event.slotId]?.let {
@@ -235,7 +231,7 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         graph = event.getConstant<Graph>("island_graphs/GLACITE_TUNNELS")
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
             value
@@ -269,7 +265,7 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad() {
         onToggle(
             config.compactGemstone,
             config.excludeFairy,
@@ -280,7 +276,7 @@ object TunnelsMaps {
 
     @HandleEvent
     @Suppress("AvoidBritishSpelling")
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(84, "mining.tunnelMaps.pathColour", "mining.tunnelMaps.pathColor")
         event.move(84, "mining.tunnelMaps.dynamicPathColour", "mining.tunnelMaps.dynamicPathColor")
     }
@@ -396,7 +392,7 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (!isEnabled()) return
         if (checkGoalReached()) return
         val prevClosest = closestNode
@@ -453,7 +449,7 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val path = path?.takeIf { it.first.isNotEmpty() } ?: return
         event.draw3DPathWithWaypoint(
@@ -484,37 +480,38 @@ object TunnelsMaps {
     } ?: config.pathColor.toColor()
 
     @HandleEvent
-    fun onKeyPress(event: KeyPressEvent) {
+    private fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (MinecraftCompat.screen != null) return
-        campfireKey(event)
-        nextSpotKey(event)
+        val keyCode = event.keyCode
+        campfireKey(keyCode)
+        nextSpotKey(keyCode)
     }
 
     @HandleEvent
-    fun onItemClick(event: ItemClickEvent) {
+    private fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled() || !config.leftClickPigeon) return
         if (event.clickType != InteractClickType.LEFT_CLICK) return
         if (event.itemInHand?.getInternalNameOrNull() != ROYAL_PIGEON) return
         nextSpot()
     }
 
-    private fun campfireKey(event: KeyPressEvent) {
-        if (event.keyCode != config.campfireKey) return
+    private fun campfireKey(keyCode: Int) {
+        if (keyCode != config.campfireKey) return
         if (lastBaseCampWarp.passedSince() < 2.seconds) return
         lastBaseCampWarp = SimpleTimeMark.now()
         if (config.travelScroll) HypixelCommands.warp("basecamp") else campfireOverride()
     }
 
     @HandleEvent
-    fun onWarp(event: SkyHanniWarpEvent) {
+    private fun onWarp() {
         if (!isEnabled() || goal == null) return
         DelayedRun.runNextTick { setNextGoal() }
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (closestNode == null) return // Value that must be none null if it was active
+    private fun onIslandLeave() {
+        if (closestNode == null) return // value that must be non null if it was active
         closestNode = null
         clearPath()
         cooldowns.clear()
@@ -523,9 +520,10 @@ object TunnelsMaps {
 
     private var nextSpotDelay = SimpleTimeMark.farPast()
 
-    private fun nextSpotKey(event: KeyPressEvent) {
-        if (event.keyCode != config.nextSpotHotkey) return
-        nextSpot()
+    private fun nextSpotKey(keyCode: Int) {
+        if (keyCode == config.nextSpotHotkey) {
+            nextSpot()
+        }
     }
 
     private fun nextSpot() {
