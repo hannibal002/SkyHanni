@@ -68,6 +68,24 @@ object CurrencyApi {
     )
 
     /**
+     * REGEX-TEST: Premium Safari Tickets: 0
+     * REGEX-TEST: First-Class Safari Tickets: 1,024
+     */
+    private val safariTicketItemPattern by patternGroup.pattern(
+        "safariticket.item",
+        "(?<type>[\\w-]+) Safari Tickets: (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * REGEX-TEST: - Basic: 1
+     * REGEX-TEST: - First-Class: 0
+     */
+    private val safariTicketSignPattern by patternGroup.pattern(
+        "safariticket.sign",
+        "- (?<type>Basic|Economy|Premium|First-Class): (?<amount>[\\d,]+)",
+    )
+
+    /**
      * The type is read as written, so a new kind of essence needs no code change.
      *
      * REGEX-TEST: Your Undead Essence: 28,439
@@ -227,6 +245,7 @@ object CurrencyApi {
         medalAmountPattern.matchMatcher(line) {
             medalCurrencyOrNull(group("type"))?.setAmount(group("amount").formatLong())
         }
+        readSafariTicketLine(line)
         // every essence shop menu holds an item that states how much of it the player owns
         essenceAmountPattern.matchMatcher(line) {
             val type = group("type")
@@ -244,6 +263,30 @@ object CurrencyApi {
 
             essenceStorage?.put(internalName, group("amount").formatLong())
         }
+    }
+
+    private fun readSafariTicketLine(line: String) {
+        safariTicketItemPattern.matchMatcher(line) {
+            setSafariTicketAmount(group("type"), group("amount"), line)
+        }
+        safariTicketSignPattern.matchMatcher(line) {
+            setSafariTicketAmount(group("type"), group("amount"), line)
+        }
+    }
+
+    private fun setSafariTicketAmount(type: String, amount: String, line: String) {
+        val currency = SkyblockCurrency.getByLoreNameOrNull("$type Safari Ticket") ?: run {
+            ErrorManager.logErrorStateWithData(
+                "Could not read how many Safari Tickets you own",
+                "Unknown Safari Ticket type in an item lore",
+                "type" to type,
+                "line" to line,
+                "inventoryName" to InventoryUtils.openInventoryName(),
+                betaOnly = true,
+            )
+            return
+        }
+        currency.setAmount(amount.formatLong())
     }
 
     private fun essenceInternalNameOrNull(type: String): NeuInternalName? =
