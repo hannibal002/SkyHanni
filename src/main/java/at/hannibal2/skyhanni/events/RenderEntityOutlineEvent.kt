@@ -76,24 +76,6 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
     }
 
     /**
-     * Adds a single entity to the list of the entities to outline
-     *
-     * @param entity       the entity to add
-     * @param outlineColor the color with which to outline
-     */
-    fun queueEntityToOutline(entity: Entity?, outlineColor: Color) {
-        if (entity == null) {
-            return
-        }
-        computeAndCacheEntitiesToChooseFrom()
-        if (!entitiesToChooseFrom.contains(entity)) {
-            return
-        }
-        entitiesToOutline[entity] = outlineColor
-        entitiesToChooseFrom.remove(entity)
-    }
-
-    /**
      * Used for on-the-fly generation of entities. Driven by event handlers in a decentralized fashion
      */
     private fun computeAndCacheEntitiesToChooseFrom(force: Boolean = false) {

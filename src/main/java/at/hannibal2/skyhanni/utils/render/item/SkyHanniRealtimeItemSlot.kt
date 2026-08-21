@@ -1,18 +1,18 @@
 package at.hannibal2.skyhanni.utils.render.item
 
+import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.textures.GpuTexture
+import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.gui.render.TextureSetup
+import net.minecraft.client.renderer.Projection
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.state.gui.BlitRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import kotlin.math.roundToInt
-
-//? if >= 26.1
-import org.joml.Matrix4f
 
 internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractItemTexture() {
 
@@ -37,18 +37,23 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         val depthTextureView = depthTextureView ?: return
 
         // Clear before rendering
-        RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(texture, 0, depthTexture, 1.0)
+        RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(
+            texture,
+            GuiRenderer.CLEAR_COLOR,
+            depthTexture,
+            RenderCompat.CLEAR_DEPTH,
+        )
 
         val size = slotSize.toFloat()
-        //~ if < 26.1 'Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f)' -> 'size, size'
-        val bufferSlice = projectionBuffer.getBuffer(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))
+        val bufferSlice = projectionBuffer.getBuffer(Projection().apply { this.setupOrtho(-1000f, 1000f, size, size, true) })
 
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
         RenderSystem.outputDepthTextureOverride = depthTextureView
 
         state.renderItemToTexture(
-            context.bufferSource, context.featureRenderDispatcher,
+            //~ if < 26.2 'submitNodeStorage' -> 'bufferSource'
+            context.submitNodeStorage, context.featureRenderDispatcher,
             centerX = slotSize / 2.0f,
             centerY = slotSize / 2.0f,
             pixelSize = slotSize,

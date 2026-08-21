@@ -18,7 +18,7 @@ class HarvestFeastConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var displayCurrentCrops: Boolean = true
+    var displayCurrentCrops: Boolean = false
 
     @Expose
     @ConfigOption(
