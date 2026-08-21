@@ -15,16 +15,12 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ActiveTextCollector
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.TextAlignment
+import net.minecraft.client.gui.components.ChatComponent
 import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.renderer.state.gui.GuiTextRenderState
 import net.minecraft.network.chat.Component
 import net.minecraft.util.FormattedCharSequence
 import org.joml.Matrix3x2f
-
-//? if >= 26.1 {
-import net.minecraft.client.gui.components.ChatComponent
-//?} else
-//import at.hannibal2.skyhanni.mixins.hooks.MessageStore.Companion.parent
 
 object CopyChat {
     private val config get() = SkyHanniMod.feature.chat.copyChat
@@ -64,11 +60,9 @@ object CopyChat {
 
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
         val mc = Minecraft.getInstance()
-        val gui = MinecraftCompat.hud
-        val chatGui = gui.chat
+        val chatGui = MinecraftCompat.hud.chat
         val finder = HoveredTextFinder(mc.font, mouseX, mouseY)
-        //~ if < 26.1 'ChatComponent.DisplayMode.FOREGROUND' -> 'true'
-        chatGui.captureClickableText(finder, mc.window.guiScaledHeight, gui.guiTicks, ChatComponent.DisplayMode.FOREGROUND)
+        chatGui.captureClickableText(finder, mc.window.guiScaledHeight, MinecraftCompat.hud.guiTicks, ChatComponent.DisplayMode.FOREGROUND)
         val visibleLine = chatGui.trimmedMessages.firstOrNull { it.content === finder.hoveredText } ?: return null
 
         return visibleLine.parent

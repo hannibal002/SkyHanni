@@ -1,5 +1,9 @@
 config:
     validation: true
+    # UnusedPrivateMember is the detekt 1.x name of UnusedPrivateFunction. detekt 2.x does not know the key,
+    # but the bundled detekt of the IntelliJ plugin still does. Excluded from validation so one config works for both.
+    excludes:
+        - '.*>UnusedPrivateMember.*'
 
 GrammarRules:
     AvoidBritishSpelling:
@@ -87,6 +91,8 @@ style:
     UnusedPrivateClass: # seldom intentional
         active: false
     UnusedPrivateFunction: # gets tripped up by API methods
+        active: false
+    UnusedPrivateMember: # detekt 1.x name of UnusedPrivateFunction, only read by the IntelliJ detekt plugin
         active: false
     UnusedPrivateProperty: # loops that don't use their iterator
         active: true

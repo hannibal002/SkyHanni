@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.test
 
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest
@@ -15,9 +16,8 @@ object RepoPatternDumpTest : FabricClientGameTest {
 
     override fun runTest(context: ClientGameTestContext) {
         val dumpDirective = PlatformUtils.getRepoPatternDumpLocation() ?: return
-        context.waitFor { mc ->
-            @Suppress("ForbiddenMethodCall")
-            mc.screen is TitleScreen
+        context.waitFor { _ ->
+            MinecraftCompat.screen is TitleScreen
         }
         val (sourceLabel, path) = dumpDirective.split(":", limit = 2)
         RepoPatternManager.dump(sourceLabel, File(path))
