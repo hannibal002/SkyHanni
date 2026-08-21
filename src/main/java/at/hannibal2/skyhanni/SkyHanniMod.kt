@@ -119,7 +119,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
 
     fun id(path: String): Identifier = Identifier.fromNamespaceAndPath(MODID, path)
 
-    val modVersion: ModVersion = ModVersion.fromString(VERSION)
+    val modVersion: ModVersion = ModVersion.installed
 
     val isBetaVersion: Boolean
         get() = modVersion.isBeta

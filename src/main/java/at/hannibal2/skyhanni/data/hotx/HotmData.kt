@@ -419,16 +419,14 @@ enum class HotmData(
     override val totalCostMaxLevel = calculateTotalCost(maxLevel)
 
     override fun getStorage(): HotxTree? = ProfileStorageData.profileSpecific?.mining?.hotmTree
-
     // TODO move all object functions into hotm api?
     @SkyHanniModule
-    companion object : HotxHandler<HotmData, HotmReward, SkymallPerk>(entries) {
+    companion object : HotxHandler<HotmData, HotmReward>(entries) {
 
         override val name: String = "HotM"
-        override val rotatingPerks = SkymallPerk.entries
-        override val rotatingPerkEntry: HotmData = SKY_MALL
-        override var currentRotPerk = HotmApi.skymall
         override val islandTypeTag = IslandTypeTag.MINING
+        val skyMallSlot = RotatingPerkSlot(SKY_MALL, SkymallPerk.entries)
+        override val rotatingPerkSlots = listOf(skyMallSlot)
 
         private val config get() = SkyHanniMod.feature.mining.hotm
         override val position: Position get() = config.skyMallPosition
@@ -564,10 +562,6 @@ enum class HotmData(
                 it.heartPattern
                 it.resetPattern
             }
-            SkymallPerk.entries.forEach {
-                it.chatPattern
-                it.itemPattern
-            }
             MayhemPerk.entries.forEach {
                 it.chatPattern
             }
@@ -620,7 +614,7 @@ enum class HotmData(
         }
 
         @HandleEvent(onlyOnSkyblock = true)
-        fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+        private fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
             ScoreboardPattern.powderPattern.firstMatcher(event.added) {
                 val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
@@ -635,7 +629,7 @@ enum class HotmData(
         }
 
         @HandleEvent
-        fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        private fun onWidgetUpdate(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.POWDER)) return
             event.lines.forEach { line ->
                 powderPattern.matchMatcher(line.string.removeColor()) {
@@ -647,7 +641,7 @@ enum class HotmData(
         }
 
         @HandleEvent(onlyOnSkyblock = true)
-        override fun onChat(event: SkyHanniChatEvent.Allow) = super.onChat(event)
+        private fun onChat(event: SkyHanniChatEvent.Allow) = handleChat(event)
 
         override fun tryBlock(event: SkyHanniChatEvent.Allow) {
             if (!chatConfig.hideSkyMall.get() || IslandTypeTag.MINING.isInIsland()) return
@@ -673,14 +667,14 @@ enum class HotmData(
         }
 
         @HandleEvent
-        fun onIslandChange() {
+        private fun onIslandChange() {
             if (HotmApi.mineshaftMayhem == null) return
             HotmApi.mineshaftMayhem = null
             ChatUtils.debug("resetting mineshaftMayhem")
         }
 
         @HandleEvent
-        fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        private fun onDebugDataCollect(event: DebugDataCollectEvent) {
             event.title("HotM")
             event.addIrrelevant {
                 add("Tokens : $availableTokens/$tokens")
