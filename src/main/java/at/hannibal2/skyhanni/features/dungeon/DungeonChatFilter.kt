@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup
 import java.util.regex.Pattern
 
@@ -203,5 +204,5 @@ object DungeonChatFilter {
 
     private fun String.isFiltered(key: MessageTypes): Boolean = config.dungeonFilteredMessageTypes.contains(key) && isPresent(key)
 
-    private fun String.isPresent(key: MessageTypes): Boolean = getPatterns(key).any { it.matcher(this).matches() }
+    private fun String.isPresent(key: MessageTypes): Boolean = getPatterns(key).anyMatches(this)
 }
