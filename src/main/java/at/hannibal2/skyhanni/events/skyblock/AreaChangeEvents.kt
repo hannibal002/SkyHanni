@@ -47,5 +47,5 @@ class ScoreboardAreaChangeEvent(val area: String, val previousArea: String?) : S
 class GraphAreaChangeEvent(
     val area: String,
     val previousArea: String?,
-    val onlyInternal: Boolean
+    val onlyInternal: Boolean,
 ) : SkyHanniEvent()
