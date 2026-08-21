@@ -47,7 +47,7 @@ class RenderEntityOutlineEvent : SkyHanniEvent() {
             val entity: Entity = iterator.next()
             val color: Color? = outlineColor(entity)
             if (color != null) {
-                entitiesToOutline[entity] = color.rgb or 0xFF000000.toInt()
+                entitiesToOutline[entity] = color.rgb
                 iterator.remove()
             }
         }
