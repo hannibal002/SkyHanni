@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -55,7 +56,19 @@ object SendCoordinates {
 
                 split.first().toFloat()
             } else end.toFloat()
-            waypoints.add(SharedWaypoint(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000))
+
+            val waypoint = SharedWaypoint(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000)
+            waypoints.add(waypoint)
+
+            if (config.pathfinder && IslandGraphs.currentIslandGraph != null) {
+                IslandGraphs.pathFind(
+                    location = waypoint.location,
+                    label = waypoint.name,
+                    color = config.color.toColor(),
+                    condition = { waypoint in waypoints },
+                )
+            }
+
             logger.log("got waypoint coords and username")
         }
     }

@@ -16,6 +16,11 @@ class CoordsWaypointConfig {
     var enabled: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Pathfinder", desc = "Automatically show a path to coordinates sent in chat.")
+    @ConfigEditorBoolean
+    var pathfinder: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Color", desc = "Color of the waypoint.")
     @ConfigEditorColour
     var color: ChromaColour = ChromaColour.fromStaticRGB(75, 197, 64, 194)
