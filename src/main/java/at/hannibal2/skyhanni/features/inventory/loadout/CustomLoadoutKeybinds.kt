@@ -30,7 +30,7 @@ object CustomLoadoutKeybinds {
     private var lastClick = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onGuiKeyPress(event: GuiKeyPressEvent) {
+    private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (handlePress()) event.cancel()
     }
 
