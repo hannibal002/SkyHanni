@@ -53,23 +53,6 @@ object WorldRenderUtils {
 
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
-    //? if < 26.2 {
-    /*// 26.1 composites entity render targets over the main target after the normal world-render hook.
-    // Drawing see-through text in the late pass prevents entities from covering it (MC-265743).
-    private val deferredSeeThroughText = mutableListOf<(MultiBufferSource.BufferSource) -> Unit>()
-
-    @JvmStatic
-    fun renderDeferredSeeThroughText(bufferSource: MultiBufferSource.BufferSource) {
-        if (deferredSeeThroughText.isEmpty()) return
-        try {
-            deferredSeeThroughText.forEach { it(bufferSource) }
-            bufferSource.endBatch()
-        } finally {
-            deferredSeeThroughText.clear()
-        }
-    }
-    *///?}
-
     //? if >= 26.2 {
     private fun SkyHanniRenderWorldEvent.submitOrderedText(
         x: Float,
@@ -346,24 +329,6 @@ object WorldRenderUtils {
         ).rotate(camera.rotation())
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
-
-        if (seeThroughBlocks) {
-            deferredSeeThroughText.add { bufferSource ->
-                fr.drawInBatch(
-                    text,
-                    x,
-                    0f,
-                    color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-                    shadow,
-                    matrix,
-                    bufferSource,
-                    SEE_THROUGH,
-                    backgroundColor,
-                    FULL_BRIGHT,
-                )
-            }
-            return
-        }
 
         fr.drawInBatch(
             text,
