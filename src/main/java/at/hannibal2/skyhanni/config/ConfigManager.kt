@@ -151,7 +151,7 @@ class ConfigManager {
         traverseConfig(obj, "", mutableSetOf(), action)
     }
 
-    private  fun traverseConfig(
+    private fun traverseConfig(
         obj: Any?,
         path: String,
         visited: MutableSet<IdentityCharacteristics<Any>>,
