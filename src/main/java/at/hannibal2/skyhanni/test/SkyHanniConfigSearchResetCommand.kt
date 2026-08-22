@@ -33,6 +33,8 @@ import java.util.UUID
 
 // TODO in the future change something here
 //  ^ Convert the command functions to suspend funs, use coroutines
+//  ^ Separate the command logic from the config finding logic, so that the config finding logic can be used in other places
+//  ^ Use Brigadier
 @SkyHanniModule
 object SkyHanniConfigSearchResetCommand {
 
