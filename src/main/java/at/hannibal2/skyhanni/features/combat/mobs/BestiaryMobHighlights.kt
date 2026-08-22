@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.BestiaryApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.features.combat.mobs.MarkedMob.Companion.toMarkedVariant
+import at.hannibal2.skyhanni.features.combat.mobs.BestiaryMobHighlight.Companion.toMarkedVariant
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -13,10 +13,9 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 
 @SkyHanniModule
-object MarkedBestiaryMob {
-
-    private val config get() = SkyHanniMod.feature.combat.mobs.markedMobs
-    private val entries get() = config.markedMobs
+object BestiaryMobHighlights {
+    private val config get() = SkyHanniMod.feature.combat.mobs.bestiaryMobHighlights
+    private val entries get() = config.highlights
 
     private var markedInventoryEntries = setOf<Int>()
 
@@ -26,7 +25,7 @@ object MarkedBestiaryMob {
             config.enabled,
             config.highlightColor
         ) {
-            MarkedMobManager.forceApplyRules(glow = isEnabled())
+            BestiaryMobHighlightManager.forceApplyRules(glow = isEnabled())
         }
     }
 
@@ -59,7 +58,7 @@ object MarkedBestiaryMob {
         val markedVariant = variant.toMarkedVariant(family)
 
         DelayedRun.runOrNextTick {
-            MarkedMobManager.toggle(markedVariant)
+            BestiaryMobHighlightManager.toggle(markedVariant)
             rebuildMarkedInventoryEntries()
         }
     }

@@ -11,12 +11,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 
 @SkyHanniModule
-object MarkedMobManager {
+object BestiaryMobHighlightManager {
 
-    private val config get() = SkyHanniMod.feature.combat.mobs.markedMobs
-    private val entries get() = config.markedMobs
+    private val config get() = SkyHanniMod.feature.combat.mobs.bestiaryMobHighlights
+    private val entries get() = config.highlights
     private val allMobs get() = HashSet(MobData.skyblockMobs)
-    private val markedMobs get() = allMobs.asSequence().filter { isMarked(it) }
+    private val highlightedMobs get() = allMobs.asSequence().filter { isMarked(it) }
 
     @HandleEvent
     private fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -28,7 +28,7 @@ object MarkedMobManager {
 
     private fun isMarked(
         mob: Mob,
-        entriesToCheck: Collection<MarkedMob> = entries,
+        entriesToCheck: Collection<BestiaryMobHighlight> = entries,
     ): Boolean {
         return entriesToCheck.any {
             it.matches(
@@ -38,7 +38,7 @@ object MarkedMobManager {
         }
     }
 
-    fun toggle(markedVariant: MarkedMob) {
+    fun toggle(markedVariant: BestiaryMobHighlight) {
         val removedEntry = entries.firstOrNull {
             it.matches(markedVariant)
         }
@@ -57,7 +57,7 @@ object MarkedMobManager {
         } else {
             entries.add(markedVariant)
 
-            for (mob in markedMobs) {
+            for (mob in highlightedMobs) {
                 mob.highlight(config.highlightColor.get())
             }
         }
@@ -69,7 +69,7 @@ object MarkedMobManager {
                 mob.highlight(config.highlightColor.get())
             }
         } else {
-            markedMobs.forEach { it.removeHighlight() }
+            highlightedMobs.forEach { it.removeHighlight() }
         }
     }
 

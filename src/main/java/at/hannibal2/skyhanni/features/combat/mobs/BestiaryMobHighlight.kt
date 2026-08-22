@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.combat.mobs
 import at.hannibal2.skyhanni.data.BestiaryApi
 import com.google.gson.annotations.Expose
 
-data class MarkedMob(
+data class BestiaryMobHighlight(
     @Expose
     val family: String,
     @Expose
@@ -12,7 +12,7 @@ data class MarkedMob(
     val level: Int,
 ) {
 
-    fun matches(other: MarkedMob): Boolean {
+    fun matches(other: BestiaryMobHighlight): Boolean {
         if (family != other.family) return false
         if (name != other.name) return false
         if (level != other.level) return false
@@ -41,8 +41,8 @@ data class MarkedMob(
     companion object {
         fun BestiaryApi.BestiaryMobVariant.toMarkedVariant(
             family: String,
-        ): MarkedMob {
-            return MarkedMob(
+        ): BestiaryMobHighlight {
+            return BestiaryMobHighlight(
                 family = family,
                 name = cleanName,
                 level = level,

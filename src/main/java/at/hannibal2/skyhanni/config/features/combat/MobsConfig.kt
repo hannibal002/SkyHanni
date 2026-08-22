@@ -9,9 +9,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class MobsConfig {
     @Expose
-    @ConfigOption(name = "Marked Mobs", desc = "Mark mobs from bestiary entries and highlight them in the world.")
+    @ConfigOption(
+        name = "Bestiary Mob Highlights",
+        desc = "Highlight selected Bestiary mobs in the world.",
+    )
     @Accordion
-    val markedMobs: MarkedMobConfig = MarkedMobConfig()
+    val bestiaryMobHighlights: BestiaryMobHighlightsConfig = BestiaryMobHighlightsConfig()
 
     @Expose
     @ConfigOption(
