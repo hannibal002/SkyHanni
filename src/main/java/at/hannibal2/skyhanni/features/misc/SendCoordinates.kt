@@ -8,6 +8,11 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
+import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -60,17 +65,32 @@ object SendCoordinates {
             val waypoint = SharedWaypoint(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000)
             waypoints.add(waypoint)
 
-            if (config.pathfinder && IslandGraphs.currentIslandGraph != null) {
-                IslandGraphs.pathFind(
-                    location = waypoint.location,
-                    label = waypoint.name,
-                    color = config.color.toColor(),
-                    condition = { waypoint in waypoints },
-                )
+            if (config.pathfinder) {
+                pathfindTo(waypoint)
+            } else {
+                sendPathfindAction(waypoint)
             }
 
             logger.log("got waypoint coords and username")
         }
+    }
+
+    private fun pathfindTo(waypoint: SharedWaypoint) {
+        if (waypoint !in waypoints || IslandGraphs.currentIslandGraph == null) return
+
+        IslandGraphs.pathFind(
+            location = waypoint.location,
+            label = waypoint.name,
+            color = config.color.toColor(),
+            condition = { waypoint in waypoints },
+        )
+    }
+
+    private fun sendPathfindAction(waypoint: SharedWaypoint) {
+        val component = "§e[SkyHanni] §7Pathfind to §r${waypoint.name}".asComponent()
+        component.onClick { pathfindTo(waypoint) }
+        component.onHover("§eClick to start pathfinding")
+        component.send(ChatUtils.getUniqueMessageId())
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
