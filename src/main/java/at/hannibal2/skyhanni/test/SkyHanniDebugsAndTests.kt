@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
@@ -35,11 +34,11 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.getRawBaseStats
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -495,7 +494,7 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item name: '$name§7'")
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true)
     private fun onGuiRenderOverlay() {
         // TODO: make this not tied to debug HUD
         if (!debugConfig.enabled || !MinecraftCompat.showDebugHud) return
@@ -510,10 +509,10 @@ object SkyHanniDebugsAndTests {
         ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
     }
 
-    @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true)
     private fun onGuiRender() {
         val stack = InventoryCompat.stackUnderCursor() ?: return
-        if (!stack.getLoreComponent().any { it.string.contains("Right-click to preview!") }) return
+        if (!stack.getCleanLore().any { it.contains("Right-click to preview!") }) return
 
         val internalName = stack.getInternalNameOrNull() ?: return
         skinId = internalName.asString()

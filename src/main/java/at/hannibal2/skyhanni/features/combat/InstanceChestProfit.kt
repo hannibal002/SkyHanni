@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -430,7 +429,7 @@ object InstanceChestProfit {
                 }
             } ?: 0.0
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
+    @HandleEvent
     private fun onChestGuiRender() {
         if (config.enabled && InventoryUtils.inInventory())
             if (isInstanceChestGUI()) {
