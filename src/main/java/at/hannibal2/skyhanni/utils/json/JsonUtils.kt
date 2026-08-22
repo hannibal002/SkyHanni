@@ -18,6 +18,14 @@ import java.nio.charset.StandardCharsets
 import kotlin.reflect.jvm.javaType
 import kotlin.reflect.typeOf
 
+object JsonUtils {
+    val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
+
+    val JsonPrimitive.asLongOrNull get() = takeIf { it.isNumber }?.asLong
+}
+
+// TODO move everything below into the object
+
 inline fun <reified T : Any> Gson.fromJson(string: String): T = this.fromJson(string, typeOf<T>().javaType)
 
 inline fun <reified T : Any> Gson.fromJsonOrNull(string: String): T? = runCatching {
@@ -100,4 +108,9 @@ fun Iterable<JsonElement>.toJsonArray(): JsonArray = JsonArray().also {
     }
 }
 
-val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
+// TODO remove after 10.0.0
+@Deprecated(
+    "Use JsonUtils.asIntOrNull instead",
+    ReplaceWith("this.asIntOrNull()", imports = ["at.hannibal2.skyhanni.utils.json.JsonUtils"]),
+)
+val JsonPrimitive.asIntOrNull get() = with(JsonUtils) { asIntOrNull }
