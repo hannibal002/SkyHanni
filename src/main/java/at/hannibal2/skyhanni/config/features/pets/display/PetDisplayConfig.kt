@@ -45,6 +45,14 @@ class PetDisplayConfig : Config() {
         val xpAccuracyWarning: String = ""
 
         @Expose
+        @ConfigOption(
+            name = "Smooth XP",
+            desc = "Smoothly animate changes to the pet XP instead of jumping to new values instantly."
+        )
+        @ConfigEditorBoolean
+        val smoothXp: Property<Boolean> = Property.of(true)
+
+        @Expose
         @ConfigLink(owner = GeneralPetDisplayConfig::class, field = "enabled")
         val position: Position = Position(200, 200)
     }
