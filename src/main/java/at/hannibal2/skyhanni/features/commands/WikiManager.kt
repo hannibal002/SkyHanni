@@ -35,9 +35,8 @@ object WikiManager {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onGuiKeyPress(event: GuiKeyPressEvent) {
-        val stack = event.stackUnderCursor() ?: return
-
         if (!config.wikiKeybind.isKeyHeld()) return
+        val stack = event.stackUnderCursor ?: return
         wikiTheItem(stack, config.menuOpenWiki)
     }
 

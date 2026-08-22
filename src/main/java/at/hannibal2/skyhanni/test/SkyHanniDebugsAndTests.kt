@@ -382,11 +382,11 @@ object SkyHanniDebugsAndTests {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (debugConfig.copyCosmeticsSkullData.isKeyHeld()) {
-            val stack = event.stackUnderCursor() ?: return
+            val stack = event.stackUnderCursor ?: return
             onKeyPressCopyCosmeticsData(stack)
         }
         if (debugConfig.copyInternalName.isKeyHeld()) {
-            val stack = event.stackUnderCursor() ?: return
+            val stack = event.stackUnderCursor ?: return
             onKeybind(stack)
         }
     }

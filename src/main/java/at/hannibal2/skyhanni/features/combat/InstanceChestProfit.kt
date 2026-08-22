@@ -201,7 +201,7 @@ object InstanceChestProfit {
     private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.keybind.isKeyHeld()) return
         val favoriteItems = profileStorage?.instanceChestFavoriteItems ?: mutableListOf()
-        event.stackUnderCursor()?.getInternalNameOrNull()?.let {
+        event.stackUnderCursor?.getInternalNameOrNull()?.let {
             if (favoriteItems.contains(it)) {
                 favoriteItems.remove(it)
                 ChatUtils.chat("Removed ${it.repoItemName}§e from Favorites List.")

@@ -148,7 +148,7 @@ object ShardTrackerDisplay {
         if (!isEnabled()) return
         if (!config.selectShardKeybind.isKeyHeld()) return
         if (!isInsideShardsMenu()) return
-        val stack = event.stackUnderCursor() ?: return
+        val stack = event.stackUnderCursor ?: return
         val internalName = stack.getInternalName()
         if (internalName == NeuInternalName.NONE) return
         toggleShard(internalName)

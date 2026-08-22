@@ -98,7 +98,7 @@ object TestExportTools {
     @HandleEvent
     private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.copyItemDataCompressed.isKeyHeld() && !config.copyItemData.isKeyHeld()) return
-        val stack = event.stackUnderCursor() ?: return
+        val stack = event.stackUnderCursor ?: return
         if (config.copyItemData.isKeyHeld()) {
             copyItemToClipboard(stack)
             return

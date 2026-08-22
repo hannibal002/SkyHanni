@@ -73,7 +73,7 @@ object AuctionHouseCopyUnderbidPrice {
     private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.copyUnderbidKeybind.isKeyHeld()) return
         if (!allowedInventoriesPattern.matches(InventoryUtils.openInventoryName())) return
-        val stack = event.stackUnderCursor() ?: return
+        val stack = event.stackUnderCursor ?: return
 
         auctionPricePattern.firstMatcher(stack.getLore()) {
             copyPrice(group("coins").formatLong())

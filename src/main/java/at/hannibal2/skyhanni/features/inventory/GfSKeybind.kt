@@ -15,7 +15,7 @@ object GfSKeybind {
     @HandleEvent
     private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.keybind.isKeyClicked()) return
-        event.stackUnderCursor()?.getInternalNameOrNull()?.let {
+        event.stackUnderCursor?.getInternalNameOrNull()?.let {
             GetFromSackApi.getFromSack(it, 9999)
         }
     }
