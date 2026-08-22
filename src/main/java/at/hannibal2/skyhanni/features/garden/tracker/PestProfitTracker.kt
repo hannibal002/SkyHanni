@@ -194,7 +194,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     fun onPestKill(event: PestKillEvent) {
         if (BitsApi.bitsAvailable > 0) {
             val bitsAmount = KILL_BITS * BitsApi.bitsMultiplier()
-            addItem(event.pestType, BITS, bitsAmount.toInt(), false)
+            addItem(event.pestType, BITS, bitsAmount.formatInt(), false)
         }
     }
 
@@ -211,7 +211,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
                 "full_message" to message,
             )
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
-            val amount = group("amount").toInt()
+            val amount = group("amount").formatInt()
 
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
