@@ -10,15 +10,15 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 
 @SkyHanniModule
 object UpdateKeybinds {
 
-    var keybinds: MutableSet<String> = mutableSetOf()
     private val logger = SkyHanniLogger("keybind_upgrader")
 
-    private val olderToNewerKeys: MutableMap<Int, Int> = mutableMapOf()
-    private val newerToOlderKeys: MutableMap<Int, Int> = mutableMapOf()
+    private val olderToNewerKeys = mutableMapOf<Int, Int>()
+    private val newerToOlderKeys = mutableMapOf<Int, Int>()
 
     @HandleEvent(priority = HandleEvent.HIGH)
     private fun onConfigLoad(event: ConfigLoadEvent) {
@@ -27,11 +27,13 @@ object UpdateKeybinds {
         val config = SkyHanniMod.feature
         val lastMcVersion = config.lastMinecraftVersion
         val currentMcVersion = PlatformUtils.MC_VERSION
+
         if (!config.storage.hasPlayedBefore) {
             logger.log("User has never used SkyHanni before!")
             config.lastMinecraftVersion = currentMcVersion
             return
         }
+
         if (lastMcVersion == currentMcVersion) return
 
         when (lastMcVersion) {
@@ -40,6 +42,7 @@ object UpdateKeybinds {
                 createKeyMapping()
                 migrateKeybinds(olderToNewerKeys)
             }
+
             "26.3" if currentMcVersion == "26.2" -> {
                 logger.log("Migrating keybinds from 26.3 to 26.2")
                 createKeyMapping()
@@ -51,7 +54,7 @@ object UpdateKeybinds {
     }
 
     private fun migrateKeybinds(map: Map<Int, Int>) {
-        for (keybind in keybinds) {
+        for (keybind in findKeybinds()) {
             migrateKeybind(keybind, map)
         }
     }
@@ -60,7 +63,18 @@ object UpdateKeybinds {
         val shimmy = Shimmy(SkyHanniMod.feature, key.split(".")) ?: return
         val oldKeyCode = shimmy.value as? Int ?: return
         val newKeyCode = map[oldKeyCode] ?: return
+
         shimmy.value = newKeyCode
+    }
+
+    private fun findKeybinds(): Set<String> {
+        return buildSet {
+            SkyHanniMod.configManager.traverseConfig { _, field, path ->
+                if (field.getAnnotation(ConfigEditorKeybind::class.java) != null) {
+                    add(path.joinToString("."))
+                }
+            }
+        }
     }
 
     private fun mapKeyCode(oldKeyCode: Int, newKeyCode: Int) {
@@ -74,10 +88,14 @@ object UpdateKeybinds {
             category = USERS_RESET
             description = "Resets all of your skyhanni keybinds"
             aliases = listOf("shkeybindreset")
+
             simpleCallback {
-                for (keybind in keybinds) {
-                    SkyHanniConfigSearchResetCommand.resetCommand(arrayOf("reset", "config.$keybind"))
+                for (keybind in findKeybinds()) {
+                    SkyHanniConfigSearchResetCommand.resetCommand(
+                        arrayOf("reset", "config.$keybind"),
+                    )
                 }
+
                 ChatUtils.chat("§aSuccessfully reset all SkyHanni Keybinds")
             }
         }

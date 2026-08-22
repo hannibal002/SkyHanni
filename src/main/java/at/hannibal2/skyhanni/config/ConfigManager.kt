@@ -32,7 +32,6 @@ import com.google.gson.Gson
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
-import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybind
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
@@ -84,11 +83,10 @@ class ConfigManager {
             saveConfig(ConfigFileType.FEATURES, "auto-save-60s")
         }
 
-        val features = SkyHanniMod.feature
         recreateConfig()
 
         try {
-            findPositionLinks(features, mutableSetOf())
+            findPositionLinks()
         } catch (e: Exception) {
             ErrorManager.crashInDevEnv("Couldn't load config links") { e }
         }
@@ -100,18 +98,16 @@ class ConfigManager {
         OSUtils.deleteExpiredFiles(File("skyhanni/config/backup"), SkyHanniMod.feature.dev.configBackupExpiryTime.days)
     }
 
-    private fun findPositionLinks(obj: Any?, slog: MutableSet<IdentityCharacteristics<Any>>) {
-        if (obj == null) return
-        if (!obj.javaClass.name.startsWith("at.hannibal2.skyhanni.")) return
-        val ic = IdentityCharacteristics(obj)
-        if (ic in slog) return
-        slog.add(ic)
+    private fun findPositionLinks() {
         var missingConfigLink = false
-        for (field in obj.javaClass.declaredFields.map { it.makeAccessible() }) {
-            if (field.type != Position::class.java && field.type != PositionList::class.java) {
-                findPositionLinks(field.get(obj), slog)
-                continue
+
+        traverseConfig(SkyHanniMod.feature) { owner, field, _ ->
+            if (field.type != Position::class.java &&
+                field.type != PositionList::class.java
+            ) {
+                return@traverseConfig
             }
+
             val configLink = field.getAnnotation(ConfigLink::class.java)
             if (configLink == null) {
                 if (PlatformUtils.isDevEnvironment) {
@@ -123,14 +119,13 @@ class ConfigManager {
                         missingConfigLink = true
                     }
                 }
-                continue
+                return@traverseConfig
             }
-            if (field.type == Position::class.java) {
-                val position = field.get(obj) as Position
-                position.setLink(configLink)
-            } else if (field.type == PositionList::class.java) {
-                val list = field.get(obj) as PositionList
-                list.setLink(configLink)
+
+            val value = field.get(owner) ?: return@traverseConfig
+            when (value) {
+                is Position -> value.setLink(configLink)
+                is PositionList -> value.setLink(configLink)
             }
         }
         if (missingConfigLink) {
@@ -146,6 +141,27 @@ class ConfigManager {
             println("3. Or add the @NoConfigLink annotation to the field.")
             println("")
             PlatformUtils.shutdownMinecraft("Missing Config Link")
+        }
+    }
+
+    internal fun traverseConfig(
+        obj: Any? = SkyHanniMod.feature,
+        path: List<String> = emptyList(),
+        visited: MutableSet<IdentityCharacteristics<Any>> = mutableSetOf(),
+        action: (owner: Any, field: Field, path: List<String>) -> Unit,
+    ) {
+        if (obj == null) return
+        if (!obj.javaClass.name.startsWith("at.hannibal2.skyhanni.")) return
+
+        val identity = IdentityCharacteristics(obj)
+        if (!visited.add(identity)) return
+
+        for (field in obj.javaClass.declaredFields.map { it.makeAccessible() }) {
+            val fieldPath = path + field.name
+
+            action(obj, field, fieldPath)
+
+            traverseConfig(field.get(obj), fieldPath, visited, action)
         }
     }
 
@@ -305,9 +321,6 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanni
             extraPath = categoryParent.split(".").last() + "."
         }
         extraPath += processedOption.getPath()
-        if (default is GuiOptionEditorKeybind) {
-            UpdateKeybinds.keybinds.add(extraPath)
-        }
 
         EnforcedConfigValues.isBlockedFromEditing(extraPath)?.let { extraMessage ->
             return GuiOptionEditorBlocked(default, extraMessage)
