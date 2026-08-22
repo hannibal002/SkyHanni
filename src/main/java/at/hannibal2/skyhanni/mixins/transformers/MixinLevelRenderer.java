@@ -32,7 +32,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.textures.GpuSampler;
 import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.RenderBuffers;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
@@ -43,7 +42,6 @@ import org.spongepowered.asm.mixin.injection.Slice;
 // The Fabric API event makes our lines render strange
 @Mixin(LevelRenderer.class)
 public abstract class MixinLevelRenderer {
-
     //? if < 26.2 {
     /*@Unique
     PoseStack contextMatrixStack;
@@ -114,7 +112,7 @@ public abstract class MixinLevelRenderer {
     //?} else {
     /*@WrapOperation(
         method = "lambda$addMainPass$0",
-        slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
+        slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucentTerrain")),
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V", ordinal = 0)
     )
     private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, GpuSampler gpuSampler, Operation<Void> original) {
@@ -151,24 +149,4 @@ public abstract class MixinLevelRenderer {
         if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
         SkyHanniOutlineHook.checkIfDepthAttachmentNeedsUpdating();
     }
-
-    //? if < 26.2 {
-    /*@Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"))
-    private void renderSkyhanniGlow(CallbackInfo ci) {
-        if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
-        SkyHanniOutlineHook.getVertexConsumers().endOutlineBatch();
-    }
-
-    @Inject(
-        method = "lambda$addLateDebugPass$0",
-        at = @At(
-            value = "FIELD",
-            target = "Lcom/mojang/blaze3d/systems/RenderSystem;outputDepthTextureOverride:Lcom/mojang/blaze3d/textures/GpuTextureView;",
-            shift = At.Shift.AFTER
-        )
-    )
-    private void renderDeferredSeeThroughText(CallbackInfo ci, @Local MultiBufferSource.BufferSource bufferSource) {
-        WorldRenderUtils.renderDeferredSeeThroughText(bufferSource);
-    }
-    *///?}
 }
