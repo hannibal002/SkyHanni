@@ -58,16 +58,9 @@ object UpdateKeybinds {
 
     private fun migrateKeybind(key: String, map: Map<Int, Int>) {
         val shimmy = Shimmy(SkyHanniMod.feature, key.split(".")) ?: return
-        val value = shimmy.getJson()
-
-        if (!value.isJsonPrimitive || !value.asJsonPrimitive.isNumber) return
-
-        val oldKeyCode = value.asInt
-
-        if (!map.containsKey(oldKeyCode)) return
-        val newKeyCode = map[oldKeyCode]
-
-        shimmy.setJson(ConfigManager.gson.toJsonTree(newKeyCode))
+        val oldKeyCode = shimmy.value as? Int ?: return
+        val newKeyCode = map[oldKeyCode] ?: return
+        shimmy.value = newKeyCode
     }
 
     private fun mapKeyCode(oldKeyCode: Int, newKeyCode: Int) {
