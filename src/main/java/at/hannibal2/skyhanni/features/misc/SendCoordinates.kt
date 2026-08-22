@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -85,7 +85,12 @@ object SendCoordinates {
             // TODO add chroma color support via config
             event.drawColor(location, LorenzColor.DARK_GREEN.toChromaColor(), alpha = 1f)
             event.drawWaypointFilled(location, config.color.toColor(), seeThroughBlocks = true, beacon = true)
-            event.drawString(location.blockCenter(), beacon.name + " §e[${formattedDistance}m]", true, LorenzColor.DARK_BLUE.toColor())
+            event.drawDynamicText(
+                location,
+                beacon.name + " §e[${formattedDistance}m]",
+                1.5,
+                hideTooCloseAt = 0.0,
+            )
         }
     }
 
