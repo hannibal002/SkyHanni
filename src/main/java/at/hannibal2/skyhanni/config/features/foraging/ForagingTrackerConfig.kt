@@ -117,7 +117,8 @@ class ForagingTrackerConfig {
     enum class Timescale(private val displayName: String, val uptimeAsTimescale: Duration.() -> Double) {
         SECOND("Per Second", { this.inPartialSeconds }),
         MINUTE("Per Minute", { this.inPartialMinutes }),
-        HOUR("Per Hour", { this.inPartialHours });
+        HOUR("Per Hour", { this.inPartialHours }),
+        ;
 
         override fun toString() = displayName
 

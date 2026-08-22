@@ -102,7 +102,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeGiftTracker.TreeType, T
         if (config.showWholeTrees && wholeTreesFelled > 0.0) {
             val preambleFormat = "Whole $baseFormat"
             val wholeRenderable = Renderable.hoverTips(
-                Renderable.text("§e$preambleFormat ${wholeTreesFelled.addSeparators()}${wholeTreeGiftsPerHour}"),
+                Renderable.text("§e$preambleFormat ${wholeTreesFelled.addSeparators()}$wholeTreeGiftsPerHour"),
                 tips = bucketData.wholeTreesCut.mapNotNull { (treeType, count) ->
                     if (count <= 0.0) return@mapNotNull null
                     "§7Whole $treeType Trees cut: §a${count.addSeparators()}"
@@ -116,7 +116,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeGiftTracker.TreeType, T
         } else ""
 
         val totalRenderable = Renderable.hoverTips(
-            Renderable.text("§e$baseFormat ${treesContributedTo.addSeparators()}${treeGiftsPerHour}"),
+            Renderable.text("§e$baseFormat ${treesContributedTo.addSeparators()}$treeGiftsPerHour"),
             tips = bucketData.treesCut.mapNotNull { (treeType, count) ->
                 if (count <= 0) return@mapNotNull null
                 "$treeType Tree contributions: §a${count.addSeparators()}"
