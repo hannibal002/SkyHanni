@@ -2,30 +2,27 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.CurrencyApi
+import at.hannibal2.skyhanni.data.NpcTradeApi
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
+import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.LoreCostUtils
 import at.hannibal2.skyhanni.utils.LoreCostUtils.LoreCostEntry
-import at.hannibal2.skyhanni.utils.LoreCostUtils.hasTradeLine
-import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.network.chat.Component
 
@@ -34,11 +31,20 @@ object NpcTradeHelper {
 
     private val config get() = SkyHanniMod.feature.inventory.npcTrade
 
-    private var tradeItems = mapOf<Int, TradeItem>()
+    /** Null when the trades this was built from may have changed since. */
+    private var cachedTradeItems: Map<String, TradeItem>? = null
+
+    /**
+     * Built on first use instead of in an event, so that NpcTradeApi has certainly read the menu
+     * and CurrencyApi has certainly booked a purchase by the time this is read.
+     */
+    private val tradeItems: Map<String, TradeItem>
+        get() = cachedTradeItems ?: buildTradeItems().also { cachedTradeItems = it }
 
     /**
      * [evaluable] is false when the owned amount is unknown, for example a currency SkyHanni
-     * does not track. Such an item is never marked as affordable.
+     * does not track. Such an item is never marked as affordable and shows a question mark
+     * instead of an amount.
      */
     private class CostLine(val rawLine: String, val text: String, val covered: Boolean, val evaluable: Boolean) {
         /** The tooltip adds color codes of its own to the lore line, so the lookup ignores them. */
@@ -50,39 +56,30 @@ object NpcTradeHelper {
     }
 
     @HandleEvent
-    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        updateItems(event.inventoryItems)
+    private fun onInventoryFullyOpened() {
+        cachedTradeItems = null
     }
 
     @HandleEvent
-    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        updateItems(event.inventoryItems)
+    private fun onInventoryUpdated() {
+        cachedTradeItems = null
     }
 
     @HandleEvent
     private fun onInventoryClose() {
-        tradeItems = emptyMap()
+        cachedTradeItems = null
     }
 
-    private fun updateItems(inventoryItems: Map<Int, SafeItemStack>) {
-        if (!isEnabled()) {
-            tradeItems = emptyMap()
-            return
-        }
-        tradeItems = buildMap {
-            for ((slot, item) in inventoryItems) {
-                readTradeItem(item)?.let { put(slot, it) }
-            }
-        }
+    // the purchase changed what the player owns, every affordability mark is stale now
+    @HandleEvent
+    private fun onNpcTrade() {
+        cachedTradeItems = null
     }
 
-    private fun readTradeItem(item: SafeItemStack): TradeItem? {
-        val lore = item.getLoreComponent().map { it.formattedTextCompatLessResets() }
-        if (!lore.hasTradeLine()) return null
+    private fun buildTradeItems(): Map<String, TradeItem> =
+        NpcTradeApi.trades.mapValues { (_, trade) -> buildTradeItem(trade.costs) }
 
-        val costs = lore.readLoreCosts(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
-        if (costs.isEmpty()) return null
-
+    private fun buildTradeItem(costs: List<LoreCostEntry>): TradeItem {
         var coinTotal = 0.0
         val otherCosts = mutableListOf<String>()
         val lines = costs.map { entry ->
@@ -110,33 +107,36 @@ object NpcTradeHelper {
         val owned = when {
             internalName == NeuInternalName.MISSING_ITEM -> null
             currency != null -> currency.getOwnedAmountOrNull()
+            // essence is a repo item, but it is not carried in the inventory and cannot be counted
+            internalName.isEssence() -> CurrencyApi.getEssenceOrNull(internalName)
             else -> internalName.getAmountInInventory().toLong()
         }
         val covered = owned != null && owned >= amount
 
         val suffix = when {
-            owned == null -> ""
+            internalName == NeuInternalName.MISSING_ITEM -> "§c!"
+            owned == null -> " §8?§7/§8${amount.addSeparators()}"
             covered -> " §a✔"
             else -> " §8${owned.addSeparators()}§7/§8${amount.addSeparators()}"
         }
         val sacks = if (currency == null) internalName.getAmountInSacksOrNull() ?: 0 else 0
         val sackText = if (sacks > 0) " §7(sacks: §a${sacks.addSeparators()}§7)" else ""
 
-        // currencies other than coins have no price, getPriceName would show a "(0)" behind them
-        val name = if (currency != null && currency.coinValue == null) {
-            currency.formatAmount(amount)
-        } else {
-            internalName.getPriceName(amount)
+        val name = when {
+            // the line could not be read, leaving it untouched beats replacing it with a broken name
+            internalName == NeuInternalName.MISSING_ITEM -> entry.rawLine
+            // currencies other than coins have no price, getPriceName would show a "(0)" behind them
+            currency != null && currency.coinValue == null -> currency.formatAmount(amount)
+            else -> internalName.getPriceName(amount)
         }
 
         return CostLine(entry.rawLine, name + suffix + sackText, covered, owned != null)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     private fun onToolTip(event: ToolTipTextEvent) {
         if (!config.costBreakdown) return
-        val slot = event.slot?.index ?: return
-        val tradeItem = tradeItems[slot] ?: return
+        val tradeItem = tradeItems[event.itemStack.cleanName] ?: return
 
         for ((index, component) in event.toolTip.withIndex()) {
             // the tooltip prefixes every lore line, the lines from the item itself do not have it
@@ -153,17 +153,17 @@ object NpcTradeHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!config.highlightAffordable || tradeItems.isEmpty()) return
 
         for (slot in event.container.slots) {
-            val tradeItem = tradeItems[slot.index] ?: continue
-            if (tradeItem.canAfford) {
+            // the trades outlive the menu, an item of the same name in the player inventory is not one
+            if (!slot.isTopInventory()) continue
+            val item = slot.item.takeUnlessEmpty() ?: continue
+            if (tradeItems[item.cleanName]?.canAfford == true) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }
     }
-
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && (config.highlightAffordable || config.costBreakdown)
 }
