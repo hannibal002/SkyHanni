@@ -44,7 +44,7 @@ object GuiData {
         if (allowedKeys.any { it.isActive() }) return
         if (GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) return
 
-        if (CustomLoadoutKeybinds.allowKeyboardClick()) return
+        if (CustomLoadoutKeybinds.allowInput()) return
 
         if (preDrawEventCancelled) event.cancel()
     }
