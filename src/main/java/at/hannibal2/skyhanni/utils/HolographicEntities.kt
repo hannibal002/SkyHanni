@@ -27,7 +27,6 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 
 //? if >= 26.2 {
-import net.minecraft.client.renderer.SubmitNodeStorage
 import net.minecraft.util.LightCoordsUtil
 //?} else {
 /*import net.minecraft.client.renderer.LevelRenderer
@@ -38,12 +37,11 @@ import net.minecraft.util.LightCoordsUtil
  */
 @SkyHanniModule
 object HolographicEntities {
-
     private var debugHologram: HolographicEntity<Zombie>? = null
     private var debugHologramTransparency: Float = 1f
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shdebughologram") {
             description = "Spawns a holographic zombie 5 blocks in front of you for testing"
             category = CommandCategory.DEVELOPER_TEST
@@ -79,7 +77,7 @@ object HolographicEntities {
 
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         val hologram = debugHologram ?: return
         event.renderHolographicEntity(hologram, opacity = debugHologramTransparency)
     }
@@ -196,8 +194,8 @@ object HolographicEntities {
         //~ if < 26.2 'gameRenderState()' -> 'gameRenderState'
         val cameraRenderState = gameRenderer.gameRenderState().levelRenderState.cameraRenderState
         val cameraPos = cameraRenderState.pos
-        //~ if < 26.2 'SubmitNodeStorage()' -> 'gameRenderer.featureRenderDispatcher.submitNodeStorage'
-        val submitNodeCollector = SubmitNodeStorage()
+        //~ if < 26.2 'submitNodeStorage' -> 'gameRenderer.featureRenderDispatcher.submitNodeStorage'
+        val submitNodeCollector = submitNodeStorage
         renderer.extractRenderState(entity, entityRenderState, partialTicks)
         entityRenderState.`skyhanni$setEntity`(entity)
         (entityRenderState as? LivingEntityRenderState)?.isBaby = holographicEntity.isChild
@@ -218,8 +216,6 @@ object HolographicEntities {
                     matrices,
                     submitNodeCollector,
                 )
-                //? if >= 26.2
-                gameRenderer.featureRenderDispatcher().renderAllFeatures(submitNodeCollector)
             }
         } finally {
             activeHolographicEntities.remove(entity)
