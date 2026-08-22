@@ -144,11 +144,18 @@ class ConfigManager {
         }
     }
 
-    internal fun traverseConfig(
-        obj: Any? = SkyHanniMod.feature,
-        path: List<String> = emptyList(),
-        visited: MutableSet<IdentityCharacteristics<Any>> = mutableSetOf(),
-        action: (owner: Any, field: Field, path: List<String>) -> Unit,
+    fun traverseConfig(
+        obj: Any?,
+        action: (owner: Any, field: Field, path: String) -> Unit,
+    ) {
+        traverseConfig(obj, "", mutableSetOf(), action)
+    }
+
+    private  fun traverseConfig(
+        obj: Any?,
+        path: String,
+        visited: MutableSet<IdentityCharacteristics<Any>>,
+        action: (owner: Any, field: Field, path: String) -> Unit,
     ) {
         if (obj == null) return
         if (!obj.javaClass.name.startsWith("at.hannibal2.skyhanni.")) return
@@ -157,7 +164,7 @@ class ConfigManager {
         if (!visited.add(identity)) return
 
         for (field in obj.javaClass.declaredFields.map { it.makeAccessible() }) {
-            val fieldPath = path + field.name
+            val fieldPath = if (path.isEmpty()) field.name else "$path.${field.name}"
 
             action(obj, field, fieldPath)
 

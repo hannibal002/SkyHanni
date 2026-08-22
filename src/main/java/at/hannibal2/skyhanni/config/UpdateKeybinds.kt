@@ -2,15 +2,12 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 
 @SkyHanniModule
 object UpdateKeybinds {
@@ -54,8 +51,10 @@ object UpdateKeybinds {
     }
 
     private fun migrateKeybinds(map: Map<Int, Int>) {
-        for (keybind in findKeybinds()) {
-            migrateKeybind(keybind, map)
+        SkyHanniConfigSearchResetCommand.findKeybinds { keybinds ->
+            for (keybind in keybinds) {
+                migrateKeybind(keybind, map)
+            }
         }
     }
 
@@ -67,38 +66,9 @@ object UpdateKeybinds {
         shimmy.value = newKeyCode
     }
 
-    private fun findKeybinds(): Set<String> {
-        return buildSet {
-            SkyHanniMod.configManager.traverseConfig { _, field, path ->
-                if (field.getAnnotation(ConfigEditorKeybind::class.java) != null) {
-                    add(path.joinToString("."))
-                }
-            }
-        }
-    }
-
     private fun mapKeyCode(oldKeyCode: Int, newKeyCode: Int) {
         olderToNewerKeys[oldKeyCode] = newKeyCode
         newerToOlderKeys[newKeyCode] = oldKeyCode
-    }
-
-    @HandleEvent
-    private fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shresetkeybinds") {
-            category = USERS_RESET
-            description = "Resets all of your skyhanni keybinds"
-            aliases = listOf("shkeybindreset")
-
-            simpleCallback {
-                for (keybind in findKeybinds()) {
-                    SkyHanniConfigSearchResetCommand.resetCommand(
-                        arrayOf("reset", "config.$keybind"),
-                    )
-                }
-
-                ChatUtils.chat("§aSuccessfully reset all SkyHanni Keybinds")
-            }
-        }
     }
 
     // Has been prefiltered to not include any keybinds that are the same in both versions

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.SkyHanniConfig
@@ -15,8 +16,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateFieldValue
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import com.google.gson.JsonElement
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.observer.Property
 import java.io.File
 import java.lang.reflect.Field
@@ -35,6 +38,8 @@ object SkyHanniConfigSearchResetCommand {
 
     private var lastCommand = emptyArray<String>()
 
+    private val defaultConfig by lazy { SkyHanniConfig() }
+
     private fun runCommand(args: Array<String>): String = if (args.isEmpty()) {
         "§cThis is a powerful config-edit command, only use it if you know what you are doing!"
     } else when (args[0].lowercase()) {
@@ -52,7 +57,7 @@ object SkyHanniConfigSearchResetCommand {
         if (term.startsWith("profileSpecific")) return "§cCannot reset profileSpecific! Use §e/shconfig set §cinstead."
 
         try {
-            val (field, defaultObject, _) = getComplexField(term, SkyHanniConfig())
+            val (field, defaultObject, _) = getComplexField(term, defaultConfig)
             val (_, _, parent) = getComplexField(term, SkyHanniMod.feature)
             val affectedElements = findConfigElements({ it.startsWith("$term.") }, { true }).size
             if (affectedElements > 3 && !args.contentEquals(lastCommand)) {
@@ -186,6 +191,7 @@ object SkyHanniConfigSearchResetCommand {
         return "§eCopied search result ($size) to clipboard."
     }
 
+    // TODO: Use ConfigManager.traverseConfig instead of reflection to find config elements
     private fun findConfigElements(
         configFilter: (String) -> Boolean,
         classFilter: (String) -> Boolean,
@@ -361,8 +367,20 @@ object SkyHanniConfigSearchResetCommand {
         else -> toString()
     }
 
+    internal fun findKeybinds(action: (Set<String>) -> Unit) = CoroutineSettings("findKeybinds").launch {
+        val configManager = SkyHanniMod.configManager
+        val set = buildSet {
+            configManager.traverseConfig(SkyHanniMod.feature) { _, field, path ->
+                if (field.getAnnotation(ConfigEditorKeybind::class.java) != null) {
+                    add(path)
+                }
+            }
+        }
+        action(set)
+    }
+
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shconfig") {
             description = "Searches or resets config elements §c(warning, dangerous!)"
             category = CommandCategory.DEVELOPER_DEBUG
@@ -371,6 +389,22 @@ object SkyHanniConfigSearchResetCommand {
                     ChatUtils.chat(runCommand(it))
                 }
                 lastCommand = it
+            }
+        }
+        event.registerBrigadier("shresetkeybinds") {
+            category = CommandCategory.DEVELOPER_DEBUG
+            description = "Resets all of your SkyHanni keybinds"
+            aliases = listOf("shkeybindreset")
+            simpleCallback {
+                findKeybinds { keybinds ->
+                    for (keybind in keybinds) {
+                        // TODO: Have some bulk reset command
+                        resetCommand(
+                            arrayOf("reset", "config.$keybind"),
+                        )
+                    }
+                    ChatUtils.chat("§aSuccessfully reset all SkyHanni Keybinds")
+                }
             }
         }
     }
