@@ -42,7 +42,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PetUtils
@@ -241,7 +240,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
                     ?.let { PetUtils.petWithRarityToInternalName(itemName, it) }
                 ?: return@matchStyledMatcher
             val pest = PestType.getByItemInternalNameOrNull(internalName) ?: return@matchStyledMatcher
-            val amount = matcher.group("amount")?.formatIntOrNull() ?: 1
+            val amount = matcher.group("amount")?.toIntOrNull() ?: 1
 
             addItem(pest, internalName, amount, command = false)
 
