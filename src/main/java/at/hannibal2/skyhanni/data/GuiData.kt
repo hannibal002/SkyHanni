@@ -35,7 +35,7 @@ object GuiData {
 
     @HandleEvent
     fun onMouseInput(event: GuiMouseInputEvent) {
-        if (CustomLoadoutKeybinds.allowMouseClick()) return
+        if (CustomLoadoutKeybinds.allowInput()) return
 
         if (preDrawEventCancelled) event.cancel()
     }
@@ -52,7 +52,7 @@ object GuiData {
         if (allowedKeys.any { it.isActive() }) return
         if (InputConstants.KEY_ESCAPE.isKeyHeld()) return
 
-        if (CustomLoadoutKeybinds.allowKeyboardClick()) return
+        if (CustomLoadoutKeybinds.allowInput()) return
 
         if (preDrawEventCancelled) event.cancel()
     }
