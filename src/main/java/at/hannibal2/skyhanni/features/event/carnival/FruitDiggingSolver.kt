@@ -293,7 +293,7 @@ class FruitDiggingSolver(private val size: Int = 7) {
                     for ((content, p) in distribution(nb)) if (content.isEdible) expectedFruitNearby += p
                 }
             }
-            return if (expectedFruitNearby >= 0.25) "Anchor" else "Mines"
+            return if (expectedFruitNearby >= 0.25) "§bAnchor" else "§fMines"
         }
 
         fun recommend(): Recommendation? {
