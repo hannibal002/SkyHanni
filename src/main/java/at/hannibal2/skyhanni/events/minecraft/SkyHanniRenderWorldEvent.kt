@@ -19,8 +19,4 @@ class SkyHanniRenderWorldEvent(
     val submitNodeStorage: SubmitNodeStorage,
     val partialTicks: Float,
     var isCurrentlyDeferring: Boolean = true,
-) : SkyHanniEvent() {
-
-    //? if >= 26.2
-    internal var skyHanniTextSubmitOrder = 0
-}
+) : SkyHanniEvent()

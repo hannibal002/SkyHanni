@@ -53,9 +53,7 @@ object WorldRenderUtils {
 
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
-    //? if >= 26.2 {
-    private const val SKYHANNI_TEXT_SUBMIT_ORDER = 10_000
-    //?} else {
+    //? if < 26.2 {
     /*// 26.1 composites entity render targets over the main target after the normal world-render hook.
     // Drawing see-through text in the late pass prevents entities from covering it (MC-265743).
     private val deferredSeeThroughText = mutableListOf<(MultiBufferSource.BufferSource) -> Unit>()
@@ -84,8 +82,8 @@ object WorldRenderUtils {
         backgroundColor: Int,
         outlineColor: Int,
     ) {
-        val order = SKYHANNI_TEXT_SUBMIT_ORDER + skyHanniTextSubmitOrder++
-        submitNodeStorage.order(order).submitText(
+        // The order ensures see-through text renders over our custom geometry, like on 26.1.
+        submitNodeStorage.order(1).submitText(
             matrices,
             x,
             y,
