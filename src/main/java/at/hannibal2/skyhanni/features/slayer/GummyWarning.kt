@@ -13,12 +13,12 @@ import at.hannibal2.skyhanni.features.misc.effects.NonGodPotEffectDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -48,12 +48,12 @@ object GummyWarning {
     private val display = Renderable.text("§4§lNo Polar Bear Active!", scale = 2.0)
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onAreaChange(event: GraphAreaChangeEvent) {
-        inSmolderingArea = smolderingAreaPattern.matches(SkyBlockUtils.graphArea)
+    private fun onAreaChange(event: GraphAreaChangeEvent) {
+        inSmolderingArea = smolderingAreaPattern.matches(event.area)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onArmorChange(event: OwnInventoryArmorUpdateEvent) {
+    private fun onArmorChange(event: OwnInventoryArmorUpdateEvent) {
         if (!config.gummyWarning) return
         val armor = InventoryUtils.getArmor()
         hasHabanero = armor.any { piece ->
@@ -64,7 +64,7 @@ object GummyWarning {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+    private fun onItemInHandChange(event: ItemInHandChangeEvent) {
         if (!isEnabled()) return
         val activeSlayer = SlayerApi.activeType ?: run {
             holdingSlayerWeapon = false
@@ -74,7 +74,7 @@ object GummyWarning {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityClick(event: EntityClickEvent) {
+    private fun onEntityClick(event: EntityClickEvent) {
         if (!isEnabled()) return
         if (event.action != EntityClickEvent.ActionType.ATTACK) return
         if (!holdingSlayerWeapon) return
@@ -90,15 +90,17 @@ object GummyWarning {
         DelayedRun.runDelayed(0.5.seconds) {
             lastWarningShown = SimpleTimeMark.now()
             SoundUtils.createSound("block.anvil.land", 0.5f).playSound()
-            ChatUtils.notifyOrDisable(
+            ChatUtils.clickToActionOrDisable(
                 message = "You do not have an active Re-Heated Gummy Polar Bear!",
                 option = config::gummyWarning,
+                actionName = "Open Bazaar",
+                action = { HypixelCommands.bazaar("Re-Heated Gummy Polar Bear") },
             )
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    private fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (lastWarningShown.passedSince() > 3.seconds) return
         config.gummyWarningPosition.renderRenderable(display, posLabel = "Gummy Warning")
