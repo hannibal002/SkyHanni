@@ -40,18 +40,13 @@ object BestiaryMobHighlights {
 
     @HandleEvent
     private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!isEnabled()) return
-        if (!BestiaryApi.isMobVariants) return
+        if (!config.enabled.get()) return
+        val state = BestiaryApi.currentState as? BestiaryApi.BestiaryGuiState.Variants ?: return
+
         if (event.clickedButton != KeyboardManager.MIDDLE_MOUSE) return
-
-        val slot = event.slot ?: return
-
-        val variant = BestiaryApi.mobVariants
-            .find { it.slot == slot.index }
-            ?: return
-
-        val family = BestiaryApi.currentFamily?.cleanName
-            ?: return
+        val slotIndex = event.slot?.index ?: return
+        val variant = state.variants[slotIndex] ?: return
+        val family = state.parentFamily?.cleanName ?: return
 
         event.cancel()
 
@@ -74,36 +69,34 @@ object BestiaryMobHighlights {
     }
 
     private fun rebuildMarkedInventoryEntries() {
-        markedInventoryEntries = when {
-            BestiaryApi.isMobVariants -> {
-                val family = BestiaryApi.currentFamily?.cleanName ?: return
+        markedInventoryEntries = when (val state = BestiaryApi.currentState) {
+            is BestiaryApi.BestiaryGuiState.Variants -> {
+                val family = state.parentFamily?.cleanName ?: return
 
-                BestiaryApi.mobVariants
-                    .filter { variant ->
+                state.variants
+                    .filterValues { variant ->
                         entries.any {
                             it.matchesVariant(family, variant)
                         }
                     }
-                    .mapNotNull { it.slot }
-                    .toSet()
+                    .keys
             }
-            BestiaryApi.isCategoryOfMobs -> {
-                BestiaryApi.mobList
-                    .filter { mob ->
+            is BestiaryApi.BestiaryGuiState.Mobs -> {
+                state.mobs
+                    .filterValues { mob ->
                         entries.any {
                             it.family == mob.cleanName
                         }
                     }
-                    .mapNotNull { it.slot }
-                    .toSet()
+                    .keys
             }
-
             else -> emptySet()
         }
     }
 
     private fun isEnabled(): Boolean {
+        val state = BestiaryApi.currentState
         return config.enabled.get() &&
-            (BestiaryApi.isCategoryOfMobs || BestiaryApi.isMobVariants)
+            (state is BestiaryApi.BestiaryGuiState.Mobs || state is BestiaryApi.BestiaryGuiState.Variants)
     }
 }
