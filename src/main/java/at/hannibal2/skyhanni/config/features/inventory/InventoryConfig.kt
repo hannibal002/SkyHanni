@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.inventory.customloadout.CustomLoado
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
 import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig
+import at.hannibal2.skyhanni.config.features.inventory.npctrade.NpcTradeConfig
 import at.hannibal2.skyhanni.config.features.inventory.sacks.OutsideSackValueConfig
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
@@ -182,10 +183,16 @@ class InventoryConfig {
     @SearchTag(EVOLVING_ITEMS_SEARCH_TAG)
     val evolvingItems: EvolvingItemsConfig = EvolvingItemsConfig()
 
+    // TODO rename to playerTrade
     @Expose
-    @ConfigOption(name = "Trade Value", desc = "Creates a trade value overlay")
+    @ConfigOption(name = "Player Trade", desc = "Creates a trade value overlay")
     @Accordion
-    val trade: TradeConfig = TradeConfig()
+    val trade: PlayerTradeConfig = PlayerTradeConfig()
+
+    @Expose
+    @ConfigOption(name = "NPC Trade", desc = "")
+    @Accordion
+    val npcTrade: NpcTradeConfig = NpcTradeConfig()
 
     @Expose
     @ConfigOption(name = "Close Prevention", desc = "")

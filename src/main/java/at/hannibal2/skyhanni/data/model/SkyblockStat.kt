@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import org.intellij.lang.annotations.Language
@@ -116,7 +118,7 @@ enum class SkyblockStat(
 
     // <editor-fold desc="Hunting Stats">
     PULL(AQUA, '\uE02D'),
-    HUNTER_FORTUNE(LIGHT_PURPLE, '\uE05B'),
+    HUNTING_FORTUNE(LIGHT_PURPLE, '\uE05B'),
     CHARM_CHANCE(AQUA, '❣'),
     // </editor-fold>
 
@@ -227,7 +229,7 @@ enum class SkyblockStat(
         private const val PLAYER_STATS_SLOT_INDEX = 13
 
         private fun onSkyblockMenu(event: InventoryFullyOpenedEvent) {
-            if (event.inventoryName != "SkyBlock Menu") return
+            if (!UtilsPatterns.skyblockMenuInventory.isInside()) return
             val list = event.inventoryItems[PLAYER_STATS_SLOT_INDEX]?.getCleanLore() ?: return
             DelayedRun.runNextTick { // Delayed to not impact opening time
                 assignEntry(list, StatSourceType.SKYBLOCK_MENU) { it.menuPattern }
@@ -237,7 +239,7 @@ enum class SkyblockStat(
         private val statsMenuRelevantSlotIndexes = listOf(14, 15, 16, 23, 24, 25, 32, 33, 34)
 
         private fun onStatsMenu(event: InventoryFullyOpenedEvent) {
-            if (event.inventoryName != "Your Equipment and Stats") return
+            if (!CurrentEquipmentApi.inventory.isInside()) return
             val list = statsMenuRelevantSlotIndexes
                 .mapNotNull { event.inventoryItems[it]?.getCleanLore() }
                 .flatten()
@@ -271,6 +273,13 @@ enum class SkyblockStat(
             event.move(69, "#profile.stats.TRUE_DEFENCE", "#profile.stats.TRUE_DEFENSE")
             event.move(112, "#profile.stats.NETHER_WART_FORTUNE", "#profile.stats.NETHER_STALK_FORTUNE")
             event.remove(113, "#profile.stats.null")
+            event.move(141, "#profile.stats.HUNTER_FORTUNE", "#profile.stats.HUNTING_FORTUNE")
+            // Stats are stored under their lowercase name, so none of the renames above ever matched anything
+            event.move(142, "#profile.stats.true_defence", "#profile.stats.true_defense")
+            event.move(142, "#profile.stats.nether_wart_fortune", "#profile.stats.nether_stalk_fortune")
+            event.move(142, "#profile.stats.hunter_fortune", "#profile.stats.hunting_fortune")
+            // Left behind by stats that were read back while their rename was still missing
+            event.remove(142, "#profile.stats.unknown")
         }
     }
 }

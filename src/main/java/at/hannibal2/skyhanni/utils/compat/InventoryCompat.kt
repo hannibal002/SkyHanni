@@ -1,11 +1,15 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.compat.ReiCompat
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.client.gui.screens.inventory.MenuAccess
+import net.minecraft.client.input.KeyEvent
+import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ContainerInput
@@ -13,31 +17,10 @@ import net.minecraft.world.inventory.Slot
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-// TODO 26.1 REI compat needed
-//? if < 26.1
-//import at.hannibal2.skyhanni.compat.ReiCompat
-
 fun LocalPlayer.getItemOnCursor(): SafeItemStack? {
     val stack = this.containerMenu.carried
     if (stack.isEmpty) return null
     return stack
-}
-
-fun stackUnderCursor(): SafeItemStack? {
-    val screen = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return null
-    val stack = screen.hoveredSlot?.item
-    if (stack != null) return stack
-    // TODO 26.1 REI compat needed
-//? if < 26.1 {
-     /*return ReiCompat.getHoveredStackFromRei()
-*///?} else {
-    return null
-//?}
-}
-
-fun slotUnderCursor(): Slot? {
-    val screen = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return null
-    return screen.hoveredSlot
 }
 
 val ContainerScreen.container: AbstractContainerMenu
@@ -46,12 +29,36 @@ val ContainerScreen.container: AbstractContainerMenu
 object InventoryCompat {
 
     /**
+     * Use [at.hannibal2.skyhanni.events.GuiKeyPressEvent.stackUnderCursor] instead of this method
+     */
+    fun stackUnderCursor(): SafeItemStack? {
+        val screen = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return null
+        val stack = screen.hoveredSlot?.item
+        if (stack != null) return stack
+        return ReiCompat.getHoveredStackFromRei()
+    }
+
+    @Suppress("unused")
+    fun stackUnderCursor(keyEvent: KeyEvent): SafeItemStack? {
+        return stackUnderCursor()
+    }
+
+    @Suppress("unused")
+    fun stackUnderCursor(mouseButtonEvent: MouseButtonEvent): SafeItemStack? {
+        return stackUnderCursor()
+    }
+
+    fun slotUnderCursor(): Slot? {
+        val screen = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return null
+        return screen.hoveredSlot
+    }
+
+    /**
      * Internal method, not meant to be called directly. Prefer [InventoryUtils.clickSlot].
      */
     internal fun clickInventorySlot(windowId: Int, slotId: Int, mouseButton: Int, mode: ContainerInput) {
         val controller = Minecraft.getInstance().gameMode ?: return
         val player = MinecraftCompat.localPlayerOrNull ?: return
-        //~ if < 26.1 'handleContainerInput' -> 'handleInventoryMouseClick'
         controller.handleContainerInput(windowId, slotId, mouseButton, mode, player)
     }
 
@@ -71,7 +78,7 @@ object InventoryCompat {
         container.menu.slots
 
     fun getWindowIdOrNull(): Int? =
-        (MinecraftCompat.screen as? ContainerScreen)?.menu?.containerId
+        (MinecraftCompat.screen as? MenuAccess<*>)?.menu?.containerId
 
     fun getWindowId(): Int =
         getWindowIdOrNull() ?: ErrorManager.skyHanniError("windowId is null")

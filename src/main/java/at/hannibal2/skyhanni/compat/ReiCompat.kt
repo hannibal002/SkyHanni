@@ -1,15 +1,16 @@
-@file:Suppress("NoEmptyFile")
-
 package at.hannibal2.skyhanni.compat
-// TODO 26.1 rei compat needed
-//? if < 26.1 {
-/*import at.hannibal2.skyhanni.utils.SafeItemStack
+
+import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import me.shedaniel.math.impl.PointHelper
+import me.shedaniel.math.Point
 import me.shedaniel.rei.api.client.REIRuntime
 import me.shedaniel.rei.api.client.gui.widgets.Slot
 import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry
-import net.minecraft.client.Minecraft
+import me.shedaniel.rei.api.common.entry.type.EntryTypeRegistry
+import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes
+import me.shedaniel.rei.api.common.plugins.PluginManager
 import net.minecraft.client.gui.components.events.ContainerEventHandler
 import net.minecraft.client.gui.components.events.GuiEventListener
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
@@ -20,8 +21,8 @@ object ReiCompat {
 
     @JvmStatic
     fun searchHasFocus(): Boolean {
-        if (!isReiLoaded) return false
-        if (Minecraft.getInstance().screen == null) return false
+        if (!isReiReady()) return false
+        if (MinecraftCompat.screen == null) return false
         return try {
             (REIRuntime.getInstance().searchTextField as? GuiEventListener)?.isFocused == true
         } catch (e: Throwable) {
@@ -30,37 +31,40 @@ object ReiCompat {
     }
 
     fun getHoveredStackFromRei(): SafeItemStack? {
-        if (!isReiLoaded) return null
-        try {
-            REIRuntime.getInstance()
+        if (!isReiReady()) return null
+        return try {
+            getItemStackFromItemList() ?: (MinecraftCompat.screen as? AbstractContainerScreen<*>)
+                ?.let(::getItemStackFromRecipe)
         } catch (e: Throwable) {
-            return null
+            null
         }
-        var stack = getItemStackFromItemList()
-        if (stack == null) {
-            val screen = Minecraft.getInstance().screen
-            if (screen !is AbstractContainerScreen<*>) return null
-            stack = getItemStackFromRecipe(screen)
-        }
-        return stack
     }
 
+    private fun isReiReady(): Boolean {
+        if (!isReiLoaded) return false
+        return try {
+            !PluginManager.areAnyReloading() &&
+                EntryTypeRegistry.getInstance().get(VanillaEntryTypes.ITEM.id) != null
+        } catch (e: Throwable) {
+            false
+        }
+    }
 
     private fun getItemStackFromRecipe(screen: AbstractContainerScreen<*>): SafeItemStack? {
-        val entryStack = ScreenRegistry.getInstance().getFocusedStack(screen, PointHelper.ofMouse())
+        val entryStack = ScreenRegistry.getInstance().getFocusedStack(screen, currentMousePoint())
             ?: return null
         return entryStack.value as? SafeItemStack ?: entryStack.cheatsAs().value
     }
 
     private fun getItemStackFromItemList(): SafeItemStack? {
         var baseElement: GuiEventListener? = REIRuntime.getInstance().overlay.orElse(null)
-        val mx = PointHelper.getMouseFloatingX()
-        val my = PointHelper.getMouseFloatingY()
+        val mousePoint = currentMousePoint()
         while (true) {
             if (baseElement is Slot) return baseElement.currentEntry.cheatsAs().value
             if (baseElement !is ContainerEventHandler) return null
-            baseElement = baseElement.getChildAt(mx, my).orElse(null)
+            baseElement = baseElement.getChildAt(mousePoint.x.toDouble(), mousePoint.y.toDouble()).orElse(null)
         }
     }
+
+    private fun currentMousePoint(): Point = Point(MouseCompat.getX(), MouseCompat.getY())
 }
-*///?}

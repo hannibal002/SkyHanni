@@ -9,20 +9,12 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.WhenT
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isPestCountInaccurate
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isPlayerInside
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.pests
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.renderPlot
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.sendTeleportTo
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlot
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi.renderPlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -50,7 +42,7 @@ object PestFinder {
     private var display = emptyList<Renderable>()
 
     @HandleEvent
-    fun onPestUpdate(event: PestUpdateEvent) {
+    private fun onPestUpdate() {
         update()
     }
 
@@ -124,7 +116,7 @@ object PestFinder {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    private fun onIslandChange() {
         display = listOf()
         update()
     }
@@ -170,7 +162,7 @@ object PestFinder {
 
     // priority to low so that this happens after other renderPlot calls.
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
         if (!shouldShowBasedOnHeldItem() && timePassedDisabled()) return
@@ -196,7 +188,7 @@ object PestFinder {
     }
 
     private fun drawName(
-        plot: GardenPlotApi.Plot,
+        plot: GardenPlot,
         playerLocation: LorenzVec,
         event: SkyHanniRenderWorldEvent,
     ) {
@@ -214,14 +206,14 @@ object PestFinder {
     private var lastKeyPress = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.noPestTitle) return
 
         if (PestApi.noPestsChatPattern.matches(event.message)) TitleManager.sendTitle("§eNo pests!", duration = 2.seconds)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onKeyPress(event: KeyPressEvent) {
+    private fun onKeyPress(event: KeyPressEvent) {
         if (MinecraftCompat.screen != null) return
 
         if (event.keyCode != config.teleportHotkey) return
@@ -229,13 +221,6 @@ object PestFinder {
         lastKeyPress = SimpleTimeMark.now()
 
         teleportNearestInfestedPlot()
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onPlaySound(event: PlaySoundEvent) {
-        if (PestApi.config.muteVacuum && event.soundName == "entity.wither.shoot") {
-            event.cancel()
-        }
     }
 
     private fun teleportNearestInfestedPlot() {
@@ -260,7 +245,7 @@ object PestFinder {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtpinfested") {
             description = "Teleports you to the nearest infested plot"
             category = CommandCategory.USERS_ACTIVE
@@ -271,7 +256,7 @@ object PestFinder {
     private fun isEnabled() = GardenApi.inGarden() && (config.showDisplay || config.showPlotInWorld)
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(97, "garden.pests.pestFinder.muteVacuum", "garden.pests.muteVacuum")
         event.move(97, "garden.pests.pestFinder.onlyWithVacuum", "garden.pests.pestFinder.whenToShow") {
             ConfigUtils.migrateBooleanToEnum(it, WhenToShow.BOTH, WhenToShow.ALWAYS)

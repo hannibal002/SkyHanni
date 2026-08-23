@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.chat.ShortenCoins.formatChatCoins
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -36,13 +35,6 @@ object BazaarCancelledBuyOrderClipboard {
         "(?:coins from |from |)(?<amount>.*)x missing items\\.",
     )
 
-    /**
-     * REGEX-TEST: [Bazaar] Cancelled! Refunded 12,345 coins from cancelling Buy Order!
-     */
-    private val cancelledMessagePattern by patternGroup.pattern(
-        "cancelledmessage.colorless",
-        "\\[Bazaar] Cancelled! Refunded (?<coins>.*) coins from cancelling Buy Order!"
-    )
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventorytitle",
         "Order options",
@@ -51,13 +43,13 @@ object BazaarCancelledBuyOrderClipboard {
     private var latestAmount: Int? = null
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!inventoryTitlePattern.matches(event.inventoryName)) return
         val stack = event.inventoryItems[11] ?: return
         if (!stack.hoverName.string.contains("Cancel Order")) return
 
-        val lore = stack.getLoreComponent().map { it.string.removeColor() }
+        val lore = stack.getCleanLore()
         lastAmountPattern.firstMatcher(lore) {
             latestAmount = group("amount").formatInt()
             return
@@ -76,9 +68,9 @@ object BazaarCancelledBuyOrderClipboard {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        val coins = cancelledMessagePattern.matchMatcher(event.cleanMessage) {
+        val coins = BazaarOrderApi.cancelledPattern.matchMatcher(event.cleanMessage) {
             group("coins").formatDouble()
         } ?: return
 

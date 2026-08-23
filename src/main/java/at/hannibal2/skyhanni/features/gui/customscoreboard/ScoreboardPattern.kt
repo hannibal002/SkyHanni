@@ -257,7 +257,7 @@ object ScoreboardPattern {
      */
     val tokensPattern by kuudraSB.pattern(
         "tokens",
-        "(?:§.)*Tokens: §.[\\w,]+",
+        "(?:§.)*Tokens: §.(?<tokens>[\\w,]+)",
     )
 
     /**
@@ -313,7 +313,7 @@ object ScoreboardPattern {
      */
     val peltsPattern by farmingSB.pattern(
         "pelts",
-        "(?:§.)*Pelts: (?:§.)*[\\d,]+.*",
+        "(?:§.)*Pelts: (?:§.)*(?<pelts>[\\d,]+).*",
     )
 
     /**
@@ -945,10 +945,11 @@ object ScoreboardPattern {
      * REGEX-TEST: Whispers: §3141§b (+1)
      * REGEX-TEST: Whispers: §317.5k§b (+50)
      * REGEX-TEST: §fWhispers: §317k§b (+40)
+     * REGEX-TEST: §fWhispers: §64.2k§b (+44)
      */
     val whispersPattern by galateaSB.pattern(
         "whispers",
-        "(?:§f)?Whispers: §3[\\w,.]+.*",
+        "(?:§f)?Whispers: §[36][\\w,.]+.*",
     )
 
     /**
@@ -966,6 +967,26 @@ object ScoreboardPattern {
     val agathasContestPattern by galateaSB.pattern(
         "agathas-contest",
         "§eAgatha's Contest §a.*",
+    )
+
+    /**
+     * REGEX-TEST: §eMiria's Contest §a0m35s
+     */
+    val miriasContestPattern by galateaSB.pattern(
+        "mirias-contest",
+        "§eMiria's Contest §a.*",
+    )
+
+    // Safari
+    private val safariSB = scoreboardGroup.group("safari")
+
+    /**
+     * REGEX-TEST: Captured Mobs: §e0
+     * REGEX-TEST: Captured Mobs: §e14
+     */
+    val capturedMobsPattern by safariSB.pattern(
+        "captured-mobs",
+        "Captured Mobs: §e(?<capturedMobs>\\d+)",
     )
 
     /**
