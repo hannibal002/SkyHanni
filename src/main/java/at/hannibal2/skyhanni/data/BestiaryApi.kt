@@ -160,7 +160,7 @@ object BestiaryApi {
         CLOSED,
         CATEGORY_OF_CATEGORIES,
         CATEGORY_OF_MOBS,
-        MOB_VARIANTS
+        MOB_VARIANTS,
     }
 
     sealed class BestiaryGuiState(val type: GuiType) {
@@ -173,20 +173,20 @@ object BestiaryApi {
 
         class Categories(
             overallProgressEnabled: Boolean,
-            val categories: Map<Int, Category>
+            val categories: Map<Int, Category>,
         ) : Open(GuiType.CATEGORY_OF_CATEGORIES, overallProgressEnabled)
 
         class Mobs(
             overallProgressEnabled: Boolean,
             val parentCategory: Category?,
-            val mobs: Map<Int, BestiaryMob>
+            val mobs: Map<Int, BestiaryMob>,
         ) : Open(GuiType.CATEGORY_OF_MOBS, overallProgressEnabled)
 
         class Variants(
             overallProgressEnabled: Boolean,
             val parentCategory: Category?,
             val parentFamily: BestiaryMob?,
-            val variants: Map<Int, BestiaryMobVariant>
+            val variants: Map<Int, BestiaryMobVariant>,
         ) : Open(GuiType.MOB_VARIANTS, overallProgressEnabled)
     }
 
@@ -292,7 +292,7 @@ object BestiaryApi {
     private fun parseCategoryFromStack(
         name: Component,
         fullName: String,
-        stack: SafeItemStack
+        stack: SafeItemStack,
     ): Category {
         var familiesFound: Long = 0
         var totalFamilies: Long = 0
@@ -494,7 +494,7 @@ object BestiaryApi {
         val fullName: String,
         val familiesFound: Long,
         val totalFamilies: Long,
-        val familiesCompleted: Long
+        val familiesCompleted: Long,
     )
 
     data class BestiaryMob(
@@ -504,7 +504,7 @@ object BestiaryApi {
         var totalKills: Long,
         var killNeededForNextLevel: Long,
         var currentKillToNextLevel: Long,
-        var actualRealTotalKill: Long
+        var actualRealTotalKill: Long,
     ) {
         val cleanName: String get() = name.string.removeColor()
         val romanLevel: String get() = takeUnless { level == 0 }?.let { level.toRoman() } ?: "0"
@@ -522,7 +522,7 @@ object BestiaryApi {
     // TODO: Add more data, like kills, mob types, etc.
     data class BestiaryMobVariant(
         val name: Component,
-        val level: Int
+        val level: Int,
     ) {
         val cleanName: String get() = name.string.removeColor().removeSuffix(" (Master)")
     }
