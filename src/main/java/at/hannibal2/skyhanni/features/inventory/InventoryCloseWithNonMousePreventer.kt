@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
@@ -19,20 +18,18 @@ object InventoryCloseWithNonMousePreventer {
     private val patternGroup = RepoPattern.group("inventory")
     private val closeButtonPatterns by patternGroup.list(
         "closebuttons",
-        "Close"
+        "Close",
     )
     private val config get() = SkyHanniMod.feature.inventory.closePrevention
 
     @HandleEvent(priority = HIGHEST)
-    fun onGuiKeyPress(event: GuiKeyPressEvent) {
+    private fun onGuiKeyboardKeyPress(event: GuiKeyPressEvent.GuiKeyboardKeyPressEvent) {
         if (!config.enabled) return
         if (inventoryButtonDown() || escapeKeyHeld()) return
-        if (!event.isMouseBasedEvent) {
-            val underMouseItemStack = stackUnderCursor() ?: return
-            ChatUtils.debug(underMouseItemStack.hoverName.string.removeColor())
-            if (closeButtonPatterns.matches(underMouseItemStack.hoverName.string.removeColor())) {
-                event.cancel()
-            }
+        val underMouseItemStack = event.stackUnderCursor ?: return
+        ChatUtils.debug(underMouseItemStack.hoverName.string.removeColor())
+        if (closeButtonPatterns.matches(underMouseItemStack.hoverName.string.removeColor())) {
+            event.cancel()
         }
     }
 
