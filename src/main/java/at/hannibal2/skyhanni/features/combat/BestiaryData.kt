@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
@@ -101,29 +102,27 @@ object BestiaryData {
 
         addCategories()
 
-        if (BestiaryApi.mobList.isEmpty()) return@buildList
-
-        addList()
+        val mobList = BestiaryApi.mobList.takeIfNotEmpty() ?: return@buildList
+        val sortedMobList = mobList.sortMobList()
+        addList(sortedMobList)
         addButtons()
     }
 
-    private fun sortMobList(): MutableList<BestiaryApi.BestiaryMob> {
+    private fun List<BestiaryApi.BestiaryMob>.sortMobList(): MutableList<BestiaryApi.BestiaryMob> {
         val sortedMobList = when (config.displayType) {
-            DisplayTypeEntry.GLOBAL_MAX -> BestiaryApi.mobList.sortedBy { it.percentToMax() }
-            DisplayTypeEntry.GLOBAL_NEXT -> BestiaryApi.mobList.sortedBy { it.percentToTier() }
-            DisplayTypeEntry.LOWEST_TOTAL -> BestiaryApi.mobList.sortedBy { it.actualRealTotalKill }
-            DisplayTypeEntry.HIGHEST_TOTAL -> BestiaryApi.mobList.sortedByDescending { it.actualRealTotalKill }
-            DisplayTypeEntry.LOWEST_MAX -> BestiaryApi.mobList.sortedBy { it.killNeededToMax() }
-            DisplayTypeEntry.HIGHEST_MAX -> BestiaryApi.mobList.sortedByDescending { it.killNeededToMax() }
-            DisplayTypeEntry.LOWEST_NEXT -> BestiaryApi.mobList.sortedBy { it.killNeededToNextLevel() }
-            DisplayTypeEntry.HIGHEST_NEXT -> BestiaryApi.mobList.sortedByDescending { it.killNeededToNextLevel() }
+            DisplayTypeEntry.GLOBAL_MAX -> this.sortedBy { it.percentToMax() }
+            DisplayTypeEntry.GLOBAL_NEXT -> this.sortedBy { it.percentToTier() }
+            DisplayTypeEntry.LOWEST_TOTAL -> this.sortedBy { it.actualRealTotalKill }
+            DisplayTypeEntry.HIGHEST_TOTAL -> this.sortedByDescending { it.actualRealTotalKill }
+            DisplayTypeEntry.LOWEST_MAX -> this.sortedBy { it.killNeededToMax() }
+            DisplayTypeEntry.HIGHEST_MAX -> this.sortedByDescending { it.killNeededToMax() }
+            DisplayTypeEntry.LOWEST_NEXT -> this.sortedBy { it.killNeededToNextLevel() }
+            DisplayTypeEntry.HIGHEST_NEXT -> this.sortedByDescending { it.killNeededToNextLevel() }
         }.toMutableList()
         return sortedMobList
     }
 
-    private fun MutableList<Renderable>.addList() {
-        val sortedMobList = sortMobList()
-
+    private fun MutableList<Renderable>.addList(sortedMobList: List<BestiaryApi.BestiaryMob>) {
         addString("§7Bestiary Data")
         for (mob in sortedMobList) {
             val isUnlocked = mob.actualRealTotalKill != 0.toLong()
