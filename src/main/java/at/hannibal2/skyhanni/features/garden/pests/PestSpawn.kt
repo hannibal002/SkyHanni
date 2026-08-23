@@ -25,31 +25,34 @@ object PestSpawn {
     private val patternGroup = RepoPattern.group("garden.pests.spawn")
 
     /**
-     * REGEX-TEST: GROSS! A ൠ Pest has appeared in Plot - S 4!
-     * REGEX-TEST: GROSS! A ൠ Pest has appeared in The Barn!
+     * REGEX-TEST: GROSS! A  Pest has appeared in Plot - S 4!
+     * REGEX-TEST: GROSS! A  Pest has appeared in The Barn!
+     * REGEX-FAIL: From [MVP+] ThePleader: GROSS! A  Pest has appeared in Plot - 67!
      */
     private val onePestPattern by patternGroup.list(
         "one.colorless",
-        ".*! A ൠ Pest has appeared in Plot - (?<plot>.*)!",
-        ".*! A ൠ Pest has appeared in (?<plot>The Barn)!",
+        "^\\w+! A  Pest has appeared in Plot - (?<plot>.*)!",
+        "^\\w+! A  Pest has appeared in (?<plot>The Barn)!",
     )
 
     /**
-     * REGEX-TEST: YUCK! 4 ൠ Pest have spawned in Plot - 14!
-     * REGEX-TEST: YUCK! 4 ൠ Pest have spawned in The Barn!
+     * REGEX-TEST: YUCK! 4  Pest have spawned in Plot - 14!
+     * REGEX-TEST: YUCK! 4  Pest have spawned in The Barn!
+     * REGEX-FAIL: From [MVP+] ThePleader: YUCK! 6  Pest have spawned in Plot - 7!
      */
     private val multiplePestsPattern by patternGroup.list(
         "multiple.colorless",
-        ".*! (?<amount>\\d) ൠ Pests? have spawned in Plot - (?<plot>.*)!",
-        ".*! (?<amount>\\d) ൠ Pests? have spawned in (?<plot>The Barn)!",
+        "^\\w+! (?<amount>\\d)  Pests? have spawned in Plot - (?<plot>.*)!",
+        "^\\w+! (?<amount>\\d)  Pests? have spawned in (?<plot>The Barn)!",
     )
 
     /**
-     * REGEX-TEST: GROSS! While you were offline, ൠ Pest spawned in Plots 12, 9, 5, 11 and 3!
+     * REGEX-TEST: GROSS! While you were offline,  Pest spawned in Plots 12, 9, 5, 11 and 3!
+     * REGEX-FAIL: From [MVP+] ThePleader: GROSS! While you were offline,  Pest spawned in Plots 6 and 7!
      */
     private val offlinePestsPattern by patternGroup.pattern(
         "offline.colorless",
-        ".*! While you were offline, ൠ Pests? spawned in Plots (?<plots>.*)!",
+        "^\\w+! While you were offline,  Pests? spawned in Plots (?<plots>.*)!",
     )
 
     /**

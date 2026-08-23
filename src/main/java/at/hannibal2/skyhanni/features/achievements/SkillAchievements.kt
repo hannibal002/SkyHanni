@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.achievements
 
+import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.achievements.Achievement
@@ -20,8 +21,7 @@ object SkillAchievements {
     private const val SKILL_ACHIEVEMENT = "Level 100 Skill"
     private const val ROCK_ACHIEVEMENT = "Mythic Rock"
     private const val DOLPHIN_ACHIEVEMENT = "Mythic Dolphin"
-    val skillDetector = InventoryDetector(checkInventoryName = { it == "Your Skills" })
-    val petSkillDetector = InventoryDetector(pattern = "(Fishing|Mining) Skill".toPattern())
+    val petSkillDetector = InventoryDetector { petSkillMenuPattern }
 
     /**
      * REGEX-TEST: Ores mined: 2,449,790
@@ -39,24 +39,32 @@ object SkillAchievements {
         "Sea Creatures killed: (?<amount>[\\d,]+)",
     )
 
+    /**
+     * REGEX-TEST: Fishing Skill
+     * REGEX-TEST: Mining Skill
+     */
+    private val petSkillMenuPattern by AchievementManager.group.pattern(
+        "pet-skill-menu",
+        "(?:Fishing|Mining) Skill",
+    )
+
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val skill100Achievement = Achievement(
-            "Expert Skiller".asComponent(),
-            "Get a skill to level 70/80/90/100".asComponent(),
-            50f,
-            false,
-            listOf(70, 80, 90, 100),
+            name = "Expert Skiller".asComponent(),
+            description = "Get a skill to level 70/80/90/100".asComponent(),
+            userLuckAmount = 50f,
+            tiers = listOf(70, 80, 90, 100),
         )
         val rockAchievement = Achievement(
-            "Where's my Mythic Rock Pet".asComponent(),
-            "Mine 1 million Ores".asComponent(),
-            10f,
+            name = "Where's my Mythic Rock Pet",
+            description = "Mine 1 million Ores",
+            userLuckAmount = 10f,
         )
         val dolphinAchievement = Achievement(
-            "Mythical Dolphin Pull".asComponent(),
-            "Kill 50,000 Sea Creatures".asComponent(),
-            10f,
+            name = "Mythical Dolphin Pull",
+            description = "Kill 50,000 Sea Creatures",
+            userLuckAmount = 10f,
         )
         event.register(skill100Achievement, SKILL_ACHIEVEMENT)
         event.register(rockAchievement, ROCK_ACHIEVEMENT)
@@ -74,9 +82,9 @@ object SkillAchievements {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val petSlot = 51
         val lore = event.inventoryItems[petSlot]?.getLoreComponent()
-        if (skillDetector.isInside()) {
+        if (SkillApi.skillMenuDetector.isInside()) {
             DelayedRun.runNextTick {
-                val storage = ProfileStorageData.profileSpecific?.skillData ?: return@runNextTick
+                val storage = ProfileStorageData.profileSpecific?.skills?.skillData ?: return@runNextTick
                 var highestSkill = 0
                 for ((_, info) in storage) {
                     if (info.overflowLevel > highestSkill) highestSkill = info.overflowLevel

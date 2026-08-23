@@ -34,9 +34,9 @@ object VoltHighlighter {
 
     private val config get() = RiftApi.config.area.dreadfarm.voltCrux
 
-    private val VOLT_DOING_LIGHTNING by lazy { SkullTextureHolder.getTexture("VOLT_DOING_LIGHTNING") }
-    private val VOLT_FRIENDLY by lazy { SkullTextureHolder.getTexture("VOLT_FRIENDLY") }
-    private val VOLT_HOSTILE by lazy { SkullTextureHolder.getTexture("VOLT_HOSTILE") }
+    private val VOLT_DOING_LIGHTNING by SkullTextureHolder.texture("VOLT_DOING_LIGHTNING")
+    private val VOLT_FRIENDLY by SkullTextureHolder.texture("VOLT_FRIENDLY")
+    private val VOLT_HOSTILE by SkullTextureHolder.texture("VOLT_HOSTILE")
 
     private const val LIGHTNING_DISTANCE = 7F
     private val CHARGE_TIME = 12.seconds
@@ -96,7 +96,8 @@ object VoltHighlighter {
     }
 
     private fun getVoltState(itemStack: SafeItemStack): VoltState {
-        return when (itemStack.getSkullTexture()) {
+        val skullTexture = itemStack.getSkullTexture() ?: return VoltState.NO_VOLT
+        return when (skullTexture) {
             VOLT_DOING_LIGHTNING -> VoltState.DOING_LIGHTNING
             VOLT_FRIENDLY -> VoltState.FRIENDLY
             VOLT_HOSTILE -> VoltState.HOSTILE

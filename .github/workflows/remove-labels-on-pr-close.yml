@@ -1,3 +1,4 @@
+# Execution context: base branch code (pull_request_target)
 # https://github.com/marketplace/actions/label-remover
 
 name: "Remove All Labels"

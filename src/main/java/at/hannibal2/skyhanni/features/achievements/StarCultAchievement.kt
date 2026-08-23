@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object StarCultAchievement {
@@ -27,9 +26,9 @@ object StarCultAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Weekly Cult".asComponent(),
-            "Attend 7 cult meetings".asComponent(),
-            7f,
+            name = "Weekly Cult",
+            description = "Attend 7 cult meetings",
+            userLuckAmount = 7f,
         )
         event.register(achievement, STAR_CULT_ACHIEVEMENT)
     }

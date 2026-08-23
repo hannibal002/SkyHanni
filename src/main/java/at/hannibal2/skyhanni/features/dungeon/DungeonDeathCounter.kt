@@ -20,24 +20,24 @@ object DungeonDeathCounter {
     private val patternGroup = RepoPattern.group("dungeon.deathcounter")
 
     /**
-     * REGEX-TEST:  ☠ Someone disconnected from the Dungeon and became a ghost.
-     * REGEX-TEST:  ☠ You were killed by Someone and became a ghost.
-     * REGEX-TEST:  ☠ You were crushed and became a ghost.
-     * REGEX-TEST:  ☠ You suffocated and became a ghost.
-     * REGEX-TEST:  ☠ You fell into a deep hole and became a ghost.
-     * REGEX-TEST:  ☠ You died to a trap and became a ghost.
-     * REGEX-TEST:  ☠ You died to a mob and became a ghost.
-     * REGEX-TEST:  ☠ You died and became a ghost.
-     * REGEX-TEST:  ☠ You burnt to death and became a ghost.
-     * REGEX-TEST:  ☠ Someone was killed by Someone and became a ghost.
-     * REGEX-TEST:  ☠ Someone was crushed and became a ghost.
-     * REGEX-TEST:  ☠ Someone suffocated and became a ghost.
-     * REGEX-TEST:  ☠ Someone fell to their death with help from Someone and became a ghost.
-     * REGEX-TEST:  ☠ Someone fell into a deep hole and became a ghost.
-     * REGEX-TEST:  ☠ Someone died to a trap and became a ghost.
-     * REGEX-TEST:  ☠ Someone died to a mob and became a ghost.
-     * REGEX-TEST:  ☠ Someone died and became a ghost.
-     * REGEX-TEST:  ☠ Someone burnt to death and became a ghost.
+     * WRAPPED-REGEX-TEST: " ☠ Someone disconnected from the Dungeon and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ You were killed by Someone and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ You were crushed and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ You suffocated and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ You fell into a deep hole and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ You died to a trap and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ You died to a mob and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ You died and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ You burnt to death and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ Someone was killed by Someone and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ Someone was crushed and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ Someone suffocated and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ Someone fell to their death with help from Someone and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ Someone fell into a deep hole and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ Someone died to a trap and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ Someone died to a mob and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ Someone died and became a ghost."
+     * WRAPPED-REGEX-TEST: " ☠ Someone burnt to death and became a ghost."
      */
     private val deathPattern by patternGroup.pattern(
         "death.message",

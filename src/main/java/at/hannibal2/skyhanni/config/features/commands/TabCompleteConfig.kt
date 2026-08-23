@@ -42,6 +42,11 @@ class TabCompleteConfig {
     var guild: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Carry Customers", desc = "Tab-complete Carry Customers.")
+    @ConfigEditorBoolean
+    var carryCustomer: Boolean = false
+
+    @Expose
     @ConfigOption(name = "VIP Visits", desc = "Tab-complete the visit to special users with cake souls on it.")
     @ConfigEditorBoolean
     @FeatureToggle

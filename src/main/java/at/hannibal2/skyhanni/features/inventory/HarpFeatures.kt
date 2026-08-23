@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedClay
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -64,7 +65,7 @@ object HarpFeatures {
     private fun isMenuGui(chestName: String) = menuTitlePattern.matches(chestName)
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGui(event: GuiKeyPressEvent) {
+    fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.keybinds) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
         val chest = event.guiContainer as? ContainerScreen ?: return
@@ -107,7 +108,7 @@ object HarpFeatures {
     }
 
     private fun updateScale() {
-        if (Minecraft.getInstance().screen == null) {
+        if (MinecraftCompat.screen == null) {
             DelayedRun.runNextTick {
                 updateScale()
             }
@@ -185,7 +186,7 @@ object HarpFeatures {
         if (!isMenuGui(InventoryUtils.openInventoryName())) return
         if (event.slot?.index != CLOSE_BUTTON_SLOT) return
         if (openTime.passedSince() > 2.seconds) return
-        val indexOfFirst = event.container.slots.filterNotNull().indexOfFirst {
+        val indexOfFirst = event.container.slots.indexOfFirst {
             songSelectedPattern.anyMatches(it.item.getLore())
         }
         indexOfFirst.takeIf { it != -1 }?.let {

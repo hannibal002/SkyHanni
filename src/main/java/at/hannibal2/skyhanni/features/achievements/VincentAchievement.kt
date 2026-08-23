@@ -25,11 +25,10 @@ object VincentAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Strawberry Collector".asComponent(),
-            "Attempt to turn a rose into a strawberry".asComponent(),
-            10f,
-            false,
-            listOf(10)
+            name = "Strawberry Collector".asComponent(),
+            description = "Attempt to turn a rose into a strawberry".asComponent(),
+            userLuckAmount = 10f,
+            tiers = listOf(10),
         )
         event.register(achievement, VINCENT_ACHIEVEMENT)
     }

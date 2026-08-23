@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 object MuteHoeLevelUp {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSound(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         if (!SkyHanniMod.feature.garden.hoeLevelDisplay.muteHoeSounds) return
         if (event.pitch == 1.4920635f && event.soundName == "block.portal.travel") event.cancel()
     }

@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents.DirtyReason
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
@@ -15,9 +17,13 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 object SkyBlockIslandTest {
 
     var testIsland: IslandType? = null
+        set(value) {
+            field = value
+            SkyHanniEvents.markEventCacheDirty(DirtyReason.LOCATION_CHANGED)
+        }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Island Test")
         testIsland?.let {
             event.addData {

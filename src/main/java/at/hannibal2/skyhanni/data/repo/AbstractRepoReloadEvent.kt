@@ -1,11 +1,10 @@
 package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.Legacy
 import kotlinx.coroutines.runBlocking
 
 abstract class AbstractRepoReloadEvent(open val manager: AbstractRepoManager<*>) : SkyHanniEvent() {
-    @Legacy("Use suspended version of this function instead", replaceWith = ReplaceWith("getConstantAsync"))
+    @Deprecated("Use suspended version of this function instead", replaceWith = ReplaceWith("getConstantAsync"))
     inline fun <reified T : Any> getConstant(constant: String): T = runBlocking {
         getConstantAsync(constant)
     }

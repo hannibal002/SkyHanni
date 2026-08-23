@@ -16,13 +16,13 @@ object BetterWikiFromMenus {
     private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(6, "fandomWiki", "commands.fandomWiki")
         // Apparently the above got changed again at some point but never got a migration
     }
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
 
         val chestName = InventoryUtils.openInventoryName()
@@ -40,17 +40,15 @@ object BetterWikiFromMenus {
 
         if (inBiblioInventory) {
             if (isWiki) {
-                WikiManager.sendWikiMessage(useIndependent = true)
+                WikiManager.sendWikiMessage(autoOpen = config.menuOpenWiki)
                 return
             }
 
-            if (isWikithis) {
-                WikiManager.otherWikiCommands(arrayOf(""), true, true)
-                return
-            }
+            WikiManager.wikiThisItem(autoOpen = config.menuOpenWiki)
+            return
         }
 
-        if (inSBGuideInventory && config.sbGuide) {
+        if (inSBGuideInventory && config.skyblockGuide) {
             val wikiSearch = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
             WikiManager.sendWikiMessage(wikiSearch, autoOpen = config.menuOpenWiki)
             event.cancel()

@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.utils.coroutines
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.Legacy
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -19,9 +21,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import kotlin.coroutines.cancellation.CancellationException
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 interface CoroutineManager {
     fun CoroutineSettings.launchCoroutine(block: suspend CoroutineScope.() -> Unit): Job
@@ -32,9 +31,9 @@ interface CoroutineManager {
 }
 
 // TODO when no more usages of these old functions remain, get rid of the compat class.
-@Legacy("Use CoroutineManager with CoroutineSettings options instead")
+@Deprecated("Use CoroutineManager with CoroutineSettings options instead")
 interface CompatCoroutineManager : CoroutineManager {
-    @Legacy(
+    @Deprecated(
         "Use launchCoroutine with CoroutineSettings options instead",
         ReplaceWith(
             "CoroutineSettings(name, timeout).launchCoroutine(block)",
@@ -44,7 +43,7 @@ interface CompatCoroutineManager : CoroutineManager {
     fun launchCoroutine(name: String, timeout: Duration = 10.seconds, block: suspend CoroutineScope.() -> Unit): Job =
         CoroutineSettings(name, timeout).launchCoroutine(block)
 
-    @Legacy(
+    @Deprecated(
         "Use launchCoroutine with CoroutineSettings options instead",
         ReplaceWith(
             "CoroutineSettings(name, timeout).launchCoroutine(block)",
@@ -54,7 +53,7 @@ interface CompatCoroutineManager : CoroutineManager {
     fun launchIOCoroutine(name: String, timeout: Duration = 10.seconds, block: suspend CoroutineScope.() -> Unit): Job =
         CoroutineSettings(name, timeout).withIOContext().launchCoroutine(block)
 
-    @Legacy(
+    @Deprecated(
         "Use launchUnScopedCoroutine with CoroutineSettings options instead",
         ReplaceWith(
             "CoroutineSettings(name, timeout).launchUnScopedCoroutine(block)",
@@ -64,7 +63,7 @@ interface CompatCoroutineManager : CoroutineManager {
     fun launchNoScopeCoroutine(name: String, timeout: Duration = 10.seconds, block: suspend () -> Unit): Job =
         CoroutineSettings(name, timeout).launchUnScopedCoroutine(block)
 
-    @Legacy(
+    @Deprecated(
         "Use launchCoroutine with CoroutineSettings options instead",
         ReplaceWith(
             "CoroutineSettings(name, timeout).launchCoroutine(block)",
@@ -75,7 +74,7 @@ interface CompatCoroutineManager : CoroutineManager {
         name: String, mutex: Mutex, timeout: Duration = 10.seconds, block: suspend CoroutineScope.() -> Unit
     ): Job = CoroutineSettings(name, timeout).withMutex(mutex).launchCoroutine(block)
 
-    @Legacy(
+    @Deprecated(
         "Use launchCoroutine with CoroutineSettings options instead",
         ReplaceWith(
             "CoroutineSettings(name, timeout).launchCoroutine(block)",

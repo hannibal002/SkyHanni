@@ -17,10 +17,10 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.player.LocalPlayer
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.sync.Mutex
 
 @SkyHanniModule
 object IslandAreaBackend {
@@ -77,7 +77,7 @@ object IslandAreaBackend {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        if (isEnabled() && event.isLocalPlayer) {
+        if (isEnabled()) {
             hasMoved = true
         }
     }

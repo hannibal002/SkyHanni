@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsAddonsHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object SuperpairsAchievement {
@@ -18,9 +17,9 @@ object SuperpairsAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "\"Memorisation\" Professional".asComponent(),
-            "Wow! You have such good memory".asComponent(),
-            2f,
+            name = "\"Memorisation\" Professional",
+            description = "Wow! You have such good memory",
+            userLuckAmount = 2f,
         )
         event.register(achievement, CHRONOMATRON_ACHIEVEMENT)
     }

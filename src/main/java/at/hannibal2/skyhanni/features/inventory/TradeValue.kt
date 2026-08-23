@@ -40,16 +40,24 @@ object TradeValue {
     private var yourDisplay = emptyList<Renderable>()
 
     /**
-     * REGEX-TEST:  §71
-     * REGEX-TEST:  §8(1,000)
+     * WRAPPED-REGEX-TEST: " §71"
+     * WRAPPED-REGEX-TEST: " §8(1,000)"
      */
     private val coinPattern by RepoPattern.pattern(
         "inventory.tradevalue.coins",
         "§(?<type>[87])\\(?(?<number>[^)]*)\\)?",
     )
 
+    /**
+     * REGEX-TEST: You     1
+     */
+    private val tradeMenuPattern by RepoPattern.pattern(
+        "inventory.tradevalue.menu",
+        "You {5}.*",
+    )
+
     // Detects trade menu thx NEU
-    val inventory = InventoryDetector({ onOpen() }) { name -> name.startsWith("You     ") }
+    val inventory = InventoryDetector(onOpenInventory = { onOpen() }) { tradeMenuPattern }
 
     init {
         RenderDisplayHelper(

@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
@@ -17,19 +16,21 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
@@ -50,15 +51,15 @@ object JacobFarmingContestsInventory {
     private var hideEverything = true
 
     /**
-     * REGEX-TEST: §7§7You placed in the §zAmethyst §7bracket!
+     * REGEX-TEST: §7You placed in the §c§lBRONZE §7bracket!
      */
     private val medalPattern by RepoPattern.pattern(
         "garden.jacob.contests.inventory.medal",
-        "§7§7You placed in the (?<medal>.*) §7bracket!",
+        "§7You placed in the (?<medal>.*) §7bracket!",
     )
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         realTime.clear()
         hideEverything = true
     }
@@ -69,12 +70,10 @@ object JacobFarmingContestsInventory {
 
         realTime.clear()
 
-        val foundEvents = mutableListOf<String>()
         for ((slot, item) in event.inventoryItems) {
-            if (!item.getLore().any { it.startsWith("§7Your score: §e") }) continue
+            if (!item.getCleanLore().any { it.startsWith("Your score: ") }) continue
 
-            foundEvents.add(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
-            val time = FarmingContestApi.getSBTimeFor(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) ?: continue
+            val time = FarmingContestApi.getSBTimeFor(item.cleanName) ?: continue
             FarmingContestApi.addContest(time, item)
             if (config.realTime) {
                 readRealTime(time, slot)
@@ -96,17 +95,18 @@ object JacobFarmingContestsInventory {
         if (!config.openOnElite.isKeyHeld()) return
 
         val slot = event.slot ?: return
-        val itemName = slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val itemName = slot.item.cleanName
 
-        when (val chestName = InventoryUtils.openInventoryName()) {
-            "Your Contests" -> {
+        val chestName = InventoryUtils.openInventoryName()
+        when {
+            FarmingContestApi.yourContestsPattern.matches(chestName) -> {
                 if (!FarmingContestApi.inInventory) return
                 val (year, month, day) = FarmingContestApi.getSBDateFromItemName(itemName) ?: return
                 openContest(year, month, day)
                 event.cancel()
             }
 
-            "Jacob's Farming Contests" -> {
+            chestName == "Jacob's Farming Contests" -> {
                 openFromJacobMenu(itemName)
                 event.cancel()
             }

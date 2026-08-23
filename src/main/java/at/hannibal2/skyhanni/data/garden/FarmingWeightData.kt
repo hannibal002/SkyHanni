@@ -1,14 +1,13 @@
 package at.hannibal2.skyhanni.data.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.lastGainedCrop
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
@@ -16,16 +15,14 @@ import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLeaderboardP
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onEnable
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -34,15 +31,18 @@ import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 @SkyHanniModule
 object FarmingWeightData {
+    private val config get() = SkyHanniMod.feature.garden.eliteFarmersLeaderboards
+
     var apiError = false
     var profileId: String = ""
 
@@ -60,21 +60,35 @@ object FarmingWeightData {
     private var hasFetchedCropWeights = false
     private var shouldRecalculateWeight = false
 
+    private val cropWeightsCoroutine = CoroutineSettings("get crop weights")
+
     @HandleEvent
-    fun onWorldChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.GARDEN) return
+    private fun onConfigLoad() {
+        config.enabled.onEnable {
+            // This is intentionally checked inside onEnable, using onlyOnIsland would be wrong here.
+            @Suppress("IsInIslandEarlyReturn")
+            if (!GardenApi.inGarden()) return@onEnable
+            ChatUtils.debug("Updating EliteSkyBlock collections because leaderboard features were toggled on")
+            updateCollections()
+        }
+    }
+
+    @HandleEvent
+    private fun onProfileJoin() {
+        reset()
+    }
+
+    @HandleEvent(onlyOnIsland = GARDEN)
+    private fun onIslandJoin() {
+        if (!isEnabled()) return
+        ChatUtils.debug("Updating EliteSkyBlock collections on Garden join")
         updateCollections()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        updateCollections()
-    }
-
     @HandleEvent
-    fun onCollectionUpdate(event: CropCollectionAddEvent) {
-        if (event.cropCollectionType == CropCollectionType.MOOSHROOM_COW) {
-            if (lastGainedCrop?.isAnyOf(CropType.CACTUS, CropType.SUGAR_CANE) == true) {
+    private fun onCollectionUpdate(event: CropCollectionAddEvent) {
+        if (event.cropCollectionType == MOOSHROOM_COW) {
+            if (lastGainedCrop?.isAnyOf(CACTUS, SUGAR_CANE) == true) {
                 addWeight(event.amount / (event.crop.getFactor() * 2))
                 return
             }
@@ -83,11 +97,13 @@ object FarmingWeightData {
         if (weightGain >= 5.0) shouldRecalculateWeight = true // weight desyncs over time due to mushroom weight calc
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    @HandleEvent(onlyOnIsland = GARDEN)
+    private fun onTick(event: SkyHanniTickEvent) {
+        if (!isEnabled()) return
         if (!event.isMod(5)) return
+        if (attemptingCropWeightFetch || hasFetchedCropWeights) return
 
-        SkyHanniMod.launchIOCoroutine("get crop weights") {
+        cropWeightsCoroutine.launch {
             getCropWeights()
         }
     }
@@ -100,14 +116,14 @@ object FarmingWeightData {
     fun getWeight(leaderboardMode: EliteLeaderboardMode, override: Boolean = false, cropWeightOnly: Boolean = false): Double? {
         if (weightMap[leaderboardMode] == null || override) {
             when (leaderboardMode) {
-                EliteLeaderboardMode.ALL_TIME -> {}
+                ALL_TIME -> {}
 
-                EliteLeaderboardMode.MONTHLY ->
-                    getLeaderboardPosition(EliteLeaderboardType.Weight(FarmingWeight.FARMING_WEIGHT, leaderboardMode))
+                MONTHLY ->
+                    getLeaderboardPosition(EliteLeaderboardType.Weight(FARMING_WEIGHT, leaderboardMode))
             }
         }
         if (shouldRecalculateWeight) {
-            weightMap[EliteLeaderboardMode.ALL_TIME] = recalculateTotalWeight()
+            weightMap[ALL_TIME] = recalculateTotalWeight()
         }
         val weight = weightMap[leaderboardMode]
         if (cropWeightOnly) {
@@ -185,7 +201,7 @@ object FarmingWeightData {
             totalWeight += weight
         }
         if (totalWeight > 0) {
-            weightPerCrop[CropType.MUSHROOM] = specialMushroomWeight(weightPerCrop, totalWeight)
+            weightPerCrop[MUSHROOM] = specialMushroomWeight(weightPerCrop, totalWeight)
         }
         totalWeight = weightPerCrop.values.sum()
         weightGain = 0.0
@@ -194,8 +210,8 @@ object FarmingWeightData {
     }
 
     private fun specialMushroomWeight(weightPerCrop: MutableMap<CropType, Double>, totalWeight: Double): Double {
-        val cactusWeight = weightPerCrop[CropType.CACTUS] ?: -1.0
-        val sugarCaneWeight = weightPerCrop[CropType.SUGAR_CANE] ?: -1.0
+        val cactusWeight = weightPerCrop[CACTUS] ?: -1.0
+        val sugarCaneWeight = weightPerCrop[SUGAR_CANE] ?: -1.0
         val doubleBreakRatio = (cactusWeight + sugarCaneWeight) / totalWeight
         val normalRatio = (totalWeight - cactusWeight - sugarCaneWeight) / totalWeight
 
@@ -248,7 +264,6 @@ object FarmingWeightData {
     )
 
     private suspend fun getCropWeights() {
-        if (attemptingCropWeightFetch || hasFetchedCropWeights) return
         attemptingCropWeightFetch = true
         val apiResponse = ApiUtils.getJsonResponse(weightStatic).assertSuccess() ?: return
         val apiResponseData = apiResponse.data ?: return
@@ -261,10 +276,10 @@ object FarmingWeightData {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shfarmingprofile") {
             description = "Look up the farming profile from yourself or another player on ${EliteDevApi.ELITE_DOMAIN}"
-            category = CommandCategory.USERS_ACTIVE
+            category = USERS_ACTIVE
             argCallback("name", BrigadierArguments.string()) { name ->
                 openWebsite(name, ignoreCooldown = true)
             }
@@ -287,7 +302,7 @@ object FarmingWeightData {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("farming weight")
         event.addIrrelevant {
             CropType.entries.forEach {
@@ -295,4 +310,6 @@ object FarmingWeightData {
             }
         }
     }
+
+    private fun isEnabled() = config.enabled.get()
 }

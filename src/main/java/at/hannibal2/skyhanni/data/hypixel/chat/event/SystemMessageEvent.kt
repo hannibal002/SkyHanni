@@ -6,26 +6,46 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.network.chat.Component
 
-// A SkyHanniChatEvent after filtering all player send events, leaving messages from the game/system.
+/**
+ * Gets fired for any chat message not sent by another player or an [NPC][NpcChatEvent].
+ */
 object SystemMessageEvent {
 
-    // TODO docs missing
+    /**
+     * Fired during the read-only phase of the chat processing pipeline.
+     * Use this event to read the message or to completely block it from being shown in the chat.
+     * Cannot be used to edit or modify the message in any way. For that, see [Modify].
+     *
+     * @param message The original message text.
+     * @param chatComponent The entire original chat component.
+     * @param blockedReason The reason if the message should be blocked. null means not blocked.
+     */
     @PrimaryFunction("onSystemMessage")
     open class Allow(
         open val message: String,
         open val chatComponent: Component,
         open var blockedReason: String? = null,
     ) : SkyHanniEvent() {
+
+        /** The plain text message without any color codes. */
         open val cleanMessage: String = chatComponent.string.removeColor()
     }
 
-    // TODO docs missing
+    /**
+     * Fired during the modification phase of the chat processing pipeline.
+     * Use this specific event to modify the text content or the visual style of the chat component before it shows up on chat.
+     * Cannot be used to block the message altogether. Do not use this event for data collection. For both, see [Allow].
+     *
+     * @param message The original message text.
+     * @param chatComponent The entire original chat component.
+     */
     open class Modify(
         open val message: String,
         @set:Deprecated("Use replaceComponent() instead")
         open var chatComponent: Component,
-        open val blockedReason: String? = null,
     ) : SkyHanniEvent() {
+
+        /** The plain text message without any color codes. */
         open val cleanMessage: String
             get() = chatComponent.string.removeColor()
 

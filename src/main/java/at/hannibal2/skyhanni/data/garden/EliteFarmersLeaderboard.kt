@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboar
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.achievements.Achievement
-import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.profileId
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.setWeight
@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardPlayer
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.crop
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
@@ -43,15 +42,14 @@ import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.withColor
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import kotlin.math.abs
 import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 @SkyHanniModule
 object EliteFarmersLeaderboard {
@@ -115,7 +113,7 @@ object EliteFarmersLeaderboard {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (lastPassedMessage.passedSince() < 30.seconds) return
         eliteLeaderboardData.forEach { lbType ->
             if (!getLeaderboardConfig(lbType.key).showLbChange) return@forEach
@@ -145,7 +143,7 @@ object EliteFarmersLeaderboard {
                             }
                             append(" Leaderboard!")
                             withColor(ChatFormatting.YELLOW)
-                        }
+                        },
                     )
                 }
             } else {
@@ -529,7 +527,7 @@ object EliteFarmersLeaderboard {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("elite leaderboard")
         event.addIrrelevant {
             eliteLeaderboardData.forEach {
@@ -543,14 +541,15 @@ object EliteFarmersLeaderboard {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Better than the devs".asComponent(),
-            componentBuilder {
+            name = "Better than the devs".asComponent(),
+            description = componentBuilder {
                 append("Pass one of the")
                 append(" SkyHanni ") {
                     withColor(TextHelper.chromaStyle)
                 }
                 append("contributors in the farming leaderboards")
-            }
+            },
+            userLuckAmount = 0f,
         )
         event.register(achievement, BETTER_THAN_DEV_ACHIEVEMENT)
     }

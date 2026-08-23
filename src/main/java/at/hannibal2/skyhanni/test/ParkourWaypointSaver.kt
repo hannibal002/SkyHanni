@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
-import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -33,7 +33,7 @@ object ParkourWaypointSaver {
     fun onKeyPress(event: KeyPressEvent) {
         @Suppress("InSkyBlockEarlyReturn")
         if (!SkyBlockUtils.inSkyBlock && !config.parkourOutsideSB) return
-        if (Minecraft.getInstance().screen != null) return
+        if (MinecraftCompat.screen != null) return
         if (GraphEditor.isEnabled()) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 

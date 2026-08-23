@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
@@ -23,23 +23,21 @@ object RecipeAchievement {
     )
 
     private const val RECIPE_ACHIEVEMENT = "Recipe Unlocker"
-    val sbMenuDetector = InventoryDetector(checkInventoryName = { it == "SkyBlock Menu" })
 
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Recipe Fanatic".asComponent(),
-            "Unlock all the Recipes".asComponent(),
-            50f,
-            false,
-            listOf(50, 70, 90, 99),
+            name = "Recipe Fanatic".asComponent(),
+            description = "Unlock all the Recipes".asComponent(),
+            userLuckAmount = 50f,
+            tiers = listOf(50, 70, 90, 99),
         )
         event.register(achievement, RECIPE_ACHIEVEMENT)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!sbMenuDetector.isInside()) return
+        if (!UtilsPatterns.skyblockMenuInventory.isInside()) return
         val recipeSlot = 21
         val lore = event.inventoryItems[recipeSlot]?.getLoreComponent() ?: return
         for (line in lore) {

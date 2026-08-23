@@ -34,7 +34,7 @@ class AnniversaryTeamFinderColorConfig {
     val green: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(85, 255, 85, 1))
 
     @Expose
-    @ConfigOption(name = "Red Color", desc = "Color for the team §ARED §7players.")
+    @ConfigOption(name = "Red Color", desc = "Color for the team §cRED §7players.")
     @ConfigEditorColour
     val red: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(255, 85, 85, 1))
 }

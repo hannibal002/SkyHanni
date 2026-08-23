@@ -1,19 +1,27 @@
+# Execution context: PR branch code
 name: "PR Changelog Verification"
 
 on:
     pull_request:
-        types: [ opened, edited, ready_for_review ]
+        types: [ opened, edited, ready_for_review, synchronize, converted_to_draft ]
 
 permissions:
     contents: read
 
+# Workflow level on purpose. A draft conversion and a still running verification are two separate runs that execute
+# different jobs, so a job level group would never let them cancel each other. Converting a PR to a draft has to cancel
+# the running verification, otherwise that run finishes later and re-adds the label draft-cleanup just removed.
+concurrency:
+    group: pr-check-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
+
 jobs:
     verify-changelog:
-        if: github.event.pull_request.state == 'open' && '511310721' == github.repository_id && github.event.pull_request.draft == false
+        if: >-
+            github.event.pull_request.state == 'open'
+            && !github.event.pull_request.draft
+            && '511310721' == github.repository_id
         runs-on: ubuntu-latest
-        concurrency:
-            group: verify-changelog-${{ github.event.pull_request.number }}
-            cancel-in-progress: true
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v6
@@ -21,7 +29,7 @@ jobs:
                     ref: ${{ github.event.pull_request.head.sha }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
+            -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository == 'hannibal002/SkyHanni'
             -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository != 'hannibal002/SkyHanni'
@@ -29,19 +37,49 @@ jobs:
             -   name: Grant execute permission for gradlew
                 run: chmod +x gradlew
 
+
             -   name: Run ChangeLog verification w/retry
+                id: check_main
                 if: github.repository == 'hannibal002/SkyHanni'
-                env:
-                    PR_TITLE: ${{ github.event.pull_request.title }}
-                    PR_BODY: ${{ github.event.pull_request.body }}
-                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
-                with:
-                    gradle-command: checkPrDescription
-            -   name: Run ChangeLog verification w/retry
-                if: github.repository != 'hannibal002/SkyHanni'
+                continue-on-error: true
                 env:
                     PR_TITLE: ${{ github.event.pull_request.title }}
                     PR_BODY: ${{ github.event.pull_request.body }}
                 uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: checkPrDescription
+            -   name: Run ChangeLog verification w/retry
+                id: check_fork
+                if: github.repository != 'hannibal002/SkyHanni'
+                continue-on-error: true
+                env:
+                    PR_TITLE: ${{ github.event.pull_request.title }}
+                    PR_BODY: ${{ github.event.pull_request.body }}
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: checkPrDescription
+
+            -   name: Upload changelog check failure artifact
+                if: steps.check_main.outcome == 'failure' || steps.check_fork.outcome == 'failure'
+                uses: actions/upload-artifact@v7
+                with:
+                    name: changelog-check-failure
+                    path: "**/changelog-verification/changelog_errors.txt"
+                    if-no-files-found: error
+
+            -   name: Fail job if changelog check failed
+                if: steps.check_main.outcome == 'failure' || steps.check_fork.outcome == 'failure'
+                run: exit 1
+
+    # This job intentionally does nothing. When a PR is converted to a draft, verify-changelog is skipped,
+    # which would leave the whole run with conclusion "skipped". The Changelog Review workflow ignores skipped
+    # runs, so an outdated label and comment would stay on the PR forever. One successful job forces the run
+    # conclusion to "success", which makes pr_review.main.kts take its cleanup path: it removes the
+    # "Wrong Title/Changelog" label and marks the previous comment as stale.
+    draft-cleanup:
+        name: Clear changelog label on draft
+        if: github.event.action == 'converted_to_draft' && '511310721' == github.repository_id
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Report reason
+                run: echo "PR converted to draft, finishing as success so the changelog label gets cleared."

@@ -20,7 +20,7 @@ object HoppityAchievements {
      */
     private val rabbitsFoundPattern by AchievementManager.group.pattern(
         "rabbits-found",
-        "Rabbits Found: (?<percent>[\\d.]+)%"
+        "Rabbits Found: (?<percent>[\\d.]+)%",
     )
 
     private const val RABBITS_FOUND_ACHIEVEMENT = "rabbit collector"
@@ -29,16 +29,15 @@ object HoppityAchievements {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val rabbitAchievement = Achievement(
-            "Hoppity's Assistant".asComponent(),
-            "Bring home all of Hoppity's Rabbits".asComponent(),
+            name = "Hoppity's Assistant".asComponent(),
+            description = "Bring home all of Hoppity's Rabbits".asComponent(),
             userLuckAmount = 200f,
-            secret = false,
             tiers = listOf(80, 90, 99),
         )
         val chocolateAchievement = Achievement(
-            "Waste of chocolate".asComponent(),
-            "Have 60 Billion Chocolate sitting in your Chocolate Factory".asComponent(),
-            5f,
+            name = "Waste of chocolate",
+            description = "Have 60 Billion Chocolate sitting in your Chocolate Factory",
+            userLuckAmount = 5f,
         )
         event.register(rabbitAchievement, RABBITS_FOUND_ACHIEVEMENT)
         event.register(chocolateAchievement, CHOCOLATE_FULL_ACHIEVEMENT)

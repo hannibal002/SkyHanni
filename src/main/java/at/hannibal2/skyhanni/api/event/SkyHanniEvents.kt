@@ -1,14 +1,20 @@
 package at.hannibal2.skyhanni.api.event
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventVersionedJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
+import at.hannibal2.skyhanni.utils.system.ModVersion
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import java.lang.reflect.Method
+import java.util.concurrent.atomic.AtomicInteger
 
 @SkyHanniModule
 object SkyHanniEvents {
@@ -51,31 +57,69 @@ object SkyHanniEvents {
     val eventPrimaryFunctionNames: Map<String, Class<out SkyHanniEvent>> =
         GeneratedEventPrimaryFunctionNames.map
 
-    @Suppress("UNCHECKED_CAST")
+    private val Method.fullyQualifiedName: String get() = "${declaringClass.name}.$name"
+
+    private fun handleZeroParameterMethod(
+        method: Method,
+        options: HandleEvent,
+    ): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
+        val primaryFunctionEventType = eventPrimaryFunctionNames[method.name]
+        if (primaryFunctionEventType != null) return options to listOf(primaryFunctionEventType)
+
+        if (options.eventType != SkyHanniEvent::class) return options to listOf(options.eventType.java)
+
+        if (options.eventTypes.isEmpty()) {
+            ErrorManager.crashInDevEnv(
+                "Function ${method.fullyQualifiedName} must have an event parameter, a primary " +
+                    "function name, or an explicit event specification because it is annotated " +
+                    "with @HandleEvent",
+            )
+            return null
+        }
+
+        return options to options.eventTypes.map { it.java }
+    }
+
+    private fun handleSingleParameterMethod(
+        method: Method,
+        options: HandleEvent,
+    ): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
+        val eventType = method.parameterTypes.first()
+
+        if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
+            ErrorManager.crashInDevEnv(
+                "Function ${method.fullyQualifiedName} must have an event assignable from " +
+                    "SkyHanniEvent because it is annotated with @HandleEvent",
+            )
+            return null
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        return options to listOf(eventType as Class<out SkyHanniEvent>)
+    }
+
     private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
         val options = method.getAnnotation(HandleEvent::class.java) ?: return null
-        when (method.parameterCount) {
-            1 -> {
-                val eventType = method.parameterTypes.first()
-                require(SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
-                    "Method ${method.name} parameter must be a subclass of SkyHanniEvent."
-                }
-                return options to listOf(eventType as Class<out SkyHanniEvent>)
-            }
-
-            0 -> {
-                val primaryFunctionEventType = eventPrimaryFunctionNames[method.name]
-                if (primaryFunctionEventType != null) {
-                    return options to listOf(primaryFunctionEventType)
-                }
-                if (options.eventType != SkyHanniEvent::class) return options to listOf(options.eventType.java)
-                require(options.eventTypes.isNotEmpty()) {
-                    "Method ${method.name} must have at least one event type specified in @HandleEvent."
-                }
-                return options to options.eventTypes.map { it.java }
+        if (!method.declaringClass.isAnnotationPresent(SkyHanniModule::class.java)) {
+            ErrorManager.crashInDevEnv(
+                "Function ${method.fullyQualifiedName} must be declared directly inside a class " +
+                    "annotated with @SkyHanniModule because it is annotated with @HandleEvent",
+            )
+            return null
+        }
+        return when (method.parameterCount) {
+            0 -> handleZeroParameterMethod(method, options)
+            1 -> handleSingleParameterMethod(method, options)
+            else -> {
+                ErrorManager.crashInDevEnv(
+                    "Function ${method.fullyQualifiedName} has too many parameters. It must have " +
+                        "exactly one event parameter, or be parameterless with a primary " +
+                        "function name or an explicit event specification because it is " +
+                        "annotated with @HandleEvent",
+                )
+                null
             }
         }
-        return null
     }
 
     private fun unregisterMethod(method: Method) {
@@ -87,20 +131,68 @@ object SkyHanniEvents {
     }
 
     private fun unregisterHandler(clazz: Class<out SkyHanniEvent>) {
-        this.handlers.removeIfKey { it.isAssignableFrom(clazz) }
+        handlers.removeIfKey { it.isAssignableFrom(clazz) }
     }
 
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
-        disabledHandlers = data.disabledHandlers
-        disabledHandlerInvokers = data.disabledInvokers
+    private val listenerCacheGeneration = AtomicInteger(0)
+    private val currentStateIndex = AtomicInteger(ListenerCollection.OUTSIDE)
+
+    fun markEventCacheDirty(type: DirtyReason) {
+        when (type) {
+            DirtyReason.REPO_RELOAD,
+            DirtyReason.OUTSIDE_SB_FEATURE_CHANGED,
+            -> listenerCacheGeneration.incrementAndGet()
+
+            DirtyReason.LOCATION_CHANGED -> {
+                listenerCacheGeneration.incrementAndGet()
+                currentStateIndex.set(ListenerCollection.getCurrentStateIndex())
+            }
+
+            DirtyReason.SERVER_DISCONNECTED -> {
+                listenerCacheGeneration.incrementAndGet()
+                currentStateIndex.set(ListenerCollection.OUTSIDE)
+            }
+        }
     }
+
+    fun getListenerCacheGeneration(): Int = listenerCacheGeneration.get()
+    fun getCurrentStateIndex(): Int = currentStateIndex.get()
+
+    enum class DirtyReason {
+        LOCATION_CHANGED,
+        OUTSIDE_SB_FEATURE_CHANGED,
+        SERVER_DISCONNECTED,
+        REPO_RELOAD,
+    }
+
+    // This is marked highest priority to let it
+    // disable other RepositoryReloadEvent listeners before they happen
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    private fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
+        val version = SkyHanniMod.modVersion
+
+        val mcVersion = PlatformUtils.MC_VERSION
+        disabledHandlers = data.disabledHandlers + data.disabledHandlersVersioned.activeNames(version, mcVersion)
+        disabledHandlerInvokers = data.disabledInvokers + data.disabledInvokersVersioned.activeNames(version, mcVersion)
+        markEventCacheDirty(DirtyReason.REPO_RELOAD)
+    }
+
+
+    private fun Set<DisabledEventVersionedJson>.activeNames(
+        version: ModVersion,
+        mcVersion: String,
+    ): Set<String> =
+        filter {
+            (it.minVersion == null || version >= it.minVersion) &&
+                (it.maxVersion == null || version <= it.maxVersion) &&
+                (it.mcVersions == null || mcVersion in it.mcVersions)
+        }.map { it.name }.toSet()
 
     val seconds = listOf(10, 60, 60 * 5)
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed(event: SecondPassedEvent) {
         try {
             val list = handlers.values.toMutableList()
 
@@ -136,7 +228,7 @@ object SkyHanniEvents {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Events")
         event.addIrrelevant {
             add("- <event name> (<total invoke count> invokes per second: <last 10s, 60s, 5m, total>)")

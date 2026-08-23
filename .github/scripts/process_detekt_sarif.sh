@@ -1,4 +1,5 @@
 #!/bin/bash
+# Execution context: PR branch, called from detekt.yml
 
 # This script processes the Detekt SARIF file and outputs results in a format
 # suitable for annotation in CI/CD systems, with the file paths fixed.

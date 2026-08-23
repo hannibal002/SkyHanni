@@ -10,13 +10,13 @@ import org.apache.http.util.EntityUtils
 import java.nio.charset.StandardCharsets
 
 /**
- * Represents the intention to perform an Api request, and the data associated with it.
+ * Represents the intention to perform an API request, and the data associated with it.
  * This class is used to encapsulate the request and response data.
  *
- * @param url The URL of the Api request.
- * @param apiName The name of the Api being requested.
+ * @param url The URL of the API request.
+ * @param apiName The name of the API being requested.
  * @param request The HTTP request to be executed.
- * @param response The HTTP response received from the Api request, if any.
+ * @param response The HTTP response received from the API request, if any.
  */
 @PublishedApi
 internal open class ApiIntentionContext(
@@ -41,11 +41,11 @@ internal open class ApiIntentionContext(
     )
 
     /**
-     * Collects "interesting" fields related to an Api request, for use in error logging.
-     * This includes the Api name, URL, request method, response headers, status, and any post body content.
+     * Collects "interesting" fields related to an API request, for use in error logging.
+     * This includes the API name, URL, request method, response headers, status, and any post body content.
      * Feel free to add more fields as you need them.
      *
-     * @param this The ApiIntentionContext containing the Api request and possibly response data.
+     * @param this The ApiIntentionContext containing the API request and possibly response data.
      * @return A [List] of pairs where each pair contains a field name and its corresponding value.
      */
     private fun collectInterestingFields(): List<Pair<String, Any?>> = buildList {
@@ -73,7 +73,7 @@ internal open class ApiIntentionContext(
 
 /**
  * See [ApiIntentionContext] for general field definitions.
- * Represents the intention to perform a GET request to an Api endpoint.
+ * Represents the intention to perform a GET request to an API endpoint.
  * @param tryForceGzip If true, the GET request will attempt to use gzip compression.
  */
 @PublishedApi

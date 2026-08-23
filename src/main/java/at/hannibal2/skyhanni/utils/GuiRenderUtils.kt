@@ -2,33 +2,25 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
-import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemRenderableConfig
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemRenderableConfig
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.mojang.blaze3d.platform.Lighting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
+import net.minecraft.client.renderer.item.TrackingItemStackRenderState
 import net.minecraft.client.renderer.state.gui.GuiItemRenderState
 import net.minecraft.network.chat.Component
-import net.minecraft.util.ARGB
 import net.minecraft.resources.Identifier
+import net.minecraft.util.ARGB
 import net.minecraft.util.FormattedCharSequence
+import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.phys.Vec3
-import java.text.DecimalFormat
+import org.joml.Matrix3x2f
 import kotlin.math.min
 import kotlin.math.sqrt
-import net.minecraft.client.renderer.item.TrackingItemStackRenderState
-import net.minecraft.world.item.ItemDisplayContext
-import org.joml.Matrix3x2f
 
 /**
  * Some functions taken from NotEnoughUpdates
@@ -46,19 +38,7 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.text(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
-    @Suppress("SameParameterValue")
-    private fun drawStringCentered(str: Component, x: Float, y: Float, shadow: Boolean, color: Int) {
-        val strLen = fr.width(str)
-        val x2 = x - strLen / 2f
-        val y2 = y - fr.lineHeight / 2f
-        DrawContextUtils.drawContext.text(fr, str, x2.toInt(), y2.toInt(), color, shadow)
-    }
-
     fun drawStringCentered(str: String, x: Int, y: Int) {
-        drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
-    }
-
-    fun drawStringCentered(str: Component, x: Int, y: Int) {
         drawStringCentered(str, x.toFloat(), y.toFloat(), true, -1)
     }
 
@@ -108,74 +88,11 @@ object GuiRenderUtils {
         }
     }
 
-    fun drawTexts(strings: List<Component>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
-        var newY = y
-        for (string in strings) {
-            DrawContextUtils.drawContext.text(fr, string, x, newY, color, shadow)
-            newY += 9
-        }
-    }
-
     fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
         left <= x && x < left + width && top <= y && y < top + height
 
-    fun getFarmingBar(
-        label: String,
-        tooltip: String,
-        currentValue: Number,
-        maxValue: Number,
-        width: Int,
-        textScale: Float = .7f,
-    ): Renderable {
-        val current = currentValue.toDouble().coerceAtLeast(0.0)
-        val percent = current.fractionOf(maxValue)
-        val scale = textScale.toDouble()
-        return with(Renderable) {
-            hoverTips(
-                vertical(
-                    text(label, scale = scale),
-                    fixedSizeLine(
-                        listOf(
-                            text(
-                                "§2${DecimalFormat("0.##").format(current)} / ${
-                                    DecimalFormat(
-                                        "0.##",
-                                    ).format(maxValue)
-                                }☘",
-                                scale = scale, horizontalAlign = HorizontalAlignment.LEFT,
-                            ),
-                            text(
-                                "§2${(percent * 100).roundTo(1)}%",
-                                scale = scale,
-                                horizontalAlign = HorizontalAlignment.RIGHT,
-                            ),
-                        ),
-                        width,
-                    ),
-                    progressBar(percent, width = width),
-                ),
-                tooltip.split('\n').map(StringRenderable::from),
-            )
-        }
-    }
-
-    fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
-        drawRect(
-            (left * inverseScale).toInt(),
-            (top * inverseScale).toInt(),
-            (right * inverseScale).toInt(),
-            (bottom * inverseScale).toInt(),
-            color,
-        )
-    }
-
     fun drawRect(left: Int, top: Int, right: Int, bottom: Int, color: Int) {
         DrawContextUtils.drawContext.fill(left, top, right, bottom, color)
-    }
-
-    fun renderItemAndBackground(item: SafeItemStack, x: Int, y: Int, color: Int) {
-        DrawContextUtils.drawItem(item, x, y)
-        drawRect(x, y, x + 16, y + 16, color)
     }
 
     fun drawGradientRect(
@@ -397,8 +314,6 @@ object GuiRenderUtils {
          *  It also will not correctly adhere to other GUI transforms (such as blurring when in a menu).
          */
         val guiItemRenderState = GuiItemRenderState(
-            //? if < 26.1
-            //this.item.name.toString(),
             Matrix3x2f(DrawContextUtils.drawContext.pose()),
             trackingState,
             0,
@@ -417,11 +332,8 @@ object GuiRenderUtils {
             frameNumber = frameNumber,
             alpha = alpha,
         )
-        //? if >= 26.1 {
-        Minecraft.getInstance().gameRenderer.gameRenderState.guiRenderState.addPicturesInPictureState(newRenderState)
-        //?} else {
-        /*Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
-        *///?}
+        //~ if < 26.2 'gameRenderState()' -> 'gameRenderState'
+        Minecraft.getInstance().gameRenderer.gameRenderState().guiRenderState.addPicturesInPictureState(newRenderState)
 
         return newRenderState.stableId
     }

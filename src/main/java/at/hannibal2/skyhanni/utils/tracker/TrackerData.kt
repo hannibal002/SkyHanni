@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.utils.Stopwatch
 import com.google.gson.annotations.Expose
-import kotlin.reflect.KClass
 import com.google.gson.annotations.SerializedName
+import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 

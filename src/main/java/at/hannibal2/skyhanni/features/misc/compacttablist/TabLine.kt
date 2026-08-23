@@ -28,7 +28,7 @@ class TabLine(val component: Component, val type: TabStringType, val customName:
 
     fun getEntity(playerInfo: PlayerInfo): Player? {
         entity?.let { return it }
-        val entity = MinecraftCompat.localWorld.getPlayerByUUID(playerInfo.profile.id)
+        val entity = MinecraftCompat.localWorldOrThrow.getPlayerByUUID(playerInfo.profile.id)
         this.entity = entity
         return entity
     }

@@ -24,9 +24,9 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 
 @SkyHanniModule
@@ -39,9 +39,9 @@ object CrimsonIsleReputationHelper {
     var tabListQuestsMissing = false
 
     /**
-     * REGEX-TEST:  ✖ Rescue Mission
-     * REGEX-TEST:  ✔ Digested Mushrooms x20
-     * REGEX-TEST:  ✖ Slugfish x1
+     * WRAPPED-REGEX-TEST: " ✖ Rescue Mission"
+     * WRAPPED-REGEX-TEST: " ✔ Digested Mushrooms x20"
+     * WRAPPED-REGEX-TEST: " ✖ Slugfish x1"
      */
     val tabListQuestPattern by RepoPattern.pattern(
         "crimson.reputationhelper.tablist.quest-no-color",
@@ -136,7 +136,7 @@ object CrimsonIsleReputationHelper {
     }
 
     fun isHotkeyHeld(): Boolean {
-        val isAllowedGui = Minecraft.getInstance().screen.let {
+        val isAllowedGui = MinecraftCompat.screen.let {
             it == null || it is InventoryScreen
         }
         if (!isAllowedGui) return false

@@ -11,6 +11,8 @@ import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addCollectionCounter
+import at.hannibal2.skyhanni.data.model.SkyblockStat.FARMING_FORTUNE
+import at.hannibal2.skyhanni.data.model.SkyblockStat.OVERBLOOM
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -25,10 +27,12 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestKillTimes
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -36,10 +40,10 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -75,33 +79,22 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
     /**
-     * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §8x9 §e(§e+134☀)
-     * REGEX-TEST: §6§lRARE DROP! §9Enchanted Cookie §8x9 §6(§6+1,810☘)
-     * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
-     * REGEX-TEST: §6§lPET DROP! §r§6Slug §e(§e+78☀)
-     * REGEX-TEST: §6§lRARE DROP! §9Squeaky Toy §6(§6+1,549☘)
-     * REGEX-TEST: §6§lRARE DROP! §6Squeaky Mousemat §6(§6+1,549☘)
-     * REGEX-TEST: §6§lRARE DROP! §aWings of Harmony Vinyl §e(§e+139.5☀)
+     * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §8x9 §e(§e+134)
+     * REGEX-TEST: §6§lRARE DROP! §9Enchanted Cookie §8x9 §6(§6+1,810)
+     * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300)
+     * REGEX-TEST: §6§lPET DROP! §r§6Slug §e(§e+78)
+     * REGEX-TEST: §6§lRARE DROP! §9Squeaky Toy §6(§6+1,549)
+     * REGEX-TEST: §6§lRARE DROP! §6Squeaky Mousemat §6(§6+1,549)
+     * REGEX-TEST: §6§lRARE DROP! §aWings of Harmony Vinyl §e(§e+139.5)
      * REGEX-TEST: §6§lRARE DROP! §r§aNot Just a Pest Vinyl §r§6(Cocoaleech)
-     * REGEX-FAIL: §6§lRARE CROP! §aCane Knot §e(§e+139.5☀)
+     * REGEX-FAIL: §6§lRARE CROP! §aCane Knot §e(§e+139.5)
      */
-    // TODO consider if we want to add Harvest Feast drops to Pest Profit Tracker - we need a way to distinguish drops
-    //  from breaking crops vs. killing pests since they use the same message
+    // Harvest Feast drops are handled elsewhere; they're added here if determined to come from a pest.
+    // This pattern intentionally does not match them.
+    @Suppress("MaxLineLength")
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>\\d+))? (?:§.)*\\((?:§.)?(?:\\+[\\d.,]+[☘☀]|Cocoaleech)\\)",
-    )
-
-    /**
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aPlant Matter§r§7!
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aDung§r§7!
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aHoney Jar§r§7!
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aTasty Cheese§r§7!
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aCompost§r§7!
-     */
-    private val sprayonatorUsedPattern by patternGroup.pattern(
-        "sprayonator",
-        "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- .* §r§7with §r§.(?<spray>.*)§r§7!",
+        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>\\d+))? (?:§.)*\\((?:§.)?(?:\\+[\\d.,]+[${FARMING_FORTUNE.hypixelIcon}${OVERBLOOM.hypixelIcon}]|Cocoaleech)\\)",
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
@@ -109,7 +102,6 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     val OVERCLOCKER = "OVERCLOCKER_3000".toInternalName()
     val BITS = "SKYBLOCK_BIT".toInternalName()
     const val KILL_BITS = 5
-    private val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
 
     private val noMessageDrops = setOf(
         "PESTERMINATOR;1",
@@ -167,7 +159,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
     }
 
-    private fun SprayType.addSprayUsed() = modify { it.spraysUsed.addOrPut(this, 1) }
+    private fun SprayType.addSprayUsed(amount: Int = 1) = modify { it.spraysUsed.addOrPut(this, amount.toLong()) }
 
     fun addRareCropDrop(drop: RareCropTracker.RareCropDropType) {
         if (!drop.canDropFromPests) return
@@ -261,13 +253,16 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onShardGain(event: ShardGainEvent) {
-        if (event.shardInternalName != PEST_SHARD) return
-        addItem(PestType.UNKNOWN, PEST_SHARD, event.amount, command = false)
+        if (!event.source.isAnyOf(CHARM, HUNT)) return
+        val pestType = PestType.getByItemInternalNameOrNull(event.shardInternalName) ?: return
+        addItem(pestType, event.shardInternalName, event.amount, command = false)
     }
 
     private fun SkyHanniChatEvent.Allow.checkSprayChats() {
-        sprayonatorUsedPattern.matchGroup(message, "spray")?.let {
-            SprayType.getByNameOrNull(it)?.addSprayUsed()
+        GardenPlotApi.plotSprayedPattern.matchMatcher(cleanMessage) {
+            val spray = group("spray")
+            val amount = groupOrNull("amount")?.formatInt() ?: 1
+            SprayType.getByNameOrNull(spray)?.addSprayUsed(amount)
         }
     }
 

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DisplayEntityUtils.transformation
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -45,8 +46,8 @@ import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.monster.Creeper
 import net.minecraft.world.entity.monster.EnderMan
-import net.minecraft.world.entity.monster.MagmaCube
 import net.minecraft.world.entity.monster.Shulker
+import net.minecraft.world.entity.monster.cubemob.MagmaCube
 import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
@@ -69,7 +70,7 @@ object CopyNearbyEntitiesCommand {
             add("entity: $simpleName")
             val displayName = entity.displayName
             add("name: '" + entity.name.formattedTextCompatLessResets() + "'")
-            if (entity is ArmorStand) add("cleanName: '" + entity.cleanName() + "'")
+            if (entity is ArmorStand) add("cleanName: '" + entity.cleanName + "'")
             add("displayName: '${displayName.formattedTextCompat()}'")
             add("entityId: ${entity.id}")
             add("Category of Mob: ${getCategory(entity, mob)}")
@@ -183,7 +184,7 @@ object CopyNearbyEntitiesCommand {
         val stack = entity.item
         val stackName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val stackDisplayName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
-        val cleanName = stack.cleanName()
+        val cleanName = stack.cleanName
         val itemEnchanted = stack.isEnchanted
         val stackSize = stack.count
         val maxStackSize = stack.maxStackSize
@@ -247,20 +248,15 @@ object CopyNearbyEntitiesCommand {
     }
 
 
-    @Suppress("UnnecessarySafeCall")
     private fun MutableList<String>.addDisplayEntity(entity: Display) {
         add("EntityDisplay:")
-        val rotation = entity.lookAngle
-        val transformation = entity.renderState()?.transformation?.get(0f) ?: return
+        val lookAngle = entity.lookAngle
+        val transformation = entity.transformation ?: return
 
-        add("-  rotation: $rotation")
-        //~ if < 26.1 '.scale()' -> '.scale'
+        add("-  lookAngle: $lookAngle")
         add("-  transformation scale: ${transformation.scale()}")
-        //~ if < 26.1 'leftRotation()' -> 'leftRotation'
         add("-  transformation left rotation: ${transformation.leftRotation()}")
-        //~ if < 26.1 'rightRotation()' -> 'rightRotation'
         add("-  transformation right rotation: ${transformation.rightRotation()}")
-        //~ if < 26.1 '.translation()' -> '.translation'
         add("-  transformation translations: ${transformation.translation()}")
     }
 
@@ -300,7 +296,7 @@ object CopyNearbyEntitiesCommand {
                 add("-     skullTexture:")
                 add("-     $skullTexture")
             }
-            val cleanName = stack.cleanName()
+            val cleanName = stack.cleanName
             val stackName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
             val type = stack.javaClass.name
             add("-     name: '$stackName'")

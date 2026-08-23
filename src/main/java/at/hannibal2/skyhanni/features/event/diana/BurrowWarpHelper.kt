@@ -25,10 +25,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonArray
-import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -88,7 +88,7 @@ object BurrowWarpHelper {
         warpQueued = false
         if (!DianaApi.isDoingDiana()) return
         if (!config.burrowNearestWarp) return
-        if (Minecraft.getInstance().screen != null) return
+        if (MinecraftCompat.screen != null) return
         val warp = currentWarp ?: return
         if (lastWarpTime.passedSince() < 1.seconds) return
 

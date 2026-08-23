@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EnumUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -36,7 +36,7 @@ object CommunityFix {
     /**
      * REGEX-TEST: §2§l§m       §f§l§m             §r §e676,985§6/§e2M
      */
-    private val amountPattern by RepoPattern.pattern(
+    private val progressPattern by RepoPattern.pattern(
         "data.garden.milestonefix.amount",
         ".*§e(?<having>.*)§6/§e(?<max>.*)",
     )
@@ -45,7 +45,7 @@ object CommunityFix {
     private var showWhenAllCorrect = false
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         val map = data.cropMilestoneCommunityHelp
         for ((key, value) in map) {
@@ -90,14 +90,14 @@ object CommunityFix {
         crop: CropType,
         wrongData: MutableList<String>,
     ) {
-        val rawNumber = stack.hoverName.string.removeColor().replace(crop.cropName, "").trim()
+        val rawNumber = stack.cleanName.replace(crop.cropName, "").trim()
         val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNecessary()
 
         val lore = stack.getLore()
         val next = lore.nextAfter({ totalPattern.matches(it) }, 3) ?: return
 
         val guessNextMax = nextMax(realTier, crop)
-        val nextMax = amountPattern.matchMatcher(next) {
+        val nextMax = progressPattern.matchMatcher(next) {
             group("max").formatLong()
         } ?: return
 
@@ -126,7 +126,6 @@ object CommunityFix {
     private var totalFixedValues = 0
 
     private fun handleInput(input: String) {
-        println(" ")
         var fixed = 0
         var alreadyCorrect = 0
         for (line in input.lines()) {
@@ -167,7 +166,7 @@ object CommunityFix {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shreadcropmilestonefromclipboard") {
             description = "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
             category = CommandCategory.DEVELOPER_TEST

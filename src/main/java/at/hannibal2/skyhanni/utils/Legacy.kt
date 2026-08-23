@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
-// This class is to replace @Deprecated, which gets flagged by detekt
+/**
+ * Alternative to [Deprecated] for things that can never be removed due to backwards compatibility reasons
+ * (e.g. item categories that no longer exist but may appear on legacy items).
+ */
 @Retention(AnnotationRetention.BINARY)
 @Target(
     AnnotationTarget.CLASS,

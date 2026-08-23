@@ -13,15 +13,17 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
+import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object EntityData {
 
     private val maxHealthMap = mutableMapOf<Int, Int>()
-    private val nametagCache = TimeLimitedCache<Entity, Component>(50.milliseconds)
+    private val nametagCache = TimeLimitedCache<UUID, Component>(50.milliseconds)
     private val healthDisplayCache = TimeLimitedCache<Component, Component>(50.milliseconds)
     private val lastVisibilityCheck = TimeLimitedCache<Int, Boolean>(200.milliseconds)
 
@@ -60,7 +62,7 @@ object EntityData {
         EntityLeaveWorldEvent(entity).post()
     }
 
-    private fun postRenderNametag(entity: Entity, chatComponent: Component) = nametagCache.getOrPut(entity) {
+    private fun postRenderNametag(entity: Entity, chatComponent: Component) = nametagCache.getOrPut(entity.uuid) {
         val event = EntityDisplayNameEvent(entity, chatComponent)
         event.post()
         event.chatComponent
@@ -74,13 +76,18 @@ object EntityData {
     }
 
     @JvmStatic
-    fun onRenderCheck(entity: Entity, camX: Double, camY: Double, camZ: Double): Boolean {
+    fun shouldRender(entity: Entity, camX: Double, camY: Double, camZ: Double): Boolean {
         if (GlobalRender.renderDisabled) return true
         lastVisibilityCheck[entity.id]?.let { result ->
             return result
         }
-        val result = CheckRenderEntityEvent(entity, camX, camY, camZ).post()
+        val result = !CheckRenderEntityEvent(entity, camX, camY, camZ).post().isCancelled
         lastVisibilityCheck[entity.id] = result
         return result
+    }
+
+    @JvmStatic
+    fun onDisplayRenderStateUpdate(display: Display) {
+        lastVisibilityCheck.remove(display.id)
     }
 }

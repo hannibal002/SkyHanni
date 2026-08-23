@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.SoundCompat
-import kotlinx.coroutines.delay
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.resources.sounds.SoundInstance
 import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundEvent
+import kotlinx.coroutines.delay
 
 @SkyHanniModule
 object SoundUtils {
@@ -23,7 +23,6 @@ object SoundUtils {
     private val clickSound by lazy { createSound("ui.button.click", 1f) }
     private val errorSound by lazy { createSound("entity.enderman.teleport", 0f) }
     val plingSound by lazy { createSound("block.note_block.pling", 1f) }
-    val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
     fun SoundInstance.playSound() {
         DelayedRun.runOrNextTick {
@@ -58,7 +57,7 @@ object SoundUtils {
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {
         val newSound = SoundCompat.getModernSoundName(name)
-        val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
+        val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9:/._-]"), ""))
         return SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(identifier), pitch, volume)
     }
 

@@ -13,10 +13,12 @@ import at.hannibal2.skyhanni.config.features.garden.optimalAngles.OptimalAnglesC
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
+import at.hannibal2.skyhanni.features.garden.farming.NoBreak.NoBreakItem
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -55,12 +57,11 @@ class GardenConfig {
 
     @Expose
     @ConfigOption(
-        name = "Prevent Breaking with Rod",
-        desc = "Stops you from breaking blocks while holding a fishing rod.",
+        name = "Prevent Breaking Crops",
+        desc = "Stops you from breaking crops while holding certain items.",
     )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var noRodBreak: Boolean = true
+    @ConfigEditorDraggableList
+    val noBreakItems: MutableList<NoBreakItem> = NoBreakItem.entries.toMutableList()
 
     @Expose
     @Category(name = "Optimal Speed", desc = "Optimal Speed Settings")
@@ -133,14 +134,9 @@ class GardenConfig {
     val yawPitchDisplay: YawPitchDisplayConfig = YawPitchDisplayConfig()
 
     @Expose
-    @ConfigOption(name = "Mouse Lock", desc = "")
+    @ConfigOption(name = "Mouse Sensitivity Reducer", desc = "")
     @Accordion
-    val mouseLock: MouseLockConfig = MouseLockConfig()
-
-    @Expose
-    @ConfigOption(name = "Sensitivity Reducer", desc = "")
-    @Accordion
-    val sensitivityReducer: SensitivityReducerConfig = SensitivityReducerConfig()
+    val mouseSensitivityReducer: MouseSensitivityReducerConfig = MouseSensitivityReducerConfig()
 
     @Expose
     @ConfigOption(name = "Crop Start Location", desc = "")
@@ -249,6 +245,7 @@ class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Log Book Stats", desc = "Show total visited/accepted/denied visitors stats.")
+    @SearchTag("logbook")
     @ConfigEditorBoolean
     @FeatureToggle
     var showLogBookStats: Boolean = true

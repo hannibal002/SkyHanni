@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.itemability.FireVeilWandConfig.DisplayEntry
 import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -28,7 +28,7 @@ object FireVeilWandParticles {
     private var lastClick = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (config.display == DisplayEntry.PARTICLES) return
         if (lastClick.passedSince() > 5.5.seconds) return
         if (event.type == ParticleTypes.FLAME && event.speed == 0.55f) {
@@ -54,7 +54,7 @@ object FireVeilWandParticles {
         if (lastClick.passedSince() > 5.5.seconds) return
 
         val color = config.displayColor.toColor()
-        event.drawCircleWireframe(MinecraftCompat.localPlayer, rad = 3.5, color)
+        event.drawCircleWireframe(MinecraftCompat.localPlayerOrThrow, rad = 3.5, color)
     }
 
     @HandleEvent

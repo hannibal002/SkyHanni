@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.combat.end
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -38,11 +39,11 @@ object DragonFightAPI {
     )
 
     /**
-     * REGEX-TEST: Dragon HP: 4,824,217 ❤
+     * REGEX-TEST: Dragon HP: 4,824,217 
      */
     private val scoreboardHPPattern by group.pattern(
         "scoreboard.hp",
-        "Dragon HP: (?<hp>.*) ❤",
+        "Dragon HP: (?<hp>.*) ${SkyblockStat.HEALTH.hypixelIcon}",
     )
 
     /**

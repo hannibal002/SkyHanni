@@ -50,7 +50,7 @@ for "Gradle JVM") is set to a Java 25 JDK.
 
 </details>
 
-Now that gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java
+Now that Gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java
 version for the project.
 
 To do this we press `(CTRL+ALT+SHIFT+S)` in IntelliJ, or go to `File` → `Project Structure...`.
@@ -71,7 +71,7 @@ We want to set the project structure to use Java 25.
 
 </details>
 
-Finally, we then want to reload gradle which can be done from the gradle tab from earlier.
+Finally, we then want to reload Gradle which can be done from the Gradle tab from earlier.
 
 <details>
 
@@ -82,7 +82,7 @@ Finally, we then want to reload gradle which can be done from the gradle tab fro
 </details>
 
 After all importing is done (which should be much quicker this time), you should find a new IntelliJ run
-configuration. If not, you can restart intellij and reload the gradle project again.
+configuration. If not, you can restart IntelliJ and reload the Gradle project again.
 
 <details>
 <summary>🖼️Show run configuration selection image</summary>
@@ -126,16 +126,27 @@ You can do this by following the instructions within the IntelliJ window in the 
 
 Please use a prefix for the PR name (e.g., Feature, Improvement, Fix, Backend, etc.).
 
+Bug fixes should generally be submitted as standalone PRs. Including a bug fix alongside other changes is only acceptable if the
+total PR size is small (under 500 lines changed). Large PRs whose primary goal is not a bug fix should not include **Fixes**
+changelog entries. If you discover a bug while working on a large PR, extract the fix into a separate standalone PR instead of
+including it in the current one.
+
 When writing the PR description, ensure you fill out the template with all the necessary information.
 In the **What** section, write technical details or explanations that don't belong in the changelog.
 Including that field is optional for small changes.
 
-If your PR relies on another PR, please include this information at the beginning of the description. Use the format `- #<pr number>`
-for the dependency, or `- <url>` for REPO dependencies.
+If your PR relies on another PR, please include this information at the beginning of the description, under a `## Dependencies` heading.
+Use the format `- #<pr number>` for the dependency, or `- <url>` for REPO dependencies.
+
+Only the lines belonging to that section are read. The list may start after a blank line. The first line that does not start with
+`- ` ends the section, so keep the entries together. Anything wrong with the section, for example a mistyped number or a line in the wrong
+format, blocks the pull request until it is corrected.
 
 ### Changelog Builder
 
-The PR description is processed by our [ChangeLog Builder](https://github.com/SkyHanniStudios/SkyHanniChangelogBuilder).
+The PR description is processed by our [ChangeLog Builder](https://github.com/SkyHanniStudios/SkyHanniChangelogBuilder), which is included
+as a build dependency of the SkyHanni project. The `ChangelogVerification` Gradle task in `buildSrc/` uses it to validate PR descriptions in
+CI. Do not manually edit `docs/CHANGELOG.md` or `docs/FEATURES.md`. These files are maintained by the project maintainer.
 
 - Follow the format examples from the template and remove the categories that do not apply to your PR.
 - A PR might include multiple changelog categories simultaneously.
@@ -169,8 +180,8 @@ Internal changes that do not impact the end user. Examples include:
 - Refactoring (renaming or moving members, functions, classes, files or packages)
 - Typos in object names (which the end user will not see)
 - API updates
-- Minor performance improvements
-- Documentation changes to markdown files, e.g., in `/docs` or this file.
+- Minor performance improvements (noticeable performance improvements belong in Improvements)
+- Documentation changes to Markdown files, e.g., in `/docs` or this file.
 
 Try to avoid using this when the main goal of the PR is a user facing change, and the included backend change is related to that change.
 We mostly only need standalone changes or big/relevant backend changes marked as Technical Details,
@@ -201,13 +212,28 @@ Make sure such pull requests have a good explanation in the **What** section.
       blocked from the repository.
 - Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
+
 - **My build is failing due to `detekt`, what do I do?**
     - `detekt` is our code quality tool. It checks for code smells and style issues.
+    - When you open or update a pull request, Detekt runs automatically in CI. Any findings are posted as a comment on
+      the PR listing the affected files, line numbers, and rule names.
     - If you have a build failure stating `Analysis failed with ... weighted issues.`, you can
       check `build/reports/detekt/` for a comprehensive list of issues.
     - **There are valid reasons to deviate from the norm**
         - If you have such a case, either use `@Suppress("rule_name")`, or re-build the `baseline-main.xml` file,
           using `./gradlew detektBaselineMain`.
+- **Setting up the Detekt IntelliJ plugin (one time, per machine)**
+    - Install the [Detekt](https://plugins.jetbrains.com/plugin/10761-detekt) plugin from the JetBrains Marketplace to
+      see Detekt findings inline while editing.
+    - Open `Settings → Tools → Detekt` and set:
+        - `Configuration Files` to `detekt/detekt.yml`
+        - `Baseline File` to `detekt/baseline-main.xml`
+    - Both `detekt.yml` and `baseline-main.xml` are committed to the repository, but the plugin's reference to them
+      is stored per machine, not shared through git. Every contributor needs to set this link once after cloning the
+      repository. Without it, the plugin flags issues that CI does not (rules disabled in `detekt.yml`, or issues
+      already covered by the baseline).
+- When the SkyHanni IntelliJ plugin flags issues in a file you are already editing, fix those issues in the
+  same PR. Do not create standalone PRs to sweep plugin warnings across the entire codebase.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
     - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
@@ -215,16 +241,21 @@ Make sure such pull requests have a good explanation in the **What** section.
     - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
+      Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.
+      Exception: a standalone `if` that calls `ci.cancel()` is acceptable when the `CallbackInfo` object must stay in the mixin.
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
     - If the feature needs to register Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature class with
       `@SkyHanniModule`
     - This will automatically register all events to the respective event bus, and loads the repo patterns.
-    - In the background, this will generate `LoadedModules.kt` during compilation. Until the project is compiled for the first time,
-      the IDE will show a red error in `SkyHanniMod.kt` — this is expected and resolves after the first build.
+    - Until the project is compiled for the first time, the IDE will show a red error in `SkyHanniMod.kt`. This is expected and resolves
+      after the first build.
+- All functions and properties must be defined inside a class or object. Top-level Kotlin functions and properties are not
+  permitted.
+- Use `Unit` instead of `Void` in Kotlin code.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
-- Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
+- Future JSON data objects should be made in kotlin.
 - Config files should be made in **Kotlin**.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it.
@@ -246,10 +277,17 @@ Make sure such pull requests have a good explanation in the **What** section.
         - RenderingSkyHanniEvent: An event in which listeners are allowed to do GUI rendering.
     - Events can also use the `SkyHanniEvent.Cancellable` and `SkyHanniEvent.Rendering`
       interfaces directly if needed.
+    - Functions annotated with `@HandleEvent` must be declared `private`.
+      The [SkyHanni IntelliJ plugin](https://github.com/hannibal002/SkyHanniDevelopment) flags non-private handlers and provides a quick
+      fix.
 - Do not subscribe to Fabric events directly in feature classes. Instead, subscribe to SkyHanni events.
   Only backend data classes in the `api` packages should listen to Fabric events. Their job is to process
   the Fabric event and fire a corresponding SkyHanni event that feature classes then use.
   See the `api/minecraftevents` package for examples.
+- Every event class must have a KDoc comment that describes: what the event represents,
+  when it is fired, what each parameter means, and optionally, when to use or not use it.
+    - For new events, the KDoc is required in the same PR.
+    - For existing events, add the KDoc the next time the event is touched or newly used in a PR.
 - Please use existing utils methods.
 - Never use  `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
@@ -259,6 +297,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - This will most likely not be possible to avoid when working with objects from java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
+  See the **Errors and Crashes** section for why every catch goes through `ErrorManager`.
 - Do not use `toRegex()` or `toPattern()`. Use `RepoPattern` instead.
   RepoPattern allows regex patterns to be updated remotely via the repo without requiring a mod update.
   Each pattern has a local fallback defined in code, but can be overridden by the repo at runtime.
@@ -278,13 +317,37 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve
-  readability and maintain encapsulation.
+  readability and maintain encapsulation. Extension functions are an exception to this rule.
+- Enum entries may be written without their enum class name wherever the compiler resolves them from context. This is
+  preferred, not just tolerated, because the enum class name carries no information there. It covers `when` subjects and
+  branches, comparisons, assignments and arguments with a known parameter type. Stay consistent within a block: do not mix
+  `MyEnum.ENTRY` and `ENTRY` in the same place.
+    - This governs how code is written, not a cleanup task. Apply it in files you are already changing. Do not open a
+      pull request whose only purpose is stripping qualifiers across the codebase.
+    - Subclasses of a sealed class are a separate case. To use them unqualified, import the subclass
+      (`import some.pkg.Outer.Variant`). That is a normal class import, it costs one line per subclass instead of one
+      per enum entry, and it applies everywhere in the file rather than only where the expected type is known. See
+      `EliteWeightJson.kt` for an example.
+- Use named parameters for boolean and numeric arguments where the meaning is not immediately clear from context (e.g.,
+  `findMobHeight(height, above = true)` instead of `findMobHeight(height, true)`).
 - Follow Kotlin conventions for acronym naming:
     - Use all-uppercase for two-letter acronyms (e.g., `XP`).
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
 - Always combine title messages with chat message.
     - This way users know what feature and what mod sends the title, if they want to disable it.
-    - Also we can include more information on why the title just showed up, as the title should not be too long.
+    - Also, we can include more information on why the title just showed up, as the title should not be too long.
+
+## Errors and Crashes
+
+SkyHanni wraps the places where the game calls into our code in a try-catch: posting events, running commands, and the consumers for delayed
+responses. Every catch goes through our own `ErrorManager`, which turns a failure into a red chat message and keeps the client running.
+Leaving as little code as possible outside that protection is a deliberate goal, so new code paths need the same treatment.
+
+An exception in SkyHanni code therefore does not crash the game. Only unprotected code can, in practice a mixin hook. Treat any path that is
+not known to be protected as unprotected.
+
+Because of that, a "crash" means the client actually terminated, while a caught exception shown as a red chat message is an "error". Keep
+the two apart in pull request titles, changelog entries and issues, since calling an error a crash overstates how bad it is.
 
 ## Additional Useful Development Tools
 
@@ -315,6 +378,17 @@ Helps you write Minecraft specific code such as mixins and access wideners.
 
 Provides syntax highlighting and quick version switching for our multiversion development setup.
 
+### [SkyHanni Development Plugin](https://github.com/hannibal002/SkyHanniDevelopment)
+
+An IntelliJ plugin with SkyHanni-specific development assistance. It validates, for example, event handler
+declarations, flags missing or incorrect `@HandleEvent`, `@PrimaryFunction`, and `@SkyHanniModule`
+annotations, resolves config paths, and suppresses false-positive IntelliJ warnings in SkyHanni-specific
+patterns such as RepoPattern keys and Brigadier command names.
+
+Install it manually: download the latest release from the
+[GitHub releases page](https://github.com/hannibal002/SkyHanniDevelopment/releases/latest) and install via
+<kbd>Settings</kbd> → <kbd>Plugins</kbd> → <kbd>⚙</kbd> → <kbd>Install plugin from disk...</kbd>.
+
 ## Software Used in SkyHanni
 
 ### Basics
@@ -335,7 +409,7 @@ and recipes. NEU is not a dependency of SkyHanni.
 
 ### Config
 
-SkyHanni stores the config (settings and user data) as a json object in a single text file.
+SkyHanni stores the config (settings and user data) as a JSON object in a single text file.
 For rendering the /sh config (categories, toggles, search, etc.),
 SkyHanni uses **[MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig)**, the same config system as NotEnoughUpdates.
 
@@ -344,7 +418,7 @@ SkyHanni uses **[MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig)**, 
 SkyHanni utilizes the [Elite API](https://api.eliteskyblock.com/) (view the [public site here](https://eliteskyblock.com)) for some farming
 features and for LBIN price data.
 
-This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for convenience. Features that upload
+This includes features relating to Farming Weight, as well as syncing Jacob contests amongst players for convenience. Features that upload
 data to the Elite API are optional and opt-in. All requests to the Elite API are subject to
 its [privacy policy](https://eliteskyblock.com/privacy).
 
@@ -358,18 +432,30 @@ It allows to easily modify methods in Minecraft itself, without conflicting with
 For more information, see https://github.com/SpongePowered/Mixin
 or [our existing mixins](https://github.com/hannibal002/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
 
-When creating new Mixins, try to keep the code inside the mixin as small as possible, and calling a hook as soon as
-possible.
+When creating new Mixins, try to keep the code inside the mixin as small as possible, and call a hook as soon as possible.
+The mixin method itself should ideally contain only a single call to a Kotlin function. All logic belongs in Kotlin, not in the Java mixin.
+
+### KSP (Kotlin Symbol Processing)
+
+SkyHanni uses KSP via the `annotation-processors` module to generate code at compile time.
+
+- `@SkyHanniModule`: Generates `LoadedModules.kt`, which registers all event handlers and repo patterns automatically.
+- Mixin registration: Scans for `@Mixin`-annotated classes and generates the mixin configuration. There is no manual mixin list to update.
 
 ### Repo
 
 SkyHanni uses a repo system to easily change static variables without the need for a mod update.
 The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
-A copy of all json files is stored on the computer under `.minecraft\config\skyhanni\repo`.
+A copy of all JSON files is stored on the computer under `.minecraft\config\skyhanni\repo`.
 On every game start, the copy gets updated (if outdated and if not manually disabled).
-If you add stuff to the repo make sure it gets serialised. See
+If you add stuff to the repo make sure it gets serialized. See
 the [JsonObjects](src/main/java/at/hannibal2/skyhanni/data/jsonobjects/repo)
 folder for how to properly do this. You also may have to disable repo auto update in game.
+
+If your PR adds or changes data in the repo, open a separate PR on the [SkyHanni-REPO](https://github.com/hannibal002/SkyHanni-REPO)
+repository as well.
+Keep the main mod PR as a draft until the repo PR is ready.
+Link the repo PR URL in the `## Dependencies` section of the mod PR.
 
 ### Discord IPC
 
@@ -386,14 +472,159 @@ We use the [auto update library](https://github.com/nea89o/libautoupdate) from n
 While not directly part of the Minecraft mod, it is useful to know that we have
 a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with small tasks related to PRs.
 
+### Automated GitHub Workflows
+
+Several GitHub Actions workflows run automatically on pull requests to enforce code quality and keep PR metadata up to date.
+All workflows use `.github/scripts/pr_review.main.kts` as the shared review script, invoked with a `MODE` parameter.
+
+When a PR is updated, any existing comment posted by a workflow is collapsed into a `<details>` spoiler. What follows depends on the
+workflow. The Detekt, Build Failure, Merge Conflict and Changelog Check comments only ever announce that something is wrong: a new comment
+is posted while issues still exist, and once everything is resolved the label is removed without a new comment. The Dependency Label and
+Description Keyword Labels comments announce both directions, so they also post when the situation resolves.
+
+Every one of these comments carries an invisible marker that lets a later run recognize its own previous comment. For the two that announce
+both directions the marker also records which direction was announced last, and that record decides whether a new comment is needed. The
+label does not. A label edited by hand therefore no longer influences whether a comment appears. Labels are still read elsewhere: they
+select which PRs get re-evaluated after a dependency PR is closed, and the Merge Conflict workflow skips a PR that already carries its
+label.
+
+Most workflows use a two-workflow split to allow write-operations on fork PRs without granting untrusted code elevated permissions.
+The first workflow is triggered by `pull_request`, runs with limited permissions, and uploads results as an artifact. The second is
+triggered by `workflow_run` on completion of the first, always uses the base branch version, carries write access (`issues: write`,
+`pull-requests: write`, `actions: read`), and runs the review script against the artifact. The PR number is resolved at runtime from
+the head branch of the triggering workflow run. The Merge Conflict Comment, Dependency Label and Description Keyword Labels sections
+do not use this split.
+
+#### Automated Detekt Review
+
+Detekt runs automatically on every pull request. When findings are present, they are posted as a comment on the PR and the `Detekt`
+label is applied.
+
+- `.github/workflows/detekt.yml`: Triggered by `pull_request`. Runs with `contents: read` only. Runs `detektMain` and uploads the
+  [SARIF](https://docs.github.com/en/code-security/reference/code-scanning/sarif-files/sarif-support)
+  output as an artifact named `detekt-output`. Fork code never executes with write access.
+- `.github/workflows/detekt-review.yml`: Triggered by `workflow_run` on completion of `detekt.yml`. Always uses the version from the
+  base branch, so a fork PR cannot modify it. Runs with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads the
+  artifact to `runner.temp` (outside the workspace) and runs the review script. The script only reads the pre-generated SARIF, so fork
+  code has no influence over what runs here.
+- `.github/scripts/pr_review.main.kts` (invoked with `MODE=detekt`): Parses the SARIF, formats findings into a PR comment,
+  manages the `Detekt` label, and handles the stale-comment logic.
+
+#### Build Failure Notification
+
+When the multi-version build fails on a pull request, the stack trace is posted as a comment on the PR and the `Fails Multi-Version`
+label is applied.
+
+- `.github/workflows/build.yml`: Triggered by `pull_request` and `push` to beta. On assemble failure, captures the Gradle output via
+  `tee` inside `.github/actions/gradle-retry/action.yml`, saves it as a log file, and uploads it as an artifact named
+  `build-failure-output-<version>` (one per matrix version). Uses `continue-on-error: true` on the assemble step so the artifact is
+  uploaded before the job fails.
+- `.github/workflows/build-review.yml`: Triggered by `workflow_run` on completion of `build.yml`. Always uses base branch code. Runs
+  with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads all version artifacts with
+  `continue-on-error: true`, resolves the PR number by branch name, and runs the review script.
+- `.github/scripts/pr_review.main.kts` (invoked with `MODE=build`): Reads the log files, extracts a one-liner (first `e:`
+  compiler error line) and the stack trace starting from `FAILURE: Build failed with an exception` (capped at 10,000 characters).
+  Posts the result as a PR comment and manages the `Fails Multi-Version` label.
+
+If no open PR matches the branch (e.g. for a direct push to beta), the script exits without posting a comment.
+
+#### Merge Conflict Comment
+
+When a pull request has merge conflicts with the base branch, the `Merge Conflicts` label is applied and a comment is posted. When
+conflicts are resolved, the comment is collapsed into a `<details>` spoiler and the label is removed without posting a new comment.
+
+- `.github/workflows/label-merge-conflict.yml`: Triggered by `pull_request_target` on `opened` and `synchronize` events, and by `push` to
+  beta. Runs with `issues: write` and `pull-requests: write`. Does not use the two-workflow split because `pull_request_target` already
+  provides write access while running base branch code. On a push to beta, no PR number is available and all open PRs are rechecked.
+- `.github/scripts/pr_review.main.kts` (invoked with `MODE=merge_conflict`): Queries the GitHub Pulls API for the `mergeable` field of
+  the PR. If `null` (GitHub has not yet computed the state), the script exits without making any changes. If `false`, an existing conflict
+  comment is staled and a new one is posted, and the label is added. If `true`, an existing conflict comment is staled and the label is
+  removed.
+
+#### Changelog Check Comment
+
+When a pull request has changelog or title issues detected by the `checkPrDescription` Gradle task, the `Wrong Title/Changelog` label is
+applied and a comment is posted with the list of issues. When the issues are resolved, the comment is collapsed into a `<details>` spoiler
+and the label is removed.
+
+The `checkPrDescription` task writes a formatted `changelog_errors.txt` to `build/changelog-verification/` on failure. The comment
+content is read directly from this file without additional parsing.
+
+- `.github/workflows/pr-check.yml`: Triggered by `pull_request` on `opened`, `edited`, `ready_for_review`, and `synchronize` events. The
+  `checkPrDescription` steps run with `continue-on-error: true` and upload `build/changelog-verification/changelog_errors.txt` as
+  the `changelog-check-failure` artifact on failure. A separate step at the end fails the job so the overall check result is still a
+  failure.
+- `.github/workflows/changelog-review.yml`: Triggered by `workflow_run` on completion of `pr-check.yml`. Always uses base branch code.
+  Runs with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads the artifact, resolves the PR number by branch name,
+  and runs the review script.
+- `.github/scripts/pr_review.main.kts` (invoked with `MODE=changelog`): Reads `changelog_errors.txt` from the artifact directory.
+  If the file is present, it stales any existing comment and posts a new one, then adds the label. If the file is absent (check passed), it
+  stales any existing comment and removes the label.
+
+#### Dependency Label
+
+When a pull request declares dependencies in its `## Dependencies` section, the `Waiting on Dependency PR` label is automatically added or
+removed based on whether any listed dependencies are still open.
+
+Two dependency formats are supported:
+
+- `- #<pr number>` for same-repository PRs
+- `- <url>` for external repository PRs
+
+Both are read only from the `## Dependencies` section, never from the rest of the description. The section starts at the heading, may be
+followed by blank lines, and ends at the first line that does not start with `- `. Text after a valid entry is ignored, so
+`- #1234 (needed for the item API)` is recognized. A line matching neither format is ignored.
+
+Dependencies on `hannibal002/SkyHanni-REPO` are explicitly excluded from the open check, as that repository is considered part of the same
+release unit.
+
+The section itself can also be wrong: an entry that fails to resolve, for example through a mistyped number, a line matching neither
+format, the template placeholder left in place, or the heading appearing twice, in which case only the first one is read. The comment then
+shows only the problems, because the state of the other dependencies says nothing useful while the section is broken, and the commit
+status fails. The label still follows the genuinely open dependencies.
+
+A comment is posted when a PR starts waiting, when the list of open dependencies changes, when a problem with the section appears or
+disappears, and when a dependency PR is closed. It names the closed PR if the run was triggered by one, followed by the dependencies that
+are still open, or by the note that the PR is no longer waiting on any. A run that has nothing new to announce produces no comment.
+
+The check runs on every `opened`, `edited`, `closed`, and `synchronize` event via `pull_request_target`. On `closed`, all open PRs currently
+carrying the label are re-evaluated so the label is removed from dependent PRs when their dependency merges.
+
+Known limitation: if a dependency PR in an external repository merges, the workflow does not fire for that repository. The label on the
+dependent PR remains until the PR itself is edited or another supported event occurs.
+
+Known limitation: the heading is matched line by line without looking at markdown structure. A description that quotes
+`## Dependencies` a second time, for example inside a fenced code block, is reported as having a duplicate heading.
+
+Relevant files: `.github/workflows/check_dependencies.yml`, `.github/scripts/pr_review.main.kts`.
+
+#### Description Keyword Labels
+
+Some labels are controlled by keywords in the pull request description. Writing the keyword on its own line adds the label, removing
+the line removes it again. Both directions post a comment on the PR explaining what happened, but only when the state actually changed
+compared to what the last comment announced. Editing the description without touching the keyword line posts nothing.
+
+Supported keywords:
+
+- `waiting_on_hypixel_alpha` adds the `Waiting on Hypixel` label. Use it when the relevant feature is only available on the Hypixel
+  alpha server, so the pull request can only be tested there and must not be merged before the feature reaches the main server. This
+  keyword also publishes a failing commit status while the line is present.
+
+The line has to match exactly, the same way `exclude_from_changelog` works. Leading or trailing spaces, list markers such as `- `, and
+a different capitalization all prevent the keyword from being recognized.
+
+The check runs on every `opened`, `edited`, `reopened`, and `synchronize` event via `pull_request_target`.
+
+Relevant files: `.github/workflows/keyword-labels.yml`, `.github/scripts/pr_review.main.kts` (invoked with `MODE=keyword_labels`).
+
 ## Access Wideners
 
-You may want to use private minecraft methods or fields, this is where access wideners come in.
+You may want to use private Minecraft methods or fields, this is where access wideners come in.
 Access wideners are a way to access private methods and fields in Minecraft classes. They are used to modify the access level of a method or
 field and allow it to be accessed from other classes. This is an easier alternative to using mixins and making an accessor.
 To get an access widener entry, you can use the Minecraft Development plugin for IntelliJ. Then you can right-click on a method or field and
 select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom
 of `src/main/resources/skyhanni.classtweaker`.
-Then you need to reload gradle for the changes to apply.
+Then you need to reload Gradle for the changes to apply.
 
 This requires you to have the Minecraft Development plugin installed as mentioned earlier.

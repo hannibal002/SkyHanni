@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.Legacy
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -16,7 +15,6 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import java.util.Collection
 import java.util.function.IntFunction
-import kotlin.collections.iterator
 
 // TODO: This class should be disambiguated into a NodePath and a Graph class
 @JvmInline
@@ -31,6 +29,8 @@ value class Graph(
         nodes.filter { node -> tag.all { node.hasTag(it) } }
     fun getNodesWithName(name: String): List<GraphNode> =
         nodes.filter { it.name == name }
+    fun getActiveNodeTags(): Set<GraphNodeTag> =
+        nodes.flatMap { it.tags }.toSet()
     fun getNodesWithNameAndTags(name: String, tag: GraphNodeTag): List<GraphNode> =
         getNodesWithTags(tag).filter { it.name == name }
     fun getClosestNode(nodeName: String, tag: GraphNodeTag): GraphNode? =
@@ -60,7 +60,7 @@ value class Graph(
     fun toPositionsList() = map { it.position }
     fun toJson(): String = gson.toJson(this)
 
-    @Legacy("See parent deprecation")
+    @Deprecated("See parent deprecation")
     @Suppress("UNCHECKED_CAST", "PLATFORM_CLASS_MAPPED_TO_KOTLIN")
     override fun <T> toArray(generator: IntFunction<Array<T>>): Array<T> =
         (nodes as Collection<GraphNode>).toArray(generator)
@@ -97,7 +97,10 @@ value class Graph(
                 if (node.extraWeight != 0) out.name("ExtraWeight").value(node.extraWeight)
                 // JSON key intentionally kept as "Neighbours" for backward compatibility
                 out.name("Neighbours").beginObject()
-                for ((neighbor, weight) in node.neighbors) {
+
+                // sort neighbors by id of the node
+                val sorted = node.neighbors.toList().sortedBy { it.first.id }
+                for ((neighbor, weight) in sorted) {
                     out.name(neighbor.id.toString()).value(weight.roundTo(2))
                 }
                 out.endObject()

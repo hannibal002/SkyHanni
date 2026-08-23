@@ -2,21 +2,16 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.features.fishing.FishingApi.isFishingRod
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenApi.isFarmingTool
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
-import at.hannibal2.skyhanni.features.inventory.EquipmentApi
-import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
@@ -28,9 +23,6 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object GardenCustomKeybinds {
-
-    private val SQUEAKY_MOUSEMAT = "SQUEAKY_MOUSEMAT".toInternalName()
-    private val SUNS_GRASP = "SUNS_GRASP".toInternalName()
 
     private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getInstance().options
@@ -76,7 +68,7 @@ object GardenCustomKeybinds {
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return
-        val screen = Minecraft.getInstance().screen ?: return
+        val screen = MinecraftCompat.screen ?: return
         if (screen !is SignEditScreen) return
         lastWindowOpenTime = SimpleTimeMark.now()
     }
@@ -167,17 +159,12 @@ object GardenCustomKeybinds {
             config.enabled &&
             !(GardenApi.onUnfarmablePlot && config.excludeBarn)
 
-    private fun isHoldingTool(): Boolean = InventoryUtils.getItemInHand()?.let { heldItem ->
-        val internalName = heldItem.getInternalName()
-
-        val wearingSunsGrasp = EquipmentApi.getEquipment(EquipmentSlot.GLOVES)?.getInternalName() == SUNS_GRASP
-
-        return internalName.isFarmingTool() ||
-            (config.mousemat && internalName == SQUEAKY_MOUSEMAT) ||
+    private fun isHoldingTool(): Boolean =
+        GardenApi.hasFarmingToolInHand() ||
+            (config.mousemat && GardenApi.hasMousematInHand()) ||
             (config.vacuum && PestApi.hasVacuumInHand()) ||
-            (config.fishingRod && internalName.isFishingRod()) ||
-            (config.sunsGrasp && wearingSunsGrasp && heldItem.isEmpty)
-    } ?: false
+            (config.fishingRod && FishingApi.holdingRod) ||
+            (config.sunsGrasp && GardenApi.hasActiveSunsGrasp())
 
     private fun isActive(): Boolean =
         isEnabled() &&
@@ -185,7 +172,7 @@ object GardenCustomKeybinds {
             !hasGuiOpen() &&
             lastWindowOpenTime.passedSince() > 300.milliseconds
 
-    private fun hasGuiOpen() = Minecraft.getInstance().screen != null
+    private fun hasGuiOpen() = MinecraftCompat.screen != null
 
     @JvmStatic
     fun disableAll() {

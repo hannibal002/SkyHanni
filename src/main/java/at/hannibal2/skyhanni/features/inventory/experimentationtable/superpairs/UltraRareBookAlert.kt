@@ -29,17 +29,21 @@ object UltraRareBookAlert {
     private var enchantsFound = false
 
     private var lastNotificationTime = SimpleTimeMark.farPast()
+    // Carries isBook from onTableRareUncover into onChestGuiRender, which polls
+    // lastNotificationTime rather than receiving the event directly.
+    private var lastUncoveredWasBook = true
 
-    private fun notification(enchantsName: String) {
+    private fun notification(enchantsName: String, isBook: Boolean) {
         lastNotificationTime = SimpleTimeMark.now()
         dragonSound.playSound()
+        val typeLabel = if (isBook) " ULTRA-RARE BOOK! " else " ULTRA-RARE ITEM! "
         ChatUtils.chat(
             componentBuilder {
-                append("You have uncovered a ")
+                append("You have uncovered an ")
                 appendWithColor("XX", ChatFormatting.LIGHT_PURPLE) {
                     obfuscated = true
                 }
-                appendWithColor(" ULTRA-RARE BOOK! ", ChatFormatting.DARK_PURPLE)
+                appendWithColor(typeLabel, ChatFormatting.DARK_PURPLE)
                 appendWithColor("XX", ChatFormatting.LIGHT_PURPLE) {
                     obfuscated = true
                 }
@@ -55,7 +59,7 @@ object UltraRareBookAlert {
         if (lastNotificationTime.passedSince() > 5.seconds) return
 
         TitleManager.sendTitle(
-            titleText = "§d§kXX§5 ULTRA-RARE BOOK! §d§kXX",
+            titleText = if (lastUncoveredWasBook) "§d§kXX§5 ULTRA-RARE BOOK! §d§kXX" else "§d§kXX§5 ULTRA-RARE ITEM! §d§kXX",
             duration = 2.seconds,
             location = TitleManager.TitleLocation.INVENTORY,
         )
@@ -64,7 +68,8 @@ object UltraRareBookAlert {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onTableRareUncover(event: TableRareUncoverEvent) {
         if (enchantsFound || !isEnabled()) return
-        notification(event.dropName)
+        lastUncoveredWasBook = event.isBook
+        notification(event.dropName, event.isBook)
         enchantsFound = true
     }
 

@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -17,9 +17,13 @@ object SlayerBossSpawnSoon {
 
     private val config get() = SlayerApi.config.slayerBossWarning
 
+    /**
+     * REGEX-TEST: 38/40 Kills
+     * REGEX-TEST: (0/4.8k) Combat XP
+     */
     private val progressPattern by RepoPattern.pattern(
         "slayer.bosswarning.progress",
-        " \\(?(?<progress>[0-9.,k]+)/(?<total>[0-9.,k]+)\\)?.*"
+        "\\(?(?<progress>[0-9,.]+k?)/(?<total>[0-9,.]+k?)\\)? .*",
     )
 
     private var lastCompletion = 0.0
@@ -30,13 +34,14 @@ object SlayerBossSpawnSoon {
         if (!isEnabled()) return
         if (!SlayerApi.isInCorrectArea) return
 
-        val completion = progressPattern.matchMatcher(event.newProgress.removeColor()) {
+        val completion = progressPattern.matchMatcher(event.newProgress) {
             group("progress").formatDouble() / group("total").formatDouble()
         } ?: return
 
         if (completion > config.percent / 100.0) {
             if (!warned || (config.repeat && completion != lastCompletion)) {
                 SoundUtils.playBeepSound()
+                ChatUtils.chat("§eSlayer boss soon!")
                 TitleManager.sendTitle("§eSlayer boss soon!", duration = 2.seconds)
                 warned = true
             }

@@ -40,8 +40,8 @@ object HoppityEggsManager {
     private val unclaimedEggsConfig get() = config.unclaimedEggs
     private val waypointsConfig get() = config.waypoints
     private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
-    private val nextEggMessageId = ChatUtils.getUniqueCustomMessageId()
-    private val nextHuntMessageId = ChatUtils.getUniqueCustomMessageId()
+    private val nextEggMessageId = ChatUtils.getUniqueMessageId()
+    private val nextHuntMessageId = ChatUtils.getUniqueMessageId()
 
     // <editor-fold desc="Patterns">
     /**

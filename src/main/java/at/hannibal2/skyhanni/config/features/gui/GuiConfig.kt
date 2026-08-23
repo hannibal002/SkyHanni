@@ -138,6 +138,11 @@ class GuiConfig {
     var beaconPowerStat: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Compress Beacon Stat", desc = "Compress the beacon stat display to only show the value.")
+    @ConfigEditorBoolean
+    var beaconPowerCompressStat: Boolean = false
+
+    @Expose
     @ConfigLink(owner = GuiConfig::class, field = "beaconPower")
     val beaconPowerPosition: Position = Position(10, 10)
 
@@ -198,4 +203,12 @@ class GuiConfig {
     @ConfigOption(name = "Legion/Bobbin Overlay", desc = "")
     @Accordion
     val legionBobbinOverlay: LegionBobbinOverlayConfig = LegionBobbinOverlayConfig()
+
+    @Expose
+    @ConfigOption(
+        name = "Hide GUI in F3 menu",
+        desc = "Hide Skyhanni GUI elements in debug menu",
+    )
+    @ConfigEditorBoolean
+    var hideGuiInDebugMenu: Boolean = true
 }

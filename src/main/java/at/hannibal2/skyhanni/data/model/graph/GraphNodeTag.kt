@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.data.model.graph
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.Legacy
 
 enum class GraphNodeTag(
     val internalName: String,
@@ -24,7 +23,7 @@ enum class GraphNodeTag(
     POI("poi", LorenzColor.WHITE, "Point of Interest", "A relevant spot or a landmark on the map.", onlySkyblock = null),
 
     // TODO delete once no graph data contains this anymore
-    @Legacy("gets split up into WARP, JUMP_PAD and TELEPORT_PAD")
+    @Deprecated("gets split up into WARP, JUMP_PAD and TELEPORT_PAD")
     TELEPORT(
         "teleport",
         LorenzColor.BLUE,
@@ -152,6 +151,70 @@ enum class GraphNodeTag(
         "Hideonleaf",
         "The green Shulkers.",
         onlyIsland = IslandType.GALATEA,
+    ),
+
+    TREE_PROTECTION_ORDER(
+        "tree_protection_order",
+        LorenzColor.RED,
+        "Tree Protection Order",
+        "Tree Protected by the Protection Order.",
+        onlyIslands = IslandTypeTag.FORAGING_CUSTOM_TREES,
+    ),
+
+    HIDEONSUN(
+        "hideonsun",
+        LorenzColor.YELLOW,
+        "Hideonsun",
+        "The yellow Shulkers.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    HONEYHIVE(
+        "honeyhive",
+        LorenzColor.GOLD,
+        "Honeyhive",
+        "Lootable Honeyhive.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    PANGOLIN(
+        "pangolin_area",
+        LorenzColor.BLUE,
+        "Pangolin",
+        "Possible Pangolin Critter spawn point.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    SANGER(
+        "sanger_area",
+        LorenzColor.GREEN,
+        "Sanger",
+        "Possible Sanger NPC spawn point.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    SAFARI_BELL(
+        "safari_bell",
+        LorenzColor.GOLD,
+        "Safari Bell",
+        "Bells to be rung in the Safari.",
+        onlyIsland = IslandType.SAFARI,
+    ),
+
+    HIDEYHO_LOCATION(
+        "hideyho",
+        LorenzColor.LIGHT_PURPLE,
+        "Hideyho Location",
+        "A location that Hideyho can be found.",
+        onlyIsland = IslandType.SAFARI,
+    ),
+
+    FLOOR_DROPS(
+        "floor_drops",
+        LorenzColor.GREEN,
+        "Floor Drops",
+        "A location where a Floor Drop can be found.",
+        onlyIsland = IslandType.SAFARI,
     ),
 
     ;

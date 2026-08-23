@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
-import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
@@ -17,16 +16,19 @@ import com.mojang.blaze3d.systems.RenderPass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.client.renderer.state.gui.BlitRenderState
 import net.minecraft.client.renderer.state.gui.GlyphRenderState
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
-import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
+
+//? if < 26.2 {
+/*import net.minecraft.client.renderer.MultiBufferSource
+*///?}
 
 object GuiRendererHook {
-    var chromaUniform = SkyHanniChromaUniform()
+    private val chromaUniform = SkyHanniChromaUniform()
     var chromaBufferSlice: GpuBufferSlice? = null
 
     fun computeChromaBufferSlice() {
@@ -48,6 +50,13 @@ object GuiRendererHook {
         chromaBufferSlice = chromaUniform.writeWith(chromaSize, timeOffset, saturation, forwardDirection)
     }
 
+    @JvmStatic
+    fun clearChromaUniforms() {
+        chromaUniform.clear()
+        //? if >= 26.2
+        chromaBufferSlice = null
+    }
+
     // This 'should' be fine being injected into GuiRenderer's render pass since if the bound pipeline's shader doesn't
     // have a uniform with the given name, then the buffer slice will never be bound
     fun insertChromaSetUniform(renderPass: RenderPass) {
@@ -56,6 +65,15 @@ object GuiRendererHook {
         // A very explicit name is given since the uniform will show up in RenderPassImpl's simpleUniforms
         // map, and so it is made clear where this uniform is from
         chromaBufferSlice?.let { renderPass.setUniform("SkyHanniChromaUniforms", it) } ?: return
+    }
+
+    fun insertChromaSetUniform(renderPass: RenderPass, pipeline: RenderPipeline) {
+        if (pipeline != SkyHanniRenderPipeline.CHROMA_TEXT.invoke() &&
+            pipeline != SkyHanniRenderPipeline.CHROMA_STANDARD.invoke()
+        ) return
+
+        if (chromaBufferSlice == null) computeChromaBufferSlice()
+        insertChromaSetUniform(renderPass)
     }
 
     fun replacePipeline(state: GuiElementRenderState, original: Operation<RenderPipeline>): RenderPipeline {
@@ -79,12 +97,11 @@ object GuiRendererHook {
 
     fun preRenderAtlas(
         pictureInPictureRenderers: Map<Class<out PictureInPictureRenderState>, PictureInPictureRenderer<*>>,
-        bufferSource: MultiBufferSource.BufferSource,
+        //? if < 26.2
+        //bufferSource: MultiBufferSource.BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
         frameNumber: Int,
     ) {
-        SkyHanniRoundedShapeRenderManager.preRenderAtlas()
-
         val renderer = pictureInPictureRenderers[SkyHanniGuiItemRenderState::class.java]
         if (renderer !is SkyHanniPipCoordinatorRenderer) return
 
@@ -94,7 +111,8 @@ object GuiRendererHook {
 
         SkyHanniItemRenderCoordinator.preRenderAtlas(
             states,
-            bufferSource,
+            //? if < 26.2
+            //bufferSource,
             featureRenderDispatcher,
             frameNumber
         )

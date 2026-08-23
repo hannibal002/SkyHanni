@@ -104,6 +104,22 @@ class DevConfig {
     var contributorNametags: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Discover Contributor Message",
+        desc = "Sends a message to your chat when you see a unique contributor.",
+    )
+    @ConfigEditorBoolean
+    var discoverContributorMessage: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Contributor Fangirling Tracker",
+        desc = "Tracks how many times you have been noticed as a contributor by a player.",
+    )
+    @ConfigEditorBoolean
+    var contributorMentionTracker: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Flip Contributors", desc = "Make SkyHanni contributors appear upside down in the world.")
     @ConfigEditorBoolean
     @FeatureToggle

@@ -21,7 +21,7 @@ class StashConfig {
             "Enable §e§l/sh empty messages §r§7to hide them."
     )
     @ConfigEditorInfoText
-    var notice: String = ""
+    val notice: String = ""
 
     @Expose
     @ConfigOption(name = "Hide Dupe Warnings", desc = "")

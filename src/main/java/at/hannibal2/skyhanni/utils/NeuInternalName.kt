@@ -26,12 +26,14 @@ value class NeuInternalName private constructor(private val internalName: String
     fun replace(oldValue: String, newValue: String): NeuInternalName =
         internalName.replace(oldValue, newValue, ignoreCase = true).toInternalName()
 
-    fun isKnownItem(): Boolean = getItemStackOrNull() != null || this == SKYBLOCK_COIN
+    fun isKnownItem(): Boolean = getItemStackOrNull() != null || SkyblockCurrency.getByInternalNameOrNull(this) != null
 
     fun isArmor(): Boolean = internalName.endsWith("_BOOTS") ||
         internalName.endsWith("_HELMET") ||
         internalName.endsWith("_CHESTPLATE") ||
         internalName.endsWith("_LEGGINGS")
+
+    fun isEssence(): Boolean = internalName.startsWith("ESSENCE_")
 
     fun getItemCategoryOrNull(): ItemCategory? =
         categoryCache.getOrPut(this) { getItemStackOrNull()?.getItemCategoryOrNull() ?: return null }
@@ -46,6 +48,7 @@ value class NeuInternalName private constructor(private val internalName: String
                 val (name, level) = internalName.split(";", limit = 2)
                 "ENCHANTED_BOOK_${name}_$level"
             }
+
             else -> internalName
         }
 
@@ -65,7 +68,15 @@ value class NeuInternalName private constructor(private val internalName: String
         val GEMSTONE_COLLECTION = "GEMSTONE_COLLECTION".toInternalName()
         val JASPER_CRYSTAL = "JASPER_CRYSTAL".toInternalName()
         val RUBY_CRYSTAL = "RUBY_CRYSTAL".toInternalName()
+
         val SKYBLOCK_COIN = "SKYBLOCK_COIN".toInternalName()
+
+        val SKYBLOCK_GOLD_MEDAL = "SKYBLOCK_GOLD_MEDAL".toInternalName()
+        val SKYBLOCK_SILVER_MEDAL = "SKYBLOCK_SILVER_MEDAL".toInternalName()
+        val SKYBLOCK_BRONZE_MEDAL = "SKYBLOCK_BRONZE_MEDAL".toInternalName()
+        val SKYBLOCK_COPPER = "SKYBLOCK_COPPER".toInternalName()
+        val SKYBLOCK_MOTE = "SKYBLOCK_MOTE".toInternalName()
+
         val WISP_POTION = "WISP_POTION".toInternalName()
         val ENCHANTED_HAY_BLOCK = "ENCHANTED_HAY_BLOCK".toInternalName()
         val TIGHTLY_TIED_HAY_BALE = "TIGHTLY_TIED_HAY_BALE".toInternalName()
@@ -86,8 +97,13 @@ value class NeuInternalName private constructor(private val internalName: String
 
         private val itemNameCache = mutableMapOf<String, NeuInternalName?>()
 
+        internal fun clearItemNameCache() {
+            itemNameCache.clear()
+        }
+
         fun fromItemNameOrNull(itemName: String): NeuInternalName? = itemNameCache.getOrPut(itemName) {
-            ItemNameResolver.getInternalNameOrNull(itemName.removeSuffix(" Pet")) ?: getCoins(itemName)
+            ItemNameResolver.getInternalNameOrNull(itemName.removeSuffix(" Pet"))
+                ?: SkyblockCurrency.getByLoreNameOrNull(itemName)?.internalName
         }
 
         fun fromItemNameOrInternalName(itemName: String): NeuInternalName = fromItemNameOrNull(itemName) ?: itemName.toInternalName()
@@ -95,19 +111,6 @@ value class NeuInternalName private constructor(private val internalName: String
         private val categoryCache = TimeLimitedCache<NeuInternalName, ItemCategory>(10.minutes)
 
         private val petCache: TimeLimitedCache<NeuInternalName, Boolean> = TimeLimitedCache(10.minutes)
-
-        private fun getCoins(itemName: String): NeuInternalName? = when {
-            isCoins(itemName) -> SKYBLOCK_COIN
-            else -> null
-        }
-
-        private val coinNames = setOf(
-            "coin", "coins",
-            "skyblock coin", "skyblock coins",
-            "skyblock_coin", "skyblock_coins",
-        )
-
-        private fun isCoins(itemName: String): Boolean = itemName.lowercase() in coinNames
 
         fun fromItemName(itemName: String): NeuInternalName = fromItemNameOrNull(itemName) ?: run {
             val name = "itemName:$itemName"

@@ -20,13 +20,14 @@ object SlothAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Good Advice".asComponent(),
-            componentBuilder {
+            name = "Good Advice".asComponent(),
+            description = componentBuilder {
                 append("Talk to the Security Sloth. ")
                 append("They have good advice, you know") {
                     withColor(ChatFormatting.RED)
                 }
-            }
+            },
+            userLuckAmount = 0f,
         )
         event.register(achievement, SECURITY_SLOTH_ACHIEVEMENT)
     }

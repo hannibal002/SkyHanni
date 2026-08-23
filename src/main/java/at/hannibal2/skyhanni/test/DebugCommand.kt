@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -129,11 +130,11 @@ object DebugCommand {
             return
         }
 
-        if (SkyBlockUtils.currentIsland != HypixelData.skyBlockIsland) {
+        if (SkyBlockUtils.currentIsland != HypixelLocationApi.island) {
             event.addData {
                 add("using a test island!")
                 add("test island: ${SkyBlockIslandTest.testIsland}")
-                add("real island: ${HypixelData.skyBlockIsland}")
+                add("real island: ${HypixelLocationApi.island}")
             }
             return
         }

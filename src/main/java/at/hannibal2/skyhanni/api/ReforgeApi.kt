@@ -17,11 +17,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 @SkyHanniModule
 object ReforgeApi {
     var reforges: List<Reforge> = emptyList()
-        private set(value) {
-            field = value
-            basicReforges = value.filterNot { it.isReforgeStone }
-            reforgeStones = value.filter { it.isReforgeStone }
-        }
+        private set
 
     var basicReforges: List<Reforge> = emptyList()
         private set
@@ -51,6 +47,7 @@ object ReforgeApi {
         SWORD_AND_ROD(ItemCategory.SWORD, ItemCategory.GAUNTLET, ItemCategory.LONGSWORD, ItemCategory.FISHING_ROD),
         SPECIAL_ITEMS,
         VACUUM(ItemCategory.VACUUM),
+        FISHING_NET(ItemCategory.FISHING_NET),
     }
 
     sealed interface ReforgeData {
@@ -105,8 +102,8 @@ object ReforgeApi {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val reforgeStoneData = event.getConstant<Map<String, NeuReforgeJson>>("reforgestones").values
-        val reforgeData = event.getConstant<Map<String, NeuReforgeJson>>("reforges").values
-        reforges = (reforgeStoneData + reforgeData).map { it.mapReforge() }
+        reforgeStones = event.getConstant<Map<String, NeuReforgeJson>>("reforgestones").values.map { it.mapReforge() }
+        basicReforges = event.getConstant<Map<String, NeuReforgeJson>>("reforges").values.map { it.mapReforge() }
+        reforges = (reforgeStones + basicReforges)
     }
 }

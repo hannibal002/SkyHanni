@@ -12,12 +12,13 @@ inputs:
 runs:
     using: composite
     steps:
-        - name: Retryable Gradle
-          shell: bash
-          env:
-              MAX_RETRIES: ${{ inputs.max-attempts }}
-              GRADLE_CMD: ${{ inputs.gradle-command }}
-          run: |
-              chmod +x .github/scripts/gradlew-retry.kts
-              # shellcheck disable=SC2086  # word-split intentional: gradle args are space-separated
-              .github/scripts/gradlew-retry.kts $GRADLE_CMD
+        -   name: Retryable Gradle
+            shell: bash
+            env:
+                MAX_RETRIES: ${{ inputs.max-attempts }}
+                GRADLE_CMD: ${{ inputs.gradle-command }}
+            run: |
+                chmod +x .github/scripts/gradlew-retry.kts
+                # shellcheck disable=SC2086  # word-split intentional: gradle args are space-separated
+                .github/scripts/gradlew-retry.kts $GRADLE_CMD 2>&1 | tee "$GITHUB_WORKSPACE/gradle-output.log"
+                exit ${PIPESTATUS[0]}

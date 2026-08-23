@@ -18,23 +18,10 @@ class NeuItemStackProvider(
     @SkyHanniModule
     companion object {
         private val providerCache = WeakHashMap<NeuItemStackProvider, SafeItemStack>()
-        private var waitingOnComponents = false
-
-        private fun rebuildProviderCache() = providerCache.forEach { (provider, _) ->
-            providerCache[provider] = provider.rebuildFromNeu()
-        }
 
         @HandleEvent(priority = HandleEvent.LOW)
         fun onNeuRepoReload() {
-            if (SafeItemStackUtils.componentsLoaded) rebuildProviderCache()
-            else waitingOnComponents = true
-        }
-
-        @HandleEvent
-        fun onComponentsLoaded() {
-            if (!waitingOnComponents) return
-            rebuildProviderCache()
-            waitingOnComponents = false
+            providerCache.clear()
         }
     }
 }

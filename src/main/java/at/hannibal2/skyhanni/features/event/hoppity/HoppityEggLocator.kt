@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -72,7 +72,7 @@ object HoppityEggLocator {
     }
 
     @HandleEvent
-    fun onEggSpawn(event: EggSpawnedEvent) {
+    fun onEggSpawned(event: EggSpawnedEvent) {
         if (event.eggType == currentEggType) resetData()
     }
 
@@ -158,25 +158,14 @@ object HoppityEggLocator {
 
     private val bezierFitter = ParticlePathBezierFitter(3)
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    @HandleEvent(onlyOnSkyblock = true, receiveCancelled = true)
+    fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         if (!event.isVillagerParticle()) return
         if (lastClick.passedSince() > 5.seconds) return
-        val pos = event.location
 
-        if (bezierFitter.isEmpty()) {
-            bezierFitter.addPoint(pos)
-            return
-        }
-
-        val lastPoint = bezierFitter.getLastPoint() ?: return
-        val dist = lastPoint.distance(pos)
-        if (dist == 0.0 || dist > 3.0) return
-
-        if (pos.getEntitiesNearby<FishingHook>(0.3).any()) return
-
-        bezierFitter.addPoint(pos)
+        val endCondition: (LorenzVec) -> Boolean = { it.getEntitiesNearby<FishingHook>(0.3).any() }
+        if (!bezierFitter.tryAdd(event.location, maxDistanceToLast = 3.0, endCondition = endCondition)) return
 
         val guess = guessEggLocation() ?: return
         if (!SkyBlockUtils.currentIsland.isInBounds(guess)) return
@@ -222,7 +211,7 @@ object HoppityEggLocator {
         it.distance(location) < 5.0
     }
 
-    private fun ReceiveParticleEvent.isVillagerParticle() = type == ParticleTypes.HAPPY_VILLAGER && speed == 0f && count == 1
+    private fun ParticleEvent.isVillagerParticle() = type == ParticleTypes.HAPPY_VILLAGER && speed == 0f && count == 1
 
     fun isEnabled() =
         SkyBlockUtils.inSkyBlock && config.waypoints.enabled && !GardenApi.inGarden() && !ReminderUtils.isBusy(true) &&
@@ -235,7 +224,7 @@ object HoppityEggLocator {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Hoppity Eggs Locations")
 
         if (!isEnabled()) {

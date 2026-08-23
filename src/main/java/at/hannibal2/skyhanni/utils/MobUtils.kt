@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getInventoryItems
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.getInventoryItems
 import net.minecraft.client.resources.language.I18n
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
@@ -33,7 +33,7 @@ object MobUtils {
         getArmorStandByRangeAll(entity, range).minByOrNull { it.distanceTo(entity) }
 
     fun getClosestArmorStandWithName(entity: Entity, range: Double, name: String) =
-        getArmorStandByRangeAll(entity, range).filter { it.cleanName().startsWith(name) }.minByOrNull { it.distanceTo(entity) }
+        getArmorStandByRangeAll(entity, range).filter { it.cleanName.startsWith(name) }.minByOrNull { it.distanceTo(entity) }
 
     fun ArmorStand.isDefaultValue() = this.name.formattedTextCompatLessResets() == defaultArmorStandName
 
@@ -46,7 +46,7 @@ object MobUtils {
     class Ownership(val ownerName: String) {
         val ownerPlayer = MobData.players.firstOrNull { it.name == ownerName }
         override fun equals(other: Any?): Boolean {
-            if (other is Player) return ownerPlayer == other || ownerName == other.cleanName()
+            if (other is Player) return ownerPlayer == other || ownerName == other.cleanName
             if (other is String) return ownerName == other
             return false
         }

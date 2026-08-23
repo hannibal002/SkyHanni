@@ -51,7 +51,7 @@ object CarrolynHelper {
 
         if (!event.itemInHand.isCarrolynItem()) return
 
-        if (SkyBlockUtils.currentIsland == IslandType.CRIMSON_ISLE) {
+        if (IslandType.CRIMSON_ISLE.isInIsland()) {
             startPathfind()
         } else {
             ChatUtils.clickableChat(

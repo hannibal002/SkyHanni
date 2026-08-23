@@ -255,7 +255,7 @@ object SeaCreatureDetectionApi {
 
     @Suppress("MaxLineLength")
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Sea Creatures")
         event.addIrrelevant {
             entityIdToData.forEach { (entityID, data) ->

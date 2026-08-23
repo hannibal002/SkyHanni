@@ -11,29 +11,30 @@ import java.util.EnumSet
 
 // TODO maybe rename this class to IslandTypeGroup
 /**
- * Each [IslandTypeTag] consists of one or more [SkyHanniIslandType]
+ * Each [IslandTypeTag] consists of one or more [IslandType] or [IslandTypeTag]
  */
-enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType {
+enum class IslandTypeTag(vararg types: Any) {
 
     PRIVATE_ISLAND(IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST),
     GARDEN_ISLAND(IslandType.GARDEN, IslandType.GARDEN_GUEST),
     PERSONAL_ISLAND(PRIVATE_ISLAND, GARDEN_ISLAND),
 
-    IS_COLD(IslandType.DWARVEN_MINES, IslandType.MINESHAFT),
+    IS_COLD(IslandType.DWARVEN_MINES, IslandType.MINESHAFT, IslandType.SAFARI),
     NORMAL_MINING(IslandType.GOLD_MINES, IslandType.DEEP_CAVERNS),
-    ADVANCED_MINING(IS_COLD, IslandType.CRYSTAL_HOLLOWS),
+    ADVANCED_MINING(IslandType.DWARVEN_MINES, IslandType.MINESHAFT, IslandType.CRYSTAL_HOLLOWS),
     MINING(NORMAL_MINING, ADVANCED_MINING),
     CUSTOM_MINING(ADVANCED_MINING, IslandType.THE_END, IslandType.CRIMSON_ISLE, IslandType.SPIDER_DEN),
 
-    FORAGING(IslandType.THE_PARK, IslandType.GALATEA),
-    FORAGING_CUSTOM_TREES(IslandType.GALATEA),
+    FORAGING_CUSTOM_TREES(IslandType.GALATEA, IslandType.TORRHUS_CANYON),
+    FORAGING(FORAGING_CUSTOM_TREES, IslandType.THE_PARK),
 
-    HOPPITY_DISALLOWED(IslandType.THE_RIFT, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.MINESHAFT),
+    HOPPITY_DISALLOWED(IslandType.THE_RIFT, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.MINESHAFT, IslandType.SAFARI),
     HAS_SHOWCASES(PRIVATE_ISLAND, IslandType.HUB, IslandType.CRIMSON_ISLE),
     CONTESTS_SHOWN(IslandType.GARDEN, IslandType.HUB, IslandType.THE_FARMING_ISLANDS),
+    HAS_OWN_PESTS(IslandType.GARDEN, IslandType.TORRHUS_CANYON),
 
     /** Busy islands are islands where a player is doing something considered 'important'. */
-    BUSY(IslandType.DARK_AUCTION, IslandType.MINESHAFT, IslandType.THE_RIFT, IslandType.NONE, IslandType.UNKNOWN),
+    BUSY(IslandType.DARK_AUCTION, IslandType.MINESHAFT, IslandType.THE_RIFT, IslandType.SAFARI, IslandType.NONE, IslandType.UNKNOWN),
 
     /** islands without npc locations that are fixed. */
     NO_FIXED_NPC_LOCATIONS(
@@ -53,6 +54,8 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
         IslandType.THE_PARK,
         IslandType.CRIMSON_ISLE,
         IslandType.WINTER,
+        IslandType.SPIDER_DEN,
+        IslandType.TORRHUS_CANYON,
     ),
     WORMHOLE(
         IslandType.LOTUS_ATOLL,
@@ -77,9 +80,11 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
         newValues.mapNotNullTo(types) { EnumUtils.enumValueOfOrNull<IslandType>(it.uppercase()) }
     }
 
-    override fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && contains(SkyBlockUtils.currentIsland)
+    fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && contains(SkyBlockUtils.currentIsland)
 
     operator fun contains(type: IslandType) = type in types
+
+    fun getTypes(): Set<IslandType> = types.toSet()
 
     @SkyHanniModule
     companion object {

@@ -2,10 +2,6 @@ package at.hannibal2.skyhanni.utils.collection
 
 import at.hannibal2.skyhanni.utils.MinMaxNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.Legacy
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import java.util.Collections
 import java.util.EnumMap
 import java.util.PriorityQueue
@@ -16,6 +12,9 @@ import kotlin.collections.filterNot
 import kotlin.math.ceil
 import kotlin.reflect.KClass
 import kotlin.time.Duration
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 
 @Suppress("TooManyFunctions")
 object CollectionUtils {
@@ -220,10 +219,10 @@ object CollectionUtils {
 
     fun <T> MutableList<T>.addAll(vararg elements: T) = addAll(elements.asList())
 
-    @Legacy("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
+    @Deprecated("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit): Map<K, V> = toMutableMap().apply(function)
 
-    @Legacy("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
+    @Deprecated("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
     fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit): List<T> = toMutableList().apply(function)
 
     fun <K, V> Map<K, V>.moveEntryToTop(matcher: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
@@ -416,11 +415,6 @@ object CollectionUtils {
     inline fun <reified C : Collection<T>, T : Collection<T2>, T2> C.filterNotEmpty(): C =
         filter { it.isNotEmpty() } as C
 
-    fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
-        @Suppress("UNCHECKED_CAST")
-        return filterKeys { it != null } as Map<K, V>
-    }
-
     fun <K, V> Map<K, V>.containsKeys(vararg keys: K) = keys.all { this.keys.contains(it) }
 
     /**
@@ -447,7 +441,7 @@ object CollectionUtils {
         }
     }
 
-    @Legacy("Use the removeIf function provided by java")
+    @Deprecated("Use the removeIf function provided by java")
     fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) = removeIf(predicate)
 
     fun <K, V> MutableMap<K, V>.removeIfKey(predicate: (K) -> Boolean) {
@@ -569,12 +563,21 @@ object CollectionUtils {
 
     fun <T> Collection<T>.filterNotClass(clazz: KClass<*>): List<T> = filterNot { clazz.isInstance(it) }
 
-    @Suppress("UNCHECKED_CAST")
-    fun <K, V> Map<K, V?>.filterValuesNotNull(): Map<K, V> = filterValues { it != null } as Map<K, V>
+    fun <K, V> Map<out K, V>.filterNotNull(): Map<K & Any, V & Any> = buildMap {
+        for ((k, v) in this@filterNotNull) {
+            if (k != null && v != null) put(k, v)
+        }
+    }
 
-    fun <T> List<T>.allIdentical(): Boolean {
-        if (isEmpty()) return true
-        val first = first()
-        return all { it == first }
+    fun <K, V> Map<out K, V>.filterNotNullKeys(): Map<K & Any, V> = buildMap {
+        for ((k, v) in this@filterNotNullKeys) {
+            if (k != null) put(k, v)
+        }
+    }
+
+    fun <K, V> Map<out K, V>.filterNotNullValues(): Map<K, V & Any> = buildMap {
+        for ((k, v) in this@filterNotNullValues) {
+            if (v != null) put(k, v)
+        }
     }
 }

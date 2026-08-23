@@ -1,11 +1,12 @@
+# Execution context: PR branch code
 name: Detekt
 
 on:
     pull_request:
-        types: [opened, synchronize, reopened]
+        types: [ opened, synchronize, reopened ]
         branches:
             - "**"
-    workflow_dispatch: {}
+    workflow_dispatch: { }
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -30,24 +31,24 @@ jobs:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
+            -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository == 'hannibal002/SkyHanni'
             -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository != 'hannibal002/SkyHanni'
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 id: run_detekt
                 if: github.repository == 'hannibal002/SkyHanni'
-                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
+                uses: ./.github/actions/gradle-retry
                 continue-on-error: true
                 with:
-                    gradle-command: detektMain --stacktrace
+                    gradle-command: :26.2:detektMain --stacktrace
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 id: run_detekt_fork
                 if: github.repository != 'hannibal002/SkyHanni'
                 uses: ./.github/actions/gradle-retry
                 continue-on-error: true
                 with:
-                    gradle-command: detektMain --stacktrace
+                    gradle-command: :26.2:detektMain --stacktrace
 
             -   name: Check if SARIF file exists
                 if: always()
@@ -59,13 +60,24 @@ jobs:
                         echo "exists=false" >> $GITHUB_OUTPUT
                     fi
 
+            -   name: Save detekt artifact
+                if: ${{ !cancelled() }}
+                run: |
+                    mkdir -p detekt-artifact
+                    if [ -f "build/reports/detekt/main.sarif" ]; then
+                        cp build/reports/detekt/main.sarif detekt-artifact/main.sarif
+                    fi
+                    if [ "${{ steps.run_detekt.outcome }}" == "failure" ] || [ "${{ steps.run_detekt_fork.outcome }}" == "failure" ]; then
+                        cp "$GITHUB_WORKSPACE/gradle-output.log" detekt-artifact/detekt-run.log 2>/dev/null || true
+                    fi
+
             -   name: Annotate detekt failures
                 if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
                 run: |
                     chmod +x .github/scripts/process_detekt_sarif.sh
                     ./.github/scripts/process_detekt_sarif.sh build/reports/detekt/main.sarif | tee detekt_output.txt
             -   name: Upload detekt artifact
-                if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
+                if: ${{ !cancelled() }}
                 uses: actions/upload-artifact@v7
                 with:
                     name: detekt-output

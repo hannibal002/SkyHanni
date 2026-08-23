@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -33,7 +34,6 @@ import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -44,7 +44,7 @@ object InfernoMinionProfitTracker {
 
     private val eyedropsItem = "CAPSAICIN_EYEDROPS_NO_CHARGES".toInternalName()
 
-    private val infernoMinionInventory = InventoryDetector(InfernoMinionFeatures.infernoMinionTitlePattern)
+    private val infernoMinionInventory = InventoryDetector { InfernoMinionFeatures.infernoMinionTitlePattern }
     private var fuelDropMap = mapOf<NeuInternalName, Set<NeuInternalName>>()
     private var minionDropMap = mapOf<String, Set<NeuInternalName>>()
 

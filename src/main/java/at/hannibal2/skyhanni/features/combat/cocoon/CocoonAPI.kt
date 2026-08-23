@@ -4,14 +4,16 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData.skyblockMobs
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
+import at.hannibal2.skyhanni.events.combat.HypixelCocoonChatMessageEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyblockEquipmentDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.LivingSeaCreatureData
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureDetectionApi.seaCreature
-import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -21,21 +23,28 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.entity.decoration.ArmorStand
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CocoonAPI {
-    private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
+    private val COCOON_SKULL_TEXTURE by SkullTextureHolder.texture("RIFT_LARVA")
 
+    /*
+    roughly where cocoon's time to hatch took during my testing.
+    the expected time between the cocoon entity being detected & spawning their contained mob.
+    this is used within the Cocoon Overlay feature to estimate when the cocoon will hatch.
+    */
     val expectedLifetime = 6.4.seconds
     var canCocoon: Boolean = false
         private set
@@ -46,8 +55,23 @@ object CocoonAPI {
      roughly where cocoon times landed for me across a few hundred cocoons
      Might require some sort of ping based tweaking?
      */
+    // This does not leak Mob, ArmorStand references since it gets cleared on entity leave world and world change events.
     private val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
     private val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
+    private val patternGroup = RepoPattern.group("combat.cocoon")
+
+    /*
+     The "an Enderman" test is forward-proofing only, as Hypixel currently always sends "a".
+     */
+    /**
+     * REGEX-TEST: CAUGHT! You cocooned a Crypt Ghoul!
+     * REGEX-TEST: CAUGHT! You cocooned a Enderman!
+     * REGEX-TEST: CAUGHT! You cocooned an Enderman!
+     */
+    private val cocoonChatMessage by patternGroup.pattern(
+        "spawn",
+        "CAUGHT! You cocooned an? (?<name>[\\w ]+)!",
+    )
 
     data class CocoonMob(
         val mob: Mob,
@@ -60,7 +84,7 @@ object CocoonAPI {
     )
 
     private fun playerCanCocoon(): Boolean {
-        val belt = EquipmentApi.getEquipment(EquipmentSlot.BELT) ?: return false
+        val belt = CurrentEquipmentApi.getEquipment(EquipmentSlot.BELT) ?: return false
         return belt.canCocoon()
     }
 
@@ -126,6 +150,13 @@ object CocoonAPI {
         val timeSince = cocoon.spawnTime.passedSince()
         logger.log("name: (${cocoonMob.name}), Type: (${cocoonMob.category}), Cocoon: (${cocoon.cocoonID}) Left World After $timeSince")
         existingCocoons.removeIf { it.cocoonID == event.entity.id }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent.Allow) {
+        cocoonChatMessage.matchMatcher(event.cleanMessage) {
+            HypixelCocoonChatMessageEvent(group("name")).post()
+        }
     }
 
     private fun getCocoonMob(cocoonVector: LorenzVec): Mob? {

@@ -32,7 +32,7 @@ object TpsCounter {
 
     private val config get() = SkyHanniMod.feature.gui
 
-    private val msPerTickList = SizeLimitedCache<Long, Double>(100)
+    private val msPerTickList = SizeLimitedCache<Int, Double>(100)
     val rawTps: Double?
         get() = when {
             timeSinceWorldSwitch < WORLD_SWITCH_DELAY -> null

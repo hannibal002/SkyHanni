@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables.animated
 
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.Legacy
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlin.time.Duration
 
@@ -17,7 +16,7 @@ interface TimeDependentRenderable : Renderable {
 
     fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration)
 
-    @Legacy("Use renderWithDelta instead", ReplaceWith("renderWithDelta(posX, posY, deltaTime)"))
+    @Deprecated("Use renderWithDelta instead", ReplaceWith("renderWithDelta(posX, posY, deltaTime)"))
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         val now = SimpleTimeMark.now()
         val deltaTime = now - lastRenderTime

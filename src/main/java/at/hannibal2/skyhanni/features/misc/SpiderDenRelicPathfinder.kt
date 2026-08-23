@@ -215,7 +215,7 @@ object SpiderDenRelicPathfinder {
         }
     }
 
-    private val calculatingMessageId = ChatUtils.getUniqueCustomMessageId()
+    private val calculatingMessageId = ChatUtils.getUniqueMessageId()
     private var calculating = false
     private var calculatingStart = SimpleTimeMark.farPast()
 
@@ -250,11 +250,7 @@ object SpiderDenRelicPathfinder {
 
         val currentIsland = SkyBlockUtils.currentIsland
         relicPathFindConfig.launch {
-            val route = NavigationUtils.getRoute(
-                missingRelics,
-                maxIterations = 300,
-                neighborhoodSize = 50,
-            ).toMutableList()
+            val route = NavigationUtils.getRouteLocations(missingRelics).toMutableList()
 
             val duration = calculatingStart.passedSince().format(showMilliSeconds = true)
             "§e[SkyHanni] Calculated Relic route in §b$duration".asComponent().send(calculatingMessageId)

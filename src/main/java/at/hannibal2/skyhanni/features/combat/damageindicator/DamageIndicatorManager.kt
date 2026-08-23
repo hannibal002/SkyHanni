@@ -67,7 +67,7 @@ import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.EnderMan
-import net.minecraft.world.entity.monster.MagmaCube
+import net.minecraft.world.entity.monster.cubemob.MagmaCube
 import net.minecraft.world.entity.monster.zombie.Zombie
 import java.util.UUID
 import kotlin.math.max
@@ -92,7 +92,8 @@ object DamageIndicatorManager {
     private var mobFinder: MobFinder? = null
     private val data = mutableMapOf<UUID, EntityData>()
     private val maxHealth = mutableMapOf<UUID, Long>()
-    private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds)
+    // EntityData is owned by the field 'data', so we can use weak keys
+    private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds, useWeakKeys = true)
 
     private var tarantulaFoundTime = SimpleTimeMark.farPast()
     private val tarantulaErrored = mutableSetOf<UUID>()
@@ -101,7 +102,7 @@ object DamageIndicatorManager {
         if (entity.tickCount > 300) return false
         if (!entity.hasCustomName()) return false
         if (entity.deceased) return false
-        val name = entity.cleanName().replace(",", "")
+        val name = entity.cleanName.replace(",", "")
 
         return damagePattern.matcher(name).matches()
     }
@@ -793,7 +794,6 @@ object DamageIndicatorManager {
                 BossType.SLAYER_ENDERMAN_2 -> 30
                 BossType.SLAYER_ENDERMAN_3 -> 60
                 BossType.SLAYER_ENDERMAN_4 -> 100
-                else -> 100
             }
             val hits = enderSlayerHitsNumberPattern.matchMatcher(armorStandHits.name.formattedTextCompatLessResets()) {
                 group("hits").toInt()
@@ -1000,7 +1000,7 @@ object DamageIndicatorManager {
 
         val showNameAndHealth = entityData.shouldShowNameAndHealth()
         if (isDamageSplash(entity)) {
-            val name = entity.cleanName().replace(",", "")
+            val name = entity.cleanName.replace(",", "")
 
             if (showNameAndHealth && config.hideDamageSplash) {
                 event.cancel()
@@ -1095,7 +1095,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Damage Indicator")
         if (!DevApi.mainToggles.damageIndicator) {
             event.addData("Damage Indicator is manually disabled!")

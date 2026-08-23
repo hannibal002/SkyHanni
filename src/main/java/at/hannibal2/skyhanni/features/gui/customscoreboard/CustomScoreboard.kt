@@ -12,10 +12,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
@@ -39,6 +37,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -64,8 +63,14 @@ object CustomScoreboard {
 
     private var lastLines: List<ScoreboardLine> = emptyList()
 
+    private var warningSilenced = false
+
+    private val customScoreboardModLoaded by lazy {
+        PlatformUtils.isModInstalled("customscoreboard")
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         display ?: return
 
@@ -83,7 +88,7 @@ object CustomScoreboard {
     }
 
     @HandleEvent
-    fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
+    private fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == GUI_NAME) {
             with(displayConfig.alignment) {
                 if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN || verticalAlignment != VerticalAlignment.DONT_ALIGN) {
@@ -107,7 +112,7 @@ object CustomScoreboard {
     }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (!isEnabled()) return
 
         if (dirty || nextScoreboardUpdate.isInPast()) {
@@ -128,8 +133,8 @@ object CustomScoreboard {
             UnknownLinesHandler.handleUnknownLines()
     }
 
-    @HandleEvent
-    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+    @HandleEvent(ScoreboardUpdateEvent::class)
+    private fun onScoreboardChange() {
         dirty = true
     }
 
@@ -183,31 +188,82 @@ object CustomScoreboard {
             ?: dropWhile { it.display.isBlank() }.dropLastWhile { it.display.isBlank() }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad() {
         ConditionalUtils.onToggle(
             config.scoreboardEntries,
             eventsConfig.eventEntries,
         ) {
             updateIslandEntries()
         }
+        // For some reason using ConditionalUtils.onEnable makes it call this callback 3 times
+        config.enabled.whenChanged { old, new ->
+            if (old == new || !new) return@whenChanged
+            showDeprecatedWarning()
+        }
     }
 
-    @HandleEvent
-    fun onHypixelJoin(event: HypixelJoinEvent) {
+    @HandleEvent(HypixelJoinEvent::class)
+    private fun onHypixelJoin() {
         updateAllIslandEntries()
+        showDeprecatedWarning()
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         runDelayed(2.seconds) {
             if (!SkyBlockUtils.inSkyBlock || !(SkyBlockUtils.onHypixel && OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected())) dirty = true
         }
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    private fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.NONE) updateAllIslandEntries()
         else updateIslandEntries()
+
+        showDeprecatedWarning()
+    }
+
+    private fun showDeprecatedWarning() {
+        if (!isEnabled() || warningSilenced) return
+
+        // Nothing to advertise if the replacement is already installed.
+        // It can override this scoreboard itself and offers a side by side comparison, so we leave it enabled.
+        if (customScoreboardModLoaded) return
+
+        ChatUtils.clickableLinkChat(
+            message = "Custom Scoreboard is deprecated and no longer supported.\n" +
+                "Please switch to §bSkyBlock Custom Scoreboard§c, a standalone replacement\n" +
+                "created and maintained by a trusted former SkyHanni contributor.\n" +
+                "§e[Click here to open it on Modrinth]",
+            url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
+            prefixColor = "§c",
+            replaceSameMessage = true,
+            hover = """
+            §eWhy use the replacement?
+
+            §7• §a100% feature parity with SkyHanni's Custom Scoreboard
+            §7• §aWorks identically by default
+            §7• §aBug fixes and improvements released independently
+            §7• §aAdditional features not available in SkyHanni
+            §7• §aConfig migration from SkyHanni is supported
+            §7• §aMaintained by a trusted former SkyHanni contributor
+            """.trimIndent(),
+        )
+
+        ChatUtils.clickableChat(
+            message = "§2§l[I GET IT]",
+            prefix = false,
+            replaceSameMessage = true,
+            oneTimeClick = true,
+            onClick = {
+                warningSilenced = true
+                ChatUtils.chat(
+                    message = "§eSkyHanni's §aCustom Scoreboard is still deprecated...\n" +
+                        "§aBut you will no longer be bothered about it this session!",
+                    prefix = false,
+                )
+            },
+        )
     }
 
     private fun updateIslandEntries() {
@@ -232,7 +288,7 @@ object CustomScoreboard {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Custom Scoreboard")
         event.addIrrelevant {
             if (!config.enabled.get()) {

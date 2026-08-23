@@ -299,7 +299,7 @@ object RepoPatternManager {
      *
      * @param prefix the prefix to search without the dot at the end (the match includes the .)
      * @return returns any pattern on the [prefix] key space (including list or any other complex structure, but as a simple pattern
-     * */
+     */
     internal fun getUnusedPatterns(prefix: String): List<Pattern> {
         if (localLoading) return emptyList()
         try {

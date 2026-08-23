@@ -1,14 +1,17 @@
 package at.hannibal2.skyhanni.utils.chat
 
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.withColor
+import com.mojang.authlib.GameProfile
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
@@ -16,7 +19,9 @@ import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.objects.AtlasSprite
+import net.minecraft.network.chat.contents.objects.PlayerSprite
 import net.minecraft.resources.Identifier
+import net.minecraft.world.item.component.ResolvableProfile
 import java.awt.Color
 import java.util.Optional
 
@@ -65,7 +70,7 @@ object TextHelper {
 
     fun Component.fitToChat(): Component {
         val width = this.width()
-        val maxWidth = Minecraft.getInstance().gui.chat.width
+        val maxWidth = MinecraftCompat.hud.chat.width
         if (width < maxWidth) {
             val repeat = maxWidth / width
             val component = "".asComponent()
@@ -75,10 +80,10 @@ object TextHelper {
         return this
     }
 
-    fun Component.center(width: Int = Minecraft.getInstance().gui.chat.width): Component {
+    fun Component.center(width: Int = MinecraftCompat.hud.chat.width): Component {
         val textWidth = this.width()
-        val spaceWidth = SPACE.width()
-        val padding = (width - textWidth) / 2
+        val spaceWidth = SPACE.width().coerceAtLeast(1)
+        val padding = (width - textWidth).coerceAtLeast(0) / 2
         return join(" ".repeat(padding / spaceWidth), this)
     }
 
@@ -134,7 +139,7 @@ object TextHelper {
         maxPerPage: Int = 15,
         dividerColor: ChatFormatting = ChatFormatting.BLUE,
         formatter: (T) -> Component,
-    ) {
+    ): Unit = DelayedRun.runOrNextTick("paginated list: $title") {
         val text = mutableListOf<Component>()
 
         val totalPages = (list.size + maxPerPage - 1) / maxPerPage
@@ -289,5 +294,11 @@ object TextHelper {
             if (index < size - 1) component.append(" ")
         }
         return component
+    }
+
+    fun GameProfile.asComponent(): Component {
+        val resolvedProfile = ResolvableProfile.createResolved(this)
+        val sprite = PlayerSprite(resolvedProfile, false)
+        return Component.`object`(sprite)
     }
 }

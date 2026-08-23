@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.rgb
@@ -13,10 +12,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.Legacy
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.position
+import at.hannibal2.skyhanni.utils.compat.rotation
 import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -25,29 +26,90 @@ import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Font
+import net.minecraft.client.gui.Font.DisplayMode
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
+import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
+import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
-import org.joml.Matrix4f
+import org.joml.Vector3f
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-//? if >= 26.1 {
-import at.hannibal2.skyhanni.utils.compat.position
-import at.hannibal2.skyhanni.utils.compat.rotation
-//?}
+//? if >= 26.2 {
+import net.minecraft.util.FormattedCharSequence
+//?} else {
+/*import net.minecraft.client.renderer.MultiBufferSource
+import org.joml.Matrix4f
+*///?}
 
 @Suppress("LargeClass")
 object WorldRenderUtils {
 
-    //~ if < 26.1 'entity/beacon/' -> 'entity/'
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
+
+    //? if >= 26.2 {
+    private const val SKYHANNI_TEXT_SUBMIT_ORDER = 10_000
+    //?} else {
+    /*// 26.1 composites entity render targets over the main target after the normal world-render hook.
+    // Drawing see-through text in the late pass prevents entities from covering it (MC-265743).
+    private val deferredSeeThroughText = mutableListOf<(MultiBufferSource.BufferSource) -> Unit>()
+
+    @JvmStatic
+    fun renderDeferredSeeThroughText(bufferSource: MultiBufferSource.BufferSource) {
+        if (deferredSeeThroughText.isEmpty()) return
+        try {
+            deferredSeeThroughText.forEach { it(bufferSource) }
+            bufferSource.endBatch()
+        } finally {
+            deferredSeeThroughText.clear()
+        }
+    }
+    *///?}
+
+    //? if >= 26.2 {
+    private fun SkyHanniRenderWorldEvent.submitOrderedText(
+        x: Float,
+        y: Float,
+        text: FormattedCharSequence,
+        shadow: Boolean,
+        displayMode: DisplayMode,
+        light: Int,
+        color: Int,
+        backgroundColor: Int,
+        outlineColor: Int,
+    ) {
+        val order = SKYHANNI_TEXT_SUBMIT_ORDER + skyHanniTextSubmitOrder++
+        submitNodeStorage.order(order).submitText(
+            matrices,
+            x,
+            y,
+            text,
+            shadow,
+            displayMode,
+            light,
+            color,
+            backgroundColor,
+            outlineColor,
+        )
+    }
+    //?}
+
+    inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
+        layer: RenderType,
+        crossinline render: (VertexConsumer) -> Unit,
+    ) {
+        //? if >= 26.2 {
+        submitNodeStorage.submitCustomGeometry(matrices, layer) { _, buffer -> render(buffer) }
+        //?} else {
+        /*render(bufferSource.getBuffer(layer))
+        *///?}
+    }
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
@@ -67,7 +129,8 @@ object WorldRenderUtils {
         matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
         BeaconRenderer.submitBeaconBeam(
             matrices,
-            Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
+            //~ if < 26.2 'submitNodeStorage' -> 'Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage'
+            submitNodeStorage,
             beaconBeam,
             1f,
             Math.floorMod(MinecraftCompat.clientTime, 40) + partialTicks,
@@ -188,44 +251,21 @@ object WorldRenderUtils {
             return
         }
 
-        val layer = SkyHanniRenderLayers.getFilled(seeThroughBlocks)
-        val buf = vertexConsumers.getBuffer(layer)
-        matrices.pushPose()
+        val layer = SkyHanniRenderLayers.getFilled(throughWalls = seeThroughBlocks)
+        submitCustomGeometry(layer) { buf ->
+            matrices.pushPose()
 
-        addChainedFilledBoxVertices(
-            matrices,
-            buf,
-            effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ,
-            effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ,
-            c.red / 255f * 0.9f,
-            c.green / 255f * 0.9f,
-            c.blue / 255f * 0.9f,
-            c.alpha / 255f * alphaMultiplier,
-        )
-        matrices.popPose()
-    }
-
-    fun SkyHanniRenderWorldEvent.drawString(
-        location: LorenzVec,
-        text: String?,
-        component: Component?,
-        seeThroughBlocks: Boolean = false,
-        color: Color? = null,
-        scale: Double = 0.53333333,
-        shadow: Boolean = false,
-        /**
-         * Screen-space vertical offset applied after camera-facing rotation.
-         * Positive values move text up on screen, independent of camera angle.
-         */
-        yOffset: Float = 0f,
-        backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
-    ) {
-        if (text != null) {
-            drawString(location, text, seeThroughBlocks, color, scale, shadow, yOffset, backGroundColor)
-        } else if (component != null) {
-            drawString(location, component, seeThroughBlocks, color, scale, shadow, yOffset, backGroundColor)
-        } else {
-            ErrorManager.skyHanniError("Both string and Component are null")
+            addChainedFilledBoxVertices(
+                matrices,
+                buf,
+                effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ,
+                effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ,
+                c.red / 255f * 0.9f,
+                c.green / 255f * 0.9f,
+                c.blue / 255f * 0.9f,
+                c.alpha / 255f * alphaMultiplier,
+            )
+            matrices.popPose()
         }
     }
 
@@ -241,50 +281,8 @@ object WorldRenderUtils {
          * Positive values move text up on screen, independent of camera angle.
          */
         yOffset: Float = 0f,
-        backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
-    ) {
-        if (this.isCurrentlyDeferring) {
-            DeferredDrawer.deferString(
-                location,
-                text,
-                color,
-                scale,
-                shadow,
-                yOffset,
-                backGroundColor,
-                !seeThroughBlocks,
-            )
-            return
-        }
-
-        val matrix = Matrix4f()
-        val cameraPos = camera.position
-        val fr = Minecraft.getInstance().font
-        val adjustedScale = (scale * 0.05).toFloat()
-
-        matrix.translate(
-            (location.x - cameraPos.x()).toFloat(),
-            (location.y - cameraPos.y()).toFloat(),
-            (location.z - cameraPos.z()).toFloat(),
-        ).rotate(camera.rotation())
-            .translate(0f, -yOffset * adjustedScale, 0f)
-            .scale(adjustedScale, -adjustedScale, adjustedScale)
-
-        val x = -fr.width(text) / 2f
-
-        fr.drawInBatch(
-            text,
-            x,
-            0f,
-            color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-            shadow,
-            matrix,
-            vertexConsumers,
-            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.POLYGON_OFFSET,
-            backGroundColor,
-            15728880,
-        )
-    }
+        backgroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
+    ) = drawString(location, text.asComponent(), seeThroughBlocks, color, scale, shadow, yOffset, backgroundColor)
 
     fun SkyHanniRenderWorldEvent.drawString(
         location: LorenzVec,
@@ -298,7 +296,7 @@ object WorldRenderUtils {
          * Positive values move text up on screen, independent of camera angle.
          */
         yOffset: Float = 0f,
-        backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
+        backgroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) {
         if (this.isCurrentlyDeferring) {
             DeferredDrawer.deferString(
@@ -308,17 +306,41 @@ object WorldRenderUtils {
                 scale,
                 shadow,
                 yOffset,
-                backGroundColor,
+                backgroundColor,
                 !seeThroughBlocks,
             )
             return
         }
 
-        val matrix = Matrix4f()
         val cameraPos = camera.position
         val fr = Minecraft.getInstance().font
         val adjustedScale = (scale * 0.05).toFloat()
+        val x = -fr.width(text) / 2f
 
+        //? if >= 26.2 {
+        matrices.pushPose()
+        matrices.translate(
+            (location.x - cameraPos.x()).toFloat(),
+            (location.y - cameraPos.y()).toFloat(),
+            (location.z - cameraPos.z()).toFloat(),
+        )
+        matrices.mulPose(camera.rotation())
+        matrices.translate(0f, -yOffset * adjustedScale, 0f)
+        matrices.scale(adjustedScale, -adjustedScale, adjustedScale)
+        submitOrderedText(
+            x,
+            0f,
+            text.visualOrderText,
+            shadow,
+            if (seeThroughBlocks) SEE_THROUGH else POLYGON_OFFSET,
+            FULL_BRIGHT,
+            color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
+            backgroundColor,
+            0,
+        )
+        matrices.popPose()
+        //?} else {
+        /*val matrix = Matrix4f()
         matrix.translate(
             (location.x - cameraPos.x()).toFloat(),
             (location.y - cameraPos.y()).toFloat(),
@@ -327,7 +349,23 @@ object WorldRenderUtils {
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
-        val x = -fr.width(text) / 2f
+        if (seeThroughBlocks) {
+            deferredSeeThroughText.add { bufferSource ->
+                fr.drawInBatch(
+                    text,
+                    x,
+                    0f,
+                    color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
+                    shadow,
+                    matrix,
+                    bufferSource,
+                    SEE_THROUGH,
+                    backgroundColor,
+                    FULL_BRIGHT,
+                )
+            }
+            return
+        }
 
         fr.drawInBatch(
             text,
@@ -336,11 +374,12 @@ object WorldRenderUtils {
             color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
             shadow,
             matrix,
-            vertexConsumers,
-            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.POLYGON_OFFSET,
-            backGroundColor,
-            15728880,
+            bufferSource,
+            if (seeThroughBlocks) SEE_THROUGH else POLYGON_OFFSET,
+            backgroundColor,
+            FULL_BRIGHT,
         )
+        *///?}
     }
 
     fun SkyHanniRenderWorldEvent.drawCircleWireframe(entity: Entity, rad: Double, color: Color) {
@@ -370,17 +409,6 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawCircleFilled(
-        entity: Entity,
-        rad: Double,
-        color: Color,
-        depth: Boolean = true,
-        segments: Int = 32,
-    ) {
-        val exactLocation = exactLocation(entity)
-        drawCircleFilled(exactLocation.x, exactLocation.y, exactLocation.z, rad, color, depth, segments)
-    }
-
-    fun SkyHanniRenderWorldEvent.drawCircleFilled(
         locX: Double,
         locY: Double,
         locZ: Double,
@@ -389,33 +417,34 @@ object WorldRenderUtils {
         depth: Boolean = true,
         segments: Int = 32,
     ) {
-        val layer = SkyHanniRenderLayers.getTriangleFan(!depth)
-        val buf = vertexConsumers.getBuffer(layer)
-        matrices.pushPose()
+        val layer = SkyHanniRenderLayers.getTriangleFan(throughWalls = !depth)
+        submitCustomGeometry(layer) { buf ->
+            matrices.pushPose()
 
-        val viewerPos = getViewerPos()
-        val x = locX - viewerPos.x
-        val y = locY - viewerPos.y
-        val z = locZ - viewerPos.z
+            val viewerPos = getViewerPos()
+            val x = locX - viewerPos.x
+            val y = locY - viewerPos.y
+            val z = locZ - viewerPos.z
 
-        for (i in 0 until segments) {
-            val theta1 = 2.0 * Math.PI * i / segments
-            val theta2 = 2.0 * Math.PI * (i + 1) / segments
+            for (i in 0 until segments) {
+                val theta1 = 2.0 * Math.PI * i / segments
+                val theta2 = 2.0 * Math.PI * (i + 1) / segments
 
-            val x1 = x + rad * cos(theta1)
-            val z1 = z + rad * sin(theta1)
+                val x1 = x + rad * cos(theta1)
+                val z1 = z + rad * sin(theta1)
 
-            val x2 = x + rad * cos(theta2)
-            val z2 = z + rad * sin(theta2)
+                val x2 = x + rad * cos(theta2)
+                val z2 = z + rad * sin(theta2)
 
-            buf.addVertex(x.toFloat(), y.toFloat(), z.toFloat()).setColor(color.red, color.green, color.blue, color.alpha)
-                .addVertex(x1.toFloat(), y.toFloat(), z1.toFloat())
-                .setColor(color.red, color.green, color.blue, color.alpha)
-                .addVertex(x2.toFloat(), y.toFloat(), z2.toFloat())
-                .setColor(color.red, color.green, color.blue, color.alpha)
+                buf.addVertex(x.toFloat(), y.toFloat(), z.toFloat()).setColor(color.red, color.green, color.blue, color.alpha)
+                    .addVertex(x1.toFloat(), y.toFloat(), z1.toFloat())
+                    .setColor(color.red, color.green, color.blue, color.alpha)
+                    .addVertex(x2.toFloat(), y.toFloat(), z2.toFloat())
+                    .setColor(color.red, color.green, color.blue, color.alpha)
+            }
+
+            matrices.popPose()
         }
-
-        matrices.popPose()
     }
 
     fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
@@ -437,32 +466,33 @@ object WorldRenderUtils {
     ) {
         val segments = 64
 
-        val layer = SkyHanniRenderLayers.getFilled(false)
-        val buf = vertexConsumers.getBuffer(layer)
-        matrices.pushPose()
+        val layer = SkyHanniRenderLayers.getFilled(throughWalls = false)
+        submitCustomGeometry(layer) { buf ->
+            matrices.pushPose()
 
-        val (viewerX, viewerY, viewerZ) = getViewerPos()
-        val x = locX - viewerX
-        val y = locY - viewerY
-        val z = locZ - viewerZ
+            val (viewerX, viewerY, viewerZ) = getViewerPos()
+            val x = locX - viewerX
+            val y = locY - viewerY
+            val z = locZ - viewerZ
 
-        for (i in 0 until segments) {
-            val angle = 2.0 * Math.PI * i / segments
+            for (i in 0 until segments) {
+                val angle = 2.0 * Math.PI * i / segments
 
-            val xOffset = radius * cos(angle)
-            val zOffset = radius * sin(angle)
+                val xOffset = radius * cos(angle)
+                val zOffset = radius * sin(angle)
 
-            buf.addVertex((x + xOffset).toFloat(), y.toFloat(), (z + zOffset).toFloat())
+                buf.addVertex((x + xOffset).toFloat(), y.toFloat(), (z + zOffset).toFloat())
+                    .setColor(color.red, color.green, color.blue, color.alpha)
+                buf.addVertex((x + xOffset).toFloat(), (y + height).toFloat(), (z + zOffset).toFloat())
+                    .setColor(color.red, color.green, color.blue, color.alpha)
+            }
+            buf.addVertex((x + radius).toFloat(), y.toFloat(), (z + 0).toFloat())
                 .setColor(color.red, color.green, color.blue, color.alpha)
-            buf.addVertex((x + xOffset).toFloat(), (y + height).toFloat(), (z + zOffset).toFloat())
+            buf.addVertex((x + radius).toFloat(), (y + height).toFloat(), (z + 0).toFloat())
                 .setColor(color.red, color.green, color.blue, color.alpha)
+
+            matrices.popPose()
         }
-        buf.addVertex((x + radius).toFloat(), y.toFloat(), (z + 0).toFloat())
-            .setColor(color.red, color.green, color.blue, color.alpha)
-        buf.addVertex((x + radius).toFloat(), (y + height).toFloat(), (z + 0).toFloat())
-            .setColor(color.red, color.green, color.blue, color.alpha)
-
-        matrices.popPose()
 
         drawCircleFilled(locX, locY, locZ, radius.toDouble(), color, depth = true, segments = segments)
         drawCircleFilled(locX, locY + height, locZ, radius.toDouble(), color, depth = true, segments = segments)
@@ -480,37 +510,38 @@ object WorldRenderUtils {
             return
         }
 
-        val layer = SkyHanniRenderLayers.getTriangles(!depth)
-        val buf = vertexConsumers.getBuffer(layer)
-        matrices.pushPose()
+        val layer = SkyHanniRenderLayers.getTriangles(throughWalls = !depth)
+        submitCustomGeometry(layer) { buf ->
+            matrices.pushPose()
 
-        val viewerPos = getViewerPos()
-        val newTop = topPoint - viewerPos
-        val baseCenter = baseCenterPoint - viewerPos
-        val baseEdge = baseEdgePoint - viewerPos
+            val viewerPos = getViewerPos()
+            val newTop = topPoint - viewerPos
+            val baseCenter = baseCenterPoint - viewerPos
+            val baseEdge = baseEdgePoint - viewerPos
 
-        val edgeVec = baseEdge - baseCenter
-        val topVecNorm = (newTop - baseCenter).normalize()
-        val corner1 = baseEdge
-        val corner2 = topVecNorm.crossProduct(edgeVec).normalize() * edgeVec.length() + baseCenter
-        val corner3 = baseCenter - edgeVec
-        val corner4 = edgeVec.crossProduct(topVecNorm).normalize() * edgeVec.length() + baseCenter
+            val edgeVec = baseEdge - baseCenter
+            val topVecNorm = (newTop - baseCenter).normalize()
+            val corner1 = baseEdge
+            val corner2 = topVecNorm.crossProduct(edgeVec).normalize() * edgeVec.length() + baseCenter
+            val corner3 = baseCenter - edgeVec
+            val corner4 = edgeVec.crossProduct(topVecNorm).normalize() * edgeVec.length() + baseCenter
 
-        fun tri(a: LorenzVec, b: LorenzVec, c: LorenzVec) {
-            buf.addVertex(a.x.toFloat(), a.y.toFloat(), a.z.toFloat()).setColor(color.red, color.green, color.blue, color.alpha)
-            buf.addVertex(b.x.toFloat(), b.y.toFloat(), b.z.toFloat()).setColor(color.red, color.green, color.blue, color.alpha)
-            buf.addVertex(c.x.toFloat(), c.y.toFloat(), c.z.toFloat()).setColor(color.red, color.green, color.blue, color.alpha)
+            fun tri(a: LorenzVec, b: LorenzVec, c: LorenzVec) {
+                buf.addVertex(a.x.toFloat(), a.y.toFloat(), a.z.toFloat()).setColor(color.red, color.green, color.blue, color.alpha)
+                buf.addVertex(b.x.toFloat(), b.y.toFloat(), b.z.toFloat()).setColor(color.red, color.green, color.blue, color.alpha)
+                buf.addVertex(c.x.toFloat(), c.y.toFloat(), c.z.toFloat()).setColor(color.red, color.green, color.blue, color.alpha)
+            }
+
+            tri(newTop, corner1, corner2)
+            tri(newTop, corner2, corner3)
+            tri(newTop, corner3, corner4)
+            tri(newTop, corner4, corner1)
+
+            tri(corner1, corner2, corner3)
+            tri(corner1, corner3, corner4)
+
+            matrices.popPose()
         }
-
-        tri(newTop, corner1, corner2)
-        tri(newTop, corner2, corner3)
-        tri(newTop, corner3, corner4)
-        tri(newTop, corner4, corner1)
-
-        tri(corner1, corner2, corner3)
-        tri(corner1, corner3, corner4)
-
-        matrices.popPose()
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereInWorld(
@@ -530,45 +561,46 @@ object WorldRenderUtils {
         radius: Float,
         segments: Int = 32,
     ) {
-        val layer = SkyHanniRenderLayers.getQuads(false)
-        val buf = vertexConsumers.getBuffer(layer)
-        matrices.pushPose()
+        val layer = SkyHanniRenderLayers.getQuads(throughWalls = false)
+        submitCustomGeometry(layer) { buf ->
+            matrices.pushPose()
 
-        val (viewerX, viewerY, viewerZ) = getViewerPos()
-        val x = locX - viewerX
-        val y = locY - viewerY
-        val z = locZ - viewerZ
+            val (viewerX, viewerY, viewerZ) = getViewerPos()
+            val x = locX - viewerX
+            val y = locY - viewerY
+            val z = locZ - viewerZ
 
-        for (phi in 0 until segments) {
-            for (theta in 0 until segments * 2) {
-                val x1 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
-                val y1 = y + radius * cos(Math.PI * phi / segments)
-                val z1 = z + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
+            for (phi in 0 until segments) {
+                for (theta in 0 until segments * 2) {
+                    val x1 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
+                    val y1 = y + radius * cos(Math.PI * phi / segments)
+                    val z1 = z + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
 
-                val x2 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
-                val y2 = y + radius * cos(Math.PI * (phi + 1) / segments)
-                val z2 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
+                    val x2 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
+                    val y2 = y + radius * cos(Math.PI * (phi + 1) / segments)
+                    val z2 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
 
-                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
-                val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
-                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                    val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                    val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
+                    val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
-                val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
-                val y4 = y + radius * cos(Math.PI * phi / segments)
-                val z4 = z + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                    val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                    val y4 = y + radius * cos(Math.PI * phi / segments)
+                    val z4 = z + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
-                buf.addVertex(x1.toFloat(), y1.toFloat(), z1.toFloat())
-                    .setColor(color.red, color.green, color.blue, color.alpha)
-                buf.addVertex(x2.toFloat(), y2.toFloat(), z2.toFloat())
-                    .setColor(color.red, color.green, color.blue, color.alpha)
-                buf.addVertex(x3.toFloat(), y3.toFloat(), z3.toFloat())
-                    .setColor(color.red, color.green, color.blue, color.alpha)
-                buf.addVertex(x4.toFloat(), y4.toFloat(), z4.toFloat())
-                    .setColor(color.red, color.green, color.blue, color.alpha)
+                    buf.addVertex(x1.toFloat(), y1.toFloat(), z1.toFloat())
+                        .setColor(color.red, color.green, color.blue, color.alpha)
+                    buf.addVertex(x2.toFloat(), y2.toFloat(), z2.toFloat())
+                        .setColor(color.red, color.green, color.blue, color.alpha)
+                    buf.addVertex(x3.toFloat(), y3.toFloat(), z3.toFloat())
+                        .setColor(color.red, color.green, color.blue, color.alpha)
+                    buf.addVertex(x4.toFloat(), y4.toFloat(), z4.toFloat())
+                        .setColor(color.red, color.green, color.blue, color.alpha)
+                }
             }
-        }
 
-        matrices.popPose()
+            matrices.popPose()
+        }
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
@@ -621,53 +653,23 @@ object WorldRenderUtils {
         location: LorenzVec,
         text: String,
         scaleMultiplier: Double,
-        /**
-         * Screen-space vertical offset applied after camera-facing rotation.
-         * Positive values move text up on screen, independent of camera angle.
-         */
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
         smallestViewDistance: Double = 5.0,
         seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
-    ) {
-        val (viewerX, viewerY, viewerZ) = getViewerPos()
-
-        val x = location.x
-        val y = location.y
-        val z = location.z
-
-        val player = MinecraftCompat.localPlayerOrNull ?: return
-        val eyeHeight = player.getEyeHeight(player.pose)
-
-        val dX = (x - viewerX) * (x - viewerX)
-        val dY = (y - (viewerY + eyeHeight)) * (y - (viewerY + eyeHeight))
-        val dZ = (z - viewerZ) * (z - viewerZ)
-        val distToPlayerSq = dX + dY + dZ
-        var distToPlayer = sqrt(distToPlayerSq)
-        // TODO this is optional maybe?
-        distToPlayer = distToPlayer.coerceAtLeast(smallestViewDistance)
-
-        if (distToPlayer < hideTooCloseAt) return
-        maxDistance?.let {
-            if (!seeThroughBlocks && distToPlayer > it) return
-        }
-
-        val distRender = distToPlayer.coerceAtMost(50.0)
-
-        var scale = distRender / 12
-        scale *= scaleMultiplier
-
-        val resultX = viewerX + (x + 0.5 - viewerX) / (distToPlayer / distRender)
-        val resultY = if (ignoreY) y * distToPlayer / distRender else viewerY + eyeHeight +
-            (y + 20 * distToPlayer / 300 - (viewerY + eyeHeight)) / (distToPlayer / distRender)
-        val resultZ = viewerZ + (z + 0.5 - viewerZ) / (distToPlayer / distRender)
-
-        val renderLocation = LorenzVec(resultX, resultY, resultZ)
-
-        drawString(renderLocation, "§f$text", seeThroughBlocks, null, scale, true, yOff, 0)
-    }
+    ) = drawDynamicText(
+        location,
+        text.asComponent(),
+        scaleMultiplier,
+        yOff,
+        hideTooCloseAt,
+        smallestViewDistance,
+        seeThroughBlocks,
+        ignoreY,
+        maxDistance,
+    )
 
     fun SkyHanniRenderWorldEvent.drawDynamicText(
         location: LorenzVec,
@@ -728,13 +730,6 @@ object WorldRenderUtils {
         }
     }
 
-    // TODO add chroma color support
-    fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: AABB, color: Color, lineWidth: Int, depth: Boolean) {
-        LineDrawer.draw3D(this, lineWidth, depth) {
-            drawEdges(axisAlignedBB, color)
-        }
-    }
-
     fun SkyHanniRenderWorldEvent.draw3DLine(
         p1: LorenzVec,
         p2: LorenzVec,
@@ -753,18 +748,6 @@ object WorldRenderUtils {
         depth: Boolean,
     ) = LineDrawer.draw3D(this, lineWidth, depth) {
         draw3DLine(p1, p2, color)
-    }
-
-    fun SkyHanniRenderWorldEvent.draw3DPolyline(
-        points: List<LorenzVec>,
-        color: Color,
-        lineWidth: Int,
-        depth: Boolean,
-    ) {
-        if (points.size < 2) return
-        LineDrawer.draw3D(this, lineWidth, depth) {
-            points.zipWithNext { a, b -> draw3DLine(a, b, color) }
-        }
     }
 
     fun SkyHanniRenderWorldEvent.draw3DBezier2(
@@ -819,7 +802,7 @@ object WorldRenderUtils {
         drawLineToCrosshair(location, color.toColor(), lineWidth, depth)
     }
 
-    @Legacy("use drawLineToCrosshair", ReplaceWith("drawLineToCrosshair(location, color, lineWidth, depth)"))
+    @Deprecated("use drawLineToCrosshair", ReplaceWith("drawLineToCrosshair(location, color, lineWidth, depth)"))
     fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: ChromaColour, lineWidth: Int, depth: Boolean) {
         drawLineToCrosshair(location, color, lineWidth, depth)
     }
@@ -849,12 +832,7 @@ object WorldRenderUtils {
     ) {
         if (path.isEmpty()) return
         val points = if (startAtEye) {
-            listOf(
-                this.exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle
-                    .toLorenzVec()
-                    /* .rotateXZ(-Math.PI / 72.0) */
-                    .times(2),
-            )
+            listOf(exactPlayerCrosshairLocation())
         } else {
             emptyList()
         } + path.toPositionsList().map { it.add(0.5, 0.5, 0.5) }
@@ -956,7 +934,8 @@ object WorldRenderUtils {
         )
     }
 
-    fun getViewerPos() = exactLocation(Minecraft.getInstance().gameRenderer.mainCamera)
+    //~ if < 26.2 'mainCamera()' -> 'mainCamera'
+    fun getViewerPos() = exactLocation(Minecraft.getInstance().gameRenderer.mainCamera())
 
     fun AABB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
     fun AABB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
@@ -979,13 +958,18 @@ object WorldRenderUtils {
     fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
     internal fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
-        val player = MinecraftCompat.localPlayer
+        val player = MinecraftCompat.localPlayerOrThrow
         val eyeHeight = player.eyeHeight.toDouble()
         return exactLocation(player).add(y = eyeHeight)
     }
 
-    internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec =
-        exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle.toLorenzVec().times(2)
+    internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec {
+        //? if >= 26.2 {
+        val look = Vector3f(0f, 0f, -1f).rotate(camera.rotation())
+        return camera.position.toLorenzVec() + LorenzVec(look.x.toDouble(), look.y.toDouble(), look.z.toDouble()).times(2)
+        //?} else
+        //return exactPlayerEyeLocation() + MinecraftCompat.localPlayerOrThrow.lookAngle.toLorenzVec().times(2)
+    }
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {
         if (entity.deceased) return entity.boundingBox
@@ -1016,22 +1000,20 @@ object WorldRenderUtils {
         k: Float,
         l: Float,
         m: Float,
-    ) {
-        addChainedFilledBoxVertices(
-            matrices,
-            vertexConsumer,
-            d.toFloat(),
-            e.toFloat(),
-            f.toFloat(),
-            g.toFloat(),
-            h.toFloat(),
-            i.toFloat(),
-            j,
-            k,
-            l,
-            m,
-        )
-    }
+    ) = addChainedFilledBoxVertices(
+        matrices,
+        vertexConsumer,
+        d.toFloat(),
+        e.toFloat(),
+        f.toFloat(),
+        g.toFloat(),
+        h.toFloat(),
+        i.toFloat(),
+        j,
+        k,
+        l,
+        m,
+    )
 
     private fun addChainedFilledBoxVertices(
         matrices: PoseStack,
@@ -1080,6 +1062,9 @@ object WorldRenderUtils {
         vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
     }
 
-    // returns true if the camera is underwater
-    fun isRenderingUnderwater() = Minecraft.getInstance().gameRenderer.mainCamera.fluidInCamera == FogType.WATER
+    /**
+     * Returns true if the camera is underwater.
+     */
+    //~ if < 26.2 'mainCamera()' -> 'mainCamera'
+    fun isRenderingUnderwater() = Minecraft.getInstance().gameRenderer.mainCamera().fluidInCamera == FogType.WATER
 }

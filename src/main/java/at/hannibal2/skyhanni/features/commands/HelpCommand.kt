@@ -19,7 +19,7 @@ import net.minecraft.network.chat.Component
 object HelpCommand {
 
     private const val COMMANDS_PER_PAGE = 15
-    private val messageId = ChatUtils.getUniqueCustomMessageId()
+    private val messageId = ChatUtils.getUniqueMessageId()
 
     private fun Map.Entry<CommandNode<*>, String>.format() = "§7 - §e/${key.name} $value"
 

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.config.enums.SharePolicy
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFarmingContest
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -56,12 +57,12 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
-import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.sync.Mutex
 
 @SkyHanniModule
 object GardenNextJacobContest {
@@ -71,7 +72,7 @@ object GardenNextJacobContest {
     private val profileStorage get() = SkyHanniMod.feature.storage
     private val config get() = GardenApi.config.jacobContest.nextContest
     private val patternGroup = RepoPattern.group("garden.nextcontest")
-    private val calendarDetector by lazy { InventoryDetector(monthPattern) }
+    private val calendarDetector by lazy { InventoryDetector { monthPattern } }
     private val haveAllContests get() = knownContests.size == MAX_CONTESTS_PER_YEAR
     private val nextContest
         get() = knownContests.filterNot {
@@ -123,15 +124,15 @@ object GardenNextJacobContest {
     // This pattern covers both the tab list widget, and calendar item lore.
     /**
      * REGEX-TEST: ○ Cactus
-     * REGEX-TEST: ☘ Carrot
+     * REGEX-TEST:  Carrot
      * REGEX-TEST: ○ Melon
-     * REGEX-TEST:  ☘ Mushroom
-     * REGEX-TEST:  ○ Pumpkin
-     * REGEX-TEST:  ○ Wheat
+     * WRAPPED-REGEX-TEST: "  Mushroom"
+     * WRAPPED-REGEX-TEST: " ○ Pumpkin"
+     * WRAPPED-REGEX-TEST: " ○ Wheat"
      */
     private val cropPattern by patternGroup.pattern(
         "crop-no-color",
-        " ?(?:○|(?<boosted>☘)) (?<crop>.*)",
+        " ?(?:○|(?<boosted>${SkyblockStat.FARMING_FORTUNE.hypixelIcon})) (?<crop>.*)",
     )
 
     /**
@@ -144,7 +145,7 @@ object GardenNextJacobContest {
     )
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Next Jacob Contest")
 
         if (!GardenApi.inGarden()) {
@@ -192,7 +193,7 @@ object GardenNextJacobContest {
     }
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.JACOB_CONTEST)) return
         simpleDisplay = Renderable.vertical {
             event.lines.forEach { add(Renderable.text(it)) }
@@ -217,19 +218,19 @@ object GardenNextJacobContest {
     }
 
     @HandleEvent(SecondPassedEvent::class)
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!isEnabled() || calendarDetector.isInside()) return
         update()
     }
 
     @HandleEvent(InventoryCloseEvent::class, onlyOnIsland = IslandType.GARDEN)
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         if (!isEnabled()) return
         update()
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled() || !calendarDetector.isInside()) return
         val (monthGroup, yearGroup) = monthPattern.matchGroups(
             event.inventoryName,
@@ -321,7 +322,7 @@ object GardenNextJacobContest {
     }
 
     @HandleEvent(ConfigLoadEvent::class)
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         val savedContests = SkyHanniMod.jacobContestsData.knownContests
         val savedYear = savedContests.firstOrNull()?.endTime?.toSkyBlockTime()?.year ?: return
         // Clear contests if from previous year
@@ -420,6 +421,8 @@ object GardenNextJacobContest {
         addString("§7(§b${duration.format()}§7)")
     }
 
+    private fun shouldOpenPopup() = config.warnPopup && !Minecraft.getInstance().isWindowActive
+
     private fun EliteFarmingContest.warnAbout() {
         val timeUntil = startTime.timeUntil()
         if (!config.warn || config.warnTime.seconds <= timeUntil) return
@@ -435,28 +438,27 @@ object GardenNextJacobContest {
         TitleManager.sendTitle("§eFarming Contest!")
         SoundUtils.playBeepSound()
 
+        if (!shouldOpenPopup()) return
+
         val cropTextNoColor = crops.joinToString(", ") {
-            if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
+            if (it == boostedCrop) "${it.cropName} (boosted)" else it.cropName
         }
-        if (config.warnPopup && !Minecraft.getInstance().isWindowActive) {
-            CoroutineSettings("garden jacob contest openPopupWindow").launchCoroutine {
-                DialogUtils.openPopupWindow(
-                    title = "SkyHanni Jacob Contest Notification",
-                    message = "<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>",
-                )
-            }
-        }
+        DialogUtils.openPopupWindow(
+            title = "SkyHanni Jacob Contest Notification",
+            message = "Farming Contest soon!\nCrops: $cropTextNoColor",
+            condition = ::shouldOpenPopup,
+        )
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         val display = display ?: simpleDisplay ?: return
         config.position.renderRenderable(display, posLabel = "Next Jacob Contest")
     }
 
     @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    fun onChestGuiRender() {
+    private fun onChestGuiRender() {
         if (!config.display || !calendarDetector.isInside()) return
         val display = display ?: return
         config.inventoryPosition.renderRenderable(display, posLabel = "Load SkyBlock Calendar")
@@ -516,7 +518,7 @@ object GardenNextJacobContest {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.nextJacobContestDisplay", "garden.nextJacobContests.display")
         event.move(3, "garden.nextJacobContestEverywhere", "garden.nextJacobContests.everywhere")
         event.move(3, "garden.nextJacobContestOtherGuis", "garden.nextJacobContests.otherGuis")

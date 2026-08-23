@@ -9,9 +9,11 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.ChatFormatting
-import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
+import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
@@ -22,17 +24,13 @@ import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.resources.Identifier
+import net.minecraft.world.item.ItemStackTemplate
 import java.net.URI
 import java.util.Optional
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
-
-//? if >= 26.1 {
-import net.minecraft.world.item.ItemStackTemplate
-import net.minecraft.client.multiplayer.chat.GuiMessageSource
-//?}
 
 // TODO do the same thing here as in EntityCompat, no more functions/members that are classless
 
@@ -60,6 +58,7 @@ private enum class FormattedTextSettings {
 
 private data class TextCacheKey(val settings: FormattedTextSettings, val component: Component)
 
+@Deprecated("Use string unless you really need color codes")
 fun Component.unformattedTextForChatCompat(): String {
     return unformattedTextCache.getOrPut(this) {
         computeUnformattedTextCompat()
@@ -73,17 +72,12 @@ private fun Component.computeUnformattedTextCompat(): String {
     return (this.contents as? PlainTextContents)?.text().orEmpty()
 }
 
+@Deprecated("Use string unless you really need color codes")
 fun Component.unformattedTextCompat(): String =
     iterator().joinToString(separator = "") { it.unformattedTextForChatCompat() }
 
-// has to be a separate function for pattern mappings
-fun Component?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
-fun Component?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
-fun Component?.formattedTextCompatLeadingWhiteLessResets(): String =
-    this.formattedTextCompat(noExtraResets = true, leadingWhite = true)
-
 @JvmOverloads
-@Suppress("unused")
+@Deprecated("Use string unless you really need color codes")
 fun Component?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite: Boolean = false): String {
     this ?: return ""
     val cacheKey = TextCacheKey(FormattedTextSettings.getByArgs(noExtraResets, leadingWhite), this)
@@ -91,6 +85,19 @@ fun Component?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite:
         computeFormattedTextCompat(noExtraResets, leadingWhite)
     }
 }
+
+@Deprecated("Use string unless you really need color codes")
+@Suppress("DEPRECATION")
+fun Component?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
+
+@Deprecated("Use string unless you really need color codes")
+@Suppress("DEPRECATION")
+fun Component?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
+
+@Deprecated("Use string unless you really need color codes")
+@Suppress("DEPRECATION")
+fun Component?.formattedTextCompatLeadingWhiteLessResets(): String =
+    this.formattedTextCompat(noExtraResets = true, leadingWhite = true)
 
 private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhite: Boolean): String {
     this ?: return ""
@@ -115,19 +122,21 @@ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadin
 }
 
 private val textColorLUT = ChatFormatting.entries
-    .mapNotNull { formatting -> formatting.color?.let { it to formatting } }
+    .mapNotNull { formatting -> TextColor.fromLegacyFormat(formatting)?.let { it.value to formatting } }
     .toMap()
 
 fun Style?.orEmpty(): Style = this ?: Style.EMPTY
 
 fun Style.chatStyle() = buildString {
-    color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.formatValue()}>") }
+    color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.serialize()}>") }
     if (isBold) append("§l")
     if (isItalic) append("§o")
     if (isUnderlined) append("§n")
     if (isStrikethrough) append("§m")
     if (isObfuscated) append("§k")
 }
+
+fun Style.takeUnlessEmpty(): Style? = takeUnless { it.isEmpty }
 
 fun TextColor.toChatFormatting(): ChatFormatting? {
     return textColorLUT[this.value]
@@ -175,13 +184,11 @@ var Component.stackHover: SafeItemStack?
     get() = this.style.hoverEvent?.takeIf {
         it.action() == HoverEvent.Action.SHOW_ITEM
     }?.let {
-        //~ if < 26.1 '.item.create()' -> '.item'
         (it as HoverEvent.ShowItem).item.create()
     }
     set(value) {
         value?.let { new ->
             this.copyIfNeeded().withStyle {
-                //~ if < 26.1 'ItemStackTemplate.fromNonEmptyStack(new)' -> 'new'
                 it.withHoverEvent(HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(new)))
             }
         }
@@ -256,7 +263,6 @@ fun Style.setHoverShowText(text: Component): Style {
 fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) message.skyhanniCreated = true
     DelayedRun.runOrNextTick {
-        //~ if < 26.1 'sendSystemMessage(message)' -> 'displayClientMessage(message, false)'
         Minecraft.getInstance().player?.sendSystemMessage(message)
     }
 }
@@ -264,13 +270,12 @@ fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false
 fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) component.skyhanniCreated = true
     DelayedRun.runOrNextTick {
-        val chat = Minecraft.getInstance().gui.chat
+        val chat = MinecraftCompat.hud.chat
         ChatManager.deleteMessage { it.signature == idToMessageSignature(id) }
         DelayedRun.runOrNextTick {
             chat.addMessage(
                 component,
                 idToMessageSignature(id),
-                //? if >= 26.1
                 GuiMessageSource.SYSTEM_CLIENT,
                 GuiMessageTag.system(),
             )
@@ -314,7 +319,6 @@ fun ClickEvent.value(): String {
 
 fun HoverEvent.value(): Component = when (action()) {
     HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
-    //~ if < 26.1 '.item.create().hoverName' -> '.item.hoverName'
     HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.create().hoverName
     HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
 }
@@ -326,8 +330,18 @@ fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): H
     else -> throw NotImplementedError("Action ${action.name} is not implemented")
 }
 
-fun Component.changeColor(color: LorenzColor): Component =
-    this.copyIfNeeded().withStyle(color.toChatFormatting())
+fun Component.changeColor(color: LorenzColor): Component {
+    val component = Component.empty()
+
+    this.visit(
+        { style: Style?, string: String? ->
+            component.append(Component.literal(string.orEmpty()).withStyle((style ?: Style.EMPTY).withColor(color.toChatFormatting())))
+            Optional.empty<Component>()
+        },
+        Style.EMPTY,
+    )
+    return component
+}
 
 fun Component.convertToJsonString(): String {
     return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(

@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object ItemValueAchievement {
@@ -16,9 +15,9 @@ object ItemValueAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Hefty Item".asComponent(),
-            "Swing an item worth more than 500mil".asComponent(),
-            50f,
+            name = "Hefty Item",
+            description = "Swing an item worth more than 500mil",
+            userLuckAmount = 50f,
         )
         event.register(achievement, ITEM_VALUE_ACHIEVEMENT)
     }

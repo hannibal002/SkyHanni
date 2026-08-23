@@ -52,19 +52,29 @@ object EnchantParser {
      * from running `formattedTextCompat()` on a lore line, which is what is used against the regex)
      *
      * REGEX-TEST: §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
+     * REGEX-TEST: §d§l§d§lFatal Tempo I, §9Chance IV, §9Cubism V
+     * REGEX-TEST: §9Drain IV, Ender Slayer VI, Execute V
+     * REGEX-TEST: §9Toxophilite VIII §82.1M
+     * REGEX-TEST: §9Cultivating VII §81,625,381
+     * REGEX-FAIL: §c§7by §c10% §7per hit, capped at §c200% §7for 3
      */
     val enchantmentExclusivePattern by patternGroup.pattern(
         "exclusive",
-        "^(?:(?:§.)+[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
+        "^(?:(?:§.)*[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?, |\$| (?:§r)?§8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
     )
 
     /**
      * REGEX-TEST: §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
+     * REGEX-TEST: §d§l§d§lFatal Tempo I, §9Chance IV, §9Cubism V
+     * REGEX-TEST: §9Drain IV, Ender Slayer VI, Execute V
+     * REGEX-TEST: §9Toxophilite VIII §82.1M
+     * REGEX-TEST: §9Cultivating VII §81,625,381
+     * REGEX-FAIL: §c§7by §c10% §7per hit, capped at §c200% §7for 3
      */
     @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
-        "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
+        "(?<=^|, )(?:§.)*(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?, |\$| (?:§r)?§8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
 
     private var currentItem: SafeItemStack? = null
@@ -386,7 +396,9 @@ object EnchantParser {
             }
 
             if (fromChatComponent) {
-                if (!(loreList[i].contents as PlainTextContents.LiteralContents).text.contains("\n")) {
+                // Only the component's own text matters here, siblings are separate tooltip lines
+                val ownText = (loreList[i].contents as? PlainTextContents)?.text().orEmpty()
+                if (!ownText.contains("\n")) {
                     maxComponentEnchantsPerLine++
                 } else {
                     maxEnchantsPerLine =

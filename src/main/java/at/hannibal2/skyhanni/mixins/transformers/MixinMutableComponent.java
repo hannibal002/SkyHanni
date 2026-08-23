@@ -22,5 +22,4 @@ public abstract class MixinMutableComponent implements ComponentCreatedStore {
     public void skyhanni$setCreated(boolean value) {
         this.skyhanni$createdMessage = value;
     }
-
 }

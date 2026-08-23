@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -44,7 +43,7 @@ object SirihHelper {
         if (lastSentMessage.passedSince() < 1.minutes) return
         if (!sirihLine.matches(event.message)) return
 
-        if (InventoryUtils.countItemsInLowerInventory { it.getInternalNameOrNull() == SULPHUR_ORE } > 0) return
+        if (InventoryUtils.containsInLowerInventoryInternalName { it == SULPHUR_ORE }) return
 
         DelayedRun.runNextTick {
             GetFromSackApi.getFromChatMessageSackItems(
