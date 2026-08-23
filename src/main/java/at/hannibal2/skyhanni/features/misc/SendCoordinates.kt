@@ -17,10 +17,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
-import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
-import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -87,10 +83,12 @@ object SendCoordinates {
     }
 
     private fun sendPathfindAction(waypoint: SharedWaypoint) {
-        val component = "§e[SkyHanni] §7Pathfind to §r${waypoint.name}".asComponent()
-        component.onClick { pathfindTo(waypoint) }
-        component.onHover("§eClick to start pathfinding")
-        component.send(ChatUtils.getUniqueMessageId())
+        ChatUtils.clickableChat(
+            message = "Pathfind to ${waypoint.name}",
+            onClick = { pathfindTo(waypoint) },
+            hover = "§eClick to start pathfinding",
+            oneTimeClick = true,
+        )
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
@@ -107,8 +105,8 @@ object SendCoordinates {
             event.drawWaypointFilled(location, config.color.toColor(), seeThroughBlocks = true, beacon = true)
             event.drawDynamicText(
                 location,
-                beacon.name + " §e[${formattedDistance}m]",
-                1.5,
+                "§1${beacon.name} §e[${formattedDistance}m]",
+                1.0,
                 hideTooCloseAt = 0.0,
             )
         }
