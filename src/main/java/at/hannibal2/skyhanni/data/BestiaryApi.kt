@@ -169,29 +169,25 @@ object BestiaryApi {
         abstract class Open(
             type: GuiType,
             val overallProgressEnabled: Boolean,
-            val inventoryItems: Map<Int, SafeItemStack>
         ) : BestiaryGuiState(type)
 
         class Categories(
             overallProgressEnabled: Boolean,
-            inventoryItems: Map<Int, SafeItemStack>,
             val categories: Map<Int, Category>
-        ) : Open(GuiType.CATEGORY_OF_CATEGORIES, overallProgressEnabled, inventoryItems)
+        ) : Open(GuiType.CATEGORY_OF_CATEGORIES, overallProgressEnabled)
 
         class Mobs(
             overallProgressEnabled: Boolean,
-            inventoryItems: Map<Int, SafeItemStack>,
             val parentCategory: Category?,
             val mobs: Map<Int, BestiaryMob>
-        ) : Open(GuiType.CATEGORY_OF_MOBS, overallProgressEnabled, inventoryItems)
+        ) : Open(GuiType.CATEGORY_OF_MOBS, overallProgressEnabled)
 
         class Variants(
             overallProgressEnabled: Boolean,
-            inventoryItems: Map<Int, SafeItemStack>,
             val parentCategory: Category?,
             val parentFamily: BestiaryMob?,
             val variants: Map<Int, BestiaryMobVariant>
-        ) : Open(GuiType.MOB_VARIANTS, overallProgressEnabled, inventoryItems)
+        ) : Open(GuiType.MOB_VARIANTS, overallProgressEnabled)
     }
 
     val indexes = listOf(
@@ -253,13 +249,13 @@ object BestiaryApi {
 
         currentState = if (inventoryCategoryOfCategoryPattern.matches(inventoryName)) {
             val map = parseCategoryOfCategories(inventoryName, items)
-            BestiaryGuiState.Categories(isOverallProgress, items, map)
+            BestiaryGuiState.Categories(isOverallProgress, map)
         } else if (hasFamilies || inventorySearchResultsPattern.matches(inventoryName)) {
             val map = parseCategoryOfMobs(items)
-            BestiaryGuiState.Mobs(isOverallProgress, items, pendingCategory ?: oldCategory, map)
+            BestiaryGuiState.Mobs(isOverallProgress, pendingCategory ?: oldCategory, map)
         } else if (hasMobFamily) {
             val map = parseMobVariants(items)
-            BestiaryGuiState.Variants(isOverallProgress, items, oldCategory, pendingFamily ?: oldFamily, map)
+            BestiaryGuiState.Variants(isOverallProgress, oldCategory, pendingFamily ?: oldFamily, map)
         } else {
             BestiaryGuiState.Closed
         }
