@@ -26,7 +26,6 @@ import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object BestiaryApi {
-
     private val patternGroup = RepoPattern.group("combat.bestiary.data")
 
     /**
@@ -157,6 +156,44 @@ object BestiaryApi {
         "\\s*Families Completed.*",
     )
 
+    enum class GuiType {
+        CLOSED,
+        CATEGORY_OF_CATEGORIES,
+        CATEGORY_OF_MOBS,
+        MOB_VARIANTS
+    }
+
+    sealed class BestiaryGuiState(val type: GuiType) {
+        object Closed : BestiaryGuiState(GuiType.CLOSED)
+
+        abstract class Open(
+            type: GuiType,
+            val overallProgressEnabled: Boolean,
+            val inventoryItems: Map<Int, SafeItemStack>
+        ) : BestiaryGuiState(type)
+
+        class Categories(
+            overallProgressEnabled: Boolean,
+            inventoryItems: Map<Int, SafeItemStack>,
+            val categories: Map<Int, Category>
+        ) : Open(GuiType.CATEGORY_OF_CATEGORIES, overallProgressEnabled, inventoryItems)
+
+        class Mobs(
+            overallProgressEnabled: Boolean,
+            inventoryItems: Map<Int, SafeItemStack>,
+            val parentCategory: Category?,
+            val mobs: Map<Int, BestiaryMob>
+        ) : Open(GuiType.CATEGORY_OF_MOBS, overallProgressEnabled, inventoryItems)
+
+        class Variants(
+            overallProgressEnabled: Boolean,
+            inventoryItems: Map<Int, SafeItemStack>,
+            val parentCategory: Category?,
+            val parentFamily: BestiaryMob?,
+            val variants: Map<Int, BestiaryMobVariant>
+        ) : Open(GuiType.MOB_VARIANTS, overallProgressEnabled, inventoryItems)
+    }
+
     val indexes = listOf(
         10..16,
         19..25,
@@ -166,30 +203,36 @@ object BestiaryApi {
 
     const val OVERALL_PROGRESS_SLOT = 52
 
-    private val stackList = mutableMapOf<Int, SafeItemStack>()
-    val mobList = mutableListOf<BestiaryMob>()
-    val catList = mutableListOf<Category>()
-    val mobVariants = mutableListOf<BestiaryMobVariant>()
-
-    var inInventory = false
-        private set
-    var overallProgressEnabled = false
-        private set
-    var currentCategory: Category? = null
-        private set
-
-    // Inventory GUI states
-    var isCategoryOfCategories = false
-        private set
-    var isCategoryOfMobs = false
-        private set
-    var isMobVariants = false
-        private set
-    var currentFamily: BestiaryMob? = null
+    // Single source of truth for the active inventory state
+    var currentState: BestiaryGuiState = BestiaryGuiState.Closed
         private set
 
     private var pendingCategory: Category? = null
     private var pendingFamily: BestiaryMob? = null
+
+    val inInventory: Boolean get() = currentState is BestiaryGuiState.Open
+    val isCategoryOfCategories: Boolean get() = currentState.type == GuiType.CATEGORY_OF_CATEGORIES
+    val isCategoryOfMobs: Boolean get() = currentState.type == GuiType.CATEGORY_OF_MOBS
+    val isMobVariants: Boolean get() = currentState.type == GuiType.MOB_VARIANTS
+
+    val overallProgressEnabled: Boolean
+        get() = (currentState as? BestiaryGuiState.Open)?.overallProgressEnabled ?: false
+
+    val currentCategory: Category?
+        get() = when (val state = currentState) {
+            is BestiaryGuiState.Mobs -> state.parentCategory
+            is BestiaryGuiState.Variants -> state.parentCategory
+            else -> null
+        }
+
+    val currentFamily: BestiaryMob?
+        get() = (currentState as? BestiaryGuiState.Variants)?.parentFamily
+
+    val mobList: List<BestiaryMob>
+        get() = (currentState as? BestiaryGuiState.Mobs)?.mobs?.values?.toList().orEmpty()
+
+    val catList: List<Category>
+        get() = (currentState as? BestiaryGuiState.Categories)?.categories?.values?.toList().orEmpty()
 
     @HandleEvent
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -199,83 +242,61 @@ object BestiaryApi {
 
         if (!isBestiaryGui(stack, inventoryName) && !inventoryCategoryOfCategoryPattern.matches(inventoryName)) return
 
-        val oldCategory = currentCategory?.copy(slot = null)
-        val oldFamily = currentFamily?.copy(slot = null)
-
-        stackList.clear()
-        stackList.putAll(items)
-        inInventory = true
-        overallProgressEnabled = isOverallProgressEnabled(items)
-        currentCategory = null
-
-        isCategoryOfCategories = false
-        isCategoryOfMobs = false
-        isMobVariants = false
-        currentFamily = null
-
+        val isOverallProgress = isOverallProgressEnabled(items)
         val cleanLore = stack.getCleanLore()
         val hasFamilies = cleanLore.any { familyFoundPattern.matches(it) || familyCompletedPattern.matches(it) }
         val hasMobFamily = parseStackName(stack.hoverName) != null
 
-        if (inventoryCategoryOfCategoryPattern.matches(inventoryName)) {
-            isCategoryOfCategories = true
-            inCategoryOfCategories(inventoryName)
+        // Capture previous references before we transition states
+        val oldCategory = currentCategory
+        val oldFamily = currentFamily
+
+        currentState = if (inventoryCategoryOfCategoryPattern.matches(inventoryName)) {
+            val map = parseCategoryOfCategories(inventoryName, items)
+            BestiaryGuiState.Categories(isOverallProgress, items, map)
         } else if (hasFamilies || inventorySearchResultsPattern.matches(inventoryName)) {
-            isCategoryOfMobs = true
-            inCategoryOfMobs()
+            val map = parseCategoryOfMobs(items)
+            BestiaryGuiState.Mobs(isOverallProgress, items, pendingCategory ?: oldCategory, map)
         } else if (hasMobFamily) {
-            isMobVariants = true
-            inMobVariants()
-        }
-
-        if (isCategoryOfMobs) {
-            currentCategory = pendingCategory ?: oldCategory
-            pendingCategory = null
-        } else if (isMobVariants) {
-            currentCategory = oldCategory
-            pendingCategory = null
+            val map = parseMobVariants(items)
+            BestiaryGuiState.Variants(isOverallProgress, items, oldCategory, pendingFamily ?: oldFamily, map)
         } else {
-            pendingCategory = null
+            BestiaryGuiState.Closed
         }
 
+        // Clean up pending states after applying them
+        if (isCategoryOfMobs || isMobVariants) {
+            pendingCategory = null
+        }
         if (isMobVariants) {
-            currentFamily = pendingFamily ?: oldFamily
-            pendingFamily = null
-        } else {
             pendingFamily = null
         }
     }
 
     @HandleEvent
     private fun onInventoryClose() {
-        stackList.clear()
-        mobList.clear()
-        catList.clear()
-        mobVariants.clear()
-        inInventory = false
-        isCategoryOfCategories = false
-        isCategoryOfMobs = false
-        isMobVariants = false
+        currentState = BestiaryGuiState.Closed
+        pendingCategory = null
+        pendingFamily = null
     }
 
     @HandleEvent
     private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        when {
-            isCategoryOfCategories -> {
-                pendingCategory = catList.firstOrNull { it.slot == event.slotId }
+        when (val state = currentState) {
+            is BestiaryGuiState.Categories -> {
+                state.categories[event.slotId]?.let { pendingCategory = it }
             }
-
-            isCategoryOfMobs -> {
-                pendingFamily = mobList.firstOrNull { it.slot == event.slotId }
+            is BestiaryGuiState.Mobs -> {
+                state.mobs[event.slotId]?.let { pendingFamily = it }
             }
+            else -> {}
         }
     }
 
     private fun parseCategoryFromStack(
         name: Component,
         fullName: String,
-        stack: SafeItemStack,
-        slot: Int?,
+        stack: SafeItemStack
     ): Category {
         var familiesFound: Long = 0
         var totalFamilies: Long = 0
@@ -287,6 +308,7 @@ object BestiaryApi {
             if (lineIndex == 0) continue
             val previousLine = cleanLore[lineIndex - 1]
             val progress = line.substring(line.lastIndexOf(' ') + 1)
+
             if (familyFoundPattern.matches(previousLine)) {
                 progressPattern.matchMatcher(progress) {
                     familiesFound = group("current").formatLong()
@@ -299,66 +321,65 @@ object BestiaryApi {
             }
         }
 
-        return Category(
-            name,
-            fullName,
-            familiesFound,
-            totalFamilies,
-            familiesCompleted,
-            slot,
-        )
+        return Category(name, fullName, familiesFound, totalFamilies, familiesCompleted)
     }
 
-    private fun inCategoryOfCategories(inventoryName: String) {
-        for ((index, stack) in stackList) {
-            val cleanName = stack.cleanName
-            if (cleanName == " " || cleanName.isEmpty()) continue
+    private fun parseCategoryOfCategories(inventoryName: String, items: Map<Int, SafeItemStack>): Map<Int, Category> {
+        val map = mutableMapOf<Int, Category>()
+        for ((index, stack) in items) {
             if (!indexes.contains(index)) continue
+            val cleanName = stack.cleanName
+            if (cleanName.isBlank()) continue
+
             val name = stack.hoverName
             val fullName = getFullNameForItem(inventoryName, cleanName)
-            val category = parseCategoryFromStack(name, fullName, stack, index)
-            if (category.totalFamilies == 0L) continue
-            catList.add(category)
+            val category = parseCategoryFromStack(name, fullName, stack)
+
+            if (category.totalFamilies > 0L) {
+                map[index] = category
+            }
         }
+        return map
     }
 
-    private fun inCategoryOfMobs() {
-        for ((index, stack) in stackList) {
-            val cleanName = stack.cleanName
-            if (cleanName == " " || cleanName.isEmpty()) continue
+    private fun parseCategoryOfMobs(items: Map<Int, SafeItemStack>): Map<Int, BestiaryMob> {
+        val map = mutableMapOf<Int, BestiaryMob>()
+        for ((index, stack) in items) {
             if (!indexes.contains(index)) continue
+            val cleanName = stack.cleanName
+            if (cleanName.isBlank()) continue
 
-            val mob = parseMobFromStack(stack, index)
+            val mob = parseMobFromStack(stack)
             if (mob != null) {
-                mobList.add(mob)
+                map[index] = mob
             }
         }
+        return map
     }
 
-    private fun inMobVariants() {
-        for ((index, stack) in stackList) {
+    private fun parseMobVariants(items: Map<Int, SafeItemStack>): Map<Int, BestiaryMobVariant> {
+        val map = mutableMapOf<Int, BestiaryMobVariant>()
+        for ((index, stack) in items) {
             if (!indexes.contains(index)) continue
             val cleanName = stack.cleanName
-            if (cleanName == " " || cleanName.isEmpty()) continue
-            val variant = getMobVariant(stack, index)
+            if (cleanName.isBlank()) continue
+
+            val variant = getMobVariant(stack)
             if (variant != null) {
-                mobVariants.add(variant)
+                map[index] = variant
             }
         }
+        return map
     }
 
-    private fun getMobVariant(stack: SafeItemStack, slot: Int): BestiaryMobVariant? {
+    private fun getMobVariant(stack: SafeItemStack): BestiaryMobVariant? {
         val (name, levelOrTier) = mobVariantPattern.matchStyledMatcher(stack.hoverName.intoSpan()) {
             val name = group("name")?.intoComponent() ?: return@matchStyledMatcher null
             val levelOrTier = group("level")?.getText()?.formatInt() ?: return@matchStyledMatcher null
             name to levelOrTier
         } ?: return null
 
-        return BestiaryMobVariant(
-            name = name,
-            level = levelOrTier,
-            slot = slot
-        )
+        return BestiaryMobVariant(name = name, level = levelOrTier)
     }
 
     private fun parseStackName(component: Component): Pair<Component, String>? {
@@ -370,10 +391,7 @@ object BestiaryApi {
         return name to level
     }
 
-    private fun parseMobFromStack(
-        stack: SafeItemStack,
-        slot: Int?,
-    ): BestiaryMob? {
+    private fun parseMobFromStack(stack: SafeItemStack): BestiaryMob? {
         val (name, level) = parseStackName(stack.hoverName) ?: return null
 
         var totalKillToMax: Long = 0
@@ -422,7 +440,6 @@ object BestiaryApi {
             totalKillToTier,
             currentKillToTier,
             actualRealTotalKill,
-            slot = slot,
         )
     }
 
@@ -439,7 +456,6 @@ object BestiaryApi {
             val hasOverallProgress = overallProgressPattern.anyMatches(cleanLore)
             if (hasTierProgress && !hasOverallProgress) return false
         }
-
         return true
     }
 
@@ -462,7 +478,6 @@ object BestiaryApi {
                 cleanLore[0].startsWith("Query: ") &&
                 cleanLore[1].startsWith("Results: ")
         }
-
         return false
     }
 
@@ -483,8 +498,7 @@ object BestiaryApi {
         val fullName: String,
         val familiesFound: Long,
         val totalFamilies: Long,
-        val familiesCompleted: Long,
-        val slot: Int? = null,
+        val familiesCompleted: Long
     )
 
     data class BestiaryMob(
@@ -494,42 +508,26 @@ object BestiaryApi {
         var totalKills: Long,
         var killNeededForNextLevel: Long,
         var currentKillToNextLevel: Long,
-        var actualRealTotalKill: Long,
-        val slot: Int? = null,
+        var actualRealTotalKill: Long
     ) {
+        val cleanName: String get() = name.string.removeColor()
+        val romanLevel: String get() = takeUnless { level == 0 }?.let { level.toRoman() } ?: "0"
 
-        val cleanName: String
-            get() = name.string.removeColor()
-
-        val romanLevel: String
-            get() = takeUnless { level == 0 }?.let { level.toRoman() } ?: "0"
-
-        fun killNeededToMax(): Long {
-            return 0L.coerceAtLeast(killToMax - actualRealTotalKill)
-        }
-
-        fun killNeededToNextLevel(): Long {
-            return 0L.coerceAtLeast(killNeededForNextLevel - currentKillToNextLevel)
-        }
+        fun killNeededToMax(): Long = 0L.coerceAtLeast(killToMax - actualRealTotalKill)
+        fun killNeededToNextLevel(): Long = 0L.coerceAtLeast(killNeededForNextLevel - currentKillToNextLevel)
 
         fun percentToMax() = if (killToMax == 0L) 0.0 else actualRealTotalKill.toDouble() / killToMax
-
         fun percentToMaxFormatted() = percentToMax().formatPercentage()
 
-        fun percentToTier() =
-            if (killNeededForNextLevel == 0L) 1.0 else currentKillToNextLevel.toDouble() / killNeededForNextLevel
-
+        fun percentToTier() = if (killNeededForNextLevel == 0L) 1.0 else currentKillToNextLevel.toDouble() / killNeededForNextLevel
         fun percentToTierFormatted() = percentToTier().formatPercentage()
     }
 
     // TODO: Add more data, like kills, mob types, etc.
     data class BestiaryMobVariant(
         val name: Component,
-        val level: Int,
-        val slot: Int? = null,
+        val level: Int
     ) {
-
-        val cleanName: String
-            get() = name.string.removeColor().removeSuffix(" (Master)")
+        val cleanName: String get() = name.string.removeColor().removeSuffix(" (Master)")
     }
 }
