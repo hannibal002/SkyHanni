@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.LOW
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -137,8 +138,8 @@ object CroesusChestTracker {
 
     private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
 
-    @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, priority = HandleEvent.LOW, onlyOnSkyblock = true)
-    fun onBackgroundDrawn() {
+    @HandleEvent(priority = LOW, onlyOnSkyblock = true)
+    private fun onBackgroundDrawn() {
         if (!SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker) return
 
         if (!inCroesusInventory || croesusEmpty) return
@@ -154,7 +155,7 @@ object CroesusChestTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if ((SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker || config.showUsedKismets) &&
             croesusPattern.matches(event.inventoryName)
         ) {
@@ -224,18 +225,18 @@ object CroesusChestTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.showUsedKismets) return
         if (inCroesusInventory && !croesusEmpty) {
-            if (event.slot == null) return
+            val item = event.item ?: return
             when (event.slotId) {
-                FRONT_ARROW_SLOT -> if (pageSwitchable && event.slot.item.isArrow()) {
+                FRONT_ARROW_SLOT -> if (pageSwitchable && item.isArrow()) {
                     pageSwitchable = false
                     currentPage++
                 }
 
                 // People are getting Index out of range errors presumably due to negative pages.
-                BACK_ARROW_SLOT -> if (pageSwitchable && currentPage != 0 && event.slot.item.isArrow()) {
+                BACK_ARROW_SLOT -> if (pageSwitchable && currentPage != 0 && item.isArrow()) {
                     pageSwitchable = false
                     currentPage--
                 }
@@ -246,7 +247,7 @@ object CroesusChestTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderItemTip(event: RenderItemTipEvent) {
+    private fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!config.kismetStackSize) return
         if (chestInventory == null) return
         if (!kismetPattern.matches(event.stack.cleanName)) return
@@ -255,7 +256,7 @@ object CroesusChestTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderInventoryItemTip(event: RenderInventoryItemTipEvent) {
+    private fun onRenderInventoryItemTip(event: RenderInventoryItemTipEvent) {
         if (!config.showUsedKismets) return
         if (!inCroesusInventory) return
         if (event.slot.containerSlot != event.slot.index) return
@@ -268,12 +269,12 @@ object CroesusChestTracker {
     }
 
     @HandleEvent
-    fun onKuudraComplete(event: KuudraCompleteEvent) {
+    private fun onKuudraComplete(event: KuudraCompleteEvent) {
         addCroesusChest("T${event.kuudraTier}")
     }
 
     @HandleEvent
-    fun onDungeonComplete(event: DungeonCompleteEvent) {
+    private fun onDungeonComplete(event: DungeonCompleteEvent) {
         if (event.floor == "E") return
         addCroesusChest(event.floor)
     }
@@ -333,7 +334,6 @@ object CroesusChestTracker {
         }
         return unopenedChests
     }
-
 
     private fun addCroesusChest(floorOrTier: String) {
         croesusChests?.add(0, DungeonRunInfo(floorOrTier, SimpleTimeMark.now()))
