@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.events.garden.GardenPlotSprayDataTablistReadEvent
 import at.hannibal2.skyhanni.events.garden.GardenPlotSprayEvent
 import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.pests.sprayonator.SprayType
 import at.hannibal2.skyhanni.features.garden.pests.SprayonatorType
+import at.hannibal2.skyhanni.features.garden.pests.sprayonator.SprayType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
