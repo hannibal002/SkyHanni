@@ -6,7 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.state.level.CameraRenderState
 
 //? if >= 26.2 {
-import net.minecraft.client.renderer.SubmitNodeStorage
+import net.minecraft.client.renderer.SubmitNodeCollector
 //?} else {
 /*import net.minecraft.client.renderer.MultiBufferSource
 *///?}
@@ -15,8 +15,9 @@ import net.minecraft.client.renderer.SubmitNodeStorage
 class SkyHanniRenderWorldEvent(
     val matrices: PoseStack,
     val camera: CameraRenderState,
-    //~ if < 26.2 'submitNodeStorage: SubmitNodeStorage' -> 'bufferSource: MultiBufferSource.BufferSource'
-    val submitNodeStorage: SubmitNodeStorage,
+    //~ if < 26.2 'submitNodeStorage: SubmitNodeCollector' -> 'bufferSource: MultiBufferSource.BufferSource'
+    val submitNodeStorage: SubmitNodeCollector,
     val partialTicks: Float,
-    var isCurrentlyDeferring: Boolean = true,
-) : SkyHanniEvent()
+) : SkyHanniEvent() {
+    var isCurrentlyDeferring: Boolean = true
+}

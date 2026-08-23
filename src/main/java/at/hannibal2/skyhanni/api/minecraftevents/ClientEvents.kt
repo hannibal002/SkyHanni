@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientShutdownEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,7 +23,9 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
+import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
@@ -33,12 +36,9 @@ import java.util.concurrent.CompletableFuture
 
 @SkyHanniModule
 object ClientEvents {
-
     var totalTicks = 0
 
     init {
-
-        // Tick event
         ClientTickEvents.END_CLIENT_TICK.register {
             if (!MinecraftCompat.localPlayerExists) return@register
             if (!MinecraftCompat.localWorldExists) return@register
@@ -46,20 +46,28 @@ object ClientEvents {
             SkyHanniTickEvent(++totalTicks).post()
         }
 
-        // Disconnect event
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ ->
             SkyHanniEvents.markEventCacheDirty(DirtyReason.SERVER_DISCONNECTED)
             ClientDisconnectEvent.post()
         }
 
-        // Connect event
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             ClientConnectEvent.post()
         }
 
-        // World change event
         ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register { _, _ ->
             WorldChangeEvent.post()
+        }
+
+        //~ if < 26.2 'COLLECT_SUBMITS' -> 'AFTER_TRANSLUCENT_TERRAIN'
+        LevelRenderEvents.COLLECT_SUBMITS.register { ctx ->
+            SkyHanniRenderWorldEvent(
+                ctx.poseStack(),
+                ctx.levelState().cameraRenderState,
+                //~ if < 26.2 'submitNodeCollector' -> 'bufferSource'
+                ctx.submitNodeCollector(),
+                Minecraft.getInstance().deltaTracker.getGameTimeDeltaPartialTick(true),
+            ).post()
         }
 
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(
