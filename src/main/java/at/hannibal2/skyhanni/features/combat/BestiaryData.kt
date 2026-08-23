@@ -238,9 +238,9 @@ object BestiaryData {
     }
 
     private fun MutableList<Renderable>.addCategories() {
-        if (BestiaryApi.catList.isEmpty()) return
+        val catList = BestiaryApi.catList.takeIfNotEmpty() ?: return
         addString("§7Category")
-        for ((name, _, familiesFound, totalFamilies, familiesCompleted) in BestiaryApi.catList) {
+        for ((name, _, familiesFound, totalFamilies, familiesCompleted) in catList) {
             val info = when {
                 familiesCompleted == totalFamilies -> "§c§lCompleted!"
                 familiesFound == totalFamilies -> "§b$familiesCompleted§7/§b$totalFamilies §7completed"
