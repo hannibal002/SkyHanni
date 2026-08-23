@@ -230,7 +230,7 @@ object BestiaryApi {
     val catList: List<Category>
         get() = (currentState as? BestiaryGuiState.Categories)?.categories?.values?.toList().orEmpty()
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGH)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         val items = event.inventoryItems
