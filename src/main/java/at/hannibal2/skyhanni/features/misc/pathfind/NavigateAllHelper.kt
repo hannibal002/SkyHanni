@@ -23,7 +23,7 @@ object NavigateAllHelper {
 
     private const val NAVIGATE_AGAIN_DISTANCE = 5
 
-    private val allowedMultiNavigationTags = setOf(
+    internal val allowedMultiNavigationTags = setOf(
         GraphNodeTag.HOPPITY,
         GraphNodeTag.RIFT_EFFIGY,
         GraphNodeTag.RIFT_MONTEZUMA,
@@ -193,7 +193,7 @@ object NavigateAllHelper {
         }
     }
 
-    private fun handleSkip() {
+    internal fun handleSkip() {
         if (!currentlyNavigating) {
             ChatUtils.userError("No current navigation to skip. §eUse /shnavigateall to start navigation")
             return
@@ -259,7 +259,7 @@ object NavigateAllHelper {
         }
     }
 
-    private fun getValidTagNames(): Set<GraphNodeTag> {
+    internal fun getValidTagNames(): Set<GraphNodeTag> {
         val activeTags = IslandGraphs.currentIslandGraph?.getActiveNodeTags() ?: return emptySet()
         return activeTags.filter { it in allowedMultiNavigationTags }.toSet()
     }
