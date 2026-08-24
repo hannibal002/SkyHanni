@@ -317,10 +317,17 @@ object GreenhouseMutationBlueprint {
             ChatUtils.chat("§cThe clipboard does not contain text.")
             return
         }
-        val isSkyMutations = clipboard.contains("skymutations", ignoreCase = true)
-        val provider = if (isSkyMutations) "SkyMutations" else "SkyShards"
+        val provider = when {
+            clipboard.contains("skylayouts.io", ignoreCase = true) -> "SkyLayouts"
+            clipboard.contains("skymutations", ignoreCase = true) -> "SkyMutations"
+            else -> "SkyShards"
+        }
         val imported = try {
-            if (isSkyMutations) SkyMutationsLayoutCodec.decode(clipboard) else SkyShardsLayoutCodec.decode(clipboard)
+            when (provider) {
+                "SkyLayouts" -> SkyLayoutsLayoutCodec.decode(clipboard)
+                "SkyMutations" -> SkyMutationsLayoutCodec.decode(clipboard)
+                else -> SkyShardsLayoutCodec.decode(clipboard)
+            }
         } catch (exception: IllegalArgumentException) {
             ChatUtils.chat("§cCould not import the $provider layout: §7${exception.message}")
             return
