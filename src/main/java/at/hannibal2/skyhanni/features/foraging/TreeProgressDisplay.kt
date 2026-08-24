@@ -111,7 +111,9 @@ object TreeProgressDisplay {
         }
     }
 
-    private fun isHoldingAxe() = config.onlyHoldingAxe && InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.AXE
+    private fun isHoldingAxe() =
+        !config.onlyHoldingAxe ||
+            InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.AXE
 
     private fun isEnabled() = config.enabled
 }
