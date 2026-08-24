@@ -42,7 +42,7 @@ object SlayerSwapReminder {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onBossHealthChange(event: BossHealthChangeEvent) {
+    fun onBossHealthChange(event: BossHealthChangeEvent) {
         if (!isActive()) return
         if (hasRemindedForCurrentBoss) return
 
@@ -63,7 +63,7 @@ object SlayerSwapReminder {
     }
 
     @HandleEvent
-    private fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob.category != MobCategory.SLAYER || !event.mob.belongsToPlayer()) return
 
         hasRemindedForCurrentBoss = false
@@ -71,7 +71,7 @@ object SlayerSwapReminder {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
-    private fun onGuiRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!isActive() || !hasRemindedForCurrentBoss) return
 
         val display = listOf(
