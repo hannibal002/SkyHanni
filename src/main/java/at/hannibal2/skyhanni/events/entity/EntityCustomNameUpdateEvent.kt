@@ -21,11 +21,7 @@ data class EntityCustomNameUpdateEvent<T : Entity>(
 ) : GenericSkyHanniEvent<T>(entity.javaClass) {
 
     @Deprecated("Use cleanName instead", ReplaceWith("cleanName"))
-    val newNameFormatted by lazy {
-        newName?.formattedTextCompatLessResets()
-    }
+    val newNameFormatted = newName?.formattedTextCompatLessResets()
 
-    val cleanName by lazy {
-        newName?.string?.removeColor()
-    }
+    val cleanName = newName?.string?.removeColor()
 }
