@@ -85,6 +85,7 @@ object SlayerApi {
         "Slayer",
     )
 
+    /**
      * WRAPPED-REGEX-TEST: "  SLAYER QUEST FAILED!"
      */
     private val questFailedPattern by patternGroup.pattern(
