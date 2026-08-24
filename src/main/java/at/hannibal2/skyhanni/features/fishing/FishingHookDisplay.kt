@@ -59,7 +59,7 @@ object FishingHookDisplay {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onEntityCustomNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         if (!isEnabled()) return
-        val newName = event.newName ?: return
+        val newName = event.newNameFormatted ?: return
         val bobber = FishingApi.bobber ?: return
 
         val displayText = timerPattern.matchMatcher(newName) {
