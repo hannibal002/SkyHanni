@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.LOWEST
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnigmaSoulsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -135,7 +133,7 @@ object EnigmaSoulWaypoints {
         adding = true
     }
 
-    @HandleEvent(priority = HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inInventory || !isEnabled()) return
 
@@ -189,7 +187,7 @@ object EnigmaSoulWaypoints {
         }
     }
 
-    @HandleEvent(priority = LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || !inInventory) return
 

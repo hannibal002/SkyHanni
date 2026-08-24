@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.LOW
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -138,7 +137,7 @@ object CroesusChestTracker {
 
     private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
 
-    @HandleEvent(priority = LOW, onlyOnSkyblock = true)
+    @HandleEvent(priority = HandleEvent.LOW, onlyOnSkyblock = true)
     private fun onBackgroundDrawn() {
         if (!SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker) return
 
