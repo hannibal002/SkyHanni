@@ -117,7 +117,7 @@ object PestApi {
      */
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
-        "§4§l[\uE07F\uE018] §cThis plot has §.(?<amount>\\d+) §2 Pests?§c!",
+        "§4§l[\uE07F\uE018] §cThis plot has §.(?<amount>\\d+) §2[\uE07F\uE018] Pests?§c!",
     )
 
     /**
