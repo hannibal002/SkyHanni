@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.features.event.diana
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
+import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MythologicalCreatureType
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -25,6 +28,9 @@ object DianaApi {
     fun hasSpadeInHand() = InventoryUtils.itemInHandId in spades
 
     fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
+
+    fun isRitualActive() = (Perk.MYTHOLOGICAL_RITUAL.isActive || Perk.PERKPOCALYPSE.isActive) ||
+        SkyHanniMod.feature.dev.debug.assumeMayor.get() == ElectionCandidate.DIANA
 
     // This intentionally does not check for mythological ritual mayor perk due to it being unreliable
     fun isDoingDiana() = IslandType.HUB.isInIsland() && hasSpadeInHotbar()

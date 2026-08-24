@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCoinsOfAvarice
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
@@ -215,7 +214,7 @@ object CrownOfAvariceCounter {
     }
 
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable && DianaApi.isDoingDiana()
+    private fun isEnabled() = config.enable && (DianaApi.isDoingDiana() || DianaApi.isRitualActive())
 
     private fun reset() {
         coinsEarned = 0L
