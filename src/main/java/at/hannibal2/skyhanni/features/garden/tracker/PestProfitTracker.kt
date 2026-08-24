@@ -236,7 +236,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             val itemGroup = group("item")
             val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
             val pest = PestType.getByItemInternalNameOrNull(internalName) ?: return@matchMatcher
-            val amount = group("amount").formatInt()
+            val amount = groupOrNull("amount")?.formatInt() ?: 1
 
             addItem(pest, internalName, amount, command = false)
 
