@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -97,9 +96,9 @@ object TestExportTools {
     }
 
     @HandleEvent
-    fun onGuiKeyPress(event: GuiKeyPressEvent) {
+    private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.copyItemDataCompressed.isKeyHeld() && !config.copyItemData.isKeyHeld()) return
-        val stack = stackUnderCursor() ?: return
+        val stack = event.stackUnderCursor ?: return
         if (config.copyItemData.isKeyHeld()) {
             copyItemToClipboard(stack)
             return
@@ -115,7 +114,7 @@ object TestExportTools {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.copyNBTDataCompressed", "dev.debug.copyNBTDataCompressed")
         event.move(4, "dev.debug.copyNBTData", "dev.debug.copyItemData")
         event.move(4, "dev.debug.copyNBTDataCompressed", "dev.debug.copyItemDataCompressed")
