@@ -210,7 +210,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
                 "full_message" to message,
             )
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
-            val amount = groupOrNull("amount")?.formatInt() ?: 1
+            val amount = group("amount").formatInt()
 
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
