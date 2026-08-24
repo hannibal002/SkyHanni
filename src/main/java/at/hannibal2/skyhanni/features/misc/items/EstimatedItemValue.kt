@@ -53,7 +53,7 @@ object EstimatedItemValue {
     private val tooltipTimeout = 200.milliseconds
 
     // dwell time on the same slot before the first display of an inventory session
-    private val hoverDelay = 500.milliseconds
+    private val hoverDelay get() = config.hoverDelay.milliseconds
 
     private var display = emptyList<Renderable>()
     private val cache = mutableMapOf<SafeItemStack, List<Renderable>>()
@@ -156,6 +156,7 @@ object EstimatedItemValue {
 
     private fun passHoverDelay(): Boolean {
         if (hoverDelayOver) return true
+        if (!hoverDelay.isPositive()) return true
         // null before the first hover of an inventory session
         if (hoveredItem == null) return false
         // measured on the tooltip stream, so the linger time after leaving a slot does not count
