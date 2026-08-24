@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.filterInnerSlots
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
@@ -51,22 +52,13 @@ object FishyTreatProfit {
         "Lukas the Aquarist",
     )
 
-    // TOOD: Not duplicate this with other inventory readers
-    private val indexes = listOf(
-        10..16,
-        19..25,
-        28..34,
-        37..43,
-    ).flatten()
-
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.fishyTreatProfit || !inventory.isInside()) return
 
         DelayedRun.runOrNextTick {
             val table = mutableListOf<DisplayTableEntry>()
-            for ((slot, item) in event.inventoryItems) {
-                if (slot !in indexes) continue
+            for ((slot, item) in event.inventoryItems.filterInnerSlots()) {
                 try {
                     readItem(slot, item, table)
                 } catch (e: Throwable) {

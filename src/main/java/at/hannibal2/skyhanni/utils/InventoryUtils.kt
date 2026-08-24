@@ -216,4 +216,15 @@ object InventoryUtils {
     fun SkyHanniGuiContainer.slots(): List<Slot> {
         return InventoryCompat.containerSlots(this)
     }
+
+    val innerInventorySlots = listOf(
+        10..16,
+        19..25,
+        28..34,
+        37..43,
+    ).flatten()
+
+    fun Map<Int, SafeItemStack>.filterInnerSlots(): Map<Int, SafeItemStack> {
+        return this.filter { it.key in innerInventorySlots }
+    }
 }
