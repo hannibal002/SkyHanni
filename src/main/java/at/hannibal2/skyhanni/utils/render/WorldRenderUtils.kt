@@ -65,7 +65,7 @@ object WorldRenderUtils {
         outlineColor: Int,
     ) {
         // The order ensures see-through text renders over our custom geometry, like on 26.1.
-        submitNodeStorage.order(1).submitText(
+        submitNodeCollector.order(1).submitText(
             matrices,
             x,
             y,
@@ -85,7 +85,7 @@ object WorldRenderUtils {
         crossinline render: (VertexConsumer) -> Unit,
     ) {
         //? if >= 26.2 {
-        submitNodeStorage.submitCustomGeometry(matrices, layer) { _, buffer -> render(buffer) }
+        submitNodeCollector.submitCustomGeometry(matrices, layer) { _, buffer -> render(buffer) }
         //?} else {
         /*render(bufferSource.getBuffer(layer))
         *///?}
@@ -109,8 +109,8 @@ object WorldRenderUtils {
         matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
         BeaconRenderer.submitBeaconBeam(
             matrices,
-            //~ if < 26.2 'submitNodeStorage' -> 'Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage'
-            submitNodeStorage,
+            //~ if < 26.2 'submitNodeCollector' -> 'Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage'
+            submitNodeCollector,
             beaconBeam,
             1f,
             Math.floorMod(MinecraftCompat.clientTime, 40) + partialTicks,

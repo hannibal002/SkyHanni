@@ -15,8 +15,8 @@ import net.minecraft.client.renderer.SubmitNodeCollector
 class SkyHanniRenderWorldEvent(
     val matrices: PoseStack,
     val camera: CameraRenderState,
-    //~ if < 26.2 'submitNodeStorage: SubmitNodeCollector' -> 'bufferSource: MultiBufferSource.BufferSource'
-    val submitNodeStorage: SubmitNodeCollector,
+    //~ if < 26.2 'submitNodeCollector: SubmitNodeCollector' -> 'bufferSource: MultiBufferSource.BufferSource'
+    val submitNodeCollector: SubmitNodeCollector,
     val partialTicks: Float,
 ) : SkyHanniEvent() {
     var isCurrentlyDeferring: Boolean = true
