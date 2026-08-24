@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.FishingProfitItemsJson
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -58,7 +58,7 @@ object FishingProfitTracker {
      */
     private val coinsChatPattern by RepoPattern.pattern(
         "fishing.tracker.chat.coins.colorless",
-        "${SkyblockStat.TREASURE_CHANCE.hypixelIcon} (?<catch>.*) CATCH! You caught (?<coins>[\\d,]+) Coins!",
+        "${SkyblockIcon.TREASURE_CHANCE} (?<catch>.*) CATCH! You caught (?<coins>[\\d,]+) Coins!",
     )
 
     private var lastCatchTime = SimpleTimeMark.farPast()
