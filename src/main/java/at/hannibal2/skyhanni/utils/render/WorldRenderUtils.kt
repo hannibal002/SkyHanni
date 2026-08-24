@@ -109,7 +109,6 @@ object WorldRenderUtils {
         matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
         BeaconRenderer.submitBeaconBeam(
             matrices,
-            //~ if < 26.2 'submitNodeCollector' -> 'Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage'
             submitNodeCollector,
             beaconBeam,
             1f,

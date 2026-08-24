@@ -64,8 +64,9 @@ object ClientEvents {
             SkyHanniRenderWorldEvent(
                 ctx.poseStack(),
                 ctx.levelState().cameraRenderState,
-                //~ if < 26.2 'submitNodeCollector' -> 'bufferSource'
                 ctx.submitNodeCollector(),
+                //? if < 26.2
+                //ctx.bufferSource(),
                 Minecraft.getInstance().deltaTracker.getGameTimeDeltaPartialTick(true),
             ).post()
         }

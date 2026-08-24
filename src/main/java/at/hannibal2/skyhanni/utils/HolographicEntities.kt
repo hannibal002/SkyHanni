@@ -194,8 +194,6 @@ object HolographicEntities {
         //~ if < 26.2 'gameRenderState()' -> 'gameRenderState'
         val cameraRenderState = gameRenderer.gameRenderState().levelRenderState.cameraRenderState
         val cameraPos = cameraRenderState.pos
-        //~ if < 26.2 'this.submitNodeCollector' -> 'gameRenderer.featureRenderDispatcher.submitNodeStorage'
-        val submitNodeCollector = this.submitNodeCollector
         renderer.extractRenderState(entity, entityRenderState, partialTicks)
         entityRenderState.`skyhanni$setEntity`(entity)
         (entityRenderState as? LivingEntityRenderState)?.isBaby = holographicEntity.isChild
