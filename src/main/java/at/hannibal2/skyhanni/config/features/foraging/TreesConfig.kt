@@ -21,10 +21,9 @@ class TreesConfig {
     val progress = TreeProgressConfig()
 
     @Expose
-    @ConfigOption(name = "Tree Insta-Fell Title", desc = "")
+    @ConfigOption(name = "Timber Title", desc = "")
     @Accordion
-    @SearchTag("petalfall timber woodpecker")
-    val instantFellTreeTitle = TreeInstantFellTitleConfig()
+    val timberTitle = TimberTitleConfig()
 
     @Expose
     @ConfigOption(name = "Compact Sweep Details", desc = "Compacts messages related to Sweep Details calculations.")

@@ -6,13 +6,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
-class TreeInstantFellTitleConfig {
+class TimberTitleConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shows a title when a fell entire tree perk activates.")
+    @ConfigOption(name = "Enabled", desc = "Shows a title when a timber activates and a tree fells instantly.")
     @ConfigEditorBoolean
-    @SearchTag("petalfall timber woodpecker")
     @FeatureToggle
     var enabled = false
 
@@ -24,5 +22,5 @@ class TreeInstantFellTitleConfig {
     @Expose
     @ConfigOption(name = "Title Text", desc = "The text of the title.")
     @ConfigEditorText
-    var titleText = "&&2&&l{perk}&&r &&6&&lTree Insta-Felled!"
+    var titleText = "&&2&&lTIMBER&&r &&6&&lTree Insta-Felled!"
 }
