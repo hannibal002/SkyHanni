@@ -40,7 +40,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -211,7 +210,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
                 "full_message" to message,
             )
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
-            val amount = groupOrNull("amount")?.formatIntOrNull() ?: 1
+            val amount = groupOrNull("amount")?.formatInt() ?: 1
 
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
@@ -237,7 +236,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             val itemGroup = group("item")
             val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
             val pest = PestType.getByItemInternalNameOrNull(internalName) ?: return@matchMatcher
-            val amount = groupOrNull("amount")?.formatIntOrNull() ?: 1
+            val amount = group("amount").formatInt()
 
             addItem(pest, internalName, amount, command = false)
 
@@ -260,7 +259,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     private fun SkyHanniChatEvent.Allow.checkSprayChats() {
         GardenPlotApi.plotSprayedPattern.matchMatcher(cleanMessage) {
             val spray = group("spray")
-            val amount = groupOrNull("amount")?.formatIntOrNull() ?: 1
+            val amount = groupOrNull("amount")?.formatInt() ?: 1
             SprayType.getByNameOrNull(spray)?.addSprayUsed(amount)
         }
     }
