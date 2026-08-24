@@ -25,7 +25,7 @@ object LoreCostUtils {
 
     fun isCostHeader(line: String): Boolean = costHeaderPattern.matches(line)
 
-    /** True when the item can be bought right now, as opposed to a locked or already owned entry. */
+    /** True when the item is a purchase entry, as opposed to a locked or already owned one. */
     fun List<String>.hasTradeLine(): Boolean = any { tradeLinePattern.matches(it.removeColor()) }
 
     private val patternGroup = RepoPattern.group("utils.lore")
@@ -51,19 +51,19 @@ object LoreCostUtils {
     )
 
     /**
-     * Shops word this line differently, the essence perk shops unlock and the chip menu levels
-     * up, but all of them list their cost the same way. Kuudra names the mouse button, and its
-     * preview line uses the right button, which must not count as a trade.
+     * Shops word this line differently, and an entry the player cannot afford says so instead of
+     * asking for a click. Kuudra's preview line uses the right button and is no trade.
      *
      * REGEX-TEST: Click to trade!
      * REGEX-TEST: Click to unlock!
      * REGEX-TEST: Click to level up!
      * REGEX-TEST: Left Click to unlock!
+     * REGEX-TEST: You can't afford this upgrade!
      * REGEX-FAIL: Right Click to preview!
      */
     private val tradeLinePattern by patternGroup.pattern(
         "trade.click",
-        "(?:Left )?Click to (?:trade|unlock|level up)!",
+        "(?:Left )?Click to (?:trade|unlock|level up)!|You can't afford this upgrade!",
     )
 
     /**
