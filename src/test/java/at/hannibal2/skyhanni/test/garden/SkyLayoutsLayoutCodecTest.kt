@@ -29,6 +29,18 @@ class SkyLayoutsLayoutCodecTest {
         }
     }
 
+    @Test
+    fun `decode Markdown escaped SkyLayouts link`() {
+        val escapedUrl = FIXTURE.replace("&", "\\&").replace("~", "\\~").replace("_", "\\_")
+        val escaped = "[$escapedUrl]($escapedUrl)"
+
+        val layout = SkyLayoutsLayoutCodec.decode(escaped)
+
+        assertEquals(72, layout.inputs.size)
+        assertEquals("wild_rose", layout.inputs.single { it.row == 0 && it.column == 0 }.cropId)
+        assertEquals("red_mushroom", layout.inputs.single { it.row == 7 && it.column == 0 }.cropId)
+    }
+
     companion object {
         private const val FIXTURE = "https://skylayouts.io/layout?m=TIMESTALK&i=7&p=1&mode=edit#" +
             "b1=2~a~WILD_ROSE,NETHER_WART,CHORUS_FRUIT,PUMPKIN,SHELLFRUIT,STOPLIGHT_PETAL,WHEAT," +

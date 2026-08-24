@@ -14,7 +14,7 @@ internal object SkyLayoutsLayoutCodec {
             .firstOrNull { it.groupValues[1].toInt() == plot }
             ?.groupValues?.get(2)
             ?: throw IllegalArgumentException("The SkyLayouts link does not contain Plot $plot data.")
-        val board = URLDecoder.decode(encodedBoard, StandardCharsets.UTF_8)
+        val board = URLDecoder.decode(encodedBoard, StandardCharsets.UTF_8).replace("\\", "")
         val parts = board.split('~')
         require(parts.size == BOARD_SECTIONS && parts[0] == FORMAT_VERSION) {
             "The SkyLayouts link uses an unsupported layout format."
@@ -69,7 +69,7 @@ internal object SkyLayoutsLayoutCodec {
         .trim('_')
 
     private val plotQuery = "[?&]p=([123])(?:[&#]|$)".toRegex(RegexOption.IGNORE_CASE)
-    private val boardPattern = "(?:#|&)b([123])=([^&#\\s]+)".toRegex(RegexOption.IGNORE_CASE)
+    private val boardPattern = "(?:#|&)b([123])=([^&#\\s\\])>]+)".toRegex(RegexOption.IGNORE_CASE)
     private const val SKYLAYOUTS_HOST = "skylayouts.io"
     private const val FORMAT_VERSION = "2"
     private const val BOARD_SECTIONS = 4
