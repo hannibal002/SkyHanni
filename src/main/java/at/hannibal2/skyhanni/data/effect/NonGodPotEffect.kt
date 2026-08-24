@@ -200,7 +200,7 @@ enum class NonGodPotEffect(
     BRINE(
         "Brine",
         displayName = "§r§5Brine§r§f",
-    )
+    ),
     ;
 
     private val patternName = name.lowercase().replace("_", "-")
