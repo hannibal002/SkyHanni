@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.seconds
 object SlayerSwapReminder {
 
     private val config get() = SlayerApi.config.swapReminder
-    private val formattedTitle = config.titleText.replace("&", "§")
+    private val formattedTitle get() = config.titleText.replace("&", "§")
 
     private var hasRemindedForCurrentBoss = false
 
