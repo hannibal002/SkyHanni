@@ -124,7 +124,9 @@ abstract class GuiContainerEvent(
 
                 postDepth.set(postDepth.get() + 1)
                 try {
-                    return SlotClickEvent(gui, container, slotId, clickedButton, clickType).post() as SlotClickEvent
+                    val event = SlotClickEvent(gui, container, slotId, clickedButton, clickType)
+                    event.post()
+                    return event
                 } finally {
                     val depth = postDepth.get() - 1
                     check(depth >= 0) {
