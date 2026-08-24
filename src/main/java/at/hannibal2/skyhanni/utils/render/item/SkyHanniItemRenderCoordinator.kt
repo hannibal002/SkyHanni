@@ -87,11 +87,6 @@ internal object SkyHanniItemRenderCoordinator {
         featureRenderDispatcher: FeatureRenderDispatcher,
         frameNumber: Int,
     ) {
-        if (pipStates.isEmpty()) {
-            frameResources = null
-            return
-        }
-
         val guiScale = Minecraft.getInstance().window.guiScale
         //~ if < 26.2 'submitNodeStorage' -> 'bufferSource'
         frameResources = FrameRenderResources(submitNodeStorage, featureRenderDispatcher, guiScale)
