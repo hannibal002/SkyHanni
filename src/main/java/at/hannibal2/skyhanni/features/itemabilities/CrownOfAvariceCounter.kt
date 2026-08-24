@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.itemabilities
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.itemability.CrownOfAvariceConfig.CrownOfAvariceLines
-import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.OwnInventoryArmorUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -215,7 +215,7 @@ object CrownOfAvariceCounter {
     }
 
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable && Perk.MYTHOLOGICAL_RITUAL.isActive
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable && DianaApi.isDoingDiana()
 
     private fun reset() {
         coinsEarned = 0L
