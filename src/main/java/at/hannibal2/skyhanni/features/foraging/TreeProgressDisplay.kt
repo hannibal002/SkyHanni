@@ -12,10 +12,12 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -30,7 +32,7 @@ object TreeProgressDisplay {
     private data class TreeProgressDisplay(
         val id: Int,
         val renderable: Renderable,
-        val distanceToPlayer: Double,
+        val position: LorenzVec,
     )
     private var progressDisplay: TreeProgressDisplay? = null
 
@@ -80,12 +82,13 @@ object TreeProgressDisplay {
         } ?: return
 
         val entity = event.entity
-        val newDistance = entity.distanceToPlayer()
+        val position = entity.getLorenzVec()
 
         val current = progressDisplay
         if (current != null && current.id != entity.id) {
             // Prefer the closest tree if there are multiple trees with progress displayed
-            val currentDistance = current.distanceToPlayer
+            val newDistance = position.distanceToPlayer()
+            val currentDistance = current.position.distanceToPlayer()
             if (newDistance >= currentDistance) {
                 return
             }
@@ -94,7 +97,7 @@ object TreeProgressDisplay {
         progressDisplay = TreeProgressDisplay(
             id = entity.id,
             renderable = Renderable.text(displayText),
-            distanceToPlayer = newDistance,
+            position = position,
         )
     }
 
