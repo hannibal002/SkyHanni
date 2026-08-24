@@ -26,7 +26,7 @@ object DianaApi {
 
     fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
 
-    // This intentionally does not check for mythological mayor perk due to it being unreliable, and just spade is enough
+    // This intentionally does not check for mythological ritual mayor perk due to it being unreliable
     fun isDoingDiana() = IslandType.HUB.isInIsland() && hasSpadeInHotbar()
 
     val SafeItemStack.isDianaSpade get() = getInternalName() in spades
