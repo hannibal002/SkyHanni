@@ -27,10 +27,10 @@ object DianaApi {
 
     fun hasSpadeInHand() = InventoryUtils.itemInHandId in spades
 
-    fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
-
     private fun isRitualActive() = (Perk.MYTHOLOGICAL_RITUAL.isActive || Perk.PERKPOCALYPSE.isActive) ||
         SkyHanniMod.feature.dev.debug.assumeMayor.get() == ElectionCandidate.DIANA
+
+    fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
 
     // This is an OR rather then an and due to mayor perk being unreliable sometimes
     fun isDoingDiana() = IslandType.HUB.isInIsland() && (isRitualActive() || hasSpadeInHotbar())
