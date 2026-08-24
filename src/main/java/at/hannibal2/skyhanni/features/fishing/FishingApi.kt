@@ -164,7 +164,7 @@ object FishingApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onJoinWorld(event: EntityEnterWorldEvent<FishingHook>) {
-        if (event.entity.playerOwner?.isLocalPlayer == false) return
+        if (event.entity.playerOwner?.isLocalPlayer != true) return
 
         lastCastTime = SimpleTimeMark.now()
         bobber = event.entity
@@ -312,7 +312,7 @@ object FishingApi {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         lavaRods = data.lavaFishingRods
         waterRods = data.waterFishingRods
