@@ -54,6 +54,7 @@ object RareDropMessages {
     /**
      * REGEX-TEST: §6 §r§6§lGREAT CATCH! §r§fYou caught a §r§7[Lvl 1] §r§aSquid§r§f!
      */
+    @Suppress("MaxLineLength")
     private val petFishedPattern by petGroup.pattern(
         "fishedmessage",
         "(?<start>(?:§.)*${SkyblockIcon.TREASURE_CHANCE} (?:§.)*(?:GOOD|GREAT|OUTSTANDING) CATCH! (?:§.)*You caught a (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)",
