@@ -137,6 +137,7 @@ object ReminderManager {
     ) { arguments, reminder ->
         val time = parseDuration(arguments.first()) ?: return@actionReminder "§cInvalid time format!"
         reminder.remindAt = SimpleTimeMark.now().plus(time)
+        reminder.lastReminder = SimpleTimeMark.farPast()
         "§6Reminder moved to ${time.format()}"
     }
 

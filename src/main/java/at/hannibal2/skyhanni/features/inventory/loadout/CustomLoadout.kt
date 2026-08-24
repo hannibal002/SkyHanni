@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -87,7 +88,7 @@ object CustomLoadout {
     @HandleEvent
     fun onChestGuiRender() {
         if (!isEnabled() || !editMode) return
-        val gui = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return
+        val gui = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return
         val renderable = inventoryButton ?: addReEnableButton().also { inventoryButton = it }
         val posX = gui.leftPos + (1.05 * gui.imageWidth).toInt()
         val posY = gui.topPos + (gui.imageHeight - renderable.height) / 2
@@ -292,7 +293,7 @@ object CustomLoadout {
         containerWidth: Int,
         containerHeight: Int,
     ): Renderable {
-        val fakePlayer = FakePlayer()
+        val fakePlayer = FakePlayer.fromLocalPlayerOrThrow()
         val armor = slot.getData()?.armor ?: LoadoutApi.emptyArmor()
 
         for (equipment in Inventory.EQUIPMENT_SLOT_MAPPING.values) {

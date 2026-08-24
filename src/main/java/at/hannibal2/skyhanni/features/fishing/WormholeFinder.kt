@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DisplayEntityUtils.arrowForwardVec
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.world.entity.Display
-import org.joml.Vector3f
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -41,7 +41,7 @@ object WormholeFinder {
     private var lastPlayerPos: LorenzVec? = null
 
     @HandleEvent(onlyOnIslands = [IslandType.LOTUS_ATOLL, IslandType.CRIMSON_ISLE])
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!config.enabled) return
         if (!event.isMod(10)) return
         if (!wearingFroggles()) return
@@ -73,15 +73,6 @@ object WormholeFinder {
         lastPlayerPos = playerPos
     }
 
-    @Suppress("UnnecessarySafeCall")
-    private fun Display.TextDisplay.arrowForwardVec(): LorenzVec {
-        //~ if < 26.1 'leftRotation()' -> 'leftRotation'
-        val quat = renderState()?.transformation()?.get(0f)?.leftRotation() ?: return LorenzVec(0, 0, 1)
-        val localY = Vector3f(0f, 1f, 0f)
-        quat.transform(localY)
-        return LorenzVec(localY.x.toDouble(), 0.0, localY.z.toDouble()).normalize()
-    }
-
     private fun matchArrow(arrow: Display.TextDisplay): GraphNode? {
         val graph = IslandGraphs.currentIslandGraph ?: return null
         val origin = arrow.getLorenzVec()
@@ -99,7 +90,7 @@ object WormholeFinder {
     }
 
     @HandleEvent(onlyOnIslands = [IslandType.LOTUS_ATOLL, IslandType.CRIMSON_ISLE])
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.enabled) return
         if (!wearingFroggles()) return
         for (wormhole in matchedWormholes) {
@@ -109,7 +100,7 @@ object WormholeFinder {
     }
 
     @HandleEvent(onlyOnIslands = [IslandType.LOTUS_ATOLL, IslandType.CRIMSON_ISLE])
-    fun onPlaySound(event: PlaySoundEvent) {
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (!config.enabled || !config.departureAlert) return
         if (!wearingFroggles()) return
         if (!(event.soundName == "entity.enderman.teleport" && event.pitch == 0.6984127f)) return
@@ -119,7 +110,7 @@ object WormholeFinder {
     }
 
     @HandleEvent
-    fun onIslandLeave() {
+    private fun onIslandLeave() {
         matchedWormholes = emptyList()
         currentTarget = null
         lastPlayerPos = null

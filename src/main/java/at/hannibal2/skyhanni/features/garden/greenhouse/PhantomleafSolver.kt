@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -77,7 +77,7 @@ object PhantomleafSolver {
         if (event.pitch !in MINIMUM_ALLOWED_PITCH..MAXIMUM_ALLOWED_PITCH) return
         if (event.soundName != "block.note_block.basedrum") return
 
-        val currentPos = PlayerUtils.getLocation()
+        val currentPos = LocationUtils.playerLocation()
 
         if (lastPos?.equalsIgnoreY(currentPos) ?: false) {
             val dist = HYPIXEL_VOLUME_SCALING_FACTOR * (1.0 - event.volume)

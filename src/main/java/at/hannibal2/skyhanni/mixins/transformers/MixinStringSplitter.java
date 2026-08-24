@@ -17,7 +17,7 @@ public abstract class MixinStringSplitter {
     @WrapMethod(
         method = "splitLines(Lnet/minecraft/network/chat/FormattedText;ILnet/minecraft/network/chat/Style;)Ljava/util/List;"
     )
-    private List<FormattedText> dontWrapOtherLines(FormattedText text, int maxWidth, Style style, Operation<List<FormattedText>> original) {
+    private List<FormattedText> doNotWrapOtherLines(FormattedText text, int maxWidth, Style style, Operation<List<FormattedText>> original) {
         return VisualWordsHook.withoutWordChanges(() -> original.call(text, maxWidth, style));
     }
 

@@ -30,7 +30,15 @@ object LocationUtils {
 
     private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean = BlockUtils.raycast(a, b).miss
 
-    fun playerLocation() = PlayerUtils.getLocation()
+    /**
+     * Returns the player's current location, or null if the player does not exist.
+     */
+    fun playerLocationOrNull(): LorenzVec? = MinecraftCompat.localPlayerOrNull?.getLorenzVec()
+
+    /**
+     * Returns the player's current location, or LorenzVec(0.0, 0.0, 0.0) if the player does not exist.
+     */
+    fun playerLocation(): LorenzVec = playerLocationOrNull() ?: LorenzVec()
 
     // Block heights are multiples of 1/16, so we subtract 1/16 to find the right block
     fun getBlockBelowPlayer() = playerLocation().add(0.0, -1.0 / 16.0, 0.0).roundToBlock()

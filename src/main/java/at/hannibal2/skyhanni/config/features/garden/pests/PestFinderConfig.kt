@@ -16,7 +16,7 @@ class PestFinderConfig {
     @ConfigOption(name = "Display", desc = "Show a display with all known pest locations.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var showDisplay: Boolean = true
+    var showDisplay: Boolean = false
 
     @Expose
     @ConfigOption(name = "Show Plot in World", desc = "Mark infested plots in the world.")
@@ -41,7 +41,7 @@ class PestFinderConfig {
     @Expose
     @ConfigOption(name = "When to Show", desc = "Change when the pest display and plot markers should be visible in the Garden.")
     @ConfigEditorDropdown
-    var whenToShow: WhenToShow = WhenToShow.ALWAYS
+    var whenToShow: WhenToShow = WhenToShow.BOTH
 
     enum class WhenToShow(private val displayName: String) {
         ALWAYS("Always"),

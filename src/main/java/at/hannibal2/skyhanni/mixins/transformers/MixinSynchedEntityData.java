@@ -29,7 +29,7 @@ public abstract class MixinSynchedEntityData {
 
     @Inject(method = "assignValues", at = @At("TAIL"))
     public void onWhatever(List<SynchedEntityData.DataValue<?>> entries, CallbackInfo ci) {
-        if (this.entity instanceof Entity entity) {
+        if (this.entity instanceof Entity syncedEntity) {
             List<SynchedEntityData.DataItem<?>> dataEntries = new ArrayList<>();
             for (SynchedEntityData.DataValue<?> serializedEntry : entries) {
                 SynchedEntityData.DataItem<?> entry = this.itemsById[serializedEntry.id()];
@@ -37,7 +37,7 @@ public abstract class MixinSynchedEntityData {
                 dataEntries.add(entry);
             }
 
-            new DataWatcherUpdatedEvent<>(entity, dataEntries).post();
+            new DataWatcherUpdatedEvent<>(syncedEntity, dataEntries).post();
         }
     }
 }

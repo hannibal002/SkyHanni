@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager;
 import net.minecraft.network.chat.TextColor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,7 +16,7 @@ public abstract class MixinTextColor {
         cancellable = true
     )
     public void chromaEqualityFix(Object o, CallbackInfoReturnable<Boolean> cir) {
-        if (ChromaFontManagerKt.isNotActuallyEqualBecauseOfChroma((TextColor)(Object)this, o)) {
+        if (ChromaFontManager.isNotActuallyEqualBecauseOfChroma((TextColor)(Object)this, o)) {
             cir.setReturnValue(false);
         }
     }

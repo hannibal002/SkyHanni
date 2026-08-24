@@ -15,6 +15,7 @@ object BaseGsonBuilder {
         .registerTypeAdapterFactory(ShadowedFieldAdapterFactory)
         .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
         .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
+        .registerTypeAdapterFactory(SkyblockStatMapTypeAdapterFactory)
         .registerTypeAdapter(ChromaColour::class.java, LegacyStringChromaColourTypeAdapter(true).nullSafe())
         .registerSkyHanniAdapters()
         .enableComplexMapKeySerialization()

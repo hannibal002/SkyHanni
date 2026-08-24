@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -13,10 +14,10 @@ import net.minecraft.world.inventory.ChestMenu
 import java.awt.Color
 
 class CustomWardrobeEditScreen(
-    handler: ChestMenu,
+    menu: ChestMenu,
     inventory: Inventory,
     title: Component,
-) : ContainerScreen(handler, inventory, title) {
+) : ContainerScreen(menu, inventory, title) {
     private val inventoryButtonPosition: Position = Position().ignoreScale()
     private var inventoryButton: Renderable? = null
 
@@ -31,13 +32,17 @@ class CustomWardrobeEditScreen(
         }
     }
 
-    //~ if < 26.1 'extractRenderState' -> 'render' {
     override fun extractRenderState(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTick: Float) {
         super.extractRenderState(graphics, mouseX, mouseY, partialTick)
-        //~}
         DrawContextUtils.setContext(graphics)
         try {
             onDrawScreen()
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Error while drawing editable custom wardrobe screen",
+                "screen" to this,
+            )
         } finally {
             DrawContextUtils.clearContext()
         }
@@ -60,7 +65,7 @@ class CustomWardrobeEditScreen(
             unhoveredColor = color.darker(0.8),
             onClick = {
                 CustomWardrobe.exitEditMode()
-            }
+            },
         )
     }
 }

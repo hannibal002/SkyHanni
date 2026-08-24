@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
@@ -34,7 +33,7 @@ object DataWatcherApi {
     fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<Entity>) {
         for (updatedEntry in event.updatedEntries) {
             if (updatedEntry.accessor == Entity.DATA_CUSTOM_NAME) {
-                EntityCustomNameUpdateEvent(event.entity, event.entity.customName.formattedTextCompatLessResets()).post()
+                EntityCustomNameUpdateEvent(event.entity, event.entity.customName).post()
             }
 
             if (updatedEntry.accessor == LivingEntity.DATA_HEALTH_ID) {

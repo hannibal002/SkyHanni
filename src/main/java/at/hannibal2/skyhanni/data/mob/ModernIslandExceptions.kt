@@ -14,7 +14,7 @@ import net.minecraft.world.item.DyeColor
 
 object ModernIslandExceptions {
 
-    internal fun galatea(
+    internal fun moongladeMarsh(
         baseEntity: LivingEntity,
         armorStand: ArmorStand?,
         nextEntity: LivingEntity?,
@@ -68,6 +68,21 @@ object ModernIslandExceptions {
         baseEntity is Shulker && baseEntity.color == DyeColor.GREEN ->
             MobData.MobResult.found(
                 Mob(baseEntity, MobCategory.BASIC, name = "Hideonleaf"),
+            )
+
+        else -> null
+    }
+
+    internal fun torrhus(
+        baseEntity: LivingEntity,
+        armorStand: ArmorStand?,
+        nextEntity: LivingEntity?,
+    ): MobData.MobResult? = when {
+
+
+        baseEntity is Shulker ->
+            MobData.MobResult.found(
+                Mob(baseEntity, MobCategory.BASIC, name = "Hideonsun"),
             )
 
         else -> null

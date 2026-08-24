@@ -5,96 +5,122 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
-import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
+import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object FishingHookDisplay {
 
     private val config get() = SkyHanniMod.feature.fishing.fishingHookDisplay
-    private var armorStand: ArmorStand? = null
-    private val potentialArmorStands = mutableListOf<ArmorStand>()
 
-    // Todo repo pattern?
-    private val pattern = "§e§l(\\d+(\\.\\d+)?)".toPattern()
+    private data class TimerDisplay(
+        val id: Int,
+        val renderable: Renderable,
+        val position: LorenzVec,
+    )
+
+    private var timerDisplay: TimerDisplay? = null
+
+    /**
+     * REGEX-TEST: §e§l3.0
+     * REGEX-TEST: §e§l1.2
+     * REGEX-TEST: §c§l!!!
+     * REGEX-TEST: !!!
+     * REGEX-FAIL: §736
+     * REGEX-FAIL: §772
+     */
+    private val timerPattern by RepoPattern.pattern(
+        "fishing.hook.timer",
+        "§e§l(?<time>\\d+(?:\\.\\d+)?)|(?:§.)*(?<alert>!!!)",
+    )
+
     private var isRendering = false
 
     @HandleEvent
-    fun onWorldChange() = reset()
+    private fun onWorldChange() {
+        reset()
+    }
 
     @HandleEvent
-    fun onBobberThrow(event: FishingBobberCastEvent) = reset()
+    private fun onBobberCast() {
+        reset()
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
+    private fun onEntityCustomNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         if (!isEnabled()) return
+        val newName = event.newNameFormatted ?: return
+        val bobber = FishingApi.bobber ?: return
 
-        if (armorStand == null) {
-            val filter = potentialArmorStands.filter { it.hasCustomName() && it.hasCorrectName() }
-            if (filter.size == 1) {
-                armorStand = filter[0]
+        val displayText = timerPattern.matchMatcher(newName) {
+            if (groupOrNull("alert") != null) {
+                config.customAlertText.replace("&", "§")
+            } else {
+                newName
             }
+        } ?: return
+
+        val position = event.entity.getLorenzVec()
+
+        val current = timerDisplay
+        if (current != null && current.id != event.entity.id) {
+            // Prefer the closest entity to the bobber if there are multiple
+            val bobberPosition = bobber.getLorenzVec()
+            if (current.position.distance(bobberPosition) < position.distance(bobberPosition)) return
+        }
+
+        timerDisplay = TimerDisplay(
+            event.entity.id,
+            Renderable.text(displayText),
+            position,
+        )
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
+        if (event.entity.id == timerDisplay?.id) {
+            reset()
         }
     }
 
-    private fun reset() {
-        potentialArmorStands.clear()
-        armorStand = null
-    }
-
     @HandleEvent(onlyOnSkyblock = true)
-    fun onJoinWorld(event: EntityEnterWorldEvent<ArmorStand>) {
-        if (!isEnabled()) return
-        potentialArmorStands.add(event.entity)
-    }
-
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
+    private fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!isEnabled()) return
         if (!config.hideArmorStand) return
         if (!isRendering) return
 
-        if (event.entity == armorStand) {
+        if (event.entity.id == timerDisplay?.id) {
             event.cancel()
         }
     }
 
-    // TODO add a cache instead of re-calculating every frame
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         isRendering = false
-
-        val armorStand = armorStand ?: return
-        if (armorStand.deceased) {
-            reset()
-            return
-        }
-        if (!armorStand.hasCustomName() || !armorStand.isCustomNameVisible) return
-        val alertText = Renderable.text(
-            if (armorStand.name.string == "!!!") config.customAlertText.replace("&", "§")
-            else armorStand.name.formattedTextCompatLessResets(),
-        )
-
+        val timerDisplay = timerDisplay ?: return
         isRendering = true
-        config.position.renderRenderable(alertText, posLabel = "Fishing Hook Display")
+        config.position.renderRenderable(timerDisplay.renderable, posLabel = "Fishing Hook Display")
+    }
+
+    private fun reset() {
+        timerDisplay = null
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(72, "fishing.fishingHookDisplay.position", Position::migrate)
     }
-
-    private fun ArmorStand.hasCorrectName(): Boolean =
-        (name.string == "!!!") || pattern.matcher(name.formattedTextCompatLessResets()).matches()
 
     fun isEnabled() = config.enabled && FishingApi.holdingRod
 }

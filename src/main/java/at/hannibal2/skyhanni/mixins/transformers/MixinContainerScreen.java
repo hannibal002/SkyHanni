@@ -19,7 +19,6 @@ abstract class MixinContainerScreen {
     private final GenericContainerScreenHook skyhanni$hook = new GenericContainerScreenHook();
 
     @ModifyArg(
-        //~ if < 26.1 'extractBackground' -> 'renderBg'
         method = "extractBackground",
         at = @At(
             value = "INVOKE",
@@ -31,11 +30,9 @@ abstract class MixinContainerScreen {
         return skyhanni$hook.getTexture(sprite);
     }
 
-    //~ if < 26.1 'extractBackground' -> 'renderBg'
     @Inject(method = "extractBackground", at = @At(value = "HEAD"), cancellable = true)
-    //~ if < 26.1 'int mouseX, int mouseY, float a' -> 'float f, int i, int j'
     private void cancelWardrobeBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float a, CallbackInfo ci) {
-        if (GuiData.INSTANCE.getPreDrawEventCancelled()) {
+        if (GuiData.getPreDrawEventCancelled()) {
             ci.cancel();
         }
     }

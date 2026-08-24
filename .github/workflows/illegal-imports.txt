@@ -9,6 +9,7 @@ at/hannibal2/skyhanni/ com.mojang.realmsclient.
 at/hannibal2/skyhanni/ com.ibm.icu.
 at/hannibal2/skyhanni/ io.netty.util.internal.
 at/hannibal2/skyhanni/ org.spongepowered.asm.mixin.Overwrite
+at/hannibal2/skyhanni/ org.spongepowered.asm.mixin.injection.ModifyConstant
 at/hannibal2/skyhanni/ org.spongepowered.asm.mixin.injection.Redirect
 # Here because SkyHanniDebugsAndTests references way too much stuff and this way we keep the internal dependencies lower
 at/hannibal2/skyhanni/ at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests

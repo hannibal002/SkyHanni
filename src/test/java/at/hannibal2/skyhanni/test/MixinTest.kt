@@ -1,11 +1,15 @@
 package at.hannibal2.skyhanni.test
 
+import at.hannibal2.skyhanni.mixins.init.SkyHanniMixinPlugin
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.spongepowered.asm.mixin.MixinEnvironment
 import org.spongepowered.asm.mixin.transformer.IMixinTransformer
 
-// Inspired by Skyblocker
+/**
+ * Audits mixins to ensure their validity without launching a full Minecraft client.
+ * Implementation inspired by [Skyblocker](https://github.com/SkyblockerMod/Skyblocker).
+ */
 class MixinTest {
 
     @Test
@@ -13,5 +17,26 @@ class MixinTest {
         val environment = MixinEnvironment.getCurrentEnvironment()
         Assertions.assertInstanceOf(IMixinTransformer::class.java, environment.activeTransformer)
         environment.audit()
+    }
+
+    @Test
+    fun `mixin discovery is successful`() {
+        val classLoader = javaClass.classLoader
+        val discovered = SkyHanniMixinPlugin().mixins
+        Assertions.assertTrue(discovered.isNotEmpty()) {
+            "Mixin discovery returned nothing, so this test would pass without inspecting a single mixin. " +
+                "SkyHanniMixinPlugin resolves them relative to its own code source, " +
+                "which the mixinTest classpath has to expose."
+        }
+        discovered.forEach { mixin ->
+            val path = "$MIXIN_PACKAGE_PATH/${mixin.replace('.', '/')}.class"
+            checkNotNull(classLoader.getResource(path)) {
+                "Mixin $mixin was discovered but $path is not on the classpath"
+            }
+        }
+    }
+
+    companion object {
+        private const val MIXIN_PACKAGE_PATH = "at/hannibal2/skyhanni/mixins/transformers"
     }
 }

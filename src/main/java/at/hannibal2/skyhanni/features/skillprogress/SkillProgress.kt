@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateSkillLevel
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
@@ -270,6 +269,17 @@ object SkillProgress {
         return newList
     }
 
+    /**
+     * Progress towards [SkillApi.SkillInfo.customGoalLevel], expressed as cumulative XP out of the
+     * cumulative XP that goal level requires.
+     *
+     * [SkillApi.SkillInfo.totalXp] is already cumulative, so it can be compared against
+     * [SkillUtil.xpRequiredForLevel] directly. [SkillApi.SkillInfo.overflowTotalXp] can not: it only
+     * counts the XP gained past the level cap.
+     */
+    private fun SkillApi.SkillInfo.customGoalProgress() =
+        SkillLevel(overflowLevel, totalXp, SkillUtil.xpRequiredForLevel(customGoalLevel), totalXp)
+
     private fun drawAllDisplay() = buildMap {
         val skillMap = SkillApi.storage ?: return@buildMap
         val sortedMap = SkillType.entries.filter { it.displayName.isNotEmpty() }.sortedBy { it.displayName.take(2) }
@@ -279,19 +289,9 @@ object SkillProgress {
             val lockedLevels = skillInfo.overflowCurrentXp > skillInfo.overflowCurrentXpMax
             val useCustomGoalLevel =
                 skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInAllDisplay
-            val targetLevel = skillInfo.customGoalLevel
-            var xp = skillInfo.overflowTotalXp
-            if (targetLevel in 50..60 && skillInfo.overflowLevel >= 50) xp += SkillUtil.xpRequiredForLevel(50)
-            else if (targetLevel > 60 && skillInfo.overflowLevel >= 60) xp += SkillUtil.xpRequiredForLevel(60)
-
-            var have = skillInfo.overflowTotalXp
-            val need = SkillUtil.xpRequiredForLevel(targetLevel)
-            if (targetLevel in 51..59) have += SkillUtil.xpRequiredForLevel(50)
-            else if (targetLevel > 60) have += SkillUtil.xpRequiredForLevel(60)
-
             val (level, currentXP, currentXPMax, totalXP) =
                 if (useCustomGoalLevel)
-                    SkillLevel(skillInfo.overflowLevel, have, need, xp)
+                    skillInfo.customGoalProgress()
                 else if (config.overflowConfig.enableInAllDisplay.get() && !lockedLevels)
                     SkillLevel(
                         skillInfo.overflowLevel,
@@ -416,23 +416,10 @@ object SkillProgress {
         val skillMap = SkillApi.storage ?: return@buildList
         val skill = skillMap[activeSkill] ?: return@buildList
         val useCustomGoalLevel = skill.customGoalLevel != 0 && skill.customGoalLevel > skill.overflowLevel
-        val targetLevel = skill.customGoalLevel
-        val xp = skill.totalXp
-        val lvl = skill.level
-        val cap = activeSkill.maxLevel
-        // This code is probably still wrong for hunting
-        // But I can not understand why we are doing this in the first place
-        val add = if (lvl >= 50) {
-            SkillUtil.xpRequiredForLevel(cap)
-        } else {
-            0
-        }
-        val (currentLevel, _, _, xpTotalCurrent) = calculateSkillLevel(xp + add, cap)
-        val need = SkillUtil.xpRequiredForLevel(targetLevel)
 
         val (level, currentXP, currentXPMax, _) =
             if (useCustomGoalLevel && customGoalConfig.enableInDisplay)
-                SkillLevel(currentLevel, xp + add, need, xpTotalCurrent)
+                skill.customGoalProgress()
             else if (config.overflowConfig.enableInDisplay.get())
                 SkillLevel(skill.overflowLevel, skill.overflowCurrentXp, skill.overflowCurrentXpMax, skill.overflowTotalXp)
             else

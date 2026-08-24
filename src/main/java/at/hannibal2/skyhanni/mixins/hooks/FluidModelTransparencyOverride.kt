@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-//? if >= 26.1 {
 import com.mojang.blaze3d.platform.Transparency
 import net.minecraft.client.renderer.block.FluidModel
 
@@ -24,4 +23,3 @@ interface FluidModelTransparencyOverride {
             }
     }
 }
-//?}

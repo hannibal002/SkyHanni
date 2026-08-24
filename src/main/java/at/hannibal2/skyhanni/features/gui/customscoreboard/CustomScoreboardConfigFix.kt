@@ -108,6 +108,8 @@ object CustomScoreboardConfigFix {
 
         event.addScoreboardEntry(111, ScoreboardConfigElement.SOWDUST, addAfter = ScoreboardConfigElement.COPPER)
         event.addChunkedStat(111, ChunkedStatsLine.SOWDUST, addAfter = ChunkedStatsLine.COPPER)
+
+        event.addEvent(140, ScoreboardConfigEventElement.SAFARI)
     }
 
     private fun ConfigUpdaterMigrator.ConfigFixEvent.addEvent(version: Int, vararg keys: ScoreboardConfigEventElement) {

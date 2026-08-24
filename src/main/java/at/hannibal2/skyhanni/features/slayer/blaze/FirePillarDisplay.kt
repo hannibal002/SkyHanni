@@ -32,7 +32,7 @@ object FirePillarDisplay {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onEntityCustomNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         if (!config.firePillarDisplay) return
-        val seconds = entityNamePattern.matchGroup(event.newName ?: return, "seconds") ?: return
+        val seconds = entityNamePattern.matchGroup(event.newNameFormatted ?: return, "seconds") ?: return
         entityId = event.entity.id
         display = Renderable.text("§cFire Pillar: §b${seconds}s")
     }

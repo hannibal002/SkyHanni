@@ -11,6 +11,10 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 /**
  * Sealed base class for inventory events that provide access to the current inventory's slot data.
  *
+ * These events are posted from the packet handler, so handlers do not run on the main thread.
+ * Anything that measures text width, such as building renderables, has to go through
+ * DelayedRun.runOrNextTick.
+ *
  * @see InventoryFullyOpenedEvent
  * @see InventoryUpdatedEvent
  */
@@ -56,7 +60,8 @@ class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : Inven
  *
  * This fires once immediately after [InventoryFullyOpenedEvent] on initial open,
  * and again on any subsequent slot update while the inventory remains open.
- * Updates after the initial open are delayed by one tick.
+ * Updates after the initial open are delayed by one tick and therefore run on the main thread,
+ * only the initial post comes from the packet handler.
  */
 @PrimaryFunction("onInventoryUpdated")
 class InventoryUpdatedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)

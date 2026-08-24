@@ -37,7 +37,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object OwnInventoryData {
 
-    private var itemAmounts = mapOf<NeuInternalName, Int>()
+    private var inventorySnapshot = InventorySnapshot()
     private var dirty = false
 
     /**
@@ -98,43 +98,63 @@ object OwnInventoryData {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
-        if (itemAmounts.isEmpty()) {
-            itemAmounts = getCurrentItems()
+        if (inventorySnapshot.isEmpty()) {
+            inventorySnapshot = getCurrentItems()
         }
 
         if (!dirty) return
         dirty = false
 
-        val map = getCurrentItems()
-        for ((internalName, amount) in map) {
-            calculateDifference(internalName, amount)
+        val newSnapshot = getCurrentItems()
+        for ((internalName, amount) in calculateAddedItems(inventorySnapshot, newSnapshot)) {
+            addItem(internalName, amount)
         }
-        itemAmounts = map
+        inventorySnapshot = newSnapshot
     }
 
-    private fun getCurrentItems(): MutableMap<NeuInternalName, Int> {
-        val map = mutableMapOf<NeuInternalName, Int>()
+    private fun getCurrentItems(): InventorySnapshot {
+        val inventoryItems = mutableMapOf<NeuInternalName, Int>()
         for (itemStack in InventoryUtils.getItemsInOwnInventory()) {
             val internalName = itemStack.getInternalNameOrNull() ?: continue
-            map.addOrPut(internalName, itemStack.count)
+            inventoryItems.addOrPut(internalName, itemStack.count)
         }
-        for (name in InventoryUtils.getArmorInternalNames()) {
-            map.addOrPut(name, 1)
+
+        val armorItems = mutableMapOf<NeuInternalName, Int>()
+        for (itemStack in InventoryUtils.getArmor()) {
+            val internalName = itemStack?.getInternalNameOrNull() ?: continue
+            armorItems.addOrPut(internalName, itemStack.count)
         }
-        return map
+        return InventorySnapshot(inventoryItems, armorItems)
     }
 
     @HandleEvent
     fun onWorldChange() {
-        itemAmounts = emptyMap()
+        inventorySnapshot = InventorySnapshot()
     }
 
-    private fun calculateDifference(internalName: NeuInternalName, newAmount: Int) {
-        val oldAmount = itemAmounts[internalName] ?: 0
+    internal data class InventorySnapshot(
+        val inventoryItems: Map<NeuInternalName, Int> = emptyMap(),
+        val armorItems: Map<NeuInternalName, Int> = emptyMap(),
+    ) {
+        fun isEmpty(): Boolean = inventoryItems.isEmpty() && armorItems.isEmpty()
+    }
 
-        val diff = newAmount - oldAmount
-        if (diff > 0) {
-            addItem(internalName, diff)
+    internal fun calculateAddedItems(
+        oldSnapshot: InventorySnapshot,
+        newSnapshot: InventorySnapshot,
+    ): Map<NeuInternalName, Int> = buildMap {
+        for ((internalName, newInventoryAmount) in newSnapshot.inventoryItems) {
+            val oldInventoryAmount = oldSnapshot.inventoryItems[internalName] ?: 0
+            val inventoryDiff = newInventoryAmount - oldInventoryAmount
+            if (inventoryDiff <= 0) continue
+
+            val oldArmorAmount = oldSnapshot.armorItems[internalName] ?: 0
+            val newArmorAmount = newSnapshot.armorItems[internalName] ?: 0
+            val armorRemoved = (oldArmorAmount - newArmorAmount).coerceAtLeast(0)
+            val addedAmount = inventoryDiff - armorRemoved
+            if (addedAmount > 0) {
+                this[internalName] = addedAmount
+            }
         }
     }
 

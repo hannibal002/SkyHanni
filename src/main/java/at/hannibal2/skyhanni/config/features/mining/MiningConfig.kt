@@ -144,7 +144,7 @@ class MiningConfig {
     @Expose
     @ConfigOption(
         name = "Names in Core",
-        desc = "Show the names of the 4 areas while in the center of the Crystal Hollows.",
+        desc = "Shows the names of the 4 areas while in the center of the Crystal Hollows.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

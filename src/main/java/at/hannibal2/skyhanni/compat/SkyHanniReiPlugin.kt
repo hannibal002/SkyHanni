@@ -7,7 +7,6 @@ import me.shedaniel.rei.api.client.registry.screen.DisplayBoundsProvider
 import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.world.InteractionResult
-import kotlin.jvm.java
 
 class SkyHanniReiPlugin : REIClientPlugin {
     override fun registerScreens(registry: ScreenRegistry) {
@@ -16,18 +15,22 @@ class SkyHanniReiPlugin : REIClientPlugin {
 }
 
 private class SkyHanniDisplayBoundsProvider : DisplayBoundsProvider<SkyHanniBaseScreen> {
-    override fun <R : Screen> shouldScreenBeOverlaid(screen: R): InteractionResult {
+    override fun <R : Screen?> shouldScreenBeOverlaid(screen: R?): InteractionResult? {
         val customScreen = screen as? SkyHanniBaseScreen ?: return InteractionResult.PASS
-        return if (customScreen.shouldShowItemList()) InteractionResult.CONSUME else InteractionResult.PASS
+        return if (customScreen.shouldShowItemList()) {
+            InteractionResult.SUCCESS
+        } else {
+            InteractionResult.FAIL
+        }
     }
 
     override fun getScreenBounds(screen: SkyHanniBaseScreen): Rectangle {
-        val dimensions = screen.getDimensions()
-        val topLeft = screen.getTopLeft()
-        return Rectangle(topLeft.first, topLeft.second, dimensions.first, dimensions.second)
+        val rectangle = screen.rectangle
+        val position = rectangle.position
+        return Rectangle(position.x, position.y, rectangle.width, rectangle.height)
     }
 
     override fun <R : Screen> isHandingScreen(screen: Class<R>): Boolean {
-        return screen.isAssignableFrom(SkyHanniBaseScreen::class.java)
+        return SkyHanniBaseScreen::class.java.isAssignableFrom(screen)
     }
 }

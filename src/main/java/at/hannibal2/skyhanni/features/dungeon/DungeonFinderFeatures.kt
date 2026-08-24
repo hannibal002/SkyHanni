@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
@@ -12,6 +11,7 @@ import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi.DungeonClass
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -181,19 +181,20 @@ object DungeonFinderFeatures {
     private var inInventory = false
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryOpen(event: InventoryOpenEvent) {
-        floorStackSize = stackTip(event)
-        highlightParty = highlightingHandler(event)
-        toolTipMap = toolTipHandler(event)
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
+        val inventoryName = event.inventoryName
+        val inventoryItems = event.inventoryItems
+        floorStackSize = stackTip(inventoryName, inventoryItems)
+        highlightParty = highlightingHandler(inventoryName, inventoryItems)
+        toolTipMap = toolTipHandler(inventoryName, inventoryItems)
     }
 
-    private fun stackTip(event: InventoryOpenEvent): Map<Int, String> {
+    private fun stackTip(inventoryName: String, inventoryItems: Map<Int, SafeItemStack>): Map<Int, String> {
         val map = mutableMapOf<Int, String>()
-        val inventoryName = event.inventoryName
-        if (catacombsGatePattern.matches(inventoryName)) catacombsGateStackTip(event.inventoryItems, map)
+        if (catacombsGatePattern.matches(inventoryName)) catacombsGateStackTip(inventoryItems, map)
         if (!config.floorAsStackSize) return map
-        if (selectFloorPattern.matches(inventoryName)) selectFloorStackTip(event.inventoryItems, map)
-        if (partyFinderTitlePattern.matches(inventoryName)) partyFinderStackTip(event.inventoryItems, map)
+        if (selectFloorPattern.matches(inventoryName)) selectFloorStackTip(inventoryItems, map)
+        if (partyFinderTitlePattern.matches(inventoryName)) partyFinderStackTip(inventoryItems, map)
         return map
     }
 
@@ -259,13 +260,13 @@ object DungeonFinderFeatures {
         "F$floorNum"
     }
 
-    private fun highlightingHandler(event: InventoryOpenEvent): Map<Int, LorenzColor> {
+    private fun highlightingHandler(inventoryName: String, inventoryItems: Map<Int, SafeItemStack>): Map<Int, LorenzColor> {
         val map = mutableMapOf<Int, LorenzColor>()
-        if (!partyFinderTitlePattern.matches(event.inventoryName)) return map
+        if (!partyFinderTitlePattern.matches(inventoryName)) return map
         inInventory = true
         // TODO: Refactor this to not have so many continue statements
         @Suppress("LoopWithTooManyJumpStatements")
-        for ((slot, stack) in event.inventoryItems) {
+        for ((slot, stack) in inventoryItems) {
             val lore = stack.getCleanLore()
             if (!checkIfPartyPattern.matches(stack.cleanName)) continue
             if (config.markIneligibleGroups && ineligiblePattern.anyMatches(lore)) {
@@ -317,12 +318,11 @@ object DungeonFinderFeatures {
         return map
     }
 
-    private fun toolTipHandler(event: InventoryOpenEvent): Map<Int, List<Component>> {
+    private fun toolTipHandler(inventoryName: String, inventoryItems: Map<Int, SafeItemStack>): Map<Int, List<Component>> {
         val map = mutableMapOf<Int, List<Component>>()
-        val inventoryName = event.inventoryName
         if (!partyFinderTitlePattern.matches(inventoryName)) return map
         inInventory = true
-        for ((slot, stack) in event.inventoryItems) {
+        for ((slot, stack) in inventoryItems) {
             val missingClasses = DungeonClass.entries.toMutableList()
             val cleanLore = stack.getCleanLore()
             val toolTip = stack.getLoreComponent().toMutableList()
@@ -358,7 +358,7 @@ object DungeonFinderFeatures {
                                 appendWithColor(", ", ChatFormatting.GRAY)
                             }
                         }
-                    }
+                    },
                 )
             }
             if (toolTip.isNotEmpty()) {
@@ -369,7 +369,7 @@ object DungeonFinderFeatures {
     }
 
     @HandleEvent
-    fun onToolTip(event: ToolTipTextEvent) {
+    private fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
         event.slot ?: return
@@ -392,7 +392,7 @@ object DungeonFinderFeatures {
     }
 
     @HandleEvent
-    fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
+    private fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
         if (!config.floorAsStackSize) return
         val slot = event.slot
@@ -401,7 +401,7 @@ object DungeonFinderFeatures {
     }
 
     @HandleEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
 
@@ -411,7 +411,7 @@ object DungeonFinderFeatures {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         inInventory = false
         floorStackSize = emptyMap()
         highlightParty = emptyMap()
@@ -419,12 +419,9 @@ object DungeonFinderFeatures {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
     }
-
-    // TODO: move this somewhere else
-    private fun SafeItemStack.getCleanLore() = getLoreComponent().map { it.string.removeColor() }
 
     // Since you can call Mort from anywhere, or use the command, this should not check for being in DUNGEON_HUB
     fun isEnabled() = SkyBlockUtils.inSkyBlock && selectedClass != null

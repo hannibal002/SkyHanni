@@ -14,17 +14,13 @@ abstract class SkyHanniBaseScreen(title: Component = Component.empty()) : Screen
 
     val mc: Minecraft = Minecraft.getInstance()
 
-    //~ if < 26.1 'extractRenderState' -> 'render' {
     override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {
         super.extractRenderState(context, mouseX, mouseY, delta)
         postDrawScreen(context, mouseX, mouseY, delta)
     }
-    //~}
 
-    //~ if < 26.1 'extract' -> 'render'
     override fun extractBackground(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, deltaTicks: Float) {
         try {
-            //~ if < 26.1 'extract' -> 'render'
             this.extractMenuBackground(context)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error while rendering background", "screen" to this)
@@ -163,11 +159,8 @@ abstract class SkyHanniBaseScreen(title: Component = Component.empty()) : Screen
     open fun onInitGui() {}
 
     fun drawDefaultBackground(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        //~ if < 26.1 'extractMenuBackground' -> 'renderMenuBackground'
         extractMenuBackground(DrawContextUtils.drawContext)
     }
 
-    open fun getDimensions(): Pair<Int, Int> = Pair(width, height)
-    open fun getTopLeft(): Pair<Int, Int> = Pair(0, 0)
     open fun shouldShowItemList(): Boolean = false
 }

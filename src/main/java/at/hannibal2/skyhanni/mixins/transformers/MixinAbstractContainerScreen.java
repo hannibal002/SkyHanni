@@ -54,7 +54,6 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         super(title);
     }
 
-    //~ if < 26.1 '"extractRenderState"' -> '"render"' {
     @Inject(method = "extractRenderState", at = @At(value = "HEAD"), cancellable = true)
     private void renderHead(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (GlobalRender.getRenderDisabled()) return;
@@ -78,9 +77,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
             new DrawBackgroundEvent(context).post();
         }
     }
-    //~}
 
-    //~ if < 26.1 'extractTooltip' -> 'renderTooltip'
     @ModifyArg(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"), index = 1)
     private List<Component> renderBackground(List<Component> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) GuiGraphicsExtractor drawContext) {
         return ToolTipData.processModernTooltip(drawContext, itemStack, textTooltip);
@@ -107,7 +104,6 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         }
     }
 
-    //~ if < 26.1 'extractLabels' -> 'renderLabels'
     @ModifyArg(method = "extractLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 4)
     private int customForegroundTextColor(int colour) {
         return BetterContainers.getTextColor(colour);
@@ -151,7 +147,6 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         skyhanni$hook.backgroundDrawn(context, mouseX, mouseY, deltaTicks);
     }
 
-    //~ if < 26.1 'extractRenderState' -> 'render' {
     @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
     private void preDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         skyhanni$hook.preDraw(context, mouseX, mouseY, deltaTicks, ci);
@@ -161,7 +156,6 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     private void postDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         skyhanni$hook.postDraw(context, mouseX, mouseY, deltaTicks);
     }
-    //~}
 
     @Inject(
         method = "extractContents",

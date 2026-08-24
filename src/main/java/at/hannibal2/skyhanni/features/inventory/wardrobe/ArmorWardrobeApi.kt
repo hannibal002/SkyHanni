@@ -38,8 +38,7 @@ object ArmorWardrobeApi : AbstractWardrobeApi() {
     @HandleEvent
     private fun onDebugDataCollect(event: DebugDataCollectEvent) = handleDebugDataCollect(event)
 
-    // Sets inThisWardrobe to true if it matches
-    // Called by MenuScreensHook to determine if the inventory should be replaced with the custom wardrobe screen
+    // This also modifies the "inWardrobe" property
     internal fun matchesInventoryName(inventoryName: String): Boolean {
         return handleInventoryOpen(inventoryName)
     }

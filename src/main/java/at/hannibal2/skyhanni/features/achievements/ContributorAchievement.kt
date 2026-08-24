@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.achievements
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.FriendApi
 import at.hannibal2.skyhanni.data.achievements.Achievement
@@ -9,21 +10,30 @@ import at.hannibal2.skyhanni.events.FriendRequestExpiredEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.hover
+import com.mojang.authlib.GameProfile
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object ContributorAchievement {
+    private val config get() = SkyHanniMod.feature.dev
+
     private const val CONTRIBUTOR_ACHIEVEMENT = "Contrib Achievement"
     private const val CONTRIBUTOR_FRIEND_ACHIEVEMENT = "Contrib Friend"
     private const val CONTRIBUTOR_NOBODY_ACHIEVEMENT = "Contrib Stranger"
     private const val CONTRIBUTOR_REJECTED_ACHIEVEMENT = "Contrib Rejected"
     private const val CONTRIBUTOR_FAMOUS_ACHIEVEMENT = "Contrib Famous"
 
+    const val CONTRIBUTOR_ACHIEVEMENT_GOT = "Achievement Get! EEEEKK!!"
+
     @HandleEvent
-    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+    private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         event.register(
             Achievement(
                 name = "EEEEKK!".asComponent(),
@@ -92,7 +102,7 @@ object ContributorAchievement {
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onProfileJoin() {
+    private fun onProfileJoin() {
         val friends = FriendApi.getAllFriends()
         if (friends.any { it.name in ContributorManager.contributorNames }) {
             AchievementManager.completeAchievement(CONTRIBUTOR_FRIEND_ACHIEVEMENT)
@@ -100,28 +110,57 @@ object ContributorAchievement {
     }
 
     @HandleEvent
-    fun onFriendAdd(event: FriendAddEvent) {
+    private fun onFriendAdd(event: FriendAddEvent) {
         if (event.playerName in ContributorManager.contributorNames) {
             AchievementManager.completeAchievement(CONTRIBUTOR_FRIEND_ACHIEVEMENT)
         }
     }
 
     @HandleEvent
-    fun onFriendRequestExpired(event: FriendRequestExpiredEvent) {
+    private fun onFriendRequestExpired(event: FriendRequestExpiredEvent) {
         if (event.playerName in ContributorManager.contributorNames) {
             AchievementManager.completeAchievement(CONTRIBUTOR_NOBODY_ACHIEVEMENT)
         }
     }
 
     @HandleEvent
-    fun onFriendRequestDeclined(event: FriendRequestDeclinedEvent) {
+    private fun onFriendRequestDeclined(event: FriendRequestDeclinedEvent) {
         if (event.playerName in ContributorManager.contributorNames) {
             AchievementManager.completeAchievement(CONTRIBUTOR_REJECTED_ACHIEVEMENT)
         }
     }
 
-    fun onUniqueContributorSeen() {
-        AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
+    fun onUniqueContributorSeen(profile: GameProfile) {
+        val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
+        if (showContributorAchievement(profile, completed)) return
+        showContributorDiscovered(profile)
+    }
+
+    private fun showContributorDiscovered(profile: GameProfile) {
+        if (!config.discoverContributorMessage) return
+        val message = getDiscoverComponent(profile)
+        ChatUtils.chat {
+            appendWithColor("A wild SkyHanni contributor appears!", ChatFormatting.GOLD)
+            appendWithColor(" (hover)", ChatFormatting.GRAY)
+            hover = message
+        }
+    }
+
+    private fun showContributorAchievement(profile: GameProfile, completed: Boolean): Boolean {
+        if (!completed || !AchievementManager.shouldShowMessages) return false
+        val message = getDiscoverComponent(profile)
+        ChatUtils.chat(message)
+        return true
+    }
+
+    private fun getDiscoverComponent(profile: GameProfile): Component {
+        val player = profile.asComponent()
+        return componentBuilder {
+            appendWithColor("You have discovered ", ChatFormatting.GRAY)
+            append(player)
+            appendWithColor(" ${profile.name}", ChatFormatting.AQUA)
+            appendWithColor(" for the first time!", ChatFormatting.GRAY)
+        }
     }
 
     fun onContributorMention(totalAmount: Int) {

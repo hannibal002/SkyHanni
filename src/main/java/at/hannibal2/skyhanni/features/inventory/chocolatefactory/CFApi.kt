@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -29,13 +29,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -54,13 +53,6 @@ object CFApi {
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
 
     // <editor-fold desc="Patterns">
-    /**
-     * REGEX-TEST: 46,559,892,200 Chocolate
-     */
-    val chocolateAmountPattern by patternGroup.pattern(
-        "chocolate.amount",
-        "(?<amount>[\\d,]+) Chocolate",
-    )
 
     /**
      * REGEX-TEST: Hoppity
@@ -141,8 +133,10 @@ object CFApi {
 
     private val partyModeRegex = Regex("§[a-fA-F0-9]")
 
+    val CHOCOLATE_ITEM = SkyblockCurrency.CHOCOLATE.internalName
+
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         DelayedRun.runNextTick {
             if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
                 if (config.enabled) {
@@ -163,7 +157,7 @@ object CFApi {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
 
         rabbitSlots = data.rabbitSlots
@@ -193,7 +187,7 @@ object CFApi {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val old = "event.chocolateFactory"
         val new = "inventory.chocolateFactory"
         event.move(44, "$old.enabled", "$new.enabled")
@@ -216,12 +210,8 @@ object CFApi {
         event.move(44, "$old.hoppityStatsPosition", "$new.hoppityStatsPosition")
     }
 
-    fun getChocolateBuyCost(lore: List<String>): Long? {
-        val nextLine = lore.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
-        return chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
-            group("amount").formatLong()
-        }
-    }
+    fun getChocolateBuyCost(lore: List<String>): Long? =
+        lore.readLoreCosts().firstOrNull { it.internalName == CHOCOLATE_ITEM }?.amount
 
     fun getNextLevelName(stack: SafeItemStack): String? = upgradeLorePattern.firstMatcher(stack.getLore()) {
         val isEmployee = stack.getLore().any { it == "§8Employee" }

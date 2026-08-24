@@ -25,8 +25,8 @@ class GraphEditorState {
     var dissolvePossible = false
 
     var seeThroughBlocks = true
-    var inEditMode = false
-    var inTutorialMode = false
+    var inNodeMoveMode = false
+    var inFeedbackMode = false
 
     val textBox = TextInput()
     var inTextMode = false
@@ -68,8 +68,8 @@ class GraphEditorState {
         newState.id = this.id
         newState.dissolvePossible = this.dissolvePossible
         newState.seeThroughBlocks = this.seeThroughBlocks
-        newState.inEditMode = this.inEditMode
-        newState.inTutorialMode = this.inTutorialMode
+        newState.inNodeMoveMode = this.inNodeMoveMode
+        newState.inFeedbackMode = this.inFeedbackMode
         newState.textBox.textBox = this.textBox.textBox
 
         val nodeMap = mutableMapOf<GraphingNode, GraphingNode>()

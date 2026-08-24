@@ -7,10 +7,11 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class DevToolConfig {
+    // TODO rename to GraphEditor
     @Expose
     @ConfigOption(name = "Graph Tools", desc = "")
     @Accordion
-    val graph: GraphConfig = GraphConfig()
+    val graph: GraphEditorConfig = GraphEditorConfig()
 
     @Expose
     @NoConfigLink

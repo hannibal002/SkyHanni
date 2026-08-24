@@ -25,8 +25,6 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HotmApi {
 
-    fun copyCurrentTree() = HotmData.storage?.deepCopy()
-
     val activeMiningAbility get() = HotmData.abilities.firstOrNull { it.enabled }
 
     private val blueGoblinEgg = "GOBLIN_OMELETTE_BLUE_CHEESE".toInternalName()
@@ -104,7 +102,7 @@ object HotmApi {
         }
     }
 
-    var skymall: SkymallPerk? = null
+    val skymall: SkymallPerk? get() = HotmData.skyMallSlot.currentPerk
 
     var mineshaftMayhem: MayhemPerk? = null
 
