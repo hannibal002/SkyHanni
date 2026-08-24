@@ -198,6 +198,10 @@ enum class NonGodPotEffect(
         "Candycomb",
         displayName = "§r§5Candycomb§r§f",
     ),
+    BRINE_TONIC(
+        "Brine Tonic",
+        displayName = "§r§5Brine Tonic§r§f",
+    ),
     ;
 
     private val patternName = name.lowercase().replace("_", "-")
