@@ -11,7 +11,6 @@ internal class GreenhouseCropStorage {
 
     private val runtimeDetectedCropsByPlot = mutableMapOf<Int, MutableSet<String>>()
     private val runtimeDetectedCropPositionsByPlot = mutableMapOf<Int, MutableMap<String, LorenzVec>>()
-    private val runtimeIgnoredReplacementsByPlot = mutableMapOf<Int, MutableSet<String>>()
     private var pendingPersistentSave = false
 
     fun syncRuntimeData() {
@@ -24,13 +23,7 @@ internal class GreenhouseCropStorage {
                 profileStorage.detectedCropPositionsByPlot = it
                 repairedNullMap = true
             }
-        val ignoredReplacements = profileStorage.ignoredCropReplacementsByPlot ?: mutableMapOf<Int, MutableSet<String>>()
-            .also {
-                profileStorage.ignoredCropReplacementsByPlot = it
-                repairedNullMap = true
-            }
-        val changed = detectedPositions.merge(runtimeDetectedCropPositionsByPlot) or
-            ignoredReplacements.mergeSets(runtimeIgnoredReplacementsByPlot)
+        val changed = detectedPositions.merge(runtimeDetectedCropPositionsByPlot)
         if (repairedNullMap || changed) pendingPersistentSave = true
         savePendingData()
     }
@@ -71,45 +64,11 @@ internal class GreenhouseCropStorage {
     fun clearAll() {
         runtimeDetectedCropsByPlot.clear()
         runtimeDetectedCropPositionsByPlot.clear()
-        runtimeIgnoredReplacementsByPlot.clear()
         storage?.detectedCropsByPlot?.clear()
         storage?.detectedCropPositionsByPlot?.clear()
         storage?.ignoredCropReplacementsByPlot?.clear()
         pendingPersistentSave = true
         savePendingData()
-    }
-
-    fun moveCrop(category: CropCategory, newPlotId: Int, position: LorenzVec) {
-        val name = category.name
-        listOfNotNull(
-            runtimeDetectedCropPositionsByPlot,
-            storage?.detectedCropPositionsByPlot,
-        ).forEach { positionsByPlot ->
-            positionsByPlot.values.forEach { it.remove(name) }
-        }
-        runtimeDetectedCropsByPlot.values.forEach { it.remove(name) }
-        storage?.detectedCropsByPlot?.values?.forEach { it.remove(name) }
-
-        runtimeDetectedCropsByPlot.getOrPut(newPlotId) { mutableSetOf() }.add(name)
-        storage?.detectedCropsByPlot?.getOrPut(newPlotId) { mutableSetOf() }?.add(name)
-        runtimeIgnoredReplacementsByPlot.values.forEach { it.remove(name) }
-        storage?.ignoredCropReplacementsByPlot?.values?.forEach { it.remove(name) }
-        saveDetectedCropPositions(newPlotId, mapOf(category to position))
-        pendingPersistentSave = true
-        savePendingData()
-    }
-
-    fun rememberIgnoredCropReplacement(plotId: Int, category: CropCategory) {
-        val name = category.name
-        runtimeIgnoredReplacementsByPlot.getOrPut(plotId) { mutableSetOf() }.add(name)
-        storage?.ignoredCropReplacementsByPlot?.getOrPut(plotId) { mutableSetOf() }?.add(name)
-        pendingPersistentSave = true
-        savePendingData()
-    }
-
-    fun ignoredCropReplacementsByPlot(): Map<Int, Set<String>> = buildMap {
-        addStored(storage?.ignoredCropReplacementsByPlot.orEmpty())
-        addStored(runtimeIgnoredReplacementsByPlot)
     }
 
     fun detectedCropsByPlot(): Map<Int, Set<String>> =
@@ -123,10 +82,6 @@ internal class GreenhouseCropStorage {
 
     fun saveDetectedCropPositions(plotId: Int, positions: Map<CropCategory, LorenzVec>) {
         val positionNames = positions.mapKeys { it.key.name }
-        positionNames.keys.forEach {
-            removeRememberedCategoryFromOtherPlots(it, plotId)
-        }
-
         val runtimePositions = runtimeDetectedCropPositionsByPlot.getOrPut(plotId) { mutableMapOf() }
         val storedPositions = storage?.detectedCropPositionsByPlot?.getOrPut(plotId) { mutableMapOf() }
         var changed = false
@@ -152,18 +107,6 @@ internal class GreenhouseCropStorage {
         storage?.detectedCropsByPlot?.get(plotId)?.let { changed = it.removeAll(names) || changed }
         if (changed) pendingPersistentSave = true
         savePendingData()
-    }
-
-    private fun removeRememberedCategoryFromOtherPlots(name: String, plotId: Int) {
-        val runtime = runtimeDetectedCropPositionsByPlot
-        val profile = storage?.detectedCropPositionsByPlot
-        var changed = false
-        listOfNotNull(runtime, profile).forEach { positionsByPlot ->
-            positionsByPlot.filterKeys { it != plotId }.values.forEach {
-                changed = it.remove(name) != null || changed
-            }
-        }
-        if (changed) pendingPersistentSave = true
     }
 
     fun detectedCropPositionsByPlot(): Map<Int, Map<String, LorenzVec>> = buildMap {
@@ -194,20 +137,6 @@ private fun MutableMap<Int, MutableMap<String, LorenzVec>>.merge(
         }
     }
     return changed
-}
-
-private fun MutableMap<Int, MutableSet<String>>.mergeSets(source: Map<Int, Set<String>>): Boolean {
-    var changed = false
-    source.forEach { (plotId, categories) ->
-        changed = getOrPut(plotId) { mutableSetOf() }.addAll(categories) || changed
-    }
-    return changed
-}
-
-private fun MutableMap<Int, Set<String>>.addStored(stored: Map<Int, Set<String>>) {
-    stored.forEach { (plotId, names) ->
-        put(plotId, get(plotId).orEmpty() + names)
-    }
 }
 
 private fun Map<Int, Map<String, LorenzVec>>.addCropPositionsTo(

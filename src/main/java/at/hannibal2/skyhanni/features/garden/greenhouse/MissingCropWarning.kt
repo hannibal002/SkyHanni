@@ -40,7 +40,6 @@ object MissingCropWarning {
     private var missingCropWaypoints: Map<CropCategory, LorenzVec> = emptyMap()
     private var lastProcessedPlotId: Int? = null
     private var checkerRunCount = 0
-    private val replacementPrompts = mutableMapOf<CropCategory, CropReplacement>()
 
     @HandleEvent(ConfigLoadEvent::class)
     private fun onConfigLoad() {
@@ -73,17 +72,9 @@ object MissingCropWarning {
             .filterValues { !GreenhouseGridScanner.isInsideGrid(plot, it) }
             .keys
         cropStorage.removeDetectedCropPositions(plot.id, outOfGridDetectedCrops)
-        val allRememberedPositions = cropStorage.rememberedCropPositions()
-        val rawScannedPositions = GreenhouseCropScanner.scanGreenhousePositions(plot)
-        promptForCropReplacements(plot.id, rawScannedPositions, allRememberedPositions)
-
-        val scannedPositions = rawScannedPositions.filterKeys { category ->
-            allRememberedPositions.none { (rememberedPlotId, positions) ->
-                rememberedPlotId != plot.id && category in positions
-            }
-        }
+        val scannedPositions = GreenhouseCropScanner.scanGreenhousePositions(plot)
         val present = scannedPositions.keys
-        val spotted = rawScannedPositions.keys
+        val spotted = present
 
         cropStorage.rememberDetectedCrops(plot.id, scannedPositions)
         if (spotted != previousScan) {
@@ -250,7 +241,6 @@ object MissingCropWarning {
 
     private fun resetGreenhouseCropData() {
         cropStorage.clearAll()
-        replacementPrompts.clear()
         clearChecklistSession()
         reset()
         ChatUtils.chat("§aCleared all remembered Greenhouse crop locations.")
@@ -306,87 +296,9 @@ object MissingCropWarning {
     private fun Collection<CropCategory>.namesOrNone(): String =
         ifEmpty { return "none" }.joinToString(", ") { it.displayName }
 
-    private fun promptForCropReplacements(
-        newPlotId: Int,
-        scannedPositions: Map<CropCategory, LorenzVec>,
-        rememberedPositions: Map<Int, Map<CropCategory, LorenzVec>>,
-    ) {
-        scannedPositions.forEach { (category, newPosition) ->
-            val oldPlotId = rememberedPositions.entries.firstOrNull { (plotId, positions) ->
-                plotId != newPlotId && category in positions
-            }?.key ?: return@forEach
-            val replacement = CropReplacement(category, oldPlotId, newPlotId, newPosition)
-            if (category.name in cropStorage.ignoredCropReplacementsByPlot()[newPlotId].orEmpty()) return@forEach
-            replacementPrompts[category]?.let { existing ->
-                if (existing.oldPlotId == oldPlotId && existing.newPlotId == newPlotId) {
-                    // Keep the actionable position fresh without repeating the same prompt.
-                    replacementPrompts[category] = replacement
-                    return@forEach
-                }
-            }
-            replacementPrompts[category] = replacement
-
-            ChatUtils.chat(
-                "§e${category.displayName} was remembered in Greenhouse Plot §6$oldPlotId§e, " +
-                    "but was also found in Plot §6$newPlotId§e. Replace its remembered location?",
-            )
-            ChatUtils.clickableChat(
-                "§a[Replace with Plot $newPlotId]",
-                onClick = {
-                    replacementPrompts[category]
-                        ?.takeIf { it.oldPlotId == oldPlotId && it.newPlotId == newPlotId }
-                        ?.let(::acceptCropReplacement)
-                        ?: ChatUtils.chat("§cThat Greenhouse crop replacement is no longer pending.")
-                },
-                hover = "§eMove the remembered ${category.displayName} location to Plot $newPlotId.",
-            )
-            ChatUtils.clickableChat(
-                "§c[Keep Plot $oldPlotId]",
-                onClick = {
-                    val pending = replacementPrompts[category]
-                    if (pending?.oldPlotId == oldPlotId && pending.newPlotId == newPlotId) {
-                        replacementPrompts.remove(category)
-                        cropStorage.rememberIgnoredCropReplacement(newPlotId, category)
-                        ChatUtils.chat("§eKept ${category.displayName} in Greenhouse Plot §6$oldPlotId§e.")
-                    }
-                },
-                hover = "§eKeep the existing location and ignore this candidate.",
-            )
-        }
-    }
-
-    private fun acceptCropReplacement(replacement: CropReplacement) {
-        if (replacementPrompts[replacement.category] != replacement) {
-            ChatUtils.chat("§cThat Greenhouse crop replacement is no longer pending.")
-            return
-        }
-        if (
-            !replacement.position.isInLoadedChunk() ||
-            GreenhouseCropScanner.isMissingCrop(replacement.position, replacement.category)
-        ) {
-            replacementPrompts.remove(replacement.category)
-            ChatUtils.chat("§cThe replacement ${replacement.category.displayName} is no longer present.")
-            return
-        }
-
-        cropStorage.moveCrop(replacement.category, replacement.newPlotId, replacement.position)
-        replacementPrompts.remove(replacement.category)
-        ChatUtils.chat(
-            "§aMoved ${replacement.category.displayName} from Greenhouse Plot §e${replacement.oldPlotId} " +
-                "§ato Plot §e${replacement.newPlotId}§a.",
-        )
-    }
-
     private fun scoreboardShowsGreenhouse(): Boolean = GreenhouseUtils.scoreboardShowsGreenhouse()
 
     private fun isInGreenhouse(): Boolean = GreenhouseUtils.isInGreenhouse()
-
-    private data class CropReplacement(
-        val category: CropCategory,
-        val oldPlotId: Int,
-        val newPlotId: Int,
-        val position: LorenzVec,
-    )
 
     private const val REQUIRED_STABLE_SCANS = 2
     private const val EXPECTED_GREENHOUSE_COUNT = 3
