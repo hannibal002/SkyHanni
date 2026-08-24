@@ -60,7 +60,6 @@ object TreeProgressDisplay {
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     private fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
-        if (!isEnabled()) return
         if (event.entity.id == progressDisplay?.id) {
             progressDisplay = null
         }
