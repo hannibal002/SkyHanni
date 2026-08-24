@@ -35,14 +35,19 @@ object LoreCostUtils {
      * into the header line is handed on as is, so that features can find that exact line again
      * in the tooltip. Matching without color would strip it and break that lookup.
      *
+     * Menus that list their costs below the header write it in singular or plural, with a colon
+     * or without one.
+     *
      * REGEX-TEST: §7Cost
      * REGEX-TEST: §5§o§7Cost
+     * REGEX-TEST: §7Costs
+     * REGEX-TEST: §7Cost:
      * REGEX-TEST: §7Cost: §b5,000 Bits
      * REGEX-TEST: §7Cost to unlock: §550 Tokens
      */
     private val costHeaderPattern by patternGroup.pattern(
         "cost.header",
-        "(?:§.)*Cost(?: to unlock)?(?:: (?<cost>.+))?",
+        "(?:§.)*Costs?(?: to unlock)?(?::(?: (?<cost>.+))?)?",
     )
 
     /**
@@ -81,7 +86,8 @@ object LoreCostUtils {
             groupOrNull("cost")?.let { return listOf(readCostLine(it, itemName)) }
         }
 
-        return drop(headerIndex + 1).takeWhile { it.isNotEmpty() }.map { readCostLine(it, itemName) }
+        // the blank line below the costs is not always empty, some menus write a color code into it
+        return drop(headerIndex + 1).takeWhile { it.removeColor().isNotEmpty() }.map { readCostLine(it, itemName) }
     }
 
     private fun readCostLine(rawLine: String, itemName: String): LoreCostEntry {
