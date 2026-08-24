@@ -48,6 +48,7 @@ object TreeProgressDisplay {
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
+        if (!isHoldingAxe()) return
         progressDisplay?.let {
             config.position.renderRenderable(it.renderable, posLabel = "Tree Progress")
         }
@@ -69,11 +70,6 @@ object TreeProgressDisplay {
     private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         if (!isEnabled()) return
         if (!MinecraftCompat.localPlayerExists) return
-
-        if (config.onlyHoldingAxe && InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.AXE) {
-            progressDisplay = null
-            return
-        }
 
         val newName = event.newName ?: return
         val displayText = currentTreeProgressPattern.matchStyledMatcher(newName) {
@@ -114,6 +110,8 @@ object TreeProgressDisplay {
             }
         }
     }
+
+    private fun isHoldingAxe() = config.onlyHoldingAxe && InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.AXE
 
     private fun isEnabled() = config.enabled
 }
