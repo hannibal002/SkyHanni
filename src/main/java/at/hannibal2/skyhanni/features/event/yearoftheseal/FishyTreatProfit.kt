@@ -51,6 +51,14 @@ object FishyTreatProfit {
         "Lukas the Aquarist",
     )
 
+    // TOOD: Not duplicate this with other inventory readers
+    private val indexes = listOf(
+        10..16,
+        19..25,
+        28..34,
+        37..43,
+    ).flatten()
+
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.fishyTreatProfit || !inventory.isInside()) return
@@ -58,10 +66,7 @@ object FishyTreatProfit {
         DelayedRun.runOrNextTick {
             val table = mutableListOf<DisplayTableEntry>()
             for ((slot, item) in event.inventoryItems) {
-                // ignore the last line of menu items
-                if (slot > 44) continue
-                // background items, named with a single space
-                if (item.hoverName.string == " ") continue
+                if (slot !in indexes) continue
                 try {
                     readItem(slot, item, table)
                 } catch (e: Throwable) {
