@@ -93,7 +93,7 @@ object PestSpawnTimer {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
-        val widgetLines = event.cleanLines.takeIfNotEmpty() ?: return
+        val widgetLines = event.cleanLines
 
         // Hypixel can sometimes send partial widget
         // so we first check if the maximum number of pests is present as a workaround
