@@ -12,7 +12,7 @@ class SwapReminderConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Triggers a screen alert when your active Slayer Boss reaches a set HP threshold."
+        desc = "Triggers a screen alert when your active Slayer Boss reaches a set HP threshold.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -21,7 +21,7 @@ class SwapReminderConfig {
     @Expose
     @ConfigOption(
         name = "HP Threshold (%)",
-        desc = "Threshold percentage to send the alert (e.g. 50%)."
+        desc = "Threshold percentage to send the alert (e.g. 50%).",
     )
     @ConfigEditorSlider(minValue = 1f, maxValue = 99f, minStep = 1f)
     var hpThreshold: Int = 50
@@ -29,7 +29,7 @@ class SwapReminderConfig {
     @Expose
     @ConfigOption(
         name = "Title Text",
-        desc = "Custom text shown on screen. Supports '&' color codes (e.g., &c&lROD SWAP!)."
+        desc = "Custom text shown on screen. Supports '&' color codes (e.g., &c&lROD SWAP!).",
     )
     @ConfigEditorText
     var titleText: String = "&c&lROD SWAP!"
@@ -37,7 +37,7 @@ class SwapReminderConfig {
     @Expose
     @ConfigOption(
         name = "Play Sound",
-        desc = "Plays an alert sound notification."
+        desc = "Plays an alert sound notification.",
     )
     @ConfigEditorBoolean
     var playSound: Boolean = true

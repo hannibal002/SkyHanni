@@ -31,7 +31,9 @@ object SlayerSwapReminder {
     }
 
     private fun stopReminder() {
-        TitleManager.conditionallyStopTitle { !hasRemindedForCurrentBoss }
+        TitleManager.conditionallyStopTitle { activeTitle ->
+            activeTitle == formattedTitle
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -48,10 +50,11 @@ object SlayerSwapReminder {
         // Ignore uninitialized or dead mob health states
         if (maxHealth <= 0 || lastHealth <= 0) return
 
-        val hpPercentage = (lastHealth / maxHealth) * 100.0
+        val hpPercentage = (lastHealth * 100.0) / maxHealth
         if (hpPercentage >= config.hpThreshold) return
 
         hasRemindedForCurrentBoss = true
+        showReminder()
     }
 
     @HandleEvent
