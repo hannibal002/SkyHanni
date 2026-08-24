@@ -134,6 +134,7 @@ internal object GreenhouseCropScanner {
             name.startsWith("coco") -> CropCategory.COCOA_BEANS
             name.startsWith("pumpkin") -> CropCategory.PUMPKIN
             name.removePrefix("melon").toIntOrNull() != null -> CropCategory.MELON
+            name.startsWith("wildrose") -> CropCategory.WILD_ROSE
             else -> null
         }
     }
@@ -148,6 +149,7 @@ internal object GreenhouseCropScanner {
             name.startsWith("coco") -> "cocoa_beans"
             name.startsWith("pumpkin") -> "pumpkin"
             name.startsWith("melon") -> "melon"
+            name.startsWith("wildrose") -> "wild_rose"
             else -> null
         }
     }
@@ -177,6 +179,7 @@ internal object GreenhouseCropScanner {
         CropCategory.COCOA_BEANS,
         CropCategory.PUMPKIN,
         CropCategory.MELON,
+        CropCategory.WILD_ROSE,
     )
     private val headOnlyCrops = setOf(
         CropCategory.COCOA_BEANS,
