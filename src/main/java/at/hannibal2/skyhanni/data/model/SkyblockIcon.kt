@@ -43,6 +43,7 @@ value class SkyblockIcon private constructor(private val icon: Char) {
         val MOONFLOWER_FORTUNE = FARMING_FORTUNE
         val WILD_ROSE_FORTUNE = FARMING_FORTUNE
         val SWEEP = SkyblockIcon('\uE023')
+        val TIMBER = SkyblockIcon('\uE02E')
         val FORAGING_FORTUNE = SkyblockIcon('\uE054')
         val FIG_FORTUNE = FORAGING_FORTUNE
         val MANGROVE_FORTUNE = FORAGING_FORTUNE
