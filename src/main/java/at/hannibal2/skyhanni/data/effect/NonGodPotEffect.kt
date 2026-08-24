@@ -197,7 +197,7 @@ enum class NonGodPotEffect(
         "Candycomb",
         displayName = "§r§5Candycomb§r§f",
     ),
-    BRINE(
+    BRINE_TONIC(
         "Brine Tonic",
         displayName = "§r§5Brine Tonic§r§f",
     ),

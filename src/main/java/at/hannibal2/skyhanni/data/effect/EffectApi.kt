@@ -167,7 +167,7 @@ object EffectApi {
         EXALTED_LUSHLILAC_BONBON,
         OCEANDY,
         CANDYCOMB,
-        BRINE,
+        BRINE_TONIC,
     )
 
     private val profileStorage get() = ProfileStorageData.profileSpecific
