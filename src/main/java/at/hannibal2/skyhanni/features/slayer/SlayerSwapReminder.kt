@@ -1,14 +1,19 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
 import at.hannibal2.skyhanni.data.mob.MobCategory
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -65,5 +70,19 @@ object SlayerSwapReminder {
         stopReminder()
     }
 
-    private fun isActive() = config.enabled && SlayerApi.isInBossFight()
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
+    private fun onGuiRenderOverlay() {
+        if (!isActive() || !hasRemindedForCurrentBoss) return
+
+        val display = listOf(
+            Renderable.text(formattedTitle)
+        )
+
+        config.position.renderRenderables(
+            renderables = display,
+            posLabel = "Slayer Swap Reminder",
+        )
+    }
+
+    private fun isActive() = config.enabled && SlayerApi.isInBossFight() && !IslandType.THE_RIFT.isInIsland()
 }
