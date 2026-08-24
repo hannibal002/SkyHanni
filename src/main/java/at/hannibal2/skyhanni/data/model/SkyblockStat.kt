@@ -121,6 +121,7 @@ enum class SkyblockStat(
     FIG_FORTUNE(GOLD, SkyblockIcon.FORAGING_FORTUNE),
     MANGROVE_FORTUNE(GOLD, SkyblockIcon.FORAGING_FORTUNE),
     HELIX_FORTUNE(GOLD, SkyblockIcon.FORAGING_FORTUNE),
+    TIMER(DARK_RED, SkyblockIcon.TIMBER),
     // </editor-fold>
 
     // <editor-fold desc="Fishing Stats">

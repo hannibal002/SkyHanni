@@ -54,7 +54,7 @@ object CurrencyApi {
      */
     private val pestsAmountPattern by patternGroup.pattern(
         "pests.amount",
-        "Vacuum Bag: (?<amount>[\\d,]+) \uE018 Pests",
+        "Vacuum Bag: (?<amount>[\\d,]+) [\uE07F\uE018] Pests",
     )
 
     /**

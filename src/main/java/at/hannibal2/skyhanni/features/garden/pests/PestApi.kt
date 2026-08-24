@@ -81,10 +81,11 @@ object PestApi {
 
     /**
      * WRAPPED-REGEX-TEST: " §7 §aThe Garden §4§l§7 x1"
+     * WRAPPED-REGEX-TEST: " §7 §cThe Garden §4§l§7 x8"
      */
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
-        " §7. §[ac]The Garden §4§l\uE018§7 x(?<pests>.*)",
+        " §7. §[ac]The Garden §4§l[\uE07F\uE018]§7 x(?<pests>.*)",
     )
 
     /**

@@ -50,27 +50,7 @@ import org.joml.Matrix4f
 
 @Suppress("LargeClass")
 object WorldRenderUtils {
-
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
-
-    //? if >= 26.2 {
-    private const val SKYHANNI_TEXT_SUBMIT_ORDER = 10_000
-    //?} else {
-    /*// 26.1 composites entity render targets over the main target after the normal world-render hook.
-    // Drawing see-through text in the late pass prevents entities from covering it (MC-265743).
-    private val deferredSeeThroughText = mutableListOf<(MultiBufferSource.BufferSource) -> Unit>()
-
-    @JvmStatic
-    fun renderDeferredSeeThroughText(bufferSource: MultiBufferSource.BufferSource) {
-        if (deferredSeeThroughText.isEmpty()) return
-        try {
-            deferredSeeThroughText.forEach { it(bufferSource) }
-            bufferSource.endBatch()
-        } finally {
-            deferredSeeThroughText.clear()
-        }
-    }
-    *///?}
 
     //? if >= 26.2 {
     private fun SkyHanniRenderWorldEvent.submitOrderedText(
@@ -84,8 +64,8 @@ object WorldRenderUtils {
         backgroundColor: Int,
         outlineColor: Int,
     ) {
-        val order = SKYHANNI_TEXT_SUBMIT_ORDER + skyHanniTextSubmitOrder++
-        submitNodeStorage.order(order).submitText(
+        // The order ensures see-through text renders over our custom geometry, like on 26.1.
+        submitNodeCollector.order(1).submitText(
             matrices,
             x,
             y,
@@ -105,7 +85,7 @@ object WorldRenderUtils {
         crossinline render: (VertexConsumer) -> Unit,
     ) {
         //? if >= 26.2 {
-        submitNodeStorage.submitCustomGeometry(matrices, layer) { _, buffer -> render(buffer) }
+        submitNodeCollector.submitCustomGeometry(matrices, layer) { _, buffer -> render(buffer) }
         //?} else {
         /*render(bufferSource.getBuffer(layer))
         *///?}
@@ -129,8 +109,7 @@ object WorldRenderUtils {
         matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
         BeaconRenderer.submitBeaconBeam(
             matrices,
-            //~ if < 26.2 'submitNodeStorage' -> 'Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage'
-            submitNodeStorage,
+            submitNodeCollector,
             beaconBeam,
             1f,
             Math.floorMod(MinecraftCompat.clientTime, 40) + partialTicks,
@@ -348,24 +327,6 @@ object WorldRenderUtils {
         ).rotate(camera.rotation())
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
-
-        if (seeThroughBlocks) {
-            deferredSeeThroughText.add { bufferSource ->
-                fr.drawInBatch(
-                    text,
-                    x,
-                    0f,
-                    color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-                    shadow,
-                    matrix,
-                    bufferSource,
-                    SEE_THROUGH,
-                    backgroundColor,
-                    FULL_BRIGHT,
-                )
-            }
-            return
-        }
 
         fr.drawInBatch(
             text,
@@ -964,11 +925,8 @@ object WorldRenderUtils {
     }
 
     internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec {
-        //? if >= 26.2 {
         val look = Vector3f(0f, 0f, -1f).rotate(camera.rotation())
         return camera.position.toLorenzVec() + LorenzVec(look.x.toDouble(), look.y.toDouble(), look.z.toDouble()).times(2)
-        //?} else
-        //return exactPlayerEyeLocation() + MinecraftCompat.localPlayerOrThrow.lookAngle.toLorenzVec().times(2)
     }
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {
