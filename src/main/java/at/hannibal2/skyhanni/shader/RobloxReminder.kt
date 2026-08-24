@@ -6,11 +6,14 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -40,12 +43,25 @@ object RobloxReminder {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    private fun onIslandChange(event: IslandChangeEvent) {
+        if (PlayerUtils.getUuid() in bannedUsers) {
+            PlatformUtils.shutdownMinecraft(
+                "Your account has been banned from using SkyHanni. " +
+                    "Please contact support for more information."
+            )
+        }
         if (event.newIsland == IslandType.NONE) return
         if (!TimeUtils.isAprilFoolsDay) return
 
         versionReminder()
         specialPerson()
+    }
+
+    private var bannedUsers: List<String> = emptyList()
+
+    @HandleEvent
+    private fun onRepoReload(event: RepositoryReloadEvent) {
+        bannedUsers = event.getConstant<List<String>>("BannedUsers")
     }
 
     private fun specialPerson() {
