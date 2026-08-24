@@ -52,7 +52,7 @@ object RareDropMessages {
     )
 
     /**
-     * REGEX-TEST: §6⛃ §r§6§lGREAT CATCH! §r§fYou caught a §r§7[Lvl 1] §r§aSquid§r§f!
+     * REGEX-TEST: §6 §r§6§lGREAT CATCH! §r§fYou caught a §r§7[Lvl 1] §r§aSquid§r§f!
      */
     private val petFishedPattern by petGroup.pattern(
         "fishedmessage",
