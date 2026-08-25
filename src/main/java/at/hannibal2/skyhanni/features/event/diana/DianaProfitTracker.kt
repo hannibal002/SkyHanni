@@ -57,7 +57,7 @@ object DianaProfitTracker {
      */
     private val chatDugOutCoinsPattern by patternGroup.pattern(
         "coins",
-        "Wow! You dug out (?<coins>[\\d+,]) coins!",
+        "Wow! You dug out (?<coins>[\\d,.]+) coins!",
     )
 
     /**
@@ -175,8 +175,7 @@ object DianaProfitTracker {
 
         if (griffinFeatherDropPattern.matches(message) ||
             treasureArrowPattern.matches(message)
-            )
-        {
+        ) {
             DianaApi.overrideDianaActive()
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tryHide(event)
