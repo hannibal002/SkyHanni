@@ -173,7 +173,7 @@ object ReplaceRomanNumerals {
      */
     private val taskListPattern by contextGroup.pattern(
         "task-list",
-        "\\d+ tasks?",
+        "^\\d+ tasks?$",
     )
 
     /**
@@ -195,7 +195,7 @@ object ReplaceRomanNumerals {
      */
     private val upgradeMenuPattern by contextGroup.pattern(
         "upgrade-menu",
-        ".+ Upgrades",
+        "^.+ Upgrades$",
     )
 
     /**
@@ -217,7 +217,7 @@ object ReplaceRomanNumerals {
      */
     private val collectionMenuPattern by contextGroup.pattern(
         "collection-menu",
-        ".+ Collection",
+        "^.+ Collection$",
     )
 
     /**
