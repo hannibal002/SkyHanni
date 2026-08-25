@@ -7,7 +7,11 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EnumUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.find
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.replace
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -26,8 +30,7 @@ object ReplaceRomanNumerals {
     private val inventoryGroup = patternGroup.group("inventory")
 
     // SkillType only holds skills with XP progression, Runecrafting and Social are not part of it
-    private val skillNames = EnumUtils.enumJoinToPattern<SkillType> { it.displayName } + "|Runecrafting|Social"
-
+    private val skillNames = "(?:" + EnumUtils.enumJoinToPattern<SkillType> { it.displayName } + "|Runecrafting|Social)"
 
     /**
      * REGEX-TEST: Catacombs Level XII
@@ -98,13 +101,13 @@ object ReplaceRomanNumerals {
         "\\bCollection (?<roman>[IVXLCDM]+)\\b",
     )
 
-
     /**
      * Anchored by the prefix and the colon, so the name in between may be any sequence of plain words.
      * REGEX-TEST: Progress to Vinesap V:
      * REGEX-TEST: Progress to Helix Log IX:
      * REGEX-TEST: Progress to Milestone CCC:
      * REGEX-FAIL: Progress: 81.9%
+     * REGEX-FAIL: Progress to Amount Consumed: 0%
      */
     private val progressPattern by inventoryGroup.pattern(
         "progress",
@@ -123,16 +126,18 @@ object ReplaceRomanNumerals {
      */
     private val skillNamePattern by inventoryGroup.pattern(
         "skill-name",
-        "\\b(?:$skillNames) (?<roman>[IVXLCDM]+)\\b",
+        "\\b$skillNames (?<roman>[IVXLCDM]+)\\b",
     )
 
     /**
      * REGEX-TEST: Heart of the Mountain X
      * REGEX-TEST: Reach Heart of the Mountain X in the
+     * REGEX-TEST: Heart of the Forest III
+     * REGEX-TEST: Reach Heart of the Forest III in
      */
-    private val heartOfTheMountainPattern by inventoryGroup.pattern(
-        "heart-of-the-mountain",
-        "\\bHeart of the Mountain (?<roman>[IVXLCDM]+)\\b",
+    private val heartOfThePattern by inventoryGroup.pattern(
+        "heart-of-the",
+        "\\bHeart of the \\w+ (?<roman>[IVXLCDM]+)\\b",
     )
 
     /**
@@ -148,6 +153,97 @@ object ReplaceRomanNumerals {
         "\\b(?<roman>[IVXLCDM]+) Rewards?:",
     )
 
+    private val contextGroup = inventoryGroup.group("context")
+
+    /**
+     * REGEX-TEST: 4 tasks
+     * REGEX-TEST: 11 tasks
+     */
+    private val taskListPattern by contextGroup.pattern(
+        "task-list",
+        "\\d+ tasks?",
+    )
+
+    /**
+     * REGEX-TEST: Feast Perk Shop.
+     * REGEX-TEST: Purchase perks from the Safari
+     * REGEX-TEST: Purchase Boss Luck I from the
+     * REGEX-TEST: Purchase Extra Farming Fortune II
+     */
+    private val perkShopPattern by contextGroup.pattern(
+        "perk-shop",
+        "Perk Shop|^Purchase ",
+    )
+
+    /**
+     * Matched against the inventory title, not against a lore line.
+     * REGEX-TEST: Plant Yield Upgrades
+     * REGEX-TEST: Growth Speed Upgrades
+     * REGEX-TEST: Plot Limit Upgrades
+     */
+    private val upgradeMenuPattern by contextGroup.pattern(
+        "upgrade-menu",
+        ".+ Upgrades",
+    )
+
+    /**
+     * The name wraps into the next line on long collections, so the prefix carries the match.
+     * REGEX-TEST: Total Collected: 210,194
+     * REGEX-TEST: View all your Gunpowder Collection
+     * REGEX-TEST: View all your Ruby Veilshroom
+     */
+    private val collectionItemPattern by contextGroup.pattern(
+        "collection-item",
+        "Total Collected:|View all your ",
+    )
+
+    /**
+     * Matched against the inventory title. The singular is what separates the detail menu of a
+     * single collection from the overview menus, which end in Collections.
+     * REGEX-TEST: Honeycomb Collection
+     * REGEX-FAIL: Foraging Collections
+     */
+    private val collectionMenuPattern by contextGroup.pattern(
+        "collection-menu",
+        ".+ Collection",
+    )
+
+    /**
+     * Only used inside a recognised context, where a bare name followed by a numeral is safe.
+     * REGEX-TEST: Leftovers II
+     * REGEX-TEST: Plant Yield V
+     * REGEX-TEST: Critter Catcher VII
+     * REGEX-TEST: Diana's Favor III
+     * WRAPPED-REGEX-TEST: "Leftovers II "
+     * REGEX-FAIL: 5 SkyBlock XP
+     * REGEX-FAIL: UNLOCKED
+     * REGEX-FAIL: You can't afford this upgrade!
+     */
+    private val namedTierPattern by contextGroup.pattern(
+        "named-tier",
+        "^(?:[\\w']+ )+(?<roman>[IVXLCDM]+)\\s*$",
+    )
+
+    /**
+     * REGEX-TEST: increase your Pumpkin tier!
+     * REGEX-TEST: to increase your Sunflower tier!
+     */
+    private val cropMilestonePattern by contextGroup.pattern(
+        "crop-milestone",
+        "increase your .+ tier!",
+    )
+
+    private enum class ToolTipContext(val titleOnly: Boolean) {
+        TASK_LIST(titleOnly = false),
+        PERK_SHOP(titleOnly = false),
+        UPGRADE_MENU(titleOnly = false),
+        CROP_MILESTONE(titleOnly = false),
+
+        // Co-op contribution lines carry player names, so only the display name is touched
+        COLLECTION(titleOnly = true),
+    }
+
+    // Rebuilt on repo reload, since that replaces the Pattern behind each delegate
     private var inventoryPatterns = buildInventoryPatterns()
 
     private fun buildInventoryPatterns() = listOf(
@@ -160,7 +256,7 @@ object ReplaceRomanNumerals {
         collectionPattern,
         progressPattern,
         skillNamePattern,
-        heartOfTheMountainPattern,
+        heartOfThePattern,
         rewardsPattern,
     )
 
@@ -182,10 +278,33 @@ object ReplaceRomanNumerals {
         if (!isEnabled()) return
 
         val toolTip = event.toolTip
+        val context = findContext(toolTip)
+        val titleOnly = context?.titleOnly ?: false
+        val contextPatterns = if (context != null) inventoryPatterns + namedTierPattern else inventoryPatterns
+
         for (index in toolTip.indices) {
-            val replaced = toolTip[index].replaceNumerals(inventoryPatterns) ?: continue
+            val patterns = if (titleOnly && index != 0) inventoryPatterns else contextPatterns
+            val replaced = toolTip[index].replaceNumerals(patterns) ?: continue
             toolTip[index] = replaced
         }
+    }
+
+    /**
+     * A context is a place where a bare name followed by a numeral is known to be a tier,
+     * so the numeral can be replaced without a keyword in front of it.
+     */
+    private fun findContext(toolTip: List<Component>): ToolTipContext? {
+        val inventoryName = InventoryUtils.openInventoryName()
+        if (upgradeMenuPattern.matches(inventoryName)) return ToolTipContext.UPGRADE_MENU
+        if (collectionMenuPattern.matches(inventoryName)) return ToolTipContext.COLLECTION
+
+        for (line in toolTip) {
+            if (taskListPattern.matches(line)) return ToolTipContext.TASK_LIST
+            if (perkShopPattern.find(line)) return ToolTipContext.PERK_SHOP
+            if (cropMilestonePattern.find(line)) return ToolTipContext.CROP_MILESTONE
+            if (collectionItemPattern.find(line)) return ToolTipContext.COLLECTION
+        }
+        return null
     }
 
     private fun Component.replaceNumerals(patterns: List<Pattern>): Component? {
@@ -212,23 +331,11 @@ object ReplaceRomanNumerals {
         return result.takeIf { it != text }
     }
 
-    private fun Pattern.replaceIn(text: String): String {
-        val matcher = matcher(text)
-        val builder = StringBuilder()
-        var lastEnd = 0
-        while (matcher.find()) {
-            val start = matcher.start("roman")
-            val end = matcher.end("roman")
-            val roman = text.substring(start, end)
-            // The pattern only locates the numeral, isRoman decides whether it is a valid one
-            if (!roman.isRoman()) continue
-            builder.append(text, lastEnd, start)
-            builder.append(roman.romanToDecimal())
-            lastEnd = end
-        }
-        if (lastEnd == 0) return text
-        builder.append(text, lastEnd, text.length)
-        return builder.toString()
+    private fun Pattern.replaceIn(text: String): String = replace(text) {
+        val roman = group("roman")
+        // The pattern only locates the numeral, isRoman decides whether it is a valid one
+        if (!roman.isRoman()) return@replace group()
+        text.substring(start(), start("roman")) + roman.romanToDecimal() + text.substring(end("roman"), end())
     }
 
     fun replaceLine(line: String): String {
