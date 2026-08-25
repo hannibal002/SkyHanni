@@ -103,8 +103,9 @@ object DianaApi {
     @HandleEvent(onlyOnIsland = HUB)
     private fun onItemAbilityActivate(event: ItemAbilityActivateEvent) {
         if (ritualActiveOverride != null) return
+        if (isRitualActive()) return
         if (event.ability == ItemAbility.ECHO) {
-            overrideActiveRitual()
+            ritualActiveOverride = true
         }
     }
 
