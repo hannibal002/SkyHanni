@@ -94,7 +94,7 @@ object DianaApi {
     @HandleEvent(onlyOnIsland = HUB)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (ritualNotActivePattern.matches(event.cleanMessage)) {
-            overrideActiveRitual(false)
+            overrideActiveRitual(active = false)
         }
     }
 
