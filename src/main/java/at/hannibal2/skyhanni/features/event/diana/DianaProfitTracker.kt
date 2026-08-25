@@ -136,7 +136,7 @@ object DianaProfitTracker {
 
     @HandleEvent
     private fun onItemAdd(event: ItemAddEvent) {
-        if (!(DianaApi.isDoingDiana())) return
+        if (!(DianaApi.isDoingDiana(strict = true))) return
         val isCommand = event.source == ItemAddManager.Source.COMMAND
         if (isCommand && !config.enabled) return
 
@@ -192,7 +192,7 @@ object DianaProfitTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand()) },
+            condition = { config.enabled && (DianaApi.isDoingDiana(strict = true) || DianaApi.hasSpadeInHand()) },
             onRender = {
                 if (DianaApi.hasSpadeInHand()) tracker.firstUpdate()
                 tracker.renderDisplay(config.position)
