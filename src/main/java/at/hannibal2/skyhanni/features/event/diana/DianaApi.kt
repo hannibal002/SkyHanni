@@ -38,7 +38,6 @@ object DianaApi {
 
     fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
 
-    // This is an OR rather than an AND due to mayor perk being unreliable sometimes
     fun isDoingDiana() = IslandType.HUB.isInIsland() && isRitualActive() && hasSpadeInHotbar()
 
     val SafeItemStack.isDianaSpade get() = getInternalName() in spades
