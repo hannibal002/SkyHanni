@@ -34,12 +34,12 @@ object InventoryUtils {
 
     var itemInHandId = NeuInternalName.NONE
 
-    val innerInventorySlots = setOf(
+    val innerInventorySlots: Set<Int> = listOf(
         10..16,
         19..25,
         28..34,
         37..43,
-    ).flatten()
+    ).flatten().toSet()
 
     fun NeuInternalName.recentlyHeld(): Boolean = this in recentItemsInHand
 
