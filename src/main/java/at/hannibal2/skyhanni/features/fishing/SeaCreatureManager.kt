@@ -12,9 +12,12 @@ import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SpecificSeaCreat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.MutableComponent
 
 @SkyHanniModule
 object SeaCreatureManager {
@@ -85,17 +88,23 @@ object SeaCreatureManager {
             var edited = original
 
             if (config.shortenFishingMessage) {
-                val name = it.displayName
-                val aOrAn = StringUtils.optionalAn(name.removeColor())
-                edited = "§9You caught $aOrAn $name§9!".asComponent()
+                val name = it.componentDisplayName
+                val aOrAn = StringUtils.optionalAn(it.name)
+                edited = componentBuilder {
+                    appendWithColor("You caught $aOrAn", ChatFormatting.BLUE)
+                    append(name)
+                    appendWithColor("!", ChatFormatting.BLUE)
+                } as MutableComponent
             }
 
             if (config.compactDoubleHook && doubleHook) {
+                val doubleHookComponent = "DOUBLE HOOK!".asComponent().withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)
                 edited = when (config.compactDoubleHookPosition) {
                     CompactDoubleHookPosition.LEFT ->
-                        "§e§lDOUBLE HOOK! ".asComponent().append(edited)
+                        doubleHookComponent.append(" ").withStyle(ChatFormatting.RESET).append(edited)
+
                     CompactDoubleHookPosition.RIGHT ->
-                        edited.append(" §e§lDOUBLE HOOK!".asComponent())
+                        edited.append(doubleHookComponent)
                 }
             }
 
