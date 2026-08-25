@@ -39,11 +39,9 @@ object DianaApi {
     fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
 
     fun isDoingDiana(strict: Boolean = false): Boolean {
-        return IslandType.HUB.isInIsland() && if (strict) {
-            isRitualActive() && hasSpadeInHotbar()
-        } else {
-            isRitualActive() || hasSpadeInHotbar()
-        }
+        if (!IslandType.HUB.isInIsland()) return false
+        if (strict && !isRitualActive()) return false
+        return hasSpadeInHotbar()
     }
 
     val SafeItemStack.isDianaSpade get() = getInternalName() in spades
