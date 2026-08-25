@@ -26,12 +26,12 @@ object DianaApi {
 
     private var spades = emptySet<NeuInternalName>()
 
-    private var dianaFoundOverride: Boolean? = null
+    private var ritualActiveOverride: Boolean? = null
 
     fun hasSpadeInHand() = InventoryUtils.itemInHandId in spades
 
     fun isRitualActive(): Boolean {
-        dianaFoundOverride?.let { return it }
+        ritualActiveOverride?.let { return it }
         return (Perk.MYTHOLOGICAL_RITUAL.isActive || Perk.PERKPOCALYPSE.isActive) ||
             SkyHanniMod.feature.dev.debug.assumeMayor.get() == ElectionCandidate.DIANA
     }
@@ -82,7 +82,7 @@ object DianaApi {
         val entity = event.entity
         // TODO: fetch rare mobs from repo instead
         if (rareDianaMobNamePattern.matches(entity.name.string.trim())) {
-            dianaFoundOverride = true
+            ritualActiveOverride = true
             RareDianaMobFoundEvent(entity).post()
         }
     }
@@ -90,7 +90,7 @@ object DianaApi {
     @HandleEvent(onlyOnIsland = HUB)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (ritualNotActivePattern.matches(event.cleanMessage) && isRitualActive()) {
-            dianaFoundOverride = false
+            ritualActiveOverride = false
         }
     }
 
@@ -103,9 +103,9 @@ object DianaApi {
         spades = dianaJson.spadeTypes.toSet()
     }
 
-    fun overrideDianaActive() {
+    fun overrideActiveRitual() {
         if (!isRitualActive()) {
-            dianaFoundOverride = true
+            ritualActiveOverride = true
         }
     }
 }

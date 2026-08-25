@@ -156,7 +156,7 @@ object DianaProfitTracker {
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.cleanMessage
         if (chatDugOutPattern.matches(message)) {
-            DianaApi.overrideDianaActive()
+            DianaApi.overrideActiveRitual()
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tracker.modify {
                 it.burrowsDug++
@@ -164,7 +164,7 @@ object DianaProfitTracker {
             tryHide(event)
         }
         chatDugOutCoinsPattern.matchMatcher(message) {
-            DianaApi.overrideDianaActive()
+            DianaApi.overrideActiveRitual()
             if (!isAvariceConsuming()) {
                 BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
                 tryAddItem(NeuInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
@@ -176,7 +176,7 @@ object DianaProfitTracker {
         if (griffinFeatherDropPattern.matches(message) ||
             treasureArrowPattern.matches(message)
         ) {
-            DianaApi.overrideDianaActive()
+            DianaApi.overrideActiveRitual()
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tryHide(event)
         }
