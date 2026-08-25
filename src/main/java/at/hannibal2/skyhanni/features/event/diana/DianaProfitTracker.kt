@@ -65,7 +65,7 @@ object DianaProfitTracker {
      */
     private val griffinFeatherDropPattern by patternGroup.pattern(
         "griffin.feather.drop",
-        "RARE DROP! You dug out a §r§9Griffin Feather!",
+        "RARE DROP! You dug out a Griffin Feather!",
     )
 
     /**
