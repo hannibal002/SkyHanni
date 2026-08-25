@@ -88,11 +88,6 @@ object DianaApi {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    private fun onWorldChange() {
-        dianaFoundOverride = null
-    }
-
     @HandleEvent(onlyOnIsland = HUB)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (ritualNotActivePattern.matches(event.message)) {
