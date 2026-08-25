@@ -68,9 +68,9 @@ object SeaCreatureManager {
             return
         }
 
-        val seaCreature = getSeaCreatureFromMessage(message) ?: run {
-            return
-        }
+        // Does not reset lastDoubleHookTime on fail due to intercepting messages like:
+        // Auto pet rule, thunder bottle, reindrake empty line + global message
+        val seaCreature = getSeaCreatureFromMessage(message) ?: return
 
         val isDoubleHook = isDoubleHookRecently(lastDoubleHookTime)
 
