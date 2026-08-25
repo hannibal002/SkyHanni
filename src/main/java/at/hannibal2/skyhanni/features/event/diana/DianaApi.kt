@@ -32,7 +32,7 @@ object DianaApi {
 
     fun isRitualActive(): Boolean {
         dianaFoundOverride?.let { return it }
-        (Perk.MYTHOLOGICAL_RITUAL.isActive || Perk.PERKPOCALYPSE.isActive) ||
+        return (Perk.MYTHOLOGICAL_RITUAL.isActive || Perk.PERKPOCALYPSE.isActive) ||
             SkyHanniMod.feature.dev.debug.assumeMayor.get() == ElectionCandidate.DIANA
     }
 
@@ -78,7 +78,7 @@ object DianaApi {
         "The mythological ritual isn't active",
     )
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = HUB)
+    @HandleEvent(onlyOnIsland = HUB)
     private fun onJoinWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         val entity = event.entity
         // TODO: fetch rare mobs from repo instead
@@ -93,7 +93,7 @@ object DianaApi {
         dianaFoundOverride = null
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = HUB)
+    @HandleEvent(onlyOnIsland = HUB)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (ritualNotActivePattern.matches(event.message)) {
             dianaFoundOverride = false

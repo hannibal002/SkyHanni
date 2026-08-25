@@ -152,7 +152,7 @@ object DianaProfitTracker {
         tracker.addItem(internalName, amount, command)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = HUB)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.cleanMessage
         if (chatDugOutPattern.matches(message)) {
