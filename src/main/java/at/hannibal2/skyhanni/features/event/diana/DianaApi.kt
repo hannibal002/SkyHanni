@@ -8,10 +8,12 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MythologicalCreatureType
+import at.hannibal2.skyhanni.events.ItemAbilityActivateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.RareDianaMobFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -95,6 +97,14 @@ object DianaApi {
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (ritualNotActivePattern.matches(event.cleanMessage)) {
             overrideActiveRitual(active = false)
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = HUB)
+    private fun onItemAbilityActivate(event: ItemAbilityActivateEvent) {
+        if (ritualActiveOverride != null) return
+        if (event.ability == ItemAbility.ECHO) {
+            overrideActiveRitual()
         }
     }
 
