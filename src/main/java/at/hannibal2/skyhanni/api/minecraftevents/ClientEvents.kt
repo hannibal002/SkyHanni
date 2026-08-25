@@ -59,14 +59,11 @@ object ClientEvents {
             WorldChangeEvent.post()
         }
 
-        //~ if < 26.2 'COLLECT_SUBMITS' -> 'AFTER_TRANSLUCENT_TERRAIN'
         LevelRenderEvents.COLLECT_SUBMITS.register { ctx ->
             SkyHanniRenderWorldEvent(
                 ctx.poseStack(),
                 ctx.levelState().cameraRenderState,
                 ctx.submitNodeCollector(),
-                //? if < 26.2
-                //ctx.bufferSource(),
                 Minecraft.getInstance().deltaTracker.getGameTimeDeltaPartialTick(true),
             ).post()
         }

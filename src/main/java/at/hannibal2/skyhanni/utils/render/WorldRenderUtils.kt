@@ -31,6 +31,7 @@ import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
+import net.minecraft.util.FormattedCharSequence
 import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
@@ -41,18 +42,10 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-//? if >= 26.2 {
-import net.minecraft.util.FormattedCharSequence
-//?} else {
-/*import net.minecraft.client.renderer.MultiBufferSource
-import org.joml.Matrix4f
-*///?}
-
 @Suppress("LargeClass")
 object WorldRenderUtils {
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
-    //? if >= 26.2 {
     private fun SkyHanniRenderWorldEvent.submitOrderedText(
         x: Float,
         y: Float,
@@ -64,7 +57,7 @@ object WorldRenderUtils {
         backgroundColor: Int,
         outlineColor: Int,
     ) {
-        // The order ensures see-through text renders over our custom geometry, like on 26.1.
+        // The order ensures see-through text renders over our custom geometry.
         submitNodeCollector.order(1).submitText(
             matrices,
             x,
@@ -78,18 +71,18 @@ object WorldRenderUtils {
             outlineColor,
         )
     }
-    //?}
 
     inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
         layer: RenderType,
         crossinline render: (VertexConsumer) -> Unit,
-    ) {
-        //? if >= 26.2 {
-        submitNodeCollector.submitCustomGeometry(matrices, layer) { _, buffer -> render(buffer) }
-        //?} else {
-        /*render(bufferSource.getBuffer(layer))
-        *///?}
-    }
+    ) = submitCustomGeometry(layer) { _, buf -> render(buf) }
+
+    // The render callback runs deferred, after the current pose is popped again.
+    // Anything needing the submit-time pose must use the callback's pose copy.
+    inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
+        layer: RenderType,
+        crossinline render: (PoseStack.Pose, VertexConsumer) -> Unit,
+    ) = submitNodeCollector.submitCustomGeometry(matrices, layer) { pose, buf -> render(pose, buf) }
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
@@ -296,7 +289,6 @@ object WorldRenderUtils {
         val adjustedScale = (scale * 0.05).toFloat()
         val x = -fr.width(text) / 2f
 
-        //? if >= 26.2 {
         matrices.pushPose()
         matrices.translate(
             (location.x - cameraPos.x()).toFloat(),
@@ -318,29 +310,6 @@ object WorldRenderUtils {
             0,
         )
         matrices.popPose()
-        //?} else {
-        /*val matrix = Matrix4f()
-        matrix.translate(
-            (location.x - cameraPos.x()).toFloat(),
-            (location.y - cameraPos.y()).toFloat(),
-            (location.z - cameraPos.z()).toFloat(),
-        ).rotate(camera.rotation())
-            .translate(0f, -yOffset * adjustedScale, 0f)
-            .scale(adjustedScale, -adjustedScale, adjustedScale)
-
-        fr.drawInBatch(
-            text,
-            x,
-            0f,
-            color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-            shadow,
-            matrix,
-            bufferSource,
-            if (seeThroughBlocks) SEE_THROUGH else POLYGON_OFFSET,
-            backgroundColor,
-            FULL_BRIGHT,
-        )
-        *///?}
     }
 
     fun SkyHanniRenderWorldEvent.drawCircleWireframe(entity: Entity, rad: Double, color: Color) {
