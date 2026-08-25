@@ -59,13 +59,11 @@ object SeaCreatureManager {
         if (isInterceptingMessage(message)) return
 
         getSeaCreatureFromMessage(message)?.let {
-            val wasDoubleHook = doubleHook
-            doubleHook = false
-
-            SeaCreatureFishEvent(it, wasDoubleHook).post()
+            SeaCreatureFishEvent(it, doubleHook).post()
 
             if (config.seaCreatureTracker.hideChat) {
                 event.blockedReason = "sea_creature_tracker"
+                doubleHook = false
             }
             return
         }
@@ -84,33 +82,35 @@ object SeaCreatureManager {
 
         if (isInterceptingMessage(message)) return
 
-        getSeaCreatureFromMessage(message)?.let {
-            val wasDoubleHook = doubleHook
+        val seaCreature = getSeaCreatureFromMessage(message) ?: run {
             doubleHook = false
-
-            val original = event.chatComponent.copy()
-            var edited = original
-
-            if (config.shortenFishingMessage) {
-                val name = it.displayName
-                val aOrAn = StringUtils.optionalAn(name.removeColor())
-                edited = "§9You caught $aOrAn $name§9!".asComponent()
-            }
-
-            if (config.compactDoubleHook && wasDoubleHook) {
-                edited = when (config.compactDoubleHookPosition) {
-                    CompactDoubleHookPosition.LEFT ->
-                        "§e§lDOUBLE HOOK! ".asComponent().append(edited)
-                    CompactDoubleHookPosition.RIGHT ->
-                        edited.append(" §e§lDOUBLE HOOK!".asComponent())
-                }
-            }
-
-            if (original == edited) return
-            event.replaceComponent(edited, "sea_creature")
+            return
         }
 
+        val wasDoubleHook = doubleHook
         doubleHook = false
+
+        val original = event.chatComponent.copy()
+        var edited = original
+
+        if (config.shortenFishingMessage) {
+            val name = seaCreature.displayName
+            val aOrAn = StringUtils.optionalAn(name.removeColor())
+            edited = "§9You caught $aOrAn $name§9!".asComponent()
+        }
+
+        if (config.compactDoubleHook && wasDoubleHook) {
+            edited = when (config.compactDoubleHookPosition) {
+                CompactDoubleHookPosition.LEFT ->
+                    "§e§lDOUBLE HOOK! ".asComponent().append(edited)
+
+                CompactDoubleHookPosition.RIGHT ->
+                    edited.append(" §e§lDOUBLE HOOK!".asComponent())
+            }
+        }
+
+        if (original == edited) return
+        event.replaceComponent(edited, "sea_creature")
     }
 
     /**
