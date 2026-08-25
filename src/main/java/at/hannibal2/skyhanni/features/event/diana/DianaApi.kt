@@ -69,6 +69,7 @@ object DianaApi {
         "(?:Minos Inquisitor|Sphinx|King Minos|Manticore)\\s*",
     )
 
+    // TODO: Get the real chat message
     /**
      * REGEX-TSET: The mythological ritual isn't active
      */
