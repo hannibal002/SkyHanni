@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.pet.PetStorageApi
-import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SeaCreatureJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -11,15 +9,16 @@ import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SpecificSeaCreatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object SeaCreatureManager {
-
-    private var doubleHook = false
+    private var lastDoubleHookTime = SimpleTimeMark.farPast()
 
     private val seaCreatureMap = mutableMapOf<String, SeaCreature>()
     var allFishingMobs = mapOf<String, SeaCreature>()
@@ -36,14 +35,6 @@ object SeaCreatureManager {
         "It's a Double Hook!(?: Woot woot!)?",
     )
 
-    /**
-     * REGEX-TEST: > Your bottle of thunder has fully charged!
-     */
-    private val thunderBottleChargedPattern by patternGroup.pattern(
-        "thundercharged.colorless",
-        "> Your bottle of thunder has fully charged!",
-    )
-
     private val config get() = SkyHanniMod.feature.fishing
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -53,21 +44,19 @@ object SeaCreatureManager {
             if (config.compactDoubleHook) {
                 event.blockedReason = "double_hook"
             }
-            doubleHook = true
+            lastDoubleHookTime = SimpleTimeMark.now()
             return
         }
-        if (isInterceptingMessage(message)) return
+        val isDoubleHook = isDoubleHookRecently(lastDoubleHookTime)
 
         getSeaCreatureFromMessage(message)?.let {
-            SeaCreatureFishEvent(it, doubleHook).post()
+            SeaCreatureFishEvent(it, isDoubleHook).post()
+
             if (config.seaCreatureTracker.hideChat) {
                 event.blockedReason = "sea_creature_tracker"
-                doubleHook = false
             }
             return
         }
-
-        doubleHook = false
     }
 
     // if you can do it better make a pr
@@ -75,19 +64,15 @@ object SeaCreatureManager {
     private fun onChat(event: SkyHanniChatEvent.Modify) {
         val message = event.cleanMessage
         if (doubleHookPattern.matches(message)) {
-            doubleHook = true
+            lastDoubleHookTime = SimpleTimeMark.now()
             return
         }
-
-        if (isInterceptingMessage(message)) return
 
         val seaCreature = getSeaCreatureFromMessage(message) ?: run {
-            doubleHook = false
             return
         }
 
-        val wasDoubleHook = doubleHook
-        doubleHook = false
+        val isDoubleHook = isDoubleHookRecently(lastDoubleHookTime)
 
         val original = event.chatComponent.copy()
         var edited = original
@@ -98,29 +83,20 @@ object SeaCreatureManager {
             edited = "§9You caught $aOrAn $name§9!".asComponent()
         }
 
-        if (config.compactDoubleHook && wasDoubleHook) {
+        if (config.compactDoubleHook && isDoubleHook) {
             edited = when (config.compactDoubleHookPosition) {
                 CompactDoubleHookPosition.LEFT ->
                     "§e§lDOUBLE HOOK! ".asComponent().append(edited)
+
                 CompactDoubleHookPosition.RIGHT ->
                     edited.append(" §e§lDOUBLE HOOK!".asComponent())
             }
         }
 
+        lastDoubleHookTime = SimpleTimeMark.farPast()
         if (original == edited) return
         event.replaceComponent(edited, "sea_creature")
     }
-
-    /**
-     * Autopet can be triggered via Sinkers as rod parts (Sponge, Prismarine, Icy) to trigger collection gain which goes between Double Hook! and the Catch message.
-     * The Thunder sea Creature gives charge when hooked, which can cause thunder bottles to charge and send the full charge message between Double Hook! and Catch message.
-     * Reindrakes send an empty line, the global message & another empty line between Double Hook! and Catch message.
-     */
-    private fun isInterceptingMessage(message: String): Boolean =
-        WinterApi.isReindrakeSpawnMessage(message) ||
-            message.isEmpty() ||
-            PetStorageApi.isAutopetMessage(message) ||
-            thunderBottleChargedPattern.matches(message)
 
     @HandleEvent
     private fun onRepoReload(event: RepositoryReloadEvent) {
@@ -159,6 +135,9 @@ object SeaCreatureManager {
         allVariants = variants
         SpecificSeaCreatures.saveSeaCreatures(SpecificSeaCreatures.updateList())
     }
+
+    private fun isDoubleHookRecently(lastDoubleHookTime: SimpleTimeMark): Boolean =
+        lastDoubleHookTime.passedSince().inWholeTicks <= 2
 
     private fun getSeaCreatureFromMessage(message: String): SeaCreature? {
         return seaCreatureMap.getOrDefault(message, null)
