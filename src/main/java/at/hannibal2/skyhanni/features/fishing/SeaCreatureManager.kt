@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object SeaCreatureManager {
@@ -37,6 +37,7 @@ object SeaCreatureManager {
 
     private val config get() = SkyHanniMod.feature.fishing
 
+    // Does not reset lastDoubleHookTime at the end due to intercepting messages
     @HandleEvent(onlyOnSkyblock = true)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.cleanMessage
@@ -48,7 +49,7 @@ object SeaCreatureManager {
             return
         }
         getSeaCreatureFromMessage(message)?.let {
-            val isDoubleHook = isDoubleHookRecently(lastDoubleHookTime)
+            val isDoubleHook = wasDoubleHookRecently()
             SeaCreatureFishEvent(it, isDoubleHook).post()
 
             if (config.seaCreatureTracker.hideChat) {
@@ -57,8 +58,6 @@ object SeaCreatureManager {
             }
             return
         }
-
-        // Does not reset lastDoubleHookTime on fail due to intercepting messages
     }
 
     // if you can do it better make a pr
@@ -74,7 +73,7 @@ object SeaCreatureManager {
         // Auto pet rule, thunder bottle, reindrake empty line + global message
         val seaCreature = getSeaCreatureFromMessage(message) ?: return
 
-        val isDoubleHook = isDoubleHookRecently(lastDoubleHookTime)
+        val isDoubleHook = wasDoubleHookRecently()
 
         val original = event.chatComponent.copy()
         var edited = original
@@ -136,8 +135,8 @@ object SeaCreatureManager {
         SpecificSeaCreatures.saveSeaCreatures(SpecificSeaCreatures.updateList())
     }
 
-    private fun isDoubleHookRecently(lastDoubleHookTime: SimpleTimeMark): Boolean =
-        lastDoubleHookTime.passedSince().inWholeTicks <= 1
+    private fun wasDoubleHookRecently(): Boolean =
+        lastDoubleHookTime.passedSince() <= 100.milliseconds
 
     private fun getSeaCreatureFromMessage(message: String): SeaCreature? {
         return seaCreatureMap.getOrDefault(message, null)
