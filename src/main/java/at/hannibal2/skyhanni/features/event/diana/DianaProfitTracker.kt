@@ -135,7 +135,7 @@ object DianaProfitTracker {
     }
 
     @HandleEvent
-    fun onItemAdd(event: ItemAddEvent) {
+    private fun onItemAdd(event: ItemAddEvent) {
         if (!(DianaApi.isDoingDiana())) return
         val isCommand = event.source == ItemAddManager.Source.COMMAND
         if (isCommand && !config.enabled) return
@@ -153,7 +153,7 @@ object DianaProfitTracker {
     }
 
     @HandleEvent(onlyOnIsland = HUB)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.cleanMessage
         if (chatDugOutPattern.matches(message)) {
             DianaApi.overrideDianaActive()
@@ -204,12 +204,12 @@ object DianaProfitTracker {
     private fun isAllowedItem(internalName: NeuInternalName): Boolean = internalName in allowedDrops
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         allowedDrops = event.getConstant<DianaDropsJson>("DianaDrops").dianaDrops
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetdianaprofittracker") {
             description = "Resets the Diana Profit Tracker"
             category = CommandCategory.USERS_RESET
@@ -226,7 +226,7 @@ object DianaProfitTracker {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         migrationMapping.forEach { (old, new) ->
             event.move(70, "#profile.diana.$old", "#profile.diana.$new")
         }
