@@ -214,7 +214,7 @@ object CrownOfAvariceCounter {
     }
 
 
-    private fun isEnabled() = config.enable && DianaApi.isDoingDiana()
+    private fun isEnabled() = config.enable && DianaApi.isRitualActive()
 
     private fun reset() {
         coinsEarned = 0L

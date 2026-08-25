@@ -42,13 +42,38 @@ object DianaProfitTracker {
     private var allowedDrops = listOf<NeuInternalName>()
 
     private val patternGroup = RepoPattern.group("diana.chat")
+
+    /**
+     * REGEX-TEST: You dug out a Griffin Burrow!
+     * REGEX-TEST: You finished the Griffin burrow chain! (4/4)
+     */
     private val chatDugOutPattern by patternGroup.pattern(
         "burrow.dug",
-        "(?:§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*",
+        "(?:You dug out a Griffin Burrow!|You finished the Griffin burrow chain!) .*",
     )
+
+    /**
+     * REGEX-TEST: Wow! You dug out 1,000 coins!
+     */
     private val chatDugOutCoinsPattern by patternGroup.pattern(
         "coins",
-        "§6§lWow! §r§eYou dug out §r§6(?<coins>.*) coins§r§e!",
+        "Wow! You dug out (?<coins>[\\d+,]) coins!",
+    )
+
+    /**
+     * REGEX-TEST: RARE DROP! You dug out a Griffin Feather!
+     */
+    private val griffinFeatherDropPattern by patternGroup.pattern(
+        "griffin.feather.drop",
+        "RARE DROP! You dug out a §r§9Griffin Feather!",
+    )
+
+    /**
+     * REGEX-TEST: Follow the arrows to find the treasure!
+     */
+    private val treasureArrowPattern by patternGroup.pattern(
+        "treasure.arrow",
+        "Follow the arrows to find the treasure!",
     )
 
     private val tracker = SkyHanniItemTracker(
@@ -129,25 +154,30 @@ object DianaProfitTracker {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        val message = event.message
+        val message = event.cleanMessage
         if (chatDugOutPattern.matches(message)) {
+            DianaApi.overrideDianaActive()
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tracker.modify {
                 it.burrowsDug++
             }
             tryHide(event)
         }
-        if (!isAvariceConsuming()) {
-            chatDugOutCoinsPattern.matchMatcher(message) {
+        chatDugOutCoinsPattern.matchMatcher(message) {
+            DianaApi.overrideDianaActive()
+            if (!isAvariceConsuming()) {
                 BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
                 tryAddItem(NeuInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
                 tryHide(event)
             }
         }
 
-        if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" ||
-            message == "§eFollow the arrows to find the §r§6treasure§r§e!"
-        ) {
+
+        if (griffinFeatherDropPattern.matches(message) ||
+            treasureArrowPattern.matches(message)
+            )
+        {
+            DianaApi.overrideDianaActive()
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tryHide(event)
         }
