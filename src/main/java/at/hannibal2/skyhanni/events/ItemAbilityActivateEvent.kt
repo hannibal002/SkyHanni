@@ -10,4 +10,4 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
  * @param ability the activated item ability
  */
 @PrimaryFunction("onItemAbilityActivate")
-class ItemAbilityActivateEvent(val ability: ItemAbility): SkyHanniEvent()
+class ItemAbilityActivateEvent(val ability: ItemAbility) : SkyHanniEvent()
