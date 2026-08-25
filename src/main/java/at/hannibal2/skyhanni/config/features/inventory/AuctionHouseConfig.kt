@@ -18,6 +18,11 @@ class AuctionHouseConfig {
     val auctionsPriceComparison: AuctionHousePriceComparisonConfig = AuctionHousePriceComparisonConfig()
 
     @Expose
+    @ConfigOption(name = "Skeleton Master Chestplate Highlight", desc = "")
+    @Accordion
+    val skeletonMasterChestplateHighlight: SkeletonMasterChestplateHighlightConfig = SkeletonMasterChestplateHighlightConfig()
+
+    @Expose
     @ConfigOption(
         name = "Highlight Auctions",
         desc = "Highlight own items that are sold and expired."
