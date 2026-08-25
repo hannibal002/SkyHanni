@@ -33,6 +33,14 @@ import kotlin.time.Duration.Companion.seconds
 object InventoryUtils {
 
     var itemInHandId = NeuInternalName.NONE
+
+    val innerInventorySlots = setOf(
+        10..16,
+        19..25,
+        28..34,
+        37..43,
+    ).flatten()
+
     fun NeuInternalName.recentlyHeld(): Boolean = this in recentItemsInHand
 
     val recentItemsInHand = TimeLimitedSet<NeuInternalName>(30.seconds)
@@ -217,14 +225,7 @@ object InventoryUtils {
         return InventoryCompat.containerSlots(this)
     }
 
-    val innerInventorySlots = listOf(
-        10..16,
-        19..25,
-        28..34,
-        37..43,
-    ).flatten()
-
-    fun Map<Int, SafeItemStack>.filterInnerSlots(): Map<Int, SafeItemStack> {
+    fun <T> Map<Int, T>.filterInnerSlots(): Map<Int, T> {
         return this.filter { it.key in innerInventorySlots }
     }
 }
