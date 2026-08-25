@@ -60,7 +60,6 @@ object SeaCreatureManager {
 
         getSeaCreatureFromMessage(message)?.let {
             SeaCreatureFishEvent(it, doubleHook).post()
-
             if (config.seaCreatureTracker.hideChat) {
                 event.blockedReason = "sea_creature_tracker"
                 doubleHook = false
@@ -103,7 +102,6 @@ object SeaCreatureManager {
             edited = when (config.compactDoubleHookPosition) {
                 CompactDoubleHookPosition.LEFT ->
                     "§e§lDOUBLE HOOK! ".asComponent().append(edited)
-
                 CompactDoubleHookPosition.RIGHT ->
                     edited.append(" §e§lDOUBLE HOOK!".asComponent())
             }
