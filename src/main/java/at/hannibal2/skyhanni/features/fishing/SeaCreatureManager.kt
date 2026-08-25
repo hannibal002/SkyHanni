@@ -57,6 +57,8 @@ object SeaCreatureManager {
             }
             return
         }
+
+        // Does not reset lastDoubleHookTime on fail due to intercepting messages
     }
 
     // if you can do it better make a pr
@@ -102,7 +104,6 @@ object SeaCreatureManager {
     private fun onRepoReload(event: RepositoryReloadEvent) {
         seaCreatureMap.clear()
         allFishingMobs = emptyMap()
-        var counter = 0
 
         val data = event.getConstant<Map<String, SeaCreatureJson>>("SeaCreatures")
         val allFishingMobs = mutableMapOf<String, SeaCreature>()
@@ -128,7 +129,6 @@ object SeaCreatureManager {
                 }
                 allFishingMobs[name] = creature
                 variantFishes.add(name)
-                counter++
             }
         }
         SeaCreatureManager.allFishingMobs = allFishingMobs
