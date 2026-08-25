@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
@@ -22,6 +24,10 @@ object ReplaceRomanNumerals {
 
     private val patternGroup = RepoPattern.group("romannumerals")
     private val inventoryGroup = patternGroup.group("inventory")
+
+    // SkillType only holds skills with XP progression, Runecrafting and Social are not part of it
+    private val skillNames = EnumUtils.enumJoinToPattern<SkillType> { it.displayName } + "|Runecrafting|Social"
+
 
     /**
      * REGEX-TEST: Catacombs Level XII
@@ -92,6 +98,7 @@ object ReplaceRomanNumerals {
         "\\bCollection (?<roman>[IVXLCDM]+)\\b",
     )
 
+
     /**
      * Anchored by the prefix and the colon, so the name in between may be any sequence of plain words.
      * REGEX-TEST: Progress to Vinesap V:
@@ -102,6 +109,43 @@ object ReplaceRomanNumerals {
     private val progressPattern by inventoryGroup.pattern(
         "progress",
         "\\bProgress to (?:\\w+ )+(?<roman>[IVXLCDM]+):",
+    )
+
+    /**
+     * REGEX-TEST: Fishing L
+     * REGEX-TEST: Enchanting LX
+     * REGEX-TEST: Hunting XIX
+     * REGEX-TEST: Runecrafting XXV
+     * REGEX-TEST: Social XVII
+     * REGEX-FAIL: Farming Skill XXIV
+     * REGEX-FAIL: Hunting Level XX
+     * REGEX-FAIL: Combat Collections
+     */
+    private val skillNamePattern by inventoryGroup.pattern(
+        "skill-name",
+        "\\b(?:$skillNames) (?<roman>[IVXLCDM]+)\\b",
+    )
+
+    /**
+     * REGEX-TEST: Heart of the Mountain X
+     * REGEX-TEST: Reach Heart of the Mountain X in the
+     */
+    private val heartOfTheMountainPattern by inventoryGroup.pattern(
+        "heart-of-the-mountain",
+        "\\bHeart of the Mountain (?<roman>[IVXLCDM]+)\\b",
+    )
+
+    /**
+     * Anchored by the suffix, the numeral belongs to whatever is named before it.
+     * Singular and plural both occur, depending on how many rewards the level grants.
+     * REGEX-TEST: Helix Log IX Rewards:
+     * REGEX-TEST: Vinesap V Rewards:
+     * REGEX-TEST: Level XVIII Reward:
+     * REGEX-FAIL: Rewards:
+     */
+    private val rewardsPattern by inventoryGroup.pattern(
+        "rewards",
+        "\\b(?<roman>[IVXLCDM]+) Rewards?:",
     )
 
     private var inventoryPatterns = buildInventoryPatterns()
@@ -115,6 +159,9 @@ object ReplaceRomanNumerals {
         floorPattern,
         collectionPattern,
         progressPattern,
+        skillNamePattern,
+        heartOfTheMountainPattern,
+        rewardsPattern,
     )
 
     // Using toRegex here since toPattern doesn't seem to provide the necessary functionality
