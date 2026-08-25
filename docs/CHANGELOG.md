@@ -7,6 +7,7 @@
 #### Dungeon
 
 + Added Blood Move Message for Dungeon Blood Camp. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/5276)
++ Added Dungeon Item Quality as Stack Size to Item Numbers. - RiskWondering (https://github.com/hannibal002/SkyHanni/pull/6223)
 
 #### Item Abilities
 
@@ -263,6 +264,9 @@
 + Added support for more currencies in the NPC Trade Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6367)
     + Now supports Copper, Sowdust, Gems, Pelts, Pests, Medals, Motes, Kuudra Tokens and Essence.
 + Improved NPC trade cost lines to show a question mark instead of the owned number when SkyHanni does not track that currency. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6401)
++ Improved Estimated Item Value to only show up after hovering over the same slot for half a second. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6451)
+    + Only for the first item after opening an inventory.
+    + The delay can be changed or disabled in the config.
 
 #### Fishing
 
@@ -340,6 +344,7 @@
 + Marked Custom Scoreboard as deprecated. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6177)
     + The built-in version is no longer maintained and will be removed in favor of the standalone mod.
 + Improved default settings for Garden features when using SkyHanni for the first time. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6357)
++ Added /shnavigateall undo to go back to the previous location. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6320)
 
 ### Fixes
 
@@ -431,6 +436,7 @@
 + Fixed the Spray Display always showing 30 minutes for upgraded Sprayonators. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6389)
     + The Juicy Sprayonator lasts 45 minutes, the Salty Sprayonator 60 minutes.
 + Fixed some Elite leaderboard requests still being sent with leaderboards disabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/6372)
++ Fixed the Custom Pest Cooldown option always showing the Pest Cooldown as ready. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6428)
 
 #### Combat
 
@@ -528,6 +534,7 @@
 + Fixed the Century Raffle Task Highlighter for the Year 500 raffle event. - Alex (https://github.com/hannibal002/SkyHanni/pull/5925)
 + Fixed Hoppity's Hunt event stats being shown in chat on login for events where the player did not participate. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6210)
 + Fixed an error when hovering over the Traveling Zoo event in the Calendar. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6255)
++ Fixed an error message when opening the Lukas the Aquarist menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6454)
 
 #### Fishing
 
@@ -554,6 +561,8 @@
 + Fixed Fishing Profit Trackers not detecting shards from fishing. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6313)
 + Fixed the Fishing Hook Display not showing while other players are fishing nearby. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6315)
 + Fixed pet and coin catches not being detected by the Fishing Profit Tracker. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/6267)
++ Fixed Fishing Bobber Timer disappearing at random when swapping items. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/6440)
++ Fixed Fishing Double Hook sometimes being applied to the next caught Sea Creature. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6424)
 
 #### Item
 
@@ -667,6 +676,7 @@
 + Fixed Cost Breakdown and Highlight Affordable not working in the Greenhouse and Carnival Upgrade menus. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6450)
 + Fixed the Wiki Keybind triggering on menu items. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6453)
     + This includes Close buttons, Go Back arrows, the SkyBlock Menu item, filler panes and empty slots.
++ Fixed Custom Wardrobe causing wrong inventory names in edit mode. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6449)
 
 #### Commands
 
@@ -865,6 +875,7 @@
 + Fixed Brine Salt not being detected for the Non God Pot Effects display. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6443)
 + Fixed some lines (e.g. for Burrow and Pest waypoints) jumping around when you sneak on Minecraft 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/6426)
 + Fixed the game crashing whenever you close it on Minecraft 26.2 with Vulkan. - Luna (https://github.com/hannibal002/SkyHanni/pull/6425)
++ Fixed Slug Pet sometimes not being detected. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6429)
 
 ### Technical Details
 
@@ -1269,6 +1280,9 @@
 + Fixed the SkyHanniRenderWorldEvent injection point on Minecraft 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/6426)
 + Made TreeProgressDisplay use events instead of checking all entities every tick. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6260)
 + Reduced window opacity changes from the See Through Window feature, which was causing errors on Linux. - Mustafa (https://github.com/hannibal002/SkyHanni/pull/6373)
++ Added /shnavclipboard, a developer command to navigate to all locations from the clipboard. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6320)
++ Cleaned up the workflow scripts. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6417)
++ Split the navigate all logic into a shared API and its commands. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6320)
 
 ### Removed Features
 
