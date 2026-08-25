@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientShutdownEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,33 +18,27 @@ import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
+import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.chat.GuiMessage
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import java.util.concurrent.CompletableFuture
 
-//? if >= 26.1 {
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents
-import net.minecraft.client.multiplayer.chat.GuiMessageSource
-//?} else {
-/*import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
-*///?}
-
 @SkyHanniModule
 object ClientEvents {
-
     var totalTicks = 0
 
     init {
-
-        // Tick event
         ClientTickEvents.END_CLIENT_TICK.register {
             if (!MinecraftCompat.localPlayerExists) return@register
             if (!MinecraftCompat.localWorldExists) return@register
@@ -51,24 +46,31 @@ object ClientEvents {
             SkyHanniTickEvent(++totalTicks).post()
         }
 
-        // Disconnect event
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ ->
             SkyHanniEvents.markEventCacheDirty(DirtyReason.SERVER_DISCONNECTED)
             ClientDisconnectEvent.post()
         }
 
-        // Connect event
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             ClientConnectEvent.post()
         }
 
-        // World change event
-        //~ if < 26.1 'ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE' -> 'ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE'
         ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register { _, _ ->
             WorldChangeEvent.post()
         }
 
-        //~ if < 26.1 'registerReloadListener' -> 'registerReloader'
+        //~ if < 26.2 'COLLECT_SUBMITS' -> 'AFTER_TRANSLUCENT_TERRAIN'
+        LevelRenderEvents.COLLECT_SUBMITS.register { ctx ->
+            SkyHanniRenderWorldEvent(
+                ctx.poseStack(),
+                ctx.levelState().cameraRenderState,
+                ctx.submitNodeCollector(),
+                //? if < 26.2
+                //ctx.bufferSource(),
+                Minecraft.getInstance().deltaTracker.getGameTimeDeltaPartialTick(true),
+            ).post()
+        }
+
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             Identifier.fromNamespaceAndPath("skyhanni", "resources"),
         ) { currentReload, _, preparationBarrier, reloadExecutor ->
@@ -106,12 +108,8 @@ object ClientEvents {
                 MinecraftCompat.hud.guiTicks,
                 message,
                 null,
-                //? if >= 26.1 {
                 GuiMessageSource.SYSTEM_CLIENT,
                 GuiMessageTag.system(),
-                //?} else {
-                /*GuiMessageTag.system(),
-                *///?}
             )
             MinecraftCompat.hud.chat.logChatMessage(chatHudLine)
         }

@@ -1,30 +1,38 @@
 package at.hannibal2.skyhanni.utils.render
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.VertexFormat
-import com.mojang.blaze3d.vertex.VertexFormatElement
 import org.lwjgl.system.MemoryUtil
 
-private typealias VFEType = VertexFormatElement.Type
-//? if < 26.1
-//private typealias VFEUsage = VertexFormatElement.Usage
+//? if >= 26.2 {
+import com.mojang.blaze3d.GpuFormat
+import com.mojang.blaze3d.vertex.DefaultVertexFormat
+//?} else {
+/*import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.mojang.blaze3d.vertex.VertexFormatElement
+*///?}
+
+//? if < 26.2
+//private typealias VFEType = VertexFormatElement.Type
 
 object SkyHanniVertexFormats {
 
-    // Different versions of MC use differing counts, so load the last registered ID dynamically.
+    //? if < 26.2 {
+    /*// Different versions of MC use differing counts, so load the last registered ID dynamically.
     val lastRegisteredId by lazy {
         (0 until VertexFormatElement.MAX_COUNT).filter { VertexFormatElement.byId(it) != null }.max()
     }
+    *///?}
 
-    @Suppress("UnusedPrivateProperty")
+    @Suppress("EmptyDefaultConstructor", "UnusedPrivateProperty")
     internal enum class VertexElement(
-        private val index: Int = 0,
+        //? if < 26.2 {
+        /*private val index: Int = 0,
         private val type: VFEType = VFEType.FLOAT,
-        //~ if < 26.1 'normalized: Boolean = false' -> 'usage: VFEUsage = VFEUsage.GENERIC'
         private val normalized: Boolean = false,
         private val count: Int = 4,
+        *///?}
     ) {
         // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
         ROUNDED_PARAMS_0,
@@ -39,16 +47,21 @@ object SkyHanniVertexFormats {
         GRADIENT_PARAMS_2,
         ;
 
-        // The ID we use to register the format element with Minecraft.
+        val attributeName: String =
+            name.lowercase().split("_").joinToString("") { it.replaceFirstChar(Char::uppercaseChar) }
+
+        //? if < 26.2 {
+        /*// The ID we use to register the format element with Minecraft.
         // see safeRegister() for details on how this is used and determined at runtime.
         private val registrationId: Int by lazy { lastRegisteredId + (ordinal + 1) }
         val element by lazy {
-            //~ if < 26.1 'false' -> 'usage'
             safeRegister(registrationId, index, type, false, count)
         }
+        *///?}
     }
 
-    /**
+    //? if < 26.2 {
+    /*/**
      * Registers a VertexFormatElement with the given parameters, automatically finding an available ID if the desired one is taken.
      * Logs an error if the desired ID was already taken, but still registers the element with a valid ID.
      * @param desiredId The preferred ID for the VertexFormatElement.
@@ -63,7 +76,6 @@ object SkyHanniVertexFormats {
         desiredId: Int,
         index: Int = 0,
         type: VFEType = VFEType.FLOAT,
-        //~ if < 26.1 'normalized: Boolean = false' -> 'usage: VFEUsage = VFEUsage.GENERIC'
         normalized: Boolean = false,
         count: Int = 4,
     ): VertexFormatElement {
@@ -74,30 +86,58 @@ object SkyHanniVertexFormats {
             "VertexFormatElement ID $desiredId was already taken, using $id instead",
             "SkyHanni vertex format element ID conflict. Desired ID $desiredId was already registered",
         )
-        //~ if < 26.1 'normalized' -> 'usage'
         return VertexFormatElement.register(id, index, type, normalized, count)
     }
+    *///?}
 
     val POSITION_COLOR_ROUNDED: VertexFormat by lazy {
-        VertexFormat.builder()
+        //? if >= 26.2 {
+        VertexFormat.builder(0)
+            .addAttribute(DefaultVertexFormat.POSITION_SEMANTIC_NAME, GpuFormat.RGB32_FLOAT)
+            .addAttribute(DefaultVertexFormat.COLOR_SEMANTIC_NAME, GpuFormat.RGBA8_UNORM)
+            .addAttribute(VertexElement.ROUNDED_PARAMS_0.attributeName, GpuFormat.RGBA32_FLOAT)
+            .addAttribute(VertexElement.ROUNDED_PARAMS_1.attributeName, GpuFormat.RGBA32_FLOAT)
+            .build()
+        //?} else {
+        /*VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
             .add("Color", VertexFormatElement.COLOR)
             .add("RoundedParams0", VertexElement.ROUNDED_PARAMS_0.element)
             .add("RoundedParams1", VertexElement.ROUNDED_PARAMS_1.element)
             .build()
+        *///?}
     }
 
     val POSITION_TEX_ROUNDED: VertexFormat by lazy {
-        VertexFormat.builder()
+        //? if >= 26.2 {
+        VertexFormat.builder(0)
+            .addAttribute(DefaultVertexFormat.POSITION_SEMANTIC_NAME, GpuFormat.RGB32_FLOAT)
+            .addAttribute(DefaultVertexFormat.UV0_SEMANTIC_NAME, GpuFormat.RG32_FLOAT)
+            .addAttribute(VertexElement.ROUNDED_PARAMS_0.attributeName, GpuFormat.RGBA32_FLOAT)
+            .addAttribute(VertexElement.ROUNDED_PARAMS_1.attributeName, GpuFormat.RGBA32_FLOAT)
+            .build()
+        //?} else {
+        /*VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
             .add("UV0", VertexFormatElement.UV0)
             .add("RoundedParams0", VertexElement.ROUNDED_PARAMS_0.element)
             .add("RoundedParams1", VertexElement.ROUNDED_PARAMS_1.element)
             .build()
+        *///?}
     }
 
     val POSITION_ROUNDED_GRADIENT: VertexFormat by lazy {
-        VertexFormat.builder()
+        //? if >= 26.2 {
+        VertexFormat.builder(0)
+            .addAttribute(DefaultVertexFormat.POSITION_SEMANTIC_NAME, GpuFormat.RGB32_FLOAT)
+            .addAttribute(VertexElement.ROUNDED_PARAMS_0.attributeName, GpuFormat.RGBA32_FLOAT)
+            .addAttribute(VertexElement.ROUNDED_PARAMS_1.attributeName, GpuFormat.RGBA32_FLOAT)
+            .addAttribute(VertexElement.GRADIENT_PARAMS_0.attributeName, GpuFormat.RGBA32_FLOAT)
+            .addAttribute(VertexElement.GRADIENT_PARAMS_1.attributeName, GpuFormat.RGBA32_FLOAT)
+            .addAttribute(VertexElement.GRADIENT_PARAMS_2.attributeName, GpuFormat.RGBA32_FLOAT)
+            .build()
+        //?} else {
+        /*VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
             .add("RoundedParams0", VertexElement.ROUNDED_PARAMS_0.element)
             .add("RoundedParams1", VertexElement.ROUNDED_PARAMS_1.element)
@@ -105,6 +145,7 @@ object SkyHanniVertexFormats {
             .add("GradientParams1", VertexElement.GRADIENT_PARAMS_1.element)
             .add("GradientParams2", VertexElement.GRADIENT_PARAMS_2.element)
             .build()
+        *///?}
     }
 
     internal fun BufferBuilder.writeParams(
@@ -114,10 +155,16 @@ object SkyHanniVertexFormats {
         w: Float,
         format: VertexElement,
     ) {
-        val element = format.element
+        //? if >= 26.2 {
+        val vertexPointer = vertexPointer.takeIf { it != -1L } ?: return
+        val element = this.format.getElement(format.attributeName) ?: return
+        val ptr = vertexPointer + element.offset()
+        //?} else {
+        /*val element = format.element
         val ptr = beginElement(element).takeIf {
             it != -1L
         } ?: return
+        *///?}
         MemoryUtil.memPutFloat(ptr, x)
         MemoryUtil.memPutFloat(ptr + 4L, y)
         MemoryUtil.memPutFloat(ptr + 8L, z)

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.inventory.customloadout.CustomLoado
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
 import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig
+import at.hannibal2.skyhanni.config.features.inventory.npctrade.NpcTradeConfig
 import at.hannibal2.skyhanni.config.features.inventory.sacks.OutsideSackValueConfig
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
@@ -182,10 +183,16 @@ class InventoryConfig {
     @SearchTag(EVOLVING_ITEMS_SEARCH_TAG)
     val evolvingItems: EvolvingItemsConfig = EvolvingItemsConfig()
 
+    // TODO rename to playerTrade
     @Expose
-    @ConfigOption(name = "Trade Value", desc = "Creates a trade value overlay")
+    @ConfigOption(name = "Player Trade", desc = "Creates a trade value overlay")
     @Accordion
-    val trade: TradeConfig = TradeConfig()
+    val trade: PlayerTradeConfig = PlayerTradeConfig()
+
+    @Expose
+    @ConfigOption(name = "NPC Trade", desc = "")
+    @Accordion
+    val npcTrade: NpcTradeConfig = NpcTradeConfig()
 
     @Expose
     @ConfigOption(name = "Hub Selector", desc = "Highlight near-capacity lobbies in the hub selector.")
@@ -208,6 +215,7 @@ class InventoryConfig {
         MASTER_STAR_TIER("§bMaster Star Tier"),
         MASTER_SKULL_TIER("§bMaster Skull Tier"),
         DUNGEON_HEAD_FLOOR_NUMBER("§bDungeon Head Floor Number"),
+        DUNGEON_ITEM_QUALITY("§bDungeon Item Quality"),
         NEW_YEAR_CAKE("§bNew Year Cake"),
         PET_LEVEL("§bPet Level"),
         MINION_TIER("§bMinion Tier"),

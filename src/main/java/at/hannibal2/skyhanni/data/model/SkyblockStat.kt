@@ -92,6 +92,7 @@ enum class SkyblockStat(
     FIG_FORTUNE(GOLD, '\uE054'),
     MANGROVE_FORTUNE(GOLD, '\uE054'),
     HELIX_FORTUNE(GOLD, '\uE054'),
+    TIMBER(DARK_RED, '\uE02E'),
     // </editor-fold>
 
     // <editor-fold desc="Fishing Stats">
@@ -118,7 +119,7 @@ enum class SkyblockStat(
 
     // <editor-fold desc="Hunting Stats">
     PULL(AQUA, '\uE02D'),
-    HUNTER_FORTUNE(LIGHT_PURPLE, '\uE05B'),
+    HUNTING_FORTUNE(LIGHT_PURPLE, '\uE05B'),
     CHARM_CHANCE(AQUA, '❣'),
     // </editor-fold>
 
@@ -273,6 +274,13 @@ enum class SkyblockStat(
             event.move(69, "#profile.stats.TRUE_DEFENCE", "#profile.stats.TRUE_DEFENSE")
             event.move(112, "#profile.stats.NETHER_WART_FORTUNE", "#profile.stats.NETHER_STALK_FORTUNE")
             event.remove(113, "#profile.stats.null")
+            event.move(141, "#profile.stats.HUNTER_FORTUNE", "#profile.stats.HUNTING_FORTUNE")
+            // Stats are stored under their lowercase name, so none of the renames above ever matched anything
+            event.move(142, "#profile.stats.true_defence", "#profile.stats.true_defense")
+            event.move(142, "#profile.stats.nether_wart_fortune", "#profile.stats.nether_stalk_fortune")
+            event.move(142, "#profile.stats.hunter_fortune", "#profile.stats.hunting_fortune")
+            // Left behind by stats that were read back while their rename was still missing
+            event.remove(142, "#profile.stats.unknown")
         }
     }
 }

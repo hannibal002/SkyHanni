@@ -3,12 +3,10 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerQuestCompleteEvent
@@ -27,14 +25,15 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessaryOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.slayer.SlayerType as Type
-
 
 @SkyHanniModule
 object SlayerApi {
@@ -43,6 +42,13 @@ object SlayerApi {
     private val trackerConfig get() = config.itemProfitTracker
 
     private val patternGroup = RepoPattern.group("slayer.api")
+
+    private const val GRACE_UPDATE_COUNT = 3
+
+    /**
+     * Cocoons take 5 seconds to burst, but we give +1 second of grace time to account for any delays in the scoreboard update
+     */
+    private val GRACE_COCOON_TIME = 6.seconds
 
     // <editor-fold desc="Patterns">
     /**
@@ -59,6 +65,22 @@ object SlayerApi {
     private val questCompletePattern by patternGroup.pattern(
         "quest.complete",
         "\\s*SLAYER QUEST COMPLETE!",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: "  SLAYER QUEST FAILED!"
+     */
+    private val questFailedPattern by patternGroup.pattern(
+        "quest.failed",
+        "\\s*SLAYER QUEST FAILED!",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: "  YOU COCOONED YOUR SLAYER BOSS"
+     */
+    private val cocoonPattern by patternGroup.pattern(
+        "cocooned.colorless",
+        "\\s+YOU COCOONED YOUR SLAYER BOSS",
     )
     // </editor-fold>
 
@@ -80,7 +102,7 @@ object SlayerApi {
     var latestCategory = ""
     var tier = 0
 
-    var latestWrongAreaWarning = SimpleTimeMark.farPast()
+    var latestWrongAreaWarningTime = SimpleTimeMark.farPast()
 
     /**
      * What is the current progress of the slayer boss? could be a string with text, or percentage, or x/x kills.
@@ -91,6 +113,16 @@ object SlayerApi {
      * What slayer type should be fought in the current area we are in
      */
     var currentAreaType: SlayerType? = null
+
+    /**
+     * How many consecutive updates have we seen that are invalid?
+     */
+    private var invalidUpdates = 0
+
+    /**
+     * The last time we saw a cocoon message, used to ensure it doesn't get stuck in a state where we think we are cocooned when we are not
+     */
+    private var latestCocoonTime = ServerTimeMark.farPast()
 
     private val outsideRiftData = SlayerData()
     private val insideRiftData = SlayerData()
@@ -111,12 +143,12 @@ object SlayerApi {
     fun isInBossFight() = state == ActiveQuestState.BOSS_FIGHT
 
     private class SlayerData {
-        var currentState: ActiveQuestState? = ActiveQuestState.NO_ACTIVE_QUEST
+        var currentState: ActiveQuestState = ActiveQuestState.NO_ACTIVE_QUEST
         var currentStateRaw: String? = null
         var type: Type? = null
     }
 
-    private fun getCurrentData() = if (RiftApi.inRift()) outsideRiftData else insideRiftData
+    private fun getCurrentData() = if (RiftApi.inRift()) insideRiftData else outsideRiftData
 
     /**
      * Do we have a slayer quest in the scoreboard?
@@ -151,7 +183,7 @@ object SlayerApi {
                 add(" /shtestwaypoint ${PlayerUtils.blockPosition().toLocalFormat()} pathfind")
             }
             add("isInAnyArea: $isInAnyArea")
-            add("latestProgress: '${latestProgress.removeColor()}'")
+            add("latestProgress: '$latestProgress'")
 
             val data = getCurrentData()
             add("active data:")
@@ -165,42 +197,29 @@ object SlayerApi {
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.cleanMessage
 
-        if (questStartPattern.matches(message)) {
-            questStartTime = SimpleTimeMark.now()
-        }
-
-        if (questCompletePattern.matches(message)) {
-            SlayerQuestCompleteEvent.post()
-        }
-    }
-
-    @HandleEvent(onlyOnSkyblock = true)
-    private fun onTick(event: SkyHanniTickEvent) {
-        // wait with sending SlayerChangeEvent until profile is detected
-        if (ProfileStorageData.profileSpecific == null) return
-
-        val (lines, source) = getSlayerLines()
-
-        val slayerQuest = lines.getOrNull(1).orEmpty()
-        val slayerProgress = lines.getOrNull(2).orEmpty()
-        if (event.isMod(5) || slayerQuest != latestCategory || latestProgress != slayerProgress) {
-            updateArea()
-        }
-        if (slayerQuest != latestCategory) {
-            val old = latestCategory
-            latestCategory = slayerQuest
-            tier = slayerQuest.split(" ").lastOrNull()?.romanToDecimalIfNecessaryOrNull()
-                ?: ErrorManager.skyHanniError(
-                    "latestCategory does not contain roman number or int: '$slayerQuest'",
-                    "lines" to lines,
-                    "source" to source.name,
-                )
-            SlayerChangeEvent(old, latestCategory).post()
-        }
-
-        if (latestProgress != slayerProgress) {
-            SlayerProgressChangeEvent(latestProgress, slayerProgress).post()
-            latestProgress = slayerProgress
+        when {
+            questStartPattern.matches(message) -> {
+                questStartTime = SimpleTimeMark.now()
+            }
+            questCompletePattern.matches(message) -> {
+                ChatUtils.debug("SlayerApi: Slayer quest complete detected, posting SlayerQuestCompleteEvent")
+                SlayerQuestCompleteEvent.post()
+            }
+            questFailedPattern.matches(message) -> {
+                val data = getCurrentData()
+                ChatUtils.debug("SlayerApi: Slayer quest failed, posting SlayerStateChangeEvent")
+                data.currentState = FAILED
+                data.currentStateRaw = "no slayer"
+                SlayerStateChangeEvent(FAILED).post()
+            }
+            cocoonPattern.matches(message) -> {
+                val data = getCurrentData()
+                ChatUtils.debug("SlayerApi: Slayer boss cocooned, posting SlayerStateChangeEvent")
+                data.currentState = COCOONED
+                data.currentStateRaw = "cocooned"
+                latestCocoonTime = ServerTimeMark.now()
+                SlayerStateChangeEvent(COCOONED).post()
+            }
         }
     }
 
@@ -215,35 +234,118 @@ object SlayerApi {
     }
 
     private fun getSlayerLines(): Pair<List<String>, SlayerLinesSource> {
-        val scoreboardLines = ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }.map { it.trim() }
+        val scoreboardLines = ScoreboardData.sidebarLinesFormatted
+            .map { it.removeColor().trim() }
+            .dropWhile { it != "Slayer Quest" }
         if (scoreboardLines.isNotEmpty()) return scoreboardLines to SlayerLinesSource.SCOREBOARD
 
-        val tabLines = TabWidget.SLAYER.lines.map { it.string.trim() }
+        val tabLines = TabWidget.SLAYER.lines.map { it.string.removeColor().trim() }
         if (tabLines.isNotEmpty()) return tabLines to SlayerLinesSource.TAB
 
         return emptyList<String>() to SlayerLinesSource.NONE
     }
 
+    // returns null if no slayer quest is found, and exception if the parsing fails
+    private fun getParsedSlayerOrNull(lines: List<String>): ParsedSlayer? {
+        val questIndex = lines.indexOfFirst { Type.getByName(it) != null }
+        if (questIndex == -1) return null
+
+        val category = lines[questIndex]
+        val type = Type.getByName(category) ?: return null
+        val progress = lines.getOrNull(questIndex + 1) ?: throw SlayerParseException("Progress line missing for category '$category'")
+
+        val tierString = category.substringAfterLast(' ', "")
+        val parsedTier =
+            tierString.romanToDecimalIfNecessaryOrNull() ?: throw SlayerParseException("Failed to parse tier from category '$category'")
+
+        return ParsedSlayer(
+            type = type,
+            category = category,
+            tier = parsedTier,
+            progress = progress,
+        )
+    }
+
     private fun updateSlayerState() {
-        val (lines, _) = getSlayerLines()
+        if (ProfileStorageData.profileSpecific == null) return
 
-        val slayerType = lines.getOrNull(1)
-        val type = slayerType?.let { Type.getByName(it) }
+        val (lines, source) = getSlayerLines()
+        val parsed = try {
+            getParsedSlayerOrNull(lines)
+        } catch (e: SlayerParseException) {
+            invalidUpdates++
+            if (invalidUpdates == GRACE_UPDATE_COUNT) {
+                val message = "Slayer Exception: ${e.message}"
+                ErrorManager.skyHanniError(
+                    message,
+                    "lines" to lines,
+                    "source" to source,
+                )
+            }
+            return
+        }
+        invalidUpdates = 0
 
-        val slayerProgress = lines.getOrNull(2) ?: "no slayer"
-        val newState = slayerProgress.removeColor()
+        val progress = parsed?.progress ?: "no slayer"
 
-        val slayerData = getCurrentData()
-        if (slayerData.currentStateRaw == newState) return
-        slayerData.type = type
+        updateCategory(parsed)
+        updateProgress(progress)
+        updateActiveState(parsed, progress)
+        updateArea()
+    }
 
-        val old = slayerData.currentStateRaw ?: "no slayer"
-        slayerData.currentStateRaw = newState
-        val state = detectState(old, newState)
-        if (slayerData.currentState == state) return
-        ChatUtils.debug("${slayerData.currentState} -> $state")
-        slayerData.currentState = state
-        SlayerStateChangeEvent(state).post()
+    private fun updateCategory(parsed: ParsedSlayer?) {
+        val category = parsed?.category.orEmpty()
+        if (category == latestCategory) return
+
+        val old = latestCategory
+        latestCategory = category
+        tier = parsed?.tier ?: 0
+
+        ChatUtils.debug("SlayerApi: $old -> $category")
+        SlayerChangeEvent(old, category).post()
+    }
+
+    private fun updateProgress(progress: String) {
+        if (progress == latestProgress) return
+
+        ChatUtils.debug("SlayerApi: $latestProgress -> $progress")
+        SlayerProgressChangeEvent(latestProgress, progress).post()
+        latestProgress = progress
+    }
+
+    private fun updateActiveState(parsed: ParsedSlayer?, progress: String) {
+        val data = getCurrentData()
+        data.type = parsed?.type
+
+        val oldStateRaw = data.currentStateRaw ?: "no slayer"
+        if (oldStateRaw == progress) return
+
+        data.currentStateRaw = progress
+
+        var newState = detectState(progress)
+
+        val cocooned = data.currentState == COCOONED && latestCocoonTime.passedSince() <= GRACE_COCOON_TIME
+        if (cocooned && (newState == NO_ACTIVE_QUEST || newState == SLAIN)) {
+            ChatUtils.debug("SlayerApi: Cocooned state detected, overriding $newState to COCOONED")
+            newState = COCOONED
+        }
+
+        // If the player kills the boss immediately after the boss spawns
+        if ((data.currentState == BOSS_FIGHT || data.currentState == COCOONED) && newState == GRINDING) {
+            ChatUtils.debug("SlayerApi: Intermediate state change detected: ${data.currentState} -> SLAIN -> GRINDING")
+            SlayerStateChangeEvent(SLAIN).post()
+        }
+        if (data.currentState == GRINDING && newState == SLAIN) {
+            ChatUtils.debug("SlayerApi: Intermediate state change detected: GRINDING -> BOSS_FIGHT -> SLAIN")
+            SlayerStateChangeEvent(BOSS_FIGHT).post()
+        }
+
+        if (newState != data.currentState) {
+            ChatUtils.debug("SlayerApi: ${data.currentState} -> $newState")
+            data.currentState = newState
+            SlayerStateChangeEvent(newState).post()
+        }
     }
 
     @HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true)
@@ -260,31 +362,30 @@ object SlayerApi {
     private fun String.inGrind() = contains("Combat") || contains("Kills")
     private fun String.inBoss() = this == "Slay the boss!"
     private fun String?.bossSlain() = this == "Boss slain!"
-    private fun String.noSlayer() = this == "no slayer"
 
     enum class ActiveQuestState {
         GRINDING, // spawning, collecting combat xp
         BOSS_FIGHT,
         FAILED,
         SLAIN,
+        COCOONED,
         NO_ACTIVE_QUEST,
     }
 
-    private fun detectState(old: String, new: String): ActiveQuestState = when {
-        new.inGrind() -> ActiveQuestState.GRINDING
-        new.inBoss() -> ActiveQuestState.BOSS_FIGHT
-        old.inBoss() && new.noSlayer() -> ActiveQuestState.FAILED
-        new.bossSlain() -> ActiveQuestState.SLAIN
-        else -> ActiveQuestState.NO_ACTIVE_QUEST
+    private fun detectState(new: String): ActiveQuestState = when {
+        new.inGrind() -> GRINDING
+        new.inBoss() -> BOSS_FIGHT
+        new.bossSlain() -> SLAIN
+        else -> NO_ACTIVE_QUEST
     }
 
-    @HandleEvent(priority = -1)
+    @HandleEvent(priority = HandleEvent.LOW)
     private fun onAreaChange() {
         currentAreaType = checkTypeForCurrentArea()
         updateArea()
     }
 
-    @HandleEvent(ConfigLoadEvent::class)
+    @HandleEvent
     private fun onConfigLoad() {
         with(trackerConfig) {
             ConditionalUtils.onToggle(revenantInGraveyard, voidgloomInNest, voidgloomInNoArea) {
@@ -294,10 +395,23 @@ object SlayerApi {
         }
     }
 
+    @HandleEvent
+    private fun onWorldChange() {
+        // Using outsideRiftData since rift does not have slayer cocoon
+        // and using getCurrentData is ambiguous while changing worlds (inside/outside rift)
+        val data = outsideRiftData
+        if (data.currentState != COCOONED) return
+        ChatUtils.debug("SlayerApi: World change detected, resetting cocooned state")
+        data.currentState = NO_ACTIVE_QUEST
+        data.currentStateRaw = null
+        latestCocoonTime = ServerTimeMark.farPast()
+        SlayerStateChangeEvent(NO_ACTIVE_QUEST).post()
+    }
+
     // TODO USE SH-REPO
     private fun checkTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
         "Graveyard" -> if (trackerConfig.revenantInGraveyard.get() && IslandType.HUB.isInIsland()) Type.REVENANT else null
-        "Revenant Cave" -> Type.REVENANT
+        "Revenant Cave", "Crypts" -> Type.REVENANT
 
         "Spider Mound",
         "Arachne's Burrow",
@@ -335,4 +449,13 @@ object SlayerApi {
         SCOREBOARD,
         TAB,
     }
+
+    private data class ParsedSlayer(
+        val type: Type,
+        val category: String,
+        val tier: Int,
+        val progress: String,
+    )
+
+    private class SlayerParseException(message: String) : Exception(message)
 }
