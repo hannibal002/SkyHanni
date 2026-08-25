@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateFieldValue
@@ -370,9 +371,8 @@ object SkyHanniConfigSearchResetCommand {
     }
 
     internal fun findKeybinds(action: (Set<String>) -> Unit) = CoroutineSettings("findKeybinds").launch {
-        val configManager = SkyHanniMod.configManager
         val set = buildSet {
-            configManager.traverseConfig(SkyHanniMod.feature) { _, field, path ->
+            ConfigUtils.traverseConfig(SkyHanniMod.feature) { _, field, path ->
                 if (field.getAnnotation(ConfigEditorKeybind::class.java) != null) {
                     add(path)
                 }

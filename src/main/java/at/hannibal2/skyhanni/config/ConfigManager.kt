@@ -19,9 +19,7 @@ import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringFileHandler
@@ -101,7 +99,7 @@ class ConfigManager {
     private fun findPositionLinks() {
         var missingConfigLink = false
 
-        traverseConfig(SkyHanniMod.feature) { owner, field, _ ->
+        ConfigUtils.traverseConfig(SkyHanniMod.feature) { owner, field, _ ->
             if (field.type != Position::class.java &&
                 field.type != PositionList::class.java
             ) {
@@ -141,34 +139,6 @@ class ConfigManager {
             println("3. Or add the @NoConfigLink annotation to the field.")
             println("")
             PlatformUtils.shutdownMinecraft("Missing Config Link")
-        }
-    }
-
-    fun traverseConfig(
-        obj: Any?,
-        action: (owner: Any, field: Field, path: String) -> Unit,
-    ) {
-        traverseConfig(obj, "", mutableSetOf(), action)
-    }
-
-    private fun traverseConfig(
-        obj: Any?,
-        path: String,
-        visited: MutableSet<IdentityCharacteristics<Any>>,
-        action: (owner: Any, field: Field, path: String) -> Unit,
-    ) {
-        if (obj == null) return
-        if (!obj.javaClass.name.startsWith("at.hannibal2.skyhanni.")) return
-
-        val identity = IdentityCharacteristics(obj)
-        if (!visited.add(identity)) return
-
-        for (field in obj.javaClass.declaredFields.map { it.makeAccessible() }) {
-            val fieldPath = if (path.isEmpty()) field.name else "$path.${field.name}"
-
-            action(obj, field, fieldPath)
-
-            traverseConfig(field.get(obj), fieldPath, visited, action)
         }
     }
 
