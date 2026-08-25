@@ -59,7 +59,11 @@ object SeaCreatureManager {
         if (isInterceptingMessage(message)) return
 
         getSeaCreatureFromMessage(message)?.let {
-            SeaCreatureFishEvent(it, doubleHook).post()
+            val wasDoubleHook = doubleHook
+            doubleHook = false
+
+            SeaCreatureFishEvent(it, wasDoubleHook).post()
+
             if (config.seaCreatureTracker.hideChat) {
                 event.blockedReason = "sea_creature_tracker"
             }
@@ -81,6 +85,9 @@ object SeaCreatureManager {
         if (isInterceptingMessage(message)) return
 
         getSeaCreatureFromMessage(message)?.let {
+            val wasDoubleHook = doubleHook
+            doubleHook = false
+
             val original = event.chatComponent.copy()
             var edited = original
 
@@ -90,7 +97,7 @@ object SeaCreatureManager {
                 edited = "§9You caught $aOrAn $name§9!".asComponent()
             }
 
-            if (config.compactDoubleHook && doubleHook) {
+            if (config.compactDoubleHook && wasDoubleHook) {
                 edited = when (config.compactDoubleHookPosition) {
                     CompactDoubleHookPosition.LEFT ->
                         "§e§lDOUBLE HOOK! ".asComponent().append(edited)
@@ -99,7 +106,6 @@ object SeaCreatureManager {
                 }
             }
 
-            doubleHook = false
             if (original == edited) return
             event.replaceComponent(edited, "sea_creature")
         }
