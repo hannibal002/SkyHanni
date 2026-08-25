@@ -49,7 +49,7 @@ object DianaProfitTracker {
      */
     private val chatDugOutPattern by patternGroup.pattern(
         "burrow.dug",
-        "(?:You dug out a Griffin Burrow!|You finished the Griffin burrow chain!) .*",
+        "(?:You dug out a Griffin Burrow!|You finished the Griffin burrow chain!).*",
     )
 
     /**
