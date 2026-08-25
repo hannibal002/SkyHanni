@@ -34,6 +34,10 @@ import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import java.util.concurrent.CompletableFuture
 
+//? if < 26.2 {
+/*import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
+*///?}
+
 @SkyHanniModule
 object ClientEvents {
     var totalTicks = 0
@@ -67,6 +71,12 @@ object ClientEvents {
                 Minecraft.getInstance().deltaTracker.getGameTimeDeltaPartialTick(true),
             ).post()
         }
+
+        //? if < 26.2 {
+        /*LevelRenderEvents.AFTER_TRANSLUCENT_TERRAIN.register { ctx ->
+            WorldRenderUtils.drawQueuedSeeThroughText(ctx.bufferSource())
+        }
+        *///?}
 
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             Identifier.fromNamespaceAndPath("skyhanni", "resources"),

@@ -36,11 +36,19 @@ import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
+import org.joml.Matrix4f
 import org.joml.Vector3f
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
+
+//? if >= 26.2 {
+import net.fabricmc.fabric.api.client.rendering.v1.SubmitRenderPhases
+import net.minecraft.client.renderer.feature.TextFeatureRenderer
+//?} else {
+/*import net.minecraft.client.renderer.MultiBufferSource
+*///?}
 
 @Suppress("LargeClass")
 object WorldRenderUtils {
@@ -57,7 +65,35 @@ object WorldRenderUtils {
         backgroundColor: Int,
         outlineColor: Int,
     ) {
-        // The order ensures see-through text renders over our custom geometry.
+        if (displayMode == SEE_THROUGH) {
+            // MC-298659: the vanilla text phase renders before translucent terrain, letting water
+            // draw over see-through text. Render only our own text after translucent terrain instead.
+            // This also makes it render after our custom geometry, so order(1) is not needed here.
+            //? if >= 26.2 {
+            submitNodeCollector.submitCustom(
+                SubmitRenderPhases.AFTER_TERRAIN,
+                TextFeatureRenderer.Submit(
+                    Matrix4f(matrices.last().pose()),
+                    x,
+                    y,
+                    text,
+                    shadow,
+                    SEE_THROUGH,
+                    light,
+                    color,
+                    backgroundColor,
+                    outlineColor,
+                ),
+            )
+            //?} else {
+            /*queuedSeeThroughText.add(
+                SeeThroughText(Matrix4f(matrices.last().pose()), x, y, text, shadow, light, color, backgroundColor),
+            )
+            *///?}
+            return
+        }
+
+        // The order ensures the text renders over our custom geometry.
         submitNodeCollector.order(1).submitText(
             matrices,
             x,
@@ -71,6 +107,42 @@ object WorldRenderUtils {
             outlineColor,
         )
     }
+
+    //? if < 26.2 {
+    /*private val queuedSeeThroughText = mutableListOf<SeeThroughText>()
+
+    private class SeeThroughText(
+        val pose: Matrix4f,
+        val x: Float,
+        val y: Float,
+        val text: FormattedCharSequence,
+        val shadow: Boolean,
+        val light: Int,
+        val color: Int,
+        val backgroundColor: Int,
+    )
+
+    // See the MC-298659 note in submitOrderedText.
+    fun drawQueuedSeeThroughText(bufferSource: MultiBufferSource.BufferSource) {
+        if (queuedSeeThroughText.isEmpty()) return
+        val fr = Minecraft.getInstance().font
+        for (entry in queuedSeeThroughText) {
+            fr.drawInBatch(
+                entry.text,
+                entry.x,
+                entry.y,
+                entry.color,
+                entry.shadow,
+                entry.pose,
+                bufferSource,
+                DisplayMode.SEE_THROUGH,
+                entry.backgroundColor,
+                entry.light,
+            )
+        }
+        queuedSeeThroughText.clear()
+    }
+    *///?}
 
     inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
         layer: RenderType,
