@@ -54,6 +54,7 @@ object SeaCreatureManager {
 
             if (config.seaCreatureTracker.hideChat) {
                 event.blockedReason = "sea_creature_tracker"
+                lastDoubleHookTime = SimpleTimeMark.farPast()
             }
             return
         }
