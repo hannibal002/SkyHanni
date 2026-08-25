@@ -82,15 +82,15 @@ object DianaApi {
         val entity = event.entity
         // TODO: fetch rare mobs from repo instead
         if (rareDianaMobNamePattern.matches(entity.name.string.trim())) {
-            ritualActiveOverride = true
+            overrideActiveRitual()
             RareDianaMobFoundEvent(entity).post()
         }
     }
 
     @HandleEvent(onlyOnIsland = HUB)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (ritualNotActivePattern.matches(event.cleanMessage) && isRitualActive()) {
-            ritualActiveOverride = false
+        if (ritualNotActivePattern.matches(event.cleanMessage)) {
+            overrideActiveRitual(false)
         }
     }
 
@@ -103,9 +103,9 @@ object DianaApi {
         spades = dianaJson.spadeTypes.toSet()
     }
 
-    fun overrideActiveRitual() {
-        if (!isRitualActive()) {
-            ritualActiveOverride = true
+    fun overrideActiveRitual(active: Boolean = true) {
+        if (isRitualActive() != active) {
+            ritualActiveOverride = active
         }
     }
 }
