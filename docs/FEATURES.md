@@ -25,7 +25,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Sack Change** chat message hider. - hannibal2
     + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
       data for future features.
-+ Adds chat symbols such as iron man/bingo/nether faction like SBA had/has. - CalMWolfs
++ Adds chat symbols such as Ironman/Bingo/Nether faction like SBA had/has. - CalMWolfs
     + Will not break with emblems.
     + Optional if left or right side of name.
     + Should not break with other mods.
@@ -36,7 +36,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Rarity text to pet drop messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1136)
 + Bits Gained Chat Message. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1487)
 + Option to reorder or hide every part of a player chat message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
-    + Parts to move around: SkyBlock Level, Emblem, player name, guild rank, private island rank, crimson faction, iron man mode, bingo level and Private Island Guest.
+    + Parts to move around: SkyBlock Level, Emblem, player name, guild rank, private island rank, crimson faction, Ironman mode, bingo level and Private Island Guest.
     + Player messages impacted by this: all chat, party, guild, private chat, /show.
     + This might break hover/click on chat actions (Will be fixed later).
 + Hide Level Brackets. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
@@ -499,7 +499,6 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Sends a message to party chat when a rare sea creature is caught.
 + Mute Banshee screams. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/5007)
 + Flay/Soul Whip Close Particle Hider. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5094)
-+ Added Sea Creature Health Overlay. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
 + Added Sea Creature Health Overlay. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
 + Added Sea Creature Kill Time. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
 + Added Sea Creature Lootshare Sphere. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)

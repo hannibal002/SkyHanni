@@ -46,11 +46,11 @@ for "Gradle JVM") is set to a Java 25 JDK.
 <details>
 <summary>🖼️Show Gradle JVM image</summary>
 
-![Gradle settings showing Java 21 being selected as JVM](docs/gradle-settings.png)
+![Gradle settings showing Java 25 being selected as JVM](docs/gradle-settings.png)
 
 </details>
 
-Now that Gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java
+Now that Gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the Java
 version for the project.
 
 To do this we press `(CTRL+ALT+SHIFT+S)` in IntelliJ, or go to `File` → `Project Structure...`.
@@ -104,7 +104,7 @@ Now that we are done with that, you should be able to launch your game from your
 
 ## Pull Requests
 
-General infos about Pull Request can be found on
+General info about Pull Requests can be found on
 the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests).
 
 ### Creating a Pull Request
@@ -259,8 +259,8 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Config files should be made in **Kotlin**.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it.
-    - Custom SkyHanni events are located in the `events` package, organized into sub packages by category.
-      When creating a new event, place it in the appropriate sub package. Thematically related events can be placed together in a single
+    - Custom SkyHanni events are located in the `events` package, organized into subpackages by category.
+      When creating a new event, place it in the appropriate subpackage. Thematically related events can be placed together in a single
       file.
     - To expand the event system, you can create a new event that is called from a Mixin,
       or you can subscribe to a Fabric event and then post a SkyHanni event from that.
@@ -292,9 +292,9 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Never use  `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
-- Try to avoid using Kotlin's `!!` (catch if not null) feature.
+- Try to avoid using Kotlin's `!!` (not-null assertion) feature.
     - Replace it with `?:` (if null return this).
-    - This will most likely not be possible to avoid when working with objects from java.
+    - This will most likely not be possible to avoid when working with objects from Java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
   See the **Errors and Crashes** section for why every catch goes through `ErrorManager`.
