@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.filterInnerSlots
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
@@ -58,7 +57,11 @@ object FishyTreatProfit {
 
         DelayedRun.runOrNextTick {
             val table = mutableListOf<DisplayTableEntry>()
-            for ((slot, item) in event.inventoryItems.filterInnerSlots()) {
+            for ((slot, item) in event.inventoryItems) {
+                // ignore the last line of menu items
+                if (slot > 44) continue
+                // background items, named with a single space
+                if (item.hoverName.string == " ") continue
                 try {
                     readItem(slot, item, table)
                 } catch (e: Throwable) {
