@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.find
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RegexUtils.replace
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -153,6 +154,17 @@ object ReplaceRomanNumerals {
         "\\b(?<roman>[IVXLCDM]+) Rewards?:",
     )
 
+    /**
+     * The tier of an item is repeated in its reward lines, where nothing else anchors it.
+     * Every hit is checked against the numeral already read from the display name.
+     * REGEX-TEST: Brewer XLIII
+     * REGEX-TEST: Charming XX
+     */
+    private val standaloneNumeralPattern by inventoryGroup.pattern(
+        "standalone-numeral",
+        "\\b(?<roman>[IVXLCDM]+)\\b",
+    )
+
     private val contextGroup = inventoryGroup.group("context")
 
     /**
@@ -282,38 +294,74 @@ object ReplaceRomanNumerals {
         val titleOnly = context?.titleOnly ?: false
         val contextPatterns = if (context != null) inventoryPatterns + namedTierPattern else inventoryPatterns
 
+        // Skipped for titleOnly, where nothing below the display name may be touched
+        val titleNumeral = if (titleOnly) null
+        else toolTip.firstOrNull()?.let { findTitleNumeral(it, contextPatterns) }
+
         for (index in toolTip.indices) {
             val patterns = if (titleOnly && index != 0) inventoryPatterns else contextPatterns
-            val replaced = toolTip[index].replaceNumerals(patterns) ?: continue
+            val replaced = toolTip[index].replaceNumerals(patterns, if (index == 0) null else titleNumeral) ?: continue
             toolTip[index] = replaced
         }
+    }
+
+    /**
+     * The first numeral in the display name, read before anything is replaced.
+     * Reward lines below repeat it without a keyword of their own.
+     */
+    private fun findTitleNumeral(title: Component, patterns: List<Pattern>): String? {
+        var found: String? = null
+        title.visit(
+            { _: Style?, string: String? ->
+                if (found == null) found = findNumeral(string.orEmpty(), patterns)
+                Optional.empty<Component>()
+            },
+            Style.EMPTY,
+        )
+        return found
+    }
+
+    private fun findNumeral(text: String, patterns: List<Pattern>): String? {
+        for (pattern in patterns) {
+            pattern.findMatcher(text) {
+                val roman = group("roman")
+                if (roman.isRoman()) return roman
+            }
+        }
+        return null
     }
 
     /**
      * A context is a place where a bare name followed by a numeral is known to be a tier,
      * so the numeral can be replaced without a keyword in front of it.
      */
-    private fun findContext(toolTip: List<Component>): ToolTipContext? {
-        val inventoryName = InventoryUtils.openInventoryName()
-        if (upgradeMenuPattern.matches(inventoryName)) return ToolTipContext.UPGRADE_MENU
-        if (collectionMenuPattern.matches(inventoryName)) return ToolTipContext.COLLECTION
+    private fun findContext(toolTip: List<Component>): ToolTipContext? =
+        findMenuContext() ?: toolTip.firstNotNullOfOrNull(::findLineContext)
 
-        for (line in toolTip) {
-            if (taskListPattern.matches(line)) return ToolTipContext.TASK_LIST
-            if (perkShopPattern.find(line)) return ToolTipContext.PERK_SHOP
-            if (cropMilestonePattern.find(line)) return ToolTipContext.CROP_MILESTONE
-            if (collectionItemPattern.find(line)) return ToolTipContext.COLLECTION
+    private fun findMenuContext(): ToolTipContext? {
+        val inventoryName = InventoryUtils.openInventoryName()
+        return when {
+            upgradeMenuPattern.matches(inventoryName) -> ToolTipContext.UPGRADE_MENU
+            collectionMenuPattern.matches(inventoryName) -> ToolTipContext.COLLECTION
+            else -> null
         }
-        return null
     }
 
-    private fun Component.replaceNumerals(patterns: List<Pattern>): Component? {
+    private fun findLineContext(line: Component): ToolTipContext? = when {
+        taskListPattern.matches(line) -> ToolTipContext.TASK_LIST
+        perkShopPattern.find(line) -> ToolTipContext.PERK_SHOP
+        cropMilestonePattern.find(line) -> ToolTipContext.CROP_MILESTONE
+        collectionItemPattern.find(line) -> ToolTipContext.COLLECTION
+        else -> null
+    }
+
+    private fun Component.replaceNumerals(patterns: List<Pattern>, titleNumeral: String?): Component? {
         val result = Component.empty()
         var changed = false
         visit(
             { style: Style?, string: String? ->
                 val original = string.orEmpty()
-                val new = replaceInText(original, patterns)
+                val new = replaceInText(original, patterns, titleNumeral)
                 if (new != null) changed = true
                 result.append(Component.literal(new ?: original).withStyle(style ?: Style.EMPTY))
                 Optional.empty<Component>()
@@ -323,13 +371,20 @@ object ReplaceRomanNumerals {
         return result.takeIf { changed }
     }
 
-    private fun replaceInText(text: String, patterns: List<Pattern>): String? {
+    private fun replaceInText(text: String, patterns: List<Pattern>, titleNumeral: String?): String? {
         var result = text
         for (pattern in patterns) {
             result = pattern.replaceIn(result)
         }
+        if (titleNumeral != null) result = replaceTitleNumeral(result, titleNumeral)
         return result.takeIf { it != text }
     }
+
+    private fun replaceTitleNumeral(text: String, titleNumeral: String): String =
+        standaloneNumeralPattern.replace(text) {
+            if (group("roman") != titleNumeral) return@replace group()
+            titleNumeral.romanToDecimal().toString()
+        }
 
     private fun Pattern.replaceIn(text: String): String = replace(text) {
         val roman = group("roman")
