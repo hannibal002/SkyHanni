@@ -137,7 +137,7 @@ object SeaCreatureManager {
     }
 
     private fun isDoubleHookRecently(lastDoubleHookTime: SimpleTimeMark): Boolean =
-        lastDoubleHookTime.passedSince().inWholeTicks <= 2
+        lastDoubleHookTime.passedSince().inWholeTicks <= 1
 
     private fun getSeaCreatureFromMessage(message: String): SeaCreature? {
         return seaCreatureMap.getOrDefault(message, null)
