@@ -47,9 +47,8 @@ object SeaCreatureManager {
             lastDoubleHookTime = SimpleTimeMark.now()
             return
         }
-        val isDoubleHook = isDoubleHookRecently(lastDoubleHookTime)
-
         getSeaCreatureFromMessage(message)?.let {
+            val isDoubleHook = isDoubleHookRecently(lastDoubleHookTime)
             SeaCreatureFishEvent(it, isDoubleHook).post()
 
             if (config.seaCreatureTracker.hideChat) {
