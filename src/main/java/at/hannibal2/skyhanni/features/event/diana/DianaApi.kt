@@ -69,13 +69,12 @@ object DianaApi {
         "(?:Minos Inquisitor|Sphinx|King Minos|Manticore)\\s*",
     )
 
-    // TODO: Get the real chat message
     /**
-     * REGEX-TSET: The mythological ritual isn't active
+     * REGEX-TEST: The mythological ritual isn't active!
      */
     private val ritualNotActivePattern by group.pattern(
         "ritual-not-active",
-        "The mythological ritual isn't active",
+        "The mythological ritual isn't active!",
     )
 
     @HandleEvent(onlyOnIsland = HUB)
