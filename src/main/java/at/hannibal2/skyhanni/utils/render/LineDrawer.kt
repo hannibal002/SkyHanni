@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.gizmos.DrawableGizmoPrimitives
 *///?}
 
 class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent, val lineWidth: Int, val depth: Boolean) {
-
     private val queuedLines = mutableListOf<QueuedLine>()
 
     @PublishedApi
@@ -26,7 +25,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         for (line in queuedLines) {
             gizmos.addLine(line.p1.toVec3(), line.p2.toVec3(), line.color.rgb, lineWidth.toFloat())
         }
-        gizmos.submit(event.submitNodeStorage, event.camera, !depth)
+        gizmos.submit(event.submitNodeCollector, event.camera, !depth)
         //?} else {
         /*val layer = SkyHanniRenderLayers.getLines(!depth)
         event.submitCustomGeometry(layer) { buf ->
