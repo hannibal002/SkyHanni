@@ -66,7 +66,6 @@ object WorldRenderUtils {
         light: Int,
         color: Int,
         backgroundColor: Int,
-        outlineColor: Int,
     ) {
         if (displayMode == SEE_THROUGH) {
             // MC-298659: the vanilla text phase renders before translucent terrain, letting water
@@ -84,7 +83,7 @@ object WorldRenderUtils {
                     light,
                     color,
                     backgroundColor,
-                    outlineColor,
+                    0,
                 ),
             )
             //?} else {
@@ -105,7 +104,7 @@ object WorldRenderUtils {
             light,
             color,
             backgroundColor,
-            outlineColor,
+            0,
         )
     }
 
@@ -381,7 +380,6 @@ object WorldRenderUtils {
             FULL_BRIGHT,
             color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
             backgroundColor,
-            0,
         )
         matrices.popPose()
     }
