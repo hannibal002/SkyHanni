@@ -91,30 +91,35 @@ object StarlynSisterCouponProfit {
         }
     }
 
-    private fun toDisplayEntry(data: ItemProfitData): DisplayTableEntry {
-        val displayedProfit = if (currentDisplayMode == DisplayMode.PER_COUPON) data.profitPerCoupon else data.profit
-        return DisplayTableEntry(
-            data.itemName.asComponent(),
-            "§6${displayedProfit.shortFormat()}".asComponent(),
-            displayedProfit,
-            data.internalName,
-            buildHoverText(data).mapToComponents(),
-            highlightsOnHoverSlots = listOf(data.slot),
-        )
-    }
+    private fun readItem(slot: Int, item: SafeItemStack): DisplayTableEntry? {
+        if (!isValidSlotNumber(slot)) return null
+        val (internalName, itemName) = workOutInternalNameOrNull(item) ?: return null
+        val requiredItems = item.readLoreCosts()
+        val price = internalName.getPrice()
+        var totalCost = 0.0
+        var couponAmount = 0L
+        for ((name, amount) in requiredItems) {
+            val itemPrice = name.getPriceOrNull() ?: continue
+            totalCost += itemPrice * amount
+            if (name == currentSisterType?.couponName) {
+                couponAmount = amount
+            }
+        }
+        val profit = price - totalCost
+        val profitPerCoupon = if (couponAmount > 0) profit / couponAmount else 0.0
 
-    private fun buildItemData(event: InventoryFullyOpenedEvent, sister: StarlynSisterType): List<ItemProfitData> =
-        event.inventoryItems.mapNotNull { (slot, item) ->
-            try {
-                readItem(slot, item, sister)
-            } catch (e: Throwable) {
-                ErrorManager.logErrorWithData(
-                    e, "Error while reading item '${item.repoItemName}'",
-                    "item" to item,
-                    "name" to item.repoItemName,
-                    "inventory name" to event.inventoryName,
-                )
-                null
+        val hover = buildList {
+            add(itemName)
+            add("")
+            add("§7Sell price: §6${price.shortFormat()}")
+            add("§7Total cost: §6${totalCost.shortFormat()}")
+            for ((requiredName, amount) in requiredItems) {
+                add(requiredName.getPriceName(amount))
+            }
+            add("")
+            add("§7Profit per sell: §6${profit.shortFormat()}")
+            if (couponAmount > 0) {
+                add("§7Profit per coupon: §6${profitPerCoupon.shortFormat()}")
             }
         }
 
