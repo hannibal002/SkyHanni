@@ -71,7 +71,6 @@ object WorldRenderUtils {
         if (displayMode == SEE_THROUGH) {
             // MC-298659: the vanilla text phase renders before translucent terrain, letting water
             // draw over see-through text. Render only our own text after translucent terrain instead.
-            // This also makes it render after our custom geometry, so order(1) is not needed here.
             //? if >= 26.2 {
             submitNodeCollector.submitCustom(
                 SubmitRenderPhases.AFTER_TERRAIN,
@@ -96,8 +95,7 @@ object WorldRenderUtils {
             return
         }
 
-        // The order ensures the text renders over our custom geometry.
-        submitNodeCollector.order(1).submitText(
+        submitNodeCollector.submitText(
             matrices,
             x,
             y,
@@ -303,11 +301,9 @@ object WorldRenderUtils {
         }
 
         val layer = SkyHanniRenderLayers.getFilled(throughWalls = seeThroughBlocks)
-        submitCustomGeometry(layer) { buf ->
-            matrices.pushPose()
-
+        submitCustomGeometry(layer) { pose, buf ->
             addChainedFilledBoxVertices(
-                matrices,
+                pose,
                 buf,
                 effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ,
                 effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ,
@@ -316,7 +312,6 @@ object WorldRenderUtils {
                 c.blue / 255f * 0.9f,
                 c.alpha / 255f * alphaMultiplier,
             )
-            matrices.popPose()
         }
     }
 
@@ -994,7 +989,7 @@ object WorldRenderUtils {
         exactLocation(player).up(player.getEyeHeight(player.pose))
 
     private fun addChainedFilledBoxVertices(
-        matrices: PoseStack,
+        matrix4f: PoseStack.Pose,
         vertexConsumer: VertexConsumer,
         d: Double,
         e: Double,
@@ -1007,7 +1002,7 @@ object WorldRenderUtils {
         l: Float,
         m: Float,
     ) = addChainedFilledBoxVertices(
-        matrices,
+        matrix4f,
         vertexConsumer,
         d.toFloat(),
         e.toFloat(),
@@ -1022,7 +1017,7 @@ object WorldRenderUtils {
     )
 
     private fun addChainedFilledBoxVertices(
-        matrices: PoseStack,
+        matrix4f: PoseStack.Pose,
         vertexConsumer: VertexConsumer,
         f: Float,
         g: Float,
@@ -1035,7 +1030,6 @@ object WorldRenderUtils {
         n: Float,
         o: Float,
     ) {
-        val matrix4f = matrices.last().pose()
         vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
         vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
         vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
