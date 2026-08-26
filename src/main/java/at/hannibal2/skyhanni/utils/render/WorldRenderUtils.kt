@@ -129,22 +129,25 @@ object WorldRenderUtils {
     @HandleEvent
     private fun onRenderWorldLegacy(event: SkyHanniRenderWorldEventLegacy) {
         if (queuedSeeThroughText.isEmpty()) return
-        val fr = Minecraft.getInstance().font
-        for (entry in queuedSeeThroughText) {
-            fr.drawInBatch(
-                entry.text,
-                entry.x,
-                entry.y,
-                entry.color,
-                entry.shadow,
-                entry.pose,
-                event.bufferSource,
-                DisplayMode.SEE_THROUGH,
-                entry.backgroundColor,
-                entry.light,
-            )
+        try {
+            val fr = Minecraft.getInstance().font
+            for (entry in queuedSeeThroughText) {
+                fr.drawInBatch(
+                    entry.text,
+                    entry.x,
+                    entry.y,
+                    entry.color,
+                    entry.shadow,
+                    entry.pose,
+                    event.bufferSource,
+                    DisplayMode.SEE_THROUGH,
+                    entry.backgroundColor,
+                    entry.light,
+                )
+            }
+        } finally {
+            queuedSeeThroughText.clear()
         }
-        queuedSeeThroughText.clear()
     }
     *///?}
 
