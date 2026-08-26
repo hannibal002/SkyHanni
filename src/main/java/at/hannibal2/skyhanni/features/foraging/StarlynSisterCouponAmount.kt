@@ -9,12 +9,15 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.foraging.StarlynSisterDetector.createStarlynDetector
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventoryAndSacks
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.itemType
 import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -29,6 +32,10 @@ object StarlynSisterCouponAmount {
     private const val CUSTOM_STACK_LOCATION = 4
     private val DEBOUNCE_DELAY = 0.3.seconds
     private var couponAmountItemStack: SafeItemStack? = null
+
+    private val emptyGlassItem = Blocks.BLACK_STAINED_GLASS_PANE.asItem()
+
+    private var itemReplaced: Boolean = false
 
     fun isEnabled() = config.starlynCouponAmount && starlynInventory.isInside()
 
@@ -58,15 +65,30 @@ object StarlynSisterCouponAmount {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun replaceItem(event: ReplaceItemEvent) {
+        itemReplaced = false
+
         if (!isEnabled() || event.slot != CUSTOM_STACK_LOCATION) return
-        if (!event.hasItem) return
-        couponAmountItemStack?.let { event.replace(it) }
+
+        if (event.originalItem.itemType == emptyGlassItem) {
+            couponAmountItemStack?.let { stack ->
+                event.replace(stack)
+                itemReplaced = true
+            }
+        } else {
+            ErrorManager.logErrorWithData(
+                IllegalStateException("Unexpected item found in slot $CUSTOM_STACK_LOCATION of Starlyn Shop"),
+                "Unexpected item found in Starlyn Shop Coupon Amount slot",
+                "slot" to CUSTOM_STACK_LOCATION,
+                "found item" to event.originalItem,
+                "expected item type" to emptyGlassItem
+            )
+        }
     }
 
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!isEnabled() || event.slotId != CUSTOM_STACK_LOCATION) return
+        if (!isEnabled() || event.slotId != CUSTOM_STACK_LOCATION || !itemReplaced) return
 
         event.cancel()
         if (lastClick.passedSince() > DEBOUNCE_DELAY) {

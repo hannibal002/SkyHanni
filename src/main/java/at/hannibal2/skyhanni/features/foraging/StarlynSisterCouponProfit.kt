@@ -49,7 +49,7 @@ object StarlynSisterCouponProfit {
         val price: Double,
         val totalCost: Double,
         val requiredItems: List<LoreCostUtils.LoreCostEntry>,
-        val couponAmount: Int,
+        val couponAmount: Long,
         val profit: Double,
         val profitPerCoupon: Double,
         val isCouponPrizeItem: Boolean,
@@ -158,13 +158,13 @@ object StarlynSisterCouponProfit {
         val itemName = internalName.repoItemName
 
         var totalCost = 0.0
-        var couponAmount = 0
+        var couponAmount = 0L
         var isCouponPrizeItem = false
 
         val requiredItems = item.readLoreCosts()
         requiredItems.forEach { (name, amount) ->
             totalCost += (name.getPriceOrNull() ?: 0.0) * amount
-            if (name == sister.couponName) couponAmount = amount.toInt()
+            if (name == sister.couponName) couponAmount = amount
             if (name == sister.prizeName) isCouponPrizeItem = true
         }
 
