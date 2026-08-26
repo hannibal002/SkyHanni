@@ -25,7 +25,7 @@ object LoreCostUtils {
 
     fun isCostHeader(line: String): Boolean = costHeaderPattern.matches(line)
 
-    /** True when the item can be bought right now, as opposed to a locked or already owned entry. */
+    /** True when the item is a purchase entry, as opposed to a locked or already owned one. */
     fun List<String>.hasTradeLine(): Boolean = any { tradeLinePattern.matches(it.removeColor()) }
 
     private val patternGroup = RepoPattern.group("utils.lore")
@@ -35,30 +35,35 @@ object LoreCostUtils {
      * into the header line is handed on as is, so that features can find that exact line again
      * in the tooltip. Matching without color would strip it and break that lookup.
      *
+     * Menus that list their costs below the header write it in singular or plural, with a colon
+     * or without one.
+     *
      * REGEX-TEST: §7Cost
      * REGEX-TEST: §5§o§7Cost
+     * REGEX-TEST: §7Costs
+     * REGEX-TEST: §7Cost:
      * REGEX-TEST: §7Cost: §b5,000 Bits
      * REGEX-TEST: §7Cost to unlock: §550 Tokens
      */
     private val costHeaderPattern by patternGroup.pattern(
         "cost.header",
-        "(?:§.)*Cost(?: to unlock)?(?:: (?<cost>.+))?",
+        "(?:§.)*Costs?(?: to unlock)?(?::(?: (?<cost>.+))?)?",
     )
 
     /**
-     * Shops word this line differently, the essence perk shops unlock and the chip menu levels
-     * up, but all of them list their cost the same way. Kuudra names the mouse button, and its
-     * preview line uses the right button, which must not count as a trade.
+     * Shops word this line differently, and an entry the player cannot afford says so instead of
+     * asking for a click. Kuudra's preview line uses the right button and is no trade.
      *
      * REGEX-TEST: Click to trade!
      * REGEX-TEST: Click to unlock!
      * REGEX-TEST: Click to level up!
      * REGEX-TEST: Left Click to unlock!
+     * REGEX-TEST: You can't afford this upgrade!
      * REGEX-FAIL: Right Click to preview!
      */
     private val tradeLinePattern by patternGroup.pattern(
         "trade.click",
-        "(?:Left )?Click to (?:trade|unlock|level up)!",
+        "(?:Left )?Click to (?:trade|unlock|level up)!|You can't afford this upgrade!",
     )
 
     /**
@@ -81,7 +86,8 @@ object LoreCostUtils {
             groupOrNull("cost")?.let { return listOf(readCostLine(it, itemName)) }
         }
 
-        return drop(headerIndex + 1).takeWhile { it.isNotEmpty() }.map { readCostLine(it, itemName) }
+        // the blank line below the costs is not always empty, some menus write a color code into it
+        return drop(headerIndex + 1).takeWhile { it.removeColor().isNotEmpty() }.map { readCostLine(it, itemName) }
     }
 
     private fun readCostLine(rawLine: String, itemName: String): LoreCostEntry {
@@ -96,10 +102,13 @@ object LoreCostUtils {
             return LoreCostEntry(NeuInternalName.MISSING_ITEM, 1, rawLine)
         }
 
-        val internalName = NeuInternalName.fromItemNameOrNull(name) ?: run {
-            logCostLineError("Unknown item in a cost line", rawLine, itemName)
-            NeuInternalName.MISSING_ITEM
-        }
+        // currencies without a repo item only arrive here, their amount is written behind the name or not at all
+        val internalName = NeuInternalName.fromItemNameOrNull(name)
+            ?: SkyblockCurrency.getByLoreNameOrNull(name)?.internalName
+            ?: run {
+                logCostLineError("Unknown item in a cost line", rawLine, itemName)
+                NeuInternalName.MISSING_ITEM
+            }
         return LoreCostEntry(internalName, amount.toLong(), rawLine)
     }
 

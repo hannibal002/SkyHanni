@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.inventory.NpcTradeEvent
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -54,7 +56,7 @@ object CurrencyApi {
      */
     private val pestsAmountPattern by patternGroup.pattern(
         "pests.amount",
-        "Vacuum Bag: (?<amount>[\\d,]+) \uE018 Pests",
+        "Vacuum Bag: (?<amount>[\\d,]+) [\uE07F\uE018] Pests",
     )
 
     /**
@@ -65,6 +67,42 @@ object CurrencyApi {
     private val medalAmountPattern by patternGroup.pattern(
         "medal.amount",
         "(?<type>GOLD|SILVER|BRONZE) medals: (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * REGEX-TEST: Premium Safari Tickets: 0
+     * REGEX-TEST: First-Class Safari Tickets: 1,024
+     */
+    private val safariTicketItemPattern by patternGroup.pattern(
+        "safariticket.item",
+        "(?<type>[\\w-]+) Safari Tickets: (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * REGEX-TEST: - Basic: 1
+     * REGEX-TEST: - First-Class: 0
+     */
+    private val safariTicketSignPattern by patternGroup.pattern(
+        "safariticket.sign",
+        "- (?<type>Basic|Economy|Premium|First-Class): (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * The lore only writes "Tokens", the item this line belongs to is what makes it unambiguous.
+     *
+     * REGEX-TEST: Carnival Tokens
+     */
+    private val carnivalTokenItemPattern by patternGroup.pattern(
+        "carnivaltoken.item",
+        "Carnival Tokens",
+    )
+
+    /**
+     * REGEX-TEST: Your Tokens: 2,136
+     */
+    private val carnivalTokenAmountPattern by patternGroup.pattern(
+        "carnivaltoken.amount",
+        "Your Tokens: (?<amount>[\\d,]+)",
     )
 
     /**
@@ -185,6 +223,17 @@ object CurrencyApi {
         }
     }
 
+    // unlocking an upgrade sends no chat message, the new amount only shows in the updated item
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        val item = event.inventoryItems.values.firstOrNull { carnivalTokenItemPattern.matches(it.cleanName) } ?: return
+        for (line in item.getCleanLore()) {
+            carnivalTokenAmountPattern.matchMatcher(line) {
+                SkyblockCurrency.CARNIVAL_TOKEN.setAmount(group("amount").formatLong())
+            }
+        }
+    }
+
     @HandleEvent
     private fun onNpcTrade(event: NpcTradeEvent) {
         for (cost in event.costs) {
@@ -227,6 +276,7 @@ object CurrencyApi {
         medalAmountPattern.matchMatcher(line) {
             medalCurrencyOrNull(group("type"))?.setAmount(group("amount").formatLong())
         }
+        readSafariTicketLine(line)
         // every essence shop menu holds an item that states how much of it the player owns
         essenceAmountPattern.matchMatcher(line) {
             val type = group("type")
@@ -244,6 +294,30 @@ object CurrencyApi {
 
             essenceStorage?.put(internalName, group("amount").formatLong())
         }
+    }
+
+    private fun readSafariTicketLine(line: String) {
+        safariTicketItemPattern.matchMatcher(line) {
+            setSafariTicketAmount(group("type"), group("amount"), line)
+        }
+        safariTicketSignPattern.matchMatcher(line) {
+            setSafariTicketAmount(group("type"), group("amount"), line)
+        }
+    }
+
+    private fun setSafariTicketAmount(type: String, amount: String, line: String) {
+        val currency = SkyblockCurrency.getByLoreNameOrNull("$type Safari Ticket") ?: run {
+            ErrorManager.logErrorStateWithData(
+                "Could not read how many Safari Tickets you own",
+                "Unknown Safari Ticket type in an item lore",
+                "type" to type,
+                "line" to line,
+                "inventoryName" to InventoryUtils.openInventoryName(),
+                betaOnly = true,
+            )
+            return
+        }
+        currency.setAmount(amount.formatLong())
     }
 
     private fun essenceInternalNameOrNull(type: String): NeuInternalName? =
