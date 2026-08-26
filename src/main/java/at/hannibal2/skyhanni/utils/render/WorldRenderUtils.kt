@@ -112,7 +112,7 @@ object WorldRenderUtils {
     //? if < 26.2 {
     /*private val queuedSeeThroughText = mutableListOf<SeeThroughText>()
 
-    private class SeeThroughText(
+    private data class SeeThroughText(
         val pose: Matrix4f,
         val x: Float,
         val y: Float,
