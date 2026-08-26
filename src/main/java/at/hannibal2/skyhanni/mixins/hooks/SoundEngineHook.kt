@@ -12,6 +12,7 @@ object SoundEngineHook {
     @JvmStatic
     fun modifySoundVolume(soundInstance: SoundInstance, original: Float): Float {
         if (soundInstance !is SkyHanniSoundInstance) return original
+        if (original == 0f) return original
         if (SkyHanniMod.feature.misc.maintainGameVolume) return original
         return soundInstance.volume.coerceIn(0f, 1f)
     }
