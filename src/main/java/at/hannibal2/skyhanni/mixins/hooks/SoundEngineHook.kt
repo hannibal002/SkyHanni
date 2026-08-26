@@ -11,7 +11,7 @@ object SoundEngineHook {
      * A complete mute is still respected and not bypassed.
      */
     @JvmStatic
-    fun modifySoundVolume(soundInstance: SoundInstance, original: Float): Float {
+    fun modifyVolume(soundInstance: SoundInstance, original: Float): Float {
         if (soundInstance !is SkyHanniSoundInstance) return original
         if (original == 0f) return original
         if (!SkyHanniMod.feature.misc.boostWarningVolume) return original

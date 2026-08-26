@@ -45,7 +45,7 @@ public abstract class MixinSoundEngine {
         )
     )
     public float overrideSkyHanniSoundVolume(float original, @Local(argsOnly = true) SoundInstance soundInstance) {
-        return SoundEngineHook.modifySoundVolume(soundInstance, original);
+        return SoundEngineHook.modifyVolume(soundInstance, original);
     }
 
     @ModifyReturnValue(
@@ -53,6 +53,6 @@ public abstract class MixinSoundEngine {
         at = @At("RETURN")
     )
     public float overrideSkyHanniSoundVolumeOnRefresh(float original, @Local(argsOnly = true) SoundInstance soundInstance) {
-        return SoundEngineHook.modifySoundVolume(soundInstance, original);
+        return SoundEngineHook.modifyVolume(soundInstance, original);
     }
 }
