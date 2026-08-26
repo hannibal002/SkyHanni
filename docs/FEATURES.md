@@ -159,6 +159,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Croesus Unopened Chest Count Overlay for Kuudra and Dungeons. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4846)
 + Croesus Profit Overlay and Highlight most profitable chest. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4857)
 + Added Blood Move Message for Dungeon Blood Camp. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/5276)
++ Added Dungeon Item Quality as Stack Size to Item Numbers. - RiskWondering (https://github.com/hannibal002/SkyHanni/pull/6223)
 
 </details>
 <details open><summary>
