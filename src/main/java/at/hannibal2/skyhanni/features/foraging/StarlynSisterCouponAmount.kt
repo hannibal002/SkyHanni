@@ -33,7 +33,7 @@ object StarlynSisterCouponAmount {
     private val DEBOUNCE_DELAY = 0.3.seconds
     private var couponAmountItemStack: SafeItemStack? = null
 
-    private val emptyGlassItem = Blocks.BLACK_STAINED_GLASS_PANE.asItem()
+    private val emptyGlassItem = Blocks.STAINED_GLASS_PANE.black().asItem()
 
     private var itemReplaced: Boolean = false
 
