@@ -396,13 +396,14 @@ class MiscConfig {
 
     @Expose
     @ConfigOption(
-        name = "Maintain Volume During Warnings",
-        desc = "Respect game volume settings for warning sounds instead of always playing them at 100%.",
+        name = "Boost Warning Volume",
+        desc = "Play SkyHanni warning sounds at 100% volume regardless of game volume settings.\n" +
+            "If the game is muted, you still won't hear the sounds.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    @SearchTag("levels loud quiet")
-    var maintainGameVolume: Boolean = false
+    @SearchTag("beep change ding during loud maintain pling quiet warnings")
+    var boostWarningVolume: Boolean = true
 
     @Expose
     @ConfigOption(

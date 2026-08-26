@@ -2,12 +2,14 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.SoundCompat
+import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SoundInstance
 import net.minecraft.resources.Identifier
@@ -21,7 +23,7 @@ object SoundUtils {
     val plingSound by lazy { createSound("block.note_block.pling", 1f) }
 
     // Sounds created via createSound bypass the user's volume settings
-    // unless the maintainGameVolume option is enabled, see SoundEngineHook.
+    // if the boostWarningVolume option is enabled, see SoundEngineHook.
     fun SoundInstance.playSound() {
         DelayedRun.runOrNextTick {
             try {
@@ -77,7 +79,7 @@ object SoundUtils {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shplaysound") {
             description = "Play the specified sound effect at the given pitch and volume."
             category = CommandCategory.DEVELOPER_TEST
@@ -99,6 +101,13 @@ object SoundUtils {
             simpleCallback {
                 ChatUtils.userError("Specify a sound effect to test")
             }
+        }
+    }
+
+    @HandleEvent
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(145, "misc.maintainGameVolume", "misc.boostWarningVolume") { element ->
+            JsonPrimitive(!element.asBoolean)
         }
     }
 }

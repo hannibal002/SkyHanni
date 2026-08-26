@@ -8,12 +8,13 @@ object SoundEngineHook {
     /**
      * Makes SkyHanni's own sounds bypass the user's volume settings, without touching
      * the volume of any other sound or the sound engine's global volume state.
+     * A complete mute is still respected and not bypassed.
      */
     @JvmStatic
     fun modifySoundVolume(soundInstance: SoundInstance, original: Float): Float {
         if (soundInstance !is SkyHanniSoundInstance) return original
         if (original == 0f) return original
-        if (SkyHanniMod.feature.misc.maintainGameVolume) return original
+        if (!SkyHanniMod.feature.misc.boostWarningVolume) return original
         return soundInstance.volume.coerceIn(0f, 1f)
     }
 }
