@@ -111,7 +111,7 @@ abstract class GuiContainerEvent(
         }
 
         companion object {
-            private val postDepth = ThreadLocal.withInitial { 0 }
+            private val posting = ThreadLocal.withInitial { false }
 
             fun postEvent(
                 gui: SkyHanniGuiContainer,
@@ -120,20 +120,15 @@ abstract class GuiContainerEvent(
                 clickedButton: Int,
                 clickType: ContainerInput,
             ): SlotClickEvent? {
-                if (postDepth.get() > 0) return null
+                if (posting.get()) return null
 
-                postDepth.set(postDepth.get() + 1)
+                posting.set(true)
                 try {
                     val event = SlotClickEvent(gui, container, slotId, clickedButton, clickType)
                     event.post()
                     return event
                 } finally {
-                    val depth = postDepth.get() - 1
-                    check(depth >= 0) {
-                        postDepth.remove()
-                        "SlotClickEvent postDepth underflow detected"
-                    }
-                    if (depth == 0) postDepth.remove() else postDepth.set(depth)
+                    posting.remove()
                 }
             }
         }
