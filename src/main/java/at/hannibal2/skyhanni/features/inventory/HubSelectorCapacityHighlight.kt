@@ -5,11 +5,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.world.inventory.ChestMenu
 
 @SkyHanniModule
 object HubSelectorCapacityHighlight {
@@ -36,12 +38,12 @@ object HubSelectorCapacityHighlight {
         "Players: (?<current>\\d+)/(?<max>\\d+)",
     )
 
-    private val hubSelectorInventory = InventoryDetector { inventoryPattern }
+    private val inventory = InventoryDetector { inventoryPattern }
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!config.enabled) return
-        if (!hubSelectorInventory.isInside()) return
+        if (!inventory.isInside()) return
 
         // Coerce the thresholds into order at read time so ranges never overlap, no matter how the
         // sliders are set (veryBusy >= busy >= moderate).
@@ -49,8 +51,9 @@ object HubSelectorCapacityHighlight {
         val busy = config.busyThreshold.coerceAtLeast(moderate)
         val veryBusy = config.veryBusyThreshold.coerceAtLeast(busy)
 
-        for (slot in event.container.slots) {
-            playersPattern.firstMatcher(slot.item.getCleanLore()) {
+        val chest = event.container as ChestMenu
+        for ((slot, stack) in chest.getUpperItems()) {
+            playersPattern.firstMatcher(stack.getCleanLore()) {
                 val current = group("current").toInt()
                 val max = group("max").toInt()
                 val percent = current.fractionOf(max) * 100
