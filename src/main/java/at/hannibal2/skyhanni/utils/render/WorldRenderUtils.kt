@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.rgb
@@ -47,9 +48,11 @@ import kotlin.math.sqrt
 import net.fabricmc.fabric.api.client.rendering.v1.SubmitRenderPhases
 import net.minecraft.client.renderer.feature.TextFeatureRenderer
 //?} else {
-/*import net.minecraft.client.renderer.MultiBufferSource
+/*import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEventLegacy
 *///?}
 
+@SkyHanniModule
 @Suppress("LargeClass")
 object WorldRenderUtils {
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
@@ -123,7 +126,8 @@ object WorldRenderUtils {
     )
 
     // See the MC-298659 note in submitOrderedText.
-    fun drawQueuedSeeThroughText(bufferSource: MultiBufferSource.BufferSource) {
+    @HandleEvent
+    private fun onRenderWorldLegacy(event: SkyHanniRenderWorldEventLegacy) {
         if (queuedSeeThroughText.isEmpty()) return
         val fr = Minecraft.getInstance().font
         for (entry in queuedSeeThroughText) {
@@ -134,7 +138,7 @@ object WorldRenderUtils {
                 entry.color,
                 entry.shadow,
                 entry.pose,
-                bufferSource,
+                event.bufferSource,
                 DisplayMode.SEE_THROUGH,
                 entry.backgroundColor,
                 entry.light,

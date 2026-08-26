@@ -35,7 +35,7 @@ import net.minecraft.server.packs.PackType
 import java.util.concurrent.CompletableFuture
 
 //? if < 26.2 {
-/*import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
+/*import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEventLegacy
 *///?}
 
 @SkyHanniModule
@@ -74,7 +74,7 @@ object ClientEvents {
 
         //? if < 26.2 {
         /*LevelRenderEvents.AFTER_TRANSLUCENT_TERRAIN.register { ctx ->
-            WorldRenderUtils.drawQueuedSeeThroughText(ctx.bufferSource())
+            SkyHanniRenderWorldEventLegacy(ctx.bufferSource()).post()
         }
         *///?}
 
