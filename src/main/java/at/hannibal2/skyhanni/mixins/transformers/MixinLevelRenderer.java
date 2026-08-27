@@ -32,4 +32,12 @@ public abstract class MixinLevelRenderer {
         if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
         SkyHanniOutlineHook.checkIfDepthAttachmentNeedsUpdating();
     }
+
+    //? if < 26.2 {
+    /*@Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"))
+    private void renderSkyHanniGlow(CallbackInfo ci) {
+        if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
+        SkyHanniOutlineHook.getVertexConsumers().endOutlineBatch();
+    }
+    *///?}
 }
