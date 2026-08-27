@@ -79,7 +79,7 @@ object SlayerRngMeterToolTipFeatures {
     )
 
     @HandleEvent
-    fun onToolTip(event: ToolTipTextEvent) {
+    private fun onToolTip(event: ToolTipTextEvent) {
         val convertToFractions = config.rngMeterFractions
         val coinsPerBoss = config.rngMeterCoinsPerBoss
         if (!convertToFractions && !coinsPerBoss) return
@@ -147,7 +147,7 @@ object SlayerRngMeterToolTipFeatures {
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!SlayerApi.inventoryNamePattern.matches(event.inventoryName)) return
 
         val items = event.inventoryItems
@@ -164,7 +164,7 @@ object SlayerRngMeterToolTipFeatures {
     }
 
     @HandleEvent
-    fun onPurseChange(event: PurseChangeEvent) {
+    private fun onPurseChange(event: PurseChangeEvent) {
         if (event.reason != PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) return
 
         val expectedCoins = SlayerApi.slayerJsonData?.spawnCosts[SlayerApi.activeType]?.get(SlayerApi.tier) ?: return
