@@ -325,7 +325,7 @@ object SlayerRngMeterDisplay {
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(140, "#profile.slayerRngMeter", "#profile.slayer.rngMeter")
     }
 
