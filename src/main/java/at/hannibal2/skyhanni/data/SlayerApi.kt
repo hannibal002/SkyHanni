@@ -438,7 +438,7 @@ object SlayerApi {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         slayerJsonData = event.getConstant<SlayerJson>("Slayer")
     }
 
