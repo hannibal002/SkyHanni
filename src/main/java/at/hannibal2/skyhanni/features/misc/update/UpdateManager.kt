@@ -241,11 +241,14 @@ object UpdateManager {
 
     private var potentialUpdate: PotentialUpdate? = null
 
+    private val releaseStreamPattern = "(?i)(?:full|release)s?".toRegex()
+    private val betaStreamPattern = "(?i)(?:beta|latest)s?".toRegex()
+
     private fun updateCommand(arg: String) {
         val currentStream = SkyHanniMod.feature.about.updateStream.get()
         val updateStream = when {
-            arg.matches("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
-            arg.matches("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
+            arg.matches(releaseStreamPattern) -> UpdateStream.RELEASES
+            arg.matches(betaStreamPattern) -> UpdateStream.BETA
             else -> currentStream
         }
 
@@ -254,14 +257,16 @@ object UpdateManager {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {
-                    val newUpdateStream = SkyHanniMod.feature.about.updateStream
-                    newUpdateStream.set(UpdateStream.BETA)
-                    checkUpdate(true, newUpdateStream.get())
+                    SkyHanniMod.feature.about.updateStream.set(UpdateStream.BETA)
+                    checkUpdate(true, UpdateStream.BETA)
                 },
                 "§eClick to confirm!",
                 oneTimeClick = true,
             )
         } else {
+            if (updateStream != currentStream) {
+                SkyHanniMod.feature.about.updateStream.set(updateStream)
+            }
             checkUpdate(true, updateStream)
         }
     }
