@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.SortingTypeEntry
+import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.StorageType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -38,6 +40,8 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButt
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonArray
+import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
@@ -88,7 +92,7 @@ object ChestValue {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
         val inInv = MinecraftCompat.screen is InventoryScreen
-        inOwnInventory = inInv && config.enableInOwnInventory
+        inOwnInventory = inInv && StorageType.OWN_INVENTORY in config.enabledIn.get()
         if (!inInventory) return
         update()
     }
@@ -249,10 +253,8 @@ object ChestValue {
         if (MinionFeatures.minionInventoryOpen) return false
         if (MinionFeatures.minionStorageInventoryOpen) return false
 
-        if ((name.contains("Backpack") && name.contains("Slot #") || name.startsWith("Ender Chest ("))
-        ) {
-            return true
-        }
+        if (name.startsWith("Ender Chest (")) return StorageType.ENDER_CHEST in config.enabledIn.get()
+        if (name.contains("Backpack") && name.contains("Slot #")) return StorageType.BACKPACK in config.enabledIn.get()
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
         return InventoryUtils.isInNormalChest() || inMinion || relevantChestValuePattern.matches(name)
@@ -288,6 +290,21 @@ object ChestValue {
         var total: Double,
         val tips: List<String>,
     )
+
+    @HandleEvent
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(
+            144,
+            "inventory.chestValueConfig.enableInOwnInventory",
+            "inventory.chestValueConfig.enabledIn",
+        ) { element ->
+            JsonArray().apply {
+                add(JsonPrimitive(StorageType.ENDER_CHEST.name))
+                add(JsonPrimitive(StorageType.BACKPACK.name))
+                if (element.asBoolean) add(JsonPrimitive(StorageType.OWN_INVENTORY.name))
+            }
+        }
+    }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }
