@@ -23,6 +23,9 @@ object PlayerChatModifier {
         patterns.add("§[7ab6](\\w{2,16})§r(?!§7x)(?!\$)".toRegex()) // all players without rank prefix in notification messages
     }
 
+    private val possessivePattern = "§[7ab6]((?:\\w+){2,16})'s".toRegex()
+    private val colorFollowPattern = "§[7ab6]((?:\\w+){2,16}) (§.)".toRegex()
+
     @HandleEvent
     fun onChat(event: SystemMessageEvent.Modify) {
         event.applyIfPossible("PLAYER_CHAT") { cutMessage(it) }
@@ -53,8 +56,8 @@ object PlayerChatModifier {
             for (pattern in patterns) {
                 string = string.replace(pattern, "§b$1")
             }
-            string = string.replace("§[7ab6]((?:\\w+){2,16})'s", "§b$1's")
-            string = string.replace("§[7ab6]((?:\\w+){2,16}) (§.)", "§b$1 $2")
+            string = string.replace(possessivePattern, "§b$1's")
+            string = string.replace(colorFollowPattern, "§b$1 $2")
         }
 
         string = MarkedPlayerManager.replaceInChat(string)
