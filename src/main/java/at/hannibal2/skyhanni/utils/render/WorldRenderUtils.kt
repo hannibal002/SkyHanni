@@ -984,6 +984,20 @@ object WorldRenderUtils {
         ) ?: aabb
     }
 
+    fun SkyHanniRenderWorldEvent.drawColorOrOutline(
+        location: LorenzVec,
+        color: ChromaColour,
+        beacon: Boolean = false,
+        width: Int = 1,
+        alpha: Float = -1f,
+        seeThroughBlocks: Boolean = true,
+        filled: Boolean = false,
+    ) {
+        if (filled) drawColor(location, color, false, alpha, seeThroughBlocks)
+        else drawEdges(location, color.toColor(), width, depth = !seeThroughBlocks)
+        if (beacon) renderBeaconBeam(location, color.toColor())
+    }
+
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec =
         exactLocation(player).up(player.getEyeHeight(player.pose))
 
