@@ -244,8 +244,8 @@ object UpdateManager {
     private fun updateCommand(arg: String) {
         val currentStream = SkyHanniMod.feature.about.updateStream.get()
         val updateStream = when {
-            arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
-            arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
+            arg.matches("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
+            arg.matches("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
             else -> currentStream
         }
 
