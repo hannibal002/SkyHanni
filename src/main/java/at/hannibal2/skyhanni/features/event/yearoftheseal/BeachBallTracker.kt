@@ -40,7 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object BeachBallTracker {
 
-    private val config get() = SkyHanniMod.feature.event.yearOfTheSeal
+    private val config get() = SkyHanniMod.feature.event.yearOfTheSeal.beachBallTracker
 
     private val FISHY_TREAT = "FISHY_TREAT".toInternalName()
     private val ENCHANTED_RAW_FISH = "ENCHANTED_RAW_FISH".toInternalName()
@@ -79,7 +79,7 @@ object BeachBallTracker {
         "Beach Ball Tracker",
         ::Data,
         { it.beachBallTracker },
-        trackerConfig = { config.beachBallTracker.perTrackerConfig },
+        trackerConfig = { config.perTrackerConfig },
     ) {
         drawDisplay(it)
     }
@@ -94,17 +94,17 @@ object BeachBallTracker {
     enum class BallType(
         val label: String,
         val item: NeuInternalName,
-        val resultPattern: Pattern,
+        val resultPattern: () -> Pattern,
     ) {
-        NORMAL("Beach Balls", "BOUNCY_BEACH_BALL".toInternalName(), normalResultPattern),
-        GIANT("Giant Beach Balls", "GIANT_BOUNCY_BEACH_BALL".toInternalName(), giantResultPattern),
+        NORMAL("Beach Balls", "BOUNCY_BEACH_BALL".toInternalName(), { normalResultPattern }),
+        GIANT("Giant Beach Balls", "GIANT_BOUNCY_BEACH_BALL".toInternalName(), { giantResultPattern }),
     }
 
     private val ballItems = BallType.entries.map { it.item }.toSet()
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!config.beachBallTracker.enabled) return
+        if (!config.enabled) return
         val message = event.cleanMessage
 
         // A ball was just thrown: show the overlay immediately (before any result comes in).
@@ -114,7 +114,7 @@ object BeachBallTracker {
         }
 
         for (type in BallType.entries) {
-            type.resultPattern.matchMatcher(message) {
+            type.resultPattern().matchMatcher(message) {
                 val treats = group("treats").formatInt()
                 markActivity()
                 tracker.modify {
@@ -175,14 +175,14 @@ object BeachBallTracker {
             condition = { shouldShowDisplay() },
             onRender = {
                 if (isHoldingBeachBall()) tracker.firstUpdate()
-                tracker.renderDisplay(config.beachBallTracker.position)
+                tracker.renderDisplay(config.position)
             },
         )
     }
 
     private fun shouldShowDisplay(): Boolean {
-        if (!config.beachBallTracker.enabled) return false
-        val recentlyActive = lastBallActivity.passedSince() < config.beachBallTracker.hideAfterInactivity.minutes
+        if (!config.enabled) return false
+        val recentlyActive = lastBallActivity.passedSince() < config.hideAfterInactivity.minutes
         return recentlyActive || isHoldingBeachBall()
     }
 

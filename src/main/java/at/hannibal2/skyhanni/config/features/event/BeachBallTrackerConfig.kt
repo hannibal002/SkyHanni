@@ -23,7 +23,7 @@ class BeachBallTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Hide After Inactivity",
-        desc = "Hide the tracker after this many minutes without bouncing a ball.",
+        desc = "Hide the tracker after this many minutes without using a ball.",
     )
     @ConfigEditorSlider(minValue = 1.0f, maxValue = 30.0f, minStep = 1.0f)
     @SearchTag("beach")
