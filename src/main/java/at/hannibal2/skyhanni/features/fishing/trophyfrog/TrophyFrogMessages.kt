@@ -32,7 +32,7 @@ object TrophyFrogMessages {
     @Suppress("MaxLineLength")
     private val trophyFrogPattern by RepoPattern.pattern(
         "fishing.trophy.trophyfrog",
-        "(?:§.|\\W)*?TROPHY FROG! (?:§.)*You caught an? (?:§.)*(?<displayName>[\\w -]+?) (?:§.)*(?<displayRarity>BRONZE|SILVER|GOLD|DIAMOND)(?:§.)*!",
+        "(?<prefix>(?:§.|\\W)*?)TROPHY FROG! (?:§.)*You caught an? (?:§.)*(?<displayName>[\\w -]+?) (?:§.)*(?<displayRarity>BRONZE|SILVER|GOLD|DIAMOND)(?:§.)*!",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -59,8 +59,8 @@ object TrophyFrogMessages {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onChat(event: SkyHanniChatEvent.Modify) {
-        val (displayName, displayRarity) = trophyFrogPattern.matchMatcher(event.message) {
-            group("displayName") to group("displayRarity")
+        val (prefix, displayName, displayRarity) = trophyFrogPattern.matchMatcher(event.message) {
+            Triple(group("prefix"), group("displayName"), group("displayRarity"))
         } ?: return
 
         val name = displayName.removeColor()
@@ -91,7 +91,7 @@ object TrophyFrogMessages {
                 DesignFormat.STYLE_2 -> "§bYou caught a $coloredName $rarityDisplay§b. §7(${amount.addSeparators()})"
                 else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $rarityDisplay $coloredName§b."
             }
-            "§2§lTROPHY FROG! $designFormat".asComponent()
+            "${prefix}TROPHY FROG! §r$designFormat".asComponent()
         } else event.chatComponent.copy()
 
         if (config.totalAmount) {
