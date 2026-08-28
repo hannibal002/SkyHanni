@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TransientEntitySectionManager.Callback.class)
 public abstract class MixinTransientEntitySectionManager$Callback<T extends EntityAccess> {
-
     @Shadow
     @Final
     private T entity;

@@ -14,7 +14,6 @@ import java.awt.Color
 
 @SkyHanniModule
 object PartyMemberOutlines {
-
     private val config get() = SkyHanniMod.feature.misc.highlightPartyMembers
 
     @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.HIGHLIGHT_PARTY_MEMBERS])

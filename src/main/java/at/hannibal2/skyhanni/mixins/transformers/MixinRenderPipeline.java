@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(value = RenderPipeline.class, remap = false)
 public abstract class MixinRenderPipeline {
-
     @ModifyReturnValue(method = "getDepthStencilState", at = @At("RETURN"))
     private DepthStencilState setGlowDepth(DepthStencilState original) {
         RenderPipeline thisPipeline = (RenderPipeline) (Object) this;

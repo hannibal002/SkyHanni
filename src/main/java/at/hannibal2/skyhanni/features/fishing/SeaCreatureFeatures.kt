@@ -31,7 +31,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SeaCreatureFeatures {
-
     private val config get() = SkyHanniMod.feature.fishing.rareCatches
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
 

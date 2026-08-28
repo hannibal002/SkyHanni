@@ -18,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(ModelFeatureRenderer.class)
 public abstract class MixinModelFeatureRenderer {
-
     @WrapOperation(
         method = "renderModel",
         at = @At(

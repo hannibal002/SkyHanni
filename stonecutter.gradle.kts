@@ -113,9 +113,9 @@ allprojects {
         }
 
         maven("https://jitpack.io") {
-            // NotEnoughUpdates (compiled against), Changelog builder, Preprocessor, Discord IPC
+            // MoulConfig, Changelog builder, Methanol (Modrinth Publisher)
             content {
-                includeGroupByRegex("(com|io)\\.github\\..*")
+                includeGroupAndSubgroups("com.github")
             }
         }
 
@@ -124,8 +124,7 @@ allprojects {
                 repositories.maven("https://maven.azureaaron.net/releases"),
             )
             filter {
-                includeGroup("net.azureaaron")
-                includeGroup("net.azureaaron.render-chest")
+                includeGroupAndSubgroups("net.azureaaron")
             }
         }
     }

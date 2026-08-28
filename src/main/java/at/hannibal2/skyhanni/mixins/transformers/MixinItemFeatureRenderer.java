@@ -28,7 +28,6 @@ import net.minecraft.client.renderer.SubmitNodeStorage;
 
 @Mixin(ItemFeatureRenderer.class)
 public abstract class MixinItemFeatureRenderer {
-
     @ModifyArg(
         //~ if < 26.2 'prepareOutlineSubmit' -> 'renderItem'
         method = "prepareOutlineSubmit",
@@ -88,5 +87,5 @@ public abstract class MixinItemFeatureRenderer {
         }
         return original.call(instance, renderType);
     }
-*///?}
+    *///?}
 }

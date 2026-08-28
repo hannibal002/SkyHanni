@@ -12,7 +12,6 @@ import java.awt.Color
 
 @SkyHanniModule
 object GlowingDroppedItems {
-
     private val config get() = SkyHanniMod.feature.misc
 
     @HandleEvent

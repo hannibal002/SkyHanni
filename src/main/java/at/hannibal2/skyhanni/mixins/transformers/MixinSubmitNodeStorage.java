@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.Unique;
     SubmitNodeStorage.ModelSubmit.class,
 })
 public abstract class MixinSubmitNodeStorage implements GlowingStateStore {
-
     @Unique
     private boolean skyhanni$usingCustomOutline = false;
 

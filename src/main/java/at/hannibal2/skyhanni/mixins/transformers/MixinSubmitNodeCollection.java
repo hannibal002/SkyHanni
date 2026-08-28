@@ -18,7 +18,6 @@ import java.util.List;
 
 @Mixin(SubmitNodeCollection.class)
 public abstract class MixinSubmitNodeCollection<E> {
-
     @WrapOperation(
         method = "submitItem",
         at = @At(
