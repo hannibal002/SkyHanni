@@ -353,7 +353,10 @@ class MiscConfig {
     var fixGhostEntities: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Replace Roman Numerals", desc = "Replace Roman Numerals with Arabic Numerals in some SkyHanni displays.")
+    @ConfigOption(
+        name = "Replace Roman Numerals",
+        desc = "Replace Roman Numerals with Arabic Numerals in inventories and in SkyHanni displays.",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     val replaceRomanNumerals: Property<Boolean> = Property.of(false)
