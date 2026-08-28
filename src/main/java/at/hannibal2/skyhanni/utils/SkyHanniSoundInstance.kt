@@ -6,9 +6,9 @@ import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundSource
 
 /**
- * A UI sound created by SkyHanni. Unless the user opted out via the Maintain Volume During Warnings option,
- * these sounds bypass the volume settings and play at their instance volume, without affecting any other sounds.
- * A complete mute is still respected and not bypassed.
+ * A UI sound created by SkyHanni. Unless the user turned off the Boost Warning Volume option,
+ * these sounds bypass the volume settings and play at their instance volume, without affecting
+ * any other sounds. A complete mute is still respected and not bypassed.
  * See `MixinSoundEngine` and [at.hannibal2.skyhanni.mixins.hooks.SoundEngineHook].
  */
 class SkyHanniSoundInstance(
