@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaFeatures
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllApi
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -453,25 +454,26 @@ object IslandGraphs {
         }
     }
 
-    fun stopNavigation(manual: Boolean = false) {
-        if (manual) {
-            if (currentTarget == null) {
-                ChatUtils.userError("No navigation is currently active.")
-                return
-            }
-            ChatUtils.userError("Manually stopped navigation")
+    fun stopNavigation() {
+        if (currentTarget != null) {
             NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
+            currentTarget = null
         }
-
-        currentTarget = null
         goal = null
         pathRenderer = null
         currentTargetNode = null
         navigationLabel = ""
         totalDistance = 0.0
         lastDisplayedDistance = 0.0
-
         NavigationFeedback.setNavInactive()
+    }
+
+    fun manualCancel() {
+        currentTarget = null // guard to stop duplicate stop messages.
+        stopNavigation()
+        NavigateAllApi.handleStop(errorMessage = false)
+        ChatUtils.userError("Manually stopped navigation")
+        onManualCancel()
     }
 
     /**
@@ -567,14 +569,9 @@ object IslandGraphs {
 
         val percentage = (1 - (distance / totalDistance)) * 100
         val component = "§e[SkyHanni] Navigating to §r$navigationLabel §f[§e$distance§f] §f(§c${percentage.roundTo(1)}%§f)".asComponent()
-        component.onClick(onClick = ::cancelClick)
+        component.onClick(onClick = ::manualCancel)
         component.hover = "§eClick to stop navigating!".asComponent()
         NavigationFeedback.sendPathFindMessage(component)
-    }
-
-    fun cancelClick() {
-        stopNavigation(manual = true)
-        onManualCancel()
     }
 
     @HandleEvent

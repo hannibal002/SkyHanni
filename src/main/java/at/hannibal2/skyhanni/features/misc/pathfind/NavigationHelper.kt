@@ -153,7 +153,7 @@ object NavigationHelper {
                 }
             }
             literalCallback("stop") {
-                IslandGraphs.stopNavigation(manual = true)
+                IslandGraphs.manualCancel()
             }
             simpleCallback {
                 doCommandAsync("")

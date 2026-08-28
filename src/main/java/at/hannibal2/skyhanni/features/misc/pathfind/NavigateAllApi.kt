@@ -178,8 +178,8 @@ object NavigateAllApi {
         navigateToCurrent()
     }
 
-    fun handleStop(manual: Boolean = false) {
-        if (!currentlyNavigating) {
+    fun handleStop(manual: Boolean = false, errorMessage: Boolean = true) {
+        if (!currentlyNavigating && errorMessage) {
             ChatUtils.userError("No current navigation to stop. §eUse /shnavigateall to start navigation")
             return
         }
