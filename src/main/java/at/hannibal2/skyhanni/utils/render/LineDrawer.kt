@@ -22,13 +22,16 @@ class LineDrawer @PublishedApi internal constructor(
         val layer = SkyHanniRenderLayers.getLines(!depth)
         val lines = queuedLines.toList()
         event.submitCustomGeometry(layer) { pose, buf ->
+            fun QueuedLine.addVertexForPoint(point: LorenzVec) {
+                buf.addVertex(pose.pose(), point.x.toFloat(), point.y.toFloat(), point.z.toFloat())
+                    .setNormal(pose, normal.x.toFloat(), normal.y.toFloat(), normal.z.toFloat())
+                    .setColor(color.red, color.green, color.blue, color.alpha)
+                    .setLineWidth(lineWidth.toFloat())
+            }
+
             for (line in lines) {
-                for (point in arrayOf(line.p1, line.p2)) {
-                    buf.addVertex(pose.pose(), point.x.toFloat(), point.y.toFloat(), point.z.toFloat())
-                        .setNormal(pose, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
-                        .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
-                        .setLineWidth(lineWidth.toFloat())
-                }
+                line.addVertexForPoint(line.p1)
+                line.addVertexForPoint(line.p2)
             }
         }
 

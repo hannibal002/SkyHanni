@@ -986,78 +986,96 @@ object WorldRenderUtils {
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec =
         exactLocation(player).up(player.getEyeHeight(player.pose))
 
+    /**
+     * Convenience overload for [addChainedFilledBoxVertices] that takes Double arguments,
+     * which AABB bounds are, and converts them to Float ahead of time.
+     */
     private fun addChainedFilledBoxVertices(
-        matrix4f: PoseStack.Pose,
+        pose: PoseStack.Pose,
         vertexConsumer: VertexConsumer,
-        d: Double,
-        e: Double,
-        f: Double,
-        g: Double,
-        h: Double,
-        i: Double,
-        j: Float,
-        k: Float,
-        l: Float,
-        m: Float,
+        minX: Double,
+        minY: Double,
+        minZ: Double,
+        maxX: Double,
+        maxY: Double,
+        maxZ: Double,
+        r: Float,
+        g: Float,
+        b: Float,
+        a: Float,
     ) = addChainedFilledBoxVertices(
-        matrix4f,
+        pose,
         vertexConsumer,
-        d.toFloat(),
-        e.toFloat(),
-        f.toFloat(),
-        g.toFloat(),
-        h.toFloat(),
-        i.toFloat(),
-        j,
-        k,
-        l,
-        m,
+        minX.toFloat(),
+        minY.toFloat(),
+        minZ.toFloat(),
+        maxX.toFloat(),
+        maxY.toFloat(),
+        maxZ.toFloat(),
+        r,
+        g,
+        b,
+        a,
     )
 
+    /**
+     * Adds the vertices for a filled axis-aligned box as a single chained triangle strip.
+     *
+     * Some vertices are intentionally duplicated to insert degenerate triangles between
+     * faces, allowing the entire box to be rendered as one continuous strip without
+     * producing visible geometry between otherwise disconnected faces.
+     */
     private fun addChainedFilledBoxVertices(
-        matrix4f: PoseStack.Pose,
+        pose: PoseStack.Pose,
         vertexConsumer: VertexConsumer,
-        f: Float,
+        minX: Float,
+        minY: Float,
+        minZ: Float,
+        maxX: Float,
+        maxY: Float,
+        maxZ: Float,
+        r: Float,
         g: Float,
-        h: Float,
-        i: Float,
-        j: Float,
-        k: Float,
-        l: Float,
-        m: Float,
-        n: Float,
-        o: Float,
+        b: Float,
+        a: Float,
     ) {
-        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
+        fun vertex(x: Float, y: Float, z: Float) {
+            vertexConsumer.addVertex(pose, x, y, z).setColor(r, g, b, a)
+        }
+
+        vertex(minX, minY, minZ)
+        vertex(minX, minY, minZ)
+        vertex(minX, minY, minZ)
+        vertex(minX, minY, maxZ)
+        vertex(minX, maxY, minZ)
+        vertex(minX, maxY, maxZ)
+        vertex(minX, maxY, maxZ)
+        vertex(minX, minY, maxZ)
+
+        vertex(maxX, maxY, maxZ)
+        vertex(maxX, minY, maxZ)
+        vertex(maxX, minY, maxZ)
+        vertex(maxX, minY, minZ)
+        vertex(maxX, maxY, maxZ)
+        vertex(maxX, maxY, minZ)
+        vertex(maxX, maxY, minZ)
+        vertex(maxX, minY, minZ)
+
+        vertex(minX, maxY, minZ)
+        vertex(minX, minY, minZ)
+        vertex(minX, minY, minZ)
+        vertex(maxX, minY, minZ)
+        vertex(minX, minY, maxZ)
+        vertex(maxX, minY, maxZ)
+        vertex(maxX, minY, maxZ)
+
+        vertex(minX, maxY, minZ)
+        vertex(minX, maxY, minZ)
+        vertex(minX, maxY, maxZ)
+        vertex(maxX, maxY, minZ)
+        vertex(maxX, maxY, maxZ)
+        vertex(maxX, maxY, maxZ)
+        vertex(maxX, maxY, maxZ)
     }
 
     /**
