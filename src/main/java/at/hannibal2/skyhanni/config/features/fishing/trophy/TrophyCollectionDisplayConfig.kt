@@ -15,7 +15,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 interface TrophyCollectionDisplayConfig {
     val enabled: Property<Boolean>
     val whenToShow: Property<WhenToShow>
-    val keybind: Int
+    var keybind: Int
     val requireArmor: Property<Boolean>
     val highlightNew: Property<Boolean>
     val extraSpace: Property<Int>
