@@ -30,8 +30,6 @@ plugins {
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
 val primaryTarget = ProjectTarget.MODERN_26200
 
-fun dependencyNotation(dep: Any): Any = (dep as? Provider<*>)?.get() ?: dep
-
 // Toolchains:
 java {
     toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
@@ -181,11 +179,11 @@ dependencies {
     "minecraftTestClientRuntimeLibraries"(libs.basicMath)
 
     // getting clock offset
-    includeImplementation(libs.commons.net)
+    shadowImpl(libs.commons.net)
     "minecraftTestClientRuntimeLibraries"(libs.commons.net)
 
     // Calculator
-    includeImplementation(libs.keval) {
+    shadowImpl(libs.keval) {
         exclude(group = "org.jetbrains.kotlin")
     }
     "minecraftTestClientRuntimeLibraries"(libs.keval)
@@ -198,14 +196,14 @@ dependencies {
     "minecraftTestClientRuntimeLibraries"(libs.httpclient)
 
     if (target.renderChestVersion != null) {
-        include("net.azureaaron:render-chest:${target.renderChestVersion}")
-        implementation("net.azureaaron:render-chest:${target.renderChestVersion}")
+        includeImplementation("net.azureaaron:render-chest:${target.renderChestVersion}")
         "minecraftTestClientRuntimeLibraries"("net.azureaaron:render-chest:${target.renderChestVersion}")
     }
 }
 
 fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit = {}) {
-    add("shadowImpl", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+    include(dep).also { (it as? ExternalModuleDependency)?.configure() }
+    implementation(dep).also { (it as? ExternalModuleDependency)?.configure() }
 }
 
 afterEvaluate {
