@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.inventory.NpcTradeEvent
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -54,7 +56,7 @@ object CurrencyApi {
      */
     private val pestsAmountPattern by patternGroup.pattern(
         "pests.amount",
-        "Vacuum Bag: (?<amount>[\\d,]+) \uE018 Pests",
+        "Vacuum Bag: (?<amount>[\\d,]+) [\uE07F\uE018] Pests",
     )
 
     /**
@@ -83,6 +85,24 @@ object CurrencyApi {
     private val safariTicketSignPattern by patternGroup.pattern(
         "safariticket.sign",
         "- (?<type>Basic|Economy|Premium|First-Class): (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * The lore only writes "Tokens", the item this line belongs to is what makes it unambiguous.
+     *
+     * REGEX-TEST: Carnival Tokens
+     */
+    private val carnivalTokenItemPattern by patternGroup.pattern(
+        "carnivaltoken.item",
+        "Carnival Tokens",
+    )
+
+    /**
+     * REGEX-TEST: Your Tokens: 2,136
+     */
+    private val carnivalTokenAmountPattern by patternGroup.pattern(
+        "carnivaltoken.amount",
+        "Your Tokens: (?<amount>[\\d,]+)",
     )
 
     /**
@@ -199,6 +219,17 @@ object CurrencyApi {
             }
             for (line in item.getCleanLore()) {
                 readCleanLine(line)
+            }
+        }
+    }
+
+    // unlocking an upgrade sends no chat message, the new amount only shows in the updated item
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        val item = event.inventoryItems.values.firstOrNull { carnivalTokenItemPattern.matches(it.cleanName) } ?: return
+        for (line in item.getCleanLore()) {
+            carnivalTokenAmountPattern.matchMatcher(line) {
+                SkyblockCurrency.CARNIVAL_TOKEN.setAmount(group("amount").formatLong())
             }
         }
     }

@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -34,7 +33,6 @@ import kotlin.time.Duration.Companion.seconds
 // Delaying key presses by 300ms comes from NotEnoughUpdates
 @SkyHanniModule
 object HarpFeatures {
-
     private val config get() = SkyHanniMod.feature.inventory.helper.harp
     private var lastClick = SimpleTimeMark.farPast()
 
@@ -65,7 +63,7 @@ object HarpFeatures {
     private fun isMenuGui(chestName: String) = menuTitlePattern.matches(chestName)
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiKeyPress(event: GuiKeyPressEvent) {
+    private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.keybinds) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
         val chest = event.guiContainer as? ContainerScreen ?: return
@@ -98,7 +96,7 @@ object HarpFeatures {
     private var openTime: SimpleTimeMark = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (config.quickRestart && isMenuGui(event.inventoryName)) {
             openTime = SimpleTimeMark.now()
         }
@@ -120,19 +118,19 @@ object HarpFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         if (!config.guiScale) return
         unSetGuiScale()
     }
 
     @HandleEvent
-    fun onDisconnect(event: ClientDisconnectEvent) {
+    private fun onDisconnect() {
         if (!config.guiScale) return
         unSetGuiScale()
     }
 
     @HandleEvent
-    fun onIslandChange() {
+    private fun onWorldChange() {
         if (!config.guiScale) return
         unSetGuiScale()
     }
@@ -170,8 +168,7 @@ object HarpFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (isHarpGui(InventoryUtils.openInventoryName())) {
             if (config.keybinds) {
                 // needed to not send duplicate clicks via keybind feature
@@ -190,14 +187,14 @@ object HarpFeatures {
             songSelectedPattern.anyMatches(it.item.getLore())
         }
         indexOfFirst.takeIf { it != -1 }?.let {
-            val clickType = event.clickType ?: return
+            val clickType = event.clickType
             event.cancel()
             InventoryUtils.clickSlot(it, event.container.containerId, mouseButton = event.clickedButton, mode = clickType)
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderItemTip(event: RenderItemTipEvent) {
+    private fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!config.showNumbers) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
         if (!event.stack.isStainedClay()) return
@@ -211,13 +208,13 @@ object HarpFeatures {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.harpKeybinds", "inventory.helper.harp.keybinds")
         event.move(2, "misc.harpNumbers", "inventory.helper.harp.showNumbers")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onToolTip(event: ToolTipTextEvent) {
+    private fun onToolTip(event: ToolTipTextEvent) {
         if (!config.hideMelodyTooltip) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
         if (event.slot?.container !is SimpleContainer) return

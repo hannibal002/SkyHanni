@@ -2806,10 +2806,6 @@
     <ID>PrivateEventListener:SkyHanniEvents.kt:SkyHanniEvents$@HandleEvent fun onSecondPassed</ID>
     <ID>PrivateEventListener:SkyHanniEvents.kt:SkyHanniEvents$@HandleEvent(priority = HandleEvent.HIGHEST) fun onRepoReload</ID>
     <ID>PrivateEventListener:SkyHanniItemRenderCoordinator.kt:SkyHanniItemRenderCoordinator$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:SkyHanniMod.kt:SkyHanniMod$@HandleEvent fun onClientShutdown</ID>
-    <ID>PrivateEventListener:SkyHanniMod.kt:SkyHanniMod$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:SkyHanniMod.kt:SkyHanniMod$@HandleEvent fun onRenderShutdown</ID>
-    <ID>PrivateEventListener:SkyHanniMod.kt:SkyHanniMod$@HandleEvent fun onTick</ID>
     <ID>PrivateEventListener:SkyHanniRepoManager.kt:SkyHanniRepoManager$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:SkyHanniRepoManager.kt:SkyHanniRepoManager$@HandleEvent fun onRepoReload</ID>
     <ID>PrivateEventListener:SkyHanniTracker.kt:SkyHanniTracker.Companion$@HandleEvent fun onTick</ID>
