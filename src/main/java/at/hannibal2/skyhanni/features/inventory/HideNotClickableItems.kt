@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.item.ItemNotClickableEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -104,13 +105,11 @@ object HideNotClickableItems {
     private fun bypassActive() = config.itemsBypass && KeyboardManager.isModifierKeyDown() && allowBypass
 
     private fun hide(chestName: String, stack: SafeItemStack): Boolean {
-        hideReasons = emptyList()
-        showGreenLine = false
-        allowBypass = true
-
-        if (PreventItemSell.shouldPreventSell(chestName, stack)) return true
-        if (config.enabled) return HideNotClickableItemsFeature.hideNotClickable(stack, chestName)
-
-        return false
+        val event = ItemNotClickableEvent(chestName, stack)
+        event.post()
+        hideReasons = event.hideReasons
+        showGreenLine = event.showGreenLine
+        allowBypass = event.allowBypass
+        return hideReasons.isNotEmpty()
     }
 }

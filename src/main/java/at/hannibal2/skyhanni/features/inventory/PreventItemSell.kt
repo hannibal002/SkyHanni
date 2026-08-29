@@ -4,8 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems.allowBypass
-import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems.hideReasons
+import at.hannibal2.skyhanni.events.item.ItemNotClickableEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -56,17 +55,19 @@ object PreventItemSell {
         }
     } ?: false
 
-    fun shouldPreventSell(chestName: String, stack: SafeItemStack): Boolean {
-        if (!inASellerInventory(chestName, stack)) return false
-        if (!shouldPreventSell(stack)) return false
+    @HandleEvent
+    private fun onItemNotClickable(event: ItemNotClickableEvent) {
+        val chestName = event.chestName
+        val stack = event.stack
+        if (!inASellerInventory(chestName, stack)) return
+        if (!shouldPreventSell(stack)) return
 
-        hideReasons = listOf(
+        event.hideReasons = listOf(
             "You prevented the selling of this item!",
             "Disable it by holding the item in the hand",
             "and type §e/shpreventsell§e!",
         )
-        allowBypass = false
-        return true
+        event.allowBypass = false
     }
 
     private fun inASellerInventory(chestName: String, stack: SafeItemStack): Boolean =

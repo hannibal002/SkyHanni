@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.item.ItemNotClickableEvent
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -46,24 +47,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object HideNotClickableItemsFeature {
 
     private val config get() = SkyHanniMod.feature.inventory.hideNotClickable
-
-    private var hideReason: String = ""
-        set(string) {
-            HideNotClickableItems.hideReasons = listOf(string)
-            field = string
-        }
-
-    private var showGreenLine: Boolean = false
-        set(bool) {
-            HideNotClickableItems.showGreenLine = bool
-            field = bool
-        }
-
-    private var allowBypass: Boolean = false
-        set(bool) {
-            HideNotClickableItems.allowBypass = bool
-            field = bool
-        }
 
     private val hideNpcSellFilter = MultiFilter()
     private val hideInStorageFilter = MultiFilter()
@@ -128,34 +111,37 @@ object HideNotClickableItemsFeature {
         }
     }
 
+    @Suppress("CyclomaticComplexMethod")
+    @HandleEvent
+    private fun onItemNotClickable(event: ItemNotClickableEvent) {
+        if (!config.enabled) return
 
-    fun hideNotClickable(stack: SafeItemStack, chestName: String): Boolean = when {
-        hideNpcSell(stack) -> true
-        hideInStorage(chestName, stack) -> true
-        hideSalvage(chestName, stack) -> true
-        hidePlayerTrade(chestName, stack) -> true
-        hideBazaarOrAH(chestName, stack) -> true
-        hideAccessoryBag(chestName, stack) -> true
-        hideBasketOfSeeds(chestName, stack) -> true
-        hideNetherWartPouch(chestName, stack) -> true
-        hideTrickOrTreatBag(chestName, stack) -> true
-        hideSackOfSacks(chestName, stack) -> true
-        hideFishingBag(chestName, stack) -> true
-        hidePotionBag(chestName, stack) -> true
-        hidePrivateIslandChest(stack) -> true
-        hideAttributeFusion(chestName, stack) -> true
-        hideYourEquipment(stack) -> true
-        hideComposter(stack) -> true
-        hideRiftMotesGrubber(chestName, stack) -> true
-        hideRiftTransferChest(chestName, stack) -> true
-        hideFossilExcavator(stack) -> true
-        hideResearchCenter(chestName, stack) -> true
-        hideBirdFeeder(chestName, stack) -> true
-
-        else -> false
+        with(event) {
+            if (hideNpcSell()) return
+            if (hideInStorage()) return
+            if (hideSalvage()) return
+            if (hidePlayerTrade()) return
+            if (hideBazaarOrAH()) return
+            if (hideAccessoryBag()) return
+            if (hideBasketOfSeeds()) return
+            if (hideNetherWartPouch()) return
+            if (hideTrickOrTreatBag()) return
+            if (hideSackOfSacks()) return
+            if (hideFishingBag()) return
+            if (hidePotionBag()) return
+            if (hidePrivateIslandChest()) return
+            if (hideAttributeFusion()) return
+            if (hideYourEquipment()) return
+            if (hideComposter()) return
+            if (hideRiftMotesGrubber()) return
+            if (hideRiftTransferChest()) return
+            if (hideFossilExcavator()) return
+            if (hideResearchCenter()) return
+            if (hideBirdFeeder()) return
+        }
     }
 
-    private fun hideFossilExcavator(stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideFossilExcavator(): Boolean {
         if (!FossilExcavatorApi.inExcavatorMenu) return false
 
         showGreenLine = true
@@ -174,7 +160,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideResearchCenter(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideResearchCenter(): Boolean {
         if (chestName != "Research Center") return false
 
         showGreenLine = true
@@ -192,7 +178,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideBirdFeeder(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideBirdFeeder(): Boolean {
         if (chestName != "Birdfeeder") return false
 
         showGreenLine = true
@@ -207,7 +193,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideRiftTransferChest(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideRiftTransferChest(): Boolean {
         if (chestName != "Rift Transfer Chest") return false
 
         showGreenLine = true
@@ -218,7 +204,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideRiftMotesGrubber(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideRiftMotesGrubber(): Boolean {
         if (!RiftApi.inRift()) return false
         if (chestName != "Motes Grubber" && !ShiftClickNpcSell.inInventory) return false
 
@@ -230,7 +216,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideComposter(stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideComposter(): Boolean {
         if (!ComposterOverlay.isEnabled() || !ComposterOverlay.inInventory) return false
 
         showGreenLine = true
@@ -247,7 +233,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideYourEquipment(stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideYourEquipment(): Boolean {
         if (!CurrentEquipmentApi.inventory.isInside()) return false
 
 
@@ -268,7 +254,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideAttributeFusion(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideAttributeFusion(): Boolean {
         if (!chestName.startsWith("Attribute Fusion")) return false
 
         showGreenLine = true
@@ -279,7 +265,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hidePrivateIslandChest(stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hidePrivateIslandChest(): Boolean {
         if (!InventoryUtils.isInNormalChest()) return false
         if (!IslandType.PRIVATE_ISLAND.isInIsland()) return false
         if (!stack.isSoulbound()) return false
@@ -288,7 +274,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hidePotionBag(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hidePotionBag(): Boolean {
         if (!chestName.startsWith("Potion Bag")) return false
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -304,7 +290,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideFishingBag(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideFishingBag(): Boolean {
         if (!chestName.startsWith("Fishing Bag")) return false
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -321,7 +307,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideSackOfSacks(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideSackOfSacks(): Boolean {
         if (!chestName.startsWith("Sack of Sacks")) return false
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
@@ -333,7 +319,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideAccessoryBag(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideAccessoryBag(): Boolean {
         if (!chestName.startsWith("Accessory Bag") && !chestName.startsWith("Accessory Bag (")) return false
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
@@ -344,7 +330,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideBasketOfSeeds(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideBasketOfSeeds(): Boolean {
         if (!chestName.startsWith("Basket of Seeds")) return false
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -361,7 +347,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideNetherWartPouch(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideNetherWartPouch(): Boolean {
         if (!chestName.startsWith("Nether Wart Pouch")) return false
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -376,7 +362,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideTrickOrTreatBag(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideTrickOrTreatBag(): Boolean {
         if (!chestName.startsWith("Trick or Treat Bag")) return false
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -391,7 +377,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hidePlayerTrade(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hidePlayerTrade(): Boolean {
         if (!isTradeMenu(chestName)) return false
 
         if ((HypixelData.noTrade && stack.isSoulbound()) || (!HypixelData.noTrade && stack.isAnySoulbound())) {
@@ -421,7 +407,7 @@ object HideNotClickableItemsFeature {
     fun isTradeMenu(chestName: String): Boolean = chestName.startsWith("You    ")
 
     @Suppress("ReturnCount")
-    private fun hideNpcSell(stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideNpcSell(): Boolean {
         if (RiftApi.inRift()) return false
         if (!ShiftClickNpcSell.inInventory) return false
         if (VisitorApi.inInventory) return false
@@ -461,12 +447,11 @@ object HideNotClickableItemsFeature {
     }
 
     fun npcSellable(stack: SafeItemStack): Boolean {
-        val sellable = clickToSellPattern.anyMatches(stack.getLore()) ||
+        return clickToSellPattern.anyMatches(stack.getLore()) ||
             (stack.getItemId() != "PET" && (stack.getInternalNameOrNull()?.getNpcPriceOrNull() ?: 0.0) > 0)
-        return sellable
     }
 
-    private fun hideInStorage(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideInStorage(): Boolean {
         if (!chestName.contains("Ender Chest") && !chestName.contains("Backpack") && chestName != "Storage") return false
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -483,7 +468,7 @@ object HideNotClickableItemsFeature {
         return result
     }
 
-    private fun hideSalvage(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideSalvage(): Boolean {
         if (!chestName.equalsOneOf("Salvage Item", "Salvage Items")) return false
         showGreenLine = true
 
@@ -521,7 +506,7 @@ object HideNotClickableItemsFeature {
         return true
     }
 
-    private fun hideBazaarOrAH(chestName: String, stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.hideBazaarOrAH(): Boolean {
         val bazaarInventory = BazaarApi.inBazaarInventory
         val auctionHouseInventory = isAuctionHouse(chestName)
         if (!bazaarInventory && !auctionHouseInventory) return false
@@ -542,7 +527,7 @@ object HideNotClickableItemsFeature {
             return true
         }
 
-        if (isNotAuctionable(stack)) return true
+        if (isNotAuctionable()) return true
 
         return false
     }
@@ -554,7 +539,7 @@ object HideNotClickableItemsFeature {
         return auctionHouseInventory
     }
 
-    private fun isNotAuctionable(stack: SafeItemStack): Boolean {
+    private fun ItemNotClickableEvent.isNotAuctionable(): Boolean {
         if (stack.isAnySoulbound()) {
             hideReason = "Soulbound items cannot be auctioned!"
             return true
