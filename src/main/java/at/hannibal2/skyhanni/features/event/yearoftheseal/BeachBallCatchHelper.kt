@@ -218,9 +218,10 @@ object BeachBallCatchHelper {
             val xTarget = targets.mapKeys { it.key.x }.weightedAverage()
             val zTarget = targets.mapKeys { it.key.z }.weightedAverage()
 
+            val averageTarget = LorenzVec(xTarget, 0.0, zTarget)
             val target = predictions.minBy {
                 val last = it.key.last()
-                xTarget - last.x + zTarget - last.z
+                last.distanceSqIgnoreY(averageTarget)
             }
             return target.key
         }
