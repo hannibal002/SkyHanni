@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -10,10 +10,13 @@ import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
 
-abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val container: AbstractContainerMenu) : SkyHanniEvent() {
+abstract class GuiContainerEvent(
+    open val gui: SkyHanniGuiContainer,
+    open val container: AbstractContainerMenu,
+) : SkyHanniEvent() {
 
     @PrimaryFunction("onBackgroundDrawn")
-    data class BackgroundDrawnEvent(
+    class BackgroundDrawnEvent(
         override val context: GuiGraphicsExtractor,
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
@@ -22,7 +25,7 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
         val partialTicks: Float,
     ) : GuiContainerEvent(gui, container), Rendering
 
-    data class PreDraw(
+    class PreDraw(
         override val context: GuiGraphicsExtractor,
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
@@ -31,7 +34,7 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
         val partialTicks: Float,
     ) : GuiContainerEvent(gui, container), Cancellable, Rendering
 
-    data class PostDraw(
+    class PostDraw(
         override val context: GuiGraphicsExtractor,
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
@@ -40,28 +43,31 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
         val partialTicks: Float,
     ) : GuiContainerEvent(gui, container), Rendering
 
-    data class CloseWindowEvent(override val gui: SkyHanniGuiContainer, override val container: AbstractContainerMenu) :
-        GuiContainerEvent(gui, container), Cancellable
+    class CloseWindowEvent(
+        override val gui: SkyHanniGuiContainer,
+        override val container: AbstractContainerMenu,
+    ) : GuiContainerEvent(gui, container), Cancellable
 
-    abstract class DrawSlotEvent(gui: SkyHanniGuiContainer, container: AbstractContainerMenu, open val slot: Slot) :
-        GuiContainerEvent(gui, container) {
+    abstract class DrawSlotEvent(
+        gui: SkyHanniGuiContainer,
+        container: AbstractContainerMenu,
+        open val slot: Slot,
+    ) : GuiContainerEvent(gui, container) {
 
-        data class GuiContainerDrawSlotPre(
+        class GuiContainerDrawSlotPre(
             override val gui: SkyHanniGuiContainer,
             override val container: AbstractContainerMenu,
             override val slot: Slot,
-        ) :
-            DrawSlotEvent(gui, container, slot), Cancellable
+        ) : DrawSlotEvent(gui, container, slot), Cancellable
 
-        data class GuiContainerDrawSlotPost(
+        class GuiContainerDrawSlotPost(
             override val gui: SkyHanniGuiContainer,
             override val container: AbstractContainerMenu,
             override val slot: Slot,
-        ) :
-            DrawSlotEvent(gui, container, slot)
+        ) : DrawSlotEvent(gui, container, slot)
     }
 
-    data class ForegroundDrawnEvent(
+    class ForegroundDrawnEvent(
         override val context: GuiGraphicsExtractor,
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
@@ -70,28 +76,61 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
         val partialTicks: Float,
     ) : GuiContainerEvent(gui, container), Rendering
 
-    data class SlotClickEvent(
+    class SlotClickEvent private constructor(
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
-        val item: SafeItemStack?,
-        val slot: Slot?,
-        val slotId: Int,
-        val clickedButton: Int,
-        val clickType: ContainerInput?,
+        var slotId: Int,
+        var clickedButton: Int,
+        var clickType: ContainerInput,
     ) : GuiContainerEvent(gui, container), Cancellable {
 
+        val slot: Slot?
+            get() = slotId.takeIf { it > -1 }?.let(container::getSlot)
+
+        val item: SafeItemStack?
+            get() = slot?.item
+
         fun makePickblock() {
-            if (this.clickedButton == 2 && this.clickType == ContainerInput.CLONE) return
-            slot?.index?.let { slotNumber ->
-                InventoryUtils.clickSlot(slotNumber, container.containerId, mouseButton = 2, mode = ContainerInput.CLONE)
-                cancel()
-            }
+            if (clickedButton == 2 && clickType == CLONE) return
+            if (slot == null) return
+
+            clickedButton = 2
+            clickType = CLONE
+        }
+
+        fun makeShiftClick() {
+            if (clickedButton == 1 && slot?.item?.getItemCategoryOrNull() == SACK) return
+            if (slot == null) return
+
+            clickedButton = 0
+            clickType = QUICK_MOVE
         }
 
         fun redirectClick(newSlotId: Int) {
-            InventoryUtils.clickSlot(newSlotId, container.containerId, clickedButton, clickType ?: ContainerInput.PICKUP)
-            cancel()
+            slotId = newSlotId
+        }
+
+        companion object {
+            private val posting = ThreadLocal.withInitial { false }
+
+            fun postEvent(
+                gui: SkyHanniGuiContainer,
+                container: AbstractContainerMenu,
+                slotId: Int,
+                clickedButton: Int,
+                clickType: ContainerInput,
+            ): SlotClickEvent? {
+                if (posting.get()) return null
+
+                posting.set(true)
+                try {
+                    val event = SlotClickEvent(gui, container, slotId, clickedButton, clickType)
+                    event.post()
+                    return event
+                } finally {
+                    posting.remove()
+                }
+            }
         }
     }
-
 }
