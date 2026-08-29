@@ -113,9 +113,9 @@ allprojects {
         }
 
         maven("https://jitpack.io") {
-            // MoulConfig, Changelog builder, Methanol (Modrinth Publisher)
+            // NotEnoughUpdates (compiled against), Changelog builder, Preprocessor, Discord IPC
             content {
-                includeGroupAndSubgroups("com.github")
+                includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
 
