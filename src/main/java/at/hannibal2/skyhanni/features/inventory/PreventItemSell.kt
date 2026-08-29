@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object PreventItemSell {
@@ -21,7 +20,7 @@ object PreventItemSell {
     @HandleEvent
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shpreventsell") {
-            description = "Prevents items from selling to Auction House, NPC's or other players. Hold the item in hand to protect."
+            description = "Prevents items from selling to Auction House, to NPC's or to other players. Hold the item in hand to activate."
             category = CommandCategory.USERS_ACTIVE
             simpleCallback { onToggle() }
         }
@@ -41,7 +40,7 @@ object PreventItemSell {
         }
 
         val notSellableItems = storage?.notSellableItems ?: error("storage is null")
-        val name = stack.displayName.string
+        val name = stack.hoverName.string
         if (uuid !in notSellableItems) {
             notSellableItems.add(uuid)
             ChatUtils.chat("$name is §anow §eprotected from selling.")
@@ -51,7 +50,7 @@ object PreventItemSell {
         }
     }
 
-    private fun shouldPreventSell(stack: ItemStack): Boolean = stack.getItemUuid()?.let { uuid ->
+    private fun shouldPreventSell(stack: SafeItemStack): Boolean = stack.getItemUuid()?.let { uuid ->
         ProfileStorageData.profileSpecific?.notSellableItems?.let { list ->
             uuid in list
         }
@@ -63,8 +62,8 @@ object PreventItemSell {
 
         hideReasons = listOf(
             "You prevented the selling of this item!",
-            "Disable it by holding the item in the hand and type",
-            "§e/shpreventsell§e!",
+            "Disable it by holding the item in the hand",
+            "and type §e/shpreventsell§e!",
         )
         allowBypass = false
         return true
