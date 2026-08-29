@@ -73,6 +73,19 @@ object HideNotClickableItems {
     private val hidePlayerTradeFilter = MultiFilter()
     private val notAuctionableFilter = MultiFilter()
 
+    private val netherWart = "NETHER_STALK".toInternalName()
+
+    private val birdFood = setOf(
+        "BAG_OF_SEEDS".toInternalName(), // for Bluebirds
+        "WRIGGLEWORM".toInternalName(), // for Parakeets
+        "YOGI_BERRY".toInternalName(), // for Macaws
+    )
+
+    // TODO add more special named fossils (hypixel why)
+    private val specialFossils = setOf(
+        "HELIX".toInternalName(),
+    )
+
     private val patternGroup = RepoPattern.group("inventory.hidenotclickable")
 
     private val clickToSellPattern by patternGroup.pattern(
@@ -95,10 +108,8 @@ object HideNotClickableItems {
         "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3|DOUBLE_PLANT|MOONFLOWER|WILD_ROSE",
     )
 
-    private val netherWart = "NETHER_STALK".toInternalName()
-
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
         hideNpcSellFilter.load(hideNotClickable.hideNpcSell)
         hideInStorageFilter.load(hideNotClickable.hideInStorage)
@@ -120,7 +131,7 @@ object HideNotClickableItems {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    private fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (bypassActive()) return
         if (event.gui !is ContainerScreen) return
@@ -137,7 +148,7 @@ object HideNotClickableItems {
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onTooltip(event: ToolTipTextEvent) {
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (bypassActive()) return
 
@@ -167,7 +178,7 @@ object HideNotClickableItems {
     }
 
     @HandleEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (!config.itemsBlockClicks) return
         if (bypassActive()) return
@@ -210,12 +221,13 @@ object HideNotClickableItems {
             hidePotionBag(chestName, stack) -> true
             hidePrivateIslandChest(stack) -> true
             hideAttributeFusion(chestName, stack) -> true
-            hideYourEquipment(chestName, stack) -> true
+            hideYourEquipment(stack) -> true
             hideComposter(stack) -> true
             hideRiftMotesGrubber(chestName, stack) -> true
             hideRiftTransferChest(chestName, stack) -> true
             hideFossilExcavator(stack) -> true
             hideResearchCenter(chestName, stack) -> true
+            hideBirdFeeder(chestName, stack) -> true
 
             else -> false
         }
@@ -236,7 +248,7 @@ object HideNotClickableItems {
             return false
         }
 
-        hideReason = "§cNot a chisel or scrap!"
+        hideReason = "Not a chisel or scrap!"
         return true
     }
 
@@ -247,19 +259,29 @@ object HideNotClickableItems {
 
         val internalName = stack.getInternalNameOrNull() ?: return false
 
-        // TODO add more special named fossils (hypixel why)
-        val list = listOf(
-            "HELIX".toInternalName(),
-        )
-
-        if (internalName in list) {
+        if (internalName in specialFossils) {
             return false
         }
         if (internalName.endsWith("_FOSSIL")) {
             return false
         }
 
-        hideReason = "§cNot a fossil!"
+        hideReason = "Not a fossil!"
+        return true
+    }
+
+    private fun hideBirdFeeder(chestName: String, stack: SafeItemStack): Boolean {
+        if (chestName != "Birdfeeder") return false
+
+        showGreenLine = true
+
+        val internalName = stack.getInternalNameOrNull() ?: return false
+
+        if (internalName in birdFood) {
+            return false
+        }
+
+        hideReason = "Not bird food!"
         return true
     }
 
@@ -303,24 +325,12 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideYourEquipment(chestName: String, stack: SafeItemStack): Boolean {
-        if (!chestName.startsWith("Your Equipment")) return false
+    private fun hideYourEquipment(stack: SafeItemStack): Boolean {
+        if (!CurrentEquipmentApi.inventory.isInside()) return false
 
-        val list = listOf(
-            "HELMET",
-            "CARNIVAL MASK",
-            "CHESTPLATE",
-            "LEGGINGS",
-            "BOOTS",
 
-            "NECKLACE",
-            "CLOAK",
-            "BELT",
-            "GLOVES",
-            "BRACELET",
-        )
-        for (type in list) {
-            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) { // todo use item api
+        if (stack.getItemCategoryOrNull() in ItemCategory.armorAndEquipmentAndMasks) {
+            if (stack.getLore().any { it.contains("§l") }) {
                 showGreenLine = true
                 return false
             }
@@ -622,7 +632,7 @@ object HideNotClickableItems {
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "inventory.hideNotClickableItems", "inventory.hideNotClickable.items")
         event.move(3, "inventory.hideNotClickableItemsBlockClicks", "inventory.hideNotClickable.itemsBlockClicks")
         event.move(3, "inventory.hideNotClickableOpacity", "inventory.hideNotClickable.opacity")

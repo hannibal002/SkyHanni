@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -36,6 +37,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotEmptyString
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -45,7 +47,6 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.Items
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -85,6 +86,16 @@ object ForagingBeaconSolver {
         "pitch",
         "Current pitch: (?<pitch>\\w+)",
     )
+
+    /**
+     * REGEX-TEST: Upgrade Signal Strength
+     * REGEX-TEST: Tune Frequency
+     */
+    private val beaconInventoryNamePattern by patternGroup.pattern(
+        "inventory",
+        "(?<upgrade>Upgrade Signal Strength)|Tune Frequency",
+    )
+
     // </editor-fold>
 
     // <editor-fold desc="Enums & Enum Helpers">
@@ -238,11 +249,13 @@ object ForagingBeaconSolver {
             enchantedTuning.reset()
             display = emptyList()
         },
-    ) { name ->
-        upgradingStrength = (name == "Upgrade Signal Strength")
-        val inInv = (name == "Tune Frequency" || upgradingStrength)
-        inInv
-    }
+        checkInventoryName = { name ->
+            beaconInventoryNamePattern.matchMatcher(name) {
+                upgradingStrength = group("upgrade") != null
+                true
+            } ?: false
+        }
+    )
 
     private var upgradingStrength = false
     private var normalTuning = BeaconTuneData()
@@ -260,7 +273,7 @@ object ForagingBeaconSolver {
         NotificationManager.queueNotification(SkyHanniNotification(text, length = 5.seconds, showOverInventory = true))
     }
 
-    private fun SafeItemStack.isPaused(): Boolean = this.`is`(Items.RED_TERRACOTTA)
+    private fun SafeItemStack.isPaused(): Boolean = this.`is`(ColoredBlockCompat.RED.clayBlock.asItem())
 
     @HandleEvent
     fun onTick() {

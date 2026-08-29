@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
+import com.mojang.brigadier.arguments.LongArgumentType
 import kotlin.enums.enumEntries
 
 @SkyHanniModule
@@ -165,12 +166,19 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
             category = CommandCategory.USERS_RESET
             simpleCallback { resetCommand() }
         }
-        event.registerBrigadier("shremovecorpsekey") {
-            description = "Removes a corpse key from the Glacite Mineshaft Corpse Tracker"
+        event.registerBrigadier("shaddcorpsekeyusage") {
+            description = "Adds/Removes a corpse key usage from the Glacite Mineshaft Corpse Tracker"
             category = CommandCategory.USERS_RESET
-            argCallback("corpseType", EnumArgumentType.custom<CorpseType>({ it.type }, isGreedy = true)) { type ->
-                modify {
-                    it.keysSaved.addOrPut(type, 1)
+            arg("corpseType", EnumArgumentType.custom<CorpseType>({ it.type })) { typeRef ->
+                callback {
+                    modify {
+                        it.keysSaved.addOrPut(getArg(typeRef), -1)
+                    }
+                }
+                argCallback("amount", LongArgumentType.longArg()) { amount ->
+                    modify {
+                        it.keysSaved.addOrPut(getArg(typeRef), -amount)
+                    }
                 }
             }
         }

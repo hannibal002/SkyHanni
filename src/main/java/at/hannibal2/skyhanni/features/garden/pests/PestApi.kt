@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -32,15 +33,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -50,10 +48,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PestApi {
-
-    private val SPRAYONATOR = "SPRAYONATOR".toInternalName()
-    private val JUICY_SPRAYONATOR = "JUICY_SPRAYONATOR".toInternalName()
-    private val SALTY_SPRAYONATOR = "SALTY_SPRAYONATOR".toInternalName()
 
     val config get() = GardenApi.config.pests
     val storage get() = GardenApi.storage
@@ -78,9 +72,7 @@ object PestApi {
     fun hasLassoInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.LASSO
     fun hasVacuumOrLassoInHand() = hasVacuumInHand() || hasLassoInHand()
 
-    private fun NeuInternalName.isSprayonator() = equalsOneOf(SPRAYONATOR, JUICY_SPRAYONATOR, SALTY_SPRAYONATOR)
-
-    fun hasSprayonatorInHand(): Boolean = InventoryUtils.itemInHandId.isSprayonator()
+    fun hasSprayonatorInHand(): Boolean = SprayonatorType.getInHandOrNull() != null
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 
@@ -88,10 +80,11 @@ object PestApi {
 
     /**
      * WRAPPED-REGEX-TEST: " §7 §aThe Garden §4§l§7 x1"
+     * WRAPPED-REGEX-TEST: " §7 §cThe Garden §4§l§7 x8"
      */
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
-        " §7. §[ac]The Garden §4§l\uE018§7 x(?<pests>.*)",
+        " §7. §[ac]The Garden §4§l[\uE07F\uE018]§7 x(?<pests>.*)",
     )
 
     /**
@@ -108,7 +101,7 @@ object PestApi {
      */
     private val pestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*(?:§.)* x(?<pests>\\d+)",
+        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*[\uE07F\uE018](?:§.)* x(?<pests>\\d+)",
     )
 
     /**
@@ -124,7 +117,7 @@ object PestApi {
      */
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
-        "§4§l §cThis plot has §.(?<amount>\\d+) §2 Pests?§c!",
+        "§4§l[\uE07F\uE018] §cThis plot has §.(?<amount>\\d+) §2[\uE07F\uE018] Pests?§c!",
     )
 
     /**
@@ -166,7 +159,7 @@ object PestApi {
         "stereo.inventory",
         "Stereo Harmony",
     )
-    val stereoInventory = InventoryDetector { name -> stereoInventoryPattern.matches(name) }
+    val stereoInventory = InventoryDetector { stereoInventoryPattern }
 
     /**
      * REGEX-TEST: §7Now Playing: §aWings of Harmony §8(Moth)
@@ -226,8 +219,15 @@ object PestApi {
         PestUpdateEvent.post()
     }
 
+    @HandleEvent(onlyOnIslandTypeTag = [HAS_OWN_PESTS])
+    private fun onPlaySound(event: PlaySoundEvent) {
+        if (config.muteVacuum && event.soundName == "entity.wither.shoot") {
+            event.cancel()
+        }
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onPestSpawn(event: PestSpawnEvent) {
+    private fun onPestSpawn(event: PestSpawnEvent) {
         val plotNames = event.plotNames
         for (plotName in plotNames) {
             val plot = GardenPlotApi.getPlotByName(plotName)
@@ -245,7 +245,7 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in GardenPlotApi.plots) {
@@ -261,7 +261,7 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
 
         infestedPlotsTabListPattern.firstMatcher(event.widget.lines.map { it.string }) {
@@ -285,27 +285,27 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+    private fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!firstScoreboardCheck) return
         checkScoreboardLines(event.added)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
         }
     }
 
     @HandleEvent
-    fun onPestKill(event: PestKillEvent) {
+    private fun onPestKill(event: PestKillEvent) {
         lastPestKillTime = SimpleTimeMark.now()
         removeNearestPest()
         GardenPlotApi.getCurrentPlot()?.let { gardenPestTypes.removeFromPlot(it, event.pestType) }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick() {
+    private fun onTick() {
         if (!firstScoreboardCheck && gardenJoinTime.passedSince() > 5.seconds) {
             checkScoreboardLines(ScoreboardData.sidebarLinesFormatted)
             firstScoreboardCheck = true
@@ -314,7 +314,7 @@ object PestApi {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         lastPestKillTime = SimpleTimeMark.farPast()
         lastTimeVacuumHeld = SimpleTimeMark.farPast()
         lastTimeLassoHeld = SimpleTimeMark.farPast()
@@ -323,7 +323,7 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+    private fun onItemInHandChange(event: ItemInHandChangeEvent) {
         if (event.oldStack.getItemCategoryOrNull() == ItemCategory.VACUUM) {
             lastTimeVacuumHeld = SimpleTimeMark.now()
         }
@@ -333,7 +333,7 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
+    private fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
         val type = PestType.getByNameOrNull(event.mob.name) ?: return
         val plot = GardenPlotApi.plots.find { it.box.isInside(event.mob.centerCords) } ?: return
         if (lastCheckedPlot != plot.id) gardenPestTypes[plot] = listOf()
@@ -450,7 +450,7 @@ object PestApi {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Pests")
 
         if (!GardenApi.inGarden()) {
@@ -479,7 +479,7 @@ object PestApi {
     }
 
     @HandleEvent
-    fun onCommand(event: CommandRegistrationEvent) {
+    private fun onCommand(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestpestkill") {
             description = "Simulates a pest kill"
             category = CommandCategory.DEVELOPER_TEST

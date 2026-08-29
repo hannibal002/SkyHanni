@@ -2,10 +2,9 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.convertEmptyToNull
@@ -25,13 +24,11 @@ import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
 // TODO refactor
 @Suppress("MemberVisibilityCanBePrivate", "TooManyFunctions", "Unused")
 object InventoryUtils {
-
     var itemInHandId = NeuInternalName.NONE
     fun NeuInternalName.recentlyHeld(): Boolean = this in recentItemsInHand
 
@@ -75,7 +72,9 @@ object InventoryUtils {
         return getItemsInOpenChest().mapNotNull { it.item.getInternalNameOrNull() }.toSet()
     }
 
-    // only works while not in an inventory
+    /**
+     * Only works while not in an inventory.
+     */
     fun getSlotsInOwnInventory(): List<Slot> {
         val guiInventory = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return emptyList()
         return guiInventory.slots()
@@ -119,8 +118,7 @@ object InventoryUtils {
             it.contains("Ender Chest") || it.contains("Backpack")
     }
 
-    // mainHandItem can be AIR, since equipment in EntityLiving is an array of item stacks that can be AIR as well.
-    fun getItemInHand(): SafeItemStack? = MinecraftCompat.localPlayerOrNull?.mainHandItem?.takeIf { it.item != Items.AIR }
+    fun getItemInHand(): SafeItemStack? = MinecraftCompat.localPlayerOrNull?.mainHandItem?.takeUnlessEmpty()
 
     fun getArmor(): Array<SafeItemStack?> = MinecraftCompat.localPlayerOrNull?.getArmorInventory() ?: arrayOfNulls(4)
     fun getArmorInternalNames(): Set<NeuInternalName> = getArmor().mapNotNull { it?.getInternalNameOrNull() }.toSet()
@@ -129,14 +127,6 @@ object InventoryUtils {
     fun getChestplate(): SafeItemStack? = getArmor()[2]
     fun getLeggings(): SafeItemStack? = getArmor()[1]
     fun getBoots(): SafeItemStack? = getArmor()[0]
-
-    internal fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
-        if (this.clickedButton == 1 && slot?.item?.getItemCategoryOrNull() == ItemCategory.SACK) return
-        slot?.index?.let { slotNumber ->
-            clickSlot(slotNumber, container.containerId, mouseButton = 0, mode = ContainerInput.QUICK_MOVE)
-            this.cancel()
-        }
-    }
 
     fun isSlotInPlayerInventory(itemStack: SafeItemStack): Boolean {
         val slotUnderMouse = slotUnderCursor() ?: return false
@@ -194,21 +184,31 @@ object InventoryUtils {
         MinecraftCompat.screen = null
     }
 
-    fun isInNormalChest(name: String = openInventoryName()): Boolean = name in normalChestInternalNames.map { I18n.get(it) }
+    fun isInNormalChest(name: String = openInventoryName()): Boolean =
+        name in normalChestInternalNames.map { I18n.get(it) }
 
+    /**
+     * Clicks a slot by calling MultiPlayerGameMode's `handleContainerInput` method.
+     * Less compatible with other mods that intercept clicks than [mouseClickSlot].
+     */
     fun clickSlot(
         slotId: Int,
         windowId: Int = InventoryCompat.getWindowId(),
         mouseButton: Int = 0,
-        mode: ContainerInput = ContainerInput.PICKUP,
+        mode: ContainerInput = PICKUP,
     ) {
         InventoryCompat.clickInventorySlot(windowId, slotId, mouseButton, mode)
     }
 
+    /**
+     * Clicks a slot by calling the AbstractContainerScreen's `slotClicked` method.
+     * Preferred over [clickSlot] for compatibility with other mods, especially when
+     * modifying an existing player click.
+     */
     fun mouseClickSlot(
         slotId: Int,
         mouseButton: Int = 0,
-        mode: ContainerInput = ContainerInput.PICKUP,
+        mode: ContainerInput = PICKUP,
     ) {
         InventoryCompat.mouseClickInventorySlot(slotId, mouseButton, mode)
     }

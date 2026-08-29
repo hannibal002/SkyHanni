@@ -12,10 +12,13 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
@@ -37,6 +40,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -65,6 +69,15 @@ object PetStorageApi {
     private var lastSaved: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastExactPetMenuClick: SimpleTimeMark = SimpleTimeMark.farPast()
     private var petWidgetState: PetWidgetState = PetWidgetState.NOT_READY
+
+    private val mainMenuInventory = InventoryDetector(
+        checkInventoryName = {
+            if (!PetStoragePatterns.mainPetMenuNamePattern.matches(it)) return@InventoryDetector false
+            // Forge pets menu is also called "Pets", but doesn't have this item
+            val titleItem = InventoryUtils.getItemAtSlotIndex(4) ?: return@InventoryDetector false
+            return@InventoryDetector PetStoragePatterns.mainPetMenuTitleItemNamePattern.matches(titleItem.cleanName)
+        }
+    )
 
     private fun isPetWidgetUnavailable(): Boolean = IslandType.CATACOMBS.isInIsland()
 
@@ -195,8 +208,7 @@ object PetStorageApi {
         else -> this.skinTag?.removeColor() == skinTag.removeColor()
     }
 
-    fun isMainPetMenuName(inventoryName: String?): Boolean =
-        PetStoragePatterns.mainPetMenuNamePattern.matches(inventoryName)
+    fun inMainPetMenuName(): Boolean = mainMenuInventory.isInside()
 
     private fun SafeItemStack.toVisiblePetDataOrNull(): PetData? =
         PetStoragePatterns.petMenuPetStackNamePattern.matchStyledMatcher(hoverName) {
@@ -494,8 +506,7 @@ object PetStorageApi {
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        val inventoryName = InventoryUtils.openInventoryName()
-        if (!isMainPetMenuName(inventoryName)) return
+        if (!inMainPetMenuName()) return
         if (!event.slotId.isPetStackLocation()) return
         val clickedItem = event.slot?.item.orNull() ?: event.item.orNull() ?: return
         val clickedPetData = clickedItem.toClickedPetDataOrNull() ?: return
@@ -534,7 +545,7 @@ object PetStorageApi {
     }
 
     private fun InventoryFullyOpenedEvent.readExactPetMenuPets(): Set<UUID> {
-        if (!isMainPetMenuName(inventoryName)) return emptySet()
+        if (!inMainPetMenuName()) return emptySet()
         val petStorage = petStorage ?: return emptySet()
         val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
         val exactPetUuids = mutableSetOf<UUID>()
@@ -561,7 +572,7 @@ object PetStorageApi {
     }
 
     private fun InventoryFullyOpenedEvent.readEquipmentPetData() {
-        if (inventoryName != "Your Equipment and Stats") return
+        if (!CurrentEquipmentApi.inventory.isInside()) return
         val petStorage = petStorage ?: return
         val currentPetItem = inventoryItems[EQUIP_MENU_CURRENT_PET_SLOT]?.takeIf {
             it.hoverName.string != "Empty Pet Slot"
@@ -575,13 +586,13 @@ object PetStorageApi {
     }
 
     private fun InventoryFullyOpenedEvent.readSelectedPetData() {
-        val isPetMenu = isMainPetMenuName(inventoryName)
+        val isPetMenu = inMainPetMenuName()
         val exactMenuPetUuids = readExactPetMenuPets()
         if (isPetMenu && lastExactPetMenuClick.passedSince() < 5.seconds) return
 
         val petItemSlot = when {
             isPetMenu -> PET_MENU_CURRENT_PET_SLOT
-            inventoryName == "SkyBlock Menu" -> SB_MENU_CURRENT_PET_SLOT
+            UtilsPatterns.skyblockMenuInventory.isInside() -> SB_MENU_CURRENT_PET_SLOT
             else -> return
         }
         val currentPetItem = inventoryItems[petItemSlot] ?: return
@@ -701,9 +712,6 @@ object PetStorageApi {
         this.rarity == rarity &&
         this.level <= level &&
         this.skinTag == skinTag
-
-    fun isAutopetMessage(message: String): Boolean =
-        PetStoragePatterns.autoPetMessageColorlessPattern.matches(message.removeColor().removeResets())
 
     fun markDirty() {
         jsonNeedsSave = true
