@@ -469,10 +469,13 @@ object IslandGraphs {
     }
 
     fun manualCancel() {
-        currentTarget = null // guard to stop duplicate stop messages.
+        if (currentTarget == null) {
+            ChatUtils.userError("No navigation is currently active.")
+            return
+        }
+
         stopNavigation()
         NavigateAllApi.handleStop(errorMessage = false)
-        ChatUtils.userError("Manually stopped navigation")
         onManualCancel()
     }
 
