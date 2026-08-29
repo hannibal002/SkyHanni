@@ -252,7 +252,9 @@ object UpdateManager {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {
-                    config.updateStream.set(updateStream)
+                    if (updateStream != currentStream) {
+                        config.updateStream.set(updateStream)
+                    }
                     checkUpdate(true, updateStream)
                 },
                 "§eClick to confirm!",
