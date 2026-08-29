@@ -48,11 +48,11 @@ object DiscountUtils {
 
     private fun NeuInternalName.getEmissaryDiscountedPrice(lowestNPCPrice: Double): Double {
         val rep = ProfileStorageData.profileSpecific?.crimsonIsle?.reputation?.maxBy { it.value }?.value ?: 0
-        var itemDiscount = 1.0
+        var discountFraction = 0.0
         emissaryScalingDiscounts.forEach { (reputation, discount) ->
-            if (rep > reputation) itemDiscount = (1.0 - discount)
+            if (rep > reputation) discountFraction = discount
         }
-        val priceDecrease = itemPriceCoinOnly[this]?.times(itemDiscount) ?: 0.0
+        val priceDecrease = itemPriceCoinOnly[this]?.times(discountFraction) ?: 0.0
         return lowestNPCPrice - priceDecrease
     }
 }
