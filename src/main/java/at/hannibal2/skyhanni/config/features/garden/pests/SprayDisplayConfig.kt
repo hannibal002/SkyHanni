@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class SprayDisplayConfig {
 
     @Expose
-    @ConfigOption(name = "Spray Display", desc = "Show the active spray and duration for your current plot.")
+    @ConfigOption(name = "Enabled", desc = "Show the active spray and duration for your current plot.")
     @ConfigEditorBoolean
     @FeatureToggle
     var displayEnabled: Boolean = true

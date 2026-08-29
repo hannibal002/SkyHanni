@@ -43,9 +43,9 @@ class SprayConfig {
         @HandleEvent
         private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             val path = "garden.pests.spray."
-            event.move(144, "${path}displayEnabled", "${path}sprayDisplay.displayEnabled")
-            event.move(144, "${path}showNotSprayed", "${path}sprayDisplay.showNotSprayed")
-            event.move(144, "${path}displayPosition", "${path}sprayDisplay.displayPosition")
+            event.move(145, "${path}displayEnabled", "${path}sprayDisplay.displayEnabled")
+            event.move(145, "${path}showNotSprayed", "${path}sprayDisplay.showNotSprayed")
+            event.move(145, "${path}displayPosition", "${path}sprayDisplay.displayPosition")
         }
     }
 }
