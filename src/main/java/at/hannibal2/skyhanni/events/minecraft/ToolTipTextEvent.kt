@@ -13,7 +13,7 @@ import net.minecraft.world.inventory.Slot
 class ToolTipTextEvent(
     val slot: Slot?,
     val itemStack: SafeItemStack,
-    val toolTip: MutableList<Component>
+    val toolTip: MutableList<Component>,
 ) : CancellableSkyHanniEvent() {
 
     val toolTipStrings: List<String>

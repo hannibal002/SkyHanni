@@ -83,7 +83,7 @@ enum class SlayerType(
         return cost
     }
 
-    fun calculateXPGain(tier: Int, includeAatrox: Boolean = true): Double? {
+    fun calculateXPGain(tier: Int, @Suppress("unused") includeAatrox: Boolean = true): Double? {
         val xpBuff = Perk.SLAYER_XP_BUFF.isActive
         val baseGained = SlayerApi.jsonData?.xpGains?.get(this)?.get(tier) ?: return null
 
