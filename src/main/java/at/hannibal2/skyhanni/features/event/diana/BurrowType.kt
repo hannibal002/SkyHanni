@@ -18,7 +18,7 @@ enum class BurrowType(val text: String) {
     override fun toString() = text
 
     companion object {
-        val config get() = SkyHanniMod.feature.event.diana.burrowColors
+        val config get() = SkyHanniMod.feature.event.diana.burrowCustomization
 
         fun BurrowType.getBurrowColour(): ChromaColour =
             when (this) {

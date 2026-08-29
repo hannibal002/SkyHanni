@@ -99,7 +99,7 @@ class DianaConfig {
         desc = ""
     )
     @Accordion
-    var burrowColors: BurrowCustomization = BurrowCustomization()
+    val burrowCustomization: BurrowCustomization = BurrowCustomization()
 
     @Expose
     @ConfigOption(

@@ -489,7 +489,11 @@ object GriffinBurrowHelper {
                 else -> target.burrowType.getBurrowText()
             }
 
-            event.drawColor(location, target.burrowType.getBurrowColour(), config.beaconDistance != -1.0F && distance > config.beaconDistance)
+            event.drawColor(
+                location,
+                target.burrowType.getBurrowColour(),
+                config.beaconDistance != -1.0F && distance > config.beaconDistance,
+            )
             event.drawDynamicText(location.up(), text, 1.5 * config.textScale)
         }
 
@@ -557,8 +561,8 @@ object GriffinBurrowHelper {
                 location,
                 burrowType.getBurrowColour(),
                 config.beaconDistance != -1.0F && distance > config.beaconDistance,
-                config.burrowColors.burrowOutlineWidth.toInt(),
-                filled = config.burrowColors.shouldRenderAsFullBlock
+                config.burrowCustomization.burrowOutlineWidth.toInt(),
+                filled = config.burrowCustomization.shouldRenderAsFullBlock,
             )
             event.drawDynamicText(location.up(), text, 1.5 * config.textScale)
         }
@@ -589,7 +593,6 @@ object GriffinBurrowHelper {
         val burrows = allGuesses.toList().flatMap { it.guesses }.union(recentGuessesRemoved)
         if (burrows.contains(location)) BurrowApi.setBurrowInteracted(location)
     }
-
 
 
     private fun isEnabled() = DianaApi.isDoingDiana()
