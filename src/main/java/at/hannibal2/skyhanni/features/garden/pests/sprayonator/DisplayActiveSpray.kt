@@ -84,7 +84,8 @@ object DisplayActiveSpray {
     }
 
     private fun buildStaticDisplayLines(): Component {
-        val sprayData = currentSprayPlot?.currentSpray
+        val sprayPlot = currentSprayPlot ?: return Component.empty()
+        val sprayData = sprayPlot.currentSpray
             ?: return if (config.showNotSprayed) componentBuilder {
                 appendWithColor("Not sprayed!", ChatFormatting.RED)
             } else Component.empty()

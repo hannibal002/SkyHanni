@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
  * @param type is the SprayType that has changed status.
  */
 @PrimaryFunction("onGardenPlotSprayChanged")
-sealed class GardenPlotSprayEvent(val plot: GardenPlot, val type: SprayType) : SkyHanniEvent() {
+sealed class GardenPlotSprayEvent(val plot: GardenPlot, val type: SprayType?) : SkyHanniEvent() {
 
     /**
      * Fired from GardenPlotApi when the plotSprayedPattern matches a chat message.
@@ -29,4 +29,13 @@ sealed class GardenPlotSprayEvent(val plot: GardenPlot, val type: SprayType) : S
      */
     @PrimaryFunction("onGardenPlotSprayExpired")
     class SprayExpiredEvent(plot: GardenPlot, type: SprayType) : GardenPlotSprayEvent(plot, type)
+
+    /**
+     * Fired from GardenPlot whenever removeSpray is fired.
+     * @param plot is the GardenPlot that the spray has been removed from.
+     * @param type is the SprayType that has been removed.
+     */
+
+    @PrimaryFunction("onGardenPlotSprayRemoval")
+    class SprayRemovedEvent(plot: GardenPlot, type: SprayType?) : GardenPlotSprayEvent(plot, type)
 }

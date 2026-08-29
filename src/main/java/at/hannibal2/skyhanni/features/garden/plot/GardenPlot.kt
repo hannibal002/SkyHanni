@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.plot
 
+import at.hannibal2.skyhanni.events.garden.GardenPlotSprayEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.sprayonator.SprayType
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -85,6 +86,8 @@ class GardenPlot(val id: Int, var inventorySlot: Int, val box: AABB, val middle:
             sprayType = null
             sprayExpiryTime = SimpleTimeMark.now()
             sprayHasNotified = true
+            val plot = GardenPlotApi.getPlotByID(id) ?: return
+            GardenPlotSprayEvent.SprayRemovedEvent(plot, sprayType)
         }
     }
 

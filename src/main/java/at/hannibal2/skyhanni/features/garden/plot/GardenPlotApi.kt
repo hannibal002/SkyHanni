@@ -283,7 +283,7 @@ object GardenPlotApi {
         }
     }
 
-    private fun getPlotByID(plotId: Int) = plots.firstOrNull { it.id == plotId }
+    fun getPlotByID(plotId: Int) = plots.firstOrNull { it.id == plotId }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {

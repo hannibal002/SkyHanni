@@ -24,19 +24,18 @@ object SprayAddedMessage {
         val expiryTime = event.newSprayExpiryTime
         if (currentSpray == null) {
             if (config.newSprayNotification) {
-                sendSprayMessage(event)
+                event.sendSprayMessage()
             }
             return
         }
-        if (sprayMessageEligible(currentSpray.expiry, expiryTime, event.newSpray, newSpray)) {
-            sendSprayMessage(event)
+        if (sprayMessageEligible(currentSpray.expiry, expiryTime, currentSpray.type, newSpray)) {
+            event.sendSprayMessage()
         }
     }
 
-    @Suppress("HandleEventInspection")
-    private fun sendSprayMessage(event: GardenPlotSprayDataTablistReadEvent) {
-        val time = event.newSprayExpiryTime.timeUntil().format()
-        ChatUtils.chat(buildFirstSprayMessage(event.plotName, event.newSpray.name))
+    private fun GardenPlotSprayDataTablistReadEvent.sendSprayMessage() {
+        val time = this.newSprayExpiryTime.timeUntil().format()
+        ChatUtils.chat(buildFirstSprayMessage(this.plotName, this.newSpray.displayName))
         ChatUtils.chat(buildSecondSprayMessage(time))
     }
 
@@ -50,7 +49,7 @@ object SprayAddedMessage {
     }
 
     private fun buildSecondSprayMessage(time: String): Component = componentBuilder {
-        appendWithColor("This will expire in", ChatFormatting.GRAY)
+        appendWithColor("This will expire in ", ChatFormatting.GRAY)
         appendWithColor(time, ChatFormatting.GREEN)
         appendWithColor("!", ChatFormatting.GRAY)
     }
