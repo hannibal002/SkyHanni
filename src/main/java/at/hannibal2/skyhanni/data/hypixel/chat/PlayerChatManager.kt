@@ -37,7 +37,6 @@ object PlayerChatManager {
      * REGEX-TEST: [302] ♫ [MVP+] lrg89: problematic
      * REGEX-TEST: [233] §6✿ §a[VIP] dawnbound§f: thats not mine too
      * REGEX-TEST: [323] §b[MVP§2+§b] xatarna§f: can somebody get these beggars out of here
-     * REGEX-FAIL: [BOSS] Bonzo: Show time!
      * REGEX-FAIL: Finding player...
      */
     private val globalPattern by patternGroup.pattern(
