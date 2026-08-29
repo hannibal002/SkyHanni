@@ -124,11 +124,6 @@ object UpdateManager {
 
         logger.log("Starting update check (source: ${context.source.javaClass.simpleName}")
 
-        val currentStream = config.updateStream.get()
-        if (forcedUpdateStream == UpdateStream.BETA && currentStream != UpdateStream.BETA) {
-            config.updateStream.set(UpdateStream.BETA)
-        }
-
         activePromise = context.checkUpdate(forcedUpdateStream.stream)
             .orTimeout(15, TimeUnit.SECONDS)
             .whenCompleteAsync(
