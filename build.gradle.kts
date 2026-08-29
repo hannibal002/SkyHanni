@@ -201,9 +201,17 @@ dependencies {
     }
 }
 
-fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit = {}) {
-    include(dep).also { (it as? ExternalModuleDependency)?.configure() }
-    implementation(dep).also { (it as? ExternalModuleDependency)?.configure() }
+/**
+ * Includes [dep] as jar-in-jar (puts the .jar into `skyhanni.jar/META-INF/jars`).
+ * Use this when you intentionally want to deduplicate a dependency between mods;
+ * prefer `shadowImpl` if it's local to us and shouldn't interfere with other mods.
+ *
+ * A configuration block is intentionally not provided, as it is not possible to
+ * exclude something from a nested jar without a manual repackage step.
+ */
+fun DependencyHandler.includeImplementation(dep: Any) {
+    include(dep)
+    implementation(dep)
 }
 
 afterEvaluate {
