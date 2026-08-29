@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
@@ -117,8 +116,10 @@ object LimboPlaytime {
         val playtime = (storage?.playtime ?: 0).seconds
         if (playtime < 60.seconds) return
         wholeMinutes = playtime.inWholeMinutes.toInt()
-        val hours = (wholeMinutes / 60.0).roundTo(1)
-        hoursString = if (hours % 1.0 == 0.0) hours.toLong().addSeparators() else hours.addSeparators()
+        val tenths = (wholeMinutes + 3) / 6
+        val whole = tenths / 10
+        val decimal = tenths % 10
+        hoursString = if (decimal == 0) "$whole" else "$whole.$decimal"
     }
 
     private fun addLimbo(hoursList: List<Component>, minutesList: List<Component>) {
