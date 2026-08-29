@@ -260,7 +260,7 @@ object SlayerProfitTracker {
             old
         }
 
-        event.move(140, "#profile.slayerProfitData", "#profile.slayer.profitData")
+        event.move(146, "#profile.slayerProfitData", "#profile.slayer.profitData")
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled

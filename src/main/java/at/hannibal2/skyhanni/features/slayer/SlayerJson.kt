@@ -28,6 +28,9 @@ data class SlayerJson(
     @Expose @SerializedName("xp_gains")
     val xpGains: Map<SlayerType, Map<Int, Int>>,
 
+    @Expose @SerializedName("drop_amounts")
+    val dropAmounts: Map<NeuInternalName, Map<Int, String>>,
+
     @Expose
     val champion: List<Double>,
 
@@ -36,6 +39,8 @@ data class SlayerJson(
     @Expose @SerializedName("multiplicative_mayor_perks") val multiplicativeMayors: Map<String, Double>,
 
     @Expose @SerializedName("arbitrary_multiplier") val arbitraryMultiplier: Double,
+
+    @Expose @SerializedName("aatrox_slayer_xp_buff_multiplier") val aatroxSlayerXPBuffMultiplier: Double,
 )
 
 data class SlayerSpecificPetData(

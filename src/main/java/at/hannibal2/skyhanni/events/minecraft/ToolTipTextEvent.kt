@@ -1,16 +1,24 @@
 package at.hannibal2.skyhanni.events.minecraft
 
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.network.chat.Component
 import net.minecraft.world.inventory.Slot
 
+/**
+ * Fired after the game has appended all base tooltip lines to the list.
+ */
+@PrimaryFunction("onToolTip")
 class ToolTipTextEvent(
     val slot: Slot?,
     val itemStack: SafeItemStack,
-    val toolTip: MutableList<Component>,
-    val toolTipStrings: Lazy<List<String>> = lazy { toolTip.map { it.string } },
-) : CancellableSkyHanniEvent()
+    val toolTip: MutableList<Component>
+) : CancellableSkyHanniEvent() {
+
+    val toolTipStrings: List<String>
+        get() = toolTip.map { it.string }
+}
 
 fun MutableList<Component>.add(index: Int, string: String) {
     this.add(index, Component.literal(string))

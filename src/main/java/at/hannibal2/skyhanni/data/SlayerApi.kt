@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -104,7 +105,7 @@ object SlayerApi {
 
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
 
-    var slayerJsonData: SlayerJson? = null
+    var jsonData: SlayerJson? = null
         private set
 
     var questStartTime = SimpleTimeMark.farPast()
@@ -167,22 +168,20 @@ object SlayerApi {
     const val BREWERY_CONTRIBUTION_REDUCTION = 0.95 // -5% from contributing to the brewery community project
     const val COST_REDUCTION_LEVEL = 7 // Slayer Bonus Rewards level required to get the -4% discount
 
+    val storage: ProfileSpecificStorage.SlayerStorage?
+        get() = ProfileStorageData.profileSpecific?.slayer
+
     var bonusRewardsLevel: Int
-        get() {
-            return ProfileStorageData.profileSpecific?.slayer?.bonusRewardsLevel ?: 0
-        }
-        set(value) {
-            ProfileStorageData.profileSpecific?.slayer?.bonusRewardsLevel = value
+        get() = storage?.bonusRewardsLevel ?: 0
+        private set(value) {
+            storage?.bonusRewardsLevel = value
         }
 
     var breweryContribution: Boolean
-        get() {
-            return ProfileStorageData.profileSpecific?.slayer?.breweryContributionReduction == true
+        get() = storage?.breweryContributionReduction == true
+        private set(value) {
+            storage?.breweryContributionReduction = value
         }
-        set(value) {
-            ProfileStorageData.profileSpecific?.slayer?.breweryContributionReduction = value
-        }
-
 
     private class SlayerData {
         var currentState: ActiveQuestState = ActiveQuestState.NO_ACTIVE_QUEST
@@ -206,6 +205,16 @@ object SlayerApi {
 
             internalName.getPriceName(amount, pricePer = maxPrice) to totalPrice
         }
+
+    fun getItemDropAmountForTier(internalName: NeuInternalName, tier: Int): Pair<Int, Int?> {
+        val dropAmount = jsonData?.dropAmounts?.get(internalName) ?: return 1 to null
+        val dropAmountForTier = dropAmount[tier]?.split("-")
+
+        val min = dropAmountForTier?.get(0)?.toInt() ?: 1
+        val max = dropAmountForTier?.get(1)?.toInt() ?: 1
+
+        return min to max
+    }
 
     @HandleEvent
     private fun onDebugDataCollect(event: DebugDataCollectEvent) {
@@ -390,6 +399,14 @@ object SlayerApi {
         }
     }
 
+    fun updateBreweryContribution(value: Boolean) {
+        breweryContribution = value
+    }
+
+    fun updateBonusRewardsLevel(value: Int) {
+        bonusRewardsLevel = value
+    }
+
     @HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true)
     private fun onScoreboardChange() {
         updateSlayerState()
@@ -439,7 +456,7 @@ object SlayerApi {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     private fun onRepoReload(event: RepositoryReloadEvent) {
-        slayerJsonData = event.getConstant<SlayerJson>("Slayer")
+        jsonData = event.getConstant<SlayerJson>("Slayer")
     }
 
     @HandleEvent

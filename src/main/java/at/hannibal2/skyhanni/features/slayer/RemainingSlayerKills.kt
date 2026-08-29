@@ -51,7 +51,7 @@ object RemainingSlayerKills {
      */
     private val progressPattern by patternGroup.pattern(
         "progress",
-        "\\((?<current>[\\d,.]+[kmb]?)\\/(?<max>[\\d,.]+[kmb]?)\\) .*",
+        "\\((?<current>[\\d,.]+[kmb]?)/(?<max>[\\d,.]+[kmb]?)\\) .*",
     )
 
     /**
@@ -162,7 +162,7 @@ object RemainingSlayerKills {
     }
 
     private fun getMobs(): List<Mob>? {
-        val data = SlayerApi.slayerJsonData ?: return null
+        val data = SlayerApi.jsonData ?: return null
         val areas = data.normalMobs[SlayerApi.currentAreaType] ?: mapOf()
         val normalMobs = areas[SkyBlockUtils.graphArea] ?: listOf()
 
@@ -187,7 +187,7 @@ object RemainingSlayerKills {
         combatWisdom += killComboWisdom
         debugMessage("kill combo wisdom is $killComboWisdom")
 
-        SlayerApi.slayerJsonData?.let { data ->
+        SlayerApi.jsonData?.let { data ->
             data.weapons[SlayerApi.activeType]?.get(InventoryUtils.itemInHandId)?.let { wisdom ->
                 combatWisdom += wisdom
                 combatWisdom += countHabaneroOnArmor()
@@ -211,7 +211,7 @@ object RemainingSlayerKills {
 
     private fun getMultiplicativeMultiplier(): Double {
         var multiplier = 1.0
-        val data = SlayerApi.slayerJsonData ?: return 1.0
+        val data = SlayerApi.jsonData ?: return 1.0
 
         ElectionApi.getAllActivePerks().forEach { multiplier *= data.multiplicativeMayors[it.name] ?: 1.0 }
 
@@ -239,7 +239,7 @@ object RemainingSlayerKills {
 
         val championLevel = (InventoryUtils.getItemInHand()?.getHypixelEnchantments().orEmpty()["champion"] ?: 0) - 1
 
-        val data = SlayerApi.slayerJsonData
+        val data = SlayerApi.jsonData
 
         if (championLevel != -1) additiveWithMultMultipliers += (data?.champion?.getOrNull(championLevel) ?: 0.0)
 
@@ -283,7 +283,7 @@ object RemainingSlayerKills {
                 }
             }
         }
-        return SlayerApi.slayerJsonData?.habaneroMultiplier?.times(counter) ?: 0.0
+        return SlayerApi.jsonData?.habaneroMultiplier?.times(counter) ?: 0.0
     }
 
     private fun Mob.names(xp: Double, totalQuestXP: Double) = buildString {

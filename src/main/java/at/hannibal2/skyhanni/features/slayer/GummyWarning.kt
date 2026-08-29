@@ -70,7 +70,8 @@ object GummyWarning {
             holdingSlayerWeapon = false
             return
         }
-        holdingSlayerWeapon = SlayerApi.slayerJsonData?.weapons[activeSlayer]?.contains(event.newItem) == true
+
+        holdingSlayerWeapon = SlayerApi.jsonData?.weapons?.get(activeSlayer)?.contains(event.newItem) == true
     }
 
     @HandleEvent(onlyOnSkyblock = true)

@@ -57,7 +57,7 @@ object BitsPerCookieVisual {
         var timeReplaced = false
 
         val toolTip = event.toolTip
-        val toolTipStrings = event.toolTipStrings.value
+        val toolTipStrings = event.toolTipStrings
         val (cookieAmount, loreIndex) = amountPattern.firstMatcherWithIndex(toolTipStrings) {
             group("amount").toInt() to it
         } ?: (1 to 0)

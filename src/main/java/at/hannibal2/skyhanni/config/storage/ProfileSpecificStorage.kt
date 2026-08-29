@@ -67,6 +67,7 @@ import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
+import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -979,10 +980,10 @@ class ProfileSpecificStorage(
         var rngMeter: MutableMap<String, RngMeterStorage> = mutableMapOf()
 
         data class RngMeterStorage(
-            @Expose var currentMeter: Long = -1,
-            @Expose var gainPerBoss: Long = -1,
-            @Expose var goalNeeded: Long = -1,
-            @Expose var itemGoal: String = "?",
+            @Expose var currentMeter: Long? = null,
+            @Expose var gainPerBoss: Long? = null,
+            @Expose var goalNeeded: Long? = null,
+            @Expose var itemGoal: String? = null,
         )
 
         @Expose
