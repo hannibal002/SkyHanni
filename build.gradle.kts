@@ -50,8 +50,6 @@ loom.apply {
         println("No classTweaker file for ${target.minecraftVersion}")
     }
 
-    fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json")
-
     runs {
         named("client") {
             appendProjectPathToDisplayName.set(true)
@@ -195,9 +193,10 @@ dependencies {
     shadowImpl(libs.httpclient)
     "minecraftTestClientRuntimeLibraries"(libs.httpclient)
 
-    if (target.renderChestVersion != null) {
-        includeImplementation("net.azureaaron:render-chest:${target.renderChestVersion}")
-        "minecraftTestClientRuntimeLibraries"("net.azureaaron:render-chest:${target.renderChestVersion}")
+    target.renderChestVersion?.let {
+        includeImplementation("net.azureaaron:render-chest:$it")
+        "productionRuntimeMods"("net.azureaaron:render-chest:$it")
+        "minecraftTestClientRuntimeLibraries"("net.azureaaron:render-chest:$it")
     }
 }
 
@@ -274,11 +273,13 @@ tasks.processResources {
     val fapiVersion = target.fabricApiVersion?.split(":")?.last() ?: ""
     val hypixelModApiVersion = target.hypixelModApiFabricVersion.split(":").last()
     val minecraftVersion = target.minecraftVersion.fabricModJsonVersion
+    val renderChestVersion = target.renderChestVersion ?: ""
     val props = buildMap {
         put("version", version)
         put("minecraft", minecraftVersion)
         put("fapi", fapiVersion)
         put("hypixelmodapi", hypixelModApiVersion)
+        put("renderchest", renderChestVersion)
     }
 
     props.forEach(inputs::property)
