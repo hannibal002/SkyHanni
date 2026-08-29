@@ -136,9 +136,7 @@ dependencies {
     implementation(libs.fabricLanguageKotlin)
     "productionRuntimeMods"(libs.fabricLanguageKotlin)
 
-    target.modMenuVersion.let {
-        implementation("maven.modrinth:modmenu:$it")
-    }
+    implementation("maven.modrinth:modmenu:${target.modMenuVersion}")
 
     runtimeOnly(libs.devauth)
     "productionRuntimeMods"(libs.devauth)
