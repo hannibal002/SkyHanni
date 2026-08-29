@@ -62,8 +62,14 @@ object HideNotClickableItems {
 
     private val config get() = SkyHanniMod.feature.inventory.hideNotClickable
 
-    private var hideReason = ""
+    private var hideReason: String
+        get() = "do not use pls this is a workaround omg"
+        set(string) {
+            hideReasons = listOf(string)
+        }
+    private var hideReasons = listOf<String>()
     private var showGreenLine = false
+    private var allowBypass = true
 
     private var lastClickTime = SimpleTimeMark.farPast()
 
@@ -132,7 +138,6 @@ object HideNotClickableItems {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
-        if (!isEnabled()) return
         if (bypassActive()) return
         if (event.gui !is ContainerScreen) return
         val chest = event.container as ChestMenu
@@ -149,7 +154,6 @@ object HideNotClickableItems {
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     private fun onTooltip(event: ToolTipTextEvent) {
-        if (!isEnabled()) return
         if (bypassActive()) return
 
         val guiChest = MinecraftCompat.screen
@@ -165,12 +169,14 @@ object HideNotClickableItems {
             event.toolTip.clear()
             event.toolTip.add("§7" + first.string)
             event.toolTip.add("")
-            if (hideReason == "") {
+            if (hideReasons.isEmpty()) {
                 event.toolTip.add("§4No hide reason!")
                 ErrorManager.skyHanniError("No hide reason for not clickable item!")
             } else {
-                event.toolTip.add("§c$hideReason")
-                if (config.itemsBypass && !hideReason.contains("SkyBlock Menu")) {
+                for (string in hideReasons) {
+                    event.toolTip.add("§c$string")
+                }
+                if (config.itemsBypass && allowBypass) {
                     event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")
                 }
             }
@@ -179,7 +185,6 @@ object HideNotClickableItems {
 
     @HandleEvent
     private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!isEnabled()) return
         if (!config.itemsBlockClicks) return
         if (bypassActive()) return
         if (event.gui !is ContainerScreen) return
@@ -200,37 +205,57 @@ object HideNotClickableItems {
         }
     }
 
-    private fun bypassActive() = config.itemsBypass && KeyboardManager.isModifierKeyDown()
+    private fun bypassActive() = config.itemsBypass && KeyboardManager.isModifierKeyDown() && allowBypass
 
     private fun hide(chestName: String, stack: SafeItemStack): Boolean {
-        hideReason = ""
+        hideReasons = emptyList()
         showGreenLine = false
+        allowBypass = true
 
-        return when {
-            hideNpcSell(stack) -> true
-            hideInStorage(chestName, stack) -> true
-            hideSalvage(chestName, stack) -> true
-            hidePlayerTrade(chestName, stack) -> true
-            hideBazaarOrAH(chestName, stack) -> true
-            hideAccessoryBag(chestName, stack) -> true
-            hideBasketOfSeeds(chestName, stack) -> true
-            hideNetherWartPouch(chestName, stack) -> true
-            hideTrickOrTreatBag(chestName, stack) -> true
-            hideSackOfSacks(chestName, stack) -> true
-            hideFishingBag(chestName, stack) -> true
-            hidePotionBag(chestName, stack) -> true
-            hidePrivateIslandChest(stack) -> true
-            hideAttributeFusion(chestName, stack) -> true
-            hideYourEquipment(stack) -> true
-            hideComposter(stack) -> true
-            hideRiftMotesGrubber(chestName, stack) -> true
-            hideRiftTransferChest(chestName, stack) -> true
-            hideFossilExcavator(stack) -> true
-            hideResearchCenter(chestName, stack) -> true
-            hideBirdFeeder(chestName, stack) -> true
-
-            else -> false
+        if (isAuctionHouse(chestName) || npcSellable(stack) || isTradeMenu(chestName)) {
+            if (PreventItemSell.shouldPreventSell(stack)) {
+                hideReasons = listOf(
+                    "You prevented the selling of this item!",
+                    "Disable it by holding the item in the hand and type",
+                    "§e/shpreventsell§e!",
+                )
+                allowBypass = false
+                return true
+            }
         }
+
+
+        if (isEnabled()) {
+            return hideNotClickable(stack, chestName)
+        }
+
+        return false
+    }
+
+    private fun hideNotClickable(stack: SafeItemStack, chestName: String): Boolean = when {
+        hideNpcSell(stack) -> true
+        hideInStorage(chestName, stack) -> true
+        hideSalvage(chestName, stack) -> true
+        hidePlayerTrade(chestName, stack) -> true
+        hideBazaarOrAH(chestName, stack) -> true
+        hideAccessoryBag(chestName, stack) -> true
+        hideBasketOfSeeds(chestName, stack) -> true
+        hideNetherWartPouch(chestName, stack) -> true
+        hideTrickOrTreatBag(chestName, stack) -> true
+        hideSackOfSacks(chestName, stack) -> true
+        hideFishingBag(chestName, stack) -> true
+        hidePotionBag(chestName, stack) -> true
+        hidePrivateIslandChest(stack) -> true
+        hideAttributeFusion(chestName, stack) -> true
+        hideYourEquipment(stack) -> true
+        hideComposter(stack) -> true
+        hideRiftMotesGrubber(chestName, stack) -> true
+        hideRiftTransferChest(chestName, stack) -> true
+        hideFossilExcavator(stack) -> true
+        hideResearchCenter(chestName, stack) -> true
+        hideBirdFeeder(chestName, stack) -> true
+
+        else -> false
     }
 
     private fun hideFossilExcavator(stack: SafeItemStack): Boolean {
@@ -338,6 +363,7 @@ object HideNotClickableItems {
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be put into your equipment!"
+            allowBypass = false
             return true
         }
 
@@ -370,6 +396,7 @@ object HideNotClickableItems {
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be put into the potion bag!"
+            allowBypass = false
             return true
         }
 
@@ -385,6 +412,7 @@ object HideNotClickableItems {
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be put into the fishing bag!"
+            allowBypass = false
             return true
         }
 
@@ -424,6 +452,7 @@ object HideNotClickableItems {
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be put into the basket of seeds!"
+            allowBypass = false
             return true
         }
 
@@ -440,6 +469,7 @@ object HideNotClickableItems {
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be put into the nether wart pouch!"
+            allowBypass = false
             return true
         }
 
@@ -454,6 +484,7 @@ object HideNotClickableItems {
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be put into the trick or treat bag!"
+            allowBypass = false
             return true
         }
 
@@ -464,7 +495,7 @@ object HideNotClickableItems {
     }
 
     private fun hidePlayerTrade(chestName: String, stack: SafeItemStack): Boolean {
-        if (!chestName.startsWith("You    ")) return false
+        if (!isTradeMenu(chestName)) return false
 
         if ((HypixelData.noTrade && stack.isSoulbound()) || (!HypixelData.noTrade && stack.isAnySoulbound())) {
             hideReason = "Soulbound items cannot be traded!"
@@ -473,6 +504,7 @@ object HideNotClickableItems {
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be traded!"
+            allowBypass = false
             return true
         }
 
@@ -489,6 +521,8 @@ object HideNotClickableItems {
         return result
     }
 
+    private fun isTradeMenu(chestName: String): Boolean = chestName.startsWith("You    ")
+
     @Suppress("ReturnCount")
     private fun hideNpcSell(stack: SafeItemStack): Boolean {
         if (RiftApi.inRift()) return false
@@ -504,8 +538,7 @@ object HideNotClickableItems {
             name = name.substring(0, name.length - amountText.length)
         }
 
-        val sellable = clickToSellPattern.anyMatches(stack.getLore()) ||
-            (stack.getItemId() != "PET" && (stack.getInternalNameOrNull()?.getNpcPriceOrNull() ?: 0.0) > 0)
+        val sellable = npcSellable(stack)
         if (!sellable) {
             hideReason = "This item cannot be sold at the NPC!"
             return true
@@ -530,11 +563,18 @@ object HideNotClickableItems {
         return true
     }
 
+    private fun npcSellable(stack: SafeItemStack): Boolean {
+        val sellable = clickToSellPattern.anyMatches(stack.getLore()) ||
+            (stack.getItemId() != "PET" && (stack.getInternalNameOrNull()?.getNpcPriceOrNull() ?: 0.0) > 0)
+        return sellable
+    }
+
     private fun hideInStorage(chestName: String, stack: SafeItemStack): Boolean {
         if (!chestName.contains("Ender Chest") && !chestName.contains("Backpack") && chestName != "Storage") return false
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be put into the storage!"
+            allowBypass = false
             return true
         }
 
@@ -569,6 +609,7 @@ object HideNotClickableItems {
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             hideReason = "The SkyBlock Menu cannot be salvaged!"
+            allowBypass = false
             return true
         }
 
@@ -585,10 +626,7 @@ object HideNotClickableItems {
 
     private fun hideBazaarOrAH(chestName: String, stack: SafeItemStack): Boolean {
         val bazaarInventory = BazaarApi.inBazaarInventory
-
-        val auctionHouseInventory =
-            chestName == "Co-op Auction House" || chestName == "Auction House" ||
-                chestName == "Create BIN Auction" || chestName == "Create Auction"
+        val auctionHouseInventory = isAuctionHouse(chestName)
         if (!bazaarInventory && !auctionHouseInventory) return false
         showGreenLine = true
 
@@ -596,6 +634,7 @@ object HideNotClickableItems {
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             if (bazaarInventory) hideReason = "The SkyBlock Menu is not a Bazaar Product!"
             if (auctionHouseInventory) hideReason = "The SkyBlock Menu cannot be auctioned!"
+            allowBypass = false
             return true
         }
 
@@ -609,6 +648,13 @@ object HideNotClickableItems {
         if (isNotAuctionable(stack)) return true
 
         return false
+    }
+
+    private fun isAuctionHouse(chestName: String): Boolean {
+        val auctionHouseInventory =
+            chestName == "Co-op Auction House" || chestName == "Auction House" ||
+                chestName == "Create BIN Auction" || chestName == "Create Auction"
+        return auctionHouseInventory
     }
 
     private fun isNotAuctionable(stack: SafeItemStack): Boolean {
