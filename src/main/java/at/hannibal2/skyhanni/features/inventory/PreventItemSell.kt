@@ -4,9 +4,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems.allowBypass
+import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems.hideReasons
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import net.minecraft.world.item.ItemStack
 
@@ -48,9 +51,27 @@ object PreventItemSell {
         }
     }
 
-    fun shouldPreventSell(stack: ItemStack): Boolean = stack.getItemUuid()?.let { uuid ->
+    private fun shouldPreventSell(stack: ItemStack): Boolean = stack.getItemUuid()?.let { uuid ->
         ProfileStorageData.profileSpecific?.notSellableItems?.let { list ->
             uuid in list
         }
     } ?: false
+
+    fun shouldPreventSell(chestName: String, stack: SafeItemStack): Boolean {
+        if (!inASellerInventory(chestName, stack)) return false
+        if (!shouldPreventSell(stack)) return false
+
+        hideReasons = listOf(
+            "You prevented the selling of this item!",
+            "Disable it by holding the item in the hand and type",
+            "§e/shpreventsell§e!",
+        )
+        allowBypass = false
+        return true
+    }
+
+    private fun inASellerInventory(chestName: String, stack: SafeItemStack): Boolean =
+        HideNotClickableItemsFeature.isAuctionHouse(chestName) ||
+            HideNotClickableItemsFeature.npcSellable(stack) ||
+            HideNotClickableItemsFeature.isTradeMenu(chestName)
 }
