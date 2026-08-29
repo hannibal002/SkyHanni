@@ -41,17 +41,24 @@ object NavigationHelper {
         GraphNodeTag.CRIMSON_MINIBOSS,
     )
 
-    private fun doCommandAsync(searchTerm: String) {
+    private fun doCommandAsync(searchTerm: String, allowInstant: Boolean = true) {
+        SkyHanniMod.launchCoroutine("shnavigate command") {
+            runCommand(searchTerm, allowInstant)
+        }
+    }
+
+    private fun runCommand(searchTerm: String, allowInstant: Boolean) {
         val distances = calculateDistances(searchTerm)
         val locations = calculateNames(distances)
 
+        // going back always shows the list, otherwise an exact match would just navigate again
         val goBack = {
-            doCommandAsync(searchTerm)
             IslandGraphs.stopNavigation()
+            doCommandAsync(searchTerm, allowInstant = false)
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
-        if (config.allowInstantNavigation) {
+        if (allowInstant && config.allowInstantNavigation) {
             val exactMatch = locations.firstOrNull { (name, _) ->
                 name.substringBefore(" §7(").equals(searchTerm, ignoreCase = true)
             }
@@ -122,6 +129,8 @@ object NavigationHelper {
         val graph = IslandGraphs.currentIslandGraph ?: return emptyMap()
         val closestNode = IslandGraphs.closestNode ?: return emptyMap()
 
+        val shortestDistances = GraphUtils.findAllShortestDistances(closestNode).distances
+
         val distances = mutableMapOf<GraphNode, Double>()
         for (node in graph) {
             if (!node.enabled) continue
@@ -129,7 +138,8 @@ object NavigationHelper {
             val remainingTags = node.tags.filter { it in allowedSingleNavigationTags }
             if (remainingTags.isEmpty()) continue
             if (name.lowercase().contains(searchTerm)) {
-                distances[node] = GraphUtils.findShortestDistance(closestNode, node)
+                // unreachable nodes fall back to 0.0 and therefore sort to the front, same as before
+                distances[node] = shortestDistances[node] ?: 0.0
             }
             if (remainingTags.size != 1) {
                 println("found node with invalid amount of tags: ${node.name} (${remainingTags.map { it.cleanName }}")
@@ -148,9 +158,7 @@ object NavigationHelper {
                 ChatUtils.chat("Started Navigating to custom goal at §f${location.toLocalFormat()}", messageId = messageId)
             }
             argCallback("search", BrigadierArguments.greedyString(), BrigadierUtils.dynamicSuggestionProvider { getNames() }) {
-                SkyHanniMod.launchCoroutine("shnavigate command") {
-                    doCommandAsync(it.lowercase().removeColor())
-                }
+                doCommandAsync(it.lowercase().removeColor())
             }
             simpleCallback {
                 doCommandAsync("")
