@@ -116,18 +116,9 @@ object LimboPlaytime {
         if (event.inventoryName != "Detailed /playtime") return
         val playtime = (storage?.playtime ?: 0).seconds
         if (playtime < 60.seconds) return
-        val wholeHours = playtime.inWholeHours
         wholeMinutes = playtime.inWholeMinutes.toInt()
-        if ((wholeMinutes % 60) == 0) {
-            hoursString = "$wholeHours"
-        } else {
-            val minutes: Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60).roundTo(1)
-            hoursString = wholeHours.addSeparators()
-            if (findFloatDecimalPlace(minutes) != 0) {
-                val minutesString = minutes.toString()
-                hoursString += minutesString.substring(minutesString.indexOf("."))
-            }
-        }
+        val hours = (wholeMinutes / 60.0).roundTo(1)
+        hoursString = if (hours % 1.0 == 0.0) hours.toLong().addSeparators() else hours.addSeparators()
     }
 
     private fun addLimbo(hoursList: List<Component>, minutesList: List<Component>) {
@@ -185,11 +176,5 @@ object LimboPlaytime {
             toolTip.addAll(modifiedList)
         }
         toolTip.addAll(lastList)
-    }
-
-    private fun findFloatDecimalPlace(input: Float): Int {
-        val string = input.toString()
-        val dotIndex = string.indexOf(".")
-        return (string[dotIndex + 1].toString().toInt())
     }
 }
