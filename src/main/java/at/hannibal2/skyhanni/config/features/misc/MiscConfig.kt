@@ -401,9 +401,8 @@ class MiscConfig {
             "If the game is muted, you still won't hear the sounds.",
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     @SearchTag("beep change ding during loud maintain pling quiet warnings")
-    var boostWarningVolume: Boolean = true
+    var boostWarningVolume: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -503,7 +502,6 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var fixDoubleClicks: Boolean = true
-
 
     @ConfigOption(
         name = "Color Particle Warning",

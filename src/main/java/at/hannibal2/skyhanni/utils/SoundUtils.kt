@@ -109,5 +109,8 @@ object SoundUtils {
         event.move(145, "misc.maintainGameVolume", "misc.boostWarningVolume") { element ->
             JsonPrimitive(!element.asBoolean)
         }
+        event.transform(146, "misc.boostWarningVolume") { _ ->
+            JsonPrimitive(false)
+        }
     }
 }
