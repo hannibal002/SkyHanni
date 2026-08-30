@@ -1,6 +1,9 @@
+@file:Suppress("NoEmptyFile")
+
 package at.hannibal2.skyhanni.mixins.hooks
 
-import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore.Companion.setUsingCustomOutline
+//? if < 26.2 {
+/*import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore.Companion.setUsingCustomOutline
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.world.entity.Entity
 
@@ -13,3 +16,4 @@ object EntityRendererHook {
         return true
     }
 }
+*///?}

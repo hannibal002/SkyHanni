@@ -1,14 +1,15 @@
+@file:Suppress("NoEmptyFile")
+
 package at.hannibal2.skyhanni.mixins.hooks
 
-import net.minecraft.client.renderer.entity.state.EntityRenderState
+//? if < 26.2 {
+/*import net.minecraft.client.renderer.entity.state.EntityRenderState
 
+// Naming is intentional
+@Suppress("FunctionName")
 interface GlowingStateStore {
-    // Naming is intentional
-    @Suppress("FunctionName")
     fun `skyhanni$isUsingCustomOutline`(): Boolean = throw UnsupportedOperationException("Implemented via mixin")
 
-    // Naming is intentional
-    @Suppress("FunctionName")
     fun `skyhanni$setUsingCustomOutline`() {
         throw UnsupportedOperationException("Implemented via mixin")
     }
@@ -19,3 +20,4 @@ interface GlowingStateStore {
         }
     }
 }
+*///?}
