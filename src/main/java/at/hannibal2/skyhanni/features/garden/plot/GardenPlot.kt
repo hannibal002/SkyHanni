@@ -87,7 +87,7 @@ class GardenPlot(val id: Int, var inventorySlot: Int, val box: AABB, val middle:
             sprayType = null
             sprayExpiryTime = SimpleTimeMark.now()
             sprayHasNotified = true
-            GardenPlotSprayEvent.SprayRemovedEvent(this@GardenPlot, previousSpray)
+            GardenPlotSprayEvent.SprayRemovedEvent(this@GardenPlot, previousSpray).post()
         }
     }
 
