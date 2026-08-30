@@ -116,10 +116,15 @@ object LimboPlaytime {
         val playtime = (storage?.playtime ?: 0).seconds
         if (playtime < 60.seconds) return
         wholeMinutes = playtime.inWholeMinutes.toInt()
-        val tenths = (wholeMinutes + 3) / 6
-        val whole = tenths / 10
-        val decimal = tenths % 10
-        hoursString = if (decimal == 0) "$whole" else "$whole.$decimal"
+        hoursString = formatMinutesAsHours(wholeMinutes)
+    }
+
+    private fun formatMinutesAsHours(minutes: Int): String {
+        // +3 is half the divisor, so the integer division rounds instead of truncating
+        val tenthsOfHour = (minutes + 3) / 6
+        val hours = tenthsOfHour / 10
+        val decimal = tenthsOfHour % 10
+        return if (decimal == 0) "$hours" else "$hours.$decimal"
     }
 
     private fun addLimbo(hoursList: List<Component>, minutesList: List<Component>) {
