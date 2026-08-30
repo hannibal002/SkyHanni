@@ -338,7 +338,7 @@ object CroesusChestTracker {
         countUnopenedChestsAndRemoveOld()
         currentRunIndex = 0
         if ((croesusChests?.size ?: 0) > MAX_CHESTS) {
-            croesusChests?.dropLast(1)
+            croesusChests?.removeLast()
         }
         display = null
 
