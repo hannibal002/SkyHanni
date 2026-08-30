@@ -35,7 +35,6 @@ sealed class GardenPlotSprayEvent(val plot: GardenPlot, val type: SprayType?) : 
      * @param plot is the GardenPlot that the spray has been removed from.
      * @param type is the SprayType that has been removed.
      */
-
     @PrimaryFunction("onGardenPlotSprayRemoval")
     class SprayRemovedEvent(plot: GardenPlot, type: SprayType?) : GardenPlotSprayEvent(plot, type)
 }

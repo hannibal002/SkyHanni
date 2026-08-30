@@ -83,11 +83,11 @@ class GardenPlot(val id: Int, var inventorySlot: Int, val box: AABB, val middle:
 
     fun removeSpray() {
         getData()?.apply {
+            val previousSpray = sprayType
             sprayType = null
             sprayExpiryTime = SimpleTimeMark.now()
             sprayHasNotified = true
-            val plot = GardenPlotApi.getPlotByID(id) ?: return
-            GardenPlotSprayEvent.SprayRemovedEvent(plot, sprayType)
+            GardenPlotSprayEvent.SprayRemovedEvent(this@GardenPlot, previousSpray)
         }
     }
 
