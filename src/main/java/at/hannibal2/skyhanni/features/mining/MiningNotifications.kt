@@ -31,7 +31,8 @@ object MiningNotifications {
         SCRAP("§9Suspicious Scrap", "§9Suspicious Scrap"),
         GOLDEN_GOBLIN("§6Golden Goblin", "§6Golden Goblin"),
         DIAMOND_GOBLIN("§bDiamond Goblin", "§bDiamond Goblin"),
-        COLD("§bCold", "§bCold");
+        COLD("§bCold", "§bCold"),
+        PICKAXE_ABILITY("§6Pickaxe Ability", "§6Pickaxe Ability Ready!");
 
         override fun toString() = str
     }
@@ -53,6 +54,18 @@ object MiningNotifications {
         "goblin.diamondspawn",
         "§6A §r§bDiamond Goblin §r§6has spawned!",
     )
+    /**
+     * REGEX-TEST: §a§r§6Mining Speed Boost §r§ais now available!
+     * REGEX-TEST: §a§r§6Pickobulus §r§ais now available!
+     * REGEX-TEST: §a§r§6Maniac Miner §r§ais now available!
+     * REGEX-TEST: §a§r§6Sheer Force §r§ais now available!
+     * REGEX-TEST: §a§r§6Tunnel Vision §r§ais now available!
+     * REGEX-TEST: §a§r§6Hazardous Miner §r§ais now available!
+     */
+    val pickaxeAbilityAvailable by patternGroup.pattern(
+        "pickaxe.ability.available",
+        "§a(?:§r)?§6(?<ability>.*) (?:§r)?§ais now available!",
+    )
 
     private val config get() = SkyHanniMod.feature.mining.notifications
 
@@ -69,6 +82,7 @@ object MiningNotifications {
             scrapDrop.matches(message) -> sendNotification(MiningNotificationList.SCRAP)
             goldenGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.GOLDEN_GOBLIN)
             diamondGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.DIAMOND_GOBLIN)
+            pickaxeAbilityAvailable.matches(message) -> sendNotification(MiningNotificationList.PICKAXE_ABILITY)
         }
     }
 
