@@ -7,15 +7,18 @@ import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.MiningApi.inGlaciteArea
 import at.hannibal2.skyhanni.data.MiningApi.lastColdReset
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -32,7 +35,8 @@ object MiningNotifications {
         GOLDEN_GOBLIN("§6Golden Goblin", "§6Golden Goblin"),
         DIAMOND_GOBLIN("§bDiamond Goblin", "§bDiamond Goblin"),
         COLD("§bCold", "§bCold"),
-        PICKAXE_ABILITY("§6Pickaxe Ability", "§6Pickaxe Ability Ready!");
+        PICKAXE_ABILITY("§6Pickaxe Ability", "§6Pickaxe Ability Ready!"),
+        ;
 
         override fun toString() = str
     }
@@ -55,16 +59,31 @@ object MiningNotifications {
         "§6A §r§bDiamond Goblin §r§6has spawned!",
     )
     /**
-     * REGEX-TEST: §a§r§6Mining Speed Boost §r§ais now available!
-     * REGEX-TEST: §a§r§6Pickobulus §r§ais now available!
-     * REGEX-TEST: §a§r§6Maniac Miner §r§ais now available!
-     * REGEX-TEST: §a§r§6Sheer Force §r§ais now available!
-     * REGEX-TEST: §a§r§6Tunnel Vision §r§ais now available!
-     * REGEX-TEST: §a§r§6Hazardous Miner §r§ais now available!
+     * REGEX-TEST: Pickobulus: Available
+     * REGEX-TEST: Mining Speed Boost: Available
+     * REGEX-TEST: Maniac Miner: Available
      */
-    val pickaxeAbilityAvailable by patternGroup.pattern(
+    private val pickaxeAbilityReadyWidgetPattern by patternGroup.pattern(
         "pickaxe.ability.available",
-        "§a(?:§r)?§6(?<ability>.*) (?:§r)?§ais now available!",
+        "\\s*(?<ability>.+): Available",
+    )
+
+    /**
+     * REGEX-TEST: Mining Speed Boost is now available!
+     * REGEX-TEST: Pickobulus is now available!
+     */
+    private val pickaxeAbilityReadyChatPattern by patternGroup.pattern(
+        "pickaxe.ability.available.chat",
+        "(?<ability>.+) is now available!",
+    )
+
+    /**
+     * REGEX-TEST: You used your Mining Speed Boost Pickaxe Ability!
+     * REGEX-TEST: You used your Pickobulus Pickaxe Ability!
+     */
+    private val pickaxeAbilityUsedPattern by patternGroup.pattern(
+        "pickaxe.ability.used",
+        "You used your (?<ability>.+) Pickaxe Ability!",
     )
 
     private val config get() = SkyHanniMod.feature.mining.notifications
@@ -72,18 +91,46 @@ object MiningNotifications {
     private var hasSentCold = false
     private var hasSentAscensionRope = false
 
+    private var pickaxeReadyArmed = false
+    private var pickaxeWidgetOnCooldown = false
+
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!IslandTypeTag.MINING.isInIsland()) return
         if (!config.enabled) return
         val message = event.message
+        val cleanMessage = event.cleanMessage
         when {
             mineshaftSpawn.matches(message) -> sendNotification(MiningNotificationList.MINESHAFT_SPAWN)
             scrapDrop.matches(message) -> sendNotification(MiningNotificationList.SCRAP)
             goldenGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.GOLDEN_GOBLIN)
             diamondGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.DIAMOND_GOBLIN)
-            pickaxeAbilityAvailable.matches(message) -> sendNotification(MiningNotificationList.PICKAXE_ABILITY)
+            pickaxeAbilityUsedPattern.matches(cleanMessage) -> pickaxeReadyArmed = true
+            pickaxeAbilityReadyChatPattern.matches(cleanMessage) -> notifyPickaxeReady()
         }
+    }
+
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.MINING])
+    private fun onPickaxeAbilityWidget(event: WidgetUpdateEvent) {
+        if (!config.enabled) return
+        if (!event.isWidget(TabWidget.PICKAXE_COOLDOWN)) return
+        if (event.isClear()) return
+
+        if (pickaxeAbilityReadyWidgetPattern.anyMatches(event.cleanLines)) {
+            if (pickaxeWidgetOnCooldown) {
+                pickaxeWidgetOnCooldown = false
+                notifyPickaxeReady()
+            }
+        } else {
+            pickaxeWidgetOnCooldown = true
+            pickaxeReadyArmed = true
+        }
+    }
+
+    private fun notifyPickaxeReady() {
+        if (!pickaxeReadyArmed) return
+        pickaxeReadyArmed = false
+        sendNotification(MiningNotificationList.PICKAXE_ABILITY)
     }
 
     @HandleEvent
@@ -108,6 +155,8 @@ object MiningNotifications {
     fun onWorldChange() {
         hasSentCold = false
         hasSentAscensionRope = false
+        pickaxeReadyArmed = false
+        pickaxeWidgetOnCooldown = false
     }
 
     @HandleEvent

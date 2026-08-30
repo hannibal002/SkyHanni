@@ -25,7 +25,7 @@ class MiningNotificationsConfig {
         MiningNotificationList.COLD,
         MiningNotificationList.GOLDEN_GOBLIN,
         MiningNotificationList.DIAMOND_GOBLIN,
-        MiningNotificationList.PICKAXE_ABILITY
+        MiningNotificationList.PICKAXE_ABILITY,
     )
 
     @Expose
