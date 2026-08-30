@@ -62,7 +62,7 @@ object PreventItemSell {
         if (!inASellerInventory(chestName, stack)) return
         if (!shouldPreventSell(stack)) return
 
-        event.hideReasons = listOf(
+        event.hideReasons += listOf(
             "You prevented the selling of this item!",
             "Disable it by holding the item in the hand",
             "and type §e/shpreventsell§e!",
