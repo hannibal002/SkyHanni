@@ -303,6 +303,11 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
   See the **Errors and Crashes** section for why every catch goes through `ErrorManager`.
+    - `logErrorWithData` is only for a throwable that was actually thrown and caught, where the stack trace points at the
+      cause. Never construct a throwable just to report a problem the code detected on its own.
+    - For an invalid state the code checks and rejects itself, use
+      `ErrorManager.logErrorStateWithData("explanation for users", "internal description", ...extraOptionalData)`.
+      The first message is what the player reads in chat, the second one only shows up in the copied error report.
 - Do not use `toRegex()` or `toPattern()`. Use `RepoPattern` instead.
   RepoPattern allows regex patterns to be updated remotely via the repo without requiring a mod update.
   Each pattern has a local fallback defined in code, but can be overridden by the repo at runtime.
