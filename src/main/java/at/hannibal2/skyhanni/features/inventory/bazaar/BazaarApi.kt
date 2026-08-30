@@ -47,7 +47,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object BazaarApi {
-
     private val storage get() = ProfileStorageData.playerSpecific?.bazaar
 
     private var loadedNpcPriceData = false
@@ -225,7 +224,7 @@ object BazaarApi {
         val buyInstantly = inventoryItems[10] ?: return null
         if (buyInstantly.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aBuy Instantly") return null
         val bazaarItem = inventoryItems[13] ?: return null
-        return NeuInternalName.fromItemName(bazaarItem.hoverName.formattedTextCompatLeadingWhiteLessResets())
+        return NeuInternalName.fromItemName(bazaarItem.hoverName)
     }
 
     private fun updateTaxRate(inventoryItems: Map<Int, SafeItemStack>) {

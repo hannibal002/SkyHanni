@@ -13,10 +13,8 @@ import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import com.google.gson.annotations.Expose
 
-// todo move back to TreeGiftTracker when 1.8 is no longer supported
 @SkyHanniModule
-@Suppress("unused")
-object ForagingTrackerLegacy {
+object TreeGiftTracker {
 
     enum class TreeType(private val displayName: String) {
         FIG("Fig"),
@@ -81,100 +79,102 @@ object ForagingTrackerLegacy {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: §2§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+     * REGEX-TEST: ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
      */
     val openCloseRewardPattern by patternGroup.pattern(
-        "open-close-reward",
-        "§2§l▬{64}"
+        "open-close-reward.colorless",
+        "(?<line>▬{64})",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: "                                §r§9§lTREE GIFT"
+     * WRAPPED-REGEX-TEST: "                                TREE GIFT"
      */
     val giftHeaderPattern by patternGroup.pattern(
-        "header",
-        " *(?:§.)+TREE GIFT"
+        "header.colorless",
+        " *TREE GIFT",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: "                 §r§7You helped cut §r§a100% §r§7of the §r§aFig Tree§r§7."
-     * WRAPPED-REGEX-TEST: "             §r§7You helped cut §r§a100% §r§7of the §r§aMangrove Tree§r§7."
-     * WRAPPED-REGEX-TEST: "                 §r§7You helped cut §r§c15.2% §r§7of the §r§aFig Tree§r§7."
+     * WRAPPED-REGEX-TEST: "                 You helped cut 100% of the Fig Tree."
+     * WRAPPED-REGEX-TEST: "             You helped cut 100% of the Mangrove Tree."
+     * WRAPPED-REGEX-TEST: "                 You helped cut 15.2% of the Fig Tree."
      */
     val percentageContributedPattern by patternGroup.pattern(
-        "contribution-percentage",
-        " *(?:§.)+You helped cut (?<percentColor>§.)+(?<percentage>[\\d.]+)% (?:§.)+of the (?:§.)+(?<type>.*) Tree(?:§.)+\\."
+        "contribution-percentage.colorless",
+        """ *You helped cut (?<percentage>[\d.]+)% +of the (?<type>\w+) Tree\.""",
     )
 
     /**
-     * REGEX-TEST: §f                       §e+5 rewards gained! §8(hover)
-     * WRAPPED-REGEX-TEST: "                            §r§e+0 rewards gained!"
+     * WRAPPED-REGEX-TEST: "                       +5 rewards gained! (hover)"
+     * WRAPPED-REGEX-TEST: "                            +0 rewards gained!"
      */
     val rewardsGainedPattern by patternGroup.pattern(
-        "rewards-gained",
-        "(?:§.)* *(?:§.)+\\+(?<count>[\\d,]+) rewards gained!(?: (?:§.)+\\(hover\\))?"
+        "rewards-gained.colorless",
+        """ *\+(?<count>[\d,]+) rewards gained!(?: \(hover\))?""",
     )
 
     /**
-     * REGEX-TEST: §2Forest Essence§r§8 x4
-     * REGEX-TEST: §2Forest Essence§r§8 x12
-     * REGEX-TEST: §2Forest Whispers §r§8x40
-     * REGEX-TEST: §2Forest Whispers §r§8x100
-     * REGEX-TEST: §3Foraging Experience §r§8x1,000
-     * REGEX-TEST: §aHOTF Experience §8x10
-     * REGEX-TEST: §aTender Wood §r§8x0-2
-     * REGEX-TEST: §aVinesap §8x0-3
-     * REGEX-TEST: §6Signal Enhancer §8(§a0.4%§8)
+     * REGEX-TEST: Forest Essence x4
+     * REGEX-TEST: Forest Essence x12
+     * REGEX-TEST: Forest Whispers x40
+     * REGEX-TEST: Forest Whispers x100
+     * REGEX-TEST: Foraging Experience x1,000
+     * REGEX-TEST: HOTF Experience x10
+     * REGEX-TEST: Tender Wood x0-2
+     * REGEX-TEST: Vinesap x0-3
+     * REGEX-TEST: Signal Enhancer (0.4%)
      */
     @Suppress("MaxLineLength")
     val hoverRewardPattern by patternGroup.pattern(
-        "hover-reward",
-        "(?:§.)*(?<item>[^§\\s](?:[^§]*[^§\\s])?)(?:§.)*\\s*(?:§.)*§8\\s*x?(?:(?:0-)?(?<amount>[\\d,]+)|\\((?:§.)*(?<percentage>[\\d.]+)%(?:§.)*\\))"
+        "hover-reward.colorless",
+        """(?<item>\S(?:.*\S)?)\s*x?(?:(?:0-)?(?<amount>[\d,]+)|\((?<percentage>[\d.]+)%\))""",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: "                                §r§d§lBONUS GIFT"
+     * WRAPPED-REGEX-TEST: "                                BONUS GIFT"
      */
     val bonusGiftSeparatorPattern by patternGroup.pattern(
-        "bonus-gift.separator",
-        " *(?:§.)+BONUS GIFT"
+        "bonus-gift.separator.colorless",
+        " *BONUS GIFT",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: "                          §r§7§r§aStretching Sticks §r§8(§r§a20%§r§8)"
-     * WRAPPED-REGEX-TEST: "          §r§7§r§aEnchanted Book (§r§d§lFirst Impression I§r§a) §r§8(§r§a0.4%§r§8)"
-     * WRAPPED-REGEX-TEST: "          §r§7§r§aEnchanted Book (§r§d§lFirst Impression I§r§a) §r§8(§r§a0.4%§r§8)"
-     * WRAPPED-REGEX-TEST: "                           §r§7§r§fSweep Booster §r§8(§r§a1%§r§8)"
-     * WRAPPED-REGEX-TEST: "                    §r§7§r§fForaging Wisdom Booster §r§8(§r§a0.5%§r§8)"
-     * WRAPPED-REGEX-TEST: "                  §r§7§r§aEnchanted Book (§r§d§lMissile I§r§a) §r§8(§r§a0.2%§r§8)"
-     * WRAPPED-REGEX-TEST: "                          §r§7§r§cTree the Fish §r§8(§r§a0.05%§r§8)"
-     * WRAPPED-REGEX-TEST: "                            §r§6Chameleon §r§8(§r§a0.08%§r§8)"
-     * WRAPPED-REGEX-TEST: "                    §r§7§r§fEnchanted Book (Karma I§r§f) §r§8(§r§a0.02%§r§8)"
-     * WRAPPED-REGEX-FAIL: "                     §r§7A §r§dPhanflare §r§7fell from the Tree!"
+     * WRAPPED-REGEX-TEST: "                          Stretching Sticks (20%)"
+     * WRAPPED-REGEX-TEST: "          Enchanted Book (First Impression I) (0.4%)"
+     * WRAPPED-REGEX-TEST: "          Enchanted Book (First Impression I) (0.4%)"
+     * WRAPPED-REGEX-TEST: "                           Sweep Booster (1%)"
+     * WRAPPED-REGEX-TEST: "                    Foraging Wisdom Booster (0.5%)"
+     * WRAPPED-REGEX-TEST: "                  Enchanted Book (Missile I) (0.2%)"
+     * WRAPPED-REGEX-TEST: "                          Tree the Fish (0.05%)"
+     * WRAPPED-REGEX-TEST: "                            Chameleon (0.08%)"
+     * WRAPPED-REGEX-TEST: "                    Enchanted Book (Karma I) (0.02%)"
+     * WRAPPED-REGEX-FAIL: "                     A Phanflare fell from the Tree!"
      */
     val bonusGiftRewardPattern by patternGroup.pattern(
-        "bonus-gift.reward",
-        " *(?:§.)*§r(?<item>.*) §r§8\\((?:§.)+(?<percentage>[\\d.]+)%(?:§.)+\\)"
+        "bonus-gift.reward.colorless",
+        """ *(?<item>.+) \((?<percentage>[\d.]+)%\)""",
     )
 
     /**
-     * REGEX-TEST: §aEnchanted Book (§r§d§lMissile I§r§a)
-     * REGEX-TEST: §aEnchanted Book (§r§d§lFirst Impression I§r§a)
-     * REGEX-TEST: §fEnchanted Book (Karma I§r§f)
+     * REGEX-TEST: Enchanted Book (Missile I)
+     * REGEX-TEST: Enchanted Book (First Impression I)
+     * REGEX-TEST: Enchanted Book (Karma I)
      */
     val enchantedBookPattern by patternGroup.pattern(
-        "bonus-gift.enchanted-book",
-        " *(?:§.)+Enchanted Book \\((?:§.)*(?<book>.*) (?<tier>[IVCLX])(?:§.)+\\)"
+        "bonus-gift.enchanted-book.colorless",
+        """ *Enchanted Book \((?<book>.+) (?<tier>[IVCLX]+)\)""",
     )
 
     /**
-     * REGEX-TEST: §r§7A §r§dPhanpyre §r§7fell from the Tree!
-     * REGEX-TEST: §r§7A §r§dPhanflare §r§7fell from the Tree!
-     * REGEX-TEST: §r§7A §r§dDreadwing §r§7fell from the Tree!
+     * REGEX-TEST: A Phanpyre fell from the Tree!
+     * REGEX-TEST: A Phanflare fell from the Tree!
+     * REGEX-TEST: A Dreadwing fell from the Tree!
+     * REGEX-TEST: A Firefox fell from the Tree!
+     * REGEX-TEST: A Grizzly Bear fell from the Tree!
      */
-    val phantomSpawnPattern by patternGroup.pattern(
-        "bonus-gift.phantoms",
-        " *(?:§.)+A (?:§.)+(?<phantom>.*) (?:§.)+fell from the Tree!"
+    val mobSpawnPattern by patternGroup.pattern(
+        "bonus-gift.mob",
+        """ *+A (?<mob>[\w ]+) fell from the Tree!""",
     )
 
     /**
@@ -185,7 +185,7 @@ object ForagingTrackerLegacy {
      */
     val logInternalNamePattern by patternGroup.pattern(
         "log-internal-name",
-        "(?<enchanted>ENCHANTED_)?(?<treeType>.*)_LOG"
+        "(?<enchanted>ENCHANTED_)?(?<treeType>.*)_LOG",
     )
     // </editor-fold>
 }

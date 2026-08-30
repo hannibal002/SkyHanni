@@ -41,7 +41,6 @@
     <ID>Kdoc:ComponentMatcherUtils.kt:/** * @author Linnea Gräf */</ID>
     <ID>Kdoc:CorpseLoot.kt:CorpseLoot$/** * TODO fix the bug that readItemAmount produces two different outputs: * §r§fEnchanted Book -&gt; §fEnchanted * §fEnchanted Book §r§8x -&gt; §fEnchanted Book * * also maybe this is no bug, as enchanted book is no real item? */</ID>
     <ID>Kdoc:CustomScoreboard.kt:/** * TODO LIST * - countdown events like fishing festival + fiesta when its not on tablist * - choose the amount of decimal places in shorten nums * - heavily optimize elements and events by only updating them when absolutely needed */</ID>
-    <ID>Kdoc:ForagingTracker.kt:ForagingTracker$/** * this is a failsafe in the event of runes lacking sufficient NEU repo data to automagically * fetch their correct internal names, and thus translating their in-game names into internal * names literally */</ID>
     <ID>Kdoc:FossilExcavatorApi.kt:FossilExcavatorApi$/** * TODO fix the bug that readItemAmount produces two different outputs: * §r§fEnchanted Book -&gt; §fEnchanted * §fEnchanted Book §r§8x -&gt; §fEnchanted Book * * also maybe this is no bug, as enchanted book is no real item? */</ID>
     <ID>Kdoc:RenderEntityOutlineEvent.kt:RenderEntityOutlineEvent$/** * Constructs the event, given the type and optional entities to outline. * * * This will modify {@param potentialEntities} internally, so make a copy before passing it if necessary. * * @param theType of the event (see [Type] */</ID>
     <ID>Kdoc:Renderable.kt:Renderable.Companion$/** Bottom Layer must be bigger then the top layer */</ID>
@@ -246,13 +245,6 @@
     <ID>PrivateEventListener:BarnFishingTimer.kt:BarnFishingTimer$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:BarnFishingTimer.kt:BarnFishingTimer$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
     <ID>PrivateEventListener:BarnFishingTimer.kt:BarnFishingTimer$@Suppress("UNUSED_PARAMETER") @HandleEvent(onlyOnIsland = IslandType.HUB) fun onPlayerMove</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent fun onSlotClick</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent fun onTick</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent(onlyOnSkyblock = true) fun onBackgroundDrawn</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent(priority = HandleEvent.HIGHEST) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:BazaarBestSellMethod.kt:BazaarBestSellMethod$@HandleEvent fun onBazaarOpenedProduct</ID>
     <ID>PrivateEventListener:BazaarBestSellMethod.kt:BazaarBestSellMethod$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:BazaarBestSellMethod.kt:BazaarBestSellMethod$@HandleEvent fun onInventoryClose</ID>
@@ -1277,14 +1269,6 @@
     <ID>PrivateEventListener:ForagingBeaconSolver.kt:ForagingBeaconSolver$@HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES]) fun onSlotClick</ID>
     <ID>PrivateEventListener:ForagingBeaconWarning.kt:ForagingBeaconWarning$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:ForagingBeaconWarning.kt:ForagingBeaconWarning$@HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES]) fun onWidget</ID>
-    <ID>PrivateEventListener:ForagingTracker.kt:ForagingTracker$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:ForagingTracker.kt:ForagingTracker$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:ForagingTracker.kt:ForagingTracker$@HandleEvent fun onIslandLeave</ID>
-    <ID>PrivateEventListener:ForagingTracker.kt:ForagingTracker$@HandleEvent fun onItemAdd</ID>
-    <ID>PrivateEventListener:ForagingTracker.kt:ForagingTracker$@HandleEvent fun onItemInHandChange</ID>
-    <ID>PrivateEventListener:ForagingTracker.kt:ForagingTracker$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:ForagingTracker.kt:ForagingTracker$@HandleEvent fun onSackChange</ID>
-    <ID>PrivateEventListener:ForagingTracker.kt:ForagingTracker$@HandleEvent(OwnInventoryItemUpdateEvent::class) fun onOwnInventoryItemUpdate</ID>
     <ID>PrivateEventListener:ForagingTutorialQuest.kt:ForagingTutorialQuest$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:ForagingTutorialQuest.kt:ForagingTutorialQuest$@HandleEvent fun onMessageSendToServer</ID>
     <ID>PrivateEventListener:ForagingTutorialQuest.kt:ForagingTutorialQuest$@HandleEvent fun onPlayerSpawn</ID>
@@ -1795,11 +1779,6 @@
     <ID>PrivateEventListener:InGameDateDisplay.kt:InGameDateDisplay$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:InGameDateDisplay.kt:InGameDateDisplay$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed: Unit</ID>
     <ID>PrivateEventListener:InWaterDisplay.kt:InWaterDisplay$@HandleEvent fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:InfernoMinionFeatures.kt:InfernoMinionFeatures$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:InfernoMinionFeatures.kt:InfernoMinionFeatures$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:InfernoMinionFeatures.kt:InfernoMinionFeatures$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:InfernoMinionFeatures.kt:InfernoMinionFeatures$@HandleEvent fun onToolTip</ID>
-    <ID>PrivateEventListener:InfernoMinionFeatures.kt:InfernoMinionFeatures$@HandleEvent(onlyOnSkyblock = true) fun onSlotClick</ID>
     <ID>PrivateEventListener:InfernoMinionProfitTracker.kt:InfernoMinionProfitTracker$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:InfernoMinionProfitTracker.kt:InfernoMinionProfitTracker$@HandleEvent fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:InfernoMinionProfitTracker.kt:InfernoMinionProfitTracker$@HandleEvent fun onMinionOpen</ID>
@@ -2899,10 +2878,6 @@
     <ID>PrivateEventListener:SpringBootsHelper.kt:SpringBootsHelper$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onPlaySound</ID>
     <ID>PrivateEventListener:StarCultAchievement.kt:StarCultAchievement$@HandleEvent fun onAchievementRegistration</ID>
     <ID>PrivateEventListener:StarCultAchievement.kt:StarCultAchievement$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:StarlynSisterCouponProfit.kt:StarlynSisterCouponProfit$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:StarlynSisterCouponProfit.kt:StarlynSisterCouponProfit$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:StarlynSisterCouponProfit.kt:StarlynSisterCouponProfit$@HandleEvent(onlyOnSkyblock = true) fun onChestGuiRender</ID>
-    <ID>PrivateEventListener:StarlynSisterCouponProfit.kt:StarlynSisterCouponProfit$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:StashCompact.kt:StashCompact$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:StashCompact.kt:StashCompact$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:StashCompact.kt:StashCompact$@HandleEvent fun onIslandChange</ID>
