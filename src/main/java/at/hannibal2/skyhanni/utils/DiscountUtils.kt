@@ -12,14 +12,14 @@ import at.hannibal2.skyhanni.utils.NeuItems.getRecipes
 
 @SkyHanniModule
 object DiscountUtils {
-    // TODO: Add Shifty Talismans, Too complex for initial PR
+    // TODO: Add Shady Talismans (Shady Ring, Crooked Artifact, Seal of the Family), Too complex for initial PR
 
     private val itemPriceCoinOnly = mutableMapOf<NeuInternalName, Int>()
     private val emissaryItems = mutableListOf<NeuInternalName>()
     private val emissaryScalingDiscounts = mutableMapOf<Int, Double>()
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemDiscountsJson>("misc/ItemDiscounts")
         data.itemPriceCoinOnly.forEach { (string, coins) ->
             itemPriceCoinOnly[string.toInternalName()] = coins
