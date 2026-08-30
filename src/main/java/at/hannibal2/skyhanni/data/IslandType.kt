@@ -113,7 +113,7 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
 
         // This is intentionally not async right now because using a fire-and-forget
         // coroutine means priority won't be fully respected. PR #6064 will fix this.
-        @HandleEvent(priority = HandleEvent.HIGH)
+        @HandleEvent(priorityLevel = HIGH)
         private fun onRepoReload(event: RepositoryReloadEvent) {
             val data = event.getConstant<IslandTypeJson>("misc/IslandType")
 

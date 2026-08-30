@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -77,7 +76,7 @@ object HoppityRabbitTheFishChecker {
         }?.key
     }
 
-    @HandleEvent(priority = HIGHEST)
+    @HandleEvent(priorityLevel = HIGHEST)
     private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || rabbitTheFishIndex == null) return
 
@@ -91,13 +90,13 @@ object HoppityRabbitTheFishChecker {
     }
 
     @HandleEvent
-    fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
+    private fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
         if (!isEnabled() || rabbitTheFishIndex == null) return
         event.sendPreventClosureTitle()
     }
 
     @HandleEvent
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         rabbitTheFishIndex = null
     }
 
@@ -106,7 +105,7 @@ object HoppityRabbitTheFishChecker {
             "§cRabbit the Fish Prevented Close",
             subtitleText = "§7Hold §eShift §7to bypass",
             duration = 5.seconds,
-            location = TitleManager.TitleLocation.INVENTORY,
+            location = INVENTORY,
         )
         SoundUtils.playErrorSound()
         cancel()
