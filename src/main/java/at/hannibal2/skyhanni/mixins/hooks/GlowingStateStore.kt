@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
+import net.minecraft.client.renderer.entity.state.EntityRenderState
+
 interface GlowingStateStore {
     // Naming is intentional
     @Suppress("FunctionName")
@@ -9,5 +11,11 @@ interface GlowingStateStore {
     @Suppress("FunctionName")
     fun `skyhanni$setUsingCustomOutline`() {
         throw UnsupportedOperationException("Implemented via mixin")
+    }
+
+    companion object {
+        fun EntityRenderState.setUsingCustomOutline() {
+            (this as GlowingStateStore).`skyhanni$setUsingCustomOutline`()
+        }
     }
 }

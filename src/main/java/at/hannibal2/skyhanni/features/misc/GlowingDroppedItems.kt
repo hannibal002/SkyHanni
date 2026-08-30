@@ -22,7 +22,6 @@ object GlowingDroppedItems {
     }
 
     private fun getGlowColor(entity: Entity): Color? {
-        if (entity.isCurrentlyGlowing) return null
         val itemEntity = entity as? ItemEntity ?: return null
         val stack = itemEntity.item
         val rarity = stack.getItemRarityOrCommon()

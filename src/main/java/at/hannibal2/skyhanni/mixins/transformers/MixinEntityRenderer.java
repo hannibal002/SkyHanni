@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 import at.hannibal2.skyhanni.data.EntityData;
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.EntityRendererHook;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import at.hannibal2.skyhanni.utils.SkyBlockUtils;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -45,22 +46,14 @@ public abstract class MixinEntityRenderer {
 
     //? if < 26.2 {
     /*@WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;shouldEntityAppearGlowing(Lnet/minecraft/world/entity/Entity;)Z"))
-    public boolean shouldAlsoGlow(Minecraft client, Entity entity, Operation<Boolean> original, @Local(argsOnly = true) EntityRenderState state) {
-        Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
-        if (glowColor == null) {
-            return original.call(client, entity);
-        }
-        state.skyhanni$setUsingCustomOutline();
-        return true;
+    public boolean shouldAlsoGlow(Minecraft minecraft, Entity entity, Operation<Boolean> original, @Local(argsOnly = true) EntityRenderState state) {
+        return EntityRendererHook.shouldAlsoGlow(entity, state, original.call(minecraft, entity));
     }
 
     @WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getTeamColor()I"))
     public int getCustomGlowColor(Entity entity, Operation<Integer> original) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
-        if (glowColor == null) {
-            return original.call(entity);
-        }
-        return glowColor;
+        return glowColor != null ? glowColor : original.call(entity);
     }
     *///?}
 
