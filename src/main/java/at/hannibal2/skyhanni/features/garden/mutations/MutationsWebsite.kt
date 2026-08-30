@@ -15,8 +15,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.item.Items
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MutationsWebsite {
@@ -26,16 +28,18 @@ object MutationsWebsite {
     private const val ICON_SLOT = 8
     private const val MIDDLE_SLOT = 22
     private const val LINK = "https://skymutations.eu/"
+    private var lastClicked = SimpleTimeMark.farPast()
 
     private val icon by lazy {
         ItemUtils.createItemStack(
             Items.MAP,
             "§aSky Mutations",
-            "§8(Link from SkyHanni)",
+            "§8(From SkyHanni)",
             "",
-            "§7Click to open the §aSky Mutations",
-            "§7webiste, with guides and other",
-            "§7useful informations for mutations!",
+            "§7Click here to open",
+            "§7guides and other useful",
+            "§7information about mutations",
+            "§7on §askymutations.eu",
         )
     }
 
@@ -44,6 +48,11 @@ object MutationsWebsite {
     @HandleEvent
     private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         inInventory = event.isInInventory()
+    }
+
+    @HandleEvent
+    private fun onInventoryClose() {
+        inInventory = false
     }
 
     private fun InventoryUpdatedEvent.isInInventory(): Boolean {
@@ -77,12 +86,12 @@ object MutationsWebsite {
         if (event.inventory !is SimpleContainer) return
         if (event.slot != ICON_SLOT) return
 
-        // only replace if there is either no item or a colored glass pane (no item name)
+        // we expect an empty slot or an unnamed filler pane, warn if Hypixel ever puts a real item here
         if (event.hasItem) {
             val originalItem = event.originalItem
-            if (originalItem.cleanName != "") {
+            if (originalItem.cleanName.isNotEmpty()) {
                 ErrorManager.logErrorStateWithData(
-                    "can no show item for mutations website", "at slot $ICON_SLOT is already a different item.",
+                    "can not show item for mutations website", "at slot $ICON_SLOT is already a different item.",
                     "originalItem" to originalItem,
                     "cleanName" to originalItem.cleanName,
                     "internalName" to originalItem.getInternalNameOrNull(),
@@ -98,10 +107,12 @@ object MutationsWebsite {
     private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
-        if (event.slotId == ICON_SLOT) {
-            event.cancel()
-            OSUtils.openBrowser(LINK)
-        }
+        if (event.slot?.container !is SimpleContainer) return
+        if (event.slotId != ICON_SLOT) return
+        event.cancel()
+        if (lastClicked.passedSince() < 2.seconds) return
+        OSUtils.openBrowser(LINK)
+        lastClicked = SimpleTimeMark.now()
     }
 
     private fun isEnabled() = config.mutationsWebsite
