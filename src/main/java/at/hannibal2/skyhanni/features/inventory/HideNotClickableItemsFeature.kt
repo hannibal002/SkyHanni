@@ -380,7 +380,8 @@ object HideNotClickableItemsFeature {
     private fun ItemNotClickableEvent.hidePlayerTrade(): Boolean {
         if (!isTradeMenu(chestName)) return false
 
-        if ((HypixelData.noTrade && stack.isSoulbound()) || (!HypixelData.noTrade && stack.isAnySoulbound())) {
+        val isUntradableSoulbound = if (HypixelData.noTrade) stack.isSoulbound() else stack.isAnySoulbound()
+        if (isUntradableSoulbound) {
             hideReason = "Soulbound items cannot be traded!"
             return true
         }
@@ -468,6 +469,7 @@ object HideNotClickableItemsFeature {
         return result
     }
 
+    @Suppress("ReturnCount")
     private fun ItemNotClickableEvent.hideSalvage(): Boolean {
         if (!chestName.equalsOneOf("Salvage Item", "Salvage Items")) return false
         showGreenLine = true
