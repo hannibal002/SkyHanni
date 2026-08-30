@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.hasVisibleEquipment
+import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.util.ARGB
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
@@ -21,7 +22,13 @@ import net.azureaaron.renderchest.api.GlowConstants
 object RenderLivingEntityHelper {
     private data class EntityGlowData(val rgb: Int, val condition: () -> Boolean)
 
+    // Must be only accessed from the render thread, will throw otherwise.
     private val entityGlowMap = mutableMapOf<Int, EntityGlowData>()
+        get() {
+            RenderSystem.assertOnRenderThread()
+            return field
+        }
+
     private var currentGlowEvent: RenderEntityOutlineEvent? = null
 
     //? if >= 26.2 {
