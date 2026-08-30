@@ -30,10 +30,10 @@ object MutationsWebsite {
     private val icon by lazy {
         ItemUtils.createItemStack(
             Items.MAP,
-            "§aSKY MUTATIONS",
+            "§aSky Mutations",
             "§8(Link from SkyHanni)",
             "",
-            "§7Click to open the §aSKY MUTATIONS",
+            "§7Click to open the §aSky Mutations",
             "§7webiste, with guides and other",
             "§7useful informations for mutations!",
         )
