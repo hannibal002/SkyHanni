@@ -10,7 +10,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SafeItemStack
@@ -255,11 +256,11 @@ object TestCopyBestiaryValues {
         }
 
         val capTier = if (overallProgress.contains("100%")) {
-            titleItem.hoverName.string.substringAfterLast(" ").romanToDecimal()
+            titleItem.hoverName.string.substringAfterLast(" ").romanToDecimalIfNecessary()
         } else {
             lore.firstOrNull { it.contains("Capped at Tier") }
                 ?.substringAfter("Capped at Tier ")
-                ?.toInt() ?: 0
+                ?.formatIntOrNull() ?: 0
         }
 
         if (capTier == 0) {
