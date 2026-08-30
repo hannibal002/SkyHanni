@@ -150,6 +150,11 @@ CI. Do not manually edit `docs/CHANGELOG.md` or `docs/FEATURES.md`. These files 
 
 - Follow the format examples from the template and remove the categories that do not apply to your PR.
 - A PR might include multiple changelog categories simultaneously.
+- Outside of Technical Details, write entries from the player's point of view. Name the behavior a user can
+  observe, not the code that produces it. "Fixed wrong Kuudra Key cost in Instance Chest Profit" belongs in
+  the changelog, "fixed an inverted discount calculation" belongs in the **What** section.
+- Refer to a feature by its name and capitalize it, along with every SkyBlock proper noun. This includes the
+  names that read like ordinary words, such as Hunting Box or Instance Chest Profit.
 
 Here is an explanation of which changes belong to each category:
 
