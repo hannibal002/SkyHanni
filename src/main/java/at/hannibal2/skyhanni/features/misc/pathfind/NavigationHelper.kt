@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -22,12 +23,15 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 
 @SkyHanniModule
 object NavigationHelper {
     private val config get() = SkyHanniMod.feature.misc.navigation
 
     private val messageId = ChatUtils.getUniqueMessageId()
+
+    private val commandCoroutine = CoroutineSettings("shnavigate command")
 
     val allowedSingleNavigationTags = setOf(
         GraphNodeTag.NPC,
@@ -42,7 +46,7 @@ object NavigationHelper {
     )
 
     private fun doCommandAsync(searchTerm: String, allowInstant: Boolean = true) {
-        SkyHanniMod.launchCoroutine("shnavigate command") {
+        commandCoroutine.launch {
             runCommand(searchTerm, allowInstant)
         }
     }
