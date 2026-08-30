@@ -13,15 +13,14 @@ import java.awt.Color
 
 @SkyHanniModule
 object DeferredDrawer {
-
     private val boxesNoDepth = mutableListOf<DeferredBox>()
     private val boxesDepth = mutableListOf<DeferredBox>()
     private val pyramidsNoDepth = mutableListOf<DeferredPyramid>()
     private val pyramidsDepth = mutableListOf<DeferredPyramid>()
     private val strings = mutableListOf<DeferredString>()
 
-    @HandleEvent(priority = 999)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    @HandleEvent(priorityLevel = LOWEST)
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         event.isCurrentlyDeferring = false
         boxesNoDepth.forEach { box ->
             event.drawFilledBoundingBox(

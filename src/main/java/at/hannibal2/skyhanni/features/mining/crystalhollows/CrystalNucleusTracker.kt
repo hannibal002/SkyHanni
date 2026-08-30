@@ -2,13 +2,10 @@ package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
@@ -79,8 +76,8 @@ object CrystalNucleusTracker {
         override fun getCoinDescription(item: TrackedItem) = mutableListOf<String>()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    @HandleEvent(onlyOnIsland = CRYSTAL_HOLLOWS)
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         balObtainedPattern.matchMatcher(event.message) {
             if (!group("player").equals(PlayerUtils.getName(), ignoreCase = true)) return@matchMatcher
 
@@ -95,8 +92,8 @@ object CrystalNucleusTracker {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onShardGain(event: ShardGainEvent) {
+    @HandleEvent(onlyOnIsland = CRYSTAL_HOLLOWS)
+    private fun onShardGain(event: ShardGainEvent) {
         if (event.shardInternalName != BAL_SHARD_ITEM) return
 
         tracker.modify {
@@ -105,16 +102,16 @@ object CrystalNucleusTracker {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetcrystalnucleustracker") {
             description = "Resets the Crystal Nucleus Tracker."
-            category = CommandCategory.USERS_RESET
+            category = USERS_RESET
             simpleCallback { tracker.resetCommand() }
         }
     }
 
-    @HandleEvent(priority = HIGH)
-    fun onCrystalNucleusLoot(event: CrystalNucleusLootEvent) {
+    @HandleEvent(priorityLevel = HIGH)
+    private fun onCrystalNucleusLoot(event: CrystalNucleusLootEvent) {
         tracker.modify {
             it.runsCompleted++
         }
@@ -124,7 +121,7 @@ object CrystalNucleusTracker {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad(event: ConfigLoadEvent) {
         config.professorUsage.onToggle(tracker::update)
     }
 
@@ -188,10 +185,10 @@ object CrystalNucleusTracker {
     }
 
     @HandleEvent
-    fun onItemAdd(event: ItemAddEvent) {
+    private fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
 
-        if (event.source == ItemAddManager.Source.COMMAND) {
+        if (event.source == COMMAND) {
             tracker.addItem(event.internalName, event.amount, command = true)
         }
     }
@@ -208,8 +205,8 @@ object CrystalNucleusTracker {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.CRYSTAL_HOLLOWS) {
+    private fun onIslandJoin(event: IslandJoinEvent) {
+        if (event.island == CRYSTAL_HOLLOWS) {
             tracker.firstUpdate()
         }
     }
