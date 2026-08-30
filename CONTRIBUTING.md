@@ -150,6 +150,11 @@ CI. Do not manually edit `docs/CHANGELOG.md` or `docs/FEATURES.md`. These files 
 
 - Follow the format examples from the template and remove the categories that do not apply to your PR.
 - A PR might include multiple changelog categories simultaneously.
+- Outside of Technical Details, write entries from the player's point of view. Name the behavior a user can
+  observe, not the code that produces it. "Fixed wrong Kuudra Key cost in Instance Chest Profit" belongs in
+  the changelog, "fixed an inverted discount calculation" belongs in the **What** section.
+- Refer to a feature by its name and capitalize it, along with every SkyBlock proper noun. This includes the
+  names that read like ordinary words, such as Hunting Box or Instance Chest Profit.
 
 Here is an explanation of which changes belong to each category:
 
@@ -298,6 +303,11 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
   See the **Errors and Crashes** section for why every catch goes through `ErrorManager`.
+    - `logErrorWithData` is only for a throwable that was actually thrown and caught, where the stack trace points at the
+      cause. Never construct a throwable just to report a problem the code detected on its own.
+    - For an invalid state the code checks and rejects itself, use
+      `ErrorManager.logErrorStateWithData("explanation for users", "internal description", ...extraOptionalData)`.
+      The first message is what the player reads in chat, the second one only shows up in the copied error report.
 - Do not use `toRegex()` or `toPattern()`. Use `RepoPattern` instead.
   RepoPattern allows regex patterns to be updated remotely via the repo without requiring a mod update.
   Each pattern has a local fallback defined in code, but can be overridden by the repo at runtime.

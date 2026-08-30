@@ -1,8 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <SmellBaseline>
   <ManuallySuppressedIssues>
-    <ID>CyclomaticComplexMethod:HideNotClickableItemsFeature.kt$HideNotClickableItemsFeature$private fun ItemNotClickableEvent.hideNotClickable(): Any</ID>
-    <ID>ReturnCount:HideNotClickableItemsFeature.kt$HideNotClickableItemsFeature$private fun ItemNotClickableEvent.hideSalvage(): Boolean</ID>
+    <ID>MayBeConst:MutationsWebsite.kt$MutationsWebsite$private val link = "https://skymutations.eu/"</ID>
   </ManuallySuppressedIssues>
   <CurrentIssues>
     <ID>ArrayPrimitive:LorenzVec.kt:Array&lt;Double></ID>
