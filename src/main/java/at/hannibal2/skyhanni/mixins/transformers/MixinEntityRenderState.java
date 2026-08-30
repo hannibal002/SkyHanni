@@ -22,8 +22,7 @@ public abstract class MixinEntityRenderState implements EntityRenderStateStore {
     }
 
     //? if < 26.2 {
-    /*
-    @Unique
+    /*@Unique
     boolean skyhanni$usingCustomOutline = false;
 
     @Override
