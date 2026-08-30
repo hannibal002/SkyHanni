@@ -27,7 +27,8 @@ object RenderLivingEntityHelper {
     //? if >= 26.2 {
     init {
         CustomGlowCallback.EVENT.register { entity, _ ->
-            ARGB.opaque(getEntityGlowColor(entity)) ?: GlowConstants.NO_GLOW
+            // Minecraft already renders all glow as opaque, and non-opaque values are reserved by Render Chest.
+            getEntityGlowColor(entity)?.let(ARGB::opaque) ?: GlowConstants.NO_GLOW
         }
     }
     //?} else {
