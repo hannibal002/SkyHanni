@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemNameResolver
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -110,13 +110,13 @@ object ItemPickupLog {
     )
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         display?.let { config.position.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         if (!isEnabled()) return
         itemList.clear()
         itemsAddedToInventory.clear()
@@ -124,7 +124,7 @@ object ItemPickupLog {
     }
 
     @HandleEvent
-    fun onSackChange(event: SackChangeEvent) {
+    private fun onSackChange(event: SackChangeEvent) {
         if (!isEnabled() || !config.sack) return
 
         event.sackChanges.forEach {
@@ -136,7 +136,7 @@ object ItemPickupLog {
     }
 
     @HandleEvent
-    fun onShardGain(event: ShardEvent) {
+    private fun onShardGain(event: ShardEvent) {
         if (!isEnabled() || !config.shards) return
 
         val itemStack = event.shardInternalName.getItemStack()
@@ -146,14 +146,14 @@ object ItemPickupLog {
     }
 
     @HandleEvent
-    fun onPurseChange(event: PurseChangeEvent) {
+    private fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled() || !config.coins || !worldChangeCooldown()) return
 
         updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), event.coins < 0)
     }
 
     @HandleEvent(SkyHanniTickEvent::class)
-    fun onTick() {
+    private fun onTick() {
         if (!isEnabled()) return
         val oldItemList = mutableMapOf<Int, Pair<SafeItemStack, Int>>()
 
@@ -310,7 +310,7 @@ object ItemPickupLog {
         // Handle purse coins as a special case
         amount.toDouble()
     } else {
-        val pricePer = neuInternalName?.getPriceOrNull(coinConfig.priceSource) ?: 0.0
+        val pricePer = neuInternalName?.getPrice(coinConfig.priceSource) ?: 0.0
         pricePer * amount
     }
 
@@ -371,7 +371,7 @@ object ItemPickupLog {
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(97, "inventory.itemPickupLogConfig", "inventory.itemPickupLog")
         event.move(97, "inventory.itemPickupLog.pos", "inventory.itemPickupLog.position")
     }
