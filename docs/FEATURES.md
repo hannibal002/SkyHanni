@@ -325,6 +325,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added NPC Trade Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6365)
     + Highlights items in NPC trade menus that you can buy right now.
     + Also shows the price, the number you own and the total cost in the item lore.
++ Added an option to highlight how full each lobby is in the SkyBlock Hub Selector. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6207)
 
 ### Bazaar
 
@@ -973,6 +974,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added option to change the pest spawn sound. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4580)
   + Modes are Default, Muted, Custom, and Plumber.
 + Added option to show crops instead of tools in Farming Toolkit menu. - Growling_Grizzly (https://github.com/hannibal002/SkyHanni/pull/5657)
+
+### Greenhouse
+
++ Added a link to the Sky Mutations website. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6467)
+    + Shows up in the Carpenter inventory in the Greenhouse and in the Crop Analyzer in the Secret Lab.
+    + Clicking the item opens the website, which offers useful information about mutations.
 
 </details>
 <details open><summary>

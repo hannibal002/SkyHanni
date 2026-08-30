@@ -86,6 +86,7 @@
 + Added NPC Trade Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6365)
     + Highlights items in NPC trade menus that you can buy right now.
     + Also shows the price, the number you own and the total cost in the item lore.
++ Added an option to highlight how full each lobby is in the SkyBlock Hub Selector. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6207)
 
 #### Garden
 
@@ -103,6 +104,9 @@
     + When harvesting Phantomleaf in the Garden, highlight the hiding spot in green.
     + Stand still for best results.
 + Added Charmed Visitor Display. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5832)
++ Added a link to the Sky Mutations website. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6467)
+    + Shows up in the Carpenter inventory in the Greenhouse and in the Crop Analyzer in the Secret Lab.
+    + Clicking the item opens the website, which offers useful information about mutations.
 
 #### Chat
 
@@ -234,6 +238,7 @@
 + Added multiplicative pet perk support to Remaining Slayer Kills Display. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5847)
 + Added a button to the No Gummy Warning chat message to open the bazaar for Re-Heated Gummy Polar Bears. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6236)
 + Added a Discord RPC message for when your Slayer boss is cocooned. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6258)
++ Improved error message for missing Slayer RNG Meter data. - Luna (https://github.com/hannibal002/SkyHanni/pull/6481)
 
 #### Rift
 
@@ -691,6 +696,7 @@
 + Fixed /shminingspeed and /shblockstrength giving not being able to read your stats. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6088)
 + Fixed /wiki and /wikithis not being shown as available commands. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6340)
 + Fixed an error when autocompleting commands if you have never joined Hypixel. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6410)
++ Fixed the client freezing for a moment when running /shnavigate. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6472)
 
 #### Mining
 
@@ -716,6 +722,8 @@
 + Fixed ore block detection being broken, which also crashed the game on 1.21.11. - Luna (https://github.com/hannibal002/SkyHanni/pull/6291)
     + Affected Mithril, Titanium, Hard Stone, Red Sand, Umber, and Tungsten detection.
 + Fixed mining features showing up on the Critter Safari. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6324)
++ Fixed an error message when the Mining Event Tracker could not load data. - 3d3n-pyc (https://github.com/hannibal002/SkyHanni/pull/6474)
++ Fixed an error when clicking fast in the Heart of the Mountain and Heart of the Forest menus. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6466)
 
 #### Chat
 
@@ -724,6 +732,7 @@
 + Fixed potential error message in chat centering when space width is zero. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5966)
 + Fixed Same Chat Color not working. - Tomeko (https://github.com/hannibal002/SkyHanni/pull/6052)
 + Fixed Error while deleting message with Compact Bestiary Messages and rarely with other features (hopefully for real this time). - Luna (https://github.com/hannibal002/SkyHanni/pull/6239)
++ Fixed Player Rank Hider not hiding ranks for players with a SkyBlock emblem in front of their name. - 3d3n-pyc (https://github.com/hannibal002/SkyHanni/pull/6462)
 
 #### Misc
 
@@ -882,6 +891,14 @@
 + Fixed errors in chat about the Limbo Playtime feature when using /playtimedetailed. - Luna (https://github.com/hannibal002/SkyHanni/pull/6381)
 + Fixed some glow/highlight features not working and causing stutters and crashes on Minecraft 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/6463)
 + Fixed the message about newly introduced config options showing up after an update that added none. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6456)
++ Fixed /shnavigate not stopping the navigation when clicking to return to the previous search. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6472)
++ Fixed /shupdate release and /shupdate beta not switching the update stream. - 3d3n-pyc (https://github.com/hannibal002/SkyHanni/pull/6461)
++ Fixed pathfinding lines cutting off when touching water on Minecraft 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/6458)
++ Fixed SkyHanni alert sounds being too quiet. - Luna (https://github.com/hannibal002/SkyHanni/pull/6418)
+    + If you find that they are now too loud for your liking, turn off the "Boost Warning Volume" option.
++ Fixed SkyHanni making UI sounds from the game and other mods quieter. - Luna (https://github.com/hannibal002/SkyHanni/pull/6418)
++ Fixed text shown by SkyHanni in the world being dimmed by water and stained glass on Minecraft 26.2. - Luna (https://github.com/hannibal002/SkyHanni/pull/6458)
+    + Example: Fishing and Lily Pad Minion name tags, depending on placement.
 
 ### Technical Details
 
@@ -1290,6 +1307,10 @@
 + Cleaned up the workflow scripts. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6417)
 + Split the navigate all logic into a shared API and its commands. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6320)
 + Changed the Anita and pesthunter shop profit overlays to detect menu items by their trade line instead of hardcoded display names. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6457)
++ Changed SkyHanniRenderWorldEvent to fire on COLLECT_SUBMITS instead of AFTER_TRANSLUCENT_TERRAIN on Minecraft 26.1, and changed the remaining MultiBufferSource-based rendering in this event to be SubmitNodeCollector-based. - Luna (https://github.com/hannibal002/SkyHanni/pull/6458)
++ Fixed drawFilledBoundingBox using the wrong PoseStack, making custom ordering for text submissions no longer necessary. - Luna (https://github.com/hannibal002/SkyHanni/pull/6458)
++ Made submitOrderedText defer rendering to after terrain to work around MC-298659. - Luna (https://github.com/hannibal002/SkyHanni/pull/6458)
++ Unified LineDrawer to use vertex-based rendering on all versions. - Luna (https://github.com/hannibal002/SkyHanni/pull/6458)
 
 ### Removed Features
 
