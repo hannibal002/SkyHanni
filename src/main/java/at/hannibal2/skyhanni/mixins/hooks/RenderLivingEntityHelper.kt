@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.hasVisibleEquipment
+import net.minecraft.util.ARGB
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import java.awt.Color
@@ -26,7 +27,7 @@ object RenderLivingEntityHelper {
     //? if >= 26.2 {
     init {
         CustomGlowCallback.EVENT.register { entity, _ ->
-            getEntityGlowColor(entity) ?: GlowConstants.NO_GLOW
+            ARGB.opaque(getEntityGlowColor(entity)) ?: GlowConstants.NO_GLOW
         }
     }
     //?} else {

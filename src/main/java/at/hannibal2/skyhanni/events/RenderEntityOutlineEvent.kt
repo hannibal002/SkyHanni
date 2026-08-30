@@ -27,10 +27,9 @@ class RenderEntityOutlineEvent : SkyHanniEvent() {
     private var computed: Boolean = false
 
     /**
-     * Conditionally queue entities around which to render entities
+     * Conditionally queue entities around which to render outlines.
      * Selects from the pool of [.entitiesToChooseFrom] to speed up the predicate testing on subsequent calls.
      * Is more efficient (theoretically) than calling [.queueEntityToOutline] for each entity because lists are handled internally.
-     *
      *
      * This function loops through all entities and so is not very efficient.
      * It's advisable to encapsulate calls to this function with global checks (those not dependent on an individual entity) for efficiency purposes.
@@ -47,7 +46,7 @@ class RenderEntityOutlineEvent : SkyHanniEvent() {
             val entity: Entity = iterator.next()
             val color: Color? = outlineColor(entity)
             if (color != null) {
-                entitiesToOutline[entity] = color.rgb or 0xFF000000.toInt()
+                entitiesToOutline[entity] = color.rgb
                 iterator.remove()
             }
         }
