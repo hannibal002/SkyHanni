@@ -50,7 +50,7 @@ object DiscountUtils {
         val rep = ProfileStorageData.profileSpecific?.crimsonIsle?.reputation?.maxBy { it.value }?.value ?: 0
         var itemDiscount = 1.0
         emissaryScalingDiscounts.forEach { (reputation, discount) ->
-            if (rep > reputation) itemDiscount = (1.0 - discount)
+            if (rep > reputation) itemDiscount = (100 - discount) / 100
         }
         val priceDecrease = itemPriceCoinOnly[this]?.times(itemDiscount) ?: 0.0
         return lowestNPCPrice - priceDecrease
