@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.HeldItem
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTimerTextEntry
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleContext
@@ -19,6 +18,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.pestCooldownEndTime
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasLassoInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasVacuumInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
+import at.hannibal2.skyhanni.features.inventory.loadout.LoadoutApi
 import at.hannibal2.skyhanni.features.inventory.wardrobe.ArmorWardrobeApi
 import at.hannibal2.skyhanni.features.inventory.wardrobe.EquipmentWardrobeApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -44,7 +44,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PestSpawnTimer {
-
     private val config get() = PestApi.config.pestTimer
     private val patternGroup = RepoPattern.group("garden.pests")
     private val cooldownOverMessageId = ChatUtils.getUniqueMessageId()
@@ -58,7 +57,7 @@ object PestSpawnTimer {
      */
     private val pestCooldownPattern by patternGroup.pattern(
         "cooldowntime-no-color",
-        "\\sCooldown: (?<time>\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
+        """\sCooldown: (?<time>\d{1,2}[ms](?: \d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*""",
     )
 
     /**
@@ -66,7 +65,7 @@ object PestSpawnTimer {
      */
     private val maxPestsAlivePattern by patternGroup.pattern(
         "max-pests-alive",
-        "\\sAlive: 8",
+        """\sAlive: 8""",
     )
 
     private val pestSpawnTimes: MutableList<Duration> = mutableListOf()
@@ -89,9 +88,9 @@ object PestSpawnTimer {
         else customCooldownTime
     }.get().seconds
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIsland = GARDEN)
     private fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.PESTS)) return
+        if (!event.isWidget(PESTS)) return
         val widgetLines = event.cleanLines
 
         // Hypixel can sometimes send partial widget
@@ -151,7 +150,7 @@ object PestSpawnTimer {
         lastPestSpawnTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIsland = GARDEN)
     private fun onGuiRenderOverlay() {
         if (!shouldRender) return
         config.position.renderRenderables(display, posLabel = "Pest Spawn Timer")
@@ -168,7 +167,7 @@ object PestSpawnTimer {
         lastCropBrokenTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIsland = GARDEN)
     private fun onSecondPassed() {
         if (!isEnabled()) return
         update()
@@ -195,10 +194,10 @@ object PestSpawnTimer {
         } else shouldRepeatWarning = false
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIsland = GARDEN)
     private fun onTick(event: SkyHanniTickEvent) {
         if (shouldRepeatWarning) {
-            if (ArmorWardrobeApi.inWardrobe() || EquipmentWardrobeApi.inWardrobe()) {
+            if (LoadoutApi.inLoadouts() || ArmorWardrobeApi.inWardrobe() || EquipmentWardrobeApi.inWardrobe()) {
                 shouldRepeatWarning = false
                 countdownTitleContext?.stop()
                 countdownTitleContext = null
@@ -210,7 +209,7 @@ object PestSpawnTimer {
         shouldRender = shouldRender()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIsland = GARDEN)
     private fun onIslandJoin() {
         shouldRepeatWarning = false
         longestCropBrokenTime = lastCropBrokenTime.passedSince()
@@ -242,7 +241,7 @@ object PestSpawnTimer {
             "§eLast pest spawned: §b$timeSinceLastPest ago"
         }
 
-        lineMap[PestTimerTextEntry.PEST_TIMER] = Renderable.text(lastPestSpawned)
+        lineMap[PEST_TIMER] = Renderable.text(lastPestSpawned)
 
         val pestCooldown = if (!TabWidget.PESTS.isActive) {
             "§cPests Widget not detected! Enable via /widget!"
@@ -258,11 +257,11 @@ object PestSpawnTimer {
             "§ePest Cooldown: §b$cooldownValue"
         }
 
-        lineMap[PestTimerTextEntry.PEST_COOLDOWN] = Renderable.text(pestCooldown)
+        lineMap[PEST_COOLDOWN] = Renderable.text(pestCooldown)
 
         val averageSpawn = averageSpawnTime.format()
         if (averageSpawnTime != 0.seconds) {
-            lineMap[PestTimerTextEntry.AVERAGE_PEST_SPAWN] = Renderable.text("§eAverage time to spawn: §b$averageSpawn")
+            lineMap[AVERAGE_PEST_SPAWN] = Renderable.text("§eAverage time to spawn: §b$averageSpawn")
         }
 
         return formatDisplay(lineMap)
@@ -282,9 +281,9 @@ object PestSpawnTimer {
 
         return config.onlyWhenHolding.any {
             when (it) {
-                HeldItem.FARMING_TOOL -> hasFarmingToolInHand()
-                HeldItem.VACUUM -> hasVacuumInHand()
-                HeldItem.LASSO -> hasLassoInHand()
+                FARMING_TOOL -> hasFarmingToolInHand()
+                VACUUM -> hasVacuumInHand()
+                LASSO -> hasLassoInHand()
             }
         }
     }
@@ -329,15 +328,15 @@ object PestSpawnTimer {
         }
     }
 
-    // TODO: Change to countdown title when that works
+    // TODO Change to countdown title when that works
     private fun countdownWarn(timeLeft: Duration) {
         val text = "§cPest spawn cooldown expires in ${timeLeft.format()}"
         countdownTitleContext = TitleManager.sendTitle(
             text,
             duration = 1.seconds,
             intention = PestTitleIntention.COOLDOWN_COUNTDOWN,
-            addType = TitleManager.TitleAddType.FORCE_FIRST,
-            // countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS,
+            addType = FORCE_FIRST,
+            // countDownDisplayType = WHOLE_SECONDS,
         )
         ChatUtils.notifyOrDisable(
             text,
@@ -364,11 +363,11 @@ object PestSpawnTimer {
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val userSelections: List<HeldItem> = buildList {
             event.transform(97, "garden.pests.pestTimer.onlyWithFarmingTool") { entry ->
-                if (entry.asBoolean) add(HeldItem.FARMING_TOOL)
+                if (entry.asBoolean) add(FARMING_TOOL)
                 entry
             }
             event.transform(97, "garden.pests.pestTimer.onlyWithVacuum") { entry ->
-                if (entry.asBoolean) add(HeldItem.VACUUM)
+                if (entry.asBoolean) add(VACUUM)
                 entry
             }
         }
