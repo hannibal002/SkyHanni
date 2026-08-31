@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi.dungeonFloor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -83,14 +84,12 @@ object DungeonBossApi {
     )
 
     /**
-     * REGEX-TEST: §bmartimavocado§r§a activated a lever! (§r§c7§r§a/7)
-     * REGEX-TEST: §bmartimavocado§r§a completed a device! (§r§c3§r§a/8)
-     * REGEX-TEST: §bmartimavocado§r§a activated a terminal! (§r§c4§r§a/7)
+     * REGEX-TEST: GregSpeck1 activated a terminal! (3/7)
      */
     @Suppress("MaxLineLength")
     val goldorTerminalPattern by patternGroup.pattern(
-        "f7.goldor.terminalcomplete",
-        "§.(?<playerName>\\w+)§r§a (?:activated|completed) a (?<type>lever|terminal|device)! \\(§r§c(?<currentTerminal>\\d)§r§a/(?<total>\\d)\\)",
+        "f7.goldor.terminalcomplete.colorless",
+        "(?<playerName>\\w+) (?:activated|completed) a (?<type>lever|terminal|device)! \\((?<currentTerminal>\\d)/(?<total>\\d)\\)",
     )
 
     /**
@@ -125,7 +124,7 @@ object DungeonBossApi {
         }
 
         if (dungeonFloor == "F7" || dungeonFloor == "M7") { // TODO: move to enum
-            goldorTerminalPattern.matchMatcher(message) {
+            goldorTerminalPattern.matchMatcher(message.removeColor()) {
                 val currentTerminal = group("currentTerminal").toIntOrNull() ?: return
                 val totalTerminals = group("total").toIntOrNull() ?: return
                 if (currentTerminal != totalTerminals) return
@@ -155,17 +154,17 @@ object DungeonBossApi {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         bossPhase = null
     }
 
     @HandleEvent
-    fun onDungeonEnd(event: DungeonCompleteEvent) {
+    private fun onDungeonEnd(event: DungeonCompleteEvent) {
         bossPhase = null
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         handlePhaseMessage(event.message)
     }
 }
