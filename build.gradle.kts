@@ -174,9 +174,11 @@ dependencies {
     }
     val reiApi = "me.shedaniel:RoughlyEnoughItems-api:$reiVersion"
     compileOnly(reiApi) { isTransitive = false }
+    compileOnly(libs.skyblockitemlist)
     "minecraftTestClientRuntimeLibraries"(reiApi) {
         isTransitive = false
     }
+    "minecraftTestClientRuntimeLibraries"(libs.skyblockitemlist)
     compileOnly(libs.basicMath)
     "minecraftTestClientRuntimeLibraries"(libs.basicMath)
 

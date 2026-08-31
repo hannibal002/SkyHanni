@@ -100,6 +100,17 @@ allprojects {
             }
         }
 
+        // SBIL for compat plugin
+        exclusiveContent {
+            forRepositories(
+                repositories.maven("https://maven.operationpotato.com/releases"),
+                repositories.maven("https://maven.operationpotato.com/snapshots"),
+            )
+            filter {
+                includeGroup("com.operationpotato")
+            }
+        }
+
         // Rei for compat plugin
         exclusiveContent {
             forRepository {
@@ -113,7 +124,7 @@ allprojects {
         }
 
         maven("https://jitpack.io") {
-            // NotEnoughUpdates (compiled against), Changelog builder, Preprocessor, Discord IPC
+            // MoulConfig, Changelog builder, Methanol (Modrinth Publisher)
             content {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
