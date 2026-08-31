@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
@@ -116,18 +115,16 @@ object LimboPlaytime {
         if (event.inventoryName != "Detailed /playtime") return
         val playtime = (storage?.playtime ?: 0).seconds
         if (playtime < 60.seconds) return
-        val wholeHours = playtime.inWholeHours
         wholeMinutes = playtime.inWholeMinutes.toInt()
-        if ((wholeMinutes % 60) == 0) {
-            hoursString = "$wholeHours"
-        } else {
-            val minutes: Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60).roundTo(1)
-            hoursString = wholeHours.addSeparators()
-            if (findFloatDecimalPlace(minutes) != 0) {
-                val minutesString = minutes.toString()
-                hoursString += minutesString.substring(minutesString.indexOf("."))
-            }
-        }
+        hoursString = formatMinutesAsHours(wholeMinutes)
+    }
+
+    private fun formatMinutesAsHours(minutes: Int): String {
+        // +3 is half the divisor, so the integer division rounds instead of truncating
+        val tenthsOfHour = (minutes + 3) / 6
+        val hours = tenthsOfHour / 10
+        val decimal = tenthsOfHour % 10
+        return if (decimal == 0) "$hours" else "$hours.$decimal"
     }
 
     private fun addLimbo(hoursList: List<Component>, minutesList: List<Component>) {
@@ -185,11 +182,5 @@ object LimboPlaytime {
             toolTip.addAll(modifiedList)
         }
         toolTip.addAll(lastList)
-    }
-
-    private fun findFloatDecimalPlace(input: Float): Int {
-        val string = input.toString()
-        val dotIndex = string.indexOf(".")
-        return (string[dotIndex + 1].toString().toInt())
     }
 }
