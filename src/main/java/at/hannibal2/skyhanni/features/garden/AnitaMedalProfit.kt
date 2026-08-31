@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -14,8 +15,10 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LoreCostUtils
+import at.hannibal2.skyhanni.utils.LoreCostUtils.hasTradeLine
 import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -26,6 +29,7 @@ import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -70,40 +74,45 @@ object AnitaMedalProfit {
         if (event.inventoryName != "Anita") return
         if (VisitorApi.inInventory) return
 
-        inInventory = true
+        DelayedRun.runOrNextTick {
+            inInventory = true
 
-        val table = mutableListOf<DisplayTableEntry>()
-        for ((slot, item) in event.inventoryItems) {
-            try {
-                readItem(slot, item, table)
-            } catch (e: Throwable) {
-                ErrorManager.logErrorWithData(
-                    e, "Error in AnitaMedalProfit while reading item '${item.repoItemName}'",
-                    "item" to item,
-                    "name" to item.repoItemName,
-                    "inventory name" to InventoryUtils.openInventoryName(),
-                )
+            val table = mutableListOf<DisplayTableEntry>()
+            for ((slot, item) in event.inventoryItems) {
+                try {
+                    readItem(slot, item, table)
+                } catch (e: Throwable) {
+                    ErrorManager.logErrorWithData(
+                        e, "Error in AnitaMedalProfit while reading item '${item.repoItemName}'",
+                        "item" to item,
+                        "name" to item.repoItemName,
+                        "inventory name" to InventoryUtils.openInventoryName(),
+                    )
+                }
             }
-        }
 
-        val newList = mutableListOf<Renderable>()
-        newList.addString("§eProfit per Bronze Medal")
-        newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
-        display = newList
+            val newList = mutableListOf<Renderable>()
+            newList.addString("§eProfit per Bronze Medal")
+            newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
+            display = newList
+        }
     }
 
     private fun readItem(slot: Int, item: SafeItemStack, table: MutableList<DisplayTableEntry>) {
-        val itemName = getItemName(item)
-        if (isInvalidItemName(itemName.string)) return
+        val lore = item.getLoreComponent().map { it.formattedTextCompatLessResets() }
+        if (!lore.hasTradeLine()) return
 
-        val requiredItems = item.readLoreCosts()
+        val itemName = getItemName(item)
+        val nameString = itemName.formattedTextCompatLeadingWhiteLessResets()
+
+        val requiredItems = lore.readLoreCosts(nameString)
         val additionalMaterials = getAdditionalMaterials(requiredItems)
         val additionalCost = getAdditionalCost(additionalMaterials)
 
         // Ignore items without medal cost, e.g. InfiniDirt Wand
         val bronzeCost = getBronzeCost(requiredItems) ?: return
 
-        val (name, amount) = ItemUtils.readItemAmount(itemName.formattedTextCompatLeadingWhiteLessResets()) ?: return
+        val (name, amount) = ItemUtils.readItemAmount(nameString) ?: return
 
         var internalName = NeuInternalName.fromItemNameOrNull(name)
         if (internalName == null) {
@@ -148,20 +157,11 @@ object AnitaMedalProfit {
         )
     }
 
-    private fun MutableList<Any>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Int>) {
+    private fun MutableList<Any>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Long>) {
         for ((internalName, amount) in additionalMaterials) {
             add(internalName.getPriceName(amount))
         }
     }
-
-    private val invalidItemNames = listOf(
-        " ",
-        "Close",
-        "Unique Gold Medals",
-        "Medal Trades",
-    )
-
-    private fun isInvalidItemName(itemName: String): Boolean = itemName in invalidItemNames
 
     private fun getItemName(item: SafeItemStack): Component {
         val name = item.hoverName
@@ -171,11 +171,11 @@ object AnitaMedalProfit {
         } else name
     }
 
-    private fun getAdditionalMaterials(requiredItems: List<LoreCostUtils.LoreCostEntry>): Map<NeuInternalName, Int> =
+    private fun getAdditionalMaterials(requiredItems: List<LoreCostUtils.LoreCostEntry>): Map<NeuInternalName, Long> =
         requiredItems.filter { MedalType.getByInternalNameOrNull(it.internalName) == null }
-            .associate { it.internalName to it.amount.toInt() }
+            .associate { it.internalName to it.amount }
 
-    private fun getAdditionalCost(requiredItems: Map<NeuInternalName, Int>): Double {
+    private fun getAdditionalCost(requiredItems: Map<NeuInternalName, Long>): Double {
         var otherItemsPrice = 0.0
         for ((name, amount) in requiredItems) {
             otherItemsPrice += name.getPrice() * amount
@@ -183,10 +183,10 @@ object AnitaMedalProfit {
         return otherItemsPrice
     }
 
-    private fun getBronzeCost(requiredItems: List<LoreCostUtils.LoreCostEntry>): Int? {
+    private fun getBronzeCost(requiredItems: List<LoreCostUtils.LoreCostEntry>): Long? {
         for (entry in requiredItems) {
             MedalType.getByInternalNameOrNull(entry.internalName)?.let {
-                return it.factorBronze * entry.amount.toInt()
+                return it.factorBronze * entry.amount
             }
         }
         return null

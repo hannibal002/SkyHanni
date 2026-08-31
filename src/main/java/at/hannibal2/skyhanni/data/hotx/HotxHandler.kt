@@ -9,14 +9,14 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import net.minecraft.world.inventory.Slot
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -77,9 +77,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
             it.isUnlocked = false
         }
 
-        rotatingPerkSlots.forEach {
-            it.currentPerk = null
-        }
+        rotatingPerkSlots.forEach { it.clear() }
 
         currencyReset()
     }
@@ -93,8 +91,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
         entry.slot = this
         entry.item = item
 
-        val rawLore = item.getLore()
-        val lore = item.getLoreComponent().takeIf { it.isNotEmpty() }?.map { it.string.removeColor() } ?: return
+        val lore = item.getCleanLore().takeIfNotEmpty() ?: return
 
         if (entry != core && notUnlockedPattern.matches(lore.last())) {
             entry.rawLevel = 0
@@ -106,7 +103,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
         entry.isUnlocked = true
 
         // This needs color codes
-        entry.rawLevel = levelPattern.matchMatcher(rawLore.first(), readingLevelTransform) ?: entry.maxLevel
+        entry.rawLevel = levelPattern.matchMatcher(item.getLore().first(), readingLevelTransform) ?: entry.maxLevel
 
         // raw level to ignore the blue egg buff
         if (entry.rawLevel > entry.maxLevel) {
@@ -156,10 +153,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
             heartItem = this
         }
 
-        val lore = item.getLoreComponent().map { it.string.removeColor() }
-
         val tokenPattern = if (isHeartItem) heartTokensPattern else resetTokensPattern
-        lore@ for (line in lore) {
+        lore@ for (line in item.getCleanLore()) {
             tokenPattern.matchMatcher(line) {
                 val token = group("token").toInt()
                 if (isHeartItem) {
@@ -200,13 +195,13 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
 
     protected abstract val islandTypeTag: IslandTypeTag
     protected open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }
-    abstract val rotatingPerkSlots: List<RotatingPerkSlot<Data>>
+    abstract val rotatingPerkSlots: List<RotatingPerkSlot<Data, *>>
 
     abstract val resetChatPattern: Pattern
 
     abstract fun extraChatHandling(event: SkyHanniChatEvent.Allow)
 
-    open fun onChat(event: SkyHanniChatEvent.Allow) {
+    protected fun handleChat(event: SkyHanniChatEvent.Allow) {
         if (resetChatPattern.matches(event.cleanMessage)) {
             resetTree()
             return
@@ -219,22 +214,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
     fun tryReadRotatingPerkChat(event: SkyHanniChatEvent.Allow): Boolean? {
         rotatingPerkPattern.matchMatcher(event.cleanMessage) {
             val perkString = group("perk")
-
-            val result = rotatingPerkSlots.firstNotNullOfOrNull { slot ->
-                val perk = slot.perks.firstOrNull {
-                    it.chatPattern.matches(perkString)
-                }
-
-                if (perk != null) {
-                    slot to perk
-                } else {
-                    null
-                }
-            } ?: return false
-
+            if (rotatingPerkSlots.none { it.trySetFromChat(perkString) }) return false
             tryBlock(event)
-            result.first.currentPerk = result.second
-
             return true
         }
 
@@ -251,23 +232,22 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection
         // Hypixel sometimes doesn't show the current perk in lore if switching hotx trees layouts
         val index = HotxPatterns.itemPreEffectPattern.indexOfFirstMatch(lore) ?: return
 
-        val nextLine = lore.getOrNull(index + 1) ?: return
+        val singleLine = lore.getOrNull(index + 1) ?: return
+        // Long effects wrap over several lines. The single line is tried first because one Sky Mall
+        // item pattern is deliberately cut off after the first line of a wrapped effect.
+        val wrapped = lore.drop(index + 1).takeWhile { it.isNotBlank() }.joinToString(" ") { it.trim() }
 
-        val perkLore = HotxPatterns.rotatingPerkPattern
-            .matchGroup(nextLine, "perk")
-            ?: return
-
-        slot.currentPerk = slot.perks.firstOrNull {
-            it.itemPattern.matches(perkLore)
+        val perkLores = listOf(singleLine, wrapped).mapNotNull {
+            HotxPatterns.rotatingPerkPattern.matchGroup(it, "perk")
         }
+        if (perkLores.any { slot.setFromItem(it) }) return
 
-        if (slot.currentPerk == null) {
-            ErrorManager.logErrorStateWithData(
-                "Could not read rotating perk from $name tree",
-                "no itemPattern matched",
-                "entry" to entry.guiName,
-                "perkLore" to perkLore,
-            )
-        }
+        ErrorManager.logErrorStateWithData(
+            "Could not read rotating perk from $name tree",
+            "no itemPattern matched",
+            "entry" to entry.guiName,
+            "singleLine" to singleLine,
+            "wrapped" to wrapped,
+        )
     }
 }

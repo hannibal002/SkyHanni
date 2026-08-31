@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -14,7 +15,9 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LoreCostUtils.hasTradeLine
 import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -25,6 +28,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -39,7 +43,7 @@ object FishyTreatProfit {
     private val inventory = InventoryDetector { inventoryNamePattern }
     private val FISHY_TREAT = "FISHY_TREAT".toInternalName()
 
-    // idk why this fetches price source based on tracker config,
+    // I don't know why this fetches price source based on tracker config,
     // but it already did before I changed how tracker config worked
     val priceSource get() = SkyHanniMod.feature.misc.tracker.priceSource
 
@@ -53,49 +57,48 @@ object FishyTreatProfit {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.fishyTreatProfit || !inventory.isInside()) return
-        val table = mutableListOf<DisplayTableEntry>()
-        for ((slot, item) in event.inventoryItems) {
-            // ignore the last line of menu items
-            if (slot > 44) continue
-            // background items
-            if (item.hoverName.string == " ") continue
-            try {
-                readItem(slot, item, table)
-            } catch (e: Throwable) {
-                ErrorManager.logErrorWithData(
-                    e, "Error in FishyTreatProfit while reading item '${item.repoItemName}'",
-                    "item" to item,
-                    "name" to item.repoItemName,
-                    "inventory name" to InventoryUtils.openInventoryName(),
-                )
-            }
-        }
 
-        val newList = mutableListOf<Renderable>()
-        newList.addString("§eProfit per Fishy Treat")
-        newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
-        display = newList
-        return
+        DelayedRun.runOrNextTick {
+            val table = mutableListOf<DisplayTableEntry>()
+            for ((slot, item) in event.inventoryItems) {
+                // ignore the last line of menu items
+                if (slot > 44) continue
+                // background items, named with a single space
+                if (item.hoverName.string == " ") continue
+                try {
+                    readItem(slot, item, table)
+                } catch (e: Throwable) {
+                    ErrorManager.logErrorWithData(
+                        e, "Error in FishyTreatProfit while reading item '${item.repoItemName}'",
+                        "item" to item,
+                        "name" to item.repoItemName,
+                        "inventory name" to InventoryUtils.openInventoryName(),
+                    )
+                }
+            }
+
+            val newList = mutableListOf<Renderable>()
+            newList.addString("§eProfit per Fishy Treat")
+            newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
+            display = newList
+        }
     }
 
     private fun readItem(slot: Int, item: SafeItemStack, table: MutableList<DisplayTableEntry>) {
-        val itemName = getItemName(item)
-        val allMaterials = item.readLoreCosts().associate { it.internalName to it.amount }
-        val additionalMaterials = allMaterials.filter { it.key != FISHY_TREAT }
-        val amountOfFishyTreat = allMaterials[FISHY_TREAT] ?: run {
-            ErrorManager.logErrorStateWithData(
-                "failed reading fishy treat amount",
-                "fishy treat amount not found in additionalMaterials",
-                "itemName" to itemName,
-                "additionalMaterials" to allMaterials,
-                "inventory" to "",
-            )
-            return
-        }
+        val lore = item.getLoreComponent().map { it.formattedTextCompatLessResets() }
+        if (!lore.hasTradeLine()) return
 
+        val itemName = getItemName(item)
+        val itemNameText = itemName.formattedTextCompatLeadingWhiteLessResets()
+        val allMaterials = lore.readLoreCosts(itemNameText).associate { it.internalName to it.amount }
+
+        // ignore shop entries that do not cost fishy treats
+        val amountOfFishyTreat = allMaterials[FISHY_TREAT] ?: return
+
+        val additionalMaterials = allMaterials.filter { it.key != FISHY_TREAT }
         val additionalCost = getAdditionalCost(additionalMaterials)
 
-        val (name, amount) = ItemUtils.readItemAmount(itemName.formattedTextCompatLeadingWhiteLessResets()) ?: return
+        val (name, amount) = ItemUtils.readItemAmount(itemNameText) ?: return
 
         var internalName = NeuInternalName.fromItemNameOrNull(name)
         if (internalName == null) {

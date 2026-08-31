@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -24,7 +25,7 @@ object LoreCostUtils {
 
     fun isCostHeader(line: String): Boolean = costHeaderPattern.matches(line)
 
-    /** True when the item can be bought right now, as opposed to a locked or already owned entry. */
+    /** True when the item is a purchase entry, as opposed to a locked or already owned one. */
     fun List<String>.hasTradeLine(): Boolean = any { tradeLinePattern.matches(it.removeColor()) }
 
     private val patternGroup = RepoPattern.group("utils.lore")
@@ -34,21 +35,44 @@ object LoreCostUtils {
      * into the header line is handed on as is, so that features can find that exact line again
      * in the tooltip. Matching without color would strip it and break that lookup.
      *
+     * Menus that list their costs below the header write it in singular or plural, with a colon
+     * or without one.
+     *
      * REGEX-TEST: §7Cost
      * REGEX-TEST: §5§o§7Cost
+     * REGEX-TEST: §7Costs
+     * REGEX-TEST: §7Cost:
      * REGEX-TEST: §7Cost: §b5,000 Bits
+     * REGEX-TEST: §7Cost to unlock: §550 Tokens
      */
     private val costHeaderPattern by patternGroup.pattern(
         "cost.header",
-        "(?:§.)*Cost(?:: (?<cost>.+))?",
+        "(?:§.)*Costs?(?: to unlock)?(?::(?: (?<cost>.+))?)?",
     )
 
     /**
+     * Shops word this line differently, and an entry the player cannot afford says so instead of
+     * asking for a click. Kuudra's preview line uses the right button and is no trade.
+     *
      * REGEX-TEST: Click to trade!
+     * REGEX-TEST: Click to unlock!
+     * REGEX-TEST: Click to level up!
+     * REGEX-TEST: Left Click to unlock!
+     * REGEX-TEST: You can't afford this upgrade!
+     * REGEX-FAIL: Right Click to preview!
      */
     private val tradeLinePattern by patternGroup.pattern(
         "trade.click",
-        "Click to trade!",
+        "(?:Left )?Click to (?:trade|unlock|level up)!|You can't afford this upgrade!",
+    )
+
+    /**
+     * REGEX-TEST: 50 Safari Essence
+     * REGEX-TEST: 50,000 Undead Essence
+     */
+    private val amountFirstPattern by patternGroup.pattern(
+        "cost.amount-first",
+        "(?<amount>[\\d,]+) (?<name>[\\w' ]+)",
     )
 
     fun SafeItemStack.readLoreCosts(): List<LoreCostEntry> = getLoreComponent()
@@ -62,7 +86,8 @@ object LoreCostUtils {
             groupOrNull("cost")?.let { return listOf(readCostLine(it, itemName)) }
         }
 
-        return drop(headerIndex + 1).takeWhile { it.isNotEmpty() }.map { readCostLine(it, itemName) }
+        // the blank line below the costs is not always empty, some menus write a color code into it
+        return drop(headerIndex + 1).takeWhile { it.removeColor().isNotEmpty() }.map { readCostLine(it, itemName) }
     }
 
     private fun readCostLine(rawLine: String, itemName: String): LoreCostEntry {
@@ -70,16 +95,20 @@ object LoreCostUtils {
         val line = rawLine.replace("§8 ", " §8")
 
         readCurrencyOrNull(line, rawLine)?.let { return it }
+        readAmountFirstOrNull(line, rawLine)?.let { return it }
 
         val (name, amount) = ItemUtils.readItemAmount(line) ?: run {
             logCostLineError("Could not read the amount of a cost line", rawLine, itemName)
             return LoreCostEntry(NeuInternalName.MISSING_ITEM, 1, rawLine)
         }
 
-        val internalName = NeuInternalName.fromItemNameOrNull(name) ?: run {
-            logCostLineError("Unknown item in a cost line", rawLine, itemName)
-            NeuInternalName.MISSING_ITEM
-        }
+        // currencies without a repo item only arrive here, their amount is written behind the name or not at all
+        val internalName = NeuInternalName.fromItemNameOrNull(name)
+            ?: SkyblockCurrency.getByLoreNameOrNull(name)?.internalName
+            ?: run {
+                logCostLineError("Unknown item in a cost line", rawLine, itemName)
+                NeuInternalName.MISSING_ITEM
+            }
         return LoreCostEntry(internalName, amount.toLong(), rawLine)
     }
 
@@ -97,5 +126,15 @@ object LoreCostUtils {
     private fun readCurrencyOrNull(line: String, rawLine: String): LoreCostEntry? =
         SkyblockCurrency.readCurrencyOrNull(line)?.let { (currency, amount) ->
             LoreCostEntry(currency.internalName, amount, rawLine)
+        }
+
+    /**
+     * Items that write the amount in front of the name, like "50,000 Undead Essence".
+     * [ItemUtils.readItemAmount] only reads the other form, where the amount is behind the name.
+     */
+    private fun readAmountFirstOrNull(line: String, rawLine: String): LoreCostEntry? =
+        amountFirstPattern.matchMatcher(line.removeColor()) {
+            val internalName = NeuInternalName.fromItemNameOrNull(group("name")) ?: return@matchMatcher null
+            LoreCostEntry(internalName, group("amount").formatLong(), rawLine)
         }
 }

@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.BitsApi
+import at.hannibal2.skyhanni.data.CurrencyApi.getFromStorage
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PurseApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -34,8 +36,15 @@ enum class SkyblockCurrency(
     val color: LorenzColor,
     val coinValue: Double? = null,
     private val loreNames: Set<String>,
-    /** How much of this currency the player owns, or null when SkyHanni does not track it. */
-    private val ownedAmount: (() -> Long?),
+    /** Set when the lore name alone is ambiguous and only unique on one island. */
+    private val island: IslandType? = null,
+    /** True when the amount belongs to the account instead of the current profile. */
+    val accountWide: Boolean = false,
+    /**
+     * How much of this currency the player owns, or null when SkyHanni does not track it.
+     * There is no default on purpose, every currency has to state where its amount comes from.
+     */
+    private val ownedAmount: SkyblockCurrency.() -> Long?,
 ) {
     // Universal
     COINS(
@@ -48,13 +57,16 @@ enum class SkyblockCurrency(
     ),
 
     // Bits Shop from Elisabeth
-    BITS("BITS".toInternalName(), "Bits", AQUA, loreNames = setOf("bit", "bits"), ownedAmount = { BitsApi.bits.toLong() }),
+    BITS(
+        "BITS".toInternalName(), "Bits", AQUA, loreNames = setOf("bit", "bits"),
+        accountWide = true,
+        ownedAmount = { BitsApi.bits.toLong() },
+    ),
 
     // Pesthunter's Wares in Garden
     PESTS(
         "PESTS".toInternalName(), "Pests", DARK_GREEN, loreNames = setOf("pest", "pests"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
 
     // Chocolate Factory
@@ -69,40 +81,88 @@ enum class SkyblockCurrency(
     // SkyMart in Garden
     COPPER(
         NeuInternalName.SKYBLOCK_COPPER, "Copper", RED, loreNames = setOf("copper"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
 
     // Anita in Garden
     GOLD_MEDAL(
         NeuInternalName.SKYBLOCK_GOLD_MEDAL, "Gold medal", GOLD, loreNames = setOf("gold medal", "gold medals"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
     SILVER_MEDAL(
         NeuInternalName.SKYBLOCK_SILVER_MEDAL, "Silver medal", WHITE, loreNames = setOf("silver medal", "silver medals"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
     BRONZE_MEDAL(
         NeuInternalName.SKYBLOCK_BRONZE_MEDAL, "Bronze medal", RED, loreNames = setOf("bronze medal", "bronze medals"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
 
     // Tony's Shop in the Farming Islands
     PELTS(
         "PELTS".toInternalName(), "Pelts", DARK_PURPLE, loreNames = setOf("pelt", "pelts"),
-        // TODO add
-        ownedAmount = { null },
+        ownedAmount = { getFromStorage() },
     ),
 
     // Cosmetics in various shops
     GEMS(
         "GEMS".toInternalName(), "Gems", GREEN, loreNames = setOf("gem", "gems"),
-        // TODO add
-        ownedAmount = { null },
+        accountWide = true,
+        ownedAmount = { getFromStorage() },
     ),
+
+    // no shop sells for sowdust yet, this only tracks the amount
+    SOWDUST(
+        "SOWDUST".toInternalName(), "Sowdust", DARK_GREEN, loreNames = setOf("sowdust"),
+        ownedAmount = { getFromStorage() },
+    ),
+
+    // Rift shops
+    MOTES(
+        NeuInternalName.SKYBLOCK_MOTE, "Mote", LIGHT_PURPLE, loreNames = setOf("mote", "motes"),
+        ownedAmount = { getFromStorage() },
+    ),
+
+    // the lore only writes "Tokens", the island is what makes it unambiguous
+    KUUDRA_TOKEN(
+        "KUUDRA_TOKEN".toInternalName(), "Tokens", DARK_PURPLE, loreNames = setOf("token", "tokens"),
+        island = IslandType.KUUDRA_ARENA,
+        ownedAmount = { getFromStorage() },
+    ),
+
+    // Ticket Exchange from the Safari Manager, a ticket starts one Critter Safari
+    // and the lower tiers are spent to upgrade into the higher ones
+    SAFARI_TICKET_BASIC(
+        "SAFARI_TICKET_BASIC".toInternalName(), "Basic Safari Ticket", DARK_GREEN,
+        loreNames = setOf("basic safari ticket", "basic safari tickets"),
+        ownedAmount = { getFromStorage() },
+    ),
+    SAFARI_TICKET_ECONOMY(
+        "SAFARI_TICKET_ECONOMY".toInternalName(), "Economy Safari Ticket", BLUE,
+        loreNames = setOf("economy safari ticket", "economy safari tickets"),
+        ownedAmount = { getFromStorage() },
+    ),
+    SAFARI_TICKET_PREMIUM(
+        "SAFARI_TICKET_PREMIUM".toInternalName(), "Premium Safari Ticket", DARK_PURPLE,
+        loreNames = setOf("premium safari ticket", "premium safari tickets"),
+        ownedAmount = { getFromStorage() },
+    ),
+    SAFARI_TICKET_FIRST_CLASS(
+        "SAFARI_TICKET_FIRST_CLASS".toInternalName(), "First-Class Safari Ticket", GOLD,
+        loreNames = setOf("first-class safari ticket", "first-class safari tickets"),
+        ownedAmount = { getFromStorage() },
+    ),
+
+    // Carnival upgrades in the Hub
+    CARNIVAL_TOKEN(
+        "SKYBLOCK_CARNIVAL_POINT".toInternalName(), "Carnival Token", YELLOW,
+        loreNames = setOf("carnival token", "carnival tokens"),
+        ownedAmount = { getFromStorage() },
+    ),
+
+    // TODO add these currencies, each one needs a real cost line from its shop first
+    //  - North Stars, waiting on the winter event
+    //  - Bingo Points, waiting on the bingo event
     ;
 
     val coloredName: String = color.getChatColor() + displayName
@@ -113,7 +173,10 @@ enum class SkyblockCurrency(
      */
     fun readAmountOrNull(text: String): Long? = readCurrencyOrNull(text)?.takeIf { it.first == this }?.second
 
-    fun getOwnedAmountOrNull(): Long? = ownedAmount.invoke()
+    fun getOwnedAmountOrNull(): Long? = ownedAmount.invoke(this)
+
+    /** False when this currency belongs to an island the player is not on. */
+    private fun isAvailable(): Boolean = island?.isInIsland() ?: true
 
     /** Formats an amount the way it appears in a cost lore, for example "§b5,000 Bits". */
     fun formatAmount(amount: Long): String = "${color.getChatColor()}${amount.addSeparators()} $displayName"
@@ -147,7 +210,7 @@ enum class SkyblockCurrency(
 
         fun getByLoreNameOrNull(name: String): SkyblockCurrency? {
             val clean = name.removeColor().lowercase()
-            return entries.firstOrNull { clean in it.loreNames }
+            return entries.firstOrNull { it.isAvailable() && clean in it.loreNames }
         }
 
         /**
