@@ -91,15 +91,6 @@ configuration. If not, you can restart IntelliJ and reload the Gradle project ag
 
 </details>
 
-Select an appropriate Java 25 JDK (preferably [Adoptium](https://adoptium.net/), but any Java 25 JDK will do).
-
-<details>
-<summary>🖼️Show run configuration image</summary>
-
-![Run configuration settings](docs/run-configuration-settings.avif)
-
-</details>
-
 Now that we are done with that, you should be able to launch your game from your IDE with that run configuration.
 
 ## Pull Requests
