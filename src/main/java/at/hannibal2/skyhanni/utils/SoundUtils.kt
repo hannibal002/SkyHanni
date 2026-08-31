@@ -2,35 +2,30 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.SoundCompat
+import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
-import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.resources.sounds.SoundInstance
 import net.minecraft.resources.Identifier
-import net.minecraft.sounds.SoundEvent
 import kotlinx.coroutines.delay
 
 @SkyHanniModule
 object SoundUtils {
-
-    private val config get() = SkyHanniMod.feature.misc
     private val beepSoundCache = mutableMapOf<Float, SoundInstance>()
     private val clickSound by lazy { createSound("ui.button.click", 1f) }
     private val errorSound by lazy { createSound("entity.enderman.teleport", 0f) }
     val plingSound by lazy { createSound("block.note_block.pling", 1f) }
 
+    // Sounds created via createSound bypass the user's volume settings
+    // if the boostWarningVolume option is enabled, see SoundEngineHook.
     fun SoundInstance.playSound() {
         DelayedRun.runOrNextTick {
-            val category = this.source
-
-            val oldLevel = Minecraft.getInstance().options.getSoundSourceVolume(category)
-            if (!config.maintainGameVolume) this.setLevel(1f)
-
             try {
                 Minecraft.getInstance().soundManager.play(this)
             } catch (e: IllegalArgumentException) {
@@ -46,19 +41,14 @@ object SoundUtils {
                     "Failed to play a sound",
                     "soundLocation" to this.identifier,
                 )
-            } finally {
-                if (!config.maintainGameVolume) this.setLevel(oldLevel)
             }
         }
     }
 
-    private fun SoundInstance.setLevel(level: Float) =
-        Minecraft.getInstance().soundManager.updateCategoryVolume(source, level)
-
     fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {
         val newSound = SoundCompat.getModernSoundName(name)
         val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9:/._-]"), ""))
-        return SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(identifier), pitch, volume)
+        return SkyHanniSoundInstance(identifier, pitch, volume)
     }
 
     fun playBeepSound(pitch: Float = 1f) {
@@ -89,7 +79,7 @@ object SoundUtils {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shplaysound") {
             description = "Play the specified sound effect at the given pitch and volume."
             category = CommandCategory.DEVELOPER_TEST
@@ -111,6 +101,13 @@ object SoundUtils {
             simpleCallback {
                 ChatUtils.userError("Specify a sound effect to test")
             }
+        }
+    }
+
+    @HandleEvent
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(145, "misc.maintainGameVolume", "misc.boostWarningVolume") { element ->
+            JsonPrimitive(!element.asBoolean)
         }
     }
 }

@@ -153,9 +153,15 @@ enum class SkyblockCurrency(
         ownedAmount = { getFromStorage() },
     ),
 
+    // Carnival upgrades in the Hub
+    CARNIVAL_TOKEN(
+        "SKYBLOCK_CARNIVAL_POINT".toInternalName(), "Carnival Token", YELLOW,
+        loreNames = setOf("carnival token", "carnival tokens"),
+        ownedAmount = { getFromStorage() },
+    ),
+
     // TODO add these currencies, each one needs a real cost line from its shop first
     //  - North Stars, waiting on the winter event
-    //  - Carnival Tokens, waiting on the carnival event, the item is SKYBLOCK_CARNIVAL_POINT
     //  - Bingo Points, waiting on the bingo event
     ;
 
