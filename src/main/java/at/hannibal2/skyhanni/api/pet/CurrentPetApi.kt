@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("LargeClass")
 @SkyHanniModule
 object CurrentPetApi {
     val patternGroup = RepoPattern.group("misc.pet")

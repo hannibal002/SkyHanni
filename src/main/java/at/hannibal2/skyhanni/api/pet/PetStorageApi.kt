@@ -56,6 +56,7 @@ import java.util.regex.Pattern
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("LargeClass")
 @SkyHanniModule
 object PetStorageApi {
 
