@@ -52,7 +52,7 @@ object WikiManager {
     private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.wikiKeybind.isKeyHeld()) return
 
-        val stack = event.stackUnderCursor()?.takeUnlessEmpty() ?: return
+        val stack = event.stackUnderCursor?.takeUnlessEmpty() ?: return
         if (isIgnoredItem(stack)) return
 
         wikiTheItem(stack, config.menuOpenWiki)
