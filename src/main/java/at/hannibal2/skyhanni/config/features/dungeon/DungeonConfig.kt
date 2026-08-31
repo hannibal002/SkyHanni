@@ -231,7 +231,7 @@ class DungeonConfig {
 
         @HandleEvent
         private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-            event.move(145, "dungeon.terminalWaypoints", "dungeon.terminalWaypoints.enabled")
+            event.move(146, "dungeon.terminalWaypoints", "dungeon.terminalWaypoints.enabled")
         }
     }
 }

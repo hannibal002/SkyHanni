@@ -17,17 +17,17 @@ class TerminalWaypointsConfig {
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color to use for inactive Terminals.")
+    @ConfigOption(name = "Inactive Color", desc = "Color to use for inactive Terminals.")
     @ConfigEditorColour
-    var inactiveTerminalColor: ChromaColour = LorenzColor.RED.toChromaColor()
+    var inactiveColor: ChromaColour = LorenzColor.RED.toChromaColor()
 
     @Expose
     @ConfigOption(name = "Hide Active Terminals", desc = "whether to remove the Terminals when activated.")
     @ConfigEditorBoolean
-    var removeActiveTerminals: Boolean = true
+    var removeActive: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color to use for active Terminals.")
+    @ConfigOption(name = "Active Color", desc = "Color to use for active Terminals.")
     @ConfigEditorColour
-    var activeTerminalColor: ChromaColour = LorenzColor.GREEN.toChromaColor()
+    var activeColor: ChromaColour = LorenzColor.GREEN.toChromaColor()
 }
