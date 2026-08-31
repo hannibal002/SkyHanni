@@ -210,6 +210,14 @@ object PetStorageApi {
 
     fun inMainPetMenuName(): Boolean = mainMenuInventory.isInside()
 
+    fun petMenuPageNumber(inventoryName: String): Int? {
+        PetStoragePatterns.mainPetMenuNamePattern.matchMatcher(inventoryName) {
+            val petPage = groupOrNull("currentpage") ?: return null
+            return petPage.toInt()
+        }
+        return null
+    }
+
     private fun SafeItemStack.toVisiblePetDataOrNull(): PetData? =
         PetStoragePatterns.petMenuPetStackNamePattern.matchStyledMatcher(hoverName) {
             val petInfo = getPetInfo()

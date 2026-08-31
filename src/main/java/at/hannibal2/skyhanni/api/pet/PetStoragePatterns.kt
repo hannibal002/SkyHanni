@@ -19,7 +19,7 @@ internal object PetStoragePatterns {
      */
     val mainPetMenuNamePattern by patternGroup.pattern(
         "menu.gui.name",
-        "(?:\\(\\d+\\/\\d+\\) )?Pets(?:: \"(?<search>.*)\")?(?: \\(\\d+\\/\\d+\\))? ?",
+        "(?:\\((?<currentpage>\\d+)\\/\\d+\\) )?Pets(?:: \"(?<search>.*)\")?(?: \\(\\d+\\/\\d+\\))? ?",
     )
 
     /**
