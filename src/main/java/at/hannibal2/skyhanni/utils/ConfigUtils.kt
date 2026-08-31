@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.MoulConfigEditorComponent
+import at.hannibal2.skyhanni.config.SkyHanniConfigScreen
 import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -20,7 +21,6 @@ import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KProperty0
 
 object ConfigUtils {
-
     private const val UNKNOWN_EDITOR_INDEX = -1
 
     private val editorProviders = listOf<() -> MoulConfigEditor<*>>(
@@ -103,11 +103,18 @@ object ConfigUtils {
     }
 
     fun openEditor(editor: MoulConfigEditor<*>) {
-        SkyHanniMod.screenToOpen = createConfigScreen(editor)
+        SkyHanniMod.screenToOpen = createConfigScreen(editor, findPreviousScreen(editor))
     }
 
-    internal fun createConfigScreen(editor: MoulConfigEditor<*>, previousScreen: Screen? = null) =
-        MoulConfigScreenComponent(Component.empty(), GuiContext(MoulConfigEditorComponent(editor)), previousScreen)
+    // Closing an editor that was linked out from another config screen (e.g. Pet Display) should return to that screen
+    private fun findPreviousScreen(editor: MoulConfigEditor<*>): Screen? {
+        val current = MinecraftCompat.screen as? MoulConfigScreenComponent ?: return null
+        val currentEditor = (current.guiContext.root as? MoulConfigEditorComponent)?.editor
+        return current.takeIf { currentEditor !== editor }
+    }
+
+    internal fun createConfigScreen(editor: MoulConfigEditor<*>, previousScreen: Screen? = null): MoulConfigScreenComponent =
+        SkyHanniConfigScreen(Component.empty(), GuiContext(MoulConfigEditorComponent(editor)), previousScreen)
 
     val configScreenCurrentlyOpen: Boolean
         get() = MinecraftCompat.screen is MoulConfigScreenComponent
