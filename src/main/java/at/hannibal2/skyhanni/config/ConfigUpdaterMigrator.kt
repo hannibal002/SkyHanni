@@ -11,7 +11,6 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
 object ConfigUpdaterMigrator {
-
     val logger = SkyHanniLogger("ConfigMigration")
     const val CONFIG_VERSION = 146
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
