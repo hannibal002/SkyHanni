@@ -86,7 +86,6 @@ object DungeonBossApi {
     /**
      * REGEX-TEST: GregSpeck1 activated a terminal! (3/7)
      */
-    @Suppress("MaxLineLength")
     val goldorTerminalPattern by patternGroup.pattern(
         "f7.goldor.terminalcomplete.colorless",
         "(?<playerName>\\w+) (?:activated|completed) a (?<type>lever|terminal|device)! \\((?<currentTerminal>\\d)/(?<total>\\d)\\)",

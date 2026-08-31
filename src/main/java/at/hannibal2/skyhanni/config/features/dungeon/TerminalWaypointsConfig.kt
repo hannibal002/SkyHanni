@@ -11,23 +11,23 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class TerminalWaypointsConfig {
 
     @Expose
-    @ConfigOption(name = "Terminal Waypoints", desc = "Displays Waypoints in the F7/M7 Goldor Phase.")
+    @ConfigOption(name = "Enabled", desc = "Displays Waypoints in the F7/M7 Goldor Phase For Terminals/Devices/Arrows.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Inactive Color", desc = "Color to use for inactive Terminals.")
+    @ConfigOption(name = "Inactive Color", desc = "Color to use for inactive Terminals/Devices/Arrows.")
     @ConfigEditorColour
     var inactiveColor: ChromaColour = LorenzColor.RED.toChromaColor()
 
     @Expose
-    @ConfigOption(name = "Hide Active Terminals", desc = "whether to remove the Terminals when activated.")
+    @ConfigOption(name = "Hide Active Terminals", desc = "whether to remove the Terminals/Devices/Arrows when activated.")
     @ConfigEditorBoolean
     var removeActive: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Active Color", desc = "Color to use for active Terminals.")
+    @ConfigOption(name = "Active Color", desc = "Color to use for active Terminals/Devices/Arrows.")
     @ConfigEditorColour
     var activeColor: ChromaColour = LorenzColor.GREEN.toChromaColor()
 }
