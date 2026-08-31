@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -29,7 +28,8 @@ object TerminalWaypoints {
         for (term in TerminalInfo.entries) {
             if (!term.phase.isCurrent() && !term.shouldShowActiveWaypoint()) continue
             if (term.unsolved) event.drawWaypointFilled(term.location, config.inactiveTerminalColor.toColor(), seeThroughBlocks = true)
-            else if (!config.removeActiveTerminals) event.drawWaypointFilled(term.location, config.activeTerminalColor.toColor(), seeThroughBlocks = true)
+            else if (!config.removeActiveTerminals)
+                event.drawWaypointFilled(term.location, config.activeTerminalColor.toColor(), seeThroughBlocks = true)
             event.drawDynamicText(term.location, term.text, 1.0)
         }
     }
