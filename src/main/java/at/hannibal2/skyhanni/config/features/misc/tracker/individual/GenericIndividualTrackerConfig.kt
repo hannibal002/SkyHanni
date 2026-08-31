@@ -6,21 +6,16 @@ import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import at.hannibal2.skyhanni.utils.ChatUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 open class GenericIndividualTrackerConfig<out Type : TrackerGenericConfig>(
     createType: () -> Type
-) {
+) : Runnable {
     @Expose
     val trackerConfig: Type = createType()
 
-    @ConfigOption(
-        name = "Individual Tracker Settings",
-        desc = "Click to open the settings that only apply to this tracker."
-    )
-    @ConfigEditorButton(buttonText = "OPEN")
-    val openTrackerSettings: Runnable = Runnable { IndividualTrackerConfigGuiManager.open(this) }
+    // Invoked by the "Tracker Settings" OPEN button this config is bound to in the enclosing config
+    override fun run() = IndividualTrackerConfigGuiManager.open(this)
 
     // the first time a user launches the game with a build that includes individual tracker configs,
     // we sync every individual tracker with the universal tracker,

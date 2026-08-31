@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualItemTrackerConfig
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker.GhostTrackerLines
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -41,9 +41,9 @@ class GhostProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "Click to open the settings that only apply to this tracker."
     )
-    @Accordion
+    @ConfigEditorButton(buttonText = "OPEN")
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
     @Expose
