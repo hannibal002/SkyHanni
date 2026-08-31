@@ -65,9 +65,8 @@ object StarlynSisterCouponAmount {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun replaceItem(event: ReplaceItemEvent) {
-        itemReplaced = false
-
         if (!isEnabled() || event.slot != CUSTOM_STACK_LOCATION) return
+        itemReplaced = false
 
         if (event.originalItem.itemType == emptyGlassItem) {
             couponAmountItemStack?.let { stack ->
@@ -75,8 +74,8 @@ object StarlynSisterCouponAmount {
                 itemReplaced = true
             }
         } else {
-            ErrorManager.logErrorWithData(
-                IllegalStateException("Unexpected item found in slot $CUSTOM_STACK_LOCATION of Starlyn Shop"),
+            ErrorManager.logErrorStateWithData(
+                "Unexpected item found in slot $CUSTOM_STACK_LOCATION of Starlyn Shop",
                 "Unexpected item found in Starlyn Shop Coupon Amount slot",
                 "slot" to CUSTOM_STACK_LOCATION,
                 "found item" to event.originalItem,

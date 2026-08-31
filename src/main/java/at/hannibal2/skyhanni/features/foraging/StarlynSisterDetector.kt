@@ -12,12 +12,16 @@ object StarlynSisterDetector {
         onClose: () -> Unit,
     ): InventoryDetector {
         val sisterTypeMap = StarlynSisterType.entries.associateBy { it.inventoryName }
+        var isInventoryOpen: Boolean
 
         return InventoryDetector(
             checkInventoryName = sisterTypeMap.keys::contains,
             onOpenInventory = { event ->
                 if (isEnabled()) {
+                    isInventoryOpen = true
                     DelayedRun.runOrNextTick {
+                        if (!isInventoryOpen) return@runOrNextTick
+
                         sisterTypeMap[event.inventoryName]?.let { sister ->
                             setSisterType(sister)
                             onOpen(event, sister)
@@ -26,6 +30,7 @@ object StarlynSisterDetector {
                 }
             },
             onCloseInventory = {
+                isInventoryOpen = false
                 setSisterType(null)
                 onClose()
             },
