@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStats.CFStat
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -245,9 +246,9 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "Stray Tracker Settings",
-        desc = ""
+        desc = "Click to open the settings that only apply to this tracker."
     )
-    @Accordion
+    @ConfigEditorButton(buttonText = "OPEN")
     val strayTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
 
     @Expose

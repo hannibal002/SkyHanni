@@ -12,6 +12,7 @@ import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorAccordio
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
+import kotlin.reflect.jvm.javaField
 
 @SkyHanniModule
 object IndividualTrackerConfigGuiManager {
@@ -32,7 +33,19 @@ object IndividualTrackerConfigGuiManager {
         BuiltinMoulConfigGuis.addProcessors(processor)
         val driver = ConfigProcessorDriver(processor)
         driver.warnForPrivateFields = false
-        driver.processConfig(config)
+        val settingsField = checkNotNull(IndividualTrackerSettingsConfig::settings.javaField) {
+            "settings is a constructor property and always has a backing field"
+        }
+        processor.beginConfig(IndividualTrackerSettingsConfig::class.java, driver, config)
+        processor.beginCategory(config, settingsField, "Tracker Settings", "Settings that only apply to this tracker.")
+        processor.pushPath(settingsField.name)
+        // The settings themselves first, then the options declared directly on the tracker
+        // (use universal settings, link-out buttons, sync), flattened into the same category
+        driver.processCategory(config.settings, ArrayList())
+        driver.processCategory(tracker, ArrayList())
+        processor.popPath()
+        processor.endCategory()
+        processor.endConfig()
         MoulConfigEditor(processor).apply {
             wide = widenConfig.get()
         }
