@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBlockClickEvent
-import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
+import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -42,8 +42,9 @@ object DungeonSecretChime {
         }
     }
 
+    // An item entity leaving the world means the player picked it up
     @HandleEvent
-    fun onItemPickup(event: EntityRemovedEvent<ItemEntity>) {
+    private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ItemEntity>) {
         if (!isEnabled()) return
         val itemName = event.entity.item.hoverName.formattedTextCompatLeadingWhiteLessResets()
         if (NeuInternalName.fromItemName(itemName) in dungeonSecretItems) {

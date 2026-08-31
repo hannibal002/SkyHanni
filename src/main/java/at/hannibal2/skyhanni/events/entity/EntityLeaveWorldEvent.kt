@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import net.minecraft.world.entity.Entity
 
+// TODO remove after 2026-11, kept so open PRs using the old name keep compiling
 @Deprecated("Use EntityLeaveWorldEvent instead", ReplaceWith("EntityLeaveWorldEvent"))
 typealias EntityRemovedEvent<T> = EntityLeaveWorldEvent<T>
 
