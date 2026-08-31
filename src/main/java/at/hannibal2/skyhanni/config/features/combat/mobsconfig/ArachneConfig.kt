@@ -87,6 +87,10 @@ class ArachneConfig {
             val newArachneKeeperPath = "$oldArachnePath.arachneSettings.keeper"
             event.move(143, "$oldArachnePath.lineToArachne", "$newArachneBossPath.line.showLine")
             event.move(143, "$oldArachnePath.lineToArachneWidth", "$newArachneBossPath.line.lineWidth")
+            event.move(143, "$oldArachnePath.showArachneSpawnTimer", "$newArachneBossPath.showSpawnTimer")
+            event.move(143, "$oldArachnePath.arachneKillTimer", "$newArachneBossPath.killTimer")
+            event.move(143, "$oldArachnePath.hideNameTagArachneMinis", "$newArachneBossPath.hideNameTagOfBroods")
+            event.move(143, "$oldArachnePath.arachneKeeperHighlight", "$newArachneKeeperPath.arachneKeeperHighlight")
             event.transform(143, oldArachnePath) { element ->
                 val oldEnabled = element.asJsonObject.get("arachneBossHighlighter").asBoolean
                 if (!oldEnabled) {
@@ -95,10 +99,6 @@ class ArachneConfig {
                 }
                 element
             }
-            event.move(143, "$oldArachnePath.showArachneSpawnTimer", "$newArachneBossPath.showSpawnTimer")
-            event.move(143, "$oldArachnePath.arachneKillTimer", "$newArachneBossPath.killTimer")
-            event.move(143, "$oldArachnePath.hideNameTagArachneMinis", "$newArachneBossPath.hideNameTagOfBroods")
-            event.move(143, "$oldArachnePath.arachneKeeperHighlight", "$newArachneKeeperPath.arachneKeeperHighlight")
         }
     }
 }

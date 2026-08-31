@@ -320,7 +320,7 @@ object VisitorApi {
         event.transform(124, "garden.visitors.rewardWarning.drops") { element ->
             element.addElementsAfter(arrayOf(VisitorReward.DYE_WILD_STRAWBERRY))
         }
-        event.transform(143, "garden.visitors.rewardWarning.drops") { element ->
+        event.transform(134, "garden.visitors.rewardWarning.drops") { element ->
             element.addElementsAfter(
                 arrayOf(
                     VisitorReward.VISITORS_GRATITUDE,

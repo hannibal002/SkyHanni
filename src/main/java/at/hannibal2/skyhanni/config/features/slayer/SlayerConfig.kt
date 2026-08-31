@@ -167,7 +167,7 @@ class SlayerConfig {
     @ConfigOption(
         name = "No Gummy Warning",
         desc = "Sends a warning when you don't have a Re-Heated Gummy Polar Bear active " +
-            "while you have Habanero Tactics on your gear, or are in the Smoldering Tomb."
+            "while you have Habanero Tactics on your gear, or are in the Smoldering Tomb.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -182,33 +182,36 @@ class SlayerConfig {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
-            event.transform(143, "slayer") { element ->
-                val elementObj = element.asJsonObject
-                val oldHighlightEnabled = elementObj.get("slayerMinibossHighlight").asBoolean
-
-                if (oldHighlightEnabled) {
-                    elementObj.replaceWithBoolean(".miniboss.slayerMinibossHighlight", true)
-                    elementObj.replaceWithBoolean(".miniboss.cocoonHighlight", true)
-                }
-                val oldMinibossLineEnabled = elementObj.get("slayerMinibossLine").asBoolean
-                if (oldMinibossLineEnabled) {
-                    elementObj.replaceWithBoolean(".miniboss.minibossLine.showLine", true)
-                    elementObj.replaceWithBoolean(".miniboss.cocoonLine.showLine", true)
-                }
-                val width = elementObj.get("slayerMinibossLineWidth")
-                elementObj.remove(".miniboss.minibossLine.lineWidth")
-                elementObj.add(".miniboss.minibossLine.lineWidth", width)
-                elementObj.remove(".miniboss.cocoonLine.lineWidth")
-                elementObj.add(".miniboss.cocoonLine.lineWidth", width)
-                element
-            }
             val oldPath = "slayer."
-            event.move(126, "${oldPath}hideIrrelevantMobsOpacity", "${oldPath}hideIrrelevantMobsTransparency")
             val remainingKillsPath = "${oldPath}slayerRemainingKills."
             event.move(138, "${oldPath}remainingKills", "${remainingKillsPath}display")
             event.move(138, "${oldPath}remainingKillsLevel", "${remainingKillsPath}includeMobLevel")
             event.move(138, "${oldPath}remainingKillsHealth", "${remainingKillsPath}includeMobHealth")
             event.move(138, "${oldPath}remainingKillsPosition", "${remainingKillsPath}remainingKillsPosition")
+            event.transform(143, "slayer") { element ->
+                if (element.isJsonObject) {
+                    val elementObj = element.asJsonObject
+                    val oldHighlightEnabled = elementObj.get("slayerMinibossHighlight")
+
+                    if (oldHighlightEnabled != null) {
+                        if (oldHighlightEnabled.asBoolean) {
+                            elementObj.replaceWithBoolean(".miniboss.slayerMinibossHighlight", true)
+                            elementObj.replaceWithBoolean(".miniboss.cocoonHighlight", true)
+                        }
+                    }
+                    val oldMinibossLineEnabled = elementObj.get("slayerMinibossLine").asBoolean
+                    if (oldMinibossLineEnabled) {
+                        elementObj.replaceWithBoolean(".miniboss.minibossLine.showLine", true)
+                        elementObj.replaceWithBoolean(".miniboss.cocoonLine.showLine", true)
+                    }
+                    val width = elementObj.get("slayerMinibossLineWidth")
+                    elementObj.remove(".miniboss.minibossLine.lineWidth")
+                    elementObj.add(".miniboss.minibossLine.lineWidth", width)
+                    elementObj.remove(".miniboss.cocoonLine.lineWidth")
+                    elementObj.add(".miniboss.cocoonLine.lineWidth", width)
+                }
+                element
+            }
         }
     }
 }
