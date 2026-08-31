@@ -4,7 +4,10 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.ConfigGuiManager.configTabCompleteSuggestionProvider
+import at.hannibal2.skyhanni.config.ConfigGuiManager.getOptionFieldForPath
 import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
+import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigOption
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.SkyHanniConfig
@@ -158,8 +161,17 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
             literalCallback("gui") {
                 GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
             }
-            argCallback("search", BrigadierArguments.greedyString()) { search ->
-                openConfigGui(search)
+            argCallback(
+                "search",
+                BrigadierArguments.greedyString(),
+                suggestions = configTabCompleteSuggestionProvider,
+            ) { search ->
+                val optionField = getOptionFieldForPath(search)
+                if (optionField != null) {
+                    openConfigOption(optionField)
+                } else {
+                    openConfigGui(search)
+                }
             }
             simpleCallback {
                 openConfigGui()
