@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.Locat
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.event.yearofthepig.ShinyOrbTracker
+import at.hannibal2.skyhanni.features.event.yearoftheseal.BeachBallTracker
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
@@ -230,6 +231,9 @@ class ProfileSpecificStorage(
     // -- year of the [___]
     @Expose
     var shinyOrbTracker: ShinyOrbTracker.ShinyOrbData = ShinyOrbTracker.ShinyOrbData()
+
+    @Expose
+    var beachBallTracker: BeachBallTracker.Data = BeachBallTracker.Data()
 
     // -- hoppity
     @Expose
