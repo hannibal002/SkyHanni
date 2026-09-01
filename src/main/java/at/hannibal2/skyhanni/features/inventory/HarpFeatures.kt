@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedClay
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.mojang.blaze3d.systems.RenderSystem
@@ -75,7 +75,7 @@ object HarpFeatures {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(37 + index, chest.container.containerId, mouseButton = 2, mode = ContainerInput.CLONE)
+            chest.clickSlot(37 + index, MIDDLE_CLICK)
             lastClick = SimpleTimeMark.now()
             break
         }
@@ -189,7 +189,7 @@ object HarpFeatures {
         indexOfFirst.takeIf { it != -1 }?.let {
             val clickType = event.clickType
             event.cancel()
-            InventoryUtils.clickSlot(it, event.container.containerId, event.rawButton(), mode = clickType)
+            InventoryUtils.clickSlotRaw(it, event.container.containerId, event.rawButton(), clickType)
         }
     }
 

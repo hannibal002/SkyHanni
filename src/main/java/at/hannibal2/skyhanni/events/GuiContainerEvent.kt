@@ -159,6 +159,17 @@ enum class MouseClickType {
     fun isRightClick(): Boolean = this == RIGHT_CLICK
     fun isMiddleClick(): Boolean = this == MIDDLE_CLICK
 
+    /** The container input vanilla sends together with this button. */
+    val defaultMode: ContainerInput get() = if (this == MIDDLE_CLICK) CLONE else PICKUP
+
+    /** The raw button value to send. [OTHER] is sent as a left click. */
+    val buttonId: Int
+        get() = when (this) {
+            LEFT_CLICK, OTHER -> 0
+            RIGHT_CLICK -> 1
+            MIDDLE_CLICK -> 2
+        }
+
     companion object {
         fun of(button: Int, clickType: ContainerInput): MouseClickType = when (clickType) {
             PICKUP, QUICK_MOVE -> when (button) {
