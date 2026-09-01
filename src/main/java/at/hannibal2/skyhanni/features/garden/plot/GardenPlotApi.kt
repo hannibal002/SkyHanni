@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.plot
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -36,7 +35,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenPlotApi {
-
     private const val PLOT_SIZE = 96.0
     private const val PLOT_GRID_SIZE = 5
     private const val PLOT_GRID_MIN = -240.0
@@ -244,8 +242,8 @@ object GardenPlotApi {
         plots = list
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    @HandleEvent(onlyOnIsland = GARDEN)
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         plotSprayedPattern.matchMatcher(event.cleanMessage) {
             val plotName = group("plot")
             val sprayName = group("spray")
@@ -253,8 +251,8 @@ object GardenPlotApi {
             val plot = getPlotByName(plotName)
             val spray = SprayType.getByNameOrNull(sprayName) ?: return
 
-            // estimate, the pests tab widget may replace this with the real remaining time
-            val type = SprayonatorType.getRecentlyHeldOrNull() ?: SprayonatorType.BASIC
+            // Estimate, the Pests tab widget may replace this with the real remaining time
+            val type = SprayonatorType.getRecentlyHeldOrNull() ?: BASIC
             plot?.setSpray(spray, type.duration)
         }
         cleanPlotChatPattern.matchMatcher(event.message) {
@@ -279,8 +277,8 @@ object GardenPlotApi {
 
     private fun getPlotByID(plotId: Int) = plots.firstOrNull { it.id == plotId }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    @HandleEvent(onlyOnIsland = GARDEN)
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in plots) {
@@ -311,8 +309,8 @@ object GardenPlotApi {
     }
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.PESTS)) return
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(PESTS)) return
         val plot = getCurrentPlot() ?: return
         if (plot.isBarn()) return
 
@@ -348,15 +346,14 @@ object GardenPlotApi {
     }
 
     @HandleEvent
-    fun onPlotChange(event: PlotChangeEvent) {
-        DelayedRun.runDelayed(3.seconds) {
-            TabWidget.forceUpdateWidget(TabWidget.PESTS)
-        }
+    private fun onPlotChange() {
+        // Re-read the spray from the next tab list update, which is guaranteed to be for the new plot
+        TabWidget.forceUpdateWidget(PESTS)
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        DelayedRun.runDelayed(.5.seconds) {
+    @HandleEvent(onlyOnIsland = GARDEN)
+    private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
+        DelayedRun.runDelayed(0.5.seconds) {
             checkCurrentPlot()
         }
     }
@@ -369,42 +366,40 @@ object GardenPlotApi {
         cornerColor: Color,
         showBuildLimit: Boolean = false,
     ) {
-
-        // These don't refer to Minecraft chunks but rather garden plots, but I use
-        // the word chunk as the logic closely represents how chunk borders are rendered in latter mc versions
         val plotSize = 96
-        val chunkX = floor((plot.middle.x + 48) / plotSize).toInt()
-        val chunkZ = floor((plot.middle.z + 48) / plotSize).toInt()
-        val chunkMinX = (chunkX * plotSize) - 48
-        val chunkMinZ = (chunkZ * plotSize) - 48
 
-        // Lowest point in the garden
+        val plotX = floor((plot.middle.x + 48) / plotSize).toInt()
+        val plotZ = floor((plot.middle.z + 48) / plotSize).toInt()
+        val plotMinX = (plotX * plotSize) - 48
+        val plotMinZ = (plotZ * plotSize) - 48
+
+        // Lowest point in the Garden
         val minHeight = 66
         val maxHeight = 66 + 36
 
         // Render 4 vertical corners
         for (i in 0..plotSize step plotSize) {
             for (j in 0..plotSize step plotSize) {
-                val start = LorenzVec(chunkMinX + i, minHeight, chunkMinZ + j)
-                val end = LorenzVec(chunkMinX + i, maxHeight, chunkMinZ + j)
+                val start = LorenzVec(plotMinX + i, minHeight, plotMinZ + j)
+                val end = LorenzVec(plotMinX + i, maxHeight, plotMinZ + j)
                 tryDraw3DLine(start, end, cornerColor, 3, true)
             }
         }
 
-        // Render vertical on X-Axis
+        // Render vertical on x-axis
         for (x in 4..<plotSize step 4) {
-            val start = LorenzVec(chunkMinX + x, minHeight, chunkMinZ)
-            val end = LorenzVec(chunkMinX + x, maxHeight, chunkMinZ)
+            val start = LorenzVec(plotMinX + x, minHeight, plotMinZ)
+            val end = LorenzVec(plotMinX + x, maxHeight, plotMinZ)
             // Front lines
             tryDraw3DLine(start, end, lineColor, 2, true)
             // Back lines
             tryDraw3DLine(start.add(z = plotSize), end.add(z = plotSize), lineColor, 2, true)
         }
 
-        // Render vertical on Z-Axis
+        // Render vertical on z-axis
         for (z in 4..<plotSize step 4) {
-            val start = LorenzVec(chunkMinX, minHeight, chunkMinZ + z)
-            val end = LorenzVec(chunkMinX, maxHeight, chunkMinZ + z)
+            val start = LorenzVec(plotMinX, minHeight, plotMinZ + z)
+            val end = LorenzVec(plotMinX, maxHeight, plotMinZ + z)
             // Left lines
             tryDraw3DLine(start, end, lineColor, 2, true)
             // Right lines
@@ -419,7 +414,7 @@ object GardenPlotApi {
             minHeight..maxHeight step 4
         }
         for (y in iterable) {
-            val start = LorenzVec(chunkMinX, y, chunkMinZ)
+            val start = LorenzVec(plotMinX, y, plotMinZ)
             val isRedLine = y == buildLimit
             val color = if (isRedLine) Color.red else lineColor
             val depth = if (isRedLine) 3 else 2

@@ -408,6 +408,9 @@ enum class TabWidget(
     /** Internal value for the checking to set [isActive] */
     private var gotChecked = false
 
+    // Makes postNewEvent post even if the lines are unchanged, see forceUpdateWidget
+    private var forceNextUpdate = false
+
     private var sendOnThisIsland = false
 
     /** A [matchMatcher] for the first line using the pattern from the widget*/
@@ -418,7 +421,8 @@ enum class TabWidget(
 
     private fun postNewEvent(lines: List<Component>) {
         // Prevent Post if lines are equal
-        if (lines == this.lines) return
+        if (lines == this.lines && !forceNextUpdate) return
+        forceNextUpdate = false
         this.lines = lines
         isActive = true
         WidgetUpdateEvent(this, lines).post()
@@ -440,7 +444,6 @@ enum class TabWidget(
 
     @SkyHanniModule
     companion object {
-
         /** The index for the start of each Widget (inclusive) */
         private val separatorIndexes = mutableListOf<Pair<Int, TabWidget?>>()
 
@@ -457,7 +460,7 @@ enum class TabWidget(
         private var lastTabComponents: List<Component> = emptyList()
 
         @HandleEvent(onlyOnSkyblock = true)
-        fun onSecondPassed(event: SecondPassedEvent) {
+        private fun onSecondPassed(event: SecondPassedEvent) {
             if (sentSinceWorldChange) return
             if (SkyBlockUtils.lastWorldSwitch.passedSince() < FORCE_UPDATE_DELAY) return
             sentSinceWorldChange = true
@@ -466,7 +469,7 @@ enum class TabWidget(
         }
 
         @HandleEvent(priority = HandleEvent.HIGH)
-        fun onTabListUpdate(event: TabListUpdateEvent) {
+        private fun onTabListUpdate(event: TabListUpdateEvent) {
             if (!SkyBlockUtils.inSkyBlock) {
                 if (separatorIndexes.isNotEmpty()) {
                     separatorIndexes.forEach { it.second?.updateIsActive() }
@@ -479,7 +482,7 @@ enum class TabWidget(
 
         // TODO remove this workaround once the WidgetUpdateEvent gets send when the tab list gets first loaded, as intended.
         @HandleEvent(priority = HandleEvent.HIGHEST)
-        fun onIslandChange(event: IslandChangeEvent) {
+        private fun onIslandChange(event: IslandChangeEvent) {
             for (widget in entries) {
                 widget.sendOnThisIsland = false
             }
@@ -521,12 +524,12 @@ enum class TabWidget(
         }
 
         @HandleEvent
-        fun onWorldChange() {
+        private fun onWorldChange() {
             sentSinceWorldChange = false
         }
 
         @HandleEvent(priority = HandleEvent.LOW)
-        fun onRepoReload(event: RepositoryReloadEvent) {
+        private fun onRepoReload(event: RepositoryReloadEvent) {
             extraPatterns = repoGroup.getUnusedPatterns()
         }
 
@@ -563,9 +566,13 @@ enum class TabWidget(
             }
         }
 
+        /**
+         * Makes the widget post a [WidgetUpdateEvent] on the next tab list update even if its lines are unchanged.
+         * Listeners are only fed fresh tab list data; the currently cached lines are never re-posted.
+         */
         fun forceUpdateWidget(widget: TabWidget) {
             if (widget.isActive) {
-                widget.postClearEvent()
+                widget.forceNextUpdate = true
             }
         }
     }
