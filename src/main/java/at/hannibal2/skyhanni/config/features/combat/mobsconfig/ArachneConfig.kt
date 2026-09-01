@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.replaceWithBoolean
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.generic.lineconfigs.LineToArachne
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -90,11 +91,13 @@ class ArachneConfig {
             event.move(146, "$oldArachnePath.arachneKillTimer", "$newArachneBossPath.killTimer")
             event.move(146, "$oldArachnePath.hideNameTagArachneMinis", "$newArachneBossPath.hideNameTagOfBroods")
             event.move(146, "$oldArachnePath.arachneKeeperHighlight", "$newArachneKeeperPath.arachneKeeperHighlight")
-            event.transform(146, oldArachnePath) { element ->
-                val oldEnabled = element.asJsonObject.get("arachneBossHighlighter").asBoolean
-                if (!oldEnabled) {
-                    element.asJsonObject.replaceWithBoolean(".arachneSettings.boss.bossHighlight", false)
-                    element.asJsonObject.replaceWithBoolean(".arachneSettings.boss.broodHighlight", false)
+            event.transform(146, "${oldArachnePath}.arachneBossHighlighter") { element ->
+                val enabled = JsonPrimitive(element.asString != "OFF")
+                event.add(146, "$newArachneBossPath.bossHighlight") {
+                    enabled
+                }
+                event.add(146, "$newArachneBossPath.broodHighlight") {
+                    enabled
                 }
                 element
             }
