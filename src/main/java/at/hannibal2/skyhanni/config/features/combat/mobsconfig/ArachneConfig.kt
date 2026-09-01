@@ -90,7 +90,7 @@ class ArachneConfig {
             event.move(146, "$oldArachnePath.arachneKillTimer", "$newArachneBossPath.killTimer")
             event.move(146, "$oldArachnePath.hideNameTagArachneMinis", "$newArachneBossPath.hideNameTagOfBroods")
             event.move(146, "$oldArachnePath.arachneKeeperHighlight", "$newArachneKeeperPath.arachneKeeperHighlight")
-            event.transform(146, "${oldArachnePath}.arachneBossHighlighter") { element ->
+            event.transform(146, "$oldArachnePath.arachneBossHighlighter") { element ->
                 val enabled = JsonPrimitive(element.asString != "OFF")
                 event.add(146, "$newArachneBossPath.bossHighlight") {
                     enabled
