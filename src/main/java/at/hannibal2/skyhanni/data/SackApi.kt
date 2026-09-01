@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -53,7 +52,7 @@ object SackApi {
     private val patternGroup = RepoPattern.group("data.sacks")
     private var lastOpenedInventory = ""
 
-    val inventory = InventoryDetector { name -> sackPattern.matches(name) }
+    val inventory = InventoryDetector { sackPattern }
 
     // <editor-fold desc="Patterns">
     /**
@@ -89,24 +88,24 @@ object SackApi {
     )
 
     /**
-     * REGEX-TEST: ☘ Rough Jade Gemstone
-     * REGEX-TEST: §f☘ Rough Jade Gemstone
-     * REGEX-TEST: §f⸕ Rough Amber Gemstone
-     * REGEX-TEST: §f✧ Rough Topaz Gemstone
-     * REGEX-TEST: §f✎ Rough Sapphire Gemstone
-     * REGEX-TEST: §f❈ Rough Amethyst Gemstone
-     * REGEX-TEST: §f❁ Rough Jasper Gemstone
-     * REGEX-TEST: §f❤ Rough Ruby Gemstone
-     * REGEX-TEST: §f❂ Rough Opal Gemstone
-     * REGEX-TEST: §f☠ Rough Onyx Gemstone
-     * REGEX-TEST: §f☂ Rough Aquamarine Gemstone
-     * REGEX-TEST: §a☘ Flawed Citrine Gemstone
-     * REGEX-TEST: §9☘ Fine Peridot Gemstone
+     * REGEX-TEST:  Rough Jade Gemstone
+     * REGEX-TEST: §f Rough Jade Gemstone
+     * REGEX-TEST: §f Rough Amber Gemstone
+     * REGEX-TEST: §f Rough Topaz Gemstone
+     * REGEX-TEST: §f Rough Sapphire Gemstone
+     * REGEX-TEST: §f Rough Amethyst Gemstone
+     * REGEX-TEST: §f Rough Jasper Gemstone
+     * REGEX-TEST: §f Rough Ruby Gemstone
+     * REGEX-TEST: §f Rough Opal Gemstone
+     * REGEX-TEST: §f Rough Onyx Gemstone
+     * REGEX-TEST: §f Rough Aquamarine Gemstone
+     * REGEX-TEST: §a Flawed Citrine Gemstone
+     * REGEX-TEST: §9 Fine Peridot Gemstone
      * REGEX-TEST: §eTopaz Gemstones
      */
     private val gemstoneItemNamePattern by patternGroup.pattern(
         "gemstone.name",
-        "(?:(?:§.)?[❤❈☘⸕✎✧❁☠❂☂] |§.)(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
+        "(?:(?:§.)?. |§.)(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
     )
 
     /**

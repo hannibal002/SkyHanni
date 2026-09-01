@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.hours
@@ -35,7 +35,7 @@ object RobloxReminder {
     init {
         InventoryDetector(
             onOpenInventory = { robuxError() },
-            checkInventoryName = { it == "SkyBlock Menu" },
+            repoPattern = { UtilsPatterns.skyblockMenuGuiPattern },
         )
     }
 
@@ -51,7 +51,7 @@ object RobloxReminder {
     private fun specialPerson() {
         if (lastSpecialPerson.passedSince() < 24.hours) return
         // why not share love for every 1 in 200?
-        val chance = if (isContributor()) 0.0051 else 0.005
+        val chance = if (ContributorManager.isSelfDeveloper()) 0.0051 else 0.005
         if (Random.nextDouble() >= chance) return
 
         lastSpecialPerson = SimpleTimeMark.now()
@@ -68,7 +68,7 @@ object RobloxReminder {
         if (lastVersionReminder.passedSince() < 3.hours) return
 
         // only 10% chance of happening on world switch
-        val chance = if (isContributor()) 0.90 else 0.10
+        val chance = if (ContributorManager.isSelfDeveloper()) 0.90 else 0.10
         if (Random.nextDouble() >= chance) return
 
         lastVersionReminder = SimpleTimeMark.now()
@@ -86,13 +86,10 @@ object RobloxReminder {
         NotificationManager.queueNotification(notification)
     }
 
-    // Tech-savvy ppl who have debug enabled should have fun as well :)
-    private fun isContributor() = ContributorManager.isSelfContributor() || SkyBlockUtils.debug
-
     private fun robuxError() {
         if (!TimeUtils.isAprilFoolsDay) return
-        // why only contributors? Because we love a calm support channel :/
-        if (!isContributor()) return
+        // why only developers? Because we love a calm support channel :/
+        if (!ContributorManager.isSelfDeveloper()) return
         if (lastInventoryError.passedSince() < 3.hours) return
 
         val chance = 0.50

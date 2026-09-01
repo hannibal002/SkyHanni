@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.features.fishing.FishingApi.isBait
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -44,8 +44,8 @@ object ShowFishingItemName {
             if (itemStack.getSkullTexture() in cheapCoins) {
                 text = "§6Coins"
             } else {
-                val name =
-                    itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().transformIf({ isBait }) { "§7" + this.removeColor() }
+                val name = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+                    .transformIf({ isBait }) { "§7${itemStack.cleanName}" }
                 text += if (isBait) "§c§l- §r" else "§a§l+ §r"
 
                 val size = itemStack.count

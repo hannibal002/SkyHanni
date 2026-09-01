@@ -37,21 +37,19 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CompatCoroutineManager
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.coroutines.SkyHanniCoroutineManager
-import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.resources.Identifier
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 
 @SkyHanniModule
 object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
@@ -91,30 +89,25 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
         with(SkyHanniMod) { asyncUnScopedCoroutine(block) }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         val screenToOpen = screenToOpen ?: return
         screenTicks++
         if (screenTicks != 5) return
         val title = InventoryUtils.openInventoryName()
         if (shouldCloseScreen) {
-            MinecraftCompat.localPlayer.closeContainer()
+            MinecraftCompat.localPlayerOrThrow.closeContainer()
             OtherInventoryData.close(title)
         }
         shouldCloseScreen = true
-        Minecraft.getInstance().setScreen(screenToOpen)
+        MinecraftCompat.screen = screenToOpen
         screenTicks = 0
         this.screenToOpen = null
     }
 
     @HandleEvent
-    fun onClientShutdown() {
+    private fun onClientShutdown() {
         configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
-    }
-
-    @HandleEvent
-    fun onRenderShutdown() {
         SkyHanniItemRenderCoordinator.closeAtlas()
-        SkyHanniRoundedShapeRenderManager.closeAtlas()
     }
 
     const val MODID: String = "skyhanni"
@@ -122,7 +115,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
 
     fun id(path: String): Identifier = Identifier.fromNamespaceAndPath(MODID, path)
 
-    val modVersion: ModVersion = ModVersion.fromString(VERSION)
+    val modVersion: ModVersion = ModVersion.installed
 
     val isBetaVersion: Boolean
         get() = modVersion.isBeta
@@ -158,7 +151,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("sh") {
             aliases = listOf("skyhanni")
             description = "Opens the main SkyHanni config"

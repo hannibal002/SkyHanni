@@ -30,7 +30,15 @@ object LocationUtils {
 
     private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean = BlockUtils.raycast(a, b).miss
 
-    fun playerLocation() = PlayerUtils.getLocation()
+    /**
+     * Returns the player's current location, or null if the player does not exist.
+     */
+    fun playerLocationOrNull(): LorenzVec? = MinecraftCompat.localPlayerOrNull?.getLorenzVec()
+
+    /**
+     * Returns the player's current location, or LorenzVec(0.0, 0.0, 0.0) if the player does not exist.
+     */
+    fun playerLocation(): LorenzVec = playerLocationOrNull() ?: LorenzVec()
 
     // Block heights are multiples of 1/16, so we subtract 1/16 to find the right block
     fun getBlockBelowPlayer() = playerLocation().add(0.0, -1.0 / 16.0, 0.0).roundToBlock()
@@ -52,7 +60,7 @@ object LocationUtils {
     fun Entity.distanceToIgnoreY(location: LorenzVec) = getLorenzVec().distanceIgnoreY(location)
 
     fun playerEyeLocation(): LorenzVec {
-        val player = MinecraftCompat.localPlayer
+        val player = MinecraftCompat.localPlayerOrThrow
         val vec = player.getLorenzVec()
         return vec.up(player.eyeHeight.toDouble())
     }
@@ -301,7 +309,7 @@ object LocationUtils {
     }
 
     fun calculatePlayerYaw(): Float {
-        val player = MinecraftCompat.localPlayer
+        val player = MinecraftCompat.localPlayerOrThrow
         var yaw = player.yRot % 360
         if (yaw < 0) yaw += 360
         if (yaw > 180) yaw -= 360

@@ -11,8 +11,10 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import org.lwjgl.glfw.GLFW
 
-abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val hotx: HotxType, private val displayText: String) {
-
+abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *>>(
+    private val hotx: HotxType,
+    private val displayText: String,
+) {
     fun handleHotxCurrency(
         event: ToolTipTextEvent,
         showCurrencySpent: Boolean,
@@ -20,7 +22,7 @@ abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val 
         showCurrentCurrency: Boolean,
         currencySpentDesign: CurrencySpentDesign,
     ) {
-        val itemName = event.itemStack.cleanName()
+        val itemName = event.itemStack.cleanName
         val perk = hotx.getPerkByNameOrNull(itemName) ?: return
 
         if (perk.getLevelUpCost() == null) return

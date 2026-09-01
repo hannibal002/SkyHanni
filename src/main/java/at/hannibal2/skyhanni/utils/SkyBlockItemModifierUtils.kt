@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.FishingApi.getFishingRodPart
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -14,8 +15,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getBooleanOrDefault
 import at.hannibal2.skyhanni.utils.compat.getByteOrDefault
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
@@ -84,6 +83,8 @@ object SkyBlockItemModifierUtils {
 
     fun SafeItemStack.getStarCount() = getAttributeInt("upgrade_level")
 
+    fun SafeItemStack.getDungeonItemQuality() = getAttributeInt("baseStatBoostPercentage")
+
     private fun SafeItemStack.isDungeonItem() = getLore().any { it.contains("DUNGEON ") }
 
     @KSerializable
@@ -143,7 +144,7 @@ object SkyBlockItemModifierUtils {
     private var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()
 
     fun SafeItemStack.getPetInfo(): PetInfo? {
-        val colorlessName = hoverName.string.removeColor()
+        val colorlessName = cleanName
         // Repo pets will always return null for PetInfo, don't even attempt to parse it
         if (colorlessName.contains("→") || colorlessName.contains("{LVL}")) return null
         val petInfoJson = getExtraAttributes()?.takeIf {

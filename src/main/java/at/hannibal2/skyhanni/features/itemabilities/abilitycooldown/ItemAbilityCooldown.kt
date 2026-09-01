@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -32,8 +33,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import kotlin.math.max
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -49,7 +50,7 @@ object ItemAbilityCooldown {
     )
     private val youBuffedYourselfPattern by patternGroup.pattern(
         "buffedyourself",
-        "§aYou buffed yourself for §r§c\\+\\d+❁ Strength",
+        "§aYou buffed yourself for §r§c\\+\\d+${SkyblockStat.STRENGTH.hypixelIcon} Strength",
     )
 
     /**
@@ -121,7 +122,7 @@ object ItemAbilityCooldown {
                 ItemAbility.SHADOW_FURY.sound()
             }
             // Giant's Sword
-            event.soundName == "block.anvil.land" && event.pitch == 0.4920635f && event.volume == 1f -> {
+            event.soundName == "block.anvil.land" && event.pitch == 0.4920635f && event.volume == 0.5f -> {
                 ItemAbility.GIANTS_SWORD.sound()
             }
             // Atomsplit Katana
@@ -370,7 +371,7 @@ object ItemAbilityCooldown {
 
         val stack = event.stack
 
-        val guiOpen = Minecraft.getInstance().screen != null
+        val guiOpen = MinecraftCompat.screen != null
         val uuid = stack.getIdentifier() ?: return
         val list = items[uuid] ?: return
 
@@ -391,7 +392,7 @@ object ItemAbilityCooldown {
         if (!isEnabled()) return
         if (!config.itemAbilityCooldownBackground) return
 
-        val guiOpen = Minecraft.getInstance().screen != null
+        val guiOpen = MinecraftCompat.screen != null
         val stack = event.stack
 
         val uuid = stack?.getIdentifier() ?: return
@@ -455,7 +456,7 @@ object ItemAbilityCooldown {
 
     // TODO add item caching
     private fun hasAbility(stack: SafeItemStack): MutableList<ItemAbility> {
-        val itemName: String = stack.cleanName()
+        val itemName: String = stack.cleanName
         val internalName = stack.getInternalName()
         val scrolls = ItemAbility.getAllAbilityScrolls(stack)
 

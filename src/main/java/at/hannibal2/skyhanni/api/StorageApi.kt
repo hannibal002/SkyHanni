@@ -25,11 +25,11 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.subMapOfStringsStartingWith
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.sync.Mutex
 import net.minecraft.world.level.block.ChestBlock
 import java.util.NavigableMap
 import java.util.TreeMap
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.sync.Mutex
 
 @SkyHanniModule
 object StorageApi {

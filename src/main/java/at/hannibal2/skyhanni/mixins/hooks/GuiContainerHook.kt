@@ -9,19 +9,20 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 class GuiContainerHook(guiAny: Any) {
-
     private val gui: SkyHanniGuiContainer = guiAny as SkyHanniGuiContainer
     private val container: AbstractContainerMenu get() = gui.menu
 
-    fun closeWindowPressed(ci: org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Boolean>) {
-        if (CloseWindowEvent(gui, container).post()) ci.cancel()
+    fun closeWindowPressed(ci: CallbackInfoReturnable<Boolean>) {
+        if (CloseWindowEvent(gui, container).post().isCancelled) ci.cancel()
     }
 
     fun backgroundDrawn(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
@@ -37,7 +38,7 @@ class GuiContainerHook(guiAny: Any) {
         ci: CallbackInfo,
     ) {
         if (GlobalRender.renderDisabled) return
-        if (GuiContainerEvent.PreDraw(context, gui, container, mouseX, mouseY, partialTicks).post()) {
+        if (GuiContainerEvent.PreDraw(context, gui, container, mouseX, mouseY, partialTicks).post().isCancelled) {
             GuiData.preDrawEventCancelled = true
             ci.cancel()
         } else {
@@ -63,17 +64,37 @@ class GuiContainerHook(guiAny: Any) {
 
     fun onDrawSlot(slot: Slot, ci: CallbackInfo) {
         val event = GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre(gui, container, slot)
-        if (event.post()) ci.cancel()
+        if (event.post().isCancelled) ci.cancel()
     }
 
     fun onDrawSlotPost(slot: Slot) {
         GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPost(gui, container, slot).post()
     }
 
-    fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: ContainerInput, ci: CallbackInfo) {
-        val item = container.items.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId)
-        if (SlotClickEvent(gui, container, item, slot, slotId, clickedButton, clickType).post()
-        ) ci.cancel()
+    fun onMouseClick(
+        // Required for Java interop with Operation<Void>
+        @Suppress("ForbiddenVoid")
+        original: Operation<Void>,
+        slot: Slot?,
+        slotId: Int,
+        buttonNum: Int,
+        containerInput: ContainerInput,
+    ) {
+        val event = SlotClickEvent.postEvent(gui, container, slotId, buttonNum, containerInput)
+
+        if (event == null) {
+            original.call(slot, slotId, buttonNum, containerInput)
+            return
+        }
+
+        if (event.isCancelled) return
+
+        original.call(
+            event.slot,
+            event.slotId,
+            event.clickedButton,
+            event.clickType,
+        )
     }
 
     fun onDrawScreenAfter(
@@ -82,7 +103,6 @@ class GuiContainerHook(guiAny: Any) {
         mouseY: Int,
         ci: CallbackInfo,
     ) {
-        if (DrawScreenAfterEvent(context, mouseX, mouseY, ci).post()) ci.cancel()
+        if (DrawScreenAfterEvent(context, mouseX, mouseY, ci).post().isCancelled) ci.cancel()
     }
-
 }

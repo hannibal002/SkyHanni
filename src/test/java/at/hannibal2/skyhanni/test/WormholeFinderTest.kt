@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
-import at.hannibal2.skyhanni.features.foraging.WormholeFinder
+import at.hannibal2.skyhanni.features.fishing.WormholeFinder
 import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.core.particles.ParticleTypes
 import org.junit.jupiter.api.Assertions.assertEquals

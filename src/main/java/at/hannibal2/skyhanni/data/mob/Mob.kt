@@ -198,7 +198,7 @@ class Mob(
 
         if (ownerName == null && category == MobCategory.SLAYER) {
             hologram2?.let {
-                summonOwnerPattern.matchMatcher(it.cleanName()) {
+                summonOwnerPattern.matchMatcher(it.cleanName) {
                     ownerName = group("name")
                 }
             }

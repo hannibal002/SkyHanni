@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnigmaSoulsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -18,7 +17,8 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -38,7 +37,6 @@ import net.minecraft.world.inventory.ChestMenu
 
 @SkyHanniModule
 object EnigmaSoulWaypoints {
-
     private val config get() = RiftApi.config.enigmaSoulWaypoints
     private var inInventory = false
     var soulLocations = mapOf<String, Map<String, LorenzVec>>()
@@ -93,8 +91,16 @@ object EnigmaSoulWaypoints {
         "SOUL! You unlocked an Enigma Soul!|You have already found that Enigma Soul!",
     )
 
+    /**
+     * REGEX-TEST: Rift Guide ➜ Enigma Souls
+     */
+    private val inventoryNamePattern by patternGroup.pattern(
+        "inventory",
+        ".*Enigma Souls$",
+    )
+
     @HandleEvent
-    fun replaceItem(event: ReplaceItemEvent) {
+    private fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
 
         if (inventoryUnfound.isEmpty()) return
@@ -104,15 +110,15 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = false
-        if (!event.inventoryName.contains("Enigma Souls")) return
+        if (!inventoryNamePattern.matches(event.inventoryName)) return
         inInventory = true
 
         for (stack in event.inventoryItems.values) {
-            stack.getLore().lastOrNull()?.let {
-                if (notCompletedPattern.matches(it.removeColor())) {
-                    enigmaTitlePattern.matchMatcher(stack.hoverName.string.removeColor()) {
+            stack.getCleanLore().lastOrNull()?.let {
+                if (notCompletedPattern.matches(it)) {
+                    enigmaTitlePattern.matchMatcher(stack.cleanName) {
                         inventoryUnfound.add(group("name"))
                     }
                 }
@@ -121,14 +127,14 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         inInventory = false
         inventoryUnfound.clear()
         adding = true
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inInventory || !isEnabled()) return
 
         val area = getSelectedArea() ?: return
@@ -147,9 +153,9 @@ object EnigmaSoulWaypoints {
             }
         }
 
-        if (event.slot?.item == null) return
+        val item = event.item ?: return
 
-        val name = enigmaTitlePattern.matchMatcher(event.slot.item.hoverName.string.removeColor()) {
+        val name = enigmaTitlePattern.matchMatcher(item.cleanName) {
             group("name")
         } ?: return
         event.makePickblock()
@@ -182,7 +188,7 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || !inInventory) return
 
         if (event.gui !is ContainerScreen) return
@@ -192,7 +198,7 @@ object EnigmaSoulWaypoints {
         val tracked = trackedSouls[area] ?: return
 
         for ((slot, stack) in chest.getAllItems()) {
-            enigmaTitlePattern.matchMatcher(stack.hoverName.string.removeColor()) {
+            enigmaTitlePattern.matchMatcher(stack.cleanName) {
                 if (group("name") in tracked) {
                     slot.highlight(LorenzColor.DARK_PURPLE)
                 }
@@ -204,7 +210,7 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         for ((area, souls) in trackedSouls) {
             for (name in souls) {
@@ -217,7 +223,7 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls")
         val areas = data.areas
         soulLocations = buildMap {
@@ -232,15 +238,15 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (foundPattern.matches(event.cleanMessage.trim())) {
             hideClosestSoul()
         }
     }
 
-    private fun getSelectedArea(): String? = InventoryUtils.getSlotAtIndex(40)?.item?.getLore()?.firstOrNull()?.let {
-        guideAreaPattern.matchMatcher(it.removeColor()) {
+    private fun getSelectedArea(): String? = InventoryUtils.getSlotAtIndex(39)?.item?.getCleanLore()?.firstOrNull()?.let {
+        guideAreaPattern.matchMatcher(it) {
             group("area")
         }
     }

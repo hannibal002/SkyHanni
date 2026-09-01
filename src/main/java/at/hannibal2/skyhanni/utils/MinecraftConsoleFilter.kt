@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
@@ -28,6 +29,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
 
     private val patternBiomeIdBounds = "Biome ID is out of bounds: (\\d+), defaulting to 0 \\(Ocean\\)".toPattern()
 
+    @SkyHanniModule
     companion object {
 
         fun initLogging() {
@@ -38,6 +40,35 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
                 loggerConfig.addFilter(MinecraftConsoleFilter(loggerName))
             }
             ctx.configuration.rootLogger.addFilter(MinecraftConsoleFilter("root"))
+        }
+
+        @HandleEvent
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(3, "dev.printUnfilteredDebugs", "dev.minecraftConsoles.printUnfilteredDebugs")
+            event.move(3, "dev.logUnfilteredFile", "dev.minecraftConsoles.logUnfilteredFile")
+            event.move(
+                3,
+                "dev.printUnfilteredDebugsOutsideSkyBlock",
+                "dev.minecraftConsoles.printUnfilteredDebugsOutsideSkyBlock",
+            )
+            event.move(3, "dev.printFilteredReason", "dev.minecraftConsoles.printFilteredReason")
+            event.move(3, "dev.filterChat", "dev.minecraftConsoles.consoleFilter.filterChat")
+            event.move(3, "dev.filterGrowBuffer", "dev.minecraftConsoles.consoleFilter.filterGrowBuffer")
+            event.move(3, "dev.filterUnknownSound", "dev.minecraftConsoles.consoleFilter.filterUnknownSound")
+            event.move(
+                3,
+                "dev.filterParticleVillagerHappy",
+                "dev.minecraftConsoles.consoleFilter.filterParticleVillagerHappy",
+            )
+            event.move(
+                3,
+                "dev.filterAmsHelperTransformer",
+                "dev.minecraftConsoles.consoleFilter.filterAmsHelperTransformer",
+            )
+            event.move(3, "dev.filterAsmHelperApplying", "dev.minecraftConsoles.consoleFilter.filterAsmHelperApplying")
+            event.move(3, "dev.filterBiomeIdBounds", "dev.minecraftConsoles.consoleFilter.filterBiomeIdBounds")
+            event.move(3, "dev.filterScoreboardErrors", "dev.minecraftConsoles.consoleFilter.filterScoreboardErrors")
+            event.move(3, "dev.filterOptiFine", "dev.minecraftConsoles.consoleFilter.filterOptiFine")
         }
     }
 
@@ -170,6 +201,42 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
             return Filter.Result.DENY
         }
 
+        if (filterConfig.filterUnknownPassengers &&
+            formattedMessage == "Received passengers for unknown entity"
+        ) {
+            filterConsole("unknown entity passengers")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterMissingTextureReferences &&
+            formattedMessage.startsWith("Missing texture references in model ")
+        ) {
+            filterConsole("missing texture references")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterAtlasCreated &&
+            formattedMessage.startsWith("Created: ") &&
+            formattedMessage.endsWith("-atlas")
+        ) {
+            filterConsole("texture atlas created")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterExistingTeam &&
+            formattedMessage.startsWith("Requested creation of existing team ")
+        ) {
+            filterConsole("existing team creation")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterChunkSectionsUbo &&
+            formattedMessage.startsWith("Resizing Chunk Sections UBO")
+        ) {
+            filterConsole("chunk sections UBO resize")
+            return Filter.Result.DENY
+        }
+
         if (filterScoreboardErrors(event)) return Filter.Result.DENY
 
         if (!config.printUnfilteredDebugs) return Filter.Result.ACCEPT
@@ -287,34 +354,5 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
         t: Throwable?,
     ): Filter.Result {
         return Filter.Result.ACCEPT
-    }
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "dev.printUnfilteredDebugs", "dev.minecraftConsoles.printUnfilteredDebugs")
-        event.move(3, "dev.logUnfilteredFile", "dev.minecraftConsoles.logUnfilteredFile")
-        event.move(
-            3,
-            "dev.printUnfilteredDebugsOutsideSkyBlock",
-            "dev.minecraftConsoles.printUnfilteredDebugsOutsideSkyBlock",
-        )
-        event.move(3, "dev.printFilteredReason", "dev.minecraftConsoles.printFilteredReason")
-        event.move(3, "dev.filterChat", "dev.minecraftConsoles.consoleFilter.filterChat")
-        event.move(3, "dev.filterGrowBuffer", "dev.minecraftConsoles.consoleFilter.filterGrowBuffer")
-        event.move(3, "dev.filterUnknownSound", "dev.minecraftConsoles.consoleFilter.filterUnknownSound")
-        event.move(
-            3,
-            "dev.filterParticleVillagerHappy",
-            "dev.minecraftConsoles.consoleFilter.filterParticleVillagerHappy",
-        )
-        event.move(
-            3,
-            "dev.filterAmsHelperTransformer",
-            "dev.minecraftConsoles.consoleFilter.filterAmsHelperTransformer",
-        )
-        event.move(3, "dev.filterAsmHelperApplying", "dev.minecraftConsoles.consoleFilter.filterAsmHelperApplying")
-        event.move(3, "dev.filterBiomeIdBounds", "dev.minecraftConsoles.consoleFilter.filterBiomeIdBounds")
-        event.move(3, "dev.filterScoreboardErrors", "dev.minecraftConsoles.consoleFilter.filterScoreboardErrors")
-        event.move(3, "dev.filterOptiFine", "dev.minecraftConsoles.consoleFilter.filterOptiFine")
     }
 }

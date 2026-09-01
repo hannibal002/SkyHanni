@@ -25,13 +25,13 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import kotlin.time.Duration.Companion.seconds
 
@@ -110,7 +110,7 @@ object IslandAreaFeatures {
     fun onGuiRenderOverlay() {
         if (!isAreaListEnabled()) return
         if (!areaListConfig.showAlways) return
-        val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
+        val isInOwnInventory = MinecraftCompat.screen is InventoryScreen
         if (!isInOwnInventory) {
             doRender()
         }
@@ -119,7 +119,7 @@ object IslandAreaFeatures {
     @HandleEvent
     fun onChestGuiRender() {
         if (!isAreaListEnabled()) return
-        val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
+        val isInOwnInventory = MinecraftCompat.screen is InventoryScreen
         if (isInOwnInventory) {
             doRender()
         }

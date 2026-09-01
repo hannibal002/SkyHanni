@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -74,7 +75,7 @@ object ScoreboardPattern {
      */
     val locationPattern by mainSB.pattern(
         "location",
-        "\\s*(?<location>(?:§7⏣|§5ф) .*)",
+        "\\s*(?<location>§.. .*)",
     )
 
     /**
@@ -202,12 +203,12 @@ object ScoreboardPattern {
     private val dungeonSB = scoreboardGroup.group("dungeon")
 
     /**
-     * REGEX-TEST: §8- §c§4Power Dragon§a 497.3M§c❤
+     * REGEX-TEST: §8- §c§4Power Dragon§a 497.3M§c
      * REGEX-TEST: §8- §c§4Power Dragon§a 497.3M
      */
     val m7dragonsPattern by dungeonSB.pattern(
         "m7dragons",
-        "§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+(?:§.❤)?",
+        "§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+(?:§.${SkyblockStat.HEALTH.hypixelIcon})?",
     )
     val keysPattern by dungeonSB.pattern(
         "keys",
@@ -237,7 +238,7 @@ object ScoreboardPattern {
      */
     val floor3GuardiansPattern by dungeonSB.pattern(
         "floor3guardians",
-        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a [\\w,.]*(?:§c❤)?",
+        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a [\\w,.]*(?:§c${SkyblockStat.HEALTH.hypixelIcon})?",
     )
 
     // kuudra
@@ -256,7 +257,7 @@ object ScoreboardPattern {
      */
     val tokensPattern by kuudraSB.pattern(
         "tokens",
-        "(?:§.)*Tokens: §.[\\w,]+",
+        "(?:§.)*Tokens: §.(?<tokens>[\\w,]+)",
     )
 
     /**
@@ -312,7 +313,7 @@ object ScoreboardPattern {
      */
     val peltsPattern by farmingSB.pattern(
         "pelts",
-        "(?:§.)*Pelts: (?:§.)*[\\d,]+.*",
+        "(?:§.)*Pelts: (?:§.)*(?<pelts>[\\d,]+).*",
     )
 
     /**
@@ -470,11 +471,11 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Event Bonus: §6+4☘
+     * REGEX-TEST: Event Bonus: §6+4
      */
     val fortunateFreezingBonusPattern by miningSB.pattern(
         "fortunatefreezing.bonus",
-        "Event Bonus: §6\\+\\d+☘",
+        "Event Bonus: §6\\+\\d+${SkyblockStat.MINING_FORTUNE.hypixelIcon}",
     )
 
     /**
@@ -532,20 +533,20 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §e389.6k§f/§a10M§c❤
+     * REGEX-TEST: §e389.6k§f/§a10M§c
      */
     val bossHealthBarPattern by combatSB.pattern(
         "magmabosshealthbar",
-        "§.[\\w,.]+§f/§a10M§c❤",
+        "§.[\\w,.]+§f/§a10M§c${SkyblockStat.HEALTH.hypixelIcon}",
     )
 
     /**
-     * REGEX-TEST: Dragon HP: §a2,317,156 §c❤
-     * REGEX-TEST: Dragon HP: §a8,612,684 §c❤
+     * REGEX-TEST: Dragon HP: §a2,317,156 §c
+     * REGEX-TEST: Dragon HP: §a8,612,684 §c
      */
     val bossHPPattern by combatSB.pattern(
         "bosshp",
-        "(?:Protector|Dragon) HP: §a[\\d,.]* §c❤",
+        "(?:Protector|Dragon) HP: §a[\\d,.]* §c${SkyblockStat.HEALTH.hypixelIcon}",
     )
 
     /**
@@ -944,10 +945,11 @@ object ScoreboardPattern {
      * REGEX-TEST: Whispers: §3141§b (+1)
      * REGEX-TEST: Whispers: §317.5k§b (+50)
      * REGEX-TEST: §fWhispers: §317k§b (+40)
+     * REGEX-TEST: §fWhispers: §64.2k§b (+44)
      */
     val whispersPattern by galateaSB.pattern(
         "whispers",
-        "(?:§f)?Whispers: §3[\\w,.]+.*",
+        "(?:§f)?Whispers: §[36][\\w,.]+.*",
     )
 
     /**
@@ -965,6 +967,26 @@ object ScoreboardPattern {
     val agathasContestPattern by galateaSB.pattern(
         "agathas-contest",
         "§eAgatha's Contest §a.*",
+    )
+
+    /**
+     * REGEX-TEST: §eMiria's Contest §a0m35s
+     */
+    val miriasContestPattern by galateaSB.pattern(
+        "mirias-contest",
+        "§eMiria's Contest §a.*",
+    )
+
+    // Safari
+    private val safariSB = scoreboardGroup.group("safari")
+
+    /**
+     * REGEX-TEST: Captured Mobs: §e0
+     * REGEX-TEST: Captured Mobs: §e14
+     */
+    val capturedMobsPattern by safariSB.pattern(
+        "captured-mobs",
+        "Captured Mobs: §e(?<capturedMobs>\\d+)",
     )
 
     /**

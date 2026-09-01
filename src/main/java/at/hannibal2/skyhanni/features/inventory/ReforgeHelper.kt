@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.toStringWithPlus
@@ -43,7 +44,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 @SkyHanniModule
 object ReforgeHelper {
-
     private val config get() = SkyHanniMod.feature.inventory.helper.reforge
 
     private val patternGroup = RepoPattern.group("reforge")
@@ -85,6 +85,7 @@ object ReforgeHelper {
 
     private var isInReforgeMenu = false
     private var isInHexReforgeMenu = false
+    private var rareReforgeBlocked = false
 
     private fun isReforgeMenu(chestName: String) = reforgeMenuPattern.matches(chestName)
     private fun isHexReforgeMenu(chestName: String) = reforgeHexMenuPattern.matches(chestName)
@@ -135,9 +136,12 @@ object ReforgeHelper {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
-        if (event.slot?.index == reforgeButton) {
-            val lastLine = event.slot.item.getLoreComponent().lastOrNull()?.string
+        rareReforgeBlocked = false
+
+        if (event.slotId == reforgeButton) {
+            val lastLine = event.item?.getLoreComponent()?.lastOrNull()?.string
             if (!clickToReforgePattern.matches(lastLine)) return
+            if (handleNonBasicReforgeBlock(event)) return
             if (handleReforgeButtonClick(event)) return
         }
 
@@ -164,6 +168,18 @@ object ReforgeHelper {
             }
         }
         return false
+    }
+
+    private fun handleNonBasicReforgeBlock(event: GuiContainerEvent.SlotClickEvent): Boolean {
+        if (!config.blockNonBasicReforge) return false
+        val current = currentReforge ?: return false
+        if (current in ReforgeApi.basicReforges) return false
+        if (KeyboardManager.isModifierKeyDown()) return false
+
+        rareReforgeBlocked = true
+        SoundUtils.playBeepSound()
+        event.cancel()
+        return true
     }
 
     @HandleEvent
@@ -212,7 +228,7 @@ object ReforgeHelper {
         isInReforgeMenu = true
         waitForChat.set(false)
         DelayedRun.runNextTick {
-            inventoryContainer = MinecraftCompat.localPlayer.containerMenu
+            inventoryContainer = MinecraftCompat.localPlayerOrThrow.containerMenu
         }
     }
 
@@ -227,6 +243,7 @@ object ReforgeHelper {
         sortAfter = null
         itemToReforge = null
         display = emptyList()
+        rareReforgeBlocked = false
     }
 
     private fun updateDisplay() {
@@ -397,6 +414,17 @@ object ReforgeHelper {
         if (!isEnabled()) return
         if (currentReforge == null) return
 
+        if (rareReforgeBlocked) {
+            inventoryContainer?.getSlot(reforgeButton)?.let {
+                val modifier = KeyboardManager.getModifierKeyName(true)
+                event.drawSlotText(
+                    it.x - 55, it.y + 20,
+                    "§cThis item has a non-Blacksmith reforge! ($modifier to bypass)",
+                    1f
+                )
+            }
+        }
+
         inventoryContainer?.getSlot(reforgeItem)?.let {
             event.drawSlotText(it.x - 5, it.y, "§e${currentReforge?.name}", 1f)
         }
@@ -436,7 +464,7 @@ object ReforgeHelper {
 
     private fun colorReforgeStone(color: Color, reforgeStone: String?) {
         val inventory = inventoryContainer?.slots ?: return
-        val slot = inventory.firstOrNull { it?.item?.cleanName() == reforgeStone }
+        val slot = inventory.firstOrNull { it?.item?.cleanName == reforgeStone }
         if (slot != null) {
             slot.highlight(color)
         } else {

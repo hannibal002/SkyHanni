@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
@@ -14,6 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
@@ -35,7 +34,6 @@ import com.google.gson.JsonPrimitive
 
 @SkyHanniModule
 object ExperimentsAddonsHelper {
-
     private enum class HelperPhase {
         READ,
         REPLICATE
@@ -95,8 +93,8 @@ object ExperimentsAddonsHelper {
     )
     // </editor-fold>
 
-    @HandleEvent(InventoryCloseEvent::class, onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun resetAddonsData() {
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    private fun onInventoryClose() {
         hypixelChronomatronData.clear()
         userChronomatronProgress.clear()
         hypixelUltrasequencerData.clear()
@@ -109,23 +107,19 @@ object ExperimentsAddonsHelper {
         chronHasBeenEmpty = true
     }
 
-    private fun SafeItemStack.getLorenzColorOrNull(): LorenzColor? = when (hoverName.string.removeColor()) {
+    private fun SafeItemStack.getLorenzColorOrNull(): LorenzColor? = when (cleanName) {
         "Green" -> LorenzColor.DARK_GREEN
         "Lime" -> LorenzColor.GREEN
         "Pink" -> LorenzColor.LIGHT_PURPLE
         "Cyan" -> LorenzColor.DARK_AQUA
         "Orange" -> LorenzColor.GOLD
         "Purple" -> LorenzColor.DARK_PURPLE
-        else -> try {
-            LorenzColor.valueOf(hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor().uppercase())
-        } catch (exception: IllegalArgumentException) {
-            null
-        }
+        else -> runCatching { LorenzColor.valueOf(cleanName.uppercase()) }.getOrNull()
     }
 
     // <editor-fold desc="Next click highlighting">
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    private fun onBackgroundDrawn() {
         if (!config.enabled) return
         if (!config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
 
@@ -165,7 +159,7 @@ object ExperimentsAddonsHelper {
 
     // <editor-fold desc="Slot click stuff">
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.enabled) return
         if (event.slot == null || event.item == null || !ExperimentationTableApi.inAddon) return
         if (currentAddonPhase != HelperPhase.REPLICATE) return
@@ -189,7 +183,7 @@ object ExperimentsAddonsHelper {
     private fun GuiContainerEvent.SlotClickEvent.handleUltrasequencerClick() {
         if (!ExperimentationTableApi.inUltrasequencer || slot == null) return
         if (userUltrasequencerProgress.size == hypixelUltrasequencerData.size) return
-        val clickedSlot = slot.index.takeIf {
+        val clickedSlot = slotId.takeIf {
             val expectedSlot = hypixelUltrasequencerData[userUltrasequencerProgress.size]
             it == expectedSlot
         } ?: run {
@@ -229,7 +223,7 @@ object ExperimentsAddonsHelper {
 
     // <editor-fold desc="Inventory Update reading logic">
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onPlaySound(event: PlaySoundEvent) {
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (!ExperimentationTableApi.inChronomatron) return
         // This sound indicates when the player has finished a round in chronomatron
         if (event.soundName != "entity.player.levelup" || event.pitch != 1.7619047f || event.volume != 0.7f) return
@@ -237,7 +231,7 @@ object ExperimentsAddonsHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!ExperimentationTableApi.inAddon) return
 
         val oldAddonPhase = currentAddonPhase
@@ -308,7 +302,7 @@ object ExperimentsAddonsHelper {
         val orderedUltrasequencerSlots = inventoryItems.filter {
             it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().trim().isNotEmpty()
         }.mapNotNull { (slot, stack) ->
-            val sequenceNumber = stack.hoverName.string.removeColor().toIntOrNull() ?: return@mapNotNull null
+            val sequenceNumber = stack.cleanName.toIntOrNull() ?: return@mapNotNull null
             currentUltraSequencerRound = maxOf(currentUltraSequencerRound, sequenceNumber)
             if (sequenceNumber !in ultrasequencerDyeMap) ultrasequencerDyeMap[sequenceNumber] = stack
             UltraSequencerSlot(
@@ -367,7 +361,7 @@ object ExperimentsAddonsHelper {
     // </editor-fold>
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val basePath = "inventory.experimentationTable.addons"
         event.move(94, "$basePath.highlightNextClick", "$basePath.enabled")
         event.transform(94, "$basePath.highlightNextClick") {

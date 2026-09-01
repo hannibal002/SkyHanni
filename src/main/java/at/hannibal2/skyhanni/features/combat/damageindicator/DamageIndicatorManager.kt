@@ -67,7 +67,7 @@ import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.EnderMan
-import net.minecraft.world.entity.monster.MagmaCube
+import net.minecraft.world.entity.monster.cubemob.MagmaCube
 import net.minecraft.world.entity.monster.zombie.Zombie
 import java.util.UUID
 import kotlin.math.max
@@ -102,7 +102,7 @@ object DamageIndicatorManager {
         if (entity.tickCount > 300) return false
         if (!entity.hasCustomName()) return false
         if (entity.deceased) return false
-        val name = entity.cleanName().replace(",", "")
+        val name = entity.cleanName.replace(",", "")
 
         return damagePattern.matcher(name).matches()
     }
@@ -1000,7 +1000,7 @@ object DamageIndicatorManager {
 
         val showNameAndHealth = entityData.shouldShowNameAndHealth()
         if (isDamageSplash(entity)) {
-            val name = entity.cleanName().replace(",", "")
+            val name = entity.cleanName.replace(",", "")
 
             if (showNameAndHealth && config.hideDamageSplash) {
                 event.cancel()

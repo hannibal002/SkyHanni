@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.coroutines
 
-import kotlinx.coroutines.sync.Mutex
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.sync.Mutex
 
 /**
  * Represents the declaration of, and execution for a coroutine run through [CoroutineManager].

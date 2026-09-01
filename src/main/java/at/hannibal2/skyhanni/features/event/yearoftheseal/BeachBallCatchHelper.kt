@@ -85,7 +85,7 @@ object BeachBallCatchHelper {
 
     private fun SkyHanniRenderWorldEvent.renderLandingPosition() {
         if (!config.bouncyBallLandingSpot.get()) return
-        val player = WorldRenderUtils.exactLocation(MinecraftCompat.localPlayer, partialTicks).add(y = 1)
+        val player = WorldRenderUtils.exactLocation(MinecraftCompat.localPlayerOrThrow, partialTicks).add(y = 1)
         for ((e, predictor) in predictors.map { EntityUtils.getEntityByID(it.key) to it.value }) {
             val entity = e ?: continue
             val location = WorldRenderUtils.exactLocation(entity, partialTicks).copy(y = player.y)

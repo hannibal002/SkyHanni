@@ -32,23 +32,12 @@ jobs:
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: ./.github/actions/setup-normal-workspace
-                if: github.repository == 'hannibal002/SkyHanni'
-            -   uses: ./.github/actions/setup-normal-workspace
-                if: github.repository != 'hannibal002/SkyHanni'
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 id: run_detekt
-                if: github.repository == 'hannibal002/SkyHanni'
                 uses: ./.github/actions/gradle-retry
                 continue-on-error: true
                 with:
-                    gradle-command: detektMain --stacktrace
-            -   name: Run detekt main (w/ typing analysis) w/gradle retry
-                id: run_detekt_fork
-                if: github.repository != 'hannibal002/SkyHanni'
-                uses: ./.github/actions/gradle-retry
-                continue-on-error: true
-                with:
-                    gradle-command: detektMain --stacktrace
+                    gradle-command: :26.2:detektMain --stacktrace
 
             -   name: Check if SARIF file exists
                 if: always()
@@ -67,6 +56,9 @@ jobs:
                     if [ -f "build/reports/detekt/main.sarif" ]; then
                         cp build/reports/detekt/main.sarif detekt-artifact/main.sarif
                     fi
+                    if [ "${{ steps.run_detekt.outcome }}" == "failure" ]; then
+                        cp "$GITHUB_WORKSPACE/gradle-output.log" detekt-artifact/detekt-run.log 2>/dev/null || true
+                    fi
 
             -   name: Annotate detekt failures
                 if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
@@ -80,5 +72,5 @@ jobs:
                     name: detekt-output
                     path: detekt-artifact/
             -   name: Fail job if detekt found issues
-                if: steps.run_detekt.outcome == 'failure' || steps.run_detekt_fork.outcome == 'failure'
+                if: steps.run_detekt.outcome == 'failure'
                 run: exit 1

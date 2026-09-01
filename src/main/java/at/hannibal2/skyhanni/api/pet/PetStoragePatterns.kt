@@ -23,6 +23,14 @@ internal object PetStoragePatterns {
     )
 
     /**
+     * REGEX-TEST: Pets
+     */
+    val mainPetMenuTitleItemNamePattern by patternGroup.pattern(
+        "menu.gui.titleitem.name",
+        "Pets",
+    )
+
+    /**
      * REGEX-TEST: [Lvl 8] Squid
      * REGEX-TEST: [Lvl 100] Hermit Crab
      * REGEX-TEST: [Lvl 200] [122✦] Golden Dragon
@@ -101,28 +109,15 @@ internal object PetStoragePatterns {
     )
 
     /**
-     * REGEX-TEST: Autopet equipped your [Lvl 100] Enderman! VIEW RULE
-     * REGEX-TEST: Autopet equipped your [Lvl 200] Golden Dragon! VIEW RULE
-     * REGEX-TEST: Autopet equipped your [Lvl 100] Rabbit ✦! VIEW RULE
-     * REGEX-TEST: Autopet equipped your [Lvl 200] [122✦] Golden Dragon! VIEW RULE
-     * REGEX-TEST: Autopet equipped your [Lvl 200] [34✦] Golden Dragon! VIEW RULE
-     * REGEX-TEST: Autopet equipped your [Lvl 67] T-Rex! VIEW RULE
-     */
-    @Suppress("MaxLineLength")
-    val autoPetMessageColorlessPattern by patternGroup.pattern(
-        "autopet.message.colorless",
-        "Autopet equipped your \\[Lvl (?<level>\\d+)] (?:\\[\\d+(?<altskin>✦)\\] )?(?<pet>[\\w -]+)(?<skin> ✦)?! VIEW RULE",
-    )
-
-    /**
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §6Mosquito§e! §a§lVIEW RULE
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §5Rabbit§9 ✦§e! §a§lVIEW RULE
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §6[122✦] Golden Dragon§e! §a§lVIEW RULE
+     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §8[§6335§8§4✦§8] §6Golden Dragon§e! §a§lVIEW RULE
      */
     @Suppress("MaxLineLength")
     val autoPetMessagePattern by patternGroup.pattern(
         "autopet.message.formatted",
-        "§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] §(?<rarity>.)(?:\\[\\d+(?<altskin>✦)] )?(?<pet>[^§!]+?)(?<skin>§. ✦)?§e! §a§lVIEW RULE(?: \\(\\d+\\))?",
+        "§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] §(?<rarity>.)(?:\\[(?:§.)*\\d+(?:§.)*(?<altskin>✦)(?:§.)*] (?:§.)*)?(?<pet>[^§!]+?)(?<skin>§. ✦)?§e! §a§lVIEW RULE(?: \\(\\d+\\))?",
     )
 
     /**
@@ -142,5 +137,13 @@ internal object PetStoragePatterns {
     val petItemHeldMessagePattern by patternGroup.pattern(
         "chat.helditem",
         "Your pet is now holding (?<item>.+?)\\.",
+    )
+
+    /**
+     * REGEX-TEST: You removed Quick Claw from your pet!
+     */
+    val petItemRemovedMessagePattern by patternGroup.pattern(
+        "chat.removedhelditem",
+        "You removed (?<item>.+?) from your pet!",
     )
 }

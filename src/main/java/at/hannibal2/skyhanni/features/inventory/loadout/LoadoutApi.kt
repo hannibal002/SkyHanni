@@ -2,23 +2,21 @@ package at.hannibal2.skyhanni.features.inventory.loadout
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.MaxwellApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
@@ -198,11 +196,11 @@ object LoadoutApi {
         data.hotm = itemsList[HOTM_SLOT].parseCurrentSelection()
         data.hotf = itemsList[HOTF_SLOT].parseCurrentSelection()
 
-        EquipmentSlot.entries.forEach {
-            val itemStack = data.equipment[it.ordinal]
-            if (itemStack != null && !itemStack.isStainedGlassPane()) {
-                EquipmentApi.setEquipment(it, itemStack)
-            } else EquipmentApi.setEquipment(it, null)
+        EquipmentSlot.entries.forEach { CurrentEquipmentApi.setEquipment(it, data.equipment[it.ordinal]) }
+
+        MaxwellApi.currentPower = data.powerstone
+        data.tunings?.let { tuningLines ->
+            MaxwellApi.tunings = tuningLines.mapNotNull { MaxwellApi.readTuningFromLine(it) }
         }
     }
 
@@ -229,14 +227,6 @@ object LoadoutApi {
         if (!slot.isInCurrentPage() || slot.locked) return
         currentSlot = slot.id
         InventoryUtils.clickSlot(slot.inventorySlot)
-    }
-
-    @HandleEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!inLoadouts) return
-        val loadoutSlotFromId = getLoadoutSlotFromId(currentSlot) ?: return
-        if (!(loadoutSlotFromId.isInCurrentPage())) return
-        event.container.getSlot(loadoutSlotFromId.inventorySlot).highlight(LorenzColor.GREEN)
     }
 
     @HandleEvent

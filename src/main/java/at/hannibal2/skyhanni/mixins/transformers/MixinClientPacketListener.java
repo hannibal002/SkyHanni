@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPacketListener.class)
-public class MixinClientPacketListener {
+public abstract class MixinClientPacketListener {
 
     @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/DebugScreenOverlay;showNetworkCharts()Z"))
     public boolean shouldShowPacketSizeAndPingCharts(boolean original) {
@@ -44,5 +44,4 @@ public class MixinClientPacketListener {
         particleChangeEvent.post();
         return particleChangeEvent.getParticleOptions();
     }
-
 }

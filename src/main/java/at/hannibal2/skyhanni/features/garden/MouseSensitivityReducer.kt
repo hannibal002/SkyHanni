@@ -21,12 +21,12 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.minecraft.client.Minecraft
 import kotlin.reflect.KProperty0
 
 @SkyHanniModule
@@ -100,7 +100,7 @@ object MouseSensitivityReducer {
         return playerLocation().let { !BlockUtils.raycast(it, it.down(tolerance)).miss }
     }
 
-    fun setManualState(state: SensitivityState?, message: String? = null, configDisableOption: KProperty0<*>? = null) {
+    private fun setManualState(state: SensitivityState?, message: String? = null, configDisableOption: KProperty0<*>? = null) {
         manualState = state
 
         if (message != null && config.chatMessage) {
@@ -110,18 +110,18 @@ object MouseSensitivityReducer {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onIslandLeave() {
         manualState = null
         autoState = null
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick() {
+    private fun onTick() {
         updateAutoState()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (config.unlockOnTeleport != UnlockOnTeleport.NEVER && manualState != null) {
             teleportPattern.matchMatchers(event.cleanMessage) {
                 if (config.unlockOnTeleport.condition(group("plot"))) {
@@ -148,7 +148,7 @@ object MouseSensitivityReducer {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shmouselock") {
             description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
             category = CommandCategory.USERS_ACTIVE
@@ -175,7 +175,7 @@ object MouseSensitivityReducer {
     }
 
     @HandleEvent
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (config.showGui) config.position.renderRenderable(
             when (activeState) {
                 null -> return
@@ -187,7 +187,7 @@ object MouseSensitivityReducer {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mouse Sensitivity Reducer")
 
         if (activeState == null) event.addIrrelevant {
@@ -202,7 +202,7 @@ object MouseSensitivityReducer {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val oldBase = "garden.sensitivityReducer"
         val base = "garden.mouseSensitivityReducer"
         event.move(80, "garden.sensitivityReducerConfig", oldBase)
@@ -240,7 +240,7 @@ object MouseSensitivityReducer {
     }
 
     enum class AutoEnableMode(private val displayName: String, val condition: () -> Boolean) {
-        KEYBIND("Holding Keybind", { config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null }),
+        KEYBIND("Holding Keybind", { config.keybind.isKeyHeld() && MinecraftCompat.screen == null }),
         TOOL("Farming tool", { GardenApi.hasFarmingToolInHand() }),
         FISHING_ROD("Fishing Rod", { FishingApi.holdingRod }),
         MOUSEMAT("Squeaky Mousemat", { GardenApi.hasMousematInHand() }),

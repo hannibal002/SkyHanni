@@ -30,7 +30,7 @@ object MovementSpeedDisplay {
     fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5)) return
 
-        bpsMoveSpeed = with(MinecraftCompat.localPlayer) {
+        bpsMoveSpeed = with(MinecraftCompat.localPlayerOrThrow) {
             val oldPos = LorenzVec(xOld, yOld, zOld)
             val newPos = LorenzVec(position().x, position().y, position().z)
 

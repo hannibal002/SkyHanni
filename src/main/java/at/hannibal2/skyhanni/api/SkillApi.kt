@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -38,6 +39,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -64,6 +66,7 @@ object SkillApi {
 
     /**
      * REGEX-TEST: +6.3 Foraging (24/750)
+     * REGEX-TEST: +207.2 Hunting (5,183,244/0)
      */
     private val skillMultiplierPattern by patternGroup.pattern(
         "skill.multiplier",
@@ -130,6 +133,23 @@ object SkillApi {
         " (?<type>\\w+)(?: (?<level>\\d+))?: (?<current>[0-9,.]+)/(?<needed>[\\d,.]+[kMB]?+)",
     )
 
+    /**
+     * REGEX-TEST: Max Skill level reached!
+     */
+    private val skillMaxLevelMenuPattern by patternGroup.pattern(
+        "skill.menu.maxreached",
+        "Max Skill level reached!"
+    )
+
+    /**
+     * REGEX-TEST: Your Skills
+     */
+    private val skillMenuNamePattern by patternGroup.pattern(
+        "skill.menu.name",
+        "Your Skills"
+    )
+
+    val skillMenuDetector = InventoryDetector { skillMenuNamePattern }
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
     var oldSkillInfoMap = mutableMapOf<SkillType?, SkillInfo?>()
     private val skillStorage get() = ProfileStorageData.profileSpecific?.skills
@@ -322,11 +342,11 @@ object SkillApi {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Your Skills") return
+        if (!skillMenuNamePattern.matches(event.inventoryName)) return
         for (stack in event.inventoryItems.values) {
             val lore = stack.getLore()
             if (lore.none { it.contains("Click to view!") || it.contains("Not unlocked!") }) continue
-            val cleanName = stack.cleanName()
+            val cleanName = stack.cleanName
             val split = cleanName.split(" ")
             val skillName = split.first()
             val skill = SkillType.getByNameOrNull(skillName) ?: continue
@@ -336,9 +356,9 @@ object SkillApi {
             lore@ for ((index, line) in lore.withIndex()) {
                 val cleanLine = line.removeColor()
                 if (!cleanLine.startsWith("                    ")) continue@lore
-                val previousLine = lore.getOrNull(index - 1) ?: continue@lore
+                val previousLine = lore.getOrNull(index - 1)?.removeColor() ?: continue@lore
                 val progress = cleanLine.substring(cleanLine.lastIndexOf(' ') + 1)
-                if (previousLine == "§7§8Max Skill level reached!") {
+                if (skillMaxLevelMenuPattern.matches(previousLine)) {
                     onUpdateMax(progress, skill, skillInfo, skillLevel)
                 } else {
                     onUpdateNotMax(progress, skillLevel, skillInfo)
@@ -554,7 +574,7 @@ object SkillApi {
         val minus = if (maxXP == 0L) 0 else 1
         val level = getLevelExact(maxXP) - minus
 
-        val levelXP = if (maxXP == 0L) currentXP else calculateLevelXP(level - 1).toLong() + currentXP
+        val levelXP = calculateLevelXP(level - 1).toLong() + currentXP
         val (currentLevel, currentOverflow, currentMaxOverflow, totalOverflow) =
             calculateSkillLevel(levelXP, skillType.maxLevel)
 

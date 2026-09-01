@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
+import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -79,7 +80,7 @@ class ConfigManager {
         }
 
         // TODO use SecondPassedEvent
-        fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
+        fixedRateTimer(name = "skyhanni-config-auto-save", daemon = true, period = 60_000L, initialDelay = 60_000L) {
             saveConfig(ConfigFileType.FEATURES, "auto-save-60s")
         }
 
@@ -167,10 +168,11 @@ class ConfigManager {
                         try {
                             run()
                         } catch (e: Throwable) {
-                            logger.log(e.stackTraceToString())
+                            logger.logError("Failed to read $fileName from $file", e)
                             PlatformUtils.shutdownMinecraft(
                                 "Config is corrupt inside development environment. " +
-                                    "Maybe you forgot to implement a config migration, or the migration failed."
+                                    "Maybe you forgot to implement a config migration, or the migration failed. " +
+                                    "Cause: ${e.message}",
                             )
                         }
                     } else {
@@ -182,21 +184,17 @@ class ConfigManager {
 
                 logger.log("Loaded $fileName from file")
             } catch (e: Exception) {
-                logger.log(e.stackTraceToString())
                 val backupFile = file.resolveSibling("$fileName-${SimpleTimeMark.now().toMillis()}-backup.json")
-                logger.log("Exception while reading $file. Will load blank $fileName and save backup to $backupFile")
-                logger.log("Exception was $e")
+                logger.logError(
+                    "Exception while reading $file. Will load blank $fileName and save backup to $backupFile",
+                    e,
+                )
                 try {
                     file.copyTo(backupFile)
                 } catch (e: Exception) {
-                    logger.log("Could not create backup for $fileName file")
-                    logger.log(e.stackTraceToString())
+                    logger.logError("Could not create backup for $fileName file", e)
                 }
             }
-        }
-
-        if (output == defaultValue) {
-            logger.log("Setting $fileName to be blank as it did not exist. It will be saved once something is written to it")
         }
         if (output == null) {
             logger.log("Setting $fileName to be blank as it was null. It will be saved once something is written to it")
@@ -231,8 +229,7 @@ class ConfigManager {
                 "fileName" to fileName,
             )
         } catch (e: IOException) {
-            logger.log("Could not save $fileName file to $file")
-            logger.log(e.stackTraceToString())
+            logger.logError("Could not save $fileName file to $file", e)
         }
     }
 
@@ -293,6 +290,8 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
 }
 
 class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanniMod.feature) {
+    val isDev by lazy { ContributorManager.isSelfDeveloper() }
+
     override fun createOptionGui(
         processedOption: ProcessedOption,
         field: Field,
@@ -312,6 +311,12 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanni
 
         EnforcedConfigValues.isBlockedFromEditing(extraPath)?.let { extraMessage ->
             return GuiOptionEditorBlocked(default, extraMessage)
+        }
+
+        if (!isDev) {
+            if (field.isAnnotationPresent(OnlyDebug::class.java)) {
+                return GuiOptionEditorHidden(default)
+            }
         }
 
         return default

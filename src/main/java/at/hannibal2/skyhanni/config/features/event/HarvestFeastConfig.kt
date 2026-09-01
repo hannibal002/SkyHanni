@@ -18,7 +18,15 @@ class HarvestFeastConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var displayCurrentCrops: Boolean = true
+    var displayCurrentCrops: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Show outside Garden",
+        desc = "Display the current in-season Harvest Feast crops outside of the Garden."
+    )
+    @ConfigEditorBoolean
+    var showOutsideGarden: Boolean = false
 
     @Expose
     @ConfigOption(

@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.SharePolicy
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastJson
@@ -18,13 +17,15 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -33,9 +34,9 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -43,11 +44,11 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.coroutines.sync.Mutex
 import net.minecraft.network.chat.Component
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlinx.coroutines.sync.Mutex
 
 @SkyHanniModule
 object HarvestFeastManager {
@@ -56,12 +57,12 @@ object HarvestFeastManager {
     private val config get() = SkyHanniMod.feature.event.feast
 
     private const val MONTH_MIDDLE_DAY = 18
-    private val CURRENT_CROPS_SLOTS = listOf(12, 13, 14)
+    private val CURRENT_CROPS_SLOTS = listOf(11, 12, 14, 15)
     private val ALL_CROPS_SLOTS = 27..44
     private val isCurrentOutdated get() = isOutdated(currentFeastData) && isDataAvailable()
 
-    private val mainMenuInventoryDetector by lazy { InventoryDetector(feastInventoryPattern) }
-    private val allCropsInventoryDetector by lazy { InventoryDetector(allCropsInventoryPattern) }
+    private val mainMenuInventoryDetector by lazy { InventoryDetector { feastInventoryPattern } }
+    private val allCropsInventoryDetector by lazy { InventoryDetector { allCropsInventoryPattern } }
 
     private var currentFeastData: EliteFeastData? = null
         set(value) {
@@ -137,7 +138,7 @@ object HarvestFeastManager {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!mainMenuInventoryDetector.isInside()) return
         if (!isCurrentOutdated) return
-        event.container.slots.find { it.item.hoverName.string.removeColor().contains("all crops", ignoreCase = true) }
+        event.container.slots.find { it.item.cleanName.contains("all crops", ignoreCase = true) }
             ?.highlight(Color(255, 100, 100, 100))
     }
 
@@ -156,16 +157,12 @@ object HarvestFeastManager {
     }
 
     private fun readAllCrops(items: Map<Int, SafeItemStack>) {
-        val current = readCurrentActiveCrops(items).takeIf { it.size == 3 } ?: return
+        val current = readCurrentActiveCrops(items).takeIf { it.size == 4 } ?: return
         val next = readCropTimestamps(items)
 
         val sendData = EliteFeastJson.of(
             current = current.map { it.cropName },
-            next = next
-                .mapNotNull { (crop, value) ->
-                    value?.let { crop.cropName to it }
-                }
-                .toMap(),
+            next = next.filterNotNullValues().map { it.key.cropName to it.value }.toMap(),
             isGrandFeast = assumeGrandFeast(),
         )
 
@@ -230,12 +227,14 @@ object HarvestFeastManager {
 
     private fun readCurrentActiveCrops(stacks: Map<Int, SafeItemStack>): List<CropType> {
         val filteredStacks = stacks.filterKeys { it in CURRENT_CROPS_SLOTS }
-        val current = filteredStacks.mapNotNull { CropType.getByNameOrNull(it.value.hoverName.string.removeColor()) }
+        val current = filteredStacks.mapNotNull { CropType.getByNameOrNull(it.value.cleanName) }
+        // Can happen when calling Ted outside of harvest feast
+        if (current.isEmpty()) return emptyList()
 
-        if (current.size != 3) {
+        if (current.size != 4) {
             ErrorManager.logErrorStateWithData(
                 "Error reading current Harvest Feast crops.",
-                "current harvest feast crops not 3",
+                "current harvest feast crops not 4",
                 "current crops" to current,
             )
         }
@@ -247,8 +246,8 @@ object HarvestFeastManager {
         val outputMap = CropType.entries.associateWith { null }.toMutableMap<CropType, SimpleTimeMark?>()
 
         items.filterKeys { it in ALL_CROPS_SLOTS }.forEach { (_, stack) ->
-            val crop = CropType.getByNameOrNull(stack.hoverName.string.removeColor())
-            val lore = stack.getLoreComponent().map { it.string.removeColor() }
+            val crop = CropType.getByNameOrNull(stack.cleanName)
+            val lore = stack.getCleanLore()
             willBeInSeasonPattern.firstMatcher(lore) {
                 groupOrNull("time")?.let { timeStr ->
                     val time = TimeUtils.getDurationOrNull(timeStr)
@@ -377,10 +376,12 @@ object HarvestFeastManager {
         addString("§7(§b${duration.format()}§7)")
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay() {
         if (!config.displayCurrentCrops) return
         if (isCurrentOutdated) return
+        @Suppress("IsInIslandEarlyReturn")
+        if (!GardenApi.inGarden() && !config.showOutsideGarden) return
         if (!isDataAvailable()) return
         val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Current Active Crops")

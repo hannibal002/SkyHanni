@@ -10,4 +10,9 @@ class CustomLoadoutConfig {
     @ConfigOption(name = "Keybinds", desc = "")
     @Accordion
     val keybinds: LoadoutKeybindConfig = LoadoutKeybindConfig()
+
+    @Expose
+    @ConfigOption(name = "Highlighting", desc = "")
+    @Accordion
+    val highlighting: LoadoutHighlightingConfig = LoadoutHighlightingConfig()
 }
