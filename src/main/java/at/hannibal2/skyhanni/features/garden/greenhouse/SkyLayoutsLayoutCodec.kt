@@ -144,15 +144,17 @@ internal object SkyLayoutsLayoutCodec {
     }
 
     private fun layoutFromCells(cells: List<String?>): SkyShardsLayoutCodec.Layout =
-        SkyShardsLayoutCodec.Layout(cells.mapIndexedNotNull { index, cropId ->
-            cropId ?: return@mapIndexedNotNull null
-            SkyShardsLayoutCodec.Placement(
-                cropId = normalizeId(cropId),
-                row = index / GRID_SIZE,
-                column = index % GRID_SIZE,
-                target = false,
-            )
-        })
+        SkyShardsLayoutCodec.Layout(
+            cells.mapIndexedNotNull { index, cropId ->
+                cropId ?: return@mapIndexedNotNull null
+                SkyShardsLayoutCodec.Placement(
+                    cropId = normalizeId(cropId),
+                    row = index / GRID_SIZE,
+                    column = index % GRID_SIZE,
+                    target = false,
+                )
+            },
+        )
 
     private fun shortValue(token: Char): Int = SHORT_ALPHABET.indexOf(token).also {
         require(it >= 0) { "The SkyLayouts short code contains an invalid character: $token" }

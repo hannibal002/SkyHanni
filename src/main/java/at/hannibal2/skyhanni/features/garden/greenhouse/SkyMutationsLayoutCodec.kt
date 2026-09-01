@@ -16,23 +16,25 @@ internal object SkyMutationsLayoutCodec {
         require(entries.size() <= GRID_CELLS) { "The SkyMutations layout contains too many entries." }
 
         val occupied = mutableSetOf<Pair<Int, Int>>()
-        return SkyShardsLayoutCodec.Layout(entries.map { element ->
-            val entry = element.asJsonArray
-            require(entry.size() >= 4) { "A SkyMutations layout entry is incomplete." }
-            val sourceX = entry[0].asInt
-            val row = entry[1].asInt
-            require(sourceX in 0 until GRID_SIZE && row in 0 until GRID_SIZE) {
-                "A SkyMutations placement is outside the Greenhouse grid."
-            }
-            val column = GRID_SIZE - 1 - sourceX
-            require(occupied.add(row to column)) { "The SkyMutations layout contains duplicate placements." }
-            SkyShardsLayoutCodec.Placement(
-                cropId = normalizeId(entry[2].asString),
-                row = row,
-                column = column,
-                target = entry[3].asInt == 0,
-            )
-        })
+        return SkyShardsLayoutCodec.Layout(
+            entries.map { element ->
+                val entry = element.asJsonArray
+                require(entry.size() >= 4) { "A SkyMutations layout entry is incomplete." }
+                val sourceX = entry[0].asInt
+                val row = entry[1].asInt
+                require(sourceX in 0 until GRID_SIZE && row in 0 until GRID_SIZE) {
+                    "A SkyMutations placement is outside the Greenhouse grid."
+                }
+                val column = GRID_SIZE - 1 - sourceX
+                require(occupied.add(row to column)) { "The SkyMutations layout contains duplicate placements." }
+                SkyShardsLayoutCodec.Placement(
+                    cropId = normalizeId(entry[2].asString),
+                    row = row,
+                    column = column,
+                    target = entry[3].asInt == 0,
+                )
+            },
+        )
     }
 
     private fun extractCode(input: String): String {
@@ -71,6 +73,7 @@ internal object SkyMutationsLayoutCodec {
             return decompress(input.length) { ALPHABET.indexOf(input[it]) }
         }
 
+        @Suppress("ReturnCount")
         private fun decompress(length: Int, nextValue: (Int) -> Int): String? {
             val dictionary = mutableListOf("0", "1", "2")
             var enlargeIn = 4

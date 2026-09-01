@@ -40,6 +40,7 @@ import java.util.UUID
 import kotlin.math.floor
 
 @SkyHanniModule
+@Suppress("LargeClass")
 object GreenhouseMutationBlueprint {
 
     private val config get() = SkyHanniMod.feature.garden.greenhouse
