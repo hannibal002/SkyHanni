@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.combat.mobsconfig
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.replaceWithBoolean
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.generic.lineconfigs.LineToArachne
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
