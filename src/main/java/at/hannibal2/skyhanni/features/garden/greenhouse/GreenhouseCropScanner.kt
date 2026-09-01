@@ -44,9 +44,18 @@ internal object GreenhouseCropScanner {
     }
 
     fun skyShardsCropIdAt(position: LorenzVec): String? {
-        for (yOffset in -VARIABLE_HEIGHT_SEARCH_RADIUS..VARIABLE_HEIGHT_SEARCH_RADIUS) {
-            position.add(y = yOffset).getBlockStateAt().block.skyShardsCropId()?.let { return it }
-        }
+        val blockCropId = preferredCropId(
+            (-VARIABLE_HEIGHT_SEARCH_RADIUS..VARIABLE_HEIGHT_SEARCH_RADIUS).mapNotNull { yOffset ->
+                position.add(y = yOffset).getBlockStateAt().block.skyShardsCropId()
+            },
+        )
+        if (blockCropId != null && blockCropId != "wheat") return blockCropId
+
+        val floatingCropId = floatingCropIdAt(position)
+        return preferredCropId(listOfNotNull(blockCropId, floatingCropId))
+    }
+
+    private fun floatingCropIdAt(position: LorenzVec): String? {
         getEntitiesInBox<ArmorStand>(position, FLOATING_CROP_ID_SEARCH_RADIUS) { stand ->
             stand.isInCropColumn(position)
         }.forEach { stand ->
@@ -55,6 +64,10 @@ internal object GreenhouseCropScanner {
         }
         return null
     }
+
+    /** Wild Rose's initial model includes decorative wheat in the same planting cell. */
+    internal fun preferredCropId(cropIds: List<String>): String? =
+        cropIds.firstOrNull { it == "wild_rose" } ?: cropIds.firstOrNull()
 
     /**
      * Finds a crop represented by its own named head, even when its grid cell is also covered by a mutation.

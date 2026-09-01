@@ -492,6 +492,12 @@ object GreenhouseMutationBlueprint {
 
     internal fun activeLayoutName(plotId: Int): String? = activeLayoutMap()?.get(plotId)
 
+    internal fun hasCropAt(plot: GardenPlot, category: CropCategory, position: LorenzVec): Boolean =
+        activeBlueprint(plot)?.importedCells.orEmpty().any { cell ->
+            !cell.target && cell.cropCategory() == category &&
+                cell.worldPosition(plot, cropBlock = true).toBlockPos() == position.toBlockPos()
+        }
+
     internal fun loadLayout(plotId: Int, name: String) {
         if (name !in layouts()) return
         activeLayoutMap()?.set(plotId, name)

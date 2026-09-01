@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test.garden
 
 import at.hannibal2.skyhanni.features.garden.greenhouse.CropCategory
+import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseCropScanner
 import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseDetectedMutation
 import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseGridScanner
 import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseMutation
@@ -41,6 +42,12 @@ class GreenhouseGridScannerTest {
         assertEquals(CropCategory.WILD_ROSE, CropCategory.fromCropId("wild_rose"))
         assertEquals(CropCategory.SUNFLOWER, CropCategory.fromCropId("moonflower"))
         assertEquals(CropCategory.MUSHROOM, CropCategory.fromCropId("brown_mushroom"))
+    }
+
+    @Test
+    fun `wild rose wins when decorative wheat occupies the same crop cell`() {
+        assertEquals("wild_rose", GreenhouseCropScanner.preferredCropId(listOf("wheat", "wild_rose")))
+        assertEquals("wild_rose", GreenhouseCropScanner.preferredCropId(listOf("wild_rose", "wheat")))
     }
 
     @Test

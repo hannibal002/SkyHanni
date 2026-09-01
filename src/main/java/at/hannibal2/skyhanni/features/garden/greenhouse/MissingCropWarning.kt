@@ -159,6 +159,13 @@ object MissingCropWarning {
             )
             add(Renderable.table(table, xSpacing = 7, ySpacing = 1))
             add(Renderable.text(combinedMissingLine()))
+            add(
+                Renderable.clickable(
+                    "§c[Clear Unique Crop Data]",
+                    tips = listOf("§7Click to clear remembered unique crops and reset this checklist."),
+                    onLeftClick = ::resetGreenhouseCropData,
+                ),
+            )
         }
         checklistDisplay = Renderable.vertical(content, spacing = 1)
     }
@@ -196,15 +203,20 @@ object MissingCropWarning {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.missingCropWarning || !isInGreenhouse()) return
-        if (GardenPlotApi.getCurrentPlot()?.id != missingCropWaypointsPlotId) return
+        val plot = GardenPlotApi.getCurrentPlot()?.takeIf { it.id == missingCropWaypointsPlotId } ?: return
         for ((category, position) in missingCropWaypoints) {
+            if (GreenhouseMutationBlueprint.hasCropAt(plot, category, position)) continue
             event.drawWaypointFilled(
                 position,
                 LorenzColor.RED.toColor(),
                 seeThroughBlocks = true,
                 beacon = true,
             )
-            event.drawDynamicText(position.add(y = 1), "§cMissing ${category.displayName}", 1.5)
+            event.drawDynamicText(
+                position.add(x = 0.5, y = 1.2, z = 0.5),
+                "§cMissing ${category.displayName}",
+                1.5,
+            )
         }
     }
 
