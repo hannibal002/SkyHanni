@@ -29,5 +29,10 @@ open class LineToConfig(
     @ConfigOption(name = "Line Color", desc = "Color of the Line.")
     @ConfigEditorColour
     var color: ChromaColour = defaultColor
-    // This Color should be redefined per Feature, defaults to Yellow Color since it's the Skyhanni Color I, guess.
+    // This Color should be redefined using a class per Feature, defaults to Yellow Color since it's the SkyHanni Color.
+    /*
+    If you do not redefine this using a class a config fix which adds values i.e. moves a width & enabled toggle but does not move a color
+    gson will create the color with no arguments & create a Yellow line.
+     */
+
 }

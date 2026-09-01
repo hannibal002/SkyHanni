@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.dungeon
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.generic.LineToConfig
+import at.hannibal2.skyhanni.config.generic.lineconfigs.LineToFelSkull
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -53,7 +53,7 @@ class ObjectHighlighterConfig {
         @Expose
         @ConfigOption(name = "Line To Fel Skulls", desc = "")
         @Accordion
-        val line: LineToConfig = LineToConfig(defaultColor = ChromaColour.fromStaticRGB(255, 0, 255, 200))
+        val line: LineToFelSkull = LineToFelSkull()
 
         @Expose
         @ConfigOption(name = "Highlight Fels Skull", desc = "Highlights fels that are not active uses same Color as above line.")
@@ -67,8 +67,8 @@ class ObjectHighlighterConfig {
         @HandleEvent
         private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             val path = "dungeon.objectHighlighter"
-            event.move(143, "$path.fel.line", "$path.fel.line.showLine")
-            event.move(143, "$path.fel.color", "$path.fel.line.color")
+            event.move(146, "$path.fel.line", "$path.fel.line.showLine")
+            event.move(146, "$path.fel.color", "$path.fel.line.color")
         }
     }
 }

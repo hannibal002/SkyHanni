@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.config.features.slayer.endermen
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.generic.LineToConfig
+import at.hannibal2.skyhanni.config.generic.lineconfigs.EndermanSlayerLineConfigs
+import at.hannibal2.skyhanni.config.generic.lineconfigs.SlayerLineConfigs
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -26,12 +26,12 @@ class EndermanConfig {
     @Expose
     @ConfigOption(name = "Line To Nukekubi Skulls", desc = "")
     @Accordion
-    val lineToNukekebi: LineToConfig = LineToConfig(defaultColor = LorenzColor.GOLD.toChromaColor())
+    val lineToNukekebi: EndermanSlayerLineConfigs.LineToNukekebi = EndermanSlayerLineConfigs.LineToNukekebi()
 
     @Expose
     @ConfigOption(name = "Line To Boss", desc = "")
     @Accordion
-    val lineToBoss: LineToConfig = LineToConfig(defaultColor = LorenzColor.AQUA.toChromaColor())
+    val lineToBoss: SlayerLineConfigs.SlayerLineDefaultOff = SlayerLineConfigs.SlayerLineDefaultOff()
 
     @Expose
     @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer.")
@@ -49,12 +49,10 @@ class EndermanConfig {
 
         @HandleEvent
         private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-
             event.move(3, "slayer.endermanHighlightNukekebi", "slayer.endermen.highlightNukekebi")
-            event.move(143, "slayer.endermen.drawLineToNukekebi", "slayer.endermen.lineToNukekebi")
-            event.move(143, "slayer.endermen.lineToBoss", "slayer.enderman.lineToBoss.showLine")
-            event.move(143, "slayer.enderman.slayerLineWidth", "slayer.enderman.lineToBoss.lineWidth")
-
+            event.move(146, "slayer.endermen.drawLineToNukekebi", "slayer.endermen.lineToNukekebi.showLine")
+            event.move(146, "slayer.endermen.lineToBoss", "slayer.endermen.lineToBoss.showLine")
+            event.move(146, "slayer.endermen.slayerLineWidth", "slayer.endermen.lineToBoss.lineWidth")
         }
     }
 }

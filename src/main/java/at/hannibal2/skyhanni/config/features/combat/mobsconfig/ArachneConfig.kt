@@ -4,9 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.replaceWithBoolean
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.generic.LineToConfig
+import at.hannibal2.skyhanni.config.generic.lineconfigs.LineToArachne
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -23,7 +22,7 @@ class ArachneConfig {
         @Expose
         @ConfigOption(name = "Line To Arachne", desc = "")
         @Accordion
-        val line: LineToConfig = LineToConfig(defaultColor = LorenzColor.RED.toChromaColor(), defaultWidth = 5)
+        val line: LineToArachne = LineToArachne()
 
         @Expose
         @ConfigOption(name = "Highlight", desc = "Highlight the Arachne boss in red.")
@@ -85,13 +84,13 @@ class ArachneConfig {
             val oldArachnePath = "combat.mobs"
             val newArachneBossPath = "$oldArachnePath.arachneSettings.boss"
             val newArachneKeeperPath = "$oldArachnePath.arachneSettings.keeper"
-            event.move(143, "$oldArachnePath.lineToArachne", "$newArachneBossPath.line.showLine")
-            event.move(143, "$oldArachnePath.lineToArachneWidth", "$newArachneBossPath.line.lineWidth")
-            event.move(143, "$oldArachnePath.showArachneSpawnTimer", "$newArachneBossPath.showSpawnTimer")
-            event.move(143, "$oldArachnePath.arachneKillTimer", "$newArachneBossPath.killTimer")
-            event.move(143, "$oldArachnePath.hideNameTagArachneMinis", "$newArachneBossPath.hideNameTagOfBroods")
-            event.move(143, "$oldArachnePath.arachneKeeperHighlight", "$newArachneKeeperPath.arachneKeeperHighlight")
-            event.transform(143, oldArachnePath) { element ->
+            event.move(146, "$oldArachnePath.lineToArachne", "$newArachneBossPath.line.showLine")
+            event.move(146, "$oldArachnePath.lineToArachneWidth", "$newArachneBossPath.line.lineWidth")
+            event.move(146, "$oldArachnePath.showArachneSpawnTimer", "$newArachneBossPath.showSpawnTimer")
+            event.move(146, "$oldArachnePath.arachneKillTimer", "$newArachneBossPath.killTimer")
+            event.move(146, "$oldArachnePath.hideNameTagArachneMinis", "$newArachneBossPath.hideNameTagOfBroods")
+            event.move(146, "$oldArachnePath.arachneKeeperHighlight", "$newArachneKeeperPath.arachneKeeperHighlight")
+            event.transform(146, oldArachnePath) { element ->
                 val oldEnabled = element.asJsonObject.get("arachneBossHighlighter").asBoolean
                 if (!oldEnabled) {
                     element.asJsonObject.replaceWithBoolean(".arachneSettings.boss.bossHighlight", false)

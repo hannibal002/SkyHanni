@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.replaceWithBoolean
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeConfig
@@ -11,6 +10,7 @@ import at.hannibal2.skyhanni.config.features.slayer.spider.SpiderConfig
 import at.hannibal2.skyhanni.config.features.slayer.vampire.VampireConfig
 import at.hannibal2.skyhanni.features.slayer.HideSlayerSpawnParticles.SpawnParticles
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -180,7 +180,7 @@ class SlayerConfig {
     @SkyHanniModule
     companion object {
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
             val oldPath = "slayer."
             val remainingKillsPath = "${oldPath}slayerRemainingKills."
@@ -188,27 +188,33 @@ class SlayerConfig {
             event.move(138, "${oldPath}remainingKillsLevel", "${remainingKillsPath}includeMobLevel")
             event.move(138, "${oldPath}remainingKillsHealth", "${remainingKillsPath}includeMobHealth")
             event.move(138, "${oldPath}remainingKillsPosition", "${remainingKillsPath}remainingKillsPosition")
-            event.transform(143, "slayer") { element ->
-                if (element.isJsonObject) {
-                    val elementObj = element.asJsonObject
-                    val oldHighlightEnabled = elementObj.get("slayerMinibossHighlight")
-
-                    if (oldHighlightEnabled != null) {
-                        if (oldHighlightEnabled.asBoolean) {
-                            elementObj.replaceWithBoolean(".miniboss.slayerMinibossHighlight", true)
-                            elementObj.replaceWithBoolean(".miniboss.cocoonHighlight", true)
-                        }
-                    }
-                    val oldMinibossLineEnabled = elementObj.get("slayerMinibossLine").asBoolean
-                    if (oldMinibossLineEnabled) {
-                        elementObj.replaceWithBoolean(".miniboss.minibossLine.showLine", true)
-                        elementObj.replaceWithBoolean(".miniboss.cocoonLine.showLine", true)
-                    }
-                    val width = elementObj.get("slayerMinibossLineWidth")
-                    elementObj.remove(".miniboss.minibossLine.lineWidth")
-                    elementObj.add(".miniboss.minibossLine.lineWidth", width)
-                    elementObj.remove(".miniboss.cocoonLine.lineWidth")
-                    elementObj.add(".miniboss.cocoonLine.lineWidth", width)
+            event.transform(146, "${oldPath}slayerMinibossHighlight") { element ->
+                val enabled = JsonPrimitive(element.asString != "OFF")
+                event.add(146, "${oldPath}miniboss.slayerMinibossHighlight") {
+                    enabled
+                }
+                event.add(146, "${oldPath}miniboss.cocoonHighlight") {
+                    enabled
+                }
+                element
+            }
+            event.transform(146, "${oldPath}slayerMinibossLine") { element ->
+                val enabled = JsonPrimitive(element.asString != "OFF")
+                event.add(146, "${oldPath}miniboss.minibossLine.showLine") {
+                    enabled
+                }
+                event.add(146, "${oldPath}miniboss.cocoonLine.showLine") {
+                    enabled
+                }
+                element
+            }
+            event.transform(146, "${oldPath}slayerMinibossLineWidth") { element ->
+                val width = JsonPrimitive(element.asInt)
+                event.add(146, "${oldPath}miniboss.minibossLine.lineWidth") {
+                    width
+                }
+                event.add(146, "${oldPath}miniboss.cocoonLine.lineWidth") {
+                    width
                 }
                 element
             }

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.slayer.vampire
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.generic.LineToConfig
+import at.hannibal2.skyhanni.config.generic.lineconfigs.SlayerLineConfigs
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -32,7 +32,7 @@ class VampireConfig {
     @Expose
     @ConfigOption(name = "Line from Crosshair To Boss Head.", desc = "")
     @Accordion
-    val line: LineToConfig = LineToConfig(defaultColor = ChromaColour.fromStaticRGB(255, 0, 88, 255))
+    val line: SlayerLineConfigs.SlayerLineDefaultOff = SlayerLineConfigs.SlayerLineDefaultOff()
 
     @Expose
     @ConfigOption(name = "Transparency", desc = "Choose the transparency of the color.")
@@ -70,9 +70,9 @@ class VampireConfig {
         @HandleEvent
         private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             val path = "slayer.vampire"
-            event.move(143, "$path.drawLine", "$path.line.showLine")
-            event.move(143, "$path.lineColor", "$path.line.color")
-            event.move(143, "$path.lineWidth", "$path.line.lineWidth")
+            event.move(146, "$path.drawLine", "$path.line.showLine")
+            event.move(146, "$path.lineColor", "$path.line.color")
+            event.move(146, "$path.lineWidth", "$path.line.lineWidth")
         }
     }
 }

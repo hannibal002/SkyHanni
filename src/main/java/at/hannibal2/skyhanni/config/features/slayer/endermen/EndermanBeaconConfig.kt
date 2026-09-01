@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.slayer.endermen
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.generic.LineToConfig
+import at.hannibal2.skyhanni.config.generic.lineconfigs.EndermanSlayerLineConfigs
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -17,7 +17,7 @@ class EndermanBeaconConfig {
     @Expose
     @ConfigOption(name = "Show a Line to Crosshair From Beacon", desc = "")
     @Accordion
-    val line: LineToConfig = LineToConfig(defaultColor = ChromaColour.fromStaticRGB(255, 0, 88, 255))
+    val line: EndermanSlayerLineConfigs.LineToBeacon = EndermanSlayerLineConfigs.LineToBeacon()
 
     @Expose
     @ConfigOption(
@@ -59,9 +59,9 @@ class EndermanBeaconConfig {
             event.move(3, "slayer.endermanBeaconConfig.lneColor", "slayer.endermen.endermanBeaconConfig.lineColor")
             event.move(3, "slayer.endermanBeaconConfig.lineWidth", "slayer.endermen.endermanBeaconConfig.lineWidth")
             event.move(9, "slayer.enderman.endermanBeaconConfig", "slayer.endermen.beacon")
-            event.move(143, "slayer.endermen.beacon.showLine", "slayer.endermen.beacon.line.showLine")
-            event.move(143, "slayer.endermen.beacon.lineColor", "slayer.endermen.beacon.line.color")
-            event.move(143, "slayer.endermen.beacon.lineWidth", "slayer.endermen.beacon.line.lineWidth")
+            event.move(146, "slayer.endermen.beacon.showLine", "slayer.endermen.beacon.line.showLine")
+            event.move(146, "slayer.endermen.beacon.lineColor", "slayer.endermen.beacon.line.color")
+            event.move(146, "slayer.endermen.beacon.lineWidth", "slayer.endermen.beacon.line.lineWidth")
         }
     }
 }
