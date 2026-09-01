@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
 import at.hannibal2.skyhanni.utils.ItemCategory
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -505,7 +505,7 @@ object HideNotClickableItems {
         }
 
         val sellable = clickToSellPattern.anyMatches(stack.getLore()) ||
-            (stack.getItemId() != "PET" && (stack.getInternalNameOrNull()?.getNpcPriceOrNull() ?: 0.0) > 0)
+            (stack.getItemId() != "PET" && (stack.getInternalNameOrNull()?.getNpcPrice() ?: 0.0) > 0)
         if (!sellable) {
             hideReason = "This item cannot be sold at the NPC!"
             return true
