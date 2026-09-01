@@ -50,7 +50,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.hover
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
-import net.minecraft.world.item.ItemStack
 import java.util.UUID
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -545,7 +544,7 @@ object PetStorageApi {
     }
 
     private fun toggleSummon(
-        clickedItem: ItemStack,
+        clickedItem: SafeItemStack,
         currentPetUuid: UUID?,
         clickedPetUuid: UUID?,
         clickedPetData: PetData,
