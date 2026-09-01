@@ -75,11 +75,15 @@ object PetStorageApi {
     private val mainMenuInventory = InventoryDetector(
         checkInventoryName = {
             if (!PetStoragePatterns.mainPetMenuNamePattern.matches(it)) return@InventoryDetector false
-            // Forge pets menu is also called "Pets", but doesn't have this item
-            val titleItem = InventoryUtils.getItemAtSlotIndex(4) ?: return@InventoryDetector false
-            return@InventoryDetector PetStoragePatterns.mainPetMenuTitleItemNamePattern.matches(titleItem.cleanName)
+            return@InventoryDetector extraPetMenuCheck()
         }
     )
+
+    // Forge pets menu is also called "Pets", but doesn't have this item
+    private fun extraPetMenuCheck(): Boolean {
+        val titleItem = InventoryUtils.getItemAtSlotIndex(4) ?: return false
+        return PetStoragePatterns.mainPetMenuTitleItemNamePattern.matches(titleItem.cleanName)
+    }
 
     private fun isPetWidgetUnavailable(): Boolean = IslandType.CATACOMBS.isInIsland()
 
@@ -213,9 +217,13 @@ object PetStorageApi {
     fun inMainPetMenuName(): Boolean = mainMenuInventory.isInside()
 
     fun petMenuPageNumber(inventoryName: String): Int? {
+        if (!extraPetMenuCheck()) return null
         PetStoragePatterns.mainPetMenuNamePattern.matchMatcher(inventoryName) {
-            val petPage = groupOrNull("currentpage") ?: return null
-            return petPage.toInt()
+            var petPage = groupOrNull("currentpage")
+            if (petPage == null) {
+                petPage = groupOrNull("currentalternatepage") ?: return 1
+            }
+            return petPage.formatInt()
         }
         return null
     }

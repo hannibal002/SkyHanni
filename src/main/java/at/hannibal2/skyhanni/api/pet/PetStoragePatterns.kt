@@ -18,8 +18,8 @@ internal object PetStoragePatterns {
      * REGEX-TEST: (6/6) Pets: "e"
      */
     val mainPetMenuNamePattern by patternGroup.pattern(
-        "menu.gui.name",
-        "(?:\\((?<currentpage>\\d+)\\/\\d+\\) )?Pets(?:: \"(?<search>.*)\")?(?: \\(\\d+\\/\\d+\\))? ?",
+        "menu.gui.name.new",
+        "(?:\\((?<currentpage>\\d+)\\/\\d+\\) )?Pets(?:: \"(?<search>.*)\")?(?: \\((?<currentalternatepage>\\d+)\\/\\d+\\))? ?",
     )
 
     /**
