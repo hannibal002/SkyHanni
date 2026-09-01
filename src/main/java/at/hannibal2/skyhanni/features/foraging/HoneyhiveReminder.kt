@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllHelper
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllApi
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationCondition
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -56,19 +56,18 @@ object HoneyhiveReminder {
 
     @HandleEvent(onlyOnIsland = IslandType.TORRHUS_CANYON)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!config.enabled) return
+        val message = event.cleanMessage
 
-        if (!currentlyNavigating && hiveLootedPattern.matches(event.cleanMessage)) {
-            val location = LocationUtils.playerLocation()
+        when {
+            config.enabled && !currentlyNavigating && hiveLootedPattern.matches(message) -> {
+                val location = LocationUtils.playerLocation()
+                startHiveNavigation("You looted a honeyhive, want to collect the rest?", location)
+            }
 
-            startHiveNavigation("You looted a honeyhive, want to collect the rest?", location)
-
-            return
+            config.queenBeeNotification && queenBeePattern.matches(message) -> {
+                TitleManager.sendTitle("§6Honeyhive Instantly Refilled!")
+            }
         }
-
-        if (!config.queenBeeNotification) return
-        if (!queenBeePattern.matches(event.cleanMessage)) return
-        TitleManager.sendTitle("§6Honeyhive Instantly Refilled!")
     }
 
     @HandleEvent
@@ -120,7 +119,7 @@ object HoneyhiveReminder {
             actionName = "navigate to all Honeyhives",
             action = {
                 currentlyNavigating = true
-                NavigateAllHelper.navigateAll(
+                NavigateAllApi.navigateAll(
                     nodes,
                     GraphNodeTag.HONEYHIVE.displayName,
                     GraphNodeTag.HONEYHIVE.color.toColor(),

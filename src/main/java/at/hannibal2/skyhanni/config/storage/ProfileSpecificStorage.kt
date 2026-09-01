@@ -76,6 +76,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
+import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.network.chat.Component
@@ -105,6 +106,14 @@ class ProfileSpecificStorage(
 
     @Expose
     var crimsonIsleFaction: FactionType? = null
+
+    /** Written and read by [at.hannibal2.skyhanni.data.CurrencyApi]. */
+    @Expose
+    var currencies: MutableMap<SkyblockCurrency, Long> = enumMapOf()
+
+    /** Written and read by [at.hannibal2.skyhanni.data.CurrencyApi]. */
+    @Expose
+    var essences: MutableMap<NeuInternalName, Long> = mutableMapOf()
 
     // features
     // - combat
@@ -754,6 +763,17 @@ class ProfileSpecificStorage(
 
         @Expose
         var riftSlots: MutableList<SafeItemStack?> = CurrentEquipmentApi.getEmptyEquipment()
+    }
+
+    @Expose
+    var bazaarOrders: BazaarOrdersStorage = BazaarOrdersStorage()
+
+    class BazaarOrdersStorage {
+        @Expose
+        var buyOrders: MutableMap<NeuInternalName, Int> = mutableMapOf()
+
+        @Expose
+        var sellOffers: MutableMap<NeuInternalName, Int> = mutableMapOf()
     }
 
     // - foraging

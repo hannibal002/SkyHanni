@@ -25,7 +25,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Sack Change** chat message hider. - hannibal2
     + Enable this option instead of Hypixel's own setting to hide the chat message while enabling mods to utilize sack
       data for future features.
-+ Adds chat symbols such as iron man/bingo/nether faction like SBA had/has. - CalMWolfs
++ Adds chat symbols such as Ironman/Bingo/Nether faction like SBA had/has. - CalMWolfs
     + Will not break with emblems.
     + Optional if left or right side of name.
     + Should not break with other mods.
@@ -36,7 +36,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Rarity text to pet drop messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1136)
 + Bits Gained Chat Message. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1487)
 + Option to reorder or hide every part of a player chat message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
-    + Parts to move around: SkyBlock Level, Emblem, player name, guild rank, private island rank, crimson faction, iron man mode, bingo level and Private Island Guest.
+    + Parts to move around: SkyBlock Level, Emblem, player name, guild rank, private island rank, crimson faction, Ironman mode, bingo level and Private Island Guest.
     + Player messages impacted by this: all chat, party, guild, private chat, /show.
     + This might break hover/click on chat actions (Will be fixed later).
 + Hide Level Brackets. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
@@ -159,6 +159,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Croesus Unopened Chest Count Overlay for Kuudra and Dungeons. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4846)
 + Croesus Profit Overlay and Highlight most profitable chest. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4857)
 + Added Blood Move Message for Dungeon Blood Camp. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/5276)
++ Added Dungeon Item Quality as Stack Size to Item Numbers. - RiskWondering (https://github.com/hannibal002/SkyHanni/pull/6223)
 
 </details>
 <details open><summary>
@@ -321,6 +322,18 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Loadout Keybinds. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6013)
 + Added Option To Move `Insert Item Into Sack` button back to original placement. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5874)
 + Block Overriding Rare Reforges in Blacksmith and Hex. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5856)
++ Added NPC Trade Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6365)
+    + Highlights items in NPC trade menus that you can buy right now.
+    + Also shows the price, the number you own and the total cost in the item lore.
++ Added an option to highlight how full each lobby is in the SkyBlock Hub Selector. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6207)
+
+### Bazaar
+
++ Added Hide Order Owner. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6364)
+    + Hides the `By:` line in the Bazaar order inventory, but only while every order and offer in it belongs to you.
+    + Hypixel only sends that line while you are in a Co-op.
++ Added Hide Trade Partners. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6364)
+    + Hides the list of players that traded with your Bazaar orders and offers.
 
 </details>
 <details open><summary>
@@ -488,7 +501,6 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Sends a message to party chat when a rare sea creature is caught.
 + Mute Banshee screams. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/5007)
 + Flay/Soul Whip Close Particle Hider. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5094)
-+ Added Sea Creature Health Overlay. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
 + Added Sea Creature Health Overlay. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
 + Added Sea Creature Kill Time. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
 + Added Sea Creature Lootshare Sphere. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
@@ -962,6 +974,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added option to change the pest spawn sound. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4580)
   + Modes are Default, Muted, Custom, and Plumber.
 + Added option to show crops instead of tools in Farming Toolkit menu. - Growling_Grizzly (https://github.com/hannibal002/SkyHanni/pull/5657)
+
+### Greenhouse
+
++ Added a link to the Sky Mutations website. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6467)
+    + Shows up in the Carpenter inventory in the Greenhouse and in the Crop Analyzer in the Secret Lab.
+    + Clicking the item opens the website, which offers useful information about mutations.
 
 </details>
 <details open><summary>
@@ -1922,6 +1940,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added /shnavall. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6251)
     + Navigate to all occurrences of a target on an island.
     + May be useful for new points of interest on Honey Hives (Torrhus Canyon), and the Bells and Hideyho (Safari).
++ Added support for Minecraft 26.2. - Luna (https://github.com/hannibal002/SkyHanni/pull/5894)
 
 </details>
 <details open><summary>
