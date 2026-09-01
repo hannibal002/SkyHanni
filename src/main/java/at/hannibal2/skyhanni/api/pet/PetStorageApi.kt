@@ -50,6 +50,7 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.hover
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
+import net.minecraft.world.item.ItemStack
 import java.util.UUID
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -523,27 +524,42 @@ object PetStorageApi {
         val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
         when (event.clickedButton) {
             1 -> { // Right click - remove pet from menu
-                clickedPetUuid ?: return
-                petStorage?.pets?.removeIf { it.uuid == clickedPetUuid }
-                if (currentPetUuid == clickedPetUuid) {
-                    CurrentPetApi.clearCurrentPet()
-                }
+                if (remove(clickedPetUuid, currentPetUuid)) return
             }
 
             0 -> { // Left click - if not a shift click, summon/un-summon pet
-                if (KeyboardManager.isShiftKeyDown()) return
-                lastExactPetMenuClick = SimpleTimeMark.now()
-                if (clickedItem.isCurrentPetStack() || currentPetUuid == clickedPetUuid) {
-                    CurrentPetApi.clearCurrentPet()
-                } else {
-                    if (clickedPetUuid != null) petStorage?.pets?.addOrReplace(clickedPetData)
-                    CurrentPetApi.assertFoundCurrentData(clickedPetData, CurrentPetApi.PetDataAssertionSource.MENU)
-                }
+                if (toggleSummon(clickedItem, currentPetUuid, clickedPetUuid, clickedPetData)) return
             }
 
             else -> return
         }
         jsonNeedsSave = true
+    }
+
+    private fun toggleSummon(
+        clickedItem: ItemStack,
+        currentPetUuid: UUID?,
+        clickedPetUuid: UUID?,
+        clickedPetData: PetData,
+    ): Boolean {
+        if (KeyboardManager.isShiftKeyDown()) return true
+        lastExactPetMenuClick = SimpleTimeMark.now()
+        if (clickedItem.isCurrentPetStack() || currentPetUuid == clickedPetUuid) {
+            CurrentPetApi.clearCurrentPet()
+        } else {
+            if (clickedPetUuid != null) petStorage?.pets?.addOrReplace(clickedPetData)
+            CurrentPetApi.assertFoundCurrentData(clickedPetData, CurrentPetApi.PetDataAssertionSource.MENU)
+        }
+        return false
+    }
+
+    private fun remove(clickedPetUuid: UUID?, currentPetUuid: UUID?): Boolean {
+        clickedPetUuid ?: return true
+        petStorage?.pets?.removeIf { it.uuid == clickedPetUuid }
+        if (currentPetUuid == clickedPetUuid) {
+            CurrentPetApi.clearCurrentPet()
+        }
+        return false
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
