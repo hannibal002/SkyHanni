@@ -189,7 +189,7 @@ object HarpFeatures {
         indexOfFirst.takeIf { it != -1 }?.let {
             val clickType = event.clickType
             event.cancel()
-            InventoryUtils.clickSlot(it, event.container.containerId, mouseButton = event.clickedButton, mode = clickType)
+            InventoryUtils.clickSlot(it, event.container.containerId, event.rawButton(), mode = clickType)
         }
     }
 
