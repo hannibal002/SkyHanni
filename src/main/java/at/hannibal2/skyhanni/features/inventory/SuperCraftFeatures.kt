@@ -31,7 +31,7 @@ object SuperCraftFeatures {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.superCraftGFS) return
         val craftedItem = parseCraftedItem(event.message) ?: return
         if (!SackApi.sackListInternalNames.contains(craftedItem.internalName.asString())) return

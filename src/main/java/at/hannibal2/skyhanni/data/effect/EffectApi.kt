@@ -198,12 +198,14 @@ object EffectApi {
                 EffectDurationChangeEvent(effect, EffectDurationChangeType.REMOVE, null).post()
                 return
             }
-        }
 
-        val effect = getEffectFromGainedMessage(msg) ?: return
-        val changeType = effect.effectChangeType ?: return
-        val duration = effect.effectDuration ?: return
-        EffectDurationChangeEvent(effect, changeType, duration).post()
+            if (effect.effectGainedPattern?.matches(msg) != true) continue
+            val changeType = effect.effectChangeType ?: continue
+            val duration = effect.effectDuration ?: continue
+
+            EffectDurationChangeEvent(effect, changeType, duration).post()
+            return
+        }
     }
 
     internal fun getEffectFromGainedMessage(message: String): NonGodPotEffect? {

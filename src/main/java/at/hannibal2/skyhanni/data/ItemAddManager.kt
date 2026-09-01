@@ -57,14 +57,14 @@ object ItemAddManager {
     private var lastSackInventoryLeave = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventoryName.contains("Sack")) {
             inSackInventory = true
         }
     }
 
     @HandleEvent
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         if (inSackInventory) {
             inSackInventory = false
             lastSackInventoryLeave = SimpleTimeMark.now()
@@ -72,7 +72,7 @@ object ItemAddManager {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSackChange(event: SackChangeEvent) {
+    private fun onSackChange(event: SackChangeEvent) {
 
         if (inSackInventory || lastSackInventoryLeave.passedSince() < 10.seconds) return
 
@@ -80,14 +80,14 @@ object ItemAddManager {
             val change = sackChange.delta
             val internalName = sackChange.internalName
             if (change > 0) {
-                val amount = consumeSuperCraftedAmount(internalName, change)
+                val amount = Source.SACKS.consumeSuperCraftedAmount(internalName, change)
                 if (amount > 0) Source.SACKS.addItem(internalName, amount)
             }
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onItemAdd(event: ItemAddInInventoryEvent) {
+    private fun onItemAdd(event: ItemAddInInventoryEvent) {
 
         val internalName = event.internalName
         if (internalName == ARCHFIEND_DICE || internalName == HIGH_CLASS_ARCHFIEND_DICE) {
@@ -96,12 +96,12 @@ object ItemAddManager {
             }
         }
 
-        val amount = consumeSuperCraftedAmount(internalName, event.amount)
+        val amount = Source.ITEM_ADD.consumeSuperCraftedAmount(internalName, event.amount)
         if (amount > 0) Source.ITEM_ADD.addItem(internalName, amount)
     }
 
     @HandleEvent
-    fun onShardGain(event: ShardGainEvent) {
+    private fun onShardGain(event: ShardGainEvent) {
         if (event.amount < 0) return
         Source.SHARD.addItem(event.shardInternalName, event.amount)
     }
@@ -113,13 +113,13 @@ object ItemAddManager {
     private val recentItems = mutableMapOf<ItemAddEvent, SimpleTimeMark>()
 
     @HandleEvent
-    fun onItemAdd(event: ItemAddEvent) {
+    private fun onItemAdd(event: ItemAddEvent) {
         recentItems[event] = SimpleTimeMark.now()
         recentItems.evictOldestEntry(15)
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Recent Item Adds")
         if (recentItems.isEmpty()) return event.addIrrelevant("no items added")
 
@@ -132,7 +132,7 @@ object ItemAddManager {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shdebugrecentitemadds") {
             description = "Shows recent item additions."
             category = CommandCategory.DEVELOPER_DEBUG
@@ -151,23 +151,24 @@ object ItemAddManager {
     }
 
     private var lastDiceRoll = SimpleTimeMark.farPast()
-    private val superCraftedItemAmounts = TimeLimitedCache<NeuInternalName, Int>(30.seconds)
+    private val superCraftedItemAmounts = TimeLimitedCache<Pair<NeuInternalName, Source>, Int>(30.seconds)
 
-    private fun consumeSuperCraftedAmount(internalName: NeuInternalName, amount: Int): Int {
-        val superCraftedAmount = superCraftedItemAmounts[internalName] ?: return amount
+    private fun Source.consumeSuperCraftedAmount(internalName: NeuInternalName, amount: Int): Int {
+        val key = internalName to this
+        val superCraftedAmount = superCraftedItemAmounts[key] ?: return amount
         val remainingSuperCraftedAmount = superCraftedAmount - amount
         if (remainingSuperCraftedAmount > 0) {
-            superCraftedItemAmounts[internalName] = remainingSuperCraftedAmount
+            superCraftedItemAmounts[key] = remainingSuperCraftedAmount
             return 0
         }
-        superCraftedItemAmounts.remove(internalName)
+        superCraftedItemAmounts.remove(key)
         return -remainingSuperCraftedAmount
     }
 
     private const val DICE_ACHIEVEMENT = "100 dice rolls"
 
     @HandleEvent
-    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+    private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             "Professional Gambler".asComponent(),
             componentBuilder {
@@ -184,7 +185,7 @@ object ItemAddManager {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (diceRollChatPattern.matches(event.message)) {
             lastDiceRoll = SimpleTimeMark.now()
             val achievement = AchievementManager.getAchievement(DICE_ACHIEVEMENT)
@@ -192,6 +193,9 @@ object ItemAddManager {
         }
         val (internalName, amount) = parseCraftedItem(event.message) ?: return
         if (!SackApi.sackListInternalNames.contains(internalName.asString())) return
-        superCraftedItemAmounts[internalName] = (superCraftedItemAmounts[internalName] ?: 0) + amount
+        for (source in listOf(Source.ITEM_ADD, Source.SACKS)) {
+            val key = internalName to source
+            superCraftedItemAmounts[key] = (superCraftedItemAmounts[key] ?: 0) + amount
+        }
     }
 }

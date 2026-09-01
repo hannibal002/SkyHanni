@@ -30,12 +30,10 @@ import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
@@ -44,7 +42,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -82,27 +79,21 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
     /**
-     * REGEX-TEST: RARE DROP! Mutant Nether Wart x9 (+134)
-     * REGEX-TEST: PET DROP! Slug (+78)
-     * REGEX-TEST: RARE DROP! Wings of Harmony Vinyl (+139.5)
-     * REGEX-TEST: RARE DROP! Not Just a Pest Vinyl (Cocoaleech)
-     * REGEX-TEST: RARE DROP! DynaMITES Vinyl (+130)
-     * REGEX-FAIL: RARE CROP! Cane Knot (+139.5)
+     * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §8x9 §e(§e+134)
+     * REGEX-TEST: §6§lPET DROP! §r§6Slug §e(§e+78)
+     * REGEX-TEST: §r§6§lPET DROP! §r§6Slug §r§e(+140)
+     * REGEX-TEST: §6§lPET DROP! §6Slug §e(§e+145)
+     * REGEX-TEST: §6§lRARE DROP! §aWings of Harmony Vinyl §e(§e+139.5)
+     * REGEX-TEST: §6§lRARE DROP! §r§aNot Just a Pest Vinyl §r§6(Cocoaleech)
+     * REGEX-TEST: §6§lRARE DROP! §aDynaMITES Vinyl §e(§e+130)
+     * REGEX-FAIL: §6§lRARE CROP! §aCane Knot §e(§e+139.5)
      */
     // Harvest Feast drops are handled elsewhere; they're added here if determined to come from a pest.
     // This pattern intentionally does not match them.
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "(?:RARE|PET) DROP! (?<item>.+?)(?: x(?<amount>[\\d,]+))? " +
-            "\\((?:\\+[\\d.,]+${SkyblockStat.OVERBLOOM.hypixelIcon}|Cocoaleech)\\)",
-    )
-
-    /**
-     * REGEX-TEST: WOW! [MVP+] Eisengolem found a Dung Dye!
-     */
-    private val dyeDropPattern by patternGroup.pattern(
-        "dye.drop",
-        "^WOW! (?<player>.+) found an? (?<item>.+ Dye)!$",
+        "(?:§r)?§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>[\\d,]+))? " +
+            "(?:§.)*\\((?:§.)?(?:\\+[\\d.,]+${SkyblockStat.OVERBLOOM.hypixelIcon}|Cocoaleech)\\)",
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
@@ -244,15 +235,10 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             if (shouldAddKill) addKill(pest)
         }
 
-        pestRareDropPattern.matchStyledMatcher(chatComponent) {
-            val itemComponent = componentOrThrow("item")
-            val itemName = itemComponent.string
-            val internalName = NeuInternalName.fromItemNameOrNull(itemName)
-                ?: LorenzRarity.getByComponent(itemComponent, itemName)
-                    ?.let { PetUtils.petWithRarityToInternalName(itemName, it) }
-                ?: return@matchStyledMatcher
-            val pest = PestType.getByItemInternalNameOrNull(internalName) ?: return@matchStyledMatcher
-            val amount = matcher.group("amount")?.formatInt() ?: 1
+        pestRareDropPattern.matchMatcher(message) {
+            val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
+            val pest = PestType.getByItemInternalNameOrNull(internalName) ?: return@matchMatcher
+            val amount = groupOrNull("amount")?.formatInt() ?: 1
 
             addPestItem(pest, internalName, amount)
 
@@ -264,8 +250,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             // Pests always have guaranteed loot, therefore there's no need to add kill here
         }
 
-        dyeDropPattern.matchMatcher(cleanMessage) {
-            if (!group("player").endsWith(PlayerUtils.getName())) return@matchMatcher
+        RareCropTracker.dyeDropPattern.matchMatcher(cleanMessage) {
+            if (group("player") != PlayerUtils.getName()) return@matchMatcher
             if (group("item") != "Dung Dye") return@matchMatcher
             addPestItem(PestType.UNKNOWN, DUNG_DYE, 1)
         }
@@ -391,8 +377,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
         // Get a list of all that have been killed in the last 2 seconds, it will
         // want to be the most recent one that was killed.
-        val (pest, killTime) = lastPestKillTimes.maxByOrNull { it.value } ?: return
-        if (killTime.passedSince() > 2.seconds) return
+        val pest = lastPestKillTimes.minByOrNull { it.value }?.key ?: return
         val roundedCoins = coins.roundToInt()
         addCoins(pest, roundedCoins, command = false)
         FarmingProfitTracker.addPestCoins(roundedCoins)

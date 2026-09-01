@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -96,7 +97,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
      * REGEX-TEST: RARE DROP! You dropped 48x Enchanted Melon Slice!
      * REGEX-TEST: UNCOMMON DROP! You dropped 24x Enchanted Melon Slice!
      */
-    private val rngDrop by patternGroup.pattern(
+    internal val rngDrop by patternGroup.pattern(
         "drop",
         "^(?<rarity>[\\w ]+)! You dropped (?<amount>\\d+)x (?<crop>[\\w ]+)!",
     )
@@ -117,7 +118,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
         "^GONE! Your CROP FEVER has been cured!",
     )
 
-    fun isCropFeverStartMessage(message: String): Boolean = cropFeverStart.matcher(message).matches()
+    internal fun isCropFeverStartMessage(message: String): Boolean = cropFeverStart.matches(message)
 
     private val config get() = GardenApi.config.cropFeverTracker
     private val blocksBrokenCache: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
@@ -125,7 +126,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     private var cropFeverCurrentCrop: CropType? = null
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.cleanMessage
         cropFeverStart.matchMatcher(message) {
             startCropFever()
@@ -154,7 +155,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onCropBreak(event: CropClickEvent) {
+    private fun onCropBreak(event: CropClickEvent) {
         blocksBrokenCache.addOrPut(event.crop, 1)
         // multi crop support if people farm multiple crops during 1 crop fever
         if (isCropFever) {
@@ -170,7 +171,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5) || blocksBrokenCache.isEmpty()) return
 
         val iterator = blocksBrokenCache.entries.iterator()
@@ -189,14 +190,14 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    private fun onWorldChange(event: WorldChangeEvent) {
         update()
         if (!isCropFever) return
         stopCropFever()
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.text) {
             update()
         }
@@ -350,7 +351,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetcropfevertracker") {
             aliases = listOf("shresetcft")
             description = "Resets the Crop Fever Tracker"

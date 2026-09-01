@@ -243,8 +243,7 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         displayAmount: Long,
     ) = buildList {
         add(internalName.repoItemName)
-        val formattedAmount = formatItemAmount(displayAmount)
-        if (formattedAmount != displayAmount.addSeparators()) {
+        if (shouldShowExactItemAmount(displayAmount)) {
             add("§7Exact amount: §e${displayAmount.addSeparators()}x")
         }
         add("")
@@ -269,6 +268,8 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
     }
 
     protected open fun formatItemAmount(amount: Long): String = amount.addSeparators()
+
+    protected open fun shouldShowExactItemAmount(amount: Long): Boolean = false
 
     fun addTotalProfit(
         profit: Double,

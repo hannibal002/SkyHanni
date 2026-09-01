@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.garden.FarmingProfitTrackerConfig.DisplayStat
 import at.hannibal2.skyhanni.config.features.garden.FarmingProfitTrackerConfig.TrackedSource
 import at.hannibal2.skyhanni.features.garden.pests.PestType
-import at.hannibal2.skyhanni.features.garden.tracker.FarmingProfitTracker.Data
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -19,27 +18,23 @@ object FarmingProfitTrackerStats {
 
     private val config get() = SkyHanniMod.feature.garden.farmingProfitTracker
 
-    fun addStats(list: MutableList<Searchable>, data: Data) {
-        list.addConfiguredStats(data)
-    }
-
-    private fun MutableList<Searchable>.addConfiguredStats(data: Data) {
+    fun addStats(list: MutableList<Searchable>, data: FarmingProfitTrackerData) {
         config.displayedStats.forEach { stat ->
             when (stat) {
-                DisplayStat.CROPS_TRACKED -> addCropAmountLine(data)
-                DisplayStat.BLOCKS_BROKEN -> addBlocksBrokenLine(data)
-                DisplayStat.RARE_CROP_DROPS -> addRareCropLine(data)
-                DisplayStat.BLESSED_DROPS -> addBlessedLine(data)
-                DisplayStat.CROP_FEVERS -> addCropFeversLine(data)
-                DisplayStat.CROP_FEVER_DROPS -> addCropFeverLine(data)
-                DisplayStat.PESTS_KILLED -> addPestLine(data)
-                DisplayStat.VISITORS_SERVED -> addVisitorsLine(data)
-                DisplayStat.BOUNTIFUL_COINS -> addBountifulLine(data)
+                DisplayStat.CROPS_TRACKED -> list.addCropAmountLine(data)
+                DisplayStat.BLOCKS_BROKEN -> list.addBlocksBrokenLine(data)
+                DisplayStat.RARE_CROP_DROPS -> list.addRareCropLine(data)
+                DisplayStat.BLESSED_DROPS -> list.addBlessedLine(data)
+                DisplayStat.CROP_FEVERS -> list.addCropFeversLine(data)
+                DisplayStat.CROP_FEVER_DROPS -> list.addCropFeverLine(data)
+                DisplayStat.PESTS_KILLED -> list.addPestLine(data)
+                DisplayStat.VISITORS_SERVED -> list.addVisitorsLine(data)
+                DisplayStat.BOUNTIFUL_COINS -> list.addBountifulLine(data)
             }
         }
     }
 
-    private fun MutableList<Searchable>.addCropAmountLine(data: Data) {
+    private fun MutableList<Searchable>.addCropAmountLine(data: FarmingProfitTrackerData) {
         val total = data.getTotalCropAmount()
         if (total == 0L) return
         add(
@@ -60,7 +55,7 @@ object FarmingProfitTrackerStats {
         )
     }
 
-    private fun MutableList<Searchable>.addBlocksBrokenLine(data: Data) {
+    private fun MutableList<Searchable>.addBlocksBrokenLine(data: FarmingProfitTrackerData) {
         val total = data.getTotalBlocksBroken()
         if (total == 0L) return
         add(
@@ -73,7 +68,7 @@ object FarmingProfitTrackerStats {
         )
     }
 
-    private fun MutableList<Searchable>.addRareCropLine(data: Data) {
+    private fun MutableList<Searchable>.addRareCropLine(data: FarmingProfitTrackerData) {
         val rareDrops = data.getRareCropDropsByType()
         if (rareDrops.isNotEmpty()) {
             val total = rareDrops.values.sum()
@@ -89,7 +84,7 @@ object FarmingProfitTrackerStats {
         addSeasoningLine(data)
     }
 
-    private fun MutableList<Searchable>.addSeasoningLine(data: Data) {
+    private fun MutableList<Searchable>.addSeasoningLine(data: FarmingProfitTrackerData) {
         val total = data.getTotalSeasoningDrops()
         if (total == 0L) return
         add(
@@ -100,7 +95,7 @@ object FarmingProfitTrackerStats {
         )
     }
 
-    private fun MutableList<Searchable>.addBlessedLine(data: Data) {
+    private fun MutableList<Searchable>.addBlessedLine(data: FarmingProfitTrackerData) {
         val total = data.getTotalBlessedDrops()
         if (total == 0L) return
         add(
@@ -113,7 +108,7 @@ object FarmingProfitTrackerStats {
         )
     }
 
-    private fun MutableList<Searchable>.addCropFeversLine(data: Data) {
+    private fun MutableList<Searchable>.addCropFeversLine(data: FarmingProfitTrackerData) {
         val total = data.getTotalCropFevers()
         if (total == 0L) return
         add(
@@ -126,7 +121,7 @@ object FarmingProfitTrackerStats {
         )
     }
 
-    private fun MutableList<Searchable>.addCropFeverLine(data: Data) {
+    private fun MutableList<Searchable>.addCropFeverLine(data: FarmingProfitTrackerData) {
         val total = data.getTotalCropFeverDrops()
         if (total == 0L) return
         add(
@@ -139,7 +134,7 @@ object FarmingProfitTrackerStats {
         )
     }
 
-    private fun MutableList<Searchable>.addPestLine(data: Data) {
+    private fun MutableList<Searchable>.addPestLine(data: FarmingProfitTrackerData) {
         val total = data.getTotalPestKills()
         if (total == 0L) return
         add(
@@ -153,7 +148,7 @@ object FarmingProfitTrackerStats {
         )
     }
 
-    private fun MutableList<Searchable>.addVisitorsLine(data: Data) {
+    private fun MutableList<Searchable>.addVisitorsLine(data: FarmingProfitTrackerData) {
         if (!data.isShowing(TrackedSource.VISITORS)) return
         val visitorsServed = data.visitorsServed
         val vinylSetsGiven = data.visitorVinylSetsGiven
@@ -214,7 +209,7 @@ object FarmingProfitTrackerStats {
         )
     }
 
-    private fun Data.visitorLineText(visitorsServed: Long, vinylSetsGiven: Long, netValue: Double): String =
+    private fun FarmingProfitTrackerData.visitorLineText(visitorsServed: Long, vinylSetsGiven: Long, netValue: Double): String =
         if (visitorsServed > 0L) {
             "§7Visitors served: §a${visitorsServed.addSeparators()} §7(${signedCoinFormat(netValue)}§7)"
         } else {
@@ -227,7 +222,7 @@ object FarmingProfitTrackerStats {
         else -> "§60"
     }
 
-    private fun MutableList<Searchable>.addBountifulLine(data: Data) {
+    private fun MutableList<Searchable>.addBountifulLine(data: FarmingProfitTrackerData) {
         if (!data.isShowing(TrackedSource.BOUNTIFUL)) return
         val coins = data.bountifulCoins
         if (coins == 0L) return

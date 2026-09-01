@@ -1,21 +1,17 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
@@ -48,45 +44,30 @@ object PurseApi {
      */
     private val auctionHouseSaleClaimPattern by patternGroup.pattern(
         "auctionhouse.saleclaim",
-        "^You collected [\\d,]+ coins from selling .+ in an auction!$",
+        "^You collected (?<coins>[\\d,]+) coins from selling .+ in an auction!$",
     )
 
+    private data class PendingAuctionHouseGain(val coins: Double, val created: SimpleTimeMark)
+
     private var inventoryCloseTime = SimpleTimeMark.farPast()
-    private var lastAuctionHouseCoinClaim = SimpleTimeMark.farPast()
+    private val pendingAuctionHouseGains = mutableListOf<PendingAuctionHouseGain>()
     var currentPurse = 0.0
         private set
 
-    @HandleEvent(onlyOnSkyblock = true)
-    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        val inventoryName = InventoryUtils.openInventoryName()
-        val item = event.item ?: return
-        val itemName = item.cleanName
-
-        if (inventoryName.equalsOneOf("Auction View", "BIN Auction View") && itemName == "Collect Auction") {
-            lastAuctionHouseCoinClaim = SimpleTimeMark.now()
-            return
-        }
-
-        if (inventoryName.equalsOneOf("Your Bids", "Manage Auctions") && itemName == "Claim All") {
-            lastAuctionHouseCoinClaim = SimpleTimeMark.now()
-            return
-        }
-    }
-
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose(event: InventoryCloseEvent) {
         inventoryCloseTime = SimpleTimeMark.now()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (auctionHouseSaleClaimPattern.matches(event.cleanMessage)) {
-            lastAuctionHouseCoinClaim = SimpleTimeMark.now()
+        auctionHouseSaleClaimPattern.matchMatcher(event.cleanMessage) {
+            pendingAuctionHouseGains.add(PendingAuctionHouseGain(group("coins").formatDouble(), SimpleTimeMark.now()))
         }
     }
 
     @HandleEvent
-    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+    private fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         coinsPattern.firstMatcher(event.added) {
             val newPurse = group("coins").formatDouble()
             val diff = newPurse - currentPurse
@@ -109,7 +90,14 @@ object PurseApi {
                 return PurseChangeCause.GAIN_DICE_ROLL
             }
 
-            if (lastAuctionHouseCoinClaim.passedSince() < 5.seconds) {
+            pendingAuctionHouseGains.removeAll { it.created.passedSince() >= 5.seconds }
+            val exactGain = pendingAuctionHouseGains.indexOfFirst { it.coins == diff }
+            if (exactGain != -1) {
+                pendingAuctionHouseGains.removeAt(exactGain)
+                return PurseChangeCause.GAIN_AUCTION_HOUSE
+            }
+            if (pendingAuctionHouseGains.isNotEmpty() && pendingAuctionHouseGains.sumOf { it.coins } == diff) {
+                pendingAuctionHouseGains.clear()
                 return PurseChangeCause.GAIN_AUCTION_HOUSE
             }
 
