@@ -261,7 +261,7 @@ object PetStorageApi {
     private fun SafeItemStack.isCurrentPetStack() = getLore().any { it.contains("Click to despawn") }
 
     @HandleEvent
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!jsonNeedsSave || lastSaved.passedSince() < 30.seconds) return
         SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
         jsonNeedsSave = false
@@ -269,7 +269,7 @@ object PetStorageApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
         if (event.isClear()) {
             if (SkyBlockUtils.lastWorldSwitch.passedSince() < WIDGET_LOAD_GRACE) return
@@ -401,7 +401,7 @@ object PetStorageApi {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         PetStoragePatterns.petItemHeldMessagePattern.matchStyledMatcher(event.chatComponent) {
             val petHeldItemName = componentOrThrow("item").formattedTextForItemLookup()
             val petHeldItem = resolveAppliedPetItemOrNull(petHeldItemName) ?: return
@@ -514,7 +514,7 @@ object PetStorageApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inMainPetMenuName()) return
         if (!event.slotId.isPetStackLocation()) return
         val clickedItem = event.slot?.item.orNull() ?: event.item.orNull() ?: return
@@ -547,7 +547,7 @@ object PetStorageApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         event.readSelectedPetData()
         event.readEquipmentPetData()
         PetStorageExpShare.readInventory(event.inventoryName, event.inventoryItems)
