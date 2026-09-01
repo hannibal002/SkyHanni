@@ -118,6 +118,15 @@ allprojects {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
+
+        exclusiveContent {
+            forRepositories(
+                repositories.maven("https://maven.azureaaron.net/releases"),
+            )
+            filter {
+                includeGroupAndSubgroups("net.azureaaron")
+            }
+        }
     }
 }
 
