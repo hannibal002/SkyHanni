@@ -776,6 +776,9 @@ class ProfileSpecificStorage(
         var sellOffers: MutableMap<NeuInternalName, Int> = mutableMapOf()
     }
 
+    @Expose
+    val notSellableItems: MutableList<String> = mutableListOf()
+
     // - foraging
     @Expose
     val foraging: ForagingStorage = ForagingStorage()
