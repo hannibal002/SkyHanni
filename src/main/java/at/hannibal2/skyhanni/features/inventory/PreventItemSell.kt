@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.item.ItemNotClickableEvent
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -72,6 +74,11 @@ object PreventItemSell {
 
     private fun inASellerInventory(chestName: String, stack: SafeItemStack): Boolean =
         HideNotClickableItemsFeature.isAuctionHouse(chestName) ||
-            HideNotClickableItemsFeature.npcSellable(stack) ||
+            inNpcSellInventory(stack) ||
             HideNotClickableItemsFeature.isTradeMenu(chestName)
+
+    // Rift and Visitors are excluded the same way as in HideNotClickableItemsFeature.hideNpcSell
+    private fun inNpcSellInventory(stack: SafeItemStack): Boolean =
+        !RiftApi.inRift() && ShiftClickNpcSell.inInventory && !VisitorApi.inInventory &&
+            HideNotClickableItemsFeature.npcSellable(stack)
 }
