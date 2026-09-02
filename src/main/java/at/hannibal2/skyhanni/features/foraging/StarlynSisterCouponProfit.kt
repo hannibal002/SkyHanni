@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
-import kotlin.math.round
 
 @SkyHanniModule
 object StarlynSisterCouponProfit {
@@ -41,6 +40,8 @@ object StarlynSisterCouponProfit {
     private var currentSisterType: StarlynSisterType? = null
 
     private var cachedItemData: List<ItemProfitData> = emptyList()
+
+    private val validInventorySlots = (9..44).filter { it % 9 !in setOf(0, 8) }
 
     private data class ItemProfitData(
         val slot: Int,
@@ -139,7 +140,7 @@ object StarlynSisterCouponProfit {
     }
 
     private fun readItem(slot: Int, item: SafeItemStack, sister: StarlynSisterType): ItemProfitData? {
-        if (!isValidSlotNumber(slot)) return null
+        if (slot !in validInventorySlots) return null
 
         val hoverName = item.hoverName.string
         val fixedDisplayName = hoverName.replace("[Lvl 100]", "[Lvl {LVL}]")
@@ -152,7 +153,7 @@ object StarlynSisterCouponProfit {
 
         } ?: return null
 
-        //Avoids showing upgrades in the table
+        // Avoids showing upgrades in the table
         if (internalName.isKnownItem().not()) return null
 
         val itemName = internalName.repoItemName
@@ -169,7 +170,7 @@ object StarlynSisterCouponProfit {
         }
 
         val price = internalName.getPrice()
-        val profit = round((price - totalCost) * 100.0) / 100.0
+        val profit = price - totalCost
         val profitPerCoupon = if (couponAmount > 0) (profit / couponAmount) else 0.0
 
         return ItemProfitData(
@@ -192,8 +193,6 @@ object StarlynSisterCouponProfit {
 
         config.starlynCouponProfitPos.renderRenderables(display, posLabel = "Starlyn Sister's Shop Profit")
     }
-
-    private fun isValidSlotNumber(slot: Int): Boolean = slot in 9..44 && slot % 9 !in setOf(0, 8)
 
     @HandleEvent
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

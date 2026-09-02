@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.foraging.StarlynSisterDetector.createStarlynDetector
@@ -20,7 +19,6 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.seconds
 
-
 @SkyHanniModule
 object StarlynSisterCouponAmount {
 
@@ -36,18 +34,33 @@ object StarlynSisterCouponAmount {
     private val emptyGlassItem = Blocks.STAINED_GLASS_PANE.black().asItem()
 
     private var itemReplaced: Boolean = false
+    private var canReplace: Boolean = false
 
-    fun isEnabled() = config.starlynCouponAmount && starlynInventory.isInside()
+    private fun isEnabled() = config.starlynCouponAmount && starlynInventory.isInside()
 
     private val starlynInventory = createStarlynDetector(
         isEnabled = { config.starlynCouponAmount },
         setSisterType = { currentSisterType = it },
-        onOpen = { _, sister ->
+        onOpen = { event, sister ->
             generateCouponAmountItemStack(sister)
+
+            if (event.inventoryItems[CUSTOM_STACK_LOCATION]?.itemType == emptyGlassItem) {
+                canReplace = true
+            } else {
+                ErrorManager.logErrorStateWithData(
+                    "Unexpected item found in slot $CUSTOM_STACK_LOCATION of Starlyn Shop",
+                    "Unexpected item found in Starlyn Shop Coupon Amount slot",
+                    "slot" to CUSTOM_STACK_LOCATION,
+                    "found item" to event.inventoryItems[CUSTOM_STACK_LOCATION],
+                    "expected item type" to emptyGlassItem,
+                )
+            }
         },
         onClose = {
             couponAmountItemStack = null
-        }
+            canReplace = false
+            itemReplaced = false
+        },
     )
 
     private fun generateCouponAmountItemStack(sisterType: StarlynSisterType) {
@@ -65,25 +78,13 @@ object StarlynSisterCouponAmount {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun replaceItem(event: ReplaceItemEvent) {
-        if (!isEnabled() || event.slot != CUSTOM_STACK_LOCATION) return
-        itemReplaced = false
+        if (!isEnabled() || event.slot != CUSTOM_STACK_LOCATION || !canReplace) return
 
-        if (event.originalItem.itemType == emptyGlassItem) {
-            couponAmountItemStack?.let { stack ->
-                event.replace(stack)
-                itemReplaced = true
-            }
-        } else {
-            ErrorManager.logErrorStateWithData(
-                "Unexpected item found in slot $CUSTOM_STACK_LOCATION of Starlyn Shop",
-                "Unexpected item found in Starlyn Shop Coupon Amount slot",
-                "slot" to CUSTOM_STACK_LOCATION,
-                "found item" to event.originalItem,
-                "expected item type" to emptyGlassItem
-            )
+        couponAmountItemStack?.let { stack ->
+            event.replace(stack)
+            itemReplaced = true
         }
     }
-
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
@@ -96,7 +97,6 @@ object StarlynSisterCouponAmount {
         }
     }
 
-
     @HandleEvent(onlyOnSkyblock = true)
     private fun onSackChange(event: SackChangeEvent) {
         if (!isEnabled()) return
@@ -104,7 +104,7 @@ object StarlynSisterCouponAmount {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated() {
         if (!isEnabled()) return
         generateCouponAmountItemStack(currentSisterType ?: return)
     }
