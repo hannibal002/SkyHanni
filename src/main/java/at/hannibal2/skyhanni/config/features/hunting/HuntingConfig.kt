@@ -70,7 +70,7 @@ class HuntingConfig {
 
     @Expose
     @SearchTag("hideonleaf hideonsun")
-    @ConfigOption(name = "Show next Hideonleaf", desc = "Press this key to show the next Hideonleaf.")
+    @ConfigOption(name = "Show next Shulker", desc = "Press this key to show the route to the next Shulker.")
     @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
     var nextShulkerKeybind: Int = KeyboardManager.KEY_UNKNOWN
 
