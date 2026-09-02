@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class BazaarConfig {
     @Expose
@@ -69,6 +70,7 @@ class BazaarConfig {
     val dailyLimitTrackerPosition: Position = Position(550, 150)
 
     @Expose
+    @SearchTag("clipboard")
     @ConfigOption(
         name = "Re-order Missing Items",
         desc = "Send missing items from cancelled buy orders in chat.\n" +
