@@ -70,7 +70,7 @@ class BazaarConfig {
 
     @Expose
     @ConfigOption(
-        name = "Cancelled Buy Order Clipboard",
+        name = "Re-order Missing Items",
         desc = "Send missing items from cancelled buy orders in chat.\n" +
             "Click on the message to quickly order the same item and amount again.",
     )

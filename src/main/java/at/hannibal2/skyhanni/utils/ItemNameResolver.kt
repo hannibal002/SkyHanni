@@ -34,6 +34,10 @@ object ItemNameResolver {
             return itemNameCache.getOrPut(lowercase) { NeuInternalName.MISSING_ITEM }
         }
 
+        ItemResolutionQuery.attributeNameToInternalName(itemName)?.let {
+            return itemNameCache.getOrPut(lowercase) { it.toInternalName() }
+        }
+
         ItemResolutionQuery.resolveEnchantmentByName(itemName)?.let {
             return itemNameCache.getOrPut(lowercase) { fixEnchantmentName(it.asString()) }
         }

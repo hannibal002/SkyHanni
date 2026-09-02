@@ -19,9 +19,9 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
+import at.hannibal2.skyhanni.utils.ItemNameResolver
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -193,8 +193,7 @@ object BazaarApi {
 
         if (isBazaarOrderInventory(openInvName)) {
             val nameStr = item.cleanName.removePrefix("BUY ").removePrefix("SELL ")
-            val internalName = item.getInternalNameOrNull() ?: NeuInternalName.fromItemNameOrNull(nameStr)
-
+            val internalName = ItemNameResolver.getInternalNameOrNull(nameStr)
 
             if (internalName != null) {
                 if (itemName.contains("SELL", ignoreCase = true)) {
@@ -213,11 +212,9 @@ object BazaarApi {
             OwnInventoryData.ignoreItem(1.seconds) { it == orderOptionProduct }
         }
 
-        if (inBazaarInventory) {
-            if (item.getLore().lastOrNull()?.removeColor() == "Click to buy now!") {
-                // instant buy
-                OwnInventoryData.ignoreItem(1.seconds) { it == lastOpenedProduct }
-            }
+        if (inBazaarInventory && item.getLore().lastOrNull()?.removeColor() == "Click to buy now!") {
+            // instant buy
+            OwnInventoryData.ignoreItem(1.seconds) { it == lastOpenedProduct }
         }
     }
 
@@ -225,7 +222,7 @@ object BazaarApi {
         val buyInstantly = inventoryItems[10] ?: return null
         if (buyInstantly.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aBuy Instantly") return null
         val bazaarItem = inventoryItems[13] ?: return null
-        return NeuInternalName.fromItemName(bazaarItem.hoverName.formattedTextCompatLeadingWhiteLessResets())
+        return ItemNameResolver.getInternalNameOrNull(bazaarItem.cleanName)
     }
 
     private fun updateTaxRate(inventoryItems: Map<Int, SafeItemStack>) {
@@ -298,8 +295,7 @@ object BazaarApi {
             }
         }
 
-        if (isBazaarOrderInventory(inventoryName)) return true
-        return inventoryNamePattern.matches(inventoryName)
+        return isBazaarOrderInventory(inventoryName) || inventoryNamePattern.matches(inventoryName)
     }
 
     @HandleEvent
@@ -329,9 +325,9 @@ object BazaarApi {
         val offers = if (priceSource == SimpleTransactionType.SELL_OFFER) bazaarData.buySummary else bazaarData.sellSummary
         var remaining = count
         var totalPrice = 0.0
-        for (offer in offers) {
-            val takeAmount = offer.amount.coerceAtMost(remaining)
-            totalPrice += takeAmount * offer.pricePerUnit
+        for ((amount, pricePerUnit) in offers) {
+            val takeAmount = amount.coerceAtMost(remaining)
+            totalPrice += takeAmount * pricePerUnit
             remaining -= takeAmount
             if (remaining <= 0) break
         }
