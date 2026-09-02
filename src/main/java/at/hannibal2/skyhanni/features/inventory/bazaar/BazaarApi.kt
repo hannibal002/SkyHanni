@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemNameResolver
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
@@ -212,7 +213,7 @@ object BazaarApi {
             OwnInventoryData.ignoreItem(1.seconds) { it == orderOptionProduct }
         }
 
-        if (inBazaarInventory && item.getLore().lastOrNull()?.removeColor() == "Click to buy now!") {
+        if (inBazaarInventory && item.getCleanLore().lastOrNull() == "Click to buy now!") {
             // instant buy
             OwnInventoryData.ignoreItem(1.seconds) { it == lastOpenedProduct }
         }
