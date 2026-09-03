@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -43,7 +44,11 @@ object BroodmotherFeatures {
     private val config get() = SkyHanniMod.feature.combat.broodmother
     private val spawnAlertConfig get() = config.spawnAlert
 
-    val alertSound get() = SoundUtils.createSound(spawnAlertConfig.alertSound, spawnAlertConfig.pitch, isWarning = true)
+    private val alertSound get() =
+        SoundUtils.createSound(spawnAlertConfig.alertSound, spawnAlertConfig.pitch, isWarning = true)
+
+    @JvmStatic
+    fun playTestSound() = alertSound.playSound()
 
     private var lastStage: StageEntry? = null
     private var currentStage: StageEntry? = null

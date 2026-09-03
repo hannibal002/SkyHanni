@@ -19,7 +19,7 @@ object LowHealthAlert {
     private val soundConfig get() = config.lowHealthAlertSound
     private var lastAlert: TitleContext? = null
 
-    val alertSound get() = SoundUtils.createSound(soundConfig.alertSound, soundConfig.pitch, isWarning = true)
+    private val alertSound get() = SoundUtils.createSound(soundConfig.alertSound, soundConfig.pitch, isWarning = true)
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
