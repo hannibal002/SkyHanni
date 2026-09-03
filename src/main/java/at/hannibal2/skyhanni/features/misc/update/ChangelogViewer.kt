@@ -10,26 +10,17 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.toQueryString
-import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
-import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.ModVersion
-import com.google.gson.Gson
-import moe.nea.libautoupdate.GithubReleaseUpdateSource.GithubRelease
 import java.util.NavigableMap
 import java.util.TreeMap
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.future.await
 
 @SkyHanniModule
 object ChangelogViewer {
-
-    private val gson = Gson()
-
     internal val cache: NavigableMap<ModVersion, Map<String, List<String>>> = TreeMap()
 
     internal var openTime = SimpleTimeMark.farPast()
@@ -78,29 +69,17 @@ object ChangelogViewer {
         when (val updateSource = SkyHanniMod.feature.dev.debug.updateSource.get()) {
             SkyHanniUpdateSource.MODRINTH -> {
                 val source = updateSource.source as ModrinthUpdateSource
-                source.getReleases(includeChangelog = true).await()
-                    ?.forEach { release ->
-                        cache[release.versionNumber] = formatChangelog(release.changelog.orEmpty())
-                    }
-                    ?: error("Changelog Loading Failed")
+                source.getReleases(includeChangelog = true).forEach { release ->
+                    cache[release.versionNumber] = formatChangelog(release.changelog.orEmpty())
+                }
             }
 
             SkyHanniUpdateSource.GITHUB -> {
-                val source = updateSource.source as CustomGithubReleaseUpdateSource
+                val source = updateSource.source as GitHubReleaseUpdateSource
                 buildList {
                     var pageNumber = 1
                     while (true) {
-                        val pagedUrl = source.releaseApiUrl + mapOf(
-                            "per_page" to 100,
-                            "page" to pageNumber,
-                        ).toQueryString()
-                        val (_, jsonObject) = ApiUtils.getJsonResponse(pagedUrl, apiName = "github")
-                            .assertSuccessWithData()
-                            ?: error("Changelog Loading Failed")
-
-                        // We cannot use ConfigManager.gson here because it excludes fields without
-                        // @Expose annotations, and GithubRelease comes from libautoupdate
-                        val page = gson.fromJson<List<GithubRelease>>(jsonObject)
+                        val page = source.getReleases(pageNumber)
 
                         addAll(page)
 
@@ -220,7 +199,6 @@ object ChangelogViewer {
     }
 
     private class CommandContext : CommandContextAwareObject {
-
         override var errorMessage: String? = null
 
         var until: ModVersion? = null
@@ -237,6 +215,5 @@ object ChangelogViewer {
             }
             showChangelog(since, until)
         }
-
     }
 }

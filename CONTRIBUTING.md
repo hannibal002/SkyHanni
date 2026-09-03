@@ -477,9 +477,11 @@ DiscordIPC is a service that SkyHanni uses to send information from SkyBlock to 
 For info on usage, look
 at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
 
-### Auto Updater
+### Update Checker
 
-We use the [auto update library](https://github.com/nea89o/libautoupdate) from nea89.
+SkyHanni does not install updates by itself, it only tells you about them. `UpdateManager` asks an `UpdateSource`
+(Modrinth or GitHub, selectable in the debug config) for the newest release of the configured update stream and points
+you at its download page.
 
 ### Discord Bot
 

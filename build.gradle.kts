@@ -150,11 +150,6 @@ dependencies {
         "org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}"
     )
 
-    shadowImpl(libs.libautoupdate) {
-        exclude(module = "gson")
-    }
-    "minecraftTestClientRuntimeLibraries"(libs.libautoupdate)
-
     testImplementation(libs.junit)
     testRuntimeOnly(libs.junit.launcher)
     testImplementation(libs.mockk)
@@ -371,7 +366,6 @@ tasks.shadowJar {
     exclude("META-INF/*.kotlin_module")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
-    relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("net.hypixel.modapi.tweaker", "at.hannibal2.skyhanni.deps.hypixel.modapi.tweaker")
 }
 // Loom only nests `include`d jars into the default jar task; wire them into the final jar too

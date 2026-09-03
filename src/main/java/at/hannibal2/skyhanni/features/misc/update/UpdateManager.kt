@@ -19,30 +19,21 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
-import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
-import moe.nea.libautoupdate.CurrentVersion
-import moe.nea.libautoupdate.GithubReleaseUpdateData
-import moe.nea.libautoupdate.PotentialUpdate
-import moe.nea.libautoupdate.UpdateContext
-import moe.nea.libautoupdate.UpdateUtils
 import net.minecraft.ChatFormatting
-import net.minecraft.client.Minecraft
 import net.minecraft.world.item.Items
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
-import javax.net.ssl.HttpsURLConnection
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Job
 
 @SkyHanniModule
 object UpdateManager {
@@ -50,20 +41,15 @@ object UpdateManager {
     private val logger = SkyHanniLogger("update_manager")
 
     private val repoReloadCoroutine = CoroutineSettings("update manager repo reload")
+    private val updateCheckCoroutine = CoroutineSettings("update manager update check", timeout = 15.seconds).withIOContext()
 
-    private var _activePromise: CompletableFuture<*>? = null
-    private var activePromise: CompletableFuture<*>?
-        get() = _activePromise
-        set(value) {
-            _activePromise?.cancel(true)
-            _activePromise = value
-        }
+    private var updateCheckJob: Job? = null
 
     var updateState: UpdateState = UpdateState.NONE
         private set
 
     fun getNextVersion(): String? {
-        return potentialUpdate?.update?.versionNumber?.asString
+        return nextUpdate?.version?.asString
     }
 
     @HandleEvent
@@ -74,10 +60,10 @@ object UpdateManager {
         debugConfig.updateSource.whenChanged { _, new ->
             logger.log("Update source changed to $new")
             reset()
-            refreshContext(new)
+            updateSource = new.source
         }
 
-        refreshContext(debugConfig.updateSource.get())
+        updateSource = debugConfig.updateSource.get().source
     }
 
     private var hasCheckedForUpdate = false
@@ -102,14 +88,14 @@ object UpdateManager {
 
     fun reset() {
         updateState = UpdateState.NONE
-        _activePromise = null
-        potentialUpdate = null
+        updateCheckJob = null
+        nextUpdate = null
         hasCheckedForUpdate = false
         logger.log("Reset update state")
     }
 
     fun checkUpdate(force: Boolean = false, forcedUpdateStream: UpdateStream = config.updateStream.get()) {
-        val context = updateContext ?: return
+        val source = updateSource ?: return
         hasCheckedForUpdate = true
 
         if (updateState != UpdateState.NONE) {
@@ -122,45 +108,38 @@ object UpdateManager {
             }
         }
 
-        logger.log("Starting update check (source: ${context.source.javaClass.simpleName}")
+        logger.log("Starting update check (source: ${source.javaClass.simpleName})")
 
-        activePromise = context.checkUpdate(forcedUpdateStream.stream)
-            .orTimeout(15, TimeUnit.SECONDS)
-            .whenCompleteAsync(
-                { update, throwable -> handleUpdateCheckResult(throwable, update, force) },
-                Minecraft.getInstance(),
-            )
+        if (forcedUpdateStream == UpdateStream.BETA && config.updateStream.get() != UpdateStream.BETA) {
+            config.updateStream.set(UpdateStream.BETA)
+        }
+
+        updateCheckJob?.cancel()
+        updateCheckJob = updateCheckCoroutine.launch {
+            val update = source.checkUpdate(forcedUpdateStream)
+            DelayedRun.runNextTick { handleUpdateCheckResult(update, force) }
+        }
     }
 
-    private fun handleUpdateCheckResult(throwable: Throwable?, update: PotentialUpdate?, force: Boolean) {
-        if (throwable != null) {
-            if (throwable is TimeoutException) {
-                ErrorManager.logErrorWithData(throwable, "Update check timed out")
-            } else {
-                ErrorManager.logErrorWithData(throwable, "Update check failed")
-            }
-            return
-        }
+    private fun handleUpdateCheckResult(update: UpdateData?, force: Boolean) {
         logger.log("Update check completed")
         if (updateState != UpdateState.NONE) {
             logger.log("This appears to be the second update check. Ignoring this one")
             return
         }
-        potentialUpdate = update
+        nextUpdate = update
         if (update == null) return
-        if (update.isUpdateAvailable) {
+        if (isOutdatedComparedTo(update.version)) {
             updateState = UpdateState.AVAILABLE
-            ChatUtils.chat("§aSkyHanni found a new update: ${update.update.versionName}.")
-            getDownloadPage(update)?.let { url ->
-                ChatUtils.clickableLinkChat(
-                    "§e§lCLICK HERE §r§eto open the download page.",
-                    url,
-                )
-            }
+            ChatUtils.chat("§aSkyHanni found a new update: ${update.versionName}.")
+            ChatUtils.clickableLinkChat(
+                "§e§lCLICK HERE §r§eto open the download page.",
+                update.downloadPage,
+            )
             ChatUtils.clickableChat(
                 "§e§lCLICK HERE §r§eto view changes in-game.",
                 onClick = {
-                    ChangelogViewer.showChangelog(SkyHanniMod.VERSION, update.update.versionName)
+                    ChangelogViewer.showChangelog(SkyHanniMod.VERSION, update.version.asString)
                 },
             )
         } else if (force) {
@@ -173,68 +152,29 @@ object UpdateManager {
         }
     }
 
-    fun getDownloadPage(update: PotentialUpdate? = potentialUpdate): String? {
+    private fun isOutdatedComparedTo(version: ModVersion): Boolean =
+        debugConfig.alwaysOutdated || SkyHanniMod.modVersion < version
+
+    fun getDownloadPage(): String? {
+        val update = nextUpdate
         if (update == null) {
-            ErrorManager.logErrorWithData(
-                IllegalStateException("Attempted to call getDownloadPage with no potentialUpdate"),
+            ErrorManager.logErrorStateWithData(
                 "Error while getting update download information",
+                "Attempted to call getDownloadPage with no update",
             )
             return null
         }
-        return when (val data = update.update) {
-            is ModrinthUpdateData -> data.htmlUrl
-            is GithubReleaseUpdateData -> data.htmlUrl
-            else -> {
-                ErrorManager.logErrorWithData(
-                    IllegalStateException("Unsupported update data type"),
-                    "Error while getting update download information",
-                    "updateData" to data,
-                )
-                null
-            }
-        }
+        return update.downloadPage
     }
 
-    private fun buildContext(updateSource: SkyHanniUpdateSource) = UpdateContext(
-        updateSource.source,
-        NoOpUpdateTarget,
-        object : CurrentVersion {
-            private val debug get() = debugConfig.alwaysOutdated
-            override fun display(): String = if (debug) "Force Outdated" else SkyHanniMod.VERSION
-
-            override fun isOlderThan(element: JsonElement?): Boolean {
-                if (debug) return true
-                val asString = element?.asString ?: return true
-                val otherVersion = ModVersion.fromString(asString)
-                return SkyHanniMod.modVersion < otherVersion
-            }
-        },
-        SkyHanniMod.MODID,
-    )
-
-    private fun refreshContext(updateSource: SkyHanniUpdateSource) {
-        val newContext = buildContext(updateSource)
-        newContext.cleanup()
-        updateContext = newContext
-    }
-
-    private var updateContext: UpdateContext? = null
-
-    init {
-        UpdateUtils.patchConnection {
-            it.setRequestProperty("User-Agent", SkyHanniMod.userAgent)
-            if (it is HttpsURLConnection) {
-                ApiInternalUtils.patchHttpsRequest(it)
-            }
-        }
-    }
+    private var updateSource: UpdateSource? = null
 
     enum class UpdateState {
         AVAILABLE,
         NONE
     }
 
-    private var potentialUpdate: PotentialUpdate? = null
+    private var nextUpdate: UpdateData? = null
 
     private val releaseStreamPattern = "(?i)(?:full|release)s?".toRegex()
     private val betaStreamPattern = "(?i)(?:beta|latest)s?".toRegex()
