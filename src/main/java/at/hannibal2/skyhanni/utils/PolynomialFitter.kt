@@ -89,12 +89,33 @@ open class BezierFitter(private val degree: Int) {
             return false
         }
         val distToLast = getLastPoint()?.distance(location) ?: return false
-        if (distToLast == 0.0) return false
         if (distToLast > maxDistanceToLast) return false
+        if (isAlreadyUsed(location)) return false
+        if (isMovingBackwards(location)) return false
         if (endCondition(location)) return false
 
         addPoint(location)
         return true
+    }
+
+    /**
+     * Hypixel can send the same particle position more than once. In a lag burst the copies can arrive
+     * interleaved (A, B, A, B), so comparing against the last point alone lets an already used position
+     * back in. A duplicated position makes the fit ill conditioned, with degree 3 the solution can end up
+     * thousands of blocks away.
+     */
+    private fun isAlreadyUsed(location: LorenzVec) = points.any { it.distanceSq(location) < REPEAT_TOLERANCE_SQ }
+
+    /** Assumes a particle path travels away from its first point, so anything not further from it than the last point is dropped. */
+    private fun isMovingBackwards(location: LorenzVec): Boolean {
+        val start = points.firstOrNull() ?: return false
+        val last = points.lastOrNull() ?: return false
+        return start.distanceSq(location) <= start.distanceSq(last)
+    }
+
+    companion object {
+        /** 0.01 blocks, squared. */
+        private const val REPEAT_TOLERANCE_SQ = 0.0001
     }
 }
 
