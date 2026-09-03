@@ -713,9 +713,6 @@ object PetStorageApi {
         this.level <= level &&
         this.skinTag == skinTag
 
-    fun isAutopetMessage(message: String): Boolean =
-        PetStoragePatterns.autoPetMessageColorlessPattern.matches(message.removeColor().removeResets())
-
     fun markDirty() {
         jsonNeedsSave = true
     }

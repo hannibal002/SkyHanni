@@ -43,7 +43,6 @@ object BeachBallCatchHelper {
     fun check(entity: ArmorStand) {
         if (entity.wearingSkullTexture(NORMAL_BEACH_BALL)) {
             predictors.putIfAbsent(entity.id, Predictor(entity.getLorenzVec(), Variant.NORMAL))
-            println("normal detected")
             return
         }
 //         if (entity.wearingSkullTexture(GIANT_BEACH_BALL)) {
