@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.data.ElectionApi.derpy
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobFilter.makeMobResult
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -27,33 +26,32 @@ import net.minecraft.world.entity.animal.pig.Pig
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.Creeper
 import net.minecraft.world.entity.monster.Giant
-import net.minecraft.world.entity.monster.MagmaCube
-import net.minecraft.world.entity.monster.Slime
+import net.minecraft.world.entity.monster.cubemob.MagmaCube
+import net.minecraft.world.entity.monster.cubemob.Slime
 import net.minecraft.world.entity.monster.spider.CaveSpider
 import net.minecraft.world.entity.monster.zombie.Zombie
 import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin
 
 object IslandExceptions {
-
     internal fun islandSpecificExceptions(
         baseEntity: LivingEntity,
         armorStand: ArmorStand?,
         nextEntity: LivingEntity?,
     ): MobData.MobResult? =
         when (SkyBlockUtils.currentIsland) {
-            IslandType.CATACOMBS -> dungeon(baseEntity, armorStand, nextEntity)
-            IslandType.PRIVATE_ISLAND -> privateIsland(armorStand, baseEntity)
-            IslandType.THE_RIFT -> theRift(baseEntity, nextEntity, armorStand)
-            IslandType.CRIMSON_ISLE -> crimsonIsle(baseEntity, armorStand, nextEntity)
-            IslandType.DEEP_CAVERNS -> deepCaverns(baseEntity)
-            IslandType.DWARVEN_MINES -> dwarvenMines(baseEntity)
-            IslandType.CRYSTAL_HOLLOWS -> crystalHollows(baseEntity, armorStand)
-            IslandType.HUB -> hub(baseEntity, armorStand, nextEntity)
-            IslandType.GARDEN -> garden(baseEntity)
-            IslandType.KUUDRA_ARENA -> kuudraArena(baseEntity, nextEntity)
-            IslandType.WINTER -> winterIsland(baseEntity)
-            IslandType.GALATEA -> ModernIslandExceptions.moongladeMarsh(baseEntity, armorStand, nextEntity)
-            IslandType.TORRHUS_CANYON -> ModernIslandExceptions.torrhus(baseEntity, armorStand, nextEntity)
+            CATACOMBS -> dungeon(baseEntity, armorStand, nextEntity)
+            PRIVATE_ISLAND -> privateIsland(armorStand, baseEntity)
+            THE_RIFT -> theRift(baseEntity, nextEntity, armorStand)
+            CRIMSON_ISLE -> crimsonIsle(baseEntity, armorStand, nextEntity)
+            DEEP_CAVERNS -> deepCaverns(baseEntity)
+            DWARVEN_MINES -> dwarvenMines(baseEntity)
+            CRYSTAL_HOLLOWS -> crystalHollows(baseEntity, armorStand)
+            HUB -> hub(baseEntity, armorStand, nextEntity)
+            GARDEN -> garden(baseEntity)
+            KUUDRA_ARENA -> kuudraArena(baseEntity, nextEntity)
+            WINTER -> winterIsland(baseEntity)
+            GALATEA -> ModernIslandExceptions.moongladeMarsh(baseEntity, armorStand, nextEntity)
+            TORRHUS_CANYON -> ModernIslandExceptions.torrhus(baseEntity, armorStand, nextEntity)
 
             else -> null
         }
@@ -129,9 +127,6 @@ object IslandExceptions {
         armorStand: ArmorStand?,
         nextEntity: LivingEntity?,
     ) = when {
-        baseEntity is Slime && MobFilter.heavyPearlPattern.matches(armorStand?.name.formattedTextCompatLessResets()) ->
-            MobData.MobResult.found(MobFactories.special(baseEntity, "Heavy Pearl"))
-
         baseEntity is Pig && nextEntity is Pig -> MobData.MobResult.illegal // Matriarch Tongue
         baseEntity is RemotePlayer && baseEntity.isNpc() && baseEntity.name.string == "BarbarianGuard " ->
             MobData.MobResult.found(Mob(baseEntity, MobCategory.DISPLAY_NPC, name = "Barbarian Guard"))
@@ -270,7 +265,7 @@ object IslandExceptions {
                     it.distanceTo(baseEntity) < 4.0 &&
                     it.wearingSkullTexture(MobFilter.RAT_SKULL_TEXTURE)
             }?.let {
-                MobData.MobResult.found(Mob(baseEntity, category = MobCategory.BASIC, armorStand = it, name = "Rat"))
+                MobData.MobResult.found(Mob(baseEntity, category = BASIC, armorStand = it, name = "Rat"))
             } ?: if (nextEntity is Zombie) MobData.MobResult.notYetFound else null
 
     private fun petCareHandler(baseEntity: LivingEntity): MobData.MobResult {

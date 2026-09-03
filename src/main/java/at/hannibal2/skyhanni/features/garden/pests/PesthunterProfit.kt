@@ -2,68 +2,55 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.LoreCostUtils
+import at.hannibal2.skyhanni.utils.LoreCostUtils.hasTradeLine
+import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object PesthunterProfit {
 
     private val config get() = GardenApi.config.pests.pesthunterShop
-    private val patternGroup = RepoPattern.group("garden.pests.pesthunter")
-    private val DENY_LIST_ITEMS = listOf(
-        "Close",
-        "Pesthunter's Wares",
-        " ",
-    )
     private var display = emptyList<Renderable>()
     private var inInventory = false
-
-    /**
-     * REGEX-TEST: §2100 Pests
-     * REGEX-TEST: §21,500 Pests
-     */
-    private val pestCostPattern by patternGroup.pattern(
-        "garden.pests.pesthunter.cost",
-        "§2(?<pests>[\\d,]+) Pests",
-    )
+    private val PESTS_ITEM = SkyblockCurrency.PESTS.internalName
 
     fun isInInventory() = inInventory
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         inInventory = false
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.profitEnabled) return
         if (event.inventoryName != "Pesthunter's Wares") return
 
-        inInventory = true
-        display = buildRenderables(event.inventoryItems)
+        DelayedRun.runOrNextTick {
+            inInventory = true
+            display = buildRenderables(event.inventoryItems)
+        }
     }
 
     private fun buildRenderables(items: Map<Int, SafeItemStack>) = buildList {
@@ -73,13 +60,12 @@ object PesthunterProfit {
     }
 
     private fun readItem(slot: Int, item: SafeItemStack): DisplayTableEntry? {
-        val itemName = item.hoverName.takeIf {
-            it.string !in DENY_LIST_ITEMS && it.string.trim().isNotEmpty()
-        } ?: return null
-        if (slot == 49) return null
+        val lore = item.getLoreComponent().map { it.formattedTextCompatLessResets() }
+        if (!lore.hasTradeLine()) return null
 
-        val totalCost = getFullCost(getRequiredItems(item)).takeIf { it >= 0 } ?: return null
-        val nameString = itemName.formattedTextCompatLeadingWhiteLessResets()
+        val nameString = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val costs = lore.readLoreCosts(nameString)
+        val totalCost = getFullCost(costs).takeIf { it >= 0 } ?: return null
         val (name, amount) = ItemUtils.readItemAmount(nameString) ?: return null
         val fixedDisplayName = name.replace("[Lvl 100]", "[Lvl {LVL}]")
         val internalName = NeuInternalName.fromItemNameOrNull(fixedDisplayName)
@@ -88,7 +74,7 @@ object PesthunterProfit {
         val itemPrice = (internalName.getPrice() * amount).takeIf { it >= 0 } ?: return null
 
         val profit = itemPrice - totalCost
-        val pestsCost = getPestsCost(item)
+        val pestsCost = costs.firstOrNull { it.internalName == PESTS_ITEM }?.amount ?: 0L
         val profitPerPest = if (pestsCost > 0) profit / pestsCost else 0.0
         val color = if (profitPerPest > 0) "§6" else "§c"
 
@@ -111,28 +97,12 @@ object PesthunterProfit {
         )
     }
 
-    private fun getRequiredItems(item: SafeItemStack): List<String> {
-        val lore = item.getLore().filter { !pestCostPattern.matches(it) }
-
-        val startIndex = lore.indexOf("§7Cost") + 1
-        val endIndex = lore.indexOfFirstOrNull { it.isBlank() && lore.indexOf(it) > startIndex } ?: lore.size
-
-        return lore.subList(startIndex, endIndex).map { it.replace("§8 ", " §8") }
-    }
-
-    private fun getFullCost(requiredItems: List<String>): Double = requiredItems.mapNotNull {
-        ItemUtils.readItemAmount(it)
-    }.sumOf { (name, amount) ->
-        val internalName = NeuInternalName.fromItemNameOrNull(name) ?: return@sumOf 0.0
-        internalName.getPrice() * amount
-    }
-
-    private fun getPestsCost(item: SafeItemStack): Int = pestCostPattern.firstMatcher(item.getLore()) {
-        group("pests")?.formatDoubleOrNull()?.toInt() ?: 0
-    } ?: 0
+    private fun getFullCost(costs: List<LoreCostUtils.LoreCostEntry>): Double = costs
+        .filter { it.internalName != PESTS_ITEM }
+        .sumOf { it.internalName.getPrice() * it.amount }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    private fun onChestGuiRender() {
         if (!inInventory) return
         config.profitPosition.renderRenderables(
             display,
