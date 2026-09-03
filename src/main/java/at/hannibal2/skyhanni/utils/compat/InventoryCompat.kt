@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import at.hannibal2.skyhanni.compat.ReiCompat
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SafeItemStack
@@ -17,6 +16,10 @@ import net.minecraft.world.inventory.Slot
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
+//? if rei_compat {
+/*import at.hannibal2.skyhanni.compat.ReiCompat
+*///?}
+
 fun LocalPlayer.getItemOnCursor(): SafeItemStack? {
     val stack = this.containerMenu.carried
     if (stack.isEmpty) return null
@@ -27,7 +30,6 @@ val ContainerScreen.container: AbstractContainerMenu
     get() = this.menu
 
 object InventoryCompat {
-
     /**
      * Use [at.hannibal2.skyhanni.events.GuiKeyPressEvent.stackUnderCursor] instead of this method
      */
@@ -35,7 +37,11 @@ object InventoryCompat {
         val screen = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return null
         val stack = screen.hoveredSlot?.item
         if (stack != null) return stack
-        return ReiCompat.getHoveredStackFromRei()
+
+        //? if rei_compat {
+        /*return ReiCompat.getHoveredStackFromRei()
+        *///?} else
+        return null
     }
 
     @Suppress("unused")

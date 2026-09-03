@@ -11,7 +11,6 @@ import net.minecraft.util.Util
 *///?}
 
 object SkyHanniRenderLayers {
-
     private val FILLED: RenderType = RenderType.create(
         "skyhanni_filled",
         RenderSetup.builder(SkyHanniRenderPipeline.FILLED()).createRenderSetup(),
@@ -101,7 +100,6 @@ object SkyHanniRenderLayers {
 
     fun getChromaTexturedWithIdentifier(identifier: Identifier) = CHROMA_TEXTURED.apply(identifier)
 
-    fun getChromaStandard(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
-    fun getChromaTextured(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_TEXT()
-
+    fun getChromaStandard(): com.mojang.renderpearl.api.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
+    fun getChromaTextured(): com.mojang.renderpearl.api.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_TEXT()
 }

@@ -1,15 +1,29 @@
 package at.hannibal2.skyhanni.utils.render.uniforms
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.buffers.Std140Builder
 import com.mojang.blaze3d.buffers.Std140SizeCalculator
-import net.minecraft.client.renderer.DynamicUniformStorage
+import com.mojang.renderpearl.api.buffers.GpuBuffer
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice
 import java.nio.ByteBuffer
+
+//? if >= 26.3 {
+import net.minecraft.client.renderer.DynamicGpuDataStorage
+import net.minecraft.client.renderer.DynamicGpuDataStorageMapped
+//?} else {
+/*import net.minecraft.client.renderer.DynamicUniformStorage
+*///?}
 
 class SkyHanniChromaUniform : AutoCloseable {
     private val uniformSize = Std140SizeCalculator().putFloat().putFloat().putFloat().putInt().get()
 
-    val storage = DynamicUniformStorage<UniformValue>("SkyHanni Chroma UBO", uniformSize, 2)
+    //~ if < 26.3 'DynamicGpuDataStorageMapped' -> 'DynamicUniformStorage'
+    val storage = DynamicGpuDataStorageMapped<UniformValue>(
+        "SkyHanni Chroma UBO",
+        uniformSize,
+        //? if >= 26.3
+        GpuBuffer.USAGE_UNIFORM,
+        2,
+    )
 
     fun writeWith(
         chromaSize: Float,
@@ -17,7 +31,8 @@ class SkyHanniChromaUniform : AutoCloseable {
         saturation: Float,
         forwardDirection: Int,
     ): GpuBufferSlice {
-        return storage.writeUniform(
+        //~ if < 26.3 'writeData' -> 'writeUniform'
+        return storage.writeData(
             UniformValue(chromaSize, timeOffset, saturation, forwardDirection),
         )
     }
@@ -37,7 +52,8 @@ class SkyHanniChromaUniform : AutoCloseable {
         val timeOffset: Float,
         val saturation: Float,
         val forwardDirection: Int,
-    ) : DynamicUniformStorage.DynamicUniform {
+        //~ if < 26.3 'DynamicGpuDataStorage.DynamicGpuData' -> 'DynamicUniformStorage.DynamicUniform'
+    ) : DynamicGpuDataStorage.DynamicGpuData {
         override fun write(buffer: ByteBuffer) {
             Std140Builder.intoBuffer(buffer)
                 .putFloat(chromaSize)

@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.pipeline.RenderTarget
-import com.mojang.blaze3d.systems.GpuDevice
-import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.renderpearl.api.commands.RenderPass
+import com.mojang.renderpearl.api.device.GpuDevice
+import com.mojang.renderpearl.api.pipeline.RenderPipeline
 import net.minecraft.client.renderer.RenderPipelines
 import java.util.OptionalDouble
 
@@ -15,7 +15,6 @@ import java.util.Optional
 *///?}
 
 object RenderCompat {
-
     /**
      * The depth of an empty render target. 26.2 renders with a reversed depth range,
      * so "nothing drawn" is 0 rather than 1.
@@ -45,7 +44,8 @@ object RenderCompat {
 
     private fun RenderTarget.findColorAttachment() = this.colorTextureView
 
-    private fun RenderTarget.findDepthAttachment() = if (this.useDepth) this.depthTextureView else null
+    //~ if < 26.3 'hasDepth()' -> 'useDepth'
+    private fun RenderTarget.findDepthAttachment() = if (this.hasDepth()) this.depthTextureView else null
 
     fun GpuDevice.createRenderPass(name: String, framebuffer: RenderTarget): RenderPass {
         val colorAttachment = framebuffer.findColorAttachment() ?: error("color attachment is null")
@@ -58,5 +58,4 @@ object RenderCompat {
             OptionalDouble.empty(),
         )
     }
-
 }

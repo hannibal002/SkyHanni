@@ -16,7 +16,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MouseHandler.class)
 public abstract class MixinMouseHandler {
-
     @Shadow
     private double accumulatedDX;
 
@@ -24,7 +23,7 @@ public abstract class MixinMouseHandler {
     private double accumulatedDY;
 
     @Inject(method = "onMove", at = @At("RETURN"))
-    private void onMouseButton(long window, double x, double y, CallbackInfo ci) {
+    private void onMouseMove(CallbackInfo ci) {
         MouseCompat.setDeltaMouseX(this.accumulatedDX);
         MouseCompat.setDeltaMouseY(this.accumulatedDY);
     }

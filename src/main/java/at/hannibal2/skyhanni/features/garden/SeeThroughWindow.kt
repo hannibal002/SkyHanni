@@ -8,7 +8,12 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
-import org.lwjgl.glfw.GLFW
+
+//? if >= 26.3 {
+import org.lwjgl.sdl.SDLVideo
+//?} else {
+/*import org.lwjgl.glfw.GLFW
+*///?}
 
 @SkyHanniModule
 object SeeThroughWindow {
@@ -61,8 +66,13 @@ object SeeThroughWindow {
 
     private fun setWindowOpacity(alpha: Float): Boolean {
         val handle = Minecraft.getInstance().window.handle()
-        GLFW.glfwGetError(null) // Clear previous error
+
+        //? if >= 26.3 {
+        return SDLVideo.SDL_SetWindowOpacity(handle, alpha)
+        //?} else {
+        /*GLFW.glfwGetError(null) // Clear previous error
         GLFW.glfwSetWindowOpacity(handle, alpha)
         return GLFW.glfwGetError(null) == GLFW.GLFW_NO_ERROR
+        *///?}
     }
 }

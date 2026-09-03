@@ -49,7 +49,8 @@ public abstract class MixinItemFeatureRenderer {
     private RenderType modifyRenderLayer(RenderType layer) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             if (EntityTransparencyManager.getEntityTransparency(livingEntity) == null) return layer;
-            return RenderTypes.glintTranslucent();
+            //~ if < 26.3 'patternedShieldGlint' -> 'glintTranslucent'
+            return RenderTypes.patternedShieldGlint();
         }
         return layer;
     }

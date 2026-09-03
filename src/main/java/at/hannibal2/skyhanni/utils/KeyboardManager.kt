@@ -18,19 +18,18 @@ import org.apache.commons.lang3.SystemUtils
 
 @SkyHanniModule
 object KeyboardManager {
-
     // When a screen closes (e.g. chat closed via Enter), lock Enter so it does not
     // immediately fire as a key click in features that use isKeyClicked().
     @HandleEvent
-    fun onGuiOpen(event: GuiScreenOpenEvent) {
+    private fun onGuiOpen(event: GuiScreenOpenEvent) {
         if (event.gui != null) return
         if (InputConstants.KEY_RETURN.isKeyHeld()) lockedKeys.add(InputConstants.KEY_RETURN)
         if (InputConstants.KEY_NUMPADENTER.isKeyHeld()) lockedKeys.add(InputConstants.KEY_NUMPADENTER)
     }
 
     // InputConstants.UNKNOWN exists, but is not a compile time constant
-    // TODO: For 26.3 This is 0
-    const val KEY_UNKNOWN: Int = -1
+    //~ if < 26.3 '0' -> '-1'
+    const val KEY_UNKNOWN: Int = 0
 
     const val LEFT_MOUSE = InputConstants.MOUSE_BUTTON_LEFT
     const val RIGHT_MOUSE = InputConstants.MOUSE_BUTTON_RIGHT
@@ -44,8 +43,10 @@ object KeyboardManager {
      * Represents whether either the left or right Super key (also known as Windows key) is down.
      * On macOS, this is the Command key.
      */
-    private fun isSuperKeyDown() =
-        InputConstants.KEY_LSUPER.isKeyHeld() || InputConstants.KEY_RSUPER.isKeyHeld()
+    private fun isSuperKeyDown(): Boolean {
+        //~ if < 26.3 'GUI' -> 'SUPER'
+        return InputConstants.KEY_LGUI.isKeyHeld() || InputConstants.KEY_RGUI.isKeyHeld()
+    }
 
     /**
      * Represents whether either the left or right Alt key is down.
@@ -146,7 +147,11 @@ object KeyboardManager {
 
         this == -1 -> false
         MouseCompat.isMouseButton(this) -> MouseCompat.isButtonDown(this)
-        else -> InputConstants.isKeyDown(Minecraft.getInstance().window, this)
+        else -> InputConstants.isKeyDown(
+            //? if < 26.3
+            //Minecraft.getInstance().window,
+            this,
+        )
     }
 
     private val lockedKeys = mutableSetOf<Int>()
@@ -181,7 +186,6 @@ object KeyboardManager {
 
         override fun iterator(): Iterator<KeyMapping> =
             object : Iterator<KeyMapping> {
-
                 var current = w
                 var finished = false
 

@@ -110,5 +110,5 @@ object SignUtils {
     }
 
     private val AbstractSignEditScreen.signText: Array<Component>
-        get() = this.text.getMessages(false)
+        get() = this.text.messages
 }
