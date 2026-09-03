@@ -33,8 +33,12 @@ object CompactorCraftApi {
 
     /** What the craft data says about one base item. */
     sealed interface CraftState {
+        /** Whether a craft exists at all, no matter if it can be started right now. */
+        val hasCraft: Boolean get() = this is Missing || this is Enough
+
         /** The first build has not finished yet, so nothing is known about any item. */
         data object NotLoaded : CraftState
+
 
         /** The item has no single step craft. */
         data object NoCraft : CraftState

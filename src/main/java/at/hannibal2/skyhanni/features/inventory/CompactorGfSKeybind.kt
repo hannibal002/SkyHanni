@@ -48,12 +48,13 @@ object CompactorGfSKeybind {
             if (!slot.isOwnInventory) continue
             val internalName = slot.item.getInternalNameOrNull() ?: continue
 
-            if (isPending(internalName)) {
+            val state = CompactorCraftApi.getCraftState(internalName, amounts[internalName] ?: 0)
+            // A pending request only matters for items that have a craft at all.
+            if (state.hasCraft && isPending(internalName)) {
                 slot.highlight(LorenzColor.YELLOW.addOpacity(OVERLAY_OPACITY))
                 continue
             }
 
-            val state = CompactorCraftApi.getCraftState(internalName, amounts[internalName] ?: 0)
             if (state is Missing) {
                 slot.drawBorder(LorenzColor.GREEN.addOpacity(BORDER_OPACITY))
             } else {
@@ -103,8 +104,8 @@ object CompactorGfSKeybind {
         if (!slot.isOwnInventory) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
-        val pending = isPending(internalName)
         val state = CompactorCraftApi.getCraftState(internalName)
+        val pending = state.hasCraft && isPending(internalName)
         val itemName = event.toolTip.firstOrNull() ?: return
 
         event.toolTip.clear()
