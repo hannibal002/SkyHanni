@@ -48,16 +48,19 @@ object CompactorGfSKeybind {
             if (!slot.isOwnInventory) continue
             val internalName = slot.item.getInternalNameOrNull() ?: continue
 
-            when {
-                isPending(internalName) -> slot.highlight(LorenzColor.YELLOW.addOpacity(OVERLAY_OPACITY))
-                hasMissingAmount(internalName, amounts) -> slot.drawBorder(LorenzColor.GREEN.addOpacity(BORDER_OPACITY))
-                else -> slot.highlight(LorenzColor.DARK_GRAY.addOpacity(OVERLAY_OPACITY))
+            if (isPending(internalName)) {
+                slot.highlight(LorenzColor.YELLOW.addOpacity(OVERLAY_OPACITY))
+                continue
+            }
+
+            val state = CompactorCraftApi.getCraftState(internalName, amounts[internalName] ?: 0)
+            if (state is Missing) {
+                slot.drawBorder(LorenzColor.GREEN.addOpacity(BORDER_OPACITY))
+            } else {
+                slot.highlight(LorenzColor.DARK_GRAY.addOpacity(OVERLAY_OPACITY))
             }
         }
     }
-
-    private fun hasMissingAmount(internalName: NeuInternalName, amounts: Map<NeuInternalName, Int>): Boolean =
-        CompactorCraftApi.getCraftState(internalName, amounts[internalName] ?: 0) is Missing
 
     /** Counted once per frame, so that the state of every slot does not scan the inventory again. */
     private fun countOwnInventory(): Map<NeuInternalName, Int> = buildMap {
@@ -112,16 +115,18 @@ object CompactorGfSKeybind {
             event.toolTip.add("§7${itemName.string}".asComponent())
         }
 
-        val status = statusLine(pending, state) ?: return
         event.toolTip.add("".asComponent())
-        event.toolTip.add(status.asComponent())
+        event.toolTip.add(statusLine(pending, state).asComponent())
     }
 
-    private fun statusLine(pending: Boolean, state: CompactorCraftApi.CraftState): String? = when {
-        pending -> "§7Already requested"
-        state is Missing -> "§eClick to grab §ax${state.amount} §emore for ${state.upgrade.result.repoItemName}"
-        state is Enough -> "§7Already enough for ${state.upgrade.result.repoItemName}"
-        state is Ambiguous -> "§7More than one craft at the same amount"
-        else -> null
+    private fun statusLine(pending: Boolean, state: CompactorCraftApi.CraftState): String {
+        if (pending) return "§7Already requested"
+        return when (state) {
+            is Missing -> "§eClick to grab §ax${state.amount} §emore for ${state.upgrade.result.repoItemName}"
+            is Enough -> "§7Already enough for ${state.upgrade.result.repoItemName}"
+            is Ambiguous -> "§7More than one craft at the same amount"
+            NoCraft -> "§7Cannot be crafted into another item"
+            NotLoaded -> "§7Recipe data is still loading"
+        }
     }
 }
