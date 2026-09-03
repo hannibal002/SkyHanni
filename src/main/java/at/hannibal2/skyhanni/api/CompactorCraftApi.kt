@@ -49,12 +49,13 @@ object CompactorCraftApi {
         data class Missing(val upgrade: Upgrade, val amount: Int) : CraftState
     }
 
-    fun getCraftState(base: NeuInternalName): CraftState {
+    /** [inInventory] is passed in when the caller already counted, to save one inventory scan per item. */
+    fun getCraftState(base: NeuInternalName, inInventory: Int = base.getAmountInInventory()): CraftState {
         val lookup = lookup ?: return CraftState.NotLoaded
         lookup.ambiguous[base]?.let { return CraftState.Ambiguous(it) }
         val upgrade = lookup.upgrades[base] ?: return CraftState.NoCraft
 
-        val missing = upgrade.baseAmount - base.getAmountInInventory()
+        val missing = upgrade.baseAmount - inInventory
         return if (missing > 0) CraftState.Missing(upgrade, missing) else CraftState.Enough(upgrade)
     }
 
