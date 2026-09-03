@@ -51,4 +51,12 @@ class GetFromSackConfig {
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var keybind: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(
+        name = "Compactor GfS Keybind",
+        desc = "Grabs the amount of the hovered item from your sacks that is missing to reach the next craft step."
+    )
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var compactorKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 }

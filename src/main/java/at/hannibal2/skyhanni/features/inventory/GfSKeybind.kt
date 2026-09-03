@@ -14,7 +14,7 @@ object GfSKeybind {
     private val config get() = SkyHanniMod.feature.inventory.gfs
 
     @HandleEvent
-    fun onKey(event: GuiKeyPressEvent) {
+    private fun onGuiKeyPress() {
         if (!config.keybind.isKeyClicked()) return
         stackUnderCursor()?.getInternalNameOrNull()?.let {
             GetFromSackApi.getFromSack(it, 9999)
