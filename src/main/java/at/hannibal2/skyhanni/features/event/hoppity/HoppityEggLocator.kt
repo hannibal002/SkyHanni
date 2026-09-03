@@ -204,7 +204,7 @@ object HoppityEggLocator {
         if (!warningPending) return
         if (bezierFitter.isEmpty()) return
         if (HoppityEggLocations.islandLocations.isEmpty()) return
-        ChatUtils.chat("Egg Locator result was unreliable, please use it again!")
+        ChatUtils.chat("Egglocator result was unreliable, please use it again!")
     }
 
     private fun guessEggLocation(): LorenzVec? {
