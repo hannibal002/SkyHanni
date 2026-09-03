@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.system.ModVersion
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import java.lang.reflect.Method
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -171,15 +172,22 @@ object SkyHanniEvents {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         val version = SkyHanniMod.modVersion
 
-        disabledHandlers = data.disabledHandlers + data.disabledHandlersVersioned.activeNames(version)
-        disabledHandlerInvokers = data.disabledInvokers + data.disabledInvokersVersioned.activeNames(version)
+        val mcVersion = PlatformUtils.MC_VERSION
+        disabledHandlers = data.disabledHandlers + data.disabledHandlersVersioned.activeNames(version, mcVersion)
+        disabledHandlerInvokers = data.disabledInvokers + data.disabledInvokersVersioned.activeNames(version, mcVersion)
         markEventCacheDirty(DirtyReason.REPO_RELOAD)
     }
 
 
-    private fun Set<DisabledEventVersionedJson>.activeNames(version: ModVersion): Set<String> =
-        filter { (it.minVersion == null || version >= it.minVersion) && (it.maxVersion == null || version <= it.maxVersion) }
-            .map { it.name }.toSet()
+    private fun Set<DisabledEventVersionedJson>.activeNames(
+        version: ModVersion,
+        mcVersion: String,
+    ): Set<String> =
+        filter {
+            (it.minVersion == null || version >= it.minVersion) &&
+                (it.maxVersion == null || version <= it.maxVersion) &&
+                (it.mcVersions == null || mcVersion in it.mcVersions)
+        }.map { it.name }.toSet()
 
     val seconds = listOf(10, 60, 60 * 5)
 

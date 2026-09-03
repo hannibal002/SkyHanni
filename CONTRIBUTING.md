@@ -46,11 +46,11 @@ for "Gradle JVM") is set to a Java 25 JDK.
 <details>
 <summary>🖼️Show Gradle JVM image</summary>
 
-![Gradle settings showing Java 21 being selected as JVM](docs/gradle-settings.png)
+![Gradle settings showing Java 25 being selected as JVM](docs/gradle-settings.png)
 
 </details>
 
-Now that Gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java
+Now that Gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the Java
 version for the project.
 
 To do this we press `(CTRL+ALT+SHIFT+S)` in IntelliJ, or go to `File` → `Project Structure...`.
@@ -104,7 +104,7 @@ Now that we are done with that, you should be able to launch your game from your
 
 ## Pull Requests
 
-General infos about Pull Request can be found on
+General info about Pull Requests can be found on
 the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests).
 
 ### Creating a Pull Request
@@ -150,6 +150,11 @@ CI. Do not manually edit `docs/CHANGELOG.md` or `docs/FEATURES.md`. These files 
 
 - Follow the format examples from the template and remove the categories that do not apply to your PR.
 - A PR might include multiple changelog categories simultaneously.
+- Outside of Technical Details, write entries from the player's point of view. Name the behavior a user can
+  observe, not the code that produces it. "Fixed wrong Kuudra Key cost in Instance Chest Profit" belongs in
+  the changelog, "fixed an inverted discount calculation" belongs in the **What** section.
+- Refer to a feature by its name and capitalize it, along with every SkyBlock proper noun. This includes the
+  names that read like ordinary words, such as Hunting Box or Instance Chest Profit.
 
 Here is an explanation of which changes belong to each category:
 
@@ -228,10 +233,10 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Open `Settings → Tools → Detekt` and set:
         - `Configuration Files` to `detekt/detekt.yml`
         - `Baseline File` to `detekt/baseline-main.xml`
-  - Both `detekt.yml` and `baseline-main.xml` are committed to the repository, but the plugin's reference to them
-    is stored per machine, not shared through git. Every contributor needs to set this link once after cloning the
-    repository. Without it, the plugin flags issues that CI does not (rules disabled in `detekt.yml`, or issues
-    already covered by the baseline).
+    - Both `detekt.yml` and `baseline-main.xml` are committed to the repository, but the plugin's reference to them
+      is stored per machine, not shared through git. Every contributor needs to set this link once after cloning the
+      repository. Without it, the plugin flags issues that CI does not (rules disabled in `detekt.yml`, or issues
+      already covered by the baseline).
 - When the SkyHanni IntelliJ plugin flags issues in a file you are already editing, fix those issues in the
   same PR. Do not create standalone PRs to sweep plugin warnings across the entire codebase.
 - Do not copy features from other mods. Exceptions:
@@ -255,12 +260,16 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
+- When renaming or replacing a symbol other code already uses, keep a deprecated alias under the old
+  name instead of deleting it right away. Open pull requests that still use the old name then keep
+  compiling and their authors get time to react. Remove the alias in a separate pull request one or
+  two months later, and note that date in a TODO comment above it.
 - Future JSON data objects should be made in kotlin.
 - Config files should be made in **Kotlin**.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it.
-    - Custom SkyHanni events are located in the `events` package, organized into sub packages by category.
-      When creating a new event, place it in the appropriate sub package. Thematically related events can be placed together in a single
+    - Custom SkyHanni events are located in the `events` package, organized into subpackages by category.
+      When creating a new event, place it in the appropriate subpackage. Thematically related events can be placed together in a single
       file.
     - To expand the event system, you can create a new event that is called from a Mixin,
       or you can subscribe to a Fabric event and then post a SkyHanni event from that.
@@ -292,11 +301,17 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Never use  `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
-- Try to avoid using Kotlin's `!!` (catch if not null) feature.
+- Try to avoid using Kotlin's `!!` (not-null assertion) feature.
     - Replace it with `?:` (if null return this).
-    - This will most likely not be possible to avoid when working with objects from java.
+    - This will most likely not be possible to avoid when working with objects from Java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
+  See the **Errors and Crashes** section for why every catch goes through `ErrorManager`.
+    - `logErrorWithData` is only for a throwable that was actually thrown and caught, where the stack trace points at the
+      cause. Never construct a throwable just to report a problem the code detected on its own.
+    - For an invalid state the code checks and rejects itself, use
+      `ErrorManager.logErrorStateWithData("explanation for users", "internal description", ...extraOptionalData)`.
+      The first message is what the player reads in chat, the second one only shows up in the copied error report.
 - Do not use `toRegex()` or `toPattern()`. Use `RepoPattern` instead.
   RepoPattern allows regex patterns to be updated remotely via the repo without requiring a mod update.
   Each pattern has a local fallback defined in code, but can be overridden by the repo at runtime.
@@ -321,6 +336,12 @@ Make sure such pull requests have a good explanation in the **What** section.
   preferred, not just tolerated, because the enum class name carries no information there. It covers `when` subjects and
   branches, comparisons, assignments and arguments with a known parameter type. Stay consistent within a block: do not mix
   `MyEnum.ENTRY` and `ENTRY` in the same place.
+    - This governs how code is written, not a cleanup task. Apply it in files you are already changing. Do not open a
+      pull request whose only purpose is stripping qualifiers across the codebase.
+    - Subclasses of a sealed class are a separate case. To use them unqualified, import the subclass
+      (`import some.pkg.Outer.Variant`). That is a normal class import, it costs one line per subclass instead of one
+      per enum entry, and it applies everywhere in the file rather than only where the expected type is known. See
+      `EliteWeightJson.kt` for an example.
 - Use named parameters for boolean and numeric arguments where the meaning is not immediately clear from context (e.g.,
   `findMobHeight(height, above = true)` instead of `findMobHeight(height, true)`).
 - Follow Kotlin conventions for acronym naming:
@@ -329,6 +350,18 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Always combine title messages with chat message.
     - This way users know what feature and what mod sends the title, if they want to disable it.
     - Also, we can include more information on why the title just showed up, as the title should not be too long.
+
+## Errors and Crashes
+
+SkyHanni wraps the places where the game calls into our code in a try-catch: posting events, running commands, and the consumers for delayed
+responses. Every catch goes through our own `ErrorManager`, which turns a failure into a red chat message and keeps the client running.
+Leaving as little code as possible outside that protection is a deliberate goal, so new code paths need the same treatment.
+
+An exception in SkyHanni code therefore does not crash the game. Only unprotected code can, in practice a mixin hook. Treat any path that is
+not known to be protected as unprotected.
+
+Because of that, a "crash" means the client actually terminated, while a caught exception shown as a red chat message is an "error". Keep
+the two apart in pull request titles, changelog entries and issues, since calling an error a crash overstates how bad it is.
 
 ## Additional Useful Development Tools
 

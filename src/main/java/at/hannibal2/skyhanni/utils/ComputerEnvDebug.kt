@@ -25,26 +25,26 @@ object ComputerEnvDebug {
     private var genericStacks: List<String> = listOf()
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
-        os(event)
-        launcher(event)
-        ram(event)
-        uptime(event)
-        performanceMods(event)
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.os()
+        event.launcher()
+        event.ram()
+        event.uptime()
+        event.performanceMods()
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val repoJson = event.getConstant<LaunchersJson>("Launchers")
         launchers = repoJson.launchers
         genericStacks = repoJson.genericStacks
     }
 
-    private fun launcher(event: DebugDataCollectEvent) {
-        event.title("Computer Minecraft Launcher")
+    private fun DebugDataCollectEvent.launcher() {
+        title("Computer Minecraft Launcher")
 
         val firstStack = getFirstStack() ?: run {
-            event.addData("Could not load data!")
+            addData("Could not load data!")
             return
         }
 
@@ -54,12 +54,12 @@ object ComputerEnvDebug {
         val (launcher, relevant) = findLauncher(firstStack, launcherBrand)
 
         launcher?.let {
-            if (relevant) event.addData(it)
-            else event.addIrrelevant(it)
+            if (relevant) addData(it)
+            else addIrrelevant(it)
             return
         }
 
-        event.addData {
+        addData {
             add("Unknown launcher!")
             add("System property of 'minecraft.launcher.brand': '$launcherBrand'")
             add("firstStack: '$firstStack'")
@@ -89,22 +89,22 @@ object ComputerEnvDebug {
         ErrorManager.logErrorWithData(e, "Failed loading current thread stack trace info")
     }.getOrNull()
 
-    private fun os(event: DebugDataCollectEvent) {
-        event.title("Computer Operating System")
+    private fun DebugDataCollectEvent.os() {
+        title("Computer Operating System")
         val osType = OSUtils.getOperatingSystem()
         val exactName = OSUtils.getOperatingSystemRaw()
         if (osType != OSUtils.OperatingSystem.UNKNOWN) {
-            event.addIrrelevant {
+            addIrrelevant {
                 add("OS type: $osType")
                 add("Exact name: $exactName")
             }
         } else {
-            event.addData("Unknown OS: '$exactName'")
+            addData("Unknown OS: '$exactName'")
         }
     }
 
-    private fun ram(event: DebugDataCollectEvent) {
-        event.title("Computer RAM")
+    private fun DebugDataCollectEvent.ram() {
+        title("Computer RAM")
         val runtime = Runtime.getRuntime()
 
         val text = mutableListOf<String>()
@@ -168,9 +168,9 @@ object ComputerEnvDebug {
         }
 
         if (important) {
-            event.addData(text)
+            addData(text)
         } else {
-            event.addIrrelevant(text)
+            addIrrelevant(text)
         }
     }
 
@@ -178,41 +178,41 @@ object ComputerEnvDebug {
         return roundTo(1).addSeparators()
     }
 
-    private fun uptime(event: DebugDataCollectEvent) {
-        event.title("Minecraft Uptime")
+    private fun DebugDataCollectEvent.uptime() {
+        title("Minecraft Uptime")
         val uptime = getUptime()
         val info = "The game is running for ${uptime.format()}"
         if (uptime > 5.hours) {
-            event.addData {
+            addData {
                 add("The game runs for more than 5 hours, memory leaks may accumulate to dangerous levels.")
                 add(info)
             }
         } else {
-            event.addIrrelevant(info)
+            addIrrelevant(info)
         }
     }
 
     private fun getUptime() = ManagementFactory.getRuntimeMXBean().uptime.milliseconds
 
-    private fun performanceMods(event: DebugDataCollectEvent) {
+    private fun DebugDataCollectEvent.performanceMods() {
         if (PlatformUtils.isDevEnvironment) return
-        event.title("Performance Mods")
+        title("Performance Mods")
         val hasSodium = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium")
         if (!hasSodium) {
-            event.addData {
+            addData {
                 add("Sodium is not installed")
                 add("This mod greatly improve performance")
                 add("https://modrinth.com/mod/sodium")
             }
         } else {
-            event.addIrrelevant {
+            addIrrelevant {
                 add("Sodium is installed")
             }
         }
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shuptime") {
             description = "Shows the time since the start of minecraft"
             category = CommandCategory.USERS_RESET
