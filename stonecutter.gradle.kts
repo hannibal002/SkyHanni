@@ -118,10 +118,19 @@ allprojects {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
+
+        exclusiveContent {
+            forRepositories(
+                repositories.maven("https://maven.azureaaron.net/releases"),
+            )
+            filter {
+                includeGroupAndSubgroups("net.azureaaron")
+            }
+        }
     }
 }
 
-stonecutter active "26.1"
+stonecutter active "26.2"
 
 stonecutter handlers {
     configure("fsh", "vsh") {
@@ -131,23 +140,35 @@ stonecutter handlers {
 
 stonecutter parameters {
     replacements {
-        string(current.parsed < "26.1") {
-            replace(";extractRenderState(", ";render(")
-            replace(";text", ";drawString")
-            replace("ContainerInput", "ClickType")
-            replace("GuiGraphicsExtractor", "GuiGraphics")
-            replace("InteractClickType", "InteractClickType") // prevent replacement
-            replace("ProjectionMatrixBuffer", "CachedOrthoProjectionMatrixBuffer")
-            replace("addBlitToCurrentLayer", "submitBlitToCurrentLayer")
-            replace("classTweaker v1 official", "classTweaker v1 named")
-            replace("drawContext.text", "drawContext.drawString")
-            replace("extractContents", "renderContents")
-            replace("extractSlot", "renderSlot")
-            replace("lambda\$addMainPass\$0", "method_62214")
-            replace("net.minecraft.client.multiplayer.chat.GuiMessage", "net.minecraft.client.GuiMessage")
-            replace("net.minecraft.client.multiplayer.chat.GuiMessageTag", "net.minecraft.client.GuiMessageTag")
-            replace("net.minecraft.client.renderer.state.gui", "net.minecraft.client.gui.render.state")
-            replace("net/minecraft/client/renderer/state/gui", "net/minecraft/client/gui/render/state")
+        string(current.parsed < "26.2") {
+            replace("net.minecraft.world.entity.monster.cubemob.MagmaCube", "net.minecraft.world.entity.monster.MagmaCube")
+            replace("net.minecraft.world.entity.monster.cubemob.Slime", "net.minecraft.world.entity.monster.Slime")
+
+            val dyeColors = mapOf(
+                "black" to "BLACK",
+                "blue" to "BLUE",
+                "brown" to "BROWN",
+                "cyan" to "CYAN",
+                "gray" to "GRAY",
+                "green" to "GREEN",
+                "lightBlue" to "LIGHT_BLUE",
+                "lightGray" to "LIGHT_GRAY",
+                "lime" to "LIME",
+                "magenta" to "MAGENTA",
+                "orange" to "ORANGE",
+                "pink" to "PINK",
+                "purple" to "PURPLE",
+                "red" to "RED",
+                "white" to "WHITE",
+                "yellow" to "YELLOW",
+            )
+            dyeColors.forEach { (lower, upper) ->
+                replace("DYE.$lower()", "${upper}_DYE")
+                replace("WOOL.$lower()", "${upper}_WOOL")
+                replace("STAINED_GLASS.$lower()", "${upper}_STAINED_GLASS")
+                replace("STAINED_GLASS_PANE.$lower()", "${upper}_STAINED_GLASS_PANE")
+                replace("DYED_TERRACOTTA.$lower()", "${upper}_TERRACOTTA")
+            }
         }
     }
 
