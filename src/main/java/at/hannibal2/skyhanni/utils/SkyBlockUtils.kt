@@ -10,12 +10,12 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 object SkyBlockUtils {
-
     val onHypixel get() = HypixelData.connectedToHypixel && MinecraftCompat.localPlayerExists
 
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
     @JvmStatic
+    @get:JvmName("isInSkyBlock")
     val inSkyBlock get() = onHypixel && HypixelLocationApi.inSkyblock
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby

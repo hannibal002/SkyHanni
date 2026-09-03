@@ -120,7 +120,7 @@ allprojects {
     }
 }
 
-stonecutter active "26.2"
+stonecutter active "26.3"
 
 stonecutter handlers {
     configure("fsh", "vsh") {
@@ -129,7 +129,50 @@ stonecutter handlers {
 }
 
 stonecutter parameters {
+    constants {
+        this["iris_compat"] = eval(current.version, "< 26.3")
+        this["rei_compat"] = eval(current.version, "< 26.3")
+        this["render_chest"] = eval(current.version, "= 26.2")
+    }
+
     replacements {
+        string(current.parsed < "26.3") {
+            replace("import net.minecraft.world.entity.monster.Enderman;", "import net.minecraft.world.entity.monster.EnderMan;")
+            replace("import net.minecraft.world.entity.monster.Enderman", "import net.minecraft.world.entity.monster.EnderMan as Enderman")
+
+            val renderpearlApis = setOf(
+                "GpuFormat",
+                "buffers.GpuBuffer",
+                "buffers.GpuBufferSlice",
+                "pipeline.BindGroupLayout",
+                "pipeline.BlendFunction",
+                "pipeline.ColorTargetState",
+                "pipeline.DepthStencilState",
+                "pipeline.RenderPipeline",
+                "textures.FilterMode",
+                "textures.GpuTexture",
+                "textures.GpuTextureView",
+                "vertex.VertexFormat",
+                )
+            renderpearlApis.forEach { name ->
+                replace("com.mojang.renderpearl.api.$name", "com.mojang.blaze3d.$name")
+                replace("com/mojang/renderpearl/api/${name.slashed}", "com/mojang/blaze3d/${name.slashed}")
+            }
+
+            val renderpearlRenamedApis = mapOf(
+                "commands.RenderPass" to "systems.RenderPass",
+                "device.GpuDevice" to "systems.GpuDevice",
+                "pipeline.CompareOp" to "platform.CompareOp",
+                "pipeline.IndexType" to "IndexType",
+                "pipeline.PrimitiveTopology" to "PrimitiveTopology",
+                "pipeline.UniformType" to "shaders.UniformType",
+            )
+            renderpearlRenamedApis.forEach { (old, new) ->
+                replace("com.mojang.renderpearl.api.$old", "com.mojang.blaze3d.$new")
+                replace("com/mojang/renderpearl/api/${old.slashed}", "com/mojang/blaze3d/${new.slashed}")
+            }
+        }
+
         string(current.parsed < "26.2") {
             replace("net.minecraft.world.entity.monster.cubemob.MagmaCube", "net.minecraft.world.entity.monster.MagmaCube")
             replace("net.minecraft.world.entity.monster.cubemob.Slime", "net.minecraft.world.entity.monster.Slime")
@@ -164,3 +207,5 @@ stonecutter parameters {
 
     filters.include("**/*.fsh", "**/*.vsh")
 }
+
+private val String.slashed get() = replace(".", "/")

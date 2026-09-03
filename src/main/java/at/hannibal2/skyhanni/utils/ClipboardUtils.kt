@@ -4,11 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod.async
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import com.mojang.blaze3d.platform.ClipboardManager
-import net.minecraft.client.Minecraft
 import kotlinx.coroutines.Deferred
 
-object ClipboardUtils {
+//? if >= 26.3 {
+import org.lwjgl.sdl.SDLError
+//?} else {
+/*import net.minecraft.client.Minecraft
+*///?}
 
+object ClipboardUtils {
     private val clipboardCoroutineSettings = CoroutineSettings(
         "clipboardAccess",
         withIOContext = true,
@@ -22,7 +26,11 @@ object ClipboardUtils {
     }
 
     private fun copyToClipboardInternal(text: String, step: Int = 0): Boolean = runCatching {
-        ClipboardManager().setClipboard(Minecraft.getInstance().window, text)
+        ClipboardManager().setClipboard(
+            //? if < 26.3
+            //Minecraft.getInstance().window,
+            text,
+        )
         true
     }.getOrElse {
         if (step == 3) {
@@ -33,9 +41,16 @@ object ClipboardUtils {
 
     fun readFromClipboard(step: Int = 0): String? {
         var shouldRetry = false
-        val clipboard = ClipboardManager().getClipboard(Minecraft.getInstance().window) { _, _ ->
+
+        //? if >= 26.3 {
+        val clipboard = ClipboardManager().getClipboard()
+        shouldRetry = SDLError.SDL_GetError() != null
+        //?} else {
+        /*val clipboard = ClipboardManager().getClipboard(Minecraft.getInstance().window) { _, _ ->
             shouldRetry = true
         }
+        *///?}
+
         return if (!shouldRetry) clipboard
         else if (step == 3) {
             ErrorManager.logErrorStateWithData(

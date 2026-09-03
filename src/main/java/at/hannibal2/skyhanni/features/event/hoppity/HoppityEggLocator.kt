@@ -140,7 +140,6 @@ object HoppityEggLocator {
                 // TODO add chroma color support via config
                 drawColor(eggLocation, LorenzColor.RED.toChromaColor(), false, alpha)
                 drawDynamicText(eggLocation.up(), "§cDuplicate Location!", 1.5)
-
             }
         }
     }

@@ -3,15 +3,14 @@ package at.hannibal2.skyhanni.features.inventory.loadout
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object CustomLoadoutKeybinds {
-
     private val config get() = LoadoutApi.config.keybinds
     private val keybinds
         get() = listOf(
@@ -52,7 +51,7 @@ object CustomLoadoutKeybinds {
         return false
     }
 
-    fun allowInput() = isEnabled() && keybinds.filter { it != GLFW.GLFW_KEY_UNKNOWN }.any { it.isKeyHeld() }
+    fun allowInput() = isEnabled() && keybinds.filter { it != KeyboardManager.KEY_UNKNOWN }.any { it.isKeyHeld() }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && LoadoutApi.inLoadouts() && config.slotKeybindsToggle
 }

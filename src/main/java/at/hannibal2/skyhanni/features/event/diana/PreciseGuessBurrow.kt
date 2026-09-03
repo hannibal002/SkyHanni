@@ -65,7 +65,6 @@ object PreciseGuessBurrow {
                 lastGuess = guessEntry
             }
         }
-
     }
 
     private fun guessBurrowLocation(): LorenzVec? = bezierFitter.solve()
