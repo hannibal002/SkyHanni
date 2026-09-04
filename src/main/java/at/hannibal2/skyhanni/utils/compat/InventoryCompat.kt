@@ -8,8 +8,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.MenuAccess
-import net.minecraft.client.input.KeyEvent
-import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ContainerInput
@@ -36,16 +34,6 @@ object InventoryCompat {
         val stack = screen.hoveredSlot?.item
         if (stack != null) return stack
         return ReiCompat.getHoveredStackFromRei()
-    }
-
-    @Suppress("unused")
-    fun stackUnderCursor(keyEvent: KeyEvent): SafeItemStack? {
-        return stackUnderCursor()
-    }
-
-    @Suppress("unused")
-    fun stackUnderCursor(mouseButtonEvent: MouseButtonEvent): SafeItemStack? {
-        return stackUnderCursor()
     }
 
     fun slotUnderCursor(): Slot? {

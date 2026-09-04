@@ -2,11 +2,8 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
-import net.minecraft.client.input.KeyEvent
-import net.minecraft.client.input.MouseButtonEvent
 
 /**
  * Event that is fired when a key is pressed while a SkyHanniGuiContainer is open.
@@ -19,27 +16,17 @@ import net.minecraft.client.input.MouseButtonEvent
 sealed class GuiKeyPressEvent(
     val guiContainer: SkyHanniGuiContainer,
 ) : CancellableSkyHanniEvent() {
-    abstract val stackUnderCursor: SafeItemStack?
+    val stackUnderCursor by lazy {
+        InventoryCompat.stackUnderCursor()
+    }
 
     @PrimaryFunction("onGuiKeyboardKeyPress")
     class GuiKeyboardKeyPressEvent(
         guiContainer: SkyHanniGuiContainer,
-        private val keyEvent: KeyEvent,
-    ) : GuiKeyPressEvent(guiContainer) {
-
-        override val stackUnderCursor by lazy(LazyThreadSafetyMode.NONE) {
-            InventoryCompat.stackUnderCursor(keyEvent)
-        }
-    }
+    ) : GuiKeyPressEvent(guiContainer)
 
     @PrimaryFunction("onGuiMouseKeyPress")
     class GuiMouseKeyPressEvent(
         guiContainer: SkyHanniGuiContainer,
-        private val mouseEvent: MouseButtonEvent,
-    ) : GuiKeyPressEvent(guiContainer) {
-
-        override val stackUnderCursor by lazy(LazyThreadSafetyMode.NONE) {
-            InventoryCompat.stackUnderCursor(mouseEvent)
-        }
-    }
+    ) : GuiKeyPressEvent(guiContainer)
 }
