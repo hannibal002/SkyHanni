@@ -194,7 +194,7 @@ object BazaarApi {
 
         if (isBazaarOrderInventory(openInvName)) {
             val nameStr = item.cleanName.removePrefix("BUY ").removePrefix("SELL ")
-            val internalName = ItemNameResolver.getInternalNameOrNull(nameStr)
+            val internalName = NeuInternalName.fromItemNameOrNull(nameStr)
 
             if (internalName != null) {
                 if (itemName.contains("SELL", ignoreCase = true)) {
@@ -223,7 +223,7 @@ object BazaarApi {
         val buyInstantly = inventoryItems[10] ?: return null
         if (buyInstantly.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aBuy Instantly") return null
         val bazaarItem = inventoryItems[13] ?: return null
-        return ItemNameResolver.getInternalNameOrNull(bazaarItem.cleanName)
+        return NeuInternalName.fromItemNameOrNull(bazaarItem.hoverName.formattedTextCompatLeadingWhiteLessResets())
     }
 
     private fun updateTaxRate(inventoryItems: Map<Int, SafeItemStack>) {

@@ -34,7 +34,7 @@ object ItemNameResolver {
             return itemNameCache.getOrPut(lowercase) { NeuInternalName.MISSING_ITEM }
         }
 
-        ItemResolutionQuery.attributeNameToInternalName(itemName)?.let {
+        ItemResolutionQuery.attributeNameToInternalName(itemName.removeColor())?.let {
             return itemNameCache.getOrPut(lowercase) { it.toInternalName() }
         }
 
