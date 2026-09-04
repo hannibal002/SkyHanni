@@ -38,14 +38,13 @@ import net.minecraft.world.item.Items
  */
 @SkyHanniModule
 object AchievementManager {
-
     private val config get() = SkyHanniMod.achievementStorage.achievements
     val shouldShowMessages get() = SkyHanniMod.feature.misc.achievementMessages
     val group = RepoPattern.group("achievements")
-    private val achievementSound = SoundUtils.createSound("ui.toast.challenge_complete", 1f, .8f)
+    private val achievementSound = SoundUtils.createSound("ui.toast.challenge_complete", 1f, .8f, isWarning = false)
 
     @HandleEvent
-    fun onInitFinished() {
+    private fun onInitFinished() {
         val event = AchievementRegistrationEvent()
         event.post()
         for ((id, achievement) in event.getAchievements()) {
@@ -139,7 +138,7 @@ object AchievementManager {
     const val TEST_ACHIEVEMENT = "Test Achievement"
 
     @HandleEvent
-    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+    private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             name = "Test Achievement".asComponent(),
             description = componentBuilder {
@@ -153,7 +152,7 @@ object AchievementManager {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestachievement") {
             description = "Tests achievement granting and revoking"
             category = CommandCategory.DEVELOPER_TEST
@@ -247,7 +246,7 @@ object AchievementManager {
     }
 
     @HandleEvent
-    fun onUserLuck(event: UserLuckCalculateEvent) {
+    private fun onUserLuck(event: UserLuckCalculateEvent) {
         var luck = 0f
         var hasDoneAllAchievements = true
         for ((_, achievement) in config) {

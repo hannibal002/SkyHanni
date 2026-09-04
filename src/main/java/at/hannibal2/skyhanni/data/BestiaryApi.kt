@@ -115,7 +115,7 @@ object BestiaryApi {
      */
     private val mobVariantPattern by patternGroup.pattern(
         "mob.variant.colorless",
-        """^\[Lv\d+] (?<name>.+)""",
+        """^\[Lv(?<level>\d+)] (?<name>.+)""",
     )
 
     /**
@@ -188,6 +188,7 @@ object BestiaryApi {
             overallProgressEnabled: Boolean,
             val parentCategory: Category?,
             val parentFamily: BestiaryMob?,
+            // Not read anywhere yet, kept for a future Variants overlay in BestiaryData.
             val variants: Map<Int, BestiaryMobVariant>,
         ) : Open(GuiType.MOB_VARIANTS, overallProgressEnabled)
     }
@@ -277,9 +278,11 @@ object BestiaryApi {
             is BestiaryGuiState.Categories -> {
                 state.categories[event.slotId]?.let { pendingCategory = it }
             }
+
             is BestiaryGuiState.Mobs -> {
                 state.mobs[event.slotId]?.let { pendingFamily = it }
             }
+
             else -> {}
         }
     }
