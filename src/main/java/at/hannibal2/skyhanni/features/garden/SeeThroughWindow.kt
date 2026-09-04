@@ -77,7 +77,7 @@ object SeeThroughWindow {
             GLFW.GLFW_NOT_INITIALIZED,
             GLFW.GLFW_FEATURE_UNAVAILABLE,
             GLFW.GLFW_FEATURE_UNIMPLEMENTED,
-             -> true
+            -> true
             else -> false
         }
 }
