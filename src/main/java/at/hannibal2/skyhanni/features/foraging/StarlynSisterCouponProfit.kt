@@ -39,9 +39,9 @@ object StarlynSisterCouponProfit {
     private var currentDisplayMode = DisplayMode.PER_COUPON
     private var currentSisterType: StarlynSisterType? = null
 
-    private var cachedItemData: List<ItemProfitData> = emptyList()
+    private var cachedItemData: Set<ItemProfitData> = emptySet()
 
-    private val validInventorySlots = (9..44).filter { it % 9 !in setOf(0, 8) }
+    private val validInventorySlots: Set<Int> = (9..44).filterTo(mutableSetOf()) { it % 9 !in setOf(0, 8) }
 
     private data class ItemProfitData(
         val slot: Int,
@@ -64,7 +64,7 @@ object StarlynSisterCouponProfit {
             updateDisplay()
         },
         onClose = {
-            cachedItemData = emptyList()
+            cachedItemData = emptySet()
             display = emptyList()
         },
     )
@@ -104,8 +104,8 @@ object StarlynSisterCouponProfit {
         )
     }
 
-    private fun buildItemData(event: InventoryFullyOpenedEvent, sister: StarlynSisterType): List<ItemProfitData> =
-        event.inventoryItems.mapNotNull { (slot, item) ->
+    private fun buildItemData(event: InventoryFullyOpenedEvent, sister: StarlynSisterType): Set<ItemProfitData> =
+        event.inventoryItems.mapNotNullTo(mutableSetOf()) { (slot, item) ->
             try {
                 readItem(slot, item, sister)
             } catch (e: Throwable) {

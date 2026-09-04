@@ -12,7 +12,7 @@ object StarlynSisterDetector {
         onClose: () -> Unit,
     ): InventoryDetector {
         val sisterTypeMap = StarlynSisterType.entries.associateBy { it.inventoryName }
-        var isInventoryOpen: Boolean
+        var isInventoryOpen = false
 
         return InventoryDetector(
             checkInventoryName = sisterTypeMap.keys::contains,
