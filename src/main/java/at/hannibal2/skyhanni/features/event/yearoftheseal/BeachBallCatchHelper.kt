@@ -43,7 +43,6 @@ object BeachBallCatchHelper {
     fun check(entity: ArmorStand) {
         if (entity.wearingSkullTexture(NORMAL_BEACH_BALL)) {
             predictors.putIfAbsent(entity.id, Predictor(entity.getLorenzVec(), Variant.NORMAL))
-            println("normal detected")
             return
         }
 //         if (entity.wearingSkullTexture(GIANT_BEACH_BALL)) {
@@ -218,9 +217,10 @@ object BeachBallCatchHelper {
             val xTarget = targets.mapKeys { it.key.x }.weightedAverage()
             val zTarget = targets.mapKeys { it.key.z }.weightedAverage()
 
+            val averageTarget = LorenzVec(xTarget, 0.0, zTarget)
             val target = predictions.minBy {
                 val last = it.key.last()
-                xTarget - last.x + zTarget - last.z
+                last.distanceSqIgnoreY(averageTarget)
             }
             return target.key
         }
