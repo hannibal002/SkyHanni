@@ -62,7 +62,7 @@ object SeeThroughWindow {
         GLFW.glfwSetWindowOpacity(handle, alpha)
 
         val error = GLFW.glfwGetError(null)
-        if (error.isGlfwPlatformError()) {
+        if (isGlfwPlatformError(error)) {
             unsupportedPlatform = true
             ChatUtils.userError("Your platform doesn't support see through windows!")
             return false
@@ -70,8 +70,8 @@ object SeeThroughWindow {
         return true
     }
 
-    private fun Int.isGlfwPlatformError(): Boolean =
-        when (this) {
+    private fun isGlfwPlatformError(error: Int): Boolean =
+        when (error) {
             GLFW.GLFW_PLATFORM_ERROR,
             GLFW.GLFW_PLATFORM_UNAVAILABLE,
             GLFW.GLFW_NOT_INITIALIZED,
