@@ -42,8 +42,7 @@ object MouseCompat {
     fun isMouseButton(button: Int) = button in 0..5
 
     fun isButtonDown(button: Int): Boolean {
-        if (isMouseButton(button)) return buttonStates[button]
-        return false
+        return isMouseButton(button) && buttonStates[button]
     }
 
     fun setButtonState(button: Int, down: Boolean) {
