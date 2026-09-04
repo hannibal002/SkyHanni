@@ -9,32 +9,46 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ItemFrame
 import java.awt.Color
 
+
+/**
+ * Fired once per frame, right before the visible entities are collected for rendering.
+ *
+ * Fired on the render thread via a Mixin into `LevelExtractor.extractVisibleEntities`
+ * (`LevelRenderer` below 26.2).
+ *
+ * Listeners do not render anything themselves. They call [queueEntitiesToOutline] with a function
+ * returning the outline color for an entity, or null to leave it unoutlined.
+ * `RenderLivingEntityHelper` reads the queued entities back while the entity is rendered.
+ *
+ * Since this runs every frame, guard the color function with checks that do not depend on the
+ * individual entity, such as the island or whether the feature is enabled.
+ */
 @PrimaryFunction("onRenderEntityOutline")
 class RenderEntityOutlineEvent : SkyHanniEvent() {
     /**
-     * The entities to outline. This is progressively cumulated from [.entitiesToChooseFrom]
+     * The entities to outline. This is progressively cumulated from [entitiesToChooseFrom]
      */
     var entitiesToOutline: HashMap<Entity, Int> = hashMapOf()
 
     /**
-     * The entities we can outline. Note that this set and [.entitiesToOutline] are disjoint at all times.
+     * The entities we can outline. Note that this set and [entitiesToOutline] are disjoint at all times.
      */
     var entitiesToChooseFrom: HashSet<Entity> = hashSetOf()
 
     /**
-     * Whether [.entitiesToChooseFrom] has been computed already.
+     * Whether [entitiesToChooseFrom] has been computed already.
      */
     private var computed: Boolean = false
 
     /**
      * Conditionally queue entities around which to render outlines.
-     * Selects from the pool of [.entitiesToChooseFrom] to speed up the predicate testing on subsequent calls.
-     * Is more efficient (theoretically) than calling [.queueEntityToOutline] for each entity because lists are handled internally.
+     * Selects from the pool of [entitiesToChooseFrom] to speed up the predicate testing on subsequent calls.
      *
      * This function loops through all entities and so is not very efficient.
-     * It's advisable to encapsulate calls to this function with global checks (those not dependent on an individual entity) for efficiency purposes.
+     * It's advisable to encapsulate calls to this function with global checks
+     * (those not dependent on an individual entity) for efficiency purposes.
      *
-     * @param outlineColor a function to test
+     * @param outlineColor returns the outline color for an entity, or null to leave it unoutlined
      */
     fun queueEntitiesToOutline(outlineColor: ((entity: Entity) -> Color?)? = null) {
         if (outlineColor == null) {

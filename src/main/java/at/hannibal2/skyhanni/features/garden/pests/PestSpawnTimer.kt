@@ -44,7 +44,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PestSpawnTimer {
-
     private val config get() = PestApi.config.pestTimer
     private val patternGroup = RepoPattern.group("garden.pests")
     private val cooldownOverMessageId = ChatUtils.getUniqueMessageId()
@@ -325,7 +324,7 @@ object PestSpawnTimer {
     @JvmStatic
     fun playUserSound() {
         with(config.sound) {
-            SoundUtils.createSound(name, pitch).playSound()
+            SoundUtils.createSound(name, pitch, isWarning = true).playSound()
         }
     }
 

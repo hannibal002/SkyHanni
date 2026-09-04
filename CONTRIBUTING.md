@@ -91,15 +91,6 @@ configuration. If not, you can restart IntelliJ and reload the Gradle project ag
 
 </details>
 
-Select an appropriate Java 25 JDK (preferably [Adoptium](https://adoptium.net/), but any Java 25 JDK will do).
-
-<details>
-<summary>🖼️Show run configuration image</summary>
-
-![Run configuration settings](docs/run-configuration-settings.avif)
-
-</details>
-
 Now that we are done with that, you should be able to launch your game from your IDE with that run configuration.
 
 ## Pull Requests
@@ -260,6 +251,10 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
+- When renaming or replacing a symbol other code already uses, keep a deprecated alias under the old
+  name instead of deleting it right away. Open pull requests that still use the old name then keep
+  compiling and their authors get time to react. Remove the alias in a separate pull request one or
+  two months later, and note that date in a TODO comment above it.
 - Future JSON data objects should be made in kotlin.
 - Config files should be made in **Kotlin**.
     - There may be legacy config files left as Java files, however they will all be ported eventually.

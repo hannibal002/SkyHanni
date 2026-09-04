@@ -92,7 +92,7 @@ class GuiContainerHook(guiAny: Any) {
         original.call(
             event.slot,
             event.slotId,
-            event.clickedButton,
+            event.rawButton(),
             event.clickType,
         )
     }
