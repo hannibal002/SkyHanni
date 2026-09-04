@@ -223,7 +223,7 @@ object BazaarApi {
         val buyInstantly = inventoryItems[10] ?: return null
         if (buyInstantly.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aBuy Instantly") return null
         val bazaarItem = inventoryItems[13] ?: return null
-        return NeuInternalName.fromItemNameOrNull(bazaarItem.hoverName.formattedTextCompatLeadingWhiteLessResets())
+        return NeuInternalName.fromItemName(bazaarItem.hoverName.formattedTextCompatLeadingWhiteLessResets())
     }
 
     private fun updateTaxRate(inventoryItems: Map<Int, SafeItemStack>) {
