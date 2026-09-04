@@ -65,4 +65,14 @@ class GreenhouseConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var magicJellyBeanHider: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Sky Mutations Link",
+        desc = "Offer a link to §aSky Mutations§7 in the Carpenter inventory in the Greenhouse and in the Crop Analyzer. " +
+            "The website offers useful information about mutations.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var mutationsWebsite: Boolean = true
 }

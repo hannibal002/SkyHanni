@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.rgb
@@ -31,10 +32,12 @@ import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
+import net.minecraft.util.FormattedCharSequence
 import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
+import org.joml.Matrix4f
 import org.joml.Vector3f
 import java.awt.Color
 import kotlin.math.cos
@@ -42,37 +45,18 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 //? if >= 26.2 {
-import net.minecraft.util.FormattedCharSequence
+import net.fabricmc.fabric.api.client.rendering.v1.SubmitRenderPhases
+import net.minecraft.client.renderer.feature.TextFeatureRenderer
 //?} else {
-/*import net.minecraft.client.renderer.MultiBufferSource
-import org.joml.Matrix4f
+/*import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEventLegacy
 *///?}
 
+@SkyHanniModule
 @Suppress("LargeClass")
 object WorldRenderUtils {
-
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
-    //? if >= 26.2 {
-    private const val SKYHANNI_TEXT_SUBMIT_ORDER = 10_000
-    //?} else {
-    /*// 26.1 composites entity render targets over the main target after the normal world-render hook.
-    // Drawing see-through text in the late pass prevents entities from covering it (MC-265743).
-    private val deferredSeeThroughText = mutableListOf<(MultiBufferSource.BufferSource) -> Unit>()
-
-    @JvmStatic
-    fun renderDeferredSeeThroughText(bufferSource: MultiBufferSource.BufferSource) {
-        if (deferredSeeThroughText.isEmpty()) return
-        try {
-            deferredSeeThroughText.forEach { it(bufferSource) }
-            bufferSource.endBatch()
-        } finally {
-            deferredSeeThroughText.clear()
-        }
-    }
-    *///?}
-
-    //? if >= 26.2 {
     private fun SkyHanniRenderWorldEvent.submitOrderedText(
         x: Float,
         y: Float,
@@ -82,10 +66,35 @@ object WorldRenderUtils {
         light: Int,
         color: Int,
         backgroundColor: Int,
-        outlineColor: Int,
     ) {
-        val order = SKYHANNI_TEXT_SUBMIT_ORDER + skyHanniTextSubmitOrder++
-        submitNodeStorage.order(order).submitText(
+        if (displayMode == SEE_THROUGH) {
+            // MC-298659: the vanilla text phase renders before translucent terrain, letting water
+            // draw over see-through text. Render only our own text after translucent terrain instead.
+            //? if >= 26.2 {
+            submitNodeCollector.submitCustom(
+                SubmitRenderPhases.AFTER_TERRAIN,
+                TextFeatureRenderer.Submit(
+                    Matrix4f(matrices.last().pose()),
+                    x,
+                    y,
+                    text,
+                    shadow,
+                    SEE_THROUGH,
+                    light,
+                    color,
+                    backgroundColor,
+                    0,
+                ),
+            )
+            //?} else {
+            /*queuedSeeThroughText.add(
+                SeeThroughText(Matrix4f(matrices.last().pose()), x, y, text, shadow, light, color, backgroundColor),
+            )
+            *///?}
+            return
+        }
+
+        submitNodeCollector.submitText(
             matrices,
             x,
             y,
@@ -95,21 +104,61 @@ object WorldRenderUtils {
             light,
             color,
             backgroundColor,
-            outlineColor,
+            0,
         )
     }
-    //?}
+
+    //? if < 26.2 {
+    /*private val queuedSeeThroughText = mutableListOf<SeeThroughText>()
+
+    private data class SeeThroughText(
+        val pose: Matrix4f,
+        val x: Float,
+        val y: Float,
+        val text: FormattedCharSequence,
+        val shadow: Boolean,
+        val light: Int,
+        val color: Int,
+        val backgroundColor: Int,
+    )
+
+    // See the MC-298659 note in submitOrderedText.
+    @HandleEvent
+    private fun onRenderWorldLegacy(event: SkyHanniRenderWorldEventLegacy) {
+        if (queuedSeeThroughText.isEmpty()) return
+        try {
+            val fr = Minecraft.getInstance().font
+            for (entry in queuedSeeThroughText) {
+                fr.drawInBatch(
+                    entry.text,
+                    entry.x,
+                    entry.y,
+                    entry.color,
+                    entry.shadow,
+                    entry.pose,
+                    event.bufferSource,
+                    DisplayMode.SEE_THROUGH,
+                    entry.backgroundColor,
+                    entry.light,
+                )
+            }
+        } finally {
+            queuedSeeThroughText.clear()
+        }
+    }
+    *///?}
 
     inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
         layer: RenderType,
         crossinline render: (VertexConsumer) -> Unit,
-    ) {
-        //? if >= 26.2 {
-        submitNodeStorage.submitCustomGeometry(matrices, layer) { _, buffer -> render(buffer) }
-        //?} else {
-        /*render(bufferSource.getBuffer(layer))
-        *///?}
-    }
+    ) = submitCustomGeometry(layer) { _, buf -> render(buf) }
+
+    // The render callback runs deferred, after the current pose is popped again.
+    // Anything needing the submit-time pose must use the callback's pose copy.
+    inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
+        layer: RenderType,
+        crossinline render: (PoseStack.Pose, VertexConsumer) -> Unit,
+    ) = submitNodeCollector.submitCustomGeometry(matrices, layer) { pose, buf -> render(pose, buf) }
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
@@ -129,8 +178,7 @@ object WorldRenderUtils {
         matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
         BeaconRenderer.submitBeaconBeam(
             matrices,
-            //~ if < 26.2 'submitNodeStorage' -> 'Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage'
-            submitNodeStorage,
+            submitNodeCollector,
             beaconBeam,
             1f,
             Math.floorMod(MinecraftCompat.clientTime, 40) + partialTicks,
@@ -252,11 +300,9 @@ object WorldRenderUtils {
         }
 
         val layer = SkyHanniRenderLayers.getFilled(throughWalls = seeThroughBlocks)
-        submitCustomGeometry(layer) { buf ->
-            matrices.pushPose()
-
+        submitCustomGeometry(layer) { pose, buf ->
             addChainedFilledBoxVertices(
-                matrices,
+                pose,
                 buf,
                 effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ,
                 effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ,
@@ -265,7 +311,6 @@ object WorldRenderUtils {
                 c.blue / 255f * 0.9f,
                 c.alpha / 255f * alphaMultiplier,
             )
-            matrices.popPose()
         }
     }
 
@@ -317,7 +362,6 @@ object WorldRenderUtils {
         val adjustedScale = (scale * 0.05).toFloat()
         val x = -fr.width(text) / 2f
 
-        //? if >= 26.2 {
         matrices.pushPose()
         matrices.translate(
             (location.x - cameraPos.x()).toFloat(),
@@ -336,50 +380,8 @@ object WorldRenderUtils {
             FULL_BRIGHT,
             color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
             backgroundColor,
-            0,
         )
         matrices.popPose()
-        //?} else {
-        /*val matrix = Matrix4f()
-        matrix.translate(
-            (location.x - cameraPos.x()).toFloat(),
-            (location.y - cameraPos.y()).toFloat(),
-            (location.z - cameraPos.z()).toFloat(),
-        ).rotate(camera.rotation())
-            .translate(0f, -yOffset * adjustedScale, 0f)
-            .scale(adjustedScale, -adjustedScale, adjustedScale)
-
-        if (seeThroughBlocks) {
-            deferredSeeThroughText.add { bufferSource ->
-                fr.drawInBatch(
-                    text,
-                    x,
-                    0f,
-                    color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-                    shadow,
-                    matrix,
-                    bufferSource,
-                    SEE_THROUGH,
-                    backgroundColor,
-                    FULL_BRIGHT,
-                )
-            }
-            return
-        }
-
-        fr.drawInBatch(
-            text,
-            x,
-            0f,
-            color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-            shadow,
-            matrix,
-            bufferSource,
-            if (seeThroughBlocks) SEE_THROUGH else POLYGON_OFFSET,
-            backgroundColor,
-            FULL_BRIGHT,
-        )
-        *///?}
     }
 
     fun SkyHanniRenderWorldEvent.drawCircleWireframe(entity: Entity, rad: Double, color: Color) {
@@ -964,11 +966,8 @@ object WorldRenderUtils {
     }
 
     internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec {
-        //? if >= 26.2 {
         val look = Vector3f(0f, 0f, -1f).rotate(camera.rotation())
         return camera.position.toLorenzVec() + LorenzVec(look.x.toDouble(), look.y.toDouble(), look.z.toDouble()).times(2)
-        //?} else
-        //return exactPlayerEyeLocation() + MinecraftCompat.localPlayerOrThrow.lookAngle.toLorenzVec().times(2)
     }
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {
@@ -987,79 +986,96 @@ object WorldRenderUtils {
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec =
         exactLocation(player).up(player.getEyeHeight(player.pose))
 
+    /**
+     * Convenience overload for [addChainedFilledBoxVertices] that takes Double arguments,
+     * which AABB bounds are, and converts them to Float ahead of time.
+     */
     private fun addChainedFilledBoxVertices(
-        matrices: PoseStack,
+        pose: PoseStack.Pose,
         vertexConsumer: VertexConsumer,
-        d: Double,
-        e: Double,
-        f: Double,
-        g: Double,
-        h: Double,
-        i: Double,
-        j: Float,
-        k: Float,
-        l: Float,
-        m: Float,
+        minX: Double,
+        minY: Double,
+        minZ: Double,
+        maxX: Double,
+        maxY: Double,
+        maxZ: Double,
+        r: Float,
+        g: Float,
+        b: Float,
+        a: Float,
     ) = addChainedFilledBoxVertices(
-        matrices,
+        pose,
         vertexConsumer,
-        d.toFloat(),
-        e.toFloat(),
-        f.toFloat(),
-        g.toFloat(),
-        h.toFloat(),
-        i.toFloat(),
-        j,
-        k,
-        l,
-        m,
+        minX.toFloat(),
+        minY.toFloat(),
+        minZ.toFloat(),
+        maxX.toFloat(),
+        maxY.toFloat(),
+        maxZ.toFloat(),
+        r,
+        g,
+        b,
+        a,
     )
 
+    /**
+     * Adds the vertices for a filled axis-aligned box as a single chained triangle strip.
+     *
+     * Some vertices are intentionally duplicated to insert degenerate triangles between
+     * faces, allowing the entire box to be rendered as one continuous strip without
+     * producing visible geometry between otherwise disconnected faces.
+     */
     private fun addChainedFilledBoxVertices(
-        matrices: PoseStack,
+        pose: PoseStack.Pose,
         vertexConsumer: VertexConsumer,
-        f: Float,
+        minX: Float,
+        minY: Float,
+        minZ: Float,
+        maxX: Float,
+        maxY: Float,
+        maxZ: Float,
+        r: Float,
         g: Float,
-        h: Float,
-        i: Float,
-        j: Float,
-        k: Float,
-        l: Float,
-        m: Float,
-        n: Float,
-        o: Float,
+        b: Float,
+        a: Float,
     ) {
-        val matrix4f = matrices.last().pose()
-        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
-        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
+        fun vertex(x: Float, y: Float, z: Float) {
+            vertexConsumer.addVertex(pose, x, y, z).setColor(r, g, b, a)
+        }
+
+        vertex(minX, minY, minZ)
+        vertex(minX, minY, minZ)
+        vertex(minX, minY, minZ)
+        vertex(minX, minY, maxZ)
+        vertex(minX, maxY, minZ)
+        vertex(minX, maxY, maxZ)
+        vertex(minX, maxY, maxZ)
+        vertex(minX, minY, maxZ)
+
+        vertex(maxX, maxY, maxZ)
+        vertex(maxX, minY, maxZ)
+        vertex(maxX, minY, maxZ)
+        vertex(maxX, minY, minZ)
+        vertex(maxX, maxY, maxZ)
+        vertex(maxX, maxY, minZ)
+        vertex(maxX, maxY, minZ)
+        vertex(maxX, minY, minZ)
+
+        vertex(minX, maxY, minZ)
+        vertex(minX, minY, minZ)
+        vertex(minX, minY, minZ)
+        vertex(maxX, minY, minZ)
+        vertex(minX, minY, maxZ)
+        vertex(maxX, minY, maxZ)
+        vertex(maxX, minY, maxZ)
+
+        vertex(minX, maxY, minZ)
+        vertex(minX, maxY, minZ)
+        vertex(minX, maxY, maxZ)
+        vertex(maxX, maxY, minZ)
+        vertex(maxX, maxY, maxZ)
+        vertex(maxX, maxY, maxZ)
+        vertex(maxX, maxY, maxZ)
     }
 
     /**
