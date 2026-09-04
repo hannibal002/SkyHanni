@@ -70,14 +70,11 @@ object SeeThroughWindow {
         return true
     }
 
-    private fun isGlfwPlatformError(error: Int): Boolean =
-        when (error) {
-            GLFW.GLFW_PLATFORM_ERROR,
-            GLFW.GLFW_PLATFORM_UNAVAILABLE,
-            GLFW.GLFW_NOT_INITIALIZED,
-            GLFW.GLFW_FEATURE_UNAVAILABLE,
-            GLFW.GLFW_FEATURE_UNIMPLEMENTED,
-            -> true
-            else -> false
-        }
+    private fun Int.isGlfwPlatformError(): Boolean = equalsOneOf(
+        GLFW.GLFW_PLATFORM_ERROR,
+        GLFW.GLFW_PLATFORM_UNAVAILABLE,
+        GLFW.GLFW_NOT_INITIALIZED,
+        GLFW.GLFW_FEATURE_UNAVAILABLE,
+        GLFW.GLFW_FEATURE_UNIMPLEMENTED,
+    )
 }
