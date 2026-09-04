@@ -54,21 +54,16 @@ object SeeThroughWindow {
         if (currentOpacity == targetOpacity) return
         if (setWindowOpacity(targetOpacity)) {
             currentOpacity = targetOpacity
+        } else {
+            unsupportedPlatform = true
+            ChatUtils.userError("Your platform doesn't support see through windows!")
         }
     }
 
     private fun setWindowOpacity(alpha: Float): Boolean {
         val handle = Minecraft.getInstance().window.handle()
-
         GLFW.glfwSetWindowOpacity(handle, alpha)
-
-        val error = GLFW.glfwGetError(null)
-        if (error.isGlfwPlatformError()) {
-            unsupportedPlatform = true
-            ChatUtils.userError("Your platform doesn't support see through windows!")
-            return false
-        }
-        return true
+        return !GLFW.glfwGetError(null).isGlfwPlatformError()
     }
 
     private fun Int.isGlfwPlatformError(): Boolean = equalsOneOf(
