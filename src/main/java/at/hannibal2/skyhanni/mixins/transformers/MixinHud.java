@@ -126,7 +126,8 @@ public abstract class MixinHud {
         }
     }
 
-    @Inject(method = "extractOverlayMessage", at = @At("TAIL"))
+    // RETURN rather than TAIL: the method returns early when there is no overlay message
+    @Inject(method = "extractOverlayMessage", at = @At("RETURN"))
     public void renderOverlayMessagePost(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
         RenderEvents.postActionBarLayerEventPost(context);
     }

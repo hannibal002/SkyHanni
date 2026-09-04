@@ -15,7 +15,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object LowHealthAlert {
-
     private val config get() = SkyHanniMod.feature.dungeon.lowHealthAlert
     private val soundConfig get() = config.lowHealthAlertSound
     private var lastAlert: TitleContext? = null
@@ -30,6 +29,8 @@ object LowHealthAlert {
         "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§(?<color>.))*(?<health>[\\w,.]+)(?:§.)*.?)",
     )
 
+    private val alertSound get() = SoundUtils.createSound(soundConfig.alertSound, soundConfig.pitch, isWarning = true)
+
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!isEnabled()) return
@@ -39,7 +40,6 @@ object LowHealthAlert {
             val health = group("health")
             if (color != "c" || health == "DEAD") return
 
-            val alertSound = SoundUtils.createSound(soundConfig.alertSound, soundConfig.pitch)
             SoundUtils.repeatSound(100, soundConfig.repeatSound, alertSound)
             lastAlert?.stop()
             TitleManager.sendTitle(
@@ -53,12 +53,8 @@ object LowHealthAlert {
     }
 
     @JvmStatic
-    fun playTestSound() {
-        with(soundConfig) {
-            SoundUtils.createSound(alertSound, pitch).playSound()
-        }
-    }
+    fun playTestSound() = alertSound.playSound()
 
     private fun isEnabled() =
-        config.enabled && DungeonApi.active && (!config.onlyWhileHealer || DungeonApi.playerClass == DungeonApi.DungeonClass.HEALER)
+        config.enabled && DungeonApi.active && (!config.onlyWhileHealer || DungeonApi.playerClass == HEALER)
 }
