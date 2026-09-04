@@ -25,7 +25,10 @@ object DefaultConfigFeatures {
 
         val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
         val updated = SkyHanniMod.VERSION !in knownToggles
-        val processor = createOptionProcessor()
+        val processor = FeatureToggleProcessor()
+        val driver = ConfigProcessorDriver(processor)
+        driver.warnForPrivateFields = false
+        driver.processConfig(SkyHanniMod.feature)
         knownToggles[SkyHanniMod.VERSION] = processor.allOptions.map { it.path }
         SkyHanniMod.configManager.saveConfig(ConfigFileType.KNOWN_FEATURES, "Updated known feature flags")
         if (!SkyHanniMod.feature.storage.hasPlayedBefore) {
@@ -43,20 +46,13 @@ object DefaultConfigFeatures {
                     "knownToggles" to knownToggles,
                     "version" to SkyHanniMod.VERSION,
                 )
+            val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}"
             ChatUtils.chat("Looks like you updated SkyHanni.")
-            val newOptions = filterOptions(
-                processor.orderedOptions,
-                togglesInOldVersion = knownToggles[lastVersion],
-                togglesInNewVersion = knownToggles[SkyHanniMod.VERSION],
+            ChatUtils.clickableChat(
+                "Click here to configure the newly introduced options, or run $command.",
+                onClick = { onCommand(lastVersion, SkyHanniMod.VERSION) },
+                "§eClick to run /shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}!",
             )
-            if (newOptions.isNotEmpty()) {
-                val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}"
-                ChatUtils.clickableChat(
-                    "Click here to configure the newly introduced options, or run $command.",
-                    onClick = { onCommand(lastVersion, SkyHanniMod.VERSION) },
-                    "§eClick to run $command!",
-                )
-            }
             ChatUtils.clickableChat(
                 "Click here to see the changelog.",
                 onClick = {
@@ -66,32 +62,12 @@ object DefaultConfigFeatures {
         }
     }
 
-    private fun createOptionProcessor(): FeatureToggleProcessor {
+    private fun onCommand(old: String, new: String) {
         val processor = FeatureToggleProcessor()
         val driver = ConfigProcessorDriver(processor)
         driver.warnForPrivateFields = false
         driver.processConfig(SkyHanniMod.feature)
-        return processor
-    }
-
-    private fun filterOptions(
-        options: Map<Category, List<FeatureToggleableOption>>,
-        togglesInOldVersion: List<String>?,
-        togglesInNewVersion: List<String>?,
-    ): Map<Category, List<FeatureToggleableOption>> {
-        val oldPaths = togglesInOldVersion?.toSet()
-        val newPaths = togglesInNewVersion?.toSet()
-        return options
-            .mapValues { (_, categoryOptions) ->
-                categoryOptions.filter {
-                    (newPaths == null || it.path in newPaths) &&
-                        (oldPaths == null || it.path !in oldPaths)
-                }
-            }
-            .filter { (_, filteredOptions) -> filteredOptions.isNotEmpty() }
-    }
-
-    private fun onCommand(old: String, new: String) {
+        var optionList = processor.orderedOptions
         val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
         val togglesInNewVersion = knownToggles[new]
         if (new != "null" && togglesInNewVersion == null) {
@@ -103,7 +79,14 @@ object DefaultConfigFeatures {
             ChatUtils.chat("Unknown version $old")
             return
         }
-        val optionList = filterOptions(createOptionProcessor().orderedOptions, togglesInOldVersion, togglesInNewVersion)
+        optionList = optionList
+            .mapValues { option ->
+                option.value.filter {
+                    (togglesInNewVersion == null || it.path in togglesInNewVersion) &&
+                        (togglesInOldVersion == null || it.path !in togglesInOldVersion)
+                }
+            }
+            .filter { (_, filteredOptions) -> filteredOptions.isNotEmpty() }
         if (optionList.isEmpty()) {
             ChatUtils.chat("There are no new options to configure between $old and $new")
             return

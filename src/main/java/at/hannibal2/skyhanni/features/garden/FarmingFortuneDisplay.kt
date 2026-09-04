@@ -2,12 +2,15 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStat.FARMING_FORTUNE
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
@@ -143,8 +146,8 @@ object FarmingFortuneDisplay {
 
     private val ZORROS_CAPE = "ZORROS_CAPE".toInternalName()
 
-    @HandleEvent(onlyOnIsland = GARDEN)
-    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         val widget = event.widget
         if (event.isWidget(TabWidget.STATS)) {
             checkStats(widget)
@@ -200,13 +203,13 @@ object FarmingFortuneDisplay {
         }
     }
 
-    @HandleEvent
-    private fun onGardenToolChange() {
+    @HandleEvent(GardenToolChangeEvent::class)
+    fun onGardenToolChange() {
         lastToolSwitch = SimpleTimeMark.now()
     }
 
     @HandleEvent
-    private fun onGuiRenderTop() {
+    fun onGuiRenderTop() {
         if (InventoryUtils.inAnyInventory()) {
             InventoryGuiScaleCompat.withOriginalHudScale {
                 renderDisplay()
@@ -341,8 +344,8 @@ object FarmingFortuneDisplay {
         }
     }
 
-    @HandleEvent(onlyOnIsland = GARDEN)
-    private fun onTick(event: SkyHanniTickEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onTick(event: SkyHanniTickEvent) {
         if (event.isMod(2)) update()
         if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
             if (lastUniversalFortuneMissingError.passedSince() < 20.seconds) return
@@ -368,13 +371,13 @@ object FarmingFortuneDisplay {
         }
     }
 
-    @HandleEvent
-    private fun onCropClick() {
+    @HandleEvent(CropClickEvent::class)
+    fun onCropClick() {
         if (firstBrokenCropTime == SimpleTimeMark.farPast()) firstBrokenCropTime = SimpleTimeMark.now()
     }
 
     @HandleEvent
-    private fun onWorldChange() {
+    fun onWorldChange() {
         display = emptyList()
         gardenJoinTime = SimpleTimeMark.now()
         firstBrokenCropTime = SimpleTimeMark.farPast()
@@ -499,7 +502,7 @@ object FarmingFortuneDisplay {
     @JvmStatic
     fun playUserSound() {
         with(config.sound) {
-            SoundUtils.createSound(name, pitch, isWarning = true).playSound()
+            SoundUtils.createSound(name, pitch).playSound()
         }
     }
 
@@ -508,7 +511,7 @@ object FarmingFortuneDisplay {
     fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
 
     @HandleEvent
-    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.farmingFortuneDisplay", "garden.farmingFortunes.display")
         event.move(3, "garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")
         event.move(3, "garden.farmingFortunePos", "garden.farmingFortunes.pos")

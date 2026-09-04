@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming.lane
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -52,17 +53,17 @@ object FarmingLaneFeatures {
     }
 
     @HandleEvent
-    private fun onFarmingLaneSwitch(event: FarmingLaneSwitchEvent) {
+    fun onFarmingLaneSwitch(event: FarmingLaneSwitchEvent) {
         display = emptyList()
     }
 
     @HandleEvent
-    private fun onGardenToolChange(event: GardenToolChangeEvent) {
+    fun onGardenToolChange(event: GardenToolChangeEvent) {
         display = emptyList()
     }
 
-    @HandleEvent(onlyOnIsland = GARDEN)
-    private fun onTick() {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onTick() {
         if (!config.distanceDisplay && !config.laneSwitchNotification.enabled) return
 
         if (!calculateDistance()) return
@@ -76,7 +77,7 @@ object FarmingLaneFeatures {
             display = buildList {
                 add("§7Distance until switch: §e${currentDistance.roundTo(1)}")
 
-                val normal = movementState == NORMAL
+                val normal = movementState == MovementState.NORMAL
                 val color = if (normal) "§b" else "§8"
                 val timeRemaining = timeRemaining ?: return@buildList
                 val format = timeRemaining.format(showMilliSeconds = timeRemaining < 20.seconds)
@@ -156,7 +157,7 @@ object FarmingLaneFeatures {
     private fun calculateSpeed(): Boolean {
         val speed = MovementSpeedDisplay.bpsMoveSpeed.roundTo(2)
         movementState = calculateMovementState(speed)
-        if (movementState != NORMAL) return false
+        if (movementState != MovementState.NORMAL) return false
 
         val timeRemaining = (currentDistance / speed).seconds
         FarmingLaneFeatures.timeRemaining = timeRemaining
@@ -178,22 +179,23 @@ object FarmingLaneFeatures {
         sameSpeedCounter++
 
         if (speed == 0.0 && sameSpeedCounter > 1) {
-            return NOT_MOVING
+            return MovementState.NOT_MOVING
         }
         val speedTooSlow = speed < 1
         if (speedTooSlow && sameSpeedCounter > 5) {
-            return TOO_SLOW
+            return MovementState.TOO_SLOW
         }
         // only calculate the time if the speed has not changed
         if (sameSpeedCounter < 6) {
-            return CALCULATING
+            return MovementState.CALCULATING
         }
 
-        return NORMAL
+
+        return MovementState.NORMAL
     }
 
-    @HandleEvent(onlyOnIsland = GARDEN)
-    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.cornerWaypoints) return
 
         val lane = FarmingLaneApi.currentLane ?: return
@@ -210,8 +212,8 @@ object FarmingLaneFeatures {
 
     private fun LorenzVec.capAtBuildHeight(): LorenzVec = if (y > 76) copy(y = 76.0) else this
 
-    @HandleEvent(onlyOnIsland = GARDEN)
-    private fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.distanceDisplay) return
 
         config.distanceDisplayPosition.renderStrings(display, posLabel = "Lane Display")
@@ -220,7 +222,7 @@ object FarmingLaneFeatures {
     @JvmStatic
     fun playUserSound() {
         with(config.laneSwitchNotification.sound) {
-            SoundUtils.createSound(name, pitch, isWarning = true).playSound()
+            SoundUtils.createSound(name, pitch).playSound()
         }
     }
 }

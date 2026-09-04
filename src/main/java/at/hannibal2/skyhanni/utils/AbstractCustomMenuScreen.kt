@@ -28,12 +28,11 @@ abstract class AbstractCustomMenuScreen(
         ToolTipData.lastSlot = null
     }
 
-    fun changeHandler(newMenu: ChestMenu, inventoryName: Component) {
+    fun changeHandler(newMenu: ChestMenu) {
         menu.removeSlotListener(this)
         menu = newMenu
         menu.addSlotListener(this)
         ToolTipData.lastSlot = null
-        this.title = inventoryName
     }
 
     override fun getMenu(): ChestMenu {

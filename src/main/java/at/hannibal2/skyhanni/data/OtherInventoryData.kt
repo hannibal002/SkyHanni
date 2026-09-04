@@ -30,26 +30,24 @@ object OtherInventoryData {
         get() = currentInventory?.title.orEmpty()
 
     @HandleEvent
-    private fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
+    fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
         close()
     }
 
     @HandleEvent
-    private fun onPacketSent(event: PacketSentEvent) {
+    fun onPacketSent(event: PacketSentEvent) {
         if (event.packet is ServerboundContainerClosePacket) {
             close()
         }
     }
 
     fun close(title: String = currentInventoryName, reopenSameName: Boolean = false) {
-        // handlers reset their state on the close event, a queued update would arrive after that
-        lateEvent = null
         InventoryCloseEvent(title, reopenSameName).post()
         currentInventory = null
     }
 
     @HandleEvent
-    private fun onTick() {
+    fun onTick() {
         lateEvent?.let {
             it.post()
             lateEvent = null
@@ -85,7 +83,7 @@ object OtherInventoryData {
     )
 
     @HandleEvent
-    private fun onInventoryDataReceiveEvent(event: PacketReceivedEvent) {
+    fun onInventoryDataReceiveEvent(event: PacketReceivedEvent) {
         val packet = event.packet
 
         if (packet is ClientboundContainerClosePacket) {

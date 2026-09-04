@@ -195,12 +195,6 @@ class InventoryConfig {
     val npcTrade: NpcTradeConfig = NpcTradeConfig()
 
     @Expose
-    @ConfigOption(name = "Hub Selector", desc = "Highlight near-capacity lobbies in the hub selector.")
-    @Accordion
-    @SearchTag("lobby full players")
-    val hubSelector: HubSelectorConfig = HubSelectorConfig()
-
-    @Expose
     @ConfigOption(name = "Item Number", desc = "Show the item number as a stack size for these items.")
     @ConfigEditorDraggableList
     @SearchTag(EVOLVING_ITEMS_SEARCH_TAG)
@@ -215,7 +209,6 @@ class InventoryConfig {
         MASTER_STAR_TIER("§bMaster Star Tier"),
         MASTER_SKULL_TIER("§bMaster Skull Tier"),
         DUNGEON_HEAD_FLOOR_NUMBER("§bDungeon Head Floor Number"),
-        DUNGEON_ITEM_QUALITY("§bDungeon Item Quality"),
         NEW_YEAR_CAKE("§bNew Year Cake"),
         PET_LEVEL("§bPet Level"),
         MINION_TIER("§bMinion Tier"),

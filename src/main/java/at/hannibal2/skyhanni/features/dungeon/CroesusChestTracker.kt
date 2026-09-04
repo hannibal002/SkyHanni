@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -136,8 +137,8 @@ object CroesusChestTracker {
 
     private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
 
-    @HandleEvent(priority = HandleEvent.LOW, onlyOnSkyblock = true)
-    private fun onBackgroundDrawn() {
+    @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, priority = HandleEvent.LOW, onlyOnSkyblock = true)
+    fun onBackgroundDrawn() {
         if (!SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker) return
 
         if (!inCroesusInventory || croesusEmpty) return
@@ -153,7 +154,7 @@ object CroesusChestTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if ((SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker || config.showUsedKismets) &&
             croesusPattern.matches(event.inventoryName)
         ) {
@@ -216,25 +217,25 @@ object CroesusChestTracker {
         openState = null
     }
 
-    @HandleEvent
-    private fun onInventoryClose() {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         inCroesusInventory = false
         chestInventory = null
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.showUsedKismets) return
         if (inCroesusInventory && !croesusEmpty) {
-            val item = event.item ?: return
+            if (event.slot == null) return
             when (event.slotId) {
-                FRONT_ARROW_SLOT -> if (pageSwitchable && item.isArrow()) {
+                FRONT_ARROW_SLOT -> if (pageSwitchable && event.slot.item.isArrow()) {
                     pageSwitchable = false
                     currentPage++
                 }
 
                 // People are getting Index out of range errors presumably due to negative pages.
-                BACK_ARROW_SLOT -> if (pageSwitchable && currentPage != 0 && item.isArrow()) {
+                BACK_ARROW_SLOT -> if (pageSwitchable && currentPage != 0 && event.slot.item.isArrow()) {
                     pageSwitchable = false
                     currentPage--
                 }
@@ -245,7 +246,7 @@ object CroesusChestTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onRenderItemTip(event: RenderItemTipEvent) {
+    fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!config.kismetStackSize) return
         if (chestInventory == null) return
         if (!kismetPattern.matches(event.stack.cleanName)) return
@@ -254,7 +255,7 @@ object CroesusChestTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onRenderInventoryItemTip(event: RenderInventoryItemTipEvent) {
+    fun onRenderInventoryItemTip(event: RenderInventoryItemTipEvent) {
         if (!config.showUsedKismets) return
         if (!inCroesusInventory) return
         if (event.slot.containerSlot != event.slot.index) return
@@ -267,12 +268,12 @@ object CroesusChestTracker {
     }
 
     @HandleEvent
-    private fun onKuudraComplete(event: KuudraCompleteEvent) {
+    fun onKuudraComplete(event: KuudraCompleteEvent) {
         addCroesusChest("T${event.kuudraTier}")
     }
 
     @HandleEvent
-    private fun onDungeonComplete(event: DungeonCompleteEvent) {
+    fun onDungeonComplete(event: DungeonCompleteEvent) {
         if (event.floor == "E") return
         addCroesusChest(event.floor)
     }
@@ -332,6 +333,7 @@ object CroesusChestTracker {
         }
         return unopenedChests
     }
+
 
     private fun addCroesusChest(floorOrTier: String) {
         croesusChests?.add(0, DungeonRunInfo(floorOrTier, SimpleTimeMark.now()))

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.event.diana.RareMobToggleConfig
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -40,6 +41,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object RareMobWaypointShare {
+
     private val config get() = SkyHanniMod.feature.event.diana.rareMobsSharing
 
     private val patternGroup = RepoPattern.group("diana.waypoints.inquisitor")
@@ -111,7 +113,7 @@ object RareMobWaypointShare {
     }
 
     @HandleEvent
-    private fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
         if (event.repeatSeconds(3)) {
@@ -122,7 +124,7 @@ object RareMobWaypointShare {
     }
 
     @HandleEvent
-    private fun onWorldChange() {
+    fun onWorldChange() {
         _waypoints.clear()
         rareMobsNearby.clear()
     }
@@ -130,7 +132,7 @@ object RareMobWaypointShare {
     private val rareMobTime = mutableListOf<SimpleTimeMark>()
 
     @HandleEvent
-    private fun onRareDianaMobFound(event: RareDianaMobFoundEvent) {
+    fun onRareDianaMobFound(event: RareDianaMobFoundEvent) {
         val rareMob = event.entity
         rareMobsNearby[rareMob.id] = rareMob
         GriffinBurrowHelper.update()
@@ -153,8 +155,8 @@ object RareMobWaypointShare {
         }
     }
 
-    @HandleEvent(onlyOnIsland = HUB, receiveCancelled = true)
-    private fun onChat(event: SkyHanniChatEvent.Allow) {
+    @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         val message = event.message
 
@@ -196,7 +198,7 @@ object RareMobWaypointShare {
     }
 
     @HandleEvent
-    private fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
+    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!isEnabled()) return
         if (event.health > 0) return
 
@@ -208,7 +210,7 @@ object RareMobWaypointShare {
     }
 
     @HandleEvent
-    private fun onKeyPress(event: KeyPressEvent) {
+    fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (MinecraftCompat.screen != null) return
         if (event.keyCode == config.keyBindShare) sendRareMob()
@@ -296,12 +298,12 @@ object RareMobWaypointShare {
     @JvmStatic
     fun playUserSound() {
         with(config.sound) {
-            SoundUtils.createSound(name, pitch, isWarning = true).playSound()
+            SoundUtils.createSound(name, pitch).playSound()
         }
     }
 
     @HandleEvent
-    private fun onCommandRegistration(event: CommandRegistrationEvent) {
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetdianamobs") {
             description = "Resets all saved rare Diana mob locations"
             category = CommandCategory.USERS_RESET

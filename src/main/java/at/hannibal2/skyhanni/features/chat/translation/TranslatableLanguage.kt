@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat.translation
 
-enum class TranslatableLanguage(englishName: String, nativeName: String, val languageCode: String) {
+enum class TranslatableLanguage(private val englishName: String, private val nativeName: String, val languageCode: String) {
+
     // 1. First Language - The primary language of the application.
     ENGLISH("English", "", "en"),
 

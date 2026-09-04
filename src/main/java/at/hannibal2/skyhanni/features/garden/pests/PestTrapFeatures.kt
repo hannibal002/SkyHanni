@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTrapConfig
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.MAX_TRAPS
@@ -29,6 +31,7 @@ private typealias WarningDisplayType = PestTrapConfig.WarningConfig.WarningDispl
 
 @SkyHanniModule
 object PestTrapFeatures {
+
     private val config get() = SkyHanniMod.feature.garden.pests.pestTrap
     private val enabledTypes: WarningDisplayType get() = config.warningConfig.warningDisplayType.get()
     private val userEnabledWarnings: List<WarningReason> get() = config.warningConfig.enabledWarnings.get()
@@ -51,18 +54,17 @@ object PestTrapFeatures {
     private var warningSound: SoundInstance? = refreshSound()
 
     private fun getNextWarningMark() = SimpleTimeMark.now() + virtualReminderInterval
-    private fun refreshSound() =
-        soundString.takeIf(String::isNotEmpty)?.let { SoundUtils.createSound(it, 1f, isWarning = true) }
+    private fun refreshSound() = soundString.takeIf(String::isNotEmpty)?.let { SoundUtils.createSound(it, 1f) }
 
     @HandleEvent
-    private fun onKeybind(event: GuiKeyPressEvent) {
+    fun onKeybind(event: GuiKeyPressEvent) {
         if (!PestTrapApi.inInventory) return
         if (!config.releaseHotkey.isKeyHeld()) return
         InventoryUtils.clickSlot(16)
     }
 
-    @HandleEvent
-    private fun onConfigLoad() {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.warningConfig.warningSound) {
             warningSound = refreshSound()
         }
@@ -96,15 +98,15 @@ object PestTrapFeatures {
     }
 
     @HandleEvent
-    private fun onPestTrapDataUpdate(event: PestTrapDataEvent) {
+    fun onPestTrapDataUpdate(event: PestTrapDataEvent) {
         allActiveWarnings.clear()
         if (event.trapsPlaced < MAX_TRAPS) allActiveWarnings.add(WarningReason.UNPLACED_TRAPS)
         if (event.fullTraps.isNotEmpty()) allActiveWarnings.add(WarningReason.TRAP_FULL)
         if (event.noBaitTraps.isNotEmpty()) allActiveWarnings.add(WarningReason.NO_BAIT)
     }
 
-    @HandleEvent(onlyOnIsland = GARDEN)
-    private fun onSecondPassed() {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onSecondPassed() {
         val applicableWarnings = allActiveWarnings.filter { it in userEnabledWarnings }
         if (applicableWarnings.isEmpty() || nextWarningMark.isInFuture()) return
         val activeWarnings = applicableWarnings.map { it.getDescriptiveWarning() }

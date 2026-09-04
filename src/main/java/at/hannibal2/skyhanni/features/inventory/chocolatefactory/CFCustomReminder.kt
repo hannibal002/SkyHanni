@@ -99,7 +99,7 @@ object CFCustomReminder {
         if (!isEnabled() || !inChocolateMenu()) return
         val item = event.item ?: return
         CFDataLoader.upgradeTierPattern.matchMatcher(item.cleanName) {
-            if (group("upgrade") == "Time Tower" && event.mouseType.isRightClick()) return
+            if (group("upgrade") == "Time Tower" && event.clickedButton == 1) return
         }
         val (cost, name) = getCostAndName(item) ?: return
         val duration = ChocolateAmount.CURRENT.timeUntilGoal(cost)

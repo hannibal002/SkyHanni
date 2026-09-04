@@ -17,6 +17,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object BlazeSlayerFirePitsWarning {
+
     private val config get() = SlayerApi.config.blazes
 
     private var lastFirePitsWarning = SimpleTimeMark.farPast()
@@ -27,17 +28,17 @@ object BlazeSlayerFirePitsWarning {
     }
 
     @HandleEvent
-    private fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(10)) return
 
         if (lastFirePitsWarning.passedSince() < 2.seconds) {
-            SoundUtils.createSound("entity.experience_orb.pickup", 0.8f, isWarning = true).playSound()
+            SoundUtils.createSound("entity.experience_orb.pickup", 0.8f).playSound()
         }
     }
 
     @HandleEvent
-    private fun onBossHealthChange(event: BossHealthChangeEvent) {
+    fun onBossHealthChange(event: BossHealthChangeEvent) {
         if (!isEnabled()) return
         val entityData = event.entityData
 
@@ -71,7 +72,7 @@ object BlazeSlayerFirePitsWarning {
             )
 
     @HandleEvent
-    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "slayer.firePitsWarning", "slayer.blazes.firePitsWarning")
     }
 }

@@ -15,6 +15,7 @@ import com.google.gson.JsonPrimitive
 
 @SkyHanniModule
 object ChatSoundResponse {
+
     private val config get() = SkyHanniMod.feature.chat.soundResponse
 
     init {
@@ -22,7 +23,7 @@ object ChatSoundResponse {
     }
 
     @HandleEvent
-    private fun onChat(event: SkyHanniChatEvent.Allow) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         for (soundType in SoundResponseTypes.entries) {
@@ -35,7 +36,7 @@ object ChatSoundResponse {
     }
 
     @HandleEvent
-    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(95, "chat.soundResponse.soundResponses") { element ->
             if (!element.isJsonArray) return@transform element
             val array = element.asJsonArray
@@ -69,6 +70,7 @@ object ChatSoundResponse {
         }
     }
 
+
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }
 
@@ -92,7 +94,7 @@ enum class SoundResponseTypes(private val displayName: String, soundLocation: St
     GOAT("Goat", "entity.goat.screaming.ambient", listOf("bleat")),
     ;
 
-    val sound by lazy { SoundUtils.createSound(soundLocation, 1f, isWarning = false) }
+    val sound by lazy { SoundUtils.createSound(soundLocation, 1f) }
 
     // creates a pattern that looks for if the message contains any of the triggerOn strings but as a full word
     val pattern by RepoPattern.pattern(

@@ -101,7 +101,7 @@ object CFInventory {
         val slotNumber = slot.index
         if (!config.useMiddleClick) return
         if (slotNumber in CFApi.noPickblockSlots &&
-            (slotNumber != CFApi.timeTowerIndex || event.mouseType.isRightClick())
+            (slotNumber != CFApi.timeTowerIndex || event.clickedButton == 1)
         ) return
 
         // this would break CFKeybinds otherwise

@@ -44,6 +44,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 @SkyHanniModule
 object ReforgeHelper {
+
     private val config get() = SkyHanniMod.feature.inventory.helper.reforge
 
     private val patternGroup = RepoPattern.group("reforge")
@@ -138,8 +139,8 @@ object ReforgeHelper {
         if (!isEnabled()) return
         rareReforgeBlocked = false
 
-        if (event.slotId == reforgeButton) {
-            val lastLine = event.item?.getLoreComponent()?.lastOrNull()?.string
+        if (event.slot?.index == reforgeButton) {
+            val lastLine = event.slot.item.getLoreComponent().lastOrNull()?.string
             if (!clickToReforgePattern.matches(lastLine)) return
             if (handleNonBasicReforgeBlock(event)) return
             if (handleReforgeButtonClick(event)) return
@@ -160,7 +161,7 @@ object ReforgeHelper {
             waitDelay = true
             event.cancel()
         } else {
-            if (event.mouseType.isMiddleClick()) return true
+            if (event.clickedButton == 2) return true
             if (waitDelay) {
                 waitDelay = false
             } else {

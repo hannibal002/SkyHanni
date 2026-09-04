@@ -21,6 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object KillZoneWarning {
+
     private val config get() = SkyHanniMod.feature.rift.area.colosseum
 
     private val patternGroup = RepoPattern.group("rift.colosseum.bacte")
@@ -36,7 +37,7 @@ object KillZoneWarning {
         "§a⚠ §r§cGet back in the arena or you will DIE(?<exclamation>!+) §r§a⚠"
     )
 
-    private val sound by lazy { SoundUtils.createSound("entity.experience_orb.pickup", 0.0f, isWarning = true) }
+    private val sound by lazy { SoundUtils.createSound("entity.experience_orb.pickup", 0.0f) }
 
     private var lastMessageTime = SimpleTimeMark.farPast()
     private var killDeadline = SimpleTimeMark.farPast()

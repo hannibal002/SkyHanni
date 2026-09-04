@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.slayer.spider
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
@@ -81,7 +81,7 @@ object SpiderEggSacHighlighter {
     }
 
     @HandleEvent
-    private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
+    fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
         if (highlightedEggSacs.remove(event.entity)) {
             RenderLivingEntityHelper.removeEntityColor(event.entity)
         }

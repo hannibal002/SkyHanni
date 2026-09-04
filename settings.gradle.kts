@@ -6,7 +6,7 @@ pluginManagement {
         gradlePluginPortal()
         maven("https://maven.fabricmc.net") {
             content {
-                includeGroupAndSubgroups("net.fabricmc")
+                includeGroupByRegex("net.fabricmc.*")
             }
         }
         maven("https://repo.spongepowered.org/maven/") {
@@ -21,13 +21,13 @@ pluginManagement {
         }
         maven("https://jitpack.io") {
             content {
-                includeGroupAndSubgroups("com.github")
+                includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
         // Stonecutter
         maven("https://maven.kikugie.dev/snapshots") {
             content {
-                includeGroupAndSubgroups("dev.kikugie")
+                includeGroupByRegex("dev.kikugie.*")
             }
         }
     }

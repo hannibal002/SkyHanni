@@ -76,7 +76,7 @@ object PetStorageApi {
             // Forge pets menu is also called "Pets", but doesn't have this item
             val titleItem = InventoryUtils.getItemAtSlotIndex(4) ?: return@InventoryDetector false
             return@InventoryDetector PetStoragePatterns.mainPetMenuTitleItemNamePattern.matches(titleItem.cleanName)
-        },
+        }
     )
 
     private fun isPetWidgetUnavailable(): Boolean = IslandType.CATACOMBS.isInIsland()
@@ -86,11 +86,9 @@ object PetStorageApi {
         !TabWidget.PET.isActive && SkyBlockUtils.lastWorldSwitch.passedSince() >= WIDGET_LOAD_GRACE -> {
             "§cInaccurate! Enable /tab → Pet Widget"
         }
-
         showMissingOverflowXpWarning && petWidgetState == PetWidgetState.MAXED_WITHOUT_OVERFLOW_XP -> {
             "§cInaccurate! Enable /tab → Pet Widget → Show Overflow Pet XP"
         }
-
         else -> null
     }
 
@@ -514,8 +512,8 @@ object PetStorageApi {
         val clickedPetData = clickedItem.toClickedPetDataOrNull() ?: return
         val clickedPetUuid = clickedPetData.uuid
         val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
-        when (event.mouseType) {
-            RIGHT_CLICK -> {
+        when (event.clickedButton) {
+            1 -> { // Right click - remove pet from menu
                 clickedPetUuid ?: return
                 petStorage?.pets?.removeIf { it.uuid == clickedPetUuid }
                 if (currentPetUuid == clickedPetUuid) {
@@ -523,7 +521,7 @@ object PetStorageApi {
                 }
             }
 
-            LEFT_CLICK -> {
+            0 -> { // Left click - if not a shift click, summon/un-summon pet
                 if (KeyboardManager.isShiftKeyDown()) return
                 lastExactPetMenuClick = SimpleTimeMark.now()
                 if (clickedItem.isCurrentPetStack() || currentPetUuid == clickedPetUuid) {
@@ -714,6 +712,9 @@ object PetStorageApi {
         this.rarity == rarity &&
         this.level <= level &&
         this.skinTag == skinTag
+
+    fun isAutopetMessage(message: String): Boolean =
+        PetStoragePatterns.autoPetMessageColorlessPattern.matches(message.removeColor().removeResets())
 
     fun markDirty() {
         jsonNeedsSave = true

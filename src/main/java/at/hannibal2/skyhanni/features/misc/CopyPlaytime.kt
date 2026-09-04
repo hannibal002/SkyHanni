@@ -31,7 +31,7 @@ object CopyPlaytime {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (InventoryUtils.openInventoryName() != "Detailed /playtime") return
         if (event.slotId != 4) return
-        if (!event.mouseType.isLeftClick()) return
+        if (event.clickedButton != 0) return
 
         event.cancel()
         val text = event.item?.getLore()?.toMutableList() ?: return

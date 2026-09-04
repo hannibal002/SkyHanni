@@ -103,7 +103,7 @@ object GetFromSackApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!event.mouseType.isRightClick()) return // filter none right clicks
+        if (event.clickedButton != 1) return // filter none right clicks
         addToQueue(inventoryMap[event.slotId] ?: return)
         inventoryMap.remove(event.slotId)
         event.cancel()

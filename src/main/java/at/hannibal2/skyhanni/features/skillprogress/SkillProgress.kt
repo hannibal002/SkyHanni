@@ -42,6 +42,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SkillProgress {
+
     val config get() = SkyHanniMod.feature.skillProgress
     private val barConfig get() = config.skillProgressBarConfig
     private val allSkillConfig get() = config.allSkillDisplayConfig
@@ -57,7 +58,7 @@ object SkillProgress {
     var hideInActionBar = listOf<String>()
 
     @HandleEvent
-    private fun onGuiRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -75,7 +76,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    private fun onChestGuiRender() {
+    fun onChestGuiRender() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -85,7 +86,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    private fun onGuiRenderTop() {
+    fun onGuiRenderTop() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -153,7 +154,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    private fun onProfileJoin() {
+    fun onProfileJoin() {
         display = emptyList()
         allDisplay = emptyList()
         etaDisplay = emptyList()
@@ -161,7 +162,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    private fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isDisplayEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 
@@ -175,7 +176,7 @@ object SkillProgress {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onLevelUp(event: SkillOverflowLevelUpEvent) {
+    fun onLevelUp(event: SkillOverflowLevelUpEvent) {
         if (!config.overflowConfig.enableInChat) return
         val skillName = event.skill.displayName
         val oldLevel = event.oldLevel
@@ -208,11 +209,11 @@ object SkillProgress {
         if (goalReached)
             chat("§lYou have reached your goal level of §b§l${skill.customGoalLevel} §e§lin the §b§l$skillName §e§lskill!")
 
-        SoundUtils.createSound("entity.player.levelup", 1f, 1f, isWarning = false).playSound()
+        SoundUtils.createSound("entity.player.levelup", 1f, 1f).playSound()
     }
 
     @HandleEvent
-    private fun onConfigLoad() {
+    fun onConfigLoad() {
         onToggle(
             config.enabled,
             config.alwaysShow,
@@ -235,7 +236,7 @@ object SkillProgress {
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
-    private fun onActionBar(event: ActionBarUpdateEvent) {
+    fun onActionBar(event: ActionBarUpdateEvent) {
         if (!config.hideInActionBar || !isDisplayEnabled()) return
         var msg = event.actionBar
         for (line in hideInActionBar) {
@@ -493,6 +494,7 @@ object SkillProgress {
         if (xpInfo.lastTotalXP > 0) {
             val delta = totalXP - xpInfo.lastTotalXP
             if (delta > 0) {
+
                 xpInfo.timer = when (SkillApi.activeSkill) {
                     SkillType.FARMING -> etaConfig.farmingPauseTime
                     SkillType.MINING -> etaConfig.miningPauseTime

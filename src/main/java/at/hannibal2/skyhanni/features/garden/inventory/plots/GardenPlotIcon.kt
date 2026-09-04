@@ -93,12 +93,12 @@ object GardenPlotIcon {
         lastClickedSlotId = event.slotId
         if (event.slotId == 53) {
             event.cancel()
-            if (event.mouseType.isLeftClick()) {
+            if (event.clickedButton == 0) {
                 if (editMode == 2)
                     editMode = 0
                 else
                     editMode++
-            } else if (event.mouseType.isRightClick()) {
+            } else if (event.clickedButton == 1) {
                 if (editMode == 0)
                     editMode = 2
                 else

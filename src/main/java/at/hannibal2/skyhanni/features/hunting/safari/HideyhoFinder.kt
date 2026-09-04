@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllApi
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllHelper
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationCondition
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -83,7 +83,7 @@ object HideyhoFinder {
         }
     }
 
-    // TODO in future once NavigateAllApi has the technology we can skip nodes that don't have a hideyho after doing a sight check
+    // TODO in future once NavigateAllHelper has the technology we can skip nodes that don't have a hideyho after doing a sight check
     private fun beginNavigation() {
         val startLocation = startLocation ?: return
         val graph = IslandGraphs.currentIslandGraph ?: return
@@ -94,7 +94,7 @@ object HideyhoFinder {
         if (locations.isEmpty()) return
 
         currentlyNavigating = true
-        NavigateAllApi.navigateAll(
+        NavigateAllHelper.navigateAll(
             locations,
             GraphNodeTag.HIDEYHO_LOCATION.displayName,
             GraphNodeTag.HIDEYHO_LOCATION.color.toColor(),
@@ -105,7 +105,7 @@ object HideyhoFinder {
                 ChatUtils.chat("Could not find any hidden Hideyho, maybe someone else already found it.")
                 reportBug = true
                 currentlyNavigating = false
-                NavigateAllApi.handleStop()
+                NavigateAllHelper.handleStop()
             },
             continueNavigationCondition = NavigationCondition.SecondPassed { node ->
                 val isNearby = node.position.nearbyLocation(5.0) != null
@@ -124,7 +124,7 @@ object HideyhoFinder {
     private fun finishNavigation() {
         ChatUtils.chat("§aFound Hideyho!")
         currentlyNavigating = false
-        NavigateAllApi.handleStop()
+        NavigateAllHelper.handleStop()
     }
 
     private fun LorenzVec.nearbyLocation(radius: Double): LorenzVec? {

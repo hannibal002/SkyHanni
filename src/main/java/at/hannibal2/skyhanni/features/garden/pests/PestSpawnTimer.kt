@@ -10,7 +10,12 @@ import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.hasFarmingToolInHand
@@ -44,6 +49,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PestSpawnTimer {
+
     private val config get() = PestApi.config.pestTimer
     private val patternGroup = RepoPattern.group("garden.pests")
     private val cooldownOverMessageId = ChatUtils.getUniqueMessageId()
@@ -89,9 +95,9 @@ object PestSpawnTimer {
     }.get().seconds
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
-        val widgetLines = event.cleanLines
+        val widgetLines = event.widget.lines.map { it.string }
 
         // Hypixel can sometimes send partial widget
         // so we first check if the maximum number of pests is present as a workaround
@@ -115,7 +121,7 @@ object PestSpawnTimer {
                 return
             }
             if (time == null) return
-            pestCooldownEndTime = if (config.customCooldown.get() && !lastPestSpawnTime.isFarPast()) {
+            pestCooldownEndTime = if (config.customCooldown.get()) {
                 lastPestSpawnTime + getCustomCooldownTime()
             } else time
 
@@ -129,8 +135,8 @@ object PestSpawnTimer {
         }
     }
 
-    @HandleEvent
-    private fun onPestSpawn() {
+    @HandleEvent(PestSpawnEvent::class)
+    fun onPestSpawn() {
         shouldRepeatWarning = false
         val spawnTime = lastPestSpawnTime.passedSince()
 
@@ -150,14 +156,14 @@ object PestSpawnTimer {
         lastPestSpawnTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    private fun onGuiRenderOverlay() {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onGuiRenderOverlay() {
         if (!shouldRender) return
         config.position.renderRenderables(display, posLabel = "Pest Spawn Timer")
     }
 
     @HandleEvent
-    private fun onCropClick() {
+    fun onCropClick() {
         val timeDiff = lastCropBrokenTime.passedSince()
 
         if (timeDiff > longestCropBrokenTime) {
@@ -167,8 +173,8 @@ object PestSpawnTimer {
         lastCropBrokenTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    private fun onSecondPassed() {
+    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         update()
         if (shouldRepeatWarning) {
@@ -195,7 +201,7 @@ object PestSpawnTimer {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    private fun onTick(event: SkyHanniTickEvent) {
+    fun onTick(event: SkyHanniTickEvent) {
         if (shouldRepeatWarning) {
             if (ArmorWardrobeApi.inWardrobe() || EquipmentWardrobeApi.inWardrobe()) {
                 shouldRepeatWarning = false
@@ -209,15 +215,14 @@ object PestSpawnTimer {
         shouldRender = shouldRender()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    private fun onIslandJoin() {
+    @HandleEvent(IslandJoinEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onIslandJoin() {
         shouldRepeatWarning = false
         longestCropBrokenTime = lastCropBrokenTime.passedSince()
-        lastPestSpawnTime = SimpleTimeMark.farPast()
     }
 
-    @HandleEvent
-    private fun onConfigLoad() {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         config.customCooldown.onToggle {
             setCustomCooldown()
         }
@@ -227,7 +232,7 @@ object PestSpawnTimer {
     }
 
     private fun setCustomCooldown() {
-        if (!config.customCooldown.get() || lastPestSpawnTime.isFarPast()) return
+        if (!config.customCooldown.get()) return
         pestCooldownEndTime = lastPestSpawnTime + getCustomCooldownTime()
     }
 
@@ -324,7 +329,7 @@ object PestSpawnTimer {
     @JvmStatic
     fun playUserSound() {
         with(config.sound) {
-            SoundUtils.createSound(name, pitch, isWarning = true).playSound()
+            SoundUtils.createSound(name, pitch).playSound()
         }
     }
 
@@ -360,7 +365,7 @@ object PestSpawnTimer {
     }
 
     @HandleEvent
-    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val userSelections: List<HeldItem> = buildList {
             event.transform(97, "garden.pests.pestTimer.onlyWithFarmingTool") { entry ->
                 if (entry.asBoolean) add(HeldItem.FARMING_TOOL)

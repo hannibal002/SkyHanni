@@ -124,6 +124,11 @@ object UpdateManager {
 
         logger.log("Starting update check (source: ${context.source.javaClass.simpleName}")
 
+        val currentStream = config.updateStream.get()
+        if (forcedUpdateStream == UpdateStream.BETA && currentStream != UpdateStream.BETA) {
+            config.updateStream.set(UpdateStream.BETA)
+        }
+
         activePromise = context.checkUpdate(forcedUpdateStream.stream)
             .orTimeout(15, TimeUnit.SECONDS)
             .whenCompleteAsync(
@@ -236,14 +241,11 @@ object UpdateManager {
 
     private var potentialUpdate: PotentialUpdate? = null
 
-    private val releaseStreamPattern = "(?i)(?:full|release)s?".toRegex()
-    private val betaStreamPattern = "(?i)(?:beta|latest)s?".toRegex()
-
     private fun updateCommand(arg: String) {
-        val currentStream = config.updateStream.get()
+        val currentStream = SkyHanniMod.feature.about.updateStream.get()
         val updateStream = when {
-            arg.matches(releaseStreamPattern) -> UpdateStream.RELEASES
-            arg.matches(betaStreamPattern) -> UpdateStream.BETA
+            arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
+            arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
             else -> currentStream
         }
 
@@ -252,18 +254,14 @@ object UpdateManager {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {
-                    if (updateStream != currentStream) {
-                        config.updateStream.set(updateStream)
-                    }
-                    checkUpdate(true, updateStream)
+                    val newUpdateStream = SkyHanniMod.feature.about.updateStream
+                    newUpdateStream.set(UpdateStream.BETA)
+                    checkUpdate(true, newUpdateStream.get())
                 },
                 "§eClick to confirm!",
                 oneTimeClick = true,
             )
         } else {
-            if (updateStream != currentStream) {
-                config.updateStream.set(updateStream)
-            }
             checkUpdate(true, updateStream)
         }
     }

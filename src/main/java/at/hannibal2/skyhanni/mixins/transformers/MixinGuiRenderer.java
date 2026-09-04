@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook;
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState;
-import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -29,6 +28,7 @@ import java.util.Map;
 
 @Mixin(GuiRenderer.class)
 public abstract class MixinGuiRenderer {
+
     @Inject(method = "executeDrawRange", at = @At("HEAD"))
     public void computeChromaBufferSlice(
         CallbackInfo ci) {
@@ -94,14 +94,6 @@ public abstract class MixinGuiRenderer {
             featureRenderDispatcher,
             skyhanni$frameNumber
         );
-    }
-
-    @Inject(
-        method = "preparePictureInPicture",
-        at = @At("TAIL")
-    )
-    private void skyhanni$evictUnusedRealtimeSlots(CallbackInfo ci) {
-        SkyHanniItemRenderCoordinator.evictUnusedRealtimeSlots(skyhanni$frameNumber);
     }
 
     @Inject(

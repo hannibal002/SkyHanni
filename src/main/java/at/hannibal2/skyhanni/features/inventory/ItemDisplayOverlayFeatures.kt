@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BINGO_GOAL_RANK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.COLLECTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_ITEM_QUALITY
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EDITION_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EVOLVING_ITEMS
@@ -51,7 +50,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonItemQuality
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMaxPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNewYearCake
@@ -168,9 +166,6 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (DUNGEON_ITEM_QUALITY.isSelected()) {
-            item.getDungeonItemQuality()?.let { return it.toString() }
-        }
         if (NEW_YEAR_CAKE.isSelected() && internalName == "NEW_YEAR_CAKE".toInternalName()) {
             val year = item.getNewYearCake()?.toString().orEmpty()
             return "§b$year"

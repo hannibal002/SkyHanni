@@ -124,15 +124,13 @@ object NpcTradeHelper {
 
         val name = when {
             // the line could not be read, leaving it untouched beats replacing it with a broken name
-            internalName == NeuInternalName.MISSING_ITEM -> entry.rawLine.trimStart()
+            internalName == NeuInternalName.MISSING_ITEM -> entry.rawLine
             // currencies other than coins have no price, getPriceName would show a "(0)" behind them
             currency != null && currency.coinValue == null -> currency.formatAmount(amount)
             else -> internalName.getPriceName(amount)
         }
 
-        // some menus indent their cost lines, the replacement keeps that indent
-        val indent = entry.rawLine.takeWhile { it == ' ' }
-        return CostLine(entry.rawLine, indent + name + suffix + sackText, covered, owned != null)
+        return CostLine(entry.rawLine, name + suffix + sackText, covered, owned != null)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

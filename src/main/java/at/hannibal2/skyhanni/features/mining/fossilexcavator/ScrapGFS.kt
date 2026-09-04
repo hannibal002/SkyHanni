@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuItemStackProvider
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -37,6 +39,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ScrapGFS {
+
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator.scrapGFS
     private val enabled get() = config.enabled && FossilExcavatorApi.inExcavatorMenu
     private val currentFetchAmount get() = config.fetchAmount.get()
@@ -70,7 +73,7 @@ object ScrapGFS {
     }.sumOf { it.count }
 
     @HandleEvent
-    private fun onConfigLoad() {
+    fun onConfigLoad() {
         config.fetchAmount.afterChange {
             uiDirty = true
             if (currentFetchAmount !in validRange) {
@@ -79,21 +82,21 @@ object ScrapGFS {
         }
     }
 
-    @HandleEvent(onlyOnIsland = DWARVEN_MINES)
-    private fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!enabled) return
         susScrapInInventory = getSusScrapCurrentlyInInventory()
         uiDirty = true
     }
 
-    @HandleEvent(onlyOnIsland = DWARVEN_MINES)
-    private fun onSackChange(event: SackChangeEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
+    fun onSackChange(event: SackChangeEvent) {
         if (!enabled || event.sackChanges.none { it.internalName == FossilExcavatorApi.scrapItem }) return
         uiDirty = true
     }
 
-    @HandleEvent(onlyOnIsland = DWARVEN_MINES)
-    private fun onChestGuiRender() {
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
+    fun onChestGuiRender() {
         if (!enabled) return
         if (config.onlyIfNoScrap && susScrapInInventory > 0) return
         if (uiDirty) {
@@ -106,8 +109,8 @@ object ScrapGFS {
 
     private fun buildFinalRenderable() = Renderable.drawInsideRoundedRectWithOutline(
         Renderable.vertical(
-            horizontalAlign = CENTER,
-            verticalAlign = CENTER,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             spacing = 5,
         ) {
             addFetchButton()
@@ -118,19 +121,20 @@ object ScrapGFS {
         topOutlineColor = lighterGray.rgb,
         bottomOutlineColor = lighterGray.rgb,
         borderOutlineThickness = 3,
-        horizontalAlign = CENTER,
-        verticalAlign = CENTER,
+        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         padding = 5,
     )
 
     private fun MutableList<Renderable>.addCenterDisplay() = Renderable.horizontal(
         spacing = 10,
-        horizontalAlign = CENTER
+        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
     ) {
-        addStaticSetButton("Minimum", RED, validRange.first)
+        addStaticSetButton("Minimum", LorenzColor.RED, validRange.first)
         addCurrentFetchContainer()
-        addStaticSetButton("Maximum", GREEN, validRange.last)
+        addStaticSetButton("Maximum", LorenzColor.GREEN, validRange.last)
     }.let { add(it) }
+
 
     private fun MutableList<Renderable>.addSackInfoFooter() = with(SackApi) {
         FossilExcavatorApi.scrapItem.getAmountInSacksOrNull()?.takeIf { it > 0 }?.let { scrapInSacks ->
@@ -140,7 +144,7 @@ object ScrapGFS {
                         "Scrap In Sacks: §f$scrapInSacks",
                         scale = 0.9,
                         color = lighterGray,
-                        horizontalAlign = CENTER
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
                     ),
                     tips = listOf("§7Click to set fetch amount to §f$scrapInSacks§7!")
                 ),
@@ -155,7 +159,7 @@ object ScrapGFS {
                 "No Scrap in Sacks!",
                 scale = 0.9,
                 color = lighterGray,
-                horizontalAlign = CENTER
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
             )
             when (config.bzIfSacksEmpty && !HypixelData.noTrade) {
                 true -> Renderable.vertical {
@@ -164,7 +168,7 @@ object ScrapGFS {
                         Renderable.text(
                             "§eClick to buy from Bazaar",
                             scale = 0.9,
-                            horizontalAlign = CENTER
+                            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
                         ),
                         onLeftClick = { HypixelCommands.bazaar("Suspicious Scrap") },
                         underlineColor = lightestGray,
@@ -176,7 +180,7 @@ object ScrapGFS {
     }
 
     private fun MutableList<Renderable>.addFetchButton() = Renderable.darkRectButton(
-        Renderable.text("Get Scrap from Sacks", horizontalAlign = CENTER, scale = 1.2),
+        Renderable.text("Get Scrap from Sacks", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER, scale = 1.2),
         onClick = {
             SoundUtils.playClickSound()
             GetFromSackApi.getFromSack(FossilExcavatorApi.scrapItem, currentFetchAmount)
@@ -193,12 +197,12 @@ object ScrapGFS {
                         frameStorage = scrapFrameStorage
                         rotationStorage = scrapRotationStorage
                         scale = 1.2
-                        horizontalAlign = CENTER
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
                     },
-                    Renderable.text(currentFetchAmount.toString(), scale = 0.9, horizontalAlign = CENTER),
+                    Renderable.text(currentFetchAmount.toString(), scale = 0.9, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
                 ),
-                horizontalAlign = CENTER,
-                verticalAlign = CENTER,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                 spacing = 3,
             ),
             padding = 4,
@@ -215,7 +219,7 @@ object ScrapGFS {
 
     private fun scrollWithStaggerSound(offset: Int) {
         if (!offset.incrementValid()) {
-            SoundUtils.playErrorSound(isWarning = false)
+            SoundUtils.playErrorSound()
             return
         }
         config.fetchAmount.set(currentFetchAmount + offset)
@@ -233,7 +237,7 @@ object ScrapGFS {
             increment > 0 -> "§a"
             else -> "§c"
         } + increment.getIncrementText(),
-        horizontalAlign = CENTER,
+        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
     )
 
     private fun buildIncrementButton(increment: Int): Renderable = Renderable.darkRectButton(
@@ -241,7 +245,7 @@ object ScrapGFS {
         onClick = {
             if (!increment.incrementValid()) {
                 if (lastScrollErrorSound.passedSince() > 100.milliseconds) {
-                    SoundUtils.playErrorSound(isWarning = false)
+                    SoundUtils.playErrorSound()
                     lastScrollErrorSound = SimpleTimeMark.now()
                 }
                 return@darkRectButton
@@ -259,18 +263,18 @@ object ScrapGFS {
         value: Int
     ) = Renderable.darkRectButton(
         Renderable.vertical(
-            horizontalAlign = CENTER,
-            verticalAlign = CENTER,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ) {
             val pre = color.getChatColor()
             Renderable.text(
                 "$pre$label",
-                horizontalAlign = CENTER,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 scale = 0.9
             ).let { add(it) }
             Renderable.text(
                 "$pre($value)",
-                horizontalAlign = CENTER,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 scale = 0.8
             ).let { add(it) }
         },
@@ -280,6 +284,6 @@ object ScrapGFS {
         },
         padding = 4,
     ).let {
-        add(Renderable.vertical(verticalAlign = CENTER) { add(it) })
+        add(Renderable.vertical(verticalAlign = RenderUtils.VerticalAlignment.CENTER) { add(it) })
     }
 }

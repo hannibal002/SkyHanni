@@ -33,7 +33,8 @@ allprojects {
                 maven("https://maven.fabricmc.net")
             }
             filter {
-                includeGroupAndSubgroups("net.fabricmc")
+                includeGroup("net.fabricmc")
+                includeGroup("net.fabricmc.fabric-api")
             }
         }
 
@@ -57,7 +58,7 @@ allprojects {
             }
         }
 
-        // libautoupdate
+        // libautoupdate and shots
         exclusiveContent {
             forRepository {
                 maven("https://repo.nea.moe/releases")
@@ -67,18 +68,19 @@ allprojects {
             }
         }
 
-        // MoulConfig and a few Detekt rules
+        // moulconfig and a few detekt rules
         exclusiveContent {
             forRepositories(
                 repositories.mavenLocal(),
                 repositories.maven("https://maven.notenoughupdates.org/releases"),
             )
             filter {
-                includeGroupAndSubgroups("org.notenoughupdates")
+                includeGroup("org.notenoughupdates")
+                includeGroup("org.notenoughupdates.moulconfig")
             }
         }
 
-        // Hypixel Mod API
+        // Hypixel mod api
         exclusiveContent {
             forRepository {
                 maven("https://repo.hypixel.net/repository/Hypixel")
@@ -98,23 +100,22 @@ allprojects {
             }
         }
 
-        // REI for compat plugin
+        // Rei for compat plugin
         exclusiveContent {
             forRepository {
                 maven("https://maven.shedaniel.me")
             }
             filter {
+                includeGroup("me.shedaniel")
                 includeGroup("dev.architectury")
-                includeGroupAndSubgroups("me.shedaniel")
+                includeGroup("me.shedaniel.cloth")
             }
         }
 
-        exclusiveContent {
-            forRepositories(
-                repositories.maven("https://maven.azureaaron.net/releases"),
-            )
-            filter {
-                includeGroupAndSubgroups("net.azureaaron")
+        maven("https://jitpack.io") {
+            // NotEnoughUpdates (compiled against), Changelog builder, Preprocessor, Discord IPC
+            content {
+                includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
     }

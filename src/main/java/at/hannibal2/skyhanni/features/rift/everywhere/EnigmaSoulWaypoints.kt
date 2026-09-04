@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnigmaSoulsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -37,6 +38,7 @@ import net.minecraft.world.inventory.ChestMenu
 
 @SkyHanniModule
 object EnigmaSoulWaypoints {
+
     private val config get() = RiftApi.config.enigmaSoulWaypoints
     private var inInventory = false
     var soulLocations = mapOf<String, Map<String, LorenzVec>>()
@@ -100,7 +102,7 @@ object EnigmaSoulWaypoints {
     )
 
     @HandleEvent
-    private fun replaceItem(event: ReplaceItemEvent) {
+    fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
 
         if (inventoryUnfound.isEmpty()) return
@@ -110,7 +112,7 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = false
         if (!inventoryNamePattern.matches(event.inventoryName)) return
         inInventory = true
@@ -127,14 +129,14 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    private fun onInventoryClose() {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         inventoryUnfound.clear()
         adding = true
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inInventory || !isEnabled()) return
 
         val area = getSelectedArea() ?: return
@@ -153,9 +155,9 @@ object EnigmaSoulWaypoints {
             }
         }
 
-        val item = event.item ?: return
+        if (event.slot?.item == null) return
 
-        val name = enigmaTitlePattern.matchMatcher(item.cleanName) {
+        val name = enigmaTitlePattern.matchMatcher(event.slot.item.cleanName) {
             group("name")
         } ?: return
         event.makePickblock()
@@ -188,7 +190,7 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || !inInventory) return
 
         if (event.gui !is ContainerScreen) return
@@ -210,7 +212,7 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         for ((area, souls) in trackedSouls) {
             for (name in souls) {
@@ -223,7 +225,7 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls")
         val areas = data.areas
         soulLocations = buildMap {
@@ -238,7 +240,7 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    private fun onChat(event: SkyHanniChatEvent.Allow) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (foundPattern.matches(event.cleanMessage.trim())) {
             hideClosestSoul()

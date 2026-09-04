@@ -15,11 +15,10 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object LowHealthAlert {
+
     private val config get() = SkyHanniMod.feature.dungeon.lowHealthAlert
     private val soundConfig get() = config.lowHealthAlertSound
     private var lastAlert: TitleContext? = null
-
-    private val alertSound get() = SoundUtils.createSound(soundConfig.alertSound, soundConfig.pitch, isWarning = true)
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
@@ -30,6 +29,7 @@ object LowHealthAlert {
             val health = group("health")
             if (color != "c" || health == "DEAD") return
 
+            val alertSound = SoundUtils.createSound(soundConfig.alertSound, soundConfig.pitch)
             SoundUtils.repeatSound(100, soundConfig.repeatSound, alertSound)
             lastAlert?.stop()
             TitleManager.sendTitle(
@@ -43,8 +43,12 @@ object LowHealthAlert {
     }
 
     @JvmStatic
-    fun playTestSound() = alertSound.playSound()
+    fun playTestSound() {
+        with(soundConfig) {
+            SoundUtils.createSound(alertSound, pitch).playSound()
+        }
+    }
 
     private fun isEnabled() =
-        config.enabled && DungeonApi.active && (!config.onlyWhileHealer || DungeonApi.playerClass == HEALER)
+        config.enabled && DungeonApi.active && (!config.onlyWhileHealer || DungeonApi.playerClass == DungeonApi.DungeonClass.HEALER)
 }
