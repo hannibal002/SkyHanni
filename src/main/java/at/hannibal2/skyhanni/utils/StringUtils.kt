@@ -525,9 +525,10 @@ object StringUtils {
 
     fun String.isValidUuid(): Boolean = runCatching(UUID::fromString).isSuccess
 
-    fun optionalAn(string: String): String {
-        if (string.isEmpty()) return ""
-        return if (string[0] in "aeiou") "an" else "a"
+    fun optionalAn(string: String): String = when {
+        string.isEmpty() -> ""
+        string.first().isVowel() -> "an"
+        else -> "a"
     }
 
     fun String.hasWhitespace(): Boolean = any { it.isWhitespace() }
