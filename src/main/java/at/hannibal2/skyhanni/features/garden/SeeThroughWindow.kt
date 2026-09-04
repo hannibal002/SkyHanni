@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
@@ -63,16 +62,7 @@ object SeeThroughWindow {
     private fun setWindowOpacity(alpha: Float): Boolean {
         val handle = Minecraft.getInstance().window.handle()
         GLFW.glfwGetError(null) // Clear previous error
-
         GLFW.glfwSetWindowOpacity(handle, alpha)
-
-        val error = GLFW.glfwGetError(null)
-        return !error.equalsOneOf(
-            GLFW.GLFW_PLATFORM_ERROR,
-            GLFW.GLFW_PLATFORM_UNAVAILABLE,
-            GLFW.GLFW_NOT_INITIALIZED,
-            GLFW.GLFW_FEATURE_UNAVAILABLE,
-            GLFW.GLFW_FEATURE_UNIMPLEMENTED,
-        )
+        return GLFW.glfwGetError(null) == GLFW.GLFW_NO_ERROR
     }
 }
