@@ -43,7 +43,8 @@ object FishingHotspotRadar {
         if (!isEnabled()) return
         val type = event.type
         if (type != ParticleTypes.FLAME) return
-        if (event.count != 1 || event.speed != 0f) return
+        // TODO verify on 26.3
+        if (event.count != 1 || !event.isSpeed(0f)) return
 
         lastParticle = SimpleTimeMark.now()
 
