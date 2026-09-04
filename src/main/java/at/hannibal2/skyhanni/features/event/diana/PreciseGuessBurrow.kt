@@ -39,7 +39,8 @@ object PreciseGuessBurrow {
         val type = event.type
         if (type != ParticleTypes.DRIPPING_LAVA) return
         if (event.count != 2) return
-        if (event.speed != -0.5f) return
+        // TODO verify on 26.3
+        if (!event.isSpeed(-0.5f)) return
         lastLavaParticle = SimpleTimeMark.now()
         if (lastDianaSpade.passedSince() > 3.seconds) return
         GriffinBurrowHelper.removeSpadeWarnTitle()

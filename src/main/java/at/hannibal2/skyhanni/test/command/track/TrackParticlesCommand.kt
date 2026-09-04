@@ -22,7 +22,6 @@ import net.minecraft.resources.Identifier
 
 @SkyHanniModule
 object TrackParticlesCommand : TrackWorldCommand<ParticleEvent, Identifier>(commonName = "particle") {
-
     override val config get() = DevApi.config.debug.trackParticle
 
     override val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit = {
@@ -35,9 +34,11 @@ object TrackParticlesCommand : TrackWorldCommand<ParticleEvent, Identifier>(comm
     override fun ParticleEvent.getTypeIdentifier(): Identifier = BuiltInRegistries.PARTICLE_TYPE.getKey(type)
         ?: throw IllegalStateException("Particle type $type is not registered in the registry")
 
-    override fun ParticleEvent.formatForDisplay() = Renderable.text("§3${getTypeIdentifier()} §8c:$count §7s:$speed")
+    override fun ParticleEvent.formatForDisplay() =
+        Renderable.text("§3${getTypeIdentifier()} §8c:$count §7xs:$xSpeed ys:$ySpeed zs:$zSpeed")
 
-    override fun ParticleEvent.formatForWorldRender() = "§7C: §e$count §7S: §a${speed.roundTo(2)}"
+    override fun ParticleEvent.formatForWorldRender() =
+        "§7C: §e$count §7XS: §a${xSpeed.roundTo(2)} §7YS: §a${ySpeed.roundTo(2)} §7ZS: §a${zSpeed.roundTo(2)}"
 
     // No explicit filtering for particles, all particles are tracked in this context.
     override fun ParticleEvent.shouldAcceptTrackableEvent(): Boolean = true
