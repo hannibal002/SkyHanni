@@ -77,12 +77,12 @@ object CropMilestonesApi {
     )
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onProfileJoin() {
+    private fun onProfileJoin() {
         if ((cropMilestoneCounter?.size ?: 0) == 0) inaccurateMilestone = true
     }
 
     @HandleEvent
-    fun onCollectionAdd(event: CropCollectionAddEvent) {
+    private fun onCollectionAdd(event: CropCollectionAddEvent) {
         val cropType = event.crop
         val collectionType = event.cropCollectionType
         val amount = event.amount
@@ -194,7 +194,6 @@ object CropMilestonesApi {
             return totalCrops
         }
 
-
         for (tierCrops in cropMilestone) {
             totalCrops += tierCrops
             tier++
@@ -291,7 +290,6 @@ object CropMilestonesApi {
             return tier
         }
 
-
         tier = getMaxTier()
 
         totalCrops = count - maxMilestoneAmount
@@ -350,7 +348,7 @@ object CropMilestonesApi {
             chat(message, false)
         }
 
-        SoundUtils.createSound("entity.player.levelup", 1f, 1f).playSound()
+        SoundUtils.createSound("entity.player.levelup", 1f, 1f, isWarning = false).playSound()
     }
 
     internal fun clearMilestoneCache() {
@@ -365,12 +363,12 @@ object CropMilestonesApi {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(116, "#profile.garden.cropCounter", "#profile.garden.cropMilestoneCounter")
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         cropMilestoneRepoData = event.getConstant<GardenJson>("Garden").cropMilestones
         missingMilestoneRepoData = false
         clearMilestoneCache()
@@ -381,7 +379,7 @@ object CropMilestonesApi {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetcropmilestones") {
             description = "Resets crop milestones."
             category = CommandCategory.DEVELOPER_DEBUG
@@ -393,7 +391,7 @@ object CropMilestonesApi {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Crop Milestones API")
         event.addIrrelevant {
             for (crop in cropMilestoneTierCache) {
@@ -408,7 +406,7 @@ object CropMilestonesApi {
     private const val CROP_MILESTONE_ACHIEVEMENT = "Expert Gardener"
 
     @HandleEvent
-    fun onAchievementRegistered(event: AchievementRegistrationEvent) {
+    private fun onAchievementRegistered(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             name = "Expert Gardener",
             description = "Get a crop milestone to level 500",
