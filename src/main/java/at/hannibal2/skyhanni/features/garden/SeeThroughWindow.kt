@@ -12,11 +12,10 @@ import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule
 object SeeThroughWindow {
-
     private val config get() = SkyHanniMod.feature.garden.seeThroughWindow
 
     private var isActive = false
-    private var opacityChanged = false
+    private var currentOpacity = 1f
     private var unsupportedPlatform = false
 
     @HandleEvent
@@ -30,6 +29,7 @@ object SeeThroughWindow {
     private fun onKeyDown() {
         if (!config.keybind.isKeyHeld()) return
         if (MinecraftCompat.screen != null) return
+
         isActive = !isActive
         setOpacity()
     }
@@ -43,32 +43,31 @@ object SeeThroughWindow {
     private fun setOpacity() {
         if (unsupportedPlatform) return
 
-        if (!isActive) {
-            if (opacityChanged) {
-                resetWindowOpacity()
-            }
-            return
+        val targetOpacity = if (isActive) {
+            (config.seeThroughFarming.get() / 100f)
+                .coerceIn(0.05f, 1f)
+        } else {
+            1f
         }
-        val alpha = (config.seeThroughFarming.get() / 100f)
-            .coerceAtLeast(0.05f)
-            .coerceAtMost(1f)
-        setWindowOpacity(alpha)
+
+        if (currentOpacity == targetOpacity) return
+        if (setWindowOpacity(targetOpacity)) {
+            currentOpacity = targetOpacity
+        }
     }
 
-    private fun setWindowOpacity(alpha: Float) {
-        opacityChanged = alpha != 1f
-
+    private fun setWindowOpacity(alpha: Float): Boolean {
         val handle = Minecraft.getInstance().window.handle()
+
         GLFW.glfwSetWindowOpacity(handle, alpha)
+
         val error = GLFW.glfwGetError(null)
         if (error.isGlfwPlatformError()) {
             unsupportedPlatform = true
             ChatUtils.userError("Your platform doesn't support see through windows!")
+            return false
         }
-    }
-
-    private fun resetWindowOpacity() {
-        setWindowOpacity(1f)
+        return true
     }
 
     private fun Int.isGlfwPlatformError(): Boolean =
