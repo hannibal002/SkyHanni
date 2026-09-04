@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.foraging
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -10,12 +9,10 @@ import at.hannibal2.skyhanni.features.foraging.StarlynSisterDetector.createStarl
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
-import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LoreCostUtils
 import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
@@ -25,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -41,7 +39,7 @@ object StarlynSisterCouponProfit {
 
     private var cachedItemData: Set<ItemProfitData> = emptySet()
 
-    private val validInventorySlots: Set<Int> = (9..44).filterTo(mutableSetOf()) { it % 9 !in setOf(0, 8) }
+    private val validInventorySlots: Set<Int> = (13..44).filterTo(mutableSetOf()) { it % 9 !in setOf(0, 8) }
 
     private data class ItemProfitData(
         val slot: Int,
@@ -142,21 +140,11 @@ object StarlynSisterCouponProfit {
     private fun readItem(slot: Int, item: SafeItemStack, sister: StarlynSisterType): ItemProfitData? {
         if (slot !in validInventorySlots) return null
 
-        val hoverName = item.hoverName.string
-        val fixedDisplayName = hoverName.replace("[Lvl 100]", "[Lvl {LVL}]")
-
-        val internalName = item.run {
-            ItemResolutionQuery.attributeNameToInternalName(fixedDisplayName)
-                ?.let { NeuInternalName.fromItemNameOrInternalName(it) }
-                ?: if (getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) getInternalNameOrNull()
-                else NeuInternalName.fromItemNameOrNull(fixedDisplayName)
-
-        } ?: return null
+        val nameStr = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val internalName = item.getInternalNameOrNull() ?: NeuInternalName.fromItemNameOrNull(nameStr) ?: return null
 
         // Avoids showing upgrades in the table
         if (internalName.isKnownItem().not()) return null
-
-        val itemName = internalName.repoItemName
 
         var totalCost = 0.0
         var couponAmount = 0L
@@ -176,7 +164,7 @@ object StarlynSisterCouponProfit {
         return ItemProfitData(
             slot = slot,
             internalName = internalName,
-            itemName = itemName,
+            itemName = internalName.repoItemName,
             price = price,
             totalCost = totalCost,
             requiredItems = requiredItems,
