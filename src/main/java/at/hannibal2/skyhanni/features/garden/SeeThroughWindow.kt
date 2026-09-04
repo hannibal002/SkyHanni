@@ -73,6 +73,8 @@ object SeeThroughWindow {
     private fun Int.isGlfwPlatformError(): Boolean =
         when (this) {
             GLFW.GLFW_PLATFORM_ERROR,
+            GLFW.GLFW_PLATFORM_UNAVAILABLE,
+            GLFW.GLFW_API_UNAVAILABLE,
             GLFW.GLFW_NOT_INITIALIZED,
             GLFW.GLFW_FEATURE_UNAVAILABLE,
             GLFW.GLFW_FEATURE_UNIMPLEMENTED -> true
