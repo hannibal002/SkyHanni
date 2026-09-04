@@ -8,12 +8,8 @@ import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(EntityRenderState.class)
 public abstract class MixinEntityRenderState implements EntityRenderStateStore {
-
     @Unique
     Entity skyhanni$savedEntity = null;
-
-    @Unique
-    boolean skyhanni$usingCustomOutline = false;
 
     @Override
     public void skyhanni$setEntity(Entity entity) {
@@ -25,6 +21,10 @@ public abstract class MixinEntityRenderState implements EntityRenderStateStore {
         return skyhanni$savedEntity;
     }
 
+    //? if < 26.2 {
+    /*@Unique
+    boolean skyhanni$usingCustomOutline = false;
+
     @Override
     public void skyhanni$setUsingCustomOutline() {
         skyhanni$usingCustomOutline = true;
@@ -34,4 +34,5 @@ public abstract class MixinEntityRenderState implements EntityRenderStateStore {
     public boolean skyhanni$isUsingCustomOutline() {
         return skyhanni$usingCustomOutline;
     }
+    *///?}
 }
