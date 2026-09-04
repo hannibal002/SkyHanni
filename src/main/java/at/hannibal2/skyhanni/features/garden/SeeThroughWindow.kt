@@ -62,6 +62,7 @@ object SeeThroughWindow {
 
     private fun setWindowOpacity(alpha: Float): Boolean {
         val handle = Minecraft.getInstance().window.handle()
+        GLFW.glfwGetError(null) // Clear previous error
         GLFW.glfwSetWindowOpacity(handle, alpha)
         return !GLFW.glfwGetError(null).isGlfwPlatformError()
     }
