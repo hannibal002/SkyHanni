@@ -100,7 +100,6 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 @Suppress("LargeClass")
 object ItemUtils {
-
     private val patternGroup = RepoPattern.group("utils.item")
 
     // <editor-fold desc="Patterns">
@@ -403,13 +402,12 @@ object ItemUtils {
     }
 
     class AutoUpdatingRepoSkullItemStack internal constructor(
-        private val displayName: String,
-        private val uuid: String,
-        private val repoSkullId: String,
-        private val lore: List<String>,
-        private val extraOps: (SafeItemStack.() -> Unit)?,
+        displayName: String,
+        uuid: String,
+        repoSkullId: String,
+        lore: List<String>,
+        extraOps: (SafeItemStack.() -> Unit)?,
     ) : ItemStackProvider {
-
         private val value = StableOrTransientValue(1.seconds) {
             val texture = SkullTextureHolder.getTexture(repoSkullId)
             val stack = createSkull(
