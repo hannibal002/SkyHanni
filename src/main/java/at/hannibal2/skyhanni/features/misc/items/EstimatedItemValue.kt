@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -38,7 +37,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import org.lwjgl.glfw.GLFW
 import kotlin.math.roundToLong
-import kotlin.time.Duration.Companion.milliseconds
 
 private typealias NeuGemstoneCostJson = HashMap<NeuInternalName, HashMap<String, List<String>>>
 
@@ -50,18 +48,9 @@ object EstimatedItemValue {
     private val repoReloadCoroutine = CoroutineSettings("estimated item value repo reload")
     private val neuRepoReloadCoroutine = CoroutineSettings("estimated item value neu repo reload")
 
-    private val tooltipTimeout = 200.milliseconds
-
-    // dwell time on the same slot before the first display of an inventory session
-    private val hoverDelay get() = config.hoverDelay.milliseconds
-
     private var display = emptyList<Renderable>()
     private val cache = mutableMapOf<SafeItemStack, List<Renderable>>()
-    private var lastToolTipTime = SimpleTimeMark.farPast()
-    private var hoveredItem: SafeItemStack? = null
-    private var hoverStart = SimpleTimeMark.farPast()
-    private var hoverDelayOver = false
-
+    private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = NeuGemstoneCostJson()
     var hasLegacyGemstoneSlots = emptyList<NeuInternalName>()
     var bookBundleAmount = mapOf<String, Int>()
@@ -77,12 +66,12 @@ object EstimatedItemValue {
     fun isCurrentlyShowing() = currentlyShowing && MinecraftCompat.screen != null
 
     @HandleEvent
-    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) = neuRepoReloadCoroutine.launch {
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) = neuRepoReloadCoroutine.launch {
         gemstoneUnlockCosts = event.getConstantAsync<NeuGemstoneCostJson>("gemstonecosts")
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
         val data = event.getConstantAsync<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
@@ -101,7 +90,7 @@ object EstimatedItemValue {
     private var renderedItems = 0
 
     @HandleEvent
-    private fun onGuiRenderOverlay() {
+    fun onGuiRenderOverlay() {
         renderedItems = 0
     }
 
@@ -136,45 +125,28 @@ object EstimatedItemValue {
     }
 
     @HandleEvent
-    private fun onChestGuiRender() {
+    fun onChestGuiRender() {
         tryRendering()
     }
 
     private fun checkCurrentlyVisible(): Boolean {
         if (!SkyBlockUtils.inSkyBlock) return false
         if (!config.enabled) return false
-        val hotkeyHeld = config.hotkey.isKeyHeld()
-        if (!hotkeyHeld && !config.alwaysEnabled) return false
-        if (lastToolTipTime.passedSince() > tooltipTimeout) return false
+        if (!config.hotkey.isKeyHeld() && !config.alwaysEnabled) return false
+        if (System.currentTimeMillis() > lastToolTipTime + 200) return false
 
         if (display.isEmpty()) return false
-        if (hotkeyHeld) return true
 
-        // after the display check on purpose, an empty display must not end the delay
-        return passHoverDelay()
-    }
-
-    private fun passHoverDelay(): Boolean {
-        if (hoverDelayOver) return true
-        if (!hoverDelay.isPositive()) return true
-        // null before the first hover of an inventory session
-        if (hoveredItem == null) return false
-        // measured on the tooltip stream, so the linger time after leaving a slot does not count
-        if (lastToolTipTime - hoverStart < hoverDelay) return false
-
-        hoverDelayOver = true
         return true
     }
 
     @HandleEvent
-    private fun onInventoryClose() {
+    fun onInventoryClose() {
         cache.clear()
-        hoveredItem = null
-        hoverDelayOver = false
     }
 
     @HandleEvent
-    private fun onConfigLoad() {
+    fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(
                 enchantmentsCap,
@@ -190,24 +162,16 @@ object EstimatedItemValue {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
+    fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
         if (!config.enabled) return
 
         updateItem(event.stack)
     }
 
-    private fun updateHoverTime(item: SafeItemStack) {
-        // also restarts when the tooltip stream was interrupted, e.g. by moving over an empty area
-        if (item === hoveredItem && lastToolTipTime.passedSince() <= tooltipTimeout) return
-        hoveredItem = item
-        hoverStart = SimpleTimeMark.now()
-    }
-
     fun updateItem(item: SafeItemStack) {
-        updateHoverTime(item)
         cache[item]?.let {
             display = it
-            lastToolTipTime = SimpleTimeMark.now()
+            lastToolTipTime = System.currentTimeMillis()
             return
         }
 
@@ -239,7 +203,7 @@ object EstimatedItemValue {
 
         cache[item] = newDisplay
         display = newDisplay
-        lastToolTipTime = SimpleTimeMark.now()
+        lastToolTipTime = System.currentTimeMillis()
     }
 
     private fun SafeItemStack.shouldIgnoreDraw(): Boolean {
@@ -285,7 +249,7 @@ object EstimatedItemValue {
     }
 
     @HandleEvent
-    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.estimatedIemValueEnabled", "misc.estimatedItemValues.enabled")
         event.move(3, "misc.estimatedItemValueHotkey", "misc.estimatedItemValues.hotkey")
         event.move(3, "misc.estimatedIemValueAlwaysEnabled", "misc.estimatedItemValues.alwaysEnabled")

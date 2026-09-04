@@ -15,9 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LoreCostUtils.hasTradeLine
 import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -28,7 +26,6 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -85,20 +82,23 @@ object FishyTreatProfit {
     }
 
     private fun readItem(slot: Int, item: SafeItemStack, table: MutableList<DisplayTableEntry>) {
-        val lore = item.getLoreComponent().map { it.formattedTextCompatLessResets() }
-        if (!lore.hasTradeLine()) return
-
         val itemName = getItemName(item)
-        val itemNameText = itemName.formattedTextCompatLeadingWhiteLessResets()
-        val allMaterials = lore.readLoreCosts(itemNameText).associate { it.internalName to it.amount }
-
-        // ignore shop entries that do not cost fishy treats
-        val amountOfFishyTreat = allMaterials[FISHY_TREAT] ?: return
-
+        val allMaterials = item.readLoreCosts().associate { it.internalName to it.amount }
         val additionalMaterials = allMaterials.filter { it.key != FISHY_TREAT }
+        val amountOfFishyTreat = allMaterials[FISHY_TREAT] ?: run {
+            ErrorManager.logErrorStateWithData(
+                "failed reading fishy treat amount",
+                "fishy treat amount not found in additionalMaterials",
+                "itemName" to itemName,
+                "additionalMaterials" to allMaterials,
+                "inventory" to "",
+            )
+            return
+        }
+
         val additionalCost = getAdditionalCost(additionalMaterials)
 
-        val (name, amount) = ItemUtils.readItemAmount(itemNameText) ?: return
+        val (name, amount) = ItemUtils.readItemAmount(itemName.formattedTextCompatLeadingWhiteLessResets()) ?: return
 
         var internalName = NeuInternalName.fromItemNameOrNull(name)
         if (internalName == null) {

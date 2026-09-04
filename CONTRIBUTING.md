@@ -46,11 +46,11 @@ for "Gradle JVM") is set to a Java 25 JDK.
 <details>
 <summary>🖼️Show Gradle JVM image</summary>
 
-![Gradle settings showing Java 25 being selected as JVM](docs/gradle-settings.png)
+![Gradle settings showing Java 21 being selected as JVM](docs/gradle-settings.png)
 
 </details>
 
-Now that Gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the Java
+Now that Gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java
 version for the project.
 
 To do this we press `(CTRL+ALT+SHIFT+S)` in IntelliJ, or go to `File` → `Project Structure...`.
@@ -91,11 +91,20 @@ configuration. If not, you can restart IntelliJ and reload the Gradle project ag
 
 </details>
 
+Select an appropriate Java 25 JDK (preferably [Adoptium](https://adoptium.net/), but any Java 25 JDK will do).
+
+<details>
+<summary>🖼️Show run configuration image</summary>
+
+![Run configuration settings](docs/run-configuration-settings.avif)
+
+</details>
+
 Now that we are done with that, you should be able to launch your game from your IDE with that run configuration.
 
 ## Pull Requests
 
-General info about Pull Requests can be found on
+General infos about Pull Request can be found on
 the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests).
 
 ### Creating a Pull Request
@@ -141,11 +150,6 @@ CI. Do not manually edit `docs/CHANGELOG.md` or `docs/FEATURES.md`. These files 
 
 - Follow the format examples from the template and remove the categories that do not apply to your PR.
 - A PR might include multiple changelog categories simultaneously.
-- Outside of Technical Details, write entries from the player's point of view. Name the behavior a user can
-  observe, not the code that produces it. "Fixed wrong Kuudra Key cost in Instance Chest Profit" belongs in
-  the changelog, "fixed an inverted discount calculation" belongs in the **What** section.
-- Refer to a feature by its name and capitalize it, along with every SkyBlock proper noun. This includes the
-  names that read like ordinary words, such as Hunting Box or Instance Chest Profit.
 
 Here is an explanation of which changes belong to each category:
 
@@ -251,16 +255,12 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
-- When renaming or replacing a symbol other code already uses, keep a deprecated alias under the old
-  name instead of deleting it right away. Open pull requests that still use the old name then keep
-  compiling and their authors get time to react. Remove the alias in a separate pull request one or
-  two months later, and note that date in a TODO comment above it.
 - Future JSON data objects should be made in kotlin.
 - Config files should be made in **Kotlin**.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it.
-    - Custom SkyHanni events are located in the `events` package, organized into subpackages by category.
-      When creating a new event, place it in the appropriate subpackage. Thematically related events can be placed together in a single
+    - Custom SkyHanni events are located in the `events` package, organized into sub packages by category.
+      When creating a new event, place it in the appropriate sub package. Thematically related events can be placed together in a single
       file.
     - To expand the event system, you can create a new event that is called from a Mixin,
       or you can subscribe to a Fabric event and then post a SkyHanni event from that.
@@ -292,17 +292,12 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Never use  `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
-- Try to avoid using Kotlin's `!!` (not-null assertion) feature.
+- Try to avoid using Kotlin's `!!` (catch if not null) feature.
     - Replace it with `?:` (if null return this).
-    - This will most likely not be possible to avoid when working with objects from Java.
+    - This will most likely not be possible to avoid when working with objects from java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
   See the **Errors and Crashes** section for why every catch goes through `ErrorManager`.
-    - `logErrorWithData` is only for a throwable that was actually thrown and caught, where the stack trace points at the
-      cause. Never construct a throwable just to report a problem the code detected on its own.
-    - For an invalid state the code checks and rejects itself, use
-      `ErrorManager.logErrorStateWithData("explanation for users", "internal description", ...extraOptionalData)`.
-      The first message is what the player reads in chat, the second one only shows up in the copied error report.
 - Do not use `toRegex()` or `toPattern()`. Use `RepoPattern` instead.
   RepoPattern allows regex patterns to be updated remotely via the repo without requiring a mod update.
   Each pattern has a local fallback defined in code, but can be overridden by the repo at runtime.

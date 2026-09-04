@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isEmptyInvisibleArmorStand
@@ -9,59 +8,67 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ItemFrame
 import java.awt.Color
 
+class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity> = hashSetOf()) : SkyHanniEvent() {
 
-/**
- * Fired once per frame, right before the visible entities are collected for rendering.
- *
- * Fired on the render thread via a Mixin into `LevelExtractor.extractVisibleEntities`
- * (`LevelRenderer` below 26.2).
- *
- * Listeners do not render anything themselves. They call [queueEntitiesToOutline] with a function
- * returning the outline color for an entity, or null to leave it unoutlined.
- * `RenderLivingEntityHelper` reads the queued entities back while the entity is rendered.
- *
- * Since this runs every frame, guard the color function with checks that do not depend on the
- * individual entity, such as the island or whether the feature is enabled.
- */
-@PrimaryFunction("onRenderEntityOutline")
-class RenderEntityOutlineEvent : SkyHanniEvent() {
     /**
-     * The entities to outline. This is progressively cumulated from [entitiesToChooseFrom]
+     * The phase of the event (see [Type]
      */
-    var entitiesToOutline: HashMap<Entity, Int> = hashMapOf()
+    var type: Type? = null
 
     /**
-     * The entities we can outline. Note that this set and [entitiesToOutline] are disjoint at all times.
+     * The entities to outline. This is progressively cumulated from [.entitiesToChooseFrom]
+     */
+    var entitiesToOutline: HashMap<Entity, Color> = hashMapOf()
+
+    /**
+     * The entities we can outline. Note that this set and [.entitiesToOutline] are disjoint at all times.
      */
     var entitiesToChooseFrom: HashSet<Entity> = hashSetOf()
 
     /**
-     * Whether [entitiesToChooseFrom] has been computed already.
+     * Whether [.entitiesToChooseFrom] has been computed already.
      */
     private var computed: Boolean = false
 
     /**
-     * Conditionally queue entities around which to render outlines.
-     * Selects from the pool of [entitiesToChooseFrom] to speed up the predicate testing on subsequent calls.
+     * Constructs the event, given the type and optional entities to outline.
+     *
+     *
+     * This will modify {@param potentialEntities} internally, so make a copy before passing it if necessary.
+     *
+     * @param theType of the event (see [Type]
+     */
+    init {
+        type = theType
+        entitiesToChooseFrom = potentialEntities
+        if (!potentialEntities.isEmpty()) {
+            entitiesToOutline = HashMap(potentialEntities.size)
+        }
+    }
+
+    /**
+     * Conditionally queue entities around which to render entities
+     * Selects from the pool of [.entitiesToChooseFrom] to speed up the predicate testing on subsequent calls.
+     * Is more efficient (theoretically) than calling [.queueEntityToOutline] for each entity because lists are handled internally.
+     *
      *
      * This function loops through all entities and so is not very efficient.
-     * It's advisable to encapsulate calls to this function with global checks
-     * (those not dependent on an individual entity) for efficiency purposes.
+     * It's advisable to encapsulate calls to this function with global checks (those not dependent on an individual entity) for efficiency purposes.
      *
-     * @param outlineColor returns the outline color for an entity, or null to leave it unoutlined
+     * @param outlineColor a function to test
      */
     fun queueEntitiesToOutline(outlineColor: ((entity: Entity) -> Color?)? = null) {
         if (outlineColor == null) {
             return
         }
         computeAndCacheEntitiesToChooseFrom()
-        val iterator: MutableIterator<Entity> = entitiesToChooseFrom.iterator()
-        while (iterator.hasNext()) {
-            val entity: Entity = iterator.next()
-            val color: Color? = outlineColor(entity)
-            if (color != null) {
-                entitiesToOutline[entity] = color.rgb
-                iterator.remove()
+        val itr: MutableIterator<Entity> = entitiesToChooseFrom.iterator()
+        while (itr.hasNext()) {
+            val e: Entity = itr.next()
+            val i: Color? = outlineColor(e)
+            if (i != null) {
+                entitiesToOutline[e] = i
+                itr.remove()
             }
         }
     }
@@ -84,5 +91,15 @@ class RenderEntityOutlineEvent : SkyHanniEvent() {
             }
         }
         entitiesToOutline = HashMap(entitiesToChooseFrom.size)
+    }
+
+    /**
+     * The phase of the event.
+     * [.XRAY] means that this directly precedes entities whose outlines are rendered through walls (Vanilla 1.9+)
+     * [.NO_XRAY] means that this directly precedes entities whose outlines are rendered only when visible to the client
+     */
+    enum class Type {
+        XRAY,
+        NO_XRAY
     }
 }

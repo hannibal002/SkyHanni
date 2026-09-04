@@ -25,7 +25,7 @@ object LoreCostUtils {
 
     fun isCostHeader(line: String): Boolean = costHeaderPattern.matches(line)
 
-    /** True when the item is a purchase entry, as opposed to a locked or already owned one. */
+    /** True when the item can be bought right now, as opposed to a locked or already owned entry. */
     fun List<String>.hasTradeLine(): Boolean = any { tradeLinePattern.matches(it.removeColor()) }
 
     private val patternGroup = RepoPattern.group("utils.lore")
@@ -35,39 +35,30 @@ object LoreCostUtils {
      * into the header line is handed on as is, so that features can find that exact line again
      * in the tooltip. Matching without color would strip it and break that lookup.
      *
-     * Menus that list their costs below the header write it in singular or plural, with a colon
-     * or without one. The prefixes are listed one by one on purpose: a generic word in front of
-     * "Cost" would also match ability lines such as "Mana Cost: 100".
-     *
      * REGEX-TEST: §7Cost
      * REGEX-TEST: §5§o§7Cost
-     * REGEX-TEST: §7Costs
-     * REGEX-TEST: §7Cost:
      * REGEX-TEST: §7Cost: §b5,000 Bits
      * REGEX-TEST: §7Cost to unlock: §550 Tokens
-     * REGEX-TEST: §7Donation Cost:
      */
     private val costHeaderPattern by patternGroup.pattern(
         "cost.header",
-        "(?:§.)*(?:Donation )?Costs?(?: to unlock)?(?::(?: (?<cost>.+))?)?",
+        "(?:§.)*Cost(?: to unlock)?(?:: (?<cost>.+))?",
     )
 
     /**
-     * Shops word this line differently, and an entry the player cannot afford says so instead of
-     * asking for a click. Kuudra's preview line uses the right button and is no trade.
+     * Shops word this line differently, the essence perk shops unlock and the chip menu levels
+     * up, but all of them list their cost the same way. Kuudra names the mouse button, and its
+     * preview line uses the right button, which must not count as a trade.
      *
      * REGEX-TEST: Click to trade!
      * REGEX-TEST: Click to unlock!
      * REGEX-TEST: Click to level up!
-     * REGEX-TEST: Click to buy!
-     * REGEX-TEST: Click to donate!
      * REGEX-TEST: Left Click to unlock!
-     * REGEX-TEST: You can't afford this upgrade!
      * REGEX-FAIL: Right Click to preview!
      */
     private val tradeLinePattern by patternGroup.pattern(
         "trade.click",
-        "(?:Left )?Click to (?:trade|unlock|level up|buy|donate)!|You can't afford this upgrade!",
+        "(?:Left )?Click to (?:trade|unlock|level up)!",
     )
 
     /**
@@ -90,13 +81,12 @@ object LoreCostUtils {
             groupOrNull("cost")?.let { return listOf(readCostLine(it, itemName)) }
         }
 
-        // the blank line below the costs is not always empty, some menus write a color code into it
-        return drop(headerIndex + 1).takeWhile { it.removeColor().isNotEmpty() }.map { readCostLine(it, itemName) }
+        return drop(headerIndex + 1).takeWhile { it.isNotEmpty() }.map { readCostLine(it, itemName) }
     }
 
     private fun readCostLine(rawLine: String, itemName: String): LoreCostEntry {
-        // some menus indent their cost lines, and some write "Gold medal§8 x2" instead of "Gold medal §8x2"
-        val line = rawLine.trim().replace("§8 ", " §8")
+        // some lines write the amount as "Gold medal§8 x2" instead of "Gold medal §8x2"
+        val line = rawLine.replace("§8 ", " §8")
 
         readCurrencyOrNull(line, rawLine)?.let { return it }
         readAmountFirstOrNull(line, rawLine)?.let { return it }

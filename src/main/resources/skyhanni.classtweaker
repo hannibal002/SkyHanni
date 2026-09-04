@@ -68,7 +68,6 @@ accessible method net/minecraft/client/gui/components/ChatComponent logChatMessa
 accessible method net/minecraft/client/gui/components/ChatComponent refreshTrimmedMessages ()V
 accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen slotClicked (Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V
 accessible method net/minecraft/client/gui/screens/inventory/AbstractSignEditScreen setMessage (Ljava/lang/String;)V
-mutable field net/minecraft/client/gui/screens/Screen title Lnet/minecraft/network/chat/Component;
 accessible method net/minecraft/client/renderer/rendertype/RenderType <init> (Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)V
 accessible method net/minecraft/network/chat/TextColor <init> (ILjava/lang/String;)V
 extendable class net/minecraft/world/item/ItemStack
@@ -92,6 +91,8 @@ accessible field net/minecraft/client/renderer/state/gui/GuiTextRenderState font
 accessible field net/minecraft/client/renderer/state/gui/GuiTextRenderState text Lnet/minecraft/util/FormattedCharSequence;
 accessible field net/minecraft/client/renderer/state/gui/GuiTextRenderState x I
 accessible field net/minecraft/client/renderer/state/gui/GuiTextRenderState y I
+inject-interface net/minecraft/client/renderer/feature/ItemFeatureRenderer$Submit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
+inject-interface net/minecraft/client/renderer/feature/ModelFeatureRenderer$Submit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
 #?} else {
 #accessible field net/minecraft/client/renderer/RenderPipelines FOG_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 #accessible field net/minecraft/client/renderer/RenderPipelines MATRICES_PROJECTION_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;

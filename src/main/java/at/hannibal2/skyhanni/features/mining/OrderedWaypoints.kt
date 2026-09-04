@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.waypoints.SkyHanniWaypoint
-import at.hannibal2.skyhanni.data.model.waypoints.WaypointFormats
+import at.hannibal2.skyhanni.data.model.waypoints.WaypointFormat
 import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import java.util.Locale
+import java.util.ServiceLoader
 import kotlinx.coroutines.Job
 
 @SkyHanniModule
@@ -202,7 +203,7 @@ object OrderedWaypoints {
             }
             literal("export") {
                 description = "Exports the loaded ordered waypoints to clipboard."
-                arg("format", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { WaypointFormats.names() }) { format ->
+                arg("format", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { getWaypointFormats() }) { format ->
                     callback { export(getArg(format)) }
                 }
                 simpleCallback { export("coleweight") }
@@ -263,7 +264,7 @@ object OrderedWaypoints {
     }
 
     private fun setupLoadJob(name: String) {
-        val result = if (name == "") WaypointFormats.load(ClipboardUtils.readFromClipboard().orEmpty())
+        val result = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
         else storage?.routes?.get(name)?.let { it to "saved" } ?: return ChatUtils.userError(
             "Route $name doesn't exist.\n" +
                 "§cSaved Routes: ${storage?.routes?.keys?.toList()?.joinToString(", ")}\n" +
@@ -273,7 +274,7 @@ object OrderedWaypoints {
         if (result == null) return ChatUtils.userError(
             "There was an error parsing waypoints. " +
                 "Please make sure they are properly formatted and in a supported format.\n" +
-                "§cSupported Formats: ${WaypointFormats.names().joinToString(", ")}",
+                "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
         )
 
         val (loadedRoute, formatName) = result
@@ -370,8 +371,8 @@ object OrderedWaypoints {
 
     private fun export(format: String) {
         SkyHanniMod.launchIOCoroutine("ordered waypoints export format:$format") {
-            val route = if (format.isEmpty()) WaypointFormats.export(orderedWaypointsList, "coleweight")
-            else WaypointFormats.export(orderedWaypointsList, format.lowercase(Locale.getDefault()))
+            val route = if (format.isEmpty()) exportWaypoints(orderedWaypointsList, "coleweight")
+            else exportWaypoints(orderedWaypointsList, format.lowercase(Locale.getDefault()))
 
             route?.let {
                 ClipboardUtils.copyToClipboard(it)
@@ -379,7 +380,7 @@ object OrderedWaypoints {
             } ?: run {
                 ChatUtils.userError(
                     "Invalid waypoint format specified.\n" +
-                        "§cFormats: ${WaypointFormats.names().joinToString(", ")}",
+                        "§cFormats: ${getWaypointFormats().joinToString { ", " }}",
                 )
             }
         }
@@ -471,5 +472,19 @@ object OrderedWaypoints {
 
     private fun incrementIndex(increment: Int) {
         currentOrderedWaypointIndex = Math.floorMod(currentOrderedWaypointIndex + increment, orderedWaypointsList.size)
+    }
+
+    private fun loadWaypoints(data: String): Pair<Waypoints<SkyHanniWaypoint>, String>? {
+        return ServiceLoader.load(WaypointFormat::class.java).firstNotNullOfOrNull { format ->
+            format.load(data)?.let { it to format.name }
+        }
+    }
+
+    private fun exportWaypoints(waypoints: Waypoints<SkyHanniWaypoint>, name: String): String? {
+        return ServiceLoader.load(WaypointFormat::class.java).firstOrNull { it.name == name }?.export(waypoints)
+    }
+
+    private fun getWaypointFormats(): List<String> {
+        return ServiceLoader.load(WaypointFormat::class.java).map { it.name }
     }
 }

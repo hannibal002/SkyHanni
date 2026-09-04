@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
-import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -87,7 +87,7 @@ object FishingHookDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
+    private fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
         if (event.entity.id == timerDisplay?.id) {
             reset()
         }

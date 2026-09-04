@@ -14,8 +14,8 @@ data class MiningEventDataSend(
 
 data class MiningEventDataReceive(
     @Expose val success: Boolean,
-    @Expose val data: MiningEventData?,
-    @Expose val cause: String?,
+    @Expose val data: MiningEventData,
+    @Expose val cause: String
 )
 
 data class MiningEventData(

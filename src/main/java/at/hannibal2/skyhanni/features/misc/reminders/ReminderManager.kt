@@ -27,6 +27,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ReminderManager {
+
     private const val REMINDERS_PER_PAGE = 10
 
     // Random numbers chosen, this will be used to delete the old list and action messages
@@ -153,7 +154,7 @@ object ReminderManager {
     }
 
     @HandleEvent
-    private fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         val remindersToSend = mutableListOf<Component>()
         val firedReasons = mutableListOf<String>()
 
@@ -193,7 +194,7 @@ object ReminderManager {
         }
 
         if (remindersToSend.isNotEmpty()) {
-            SoundUtils.repeatSound(150, 3, SoundUtils.createSound("block.note_block.pling", 1.5f, isWarning = true))
+            SoundUtils.repeatSound(150, 3, SoundUtils.createSound("block.note_block.pling", 1.5f))
             if (config.showTitle) {
                 val subtitle = if (firedReasons.size == 1) "§e${firedReasons.first()}" else null
                 val titleText = if (firedReasons.size == 1) "§cReminder!" else "§c${firedReasons.size} Reminders!"
@@ -205,7 +206,7 @@ object ReminderManager {
     }
 
     @HandleEvent
-    private fun onCommandRegistration(event: CommandRegistrationEvent) {
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shremind") {
             description = "Set a reminder for yourself"
             literal("list") {

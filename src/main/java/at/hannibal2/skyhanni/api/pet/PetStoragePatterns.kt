@@ -109,6 +109,21 @@ internal object PetStoragePatterns {
     )
 
     /**
+     * REGEX-TEST: Autopet equipped your [Lvl 100] Enderman! VIEW RULE
+     * REGEX-TEST: Autopet equipped your [Lvl 200] Golden Dragon! VIEW RULE
+     * REGEX-TEST: Autopet equipped your [Lvl 100] Rabbit ✦! VIEW RULE
+     * REGEX-TEST: Autopet equipped your [Lvl 200] [122✦] Golden Dragon! VIEW RULE
+     * REGEX-TEST: Autopet equipped your [Lvl 200] [34✦] Golden Dragon! VIEW RULE
+     * REGEX-TEST: Autopet equipped your [Lvl 67] T-Rex! VIEW RULE
+     * REGEX-TEST: Autopet equipped your [Lvl 200] [335✦] Golden Dragon! VIEW RULE
+     */
+    @Suppress("MaxLineLength")
+    val autoPetMessageColorlessPattern by patternGroup.pattern(
+        "autopet.message.colorless",
+        "Autopet equipped your \\[Lvl (?<level>\\d+)] (?:\\[\\d+(?<altskin>✦)\\] )?(?<pet>[\\w -]+)(?<skin> ✦)?! VIEW RULE",
+    )
+
+    /**
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §6Mosquito§e! §a§lVIEW RULE
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §5Rabbit§9 ✦§e! §a§lVIEW RULE
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §6[122✦] Golden Dragon§e! §a§lVIEW RULE

@@ -297,7 +297,7 @@ object ForagingBeaconSolver {
         }
 
         if (!config.useMiddleClick) return
-        if (!event.mouseType.isLeftClick()) return
+        if (event.clickedButton != 0) return
         event.makePickblock()
     }
 

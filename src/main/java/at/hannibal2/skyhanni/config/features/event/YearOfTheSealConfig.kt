@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -44,9 +43,4 @@ class YearOfTheSealConfig {
     @ConfigEditorBoolean
     @SearchTag("beach")
     val bouncyBallLandingSpot: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @Accordion
-    @ConfigOption(name = "Beach Ball Tracker", desc = "")
-    val beachBallTracker = BeachBallTrackerConfig()
 }

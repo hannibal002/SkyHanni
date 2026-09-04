@@ -46,6 +46,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CFApi {
+
     private val chromaEnabled get() = ChromaManager.config.enabled.get()
     val config: CFConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
     val profileStorage: CFStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
@@ -127,7 +128,7 @@ object CFApi {
     var bestPossibleSlot = -1
 
     var specialRabbitTextures = listOf<String>()
-    var warningSound = SoundUtils.createSound("block.note_block.pling", 1f, isWarning = true)
+    var warningSound = SoundUtils.createSound("block.note_block.pling", 1f)
     val mainInventory = InventoryDetector { HoppityApi.chocolateFactoryInvPattern }
 
     private val partyModeRegex = Regex("§[a-fA-F0-9]")

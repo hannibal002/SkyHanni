@@ -14,12 +14,15 @@ import java.awt.Color
 
 @SkyHanniModule
 object PartyMemberOutlines {
+
     private val config get() = SkyHanniMod.feature.misc.highlightPartyMembers
 
     @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.HIGHLIGHT_PARTY_MEMBERS])
-    private fun onRenderEntityOutline(event: RenderEntityOutlineEvent) {
+    fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
         if (!config.enabled || DungeonApi.inDungeon()) return
-        event.queueEntitiesToOutline { entity -> getEntityOutlineColor(entity) }
+        if (event.type === RenderEntityOutlineEvent.Type.NO_XRAY) {
+            event.queueEntitiesToOutline { entity -> getEntityOutlineColor(entity) }
+        }
     }
 
     private fun getEntityOutlineColor(entity: Entity): Color? {

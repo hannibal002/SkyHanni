@@ -17,11 +17,13 @@ import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 object NoBitsWarning {
+
     private val config get() = SkyHanniMod.feature.misc.bits
 
     @HandleEvent
-    private fun onBitsGain(event: BitsUpdateEvent.BitsGain) {
+    fun onBitsGain(event: BitsUpdateEvent.BitsGain) {
         if (config.enableWarning && event.bitsAvailable == 0) {
+
             ChatUtils.clickableChat(
                 "§bNo Bits Available! §eClick to buy booster cookies on the bazaar.",
                 onClick = { HypixelCommands.bazaar("booster cookie") },
@@ -29,8 +31,7 @@ object NoBitsWarning {
             )
             // TODO use reminder utils
             TitleManager.sendTitle("§bNo Bits Available")
-            val sound = createSound("block.note_block.pling", 0.6f, isWarning = true)
-            if (config.notificationSound) SoundUtils.repeatSound(100, 10, sound)
+            if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("block.note_block.pling", 0.6f))
         }
 
         if (config.bitsGainChatMessage) {
@@ -46,7 +47,7 @@ object NoBitsWarning {
     }
 
     @HandleEvent
-    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(35, "misc.noBitsWarning", "misc.noBitsWarning.enabled")
         event.move(40, "misc.noBitsWarning.enabled", "misc.bits.enableWarning")
         event.move(40, "misc.noBitsWarning.notificationSound", "misc.bits.notificationSound")

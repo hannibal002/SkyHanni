@@ -8,8 +8,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//? if >= 26.2 {
+import net.minecraft.client.renderer.SubmitNodeCollector;
+//?} else {
+/*import net.minecraft.client.renderer.MultiBufferSource;
+*///?}
+
 @Mixin(ScreenEffectRenderer.class)
 public abstract class MixinScreenEffectRenderer {
+
     //~ if < 26.2 'submitFire' -> 'renderFire'
     @Inject(method = "submitFire", at = @At("HEAD"), cancellable = true)
     private static void renderFire(CallbackInfo ci) {

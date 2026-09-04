@@ -39,19 +39,30 @@ jobs:
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: ./.github/actions/setup-normal-workspace
+                if: github.repository == 'hannibal002/SkyHanni'
+            -   uses: ./.github/actions/setup-normal-workspace
+                if: github.repository != 'hannibal002/SkyHanni'
             -   name: Build with Gradle w/retry
-                id: assemble
+                id: assemble_main
+                if: github.repository == 'hannibal002/SkyHanni'
+                continue-on-error: true
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: ${{ matrix.minecraft_version }}:assemble -x ${{ matrix.minecraft_version }}:test --stacktrace
+            -   name: Build with Gradle w/retry
+                id: assemble_fork
+                if: github.repository != 'hannibal002/SkyHanni'
                 continue-on-error: true
                 uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: ${{ matrix.minecraft_version }}:assemble -x ${{ matrix.minecraft_version }}:test --stacktrace
             -   name: Save assemble log on failure
-                if: steps.assemble.outcome == 'failure'
+                if: steps.assemble_main.outcome == 'failure' || steps.assemble_fork.outcome == 'failure'
                 run: |
                     cp "$GITHUB_WORKSPACE/gradle-output.log" \
                        "assemble-failure-${{ matrix.minecraft_version }}.log" 2>/dev/null || true
             -   name: Upload assemble failure artifact
-                if: steps.assemble.outcome == 'failure'
+                if: steps.assemble_main.outcome == 'failure' || steps.assemble_fork.outcome == 'failure'
                 uses: actions/upload-artifact@v7
                 with:
                     name: build-failure-output-${{ matrix.minecraft_version }}
@@ -65,20 +76,27 @@ jobs:
             # Skipped after a failed assemble: the test failure would only be a follow-up, and two logs under
             # one artifact name would be read back in directory order.
             -   name: Test with Gradle w/retry
-                id: test
-                if: steps.assemble.outcome == 'success'
+                id: test_main
+                if: github.repository == 'hannibal002/SkyHanni' && steps.assemble_main.outcome == 'success'
+                continue-on-error: true
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: ${{ matrix.minecraft_version }}:test
+            -   name: Test with Gradle w/retry
+                id: test_fork
+                if: github.repository != 'hannibal002/SkyHanni' && steps.assemble_fork.outcome == 'success'
                 continue-on-error: true
                 uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: ${{ matrix.minecraft_version }}:test
             # Same artifact name as the assemble failure above, only one of the two can ever be produced.
             -   name: Save test log on failure
-                if: steps.test.outcome == 'failure'
+                if: steps.test_main.outcome == 'failure' || steps.test_fork.outcome == 'failure'
                 run: |
                     cp "$GITHUB_WORKSPACE/gradle-output.log" \
                        "test-failure-${{ matrix.minecraft_version }}.log" 2>/dev/null || true
             -   name: Upload test failure artifact
-                if: steps.test.outcome == 'failure'
+                if: steps.test_main.outcome == 'failure' || steps.test_fork.outcome == 'failure'
                 uses: actions/upload-artifact@v7
                 with:
                     name: build-failure-output-${{ matrix.minecraft_version }}
@@ -94,7 +112,9 @@ jobs:
             # Assemble and test are both continue-on-error, so this step is what makes either of them red.
             # A newly added continue-on-error step has to be listed here too.
             -   name: Fail job if assemble or test failed
-                if: steps.assemble.outcome == 'failure' || steps.test.outcome == 'failure'
+                if: |
+                    steps.assemble_main.outcome == 'failure' || steps.assemble_fork.outcome == 'failure' ||
+                    steps.test_main.outcome == 'failure' || steps.test_fork.outcome == 'failure'
                 run: exit 1
 
     verify:

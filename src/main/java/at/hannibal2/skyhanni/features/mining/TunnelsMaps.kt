@@ -223,7 +223,7 @@ object TunnelsMaps {
     @HandleEvent
     private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
-        if (!event.mouseType.isRightClick()) return
+        if (event.clickedButton != 1) return
         clickTranslate[event.slotId]?.let {
             isCommission = true
             setActiveAndGoal(it)

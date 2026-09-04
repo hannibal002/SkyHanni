@@ -18,9 +18,10 @@ import java.util.UUID
  * @param onDebugInfo Called with diagnostic key-value pairs if pipe discovery fails.
  */
 class DiscordIPC(
-    clientId: Long,
+    private val clientId: Long,
     private val onDebugInfo: (Map<String, String>) -> Unit = {},
 ) : Closeable {
+
     @Volatile
     private var _connected = false
     private var pipe: DiscordIPCPipe? = null

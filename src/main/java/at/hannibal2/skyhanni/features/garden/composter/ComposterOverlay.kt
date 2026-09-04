@@ -4,13 +4,17 @@ import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTipLine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.SackApi.isMissingSackItem
 import at.hannibal2.skyhanni.data.garden.ComposterUpgradesData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -70,6 +74,7 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 @SkyHanniModule
 object ComposterOverlay {
+
     private var displayDirty = false
     private var organicMatterFactors: Map<NeuInternalName, Double> = emptyMap()
     private var fuelFactors: Map<NeuInternalName, Double> = emptyMap()
@@ -113,27 +118,27 @@ object ComposterOverlay {
     private val VOLTA = "VOLTA".toInternalName()
     private val OIL_BARREL = "OIL_BARREL".toInternalName()
 
-    @HandleEvent(onlyOnIsland = GARDEN)
-    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!isEnabled() || !event.isWidget(COMPOSTER)) return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!isEnabled() || !event.isWidget(TabWidget.COMPOSTER)) return
         displayDirty = true
     }
 
-    @HandleEvent(onlyOnIsland = GARDEN)
-    private fun onTick() {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onTick() {
         if (composterUpgradesInventory.isInside() && extraComposterUpgrade != null && lastHovered.passedSince() > 200.milliseconds) {
             extraComposterUpgrade = null
             displayDirty = true
         }
     }
 
-    @HandleEvent(onlyOnIsland = GARDEN)
-    private fun onInventoryFullyOpened() {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onInventoryFullyOpened() {
         if (inInventory) displayDirty = true
     }
 
-    @HandleEvent(onlyOnIsland = GARDEN)
-    private fun onToolTip(event: ToolTipTextEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!composterUpgradesInventory.isInside()) return
         for (upgrade in ComposterUpgrade.entries) {
             val name = event.itemStack.cleanName
@@ -526,7 +531,7 @@ object ComposterOverlay {
 
     private fun retrieveMaterials(internalName: NeuInternalName, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0) return
-        if (config.retrieveFrom == BAZAAR &&
+        if (config.retrieveFrom == RetrieveFromEntry.BAZAAR &&
             !SkyBlockUtils.noTradeMode && internalName != BIOFUEL
         ) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
@@ -559,7 +564,7 @@ object ComposterOverlay {
             }
         }
         if (havingInSacks == 0) {
-            SoundUtils.playErrorSound(isWarning = false)
+            SoundUtils.playErrorSound()
             if (SkyBlockUtils.noTradeMode) {
                 ChatUtils.chat("No $itemName §efound in sacks. Opening recipe.")
                 HypixelCommands.recipe(itemName)
@@ -594,19 +599,19 @@ object ComposterOverlay {
     }
 
     @HandleEvent
-    private fun onNeuRepoReload() {
+    fun onNeuRepoReload() {
         updateOrganicMatterFactors()
     }
 
     // hopefully fix the display not working properly
     @HandleEvent
-    private fun onIslandJoin(event: IslandJoinEvent) {
-        if (event.island != GARDEN) return
+    fun onIslandJoin(event: IslandJoinEvent) {
+        if (event.island != IslandType.GARDEN) return
         updateOrganicMatterFactors()
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         organicMatter = data.organicMatter
         fuelFactors = data.fuel
@@ -614,7 +619,7 @@ object ComposterOverlay {
     }
 
     @HandleEvent
-    private fun onConfigLoad() {
+    fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(minimumOrganicMatter) {
                 updateOrganicMatterFactors()
@@ -665,7 +670,7 @@ object ComposterOverlay {
     }
 
     @HandleEvent
-    private fun onChestGuiRender() {
+    fun onChestGuiRender() {
         if (!isEnabled() || !inInventory) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
         if (displayDirty) {
@@ -691,7 +696,7 @@ object ComposterOverlay {
     }
 
     @HandleEvent
-    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterOverlay", "garden.composters.overlay")
         event.move(3, "garden.composterOverlayPriceType", "garden.composters.overlayPriceType")
         event.move(3, "garden.composterOverlayRetrieveFrom", "garden.composters.retrieveFrom")
@@ -701,7 +706,7 @@ object ComposterOverlay {
     }
 
     @HandleEvent
-    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Composter")
 
         event.addIrrelevant {
@@ -727,10 +732,10 @@ object ComposterOverlay {
     }
 
     @HandleEvent
-    private fun onCommandRegistration(event: CommandRegistrationEvent) {
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestcomposter") {
             description = "Test the composter overlay"
-            category = DEVELOPER_DEBUG
+            category = CommandCategory.DEVELOPER_DEBUG
             argCallback("offset", BrigadierArguments.integer()) {
                 testOffset = it
                 ChatUtils.chat("Composter test offset set to $testOffset.")

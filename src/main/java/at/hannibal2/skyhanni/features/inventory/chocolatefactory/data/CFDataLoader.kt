@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 
 @SkyHanniModule
 object CFDataLoader {
+
     private val config get() = CFApi.config
     private val profileStorage get() = CFApi.profileStorage
 
@@ -236,7 +237,7 @@ object CFDataLoader {
     // </editor-fold>
 
     @HandleEvent
-    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!CFApi.inChocolateFactory) return
         DelayedRun.runOrNextTick {
             updateInventoryItems(event.inventoryItems)
@@ -244,17 +245,17 @@ object CFDataLoader {
     }
 
     @HandleEvent
-    private fun onWorldChange() {
+    fun onWorldChange() {
         clearData()
     }
 
     @HandleEvent
-    private fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         clearData()
     }
 
     @HandleEvent
-    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
             47,
             "inventory.chocolateFactory.rabbitWarning",
@@ -263,10 +264,10 @@ object CFDataLoader {
     }
 
     @HandleEvent
-    private fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad(event: ConfigLoadEvent) {
         val soundProperty = config.rabbitWarning.specialRabbitSound
         ConditionalUtils.onToggle(soundProperty) {
-            CFApi.warningSound = SoundUtils.createSound(soundProperty.get(), 1f, isWarning = true)
+            CFApi.warningSound = SoundUtils.createSound(soundProperty.get(), 1f)
         }
 
         config.chocolateUpgradeWarnings.upgradeWarningTimeTower.whenChanged { _, _ ->

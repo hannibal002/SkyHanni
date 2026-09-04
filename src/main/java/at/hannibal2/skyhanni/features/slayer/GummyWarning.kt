@@ -30,6 +30,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GummyWarning {
+
     private val config get() = SkyHanniMod.feature.slayer
     private var lastWarned = SimpleTimeMark.farPast()
     private var lastWarningShown = SimpleTimeMark.farPast()
@@ -97,7 +98,7 @@ object GummyWarning {
 
         DelayedRun.runDelayed(0.5.seconds) {
             lastWarningShown = SimpleTimeMark.now()
-            SoundUtils.createSound("block.anvil.land", 0.5f, isWarning = true).playSound()
+            SoundUtils.createSound("block.anvil.land", 0.5f).playSound()
             ChatUtils.clickToActionOrDisable(
                 message = "You do not have an active Re-Heated Gummy Polar Bear!",
                 option = config::gummyWarning,
@@ -116,3 +117,4 @@ object GummyWarning {
 
     private fun isEnabled() = config.gummyWarning && SlayerApi.activeType != null
 }
+

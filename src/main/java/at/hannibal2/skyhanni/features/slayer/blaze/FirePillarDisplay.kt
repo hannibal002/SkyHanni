@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
-import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -38,7 +38,7 @@ object FirePillarDisplay {
     }
 
     @HandleEvent
-    private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
+    fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
         if (event.entity.id == entityId) display = null
     }
 

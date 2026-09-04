@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -23,15 +22,12 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.compat.hover
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 
 @SkyHanniModule
 object NavigationHelper {
     private val config get() = SkyHanniMod.feature.misc.navigation
 
     private val messageId = ChatUtils.getUniqueMessageId()
-
-    private val commandCoroutine = CoroutineSettings("shnavigate command")
 
     val allowedSingleNavigationTags = setOf(
         GraphNodeTag.NPC,
@@ -45,24 +41,17 @@ object NavigationHelper {
         GraphNodeTag.CRIMSON_MINIBOSS,
     )
 
-    private fun doCommandAsync(searchTerm: String, allowInstant: Boolean = true) {
-        commandCoroutine.launch {
-            runCommand(searchTerm, allowInstant)
-        }
-    }
-
-    private fun runCommand(searchTerm: String, allowInstant: Boolean) {
+    private fun doCommandAsync(searchTerm: String) {
         val distances = calculateDistances(searchTerm)
         val locations = calculateNames(distances)
 
-        // going back always shows the list, otherwise an exact match would just navigate again
         val goBack = {
+            doCommandAsync(searchTerm)
             IslandGraphs.stopNavigation()
-            doCommandAsync(searchTerm, allowInstant = false)
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
-        if (allowInstant && config.allowInstantNavigation) {
+        if (config.allowInstantNavigation) {
             val exactMatch = locations.firstOrNull { (name, _) ->
                 name.substringBefore(" §7(").equals(searchTerm, ignoreCase = true)
             }
@@ -133,8 +122,6 @@ object NavigationHelper {
         val graph = IslandGraphs.currentIslandGraph ?: return emptyMap()
         val closestNode = IslandGraphs.closestNode ?: return emptyMap()
 
-        val shortestDistances = GraphUtils.findAllShortestDistances(closestNode).distances
-
         val distances = mutableMapOf<GraphNode, Double>()
         for (node in graph) {
             if (!node.enabled) continue
@@ -142,8 +129,7 @@ object NavigationHelper {
             val remainingTags = node.tags.filter { it in allowedSingleNavigationTags }
             if (remainingTags.isEmpty()) continue
             if (name.lowercase().contains(searchTerm)) {
-                // unreachable nodes fall back to 0.0 and therefore sort to the front, same as before
-                distances[node] = shortestDistances[node] ?: 0.0
+                distances[node] = GraphUtils.findShortestDistance(closestNode, node)
             }
             if (remainingTags.size != 1) {
                 println("found node with invalid amount of tags: ${node.name} (${remainingTags.map { it.cleanName }}")
@@ -162,7 +148,9 @@ object NavigationHelper {
                 ChatUtils.chat("Started Navigating to custom goal at §f${location.toLocalFormat()}", messageId = messageId)
             }
             argCallback("search", BrigadierArguments.greedyString(), BrigadierUtils.dynamicSuggestionProvider { getNames() }) {
-                doCommandAsync(it.lowercase().removeColor())
+                SkyHanniMod.launchCoroutine("shnavigate command") {
+                    doCommandAsync(it.lowercase().removeColor())
+                }
             }
             simpleCallback {
                 doCommandAsync("")

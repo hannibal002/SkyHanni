@@ -133,7 +133,7 @@ object TiaRelayHelper {
         if (!inInventory) return
 
         // only listen to right clicks
-        if (!event.mouseType.isRightClick()) return
+        if (event.clickedButton != 1) return
 
         lastClickSlot = event.slotId
         lastClickTime = SimpleTimeMark.now()
