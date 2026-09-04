@@ -49,10 +49,9 @@ import net.minecraft.world.entity.npc.villager.Villager
 import net.minecraft.world.entity.player.Player
 import org.intellij.lang.annotations.Language
 
-@Suppress("RegExpRedundantEscape", "MaxLineLength")
 @SkyHanniModule
+@Suppress("MaxLineLength", "RegExpRedundantEscape")
 object MobFilter {
-
     private val patternGroup = RepoPattern.group("mob.detection")
 
     @Language("RegExp")
@@ -139,11 +138,6 @@ object MobFilter {
         "pattern.summon.owner",
         ".*Spawned by: (?<name>.*).*",
     )
-    val heavyPearlPattern by patternGroup.pattern(
-        "pattern.heavypearl.collect",
-        "§.§lCOLLECT!",
-    )
-
     /**
      * REGEX-TEST: SHINY PIG
      */
@@ -294,7 +288,7 @@ object MobFilter {
 
         baseEntity.isFarmMob() -> createFarmMobs(baseEntity)?.let { MobResult.found(it) }
         baseEntity is EnderDragon -> when (SkyBlockUtils.currentIsland) {
-            IslandType.CATACOMBS -> (8..16).map { MobUtils.getArmorStand(baseEntity, it) }
+            CATACOMBS -> (8..16).map { MobUtils.getArmorStand(baseEntity, it) }
                 .makeMobResult {
                     MobFactories.boss(baseEntity, it.first(), it.drop(1))
                 }
@@ -372,7 +366,7 @@ object MobFilter {
                 else -> null
             }
         } else when (SkyBlockUtils.currentIsland) {
-            IslandType.CRIMSON_ISLE -> when {
+            CRIMSON_ISLE -> when {
                 else -> null
             }
 
@@ -397,7 +391,7 @@ object MobFilter {
 
     fun LivingEntity.isFarmMob() =
         this is Animal && this.baseMaxHealth.derpy()
-            .let { it == 50 || it == 20 || it == 130 } && SkyBlockUtils.currentIsland != IslandType.PRIVATE_ISLAND
+            .let { it == 50 || it == 20 || it == 130 } && SkyBlockUtils.currentIsland != PRIVATE_ISLAND
 
     private fun createFarmMobs(baseEntity: LivingEntity): Mob? = when (baseEntity) {
         is MushroomCow -> MobFactories.basic(baseEntity, "Farm Mooshroom")
