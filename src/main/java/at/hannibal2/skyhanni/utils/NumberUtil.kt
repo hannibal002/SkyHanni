@@ -116,7 +116,7 @@ object NumberUtil {
     }
 
     fun String.romanToDecimalIfNecessary(): Int =
-        toIntOrNull()
+        formatIntOrNull()
             ?: romanToDecimalOrNull()
             ?: throw IllegalArgumentException("Failed to parse input string as either Arabic or Roman numerals: '$this'")
 
