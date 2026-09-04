@@ -474,7 +474,7 @@ class MiscConfig {
     var coralFishHelper: Boolean = true
 
     @Expose
-I m    @ConfigLink(owner = MiscConfig::class, field = "coralFishHelper")
+    @ConfigLink(owner = MiscConfig::class, field = "coralFishHelper")
     val coralFishHelperPosition: Position = Position(174, 139)
 
     @Expose
