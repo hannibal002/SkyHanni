@@ -172,50 +172,65 @@ fun createResourceLocation(path: String): Identifier {
     return textureLocation
 }
 
-var Component.hover: Component?
+val Component.hover: Component?
     get() = this.style.hoverEvent?.takeIf {
         it.action() == HoverEvent.Action.SHOW_TEXT
     }?.let { (it as HoverEvent.ShowText).value }
+
+var MutableComponent.hover: Component?
+    get() = (this as Component).hover
     set(value) {
-        value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
+        value?.let { new -> this.withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
     }
 
-var Component.stackHover: SafeItemStack?
+val Component.stackHover: SafeItemStack?
     get() = this.style.hoverEvent?.takeIf {
         it.action() == HoverEvent.Action.SHOW_ITEM
     }?.let {
         (it as HoverEvent.ShowItem).item.create()
     }
+
+var MutableComponent.stackHover: SafeItemStack?
+    get() = (this as Component).stackHover
     set(value) {
         value?.let { new ->
-            this.copyIfNeeded().withStyle {
+            this.withStyle {
                 it.withHoverEvent(HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(new)))
             }
         }
     }
 
-var Component.command: String?
+val Component.command: String?
     get() = this.style.clickEvent?.takeIf {
         it.action() == ClickEvent.Action.RUN_COMMAND
     }?.let { (it as ClickEvent.RunCommand).command }
+
+var MutableComponent.command: String?
+    get() = (this as Component).command
     set(value) {
-        this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
+        this.withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
     }
 
-var Component.suggest: String?
+val Component.suggest: String?
     get() = this.style.clickEvent?.takeIf {
         it.action() == ClickEvent.Action.SUGGEST_COMMAND
     }?.let { (it as ClickEvent.SuggestCommand).command }
+
+var MutableComponent.suggest: String?
+    get() = (this as Component).suggest
     set(value) {
-        this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
+        this.withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
     }
 
-var Component.url: String?
+val Component.url: String?
     get() = this.style.clickEvent?.takeIf {
         it.action() == ClickEvent.Action.OPEN_URL
     }?.let { (it as ClickEvent.OpenUrl).uri.toString() }
+
+var MutableComponent.url: String?
+    get() = (this as Component).url
     set(value) {
-        this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
+        this.withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
     }
 
 var MutableComponent.underlined: Boolean
@@ -314,7 +329,6 @@ fun ClickEvent.value(): String {
         // todo use error manager here probably, not doing it now because it doesn't compile on 1.21
         else -> ""
     }
-
 }
 
 fun HoverEvent.value(): Component = when (action()) {
@@ -351,13 +365,13 @@ fun Component.convertToJsonString(): String {
 }
 
 fun Component.append(newText: Component): MutableComponent {
-    return this.copyIfNeeded().append(newText)
+    return this.copy().append(newText)
 }
 
 val formattingPattern = Regex("§.(?:§.)?")
 
 fun Component.append(newText: String): MutableComponent {
-    val mutableText = this.copyIfNeeded()
+    val mutableText = this.copy()
     if (mutableText.string.matches(formattingPattern)) {
         return (mutableText.string + newText).asComponent()
     }
@@ -369,7 +383,7 @@ fun MutableComponent.append(string: String = "", init: MutableComponent.() -> Un
 }
 
 fun MutableComponent.append(comp: Component, init: MutableComponent.() -> Unit): MutableComponent {
-    return this.append(comp.copyIfNeeded().also(init))
+    return this.append(comp.copy().also(init))
 }
 
 fun MutableComponent.appendWithColor(string: String = "", color: Int, init: MutableComponent.() -> Unit = {}): MutableComponent {
@@ -377,7 +391,7 @@ fun MutableComponent.appendWithColor(string: String = "", color: Int, init: Muta
 }
 
 fun MutableComponent.appendWithColor(comp: Component, color: Int, init: MutableComponent.() -> Unit = {}): MutableComponent {
-    return this.append(comp.copyIfNeeded().withColor(color).also(init))
+    return this.append(comp.copy().withColor(color).also(init))
 }
 
 fun MutableComponent.appendWithColor(string: String = "", color: ChatFormatting, init: MutableComponent.() -> Unit = {}): MutableComponent {
@@ -385,7 +399,7 @@ fun MutableComponent.appendWithColor(string: String = "", color: ChatFormatting,
 }
 
 fun MutableComponent.appendWithColor(comp: Component, color: ChatFormatting, init: MutableComponent.() -> Unit = {}): MutableComponent {
-    return this.append(comp.copyIfNeeded().withColor(color).also(init))
+    return this.append(comp.copy().withColor(color).also(init))
 }
 
 fun MutableComponent.appendWithColor(string: String = "", color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
@@ -393,7 +407,7 @@ fun MutableComponent.appendWithColor(string: String = "", color: TextColor, init
 }
 
 fun MutableComponent.appendWithColor(comp: Component, color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
-    return this.append(comp.copyIfNeeded().withColor(color).also(init))
+    return this.append(comp.copy().withColor(color).also(init))
 }
 
 fun List<Any>.mapToComponents(): List<Component> {
@@ -511,12 +525,10 @@ fun Component.replace(
     return newComp
 }
 
-operator fun Component.plus(string: String): Component {
+operator fun Component.plus(string: String): MutableComponent {
     return this.append(string)
 }
 
-fun componentBuilder(init: MutableComponent.() -> Unit): Component {
+fun componentBuilder(init: MutableComponent.() -> Unit): MutableComponent {
     return Component.empty().also(init)
 }
-
-fun Component.copyIfNeeded(): MutableComponent = this as? MutableComponent ?: this.copy()
