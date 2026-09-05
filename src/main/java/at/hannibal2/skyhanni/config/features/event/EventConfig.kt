@@ -83,6 +83,10 @@ class EventConfig {
     @Expose
     val yearOfTheWitch: YearOfTheWitchConfig = YearOfTheWitchConfig()
 
+    @Category(name = "Stonks Auction", desc = "Features for the Stonks Auction while the Stock Exchange perk is active.")
+    @Expose
+    val stonksAuction: StonksAuctionConfig = StonksAuctionConfig()
+
     @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
     @Expose
     val lobbyWaypoints: LobbyWaypointsConfig = LobbyWaypointsConfig()
