@@ -20,7 +20,6 @@ import com.google.gson.JsonObject
 import com.mojang.serialization.JsonOps
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.NbtOps
-import net.minecraft.resources.Identifier
 import net.minecraft.util.Unit
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.DyedItemColor
@@ -43,7 +42,6 @@ object ComponentUtils {
         if (nbtInfo.unbreakable?.boolean == true) {
             stack.set(DataComponents.UNBREAKABLE, Unit.INSTANCE)
         }
-        nbtInfo.itemModel?.let { stack.set(DataComponents.ITEM_MODEL, Identifier.parse(it)) }
         if (nbtInfo.display != null) {
             val display = nbtInfo.display
             if (display.color != null) {

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu
 
+import at.hannibal2.skyhanni.api.enoughupdates.NeuItemOverlay
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuAbstractRecipe
@@ -45,6 +46,8 @@ data class NeuItemJson(
     @Expose val recipes: List<NeuAbstractRecipe> = emptyList(),
     @Expose val count: Int? = null,
 ) {
+    internal var itemOverlay: NeuItemOverlay? = null
+
     companion object {
         private val nbtListRegex = Regex("([\\[,])\\d+:")
     }

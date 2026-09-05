@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetNumsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuAbstractRecipe
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
+import at.hannibal2.skyhanni.data.repo.filesystem.RepoFileSystem
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -28,6 +29,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
@@ -37,15 +39,58 @@ import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import net.minecraft.SharedConstants
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.component.DataComponentPatch
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.StringTag
+import net.minecraft.nbt.Tag
+import net.minecraft.nbt.TagParser
+import net.minecraft.resources.RegistryOps
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStackTemplate
 import java.io.File
 import java.util.TreeMap
+import kotlin.jvm.optionals.getOrNull
 import kotlin.math.floor
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+
+
+internal data class NeuItemOverlayCandidate(
+    val internalName: String,
+    val version: Int,
+    val path: String,
+)
+
+internal class NeuItemOverlay(
+    val itemId: String,
+    val components: CompoundTag,
+    val path: String,
+) {
+    private var patch: DataComponentPatch? = null
+    private var patchOps: RegistryOps<Tag>? = null
+
+    /**
+     * Components such as enchantments or banner patterns are backed by registries that the client only receives from
+     * the server, so the patch can not be built while the repo is loading.
+     */
+    fun componentPatch(ops: RegistryOps<Tag>): DataComponentPatch? {
+        if (patchOps === ops) return patch
+        patch = DataComponentPatch.CODEC.parse(ops, components).resultOrPartial { error ->
+            ErrorManager.logErrorWithData(
+                IllegalStateException(error),
+                "Failed to parse NEU item overlay components for item $itemId",
+                "itemId" to itemId,
+                "path" to path,
+            )
+        }.getOrNull()
+        patchOps = ops
+        return patch
+    }
+}
 
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
@@ -64,6 +109,9 @@ object EnoughUpdatesManager {
 
     private var neuPetsJson: NeuPetsJson? = null
     private var neuPetNums: NeuPetNumsJson? = null
+
+    private var overlayOps: RegistryOps<Tag>? = null
+    private var overlayOpsRegistries: HolderLookup.Provider? = null
 
     val titleWordMap = TreeMap<String, MutableMap<String, MutableList<Int>>>()
 
@@ -100,6 +148,8 @@ object EnoughUpdatesManager {
         progress.update("loadItemMap")
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
         val list = fileSystem.list("items")
+        val overlays = fileSystem.findNeuItemOverlayCandidates()
+        val worldDataVersion = SharedConstants.WORLD_VERSION
         progress.innerProgressStart(list.size)
         val parsedItems = list.mapNotNullAsync { name ->
             try {
@@ -108,7 +158,14 @@ object EnoughUpdatesManager {
                 val tryParsedItem = parseItem(itemJson)
                 progress.innerProgressStep()
                 val parsedItem = tryParsedItem ?: return@mapNotNullAsync null
-                internalName.toInternalName() to parsedItem
+                val itemInternalName = internalName.toInternalName()
+                parsedItem.applySelectedNeuItemOverlay(
+                    internalName = internalName,
+                    candidates = overlays[internalName].orEmpty(),
+                    fileSystem = fileSystem,
+                    worldDataVersion = worldDataVersion,
+                )
+                itemInternalName to parsedItem
             } catch (e: Exception) {
                 progress.update("Failed to parse item: $name")
                 ErrorManager.logErrorWithData(e, "Failed to parse item: $name")
@@ -130,6 +187,83 @@ object EnoughUpdatesManager {
                     indexList.add(index)
                 }
             }
+        }
+    }
+
+    internal fun RepoFileSystem.findNeuItemOverlayCandidates(): Map<String, List<NeuItemOverlayCandidate>> {
+        return listDirectories("itemsOverlay")
+            .mapNotNull { it.toIntOrNull() }
+            .flatMap { version ->
+                listFiles("itemsOverlay/$version", "snbt").map { fileName ->
+                    NeuItemOverlayCandidate(
+                        internalName = fileName.removeSuffix(".snbt"),
+                        version = version,
+                        path = "itemsOverlay/$version/$fileName",
+                    )
+                }
+            }
+            .groupBy { it.internalName }
+    }
+
+    internal fun selectNeuItemOverlayCandidate(
+        candidates: List<NeuItemOverlayCandidate>,
+        worldDataVersion: Int,
+    ): NeuItemOverlayCandidate? {
+        return candidates
+            .filter { it.version <= worldDataVersion }
+            .maxByOrNull { it.version }
+            ?: candidates.minByOrNull { it.version }
+    }
+
+    internal fun parseNeuItemOverlay(snbt: String, path: String): NeuItemOverlay {
+        val rootTag = TagParser.parseCompoundFully(snbt)
+        val id = rootTag.getString("id").orElseThrow {
+            IllegalArgumentException("NEU item overlay is missing id")
+        }
+        val components = rootTag.getCompound("components").orElseThrow {
+            IllegalArgumentException("NEU item overlay is missing components")
+        }
+        return NeuItemOverlay(id, components, path)
+    }
+
+    private fun currentOverlayOps(): RegistryOps<Tag>? {
+        val registries = MinecraftCompat.localWorldOrNull?.registryAccess() ?: return null
+        overlayOps?.takeIf { overlayOpsRegistries === registries }?.let { return it }
+        return RegistryOps.create(NbtOps.INSTANCE, registries).also {
+            overlayOps = it
+            overlayOpsRegistries = registries
+        }
+    }
+
+    private fun NeuItemJson.overlayComponentPatch(): DataComponentPatch? {
+        val overlay = itemOverlay ?: return null
+        val ops = currentOverlayOps() ?: return null
+        return overlay.componentPatch(ops)
+    }
+
+    private fun NeuItemJson.applySelectedNeuItemOverlay(
+        internalName: String,
+        candidates: List<NeuItemOverlayCandidate>,
+        fileSystem: RepoFileSystem,
+        worldDataVersion: Int,
+    ) {
+        val candidate = selectNeuItemOverlayCandidate(candidates, worldDataVersion) ?: return
+        runCatching {
+            val snbt = String(fileSystem.readAllBytes(candidate.path), Charsets.UTF_8)
+            val overlay = parseNeuItemOverlay(snbt, candidate.path)
+            itemId = overlay.itemId
+            itemOverlay = overlay
+        }.onFailure {
+            ErrorManager.logErrorWithData(
+                it,
+                "Failed to parse NEU item overlay for item $internalName",
+                extraData = listOf(
+                    "internalName" to internalName,
+                    "selectedOverlayVersion" to candidate.version,
+                    "path" to candidate.path,
+                    "worldDataVersion" to worldDataVersion,
+                ).toTypedArray(),
+            )
         }
     }
 
@@ -202,6 +336,7 @@ object EnoughUpdatesManager {
         val factory: () -> ItemStackTemplate = {
             val freshStack = ItemStackTemplate(baseItem, countVal).create()
             ComponentUtils.convertToComponents(freshStack, neuItemRef.neuNbt)
+            neuItemRef.overlayComponentPatch()?.let(freshStack::applyComponents)
             var innerReplacements = emptyMap<String, String>()
             if (useReplacements) {
                 innerReplacements = freshStack.getPetLoreReplacements()
