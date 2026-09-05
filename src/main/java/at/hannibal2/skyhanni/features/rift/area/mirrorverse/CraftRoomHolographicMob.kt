@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotClass
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.realHealth
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -29,7 +29,6 @@ import net.minecraft.world.phys.AABB
 // TODO fix looking at direction, slime size, helmet/skull of zombie
 @SkyHanniModule
 object CraftRoomHolographicMob {
-
     private val config get() = SkyHanniMod.feature.rift.area.mirrorverse.craftingRoom
     private val enabled get() = config.enabled && craftRoomArea.isPlayerInside()
 
@@ -83,7 +82,7 @@ object CraftRoomHolographicMob {
             append("§a$mobName ")
         }
         if (config.showHealth) {
-            append("§c${findHealthReal().roundTo(1)}♥")
+            append("§c${realHealth.roundTo(1)}♥")
         }
     }.trim().takeIf { it.isNotEmpty() }
 

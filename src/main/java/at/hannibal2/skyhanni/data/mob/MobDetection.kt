@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -42,7 +43,6 @@ import at.hannibal2.skyhanni.events.MobEvent.Spawn as SpawnEvent
 
 @SkyHanniModule
 object MobDetection {
-
     /* Unsupported Entities
         Nicked Players
         Odonata
@@ -64,13 +64,12 @@ object MobDetection {
     private val shouldClear: AtomicBoolean = AtomicBoolean(false)
 
     private fun mobDetectionReset() {
-        MobData.currentMobs.map {
-            it.createDeSpawnEvent()
-        }.forEach { it.post() }
+        MobData.currentMobs.forEach { it.createDeSpawnEvent().post() }
         MobData.retries.clear()
     }
 
     // TODO this is a unused debug function. maybe connect with a debug command or remove
+    @Suppress("unused")
     private fun watchdog() {
         val world = MinecraftCompat.localWorldOrNull ?: return
         if (MobData.retries.any { it.value.entity.level() != world }) {
@@ -100,17 +99,19 @@ object MobDetection {
     }
 
     private fun Mob.watchdogCheck(world: Level): Boolean =
-        this.baseEntity.level() != world || (
-            this.armorStand?.let { it.level() != world } ?: false
-            ) || this.extraEntities.any { it.level() != world }
+        baseEntity.level() != world ||
+            (armorStand?.let { it.level() != world } ?: false) ||
+            extraEntities.any { it.level() != world }
 
     @OptIn(AllEntitiesGetter::class)
     @HandleEvent
     fun onTick() {
-        if (shouldClear.get()) { // Needs to work outside skyblock since it needs clearing when leaving skyblock and joining limbo
+        // Needs to work outside SkyBlock since it needs clearing when leaving SkyBlock
+        if (shouldClear.get()) {
             mobDetectionReset()
             shouldClear.set(false)
         }
+
         @Suppress("InSkyBlockEarlyReturn")
         if (!SkyBlockUtils.inSkyBlock) return
 
@@ -163,7 +164,7 @@ object MobDetection {
     private fun mobDetectionError(string: String) = MobData.logger.log(string).let { true }
 
     private fun canBeSeen(mob: Mob): Boolean {
-        val isVisible = !mob.isInvisible() && mob.canBeSeen()
+        val isVisible = !mob.isFullyInvisible() && mob.canBeSeen()
         if (isVisible) {
             when (mob.category) {
                 MobCategory.PLAYER -> FirstSeenEvent.Player(mob)
@@ -256,40 +257,40 @@ object MobDetection {
 
     @HandleEvent
     fun onEntityHealthUpdateEvent(event: EntityHealthUpdateEvent) {
-        when {
+        when (event.entity) {
             // Very high false positive rate
-            /*event.entity is Bat && event.health == 6 -> {
+            /*is Bat if event.health == 6 -> {
                 entityFromPacket.add(EntityPacketType.SPIRIT_BAT to event.entity.id)
             }*/
 
-            event.entity is Villager && event.health != 20 -> {
+            is Villager if event.health != 20 -> {
                 entityFromPacket.add(EntityPacketType.VILLAGER to event.entity.id)
             }
 
-            event.entity is Creeper && event.health == 20 -> {
+            is Creeper if event.health == 20 -> {
                 entityFromPacket.add(EntityPacketType.CREEPER_VAIL to event.entity.id)
             }
         }
     }
 
-    private fun islandException(): Boolean = when (SkyBlockUtils.currentIsland) {
-        IslandType.GARDEN_GUEST -> true
-        IslandType.PRIVATE_ISLAND_GUEST -> true
-        else -> false
-    }
+    private fun islandException(): Boolean = SkyBlockUtils.currentIsland.equalsOneOf(
+        IslandType.PRIVATE_ISLAND_GUEST,
+        IslandType.GARDEN_GUEST,
+    )
 
     private fun entityDeSpawn(entity: LivingEntity) {
         MobData.entityToMob[entity]?.createDeSpawnEvent()?.post() ?: removeRetry(entity)
         allEntitiesViaPacketId.remove(entity.id)
     }
 
-    private fun Mob.createDeSpawnEvent() = when (this.category) {
+    private fun Mob.createDeSpawnEvent() = when (category) {
         MobCategory.PLAYER -> DeSpawnEvent.Player(this)
         MobCategory.SUMMON -> DeSpawnEvent.Summon(this)
         MobCategory.SPECIAL -> DeSpawnEvent.Special(this)
         MobCategory.PROJECTILE -> DeSpawnEvent.Projectile(this)
         MobCategory.DISPLAY_NPC -> DeSpawnEvent.DisplayNpc(this)
-        MobCategory.BASIC, MobCategory.DUNGEON, MobCategory.BOSS, MobCategory.SLAYER -> DeSpawnEvent.SkyblockMob(this)
+        MobCategory.BASIC, MobCategory.DUNGEON, MobCategory.BOSS, MobCategory.SLAYER ->
+            DeSpawnEvent.SkyblockMob(this)
     }
 
     fun postMobHurtEvent(mob: Mob, source: DamageSource, amount: Float) = when (mob.category) {
@@ -403,5 +404,4 @@ object MobDetection {
             }
         }
     }
-
 }

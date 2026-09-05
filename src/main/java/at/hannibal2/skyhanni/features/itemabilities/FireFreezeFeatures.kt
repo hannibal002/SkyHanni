@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHelmet
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.expand
@@ -40,7 +40,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FireFreezeFeatures {
-
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.fireFreeze
     private const val PARTICLE_OFFSET = 3.921568568330258E-4
 
@@ -135,7 +134,7 @@ object FireFreezeFeatures {
         if (!isInvisible) return false
 
         if (!headPose.isZero() || !bodyPose.isZero()) return false
-        val texture = getStandHelmet()?.getSkullTexture() ?: return false
+        val texture = getHelmet()?.getSkullTexture() ?: return false
         return texture == ARMORSTAND_SKULL_TEXTURE
     }
 
@@ -224,5 +223,4 @@ object FireFreezeFeatures {
     private fun timeFromPitch(pitch: Float): ServerTimeMark = ServerTimeMark.now() + (2.0 * pitch + 1).seconds
 
     private fun Rotations.isZero(): Boolean = x == 0.0f && y == 0.0f && z == 0.0f
-
 }

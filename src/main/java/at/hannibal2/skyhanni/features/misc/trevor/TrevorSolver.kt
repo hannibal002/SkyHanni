@@ -20,7 +20,6 @@ import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.LivingEntity
 
 object TrevorSolver {
-
     private val animalHealths = setOf(100, 200, 500, 1000, 2000, 5000, 10000, 30000)
 
     var currentMob: TrevorMob? = null
@@ -35,7 +34,6 @@ object TrevorSolver {
         val playerPosition = LocationUtils.playerLocation().roundTo(2)
         val mobHeight = if (above) playerPosition.y + height else playerPosition.y - height
         if (maxHeight == 0.0) {
-
             maxHeight = mobHeight + 2.5
             minHeight = mobHeight - 2.5
         } else {
@@ -64,7 +62,6 @@ object TrevorSolver {
             val entityHealth = if (entity is LivingEntity) entity.baseMaxHealth.derpy() else 0
             currentMob = TrevorMob.findByName(name)
             if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
-
                 val currentMob = currentMob ?: ErrorManager.skyHanniError(
                     "Found Trevor mob but current mob is null",
                     "entity" to entity,
@@ -74,7 +71,9 @@ object TrevorSolver {
                 if (foundID == entity.id) {
                     val isOasisMob = currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP
                     if (isOasisMob && mobLocation == TrapperMobArea.OASIS && !isTrevor) return
-                    val canSee = entity.canBeSeen(currentMob.renderDistance) && !entity.isInvisible && !hasBlindness
+                    val canSee = !hasBlindness &&
+                        !entity.isInvisible &&
+                        entity.canBeSeen(currentMob.renderDistance)
                     if (canSee) {
                         if (mobLocation != TrapperMobArea.FOUND) {
                             TrevorFeatures.lastTitle?.stop()

@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.RemotePlayer
@@ -115,7 +114,7 @@ object RareMobWaypointShare {
         if (!isEnabled()) return
 
         if (event.repeatSeconds(3)) {
-            rareMobsNearby.removeIf { it.value.deceased }
+            rareMobsNearby.removeIf { it.value.isRemoved }
         }
 
         _waypoints.removeIf { it.value.spawnTime.passedSince() > 75.seconds }
@@ -239,7 +238,7 @@ object RareMobWaypointShare {
             return
         }
 
-        if (rareMob.deceased) {
+        if (rareMob.isRemoved) {
             ChatUtils.chat("§cRare Mob is dead")
             return
         }

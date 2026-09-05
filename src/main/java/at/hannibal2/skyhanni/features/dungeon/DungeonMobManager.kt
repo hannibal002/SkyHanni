@@ -23,13 +23,15 @@ import net.minecraft.world.entity.LivingEntity
 
 @SkyHanniModule
 object DungeonMobManager {
-
     private val config get() = SkyHanniMod.feature.dungeon.objectHighlighter
     private val starredConfig get() = config.starred
     private val fel get() = config.fel
 
-    private val staredInvisible = mutableSetOf<Mob>()
-    val starredVisibleMobs = mutableSetOf<Mob>()
+    private val starredVisible = mutableSetOf<Mob>()
+    val starredVisibleMobs: Set<Mob> = starredVisible
+
+    private val starredInvisible = mutableSetOf<Mob>()
+
     private val felOnTheGround = mutableSetOf<Mob>()
     private val felMoving = mutableSetOf<Mob>()
 
@@ -44,7 +46,7 @@ object DungeonMobManager {
                 handleStar0(it, color)
             }
             if (!starredConfig.highlight.get()) {
-                staredInvisible.clear()
+                starredInvisible.clear()
             }
         }
     }
@@ -60,10 +62,10 @@ object DungeonMobManager {
     fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob.category != MobCategory.DUNGEON) return
         if (starredConfig.highlight.get()) {
-            staredInvisible.remove(event.mob)
+            starredInvisible.remove(event.mob)
         }
         handleFelDespawn(event.mob)
-        starredVisibleMobs.remove(event.mob)
+        starredVisible.remove(event.mob)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
@@ -125,38 +127,36 @@ object DungeonMobManager {
 
     private fun handleInvisibleStar() {
         if (!starredConfig.highlight.get()) return
-        staredInvisible.removeIf {
-            val visible = !it.isInvisible()
-            if (visible) {
-                it.highlight(getStarColor())
+
+        val iterator = starredInvisible.iterator()
+        while (iterator.hasNext()) {
+            val next = iterator.next()
+            if (next.isFullyInvisible()) {
+                next.highlight(getStarColor())
+                iterator.remove()
             }
-            visible
         }
     }
 
     private fun getStarColor(): ChromaColour = starredConfig.color.get()
 
-    private fun handleStar0(mob: Mob, colour: ChromaColour?) {
+    private fun handleStar0(mob: Mob, color: ChromaColour?) {
         if (mob.name == "Fels") {
             if (mob in felMoving) {
-                colour?.let {
-                    mob.highlight(it)
-                } ?: run {
-                    mob.removeHighlight()
-                }
+                color?.let { mob.highlight(it) } ?: mob.removeHighlight()
             }
             return
         }
-        if (mob.isInvisible()) {
-            staredInvisible.add(mob)
+        if (mob.isFullyInvisible()) {
+            starredInvisible.add(mob)
             return
         }
-        colour?.let {
+        color?.let {
             mob.highlight(it)
         } ?: run {
             mob.removeHighlight()
         }
-        starredVisibleMobs.add(mob)
+        starredVisible.add(mob)
     }
 
     private fun handleFel(mob: Mob) {

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.wyldwoods
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -21,12 +20,12 @@ import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object RiftOdonata {
+    private val ODONATA_SKULL_TEXTURE by SkullTextureHolder.texture("MOB_ODONATA")
+    private val EMPTY_ODONATA_BOTTLE = "EMPTY_ODONATA_BOTTLE".toInternalName()
 
     private val config get() = RiftApi.config.area.wyldWoods.odonata
-    private var hasBottleInHand = false
 
-    private val ODONATA_SKULL_TEXTURE by SkullTextureHolder.texture("MOB_ODONATA")
-    private val emptyBottle = "EMPTY_ODONATA_BOTTLE".toInternalName()
+    private var hasBottleInHand = false
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -36,7 +35,7 @@ object RiftOdonata {
     }
 
     private fun checkHand() {
-        hasBottleInHand = InventoryUtils.getItemInHand()?.getInternalName() == emptyBottle
+        hasBottleInHand = InventoryUtils.getItemInHand()?.getInternalName() == EMPTY_ODONATA_BOTTLE
     }
 
     @HandleEvent
@@ -54,7 +53,7 @@ object RiftOdonata {
     // This only gets called on config change, so the performance impact is minimal
     @OptIn(AllEntitiesGetter::class)
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         config.highlight.onToggle {
             getEntities<ArmorStand>().forEach(::tryAdd)
         }

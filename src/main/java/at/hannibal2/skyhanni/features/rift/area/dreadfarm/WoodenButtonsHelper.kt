@@ -32,7 +32,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object WoodenButtonsHelper {
-
     private val config get() = RiftApi.config.enigmaSoulWaypoints
 
     private val patternGroup = RepoPattern.group("rift.area.dreadfarm.buttons")
@@ -124,9 +123,9 @@ object WoodenButtonsHelper {
             val blockState = buttonLocation.getBlockStateAt()
             if (blockState.block is ButtonBlock &&
                 blockState.getValue(ButtonBlock.POWERED) == true &&
-                buttonLocation.canBeSeen(1..3) &&
                 lastHitButton != buttonLocation &&
-                !hitButtons.contains(buttonLocation)
+                !hitButtons.contains(buttonLocation) &&
+                buttonLocation.canBeSeen(1..3)
             ) {
                 lastHitButton = buttonLocation
                 addLastHitButton()

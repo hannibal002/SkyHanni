@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -18,9 +17,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.realHealth
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -30,7 +28,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object BlazeSlayerDaggerHelper {
-
     private val config get() = SlayerApi.config.blazes.hellion
 
     /**
@@ -93,7 +90,7 @@ object BlazeSlayerDaggerHelper {
 
         val playerLocation = LocationUtils.playerLocation()
         return HellionShieldHelper.hellionShieldMobs
-            .filter { !it.key.deceased && it.key.getLorenzVec().distance(playerLocation) < 10 && it.key.findHealthReal() > 0 }
+            .filterKeys { !it.isRemoved && it.getLorenzVec().distance(playerLocation) < 10 && it.realHealth > 0 }
             .toSortedMap { a, b ->
                 if (a.getLorenzVec().distance(playerLocation) > b.getLorenzVec().distance(playerLocation)) 1 else 0
             }.firstNotNullOfOrNull { it.value }
@@ -140,7 +137,6 @@ object BlazeSlayerDaggerHelper {
 
             val first = dagger.shields[0]
             if (!first.active && !dagger.shields[1].active) {
-
                 val shield = readFromInventory(dagger)
                 if (shield != null) {
                     shield.active = true
@@ -242,7 +238,7 @@ object BlazeSlayerDaggerHelper {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (!config.daggers) return
 
         val currentScreen = MinecraftCompat.screen

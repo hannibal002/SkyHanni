@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -24,8 +23,7 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
-import at.hannibal2.skyhanni.utils.compat.getStandHelmet
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -41,7 +39,6 @@ import kotlin.time.Duration.Companion.seconds
 // TODO replace all drawLineToEye with LineToMobHandler
 @SkyHanniModule
 object EndermanSlayerFeatures {
-
     private val config get() = SlayerApi.config.endermen
     private val beaconConfig get() = config.beacon
     private val endermenWithBeacons = mutableListOf<EnderMan>()
@@ -68,7 +65,7 @@ object EndermanSlayerFeatures {
 
         if (entity is ArmorStand) {
             if (showBeacon()) {
-                val stack = entity.getStandHelmet() ?: return
+                val stack = entity.getHelmet() ?: return
                 if (stack.hoverName.string == "Beacon" && entity.canBeSeen(viewDistance = 15.0, ignoreFrustum = true)) {
                     flyingBeacons.add(entity)
                     RenderLivingEntityHelper.setEntityColor(
@@ -84,7 +81,10 @@ object EndermanSlayerFeatures {
                 }
             }
 
-            if (config.highlightNukekebi && entity.hasSkullTexture(NUKEKUBI_SKULL_TEXTURE) && entity !in nukekubiSkulls) {
+            if (config.highlightNukekebi &&
+                entity.hasSkullTexture(NUKEKUBI_SKULL_TEXTURE) &&
+                entity !in nukekubiSkulls
+            ) {
                 nukekubiSkulls.add(entity)
                 RenderLivingEntityHelper.setEntityColor(
                     entity,
@@ -102,7 +102,7 @@ object EndermanSlayerFeatures {
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (beaconConfig.highlightBeacon) {
-            endermenWithBeacons.removeIf { it.deceased || !hasBeaconInHand(it) }
+            endermenWithBeacons.removeIf { it.isRemoved || !hasBeaconInHand(it) }
 
             for (location in endermenWithBeacons.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }) {
                 event.drawColor(location, beaconConfig.beaconColor, alpha = 0.5f)
@@ -116,7 +116,7 @@ object EndermanSlayerFeatures {
 
     private fun drawNukekubiSkulls(event: SkyHanniRenderWorldEvent) {
         for (skull in nukekubiSkulls) {
-            if (skull.deceased) continue
+            if (skull.isRemoved) continue
             if (config.highlightNukekebi) {
                 event.drawDynamicText(
                     skull.getLorenzVec().add(-0.5, 1.5, -0.5),
@@ -183,18 +183,18 @@ object EndermanSlayerFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         nukekubiSkulls.removeAll {
-            if (it.deceased) {
+            if (it.isRemoved) {
                 RenderLivingEntityHelper.removeEntityColor(it)
             }
-            it.deceased
+            it.isRemoved
         }
         flyingBeacons.removeAll {
-            if (it.deceased) {
+            if (it.isRemoved) {
                 RenderLivingEntityHelper.removeEntityColor(it)
             }
-            it.deceased
+            it.isRemoved
         }
 
         // Removing the beacon if It's still there after 7 seconds.

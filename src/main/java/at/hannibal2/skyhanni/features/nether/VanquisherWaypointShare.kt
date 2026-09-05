@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.combat.VanquisherEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -30,15 +29,10 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.renderBeaconBeam
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.component3
 import kotlin.time.Duration.Companion.seconds
-
 
 @SkyHanniModule
 object VanquisherWaypointShare {
-
     private val config get() = SkyHanniMod.feature.crimsonIsle.vanquisherShare
     private val patternGroup = RepoPattern.group("vanquisher.waypoint")
 
@@ -97,14 +91,14 @@ object VanquisherWaypointShare {
         }
     }
 
-    @HandleEvent(WorldChangeEvent::class)
-    fun onWorldChange() {
+    @HandleEvent
+    private fun onWorldChange() {
         sharedWaypoints.clear()
         ownVanquisherData = null
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onVanquisherSpawn(event: VanquisherEvent.Spawn) {
+    @HandleEvent
+    private fun onVanquisherSpawn(event: VanquisherEvent.Spawn) {
         if (!isEnabled()) return
         if (!event.vanquisher.isOwn) return
 
@@ -127,8 +121,8 @@ object VanquisherWaypointShare {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onVanquisherDeath(event: VanquisherEvent.Death) {
+    @HandleEvent
+    private fun onVanquisherDeath(event: VanquisherEvent.Death) {
         if (!isEnabled()) return
         if (!event.vanquisher.isOwn) return
         if (lastShareTime.passedSince() < 2.seconds) return
@@ -141,27 +135,27 @@ object VanquisherWaypointShare {
     }
 
     @HandleEvent
-    fun onVanquisherDeSpawn(event: VanquisherEvent.DeSpawn) {
+    private fun onVanquisherDespawn(event: VanquisherEvent.Despawn) {
         if (event.vanquisher == ownVanquisherData) ownVanquisherData = null
     }
 
     @HandleEvent
-    fun onKeyPressEvent(event: KeyPressEvent) {
+    private fun onKeyPressEvent(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (MinecraftCompat.screen != null) return
         if (event.keyCode == config.keybindSharing) sendSpawn()
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (event.repeatSeconds(3)) {
             sharedWaypoints.values.removeIf { it.spawnTime.passedSince() > 60.seconds }
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE, receiveCancelled = true)
-    fun onReadChat(event: SkyHanniChatEvent.Allow) {
+    @HandleEvent(receiveCancelled = true)
+    private fun onReadChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         val message = event.cleanMessage
 
@@ -214,7 +208,7 @@ object VanquisherWaypointShare {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         val beaconColor = Color(160, 37, 191)
@@ -243,5 +237,5 @@ object VanquisherWaypointShare {
         )
     }
 
-    private fun isEnabled() = config.enabled
+    private fun isEnabled() = config.enabled && IslandType.CRIMSON_ISLE.isInIsland()
 }

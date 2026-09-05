@@ -20,9 +20,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
 object PlayerTabComplete {
-
     private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
-    private var vipVisits = listOf<String>()
+
+    private var vipVisits = emptyList<String>()
 
     private val vipVisitsEntry = lazyEntry { vipVisits }
     private val allPlayers = getExcluding()
@@ -82,7 +82,6 @@ object PlayerTabComplete {
     }
 
     private fun getExcluding(vararg excluded: PlayerNameSource) = LazySuggestionEntry {
-
         fun allowed(category: PlayerNameSource): Boolean = when (category) {
             FRIENDS -> config.friends
             ISLAND_PLAYERS -> config.islandPlayers
@@ -113,9 +112,8 @@ object PlayerTabComplete {
 
     private fun lazyEntry(getter: () -> List<String>) = LazySuggestionEntry { addAll(getter()) }
 
-    fun handleTabComplete(command: String): List<String>? = suggestions.getSuggestions(command).takeIf {
-        it.isNotEmpty()
-    }?.distinct()
+    fun handleTabComplete(command: String): List<String>? =
+        suggestions.getSuggestions(command).takeUnless { it.isEmpty() }?.distinct()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
