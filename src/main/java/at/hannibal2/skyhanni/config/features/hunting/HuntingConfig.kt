@@ -69,8 +69,8 @@ class HuntingConfig {
     var shulkerFinder = false
 
     @Expose
-    @SearchTag("hideonleaf hideonsun")
     @ConfigOption(name = "Show next Shulker", desc = "Press this key to show the route to the next Shulker.")
+    @SearchTag("hideonleaf hideonsun")
     @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
     var nextShulkerKeybind: Int = KeyboardManager.KEY_UNKNOWN
 
