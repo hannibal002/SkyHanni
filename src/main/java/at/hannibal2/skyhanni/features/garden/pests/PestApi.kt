@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.sprayonator.SprayType
 import at.hannibal2.skyhanni.features.garden.plot.GardenPlot
 import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -301,7 +302,7 @@ object PestApi {
     private fun onPestKill(event: PestKillEvent) {
         lastPestKillTime = SimpleTimeMark.now()
         removeNearestPest()
-        GardenPlotApi.getCurrentPlot()?.let { gardenPestTypes.removeFromPlot(it, event.pestType) }
+        GardenPlotApi.currentPlot?.let { gardenPestTypes.removeFromPlot(it, event.pestType) }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

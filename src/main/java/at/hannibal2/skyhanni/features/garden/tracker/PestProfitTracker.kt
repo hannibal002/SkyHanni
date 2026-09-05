@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.garden.GardenPlotSprayEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
@@ -25,8 +26,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestKillTimes
 import at.hannibal2.skyhanni.features.garden.pests.PestType
-import at.hannibal2.skyhanni.features.garden.pests.SprayType
-import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.pests.sprayonator.SprayType
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -39,7 +39,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -71,7 +70,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     { it.garden.pestProfitTracker },
     { drawDisplay(it) },
     trackerConfig = { SkyHanniMod.feature.garden.pests.pestProfitTracker.perTrackerConfig },
-    customUptimeControl = true
+    customUptimeControl = true,
 ) {
     val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTracker
 
@@ -186,7 +185,6 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         event.checkPestChats()
-        event.checkSprayChats()
     }
 
     @HandleEvent
@@ -256,12 +254,10 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         addItem(pestType, event.shardInternalName, event.amount, command = false)
     }
 
-    private fun SkyHanniChatEvent.Allow.checkSprayChats() {
-        GardenPlotApi.plotSprayedPattern.matchMatcher(cleanMessage) {
-            val spray = group("spray")
-            val amount = groupOrNull("amount")?.formatInt() ?: 1
-            SprayType.getByNameOrNull(spray)?.addSprayUsed(amount)
-        }
+    @HandleEvent
+    private fun onGardenPlotSprayAdded(event: GardenPlotSprayEvent.SprayAddedEvent) {
+        if (event.type == null) return
+        event.type.addSprayUsed(event.amount)
     }
 
     private fun addKill(type: PestType) {

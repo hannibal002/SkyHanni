@@ -31,7 +31,7 @@ object GardenPlotMenuHighlighting {
             if (plot.pests >= 1 && pestsEnabled) list.add(PlotStatusType.PESTS)
             if (plot.currentSpray != null && spraysEnabled) list.add(PlotStatusType.SPRAYS)
             if (plot.locked && locksEnabled) list.add(PlotStatusType.LOCKED)
-            if (plot == GardenPlotApi.getCurrentPlot() && currentEnabled) list.add(PlotStatusType.CURRENT)
+            if (plot == GardenPlotApi.currentPlot && currentEnabled) list.add(PlotStatusType.CURRENT)
             if (plot.isBeingPasted && pastesEnabled) list.add(PlotStatusType.PASTING)
 
             getLowestIndexItem(list)?.let { index ->
