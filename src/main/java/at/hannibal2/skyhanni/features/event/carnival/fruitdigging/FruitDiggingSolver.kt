@@ -1,18 +1,17 @@
-package at.hannibal2.skyhanni.features.event.carnival
+package at.hannibal2.skyhanni.features.event.carnival.fruitdigging
 
-import at.hannibal2.skyhanni.features.event.carnival.CarnivalFruitDigging.Fruit
+import at.hannibal2.skyhanni.features.event.carnival.fruitdigging.CarnivalFruitDigging.Fruit
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 
 /**
- *
  * Steps:
  *  1. Read the board. Sort every cell into: known content, a still-diggable unknown,
- *    a fruit destroyed by a bomb and gather the dowsing clues we collected
+ *     a fruit destroyed by a bomb and gather the dowsing clues we collected
  *  2. Estimate beliefs. Give the unknowns and clues to [FruitDiggingBelief], which returns
- *    the probability
+ *     the probability
  *  3. Score and pick
  */
 class FruitDiggingSolver(private val size: Int = 7) {
-
     data class CellInput(
         val content: Fruit?,
         val diggable: Boolean,
@@ -26,7 +25,7 @@ class FruitDiggingSolver(private val size: Int = 7) {
     data class Recommendation(
         val targetRow: Int,
         val targetCol: Int,
-        val shovel: String,
+        val shovel: DowsingMode,
         val expectedPoints: Double,
         val pBomb: Double,
         val pRum: Double,
@@ -52,7 +51,7 @@ class FruitDiggingSolver(private val size: Int = 7) {
         }
     }
 
-    private val allContents: List<Fruit> = Fruit.entries.filter { it.isEdible || it == Fruit.BOMB || it == Fruit.RUM }
+    private val allContents: List<Fruit> = Fruit.entries.filter { it.isEdible || it.equalsOneOf(BOMB, RUM) }
 
     fun recommend(
         grid: Array<Array<CellInput>>,
@@ -67,7 +66,6 @@ class FruitDiggingSolver(private val size: Int = 7) {
         private val nextMultiplier: Double,
         private val coconutProtection: Boolean,
     ) {
-
         private val knownContent = arrayOfNulls<Fruit>(size * size)
 
         private val diggable = BooleanArray(size * size)
@@ -91,7 +89,7 @@ class FruitDiggingSolver(private val size: Int = 7) {
                 for (col in 0 until size) {
                     val id = row * size + col
                     val cell = grid[row][col]
-                    val content = cell.content?.takeIf { it != Fruit.UNKNOWN && it != Fruit.NO_FRUIT }
+                    val content = cell.content?.takeUnless { it.equalsOneOf(UNKNOWN, NO_FRUIT) }
 
                     knownContent[id] = content
                     diggable[id] = cell.diggable
@@ -108,8 +106,8 @@ class FruitDiggingSolver(private val size: Int = 7) {
                     }
 
                     if (content != null && !cell.diggable) {
-                        if (content == Fruit.APPLE) applesCollected++
-                        if (content == Fruit.CHERRY) cherriesCollected++
+                        if (content == APPLE) applesCollected++
+                        if (content == CHERRY) cherriesCollected++
                     }
                 }
             }
@@ -136,8 +134,8 @@ class FruitDiggingSolver(private val size: Int = 7) {
                     val hiddenNeighbors = neighborsOf[id].filter { it in openCellsOnBoard }
 
                     cell.minesCount?.let { add(FruitDiggingBelief.BombCount(hiddenNeighbors, it)) }
-                    cell.treasure?.let { add(orderClue(id, hiddenNeighbors, it, isAnchor = false)) }
-                    cell.anchor?.let { add(orderClue(id, hiddenNeighbors, it, isAnchor = true)) }
+                    cell.treasure?.let { add(orderClue(id, hiddenNeighbors, it, DowsingMode.TREASURE)) }
+                    cell.anchor?.let { add(orderClue(id, hiddenNeighbors, it, DowsingMode.ANCHOR)) }
 
                     if (ghost[id] || cell.mustFruit) add(FruitDiggingBelief.MustBeFruit(id))
                 }
@@ -148,7 +146,7 @@ class FruitDiggingSolver(private val size: Int = 7) {
             center: Int,
             hiddenNeighbors: List<Int>,
             named: Fruit,
-            isAnchor: Boolean,
+            mode: DowsingMode,
         ): FruitDiggingBelief.Clue {
             if (named == Fruit.NO_FRUIT) return FruitDiggingBelief.NoFruitNearby(hiddenNeighbors)
 
@@ -156,18 +154,17 @@ class FruitDiggingSolver(private val size: Int = 7) {
             // exists nearby" half of the clue is satisfied without sampling
             val satisfiedByKnown = neighborsOf[center].any { knownContent[it] == named && diggable[it] }
             val rank = FruitDiggingBelief.fruitDowsingRank(named)
-            return if (isAnchor) {
-                FruitDiggingBelief.FruitFloor(hiddenNeighbors, rank, named, satisfiedByKnown)
-            } else {
-                FruitDiggingBelief.FruitCeil(hiddenNeighbors, rank, named, satisfiedByKnown)
+            return when (mode) {
+                ANCHOR -> FruitDiggingBelief.FruitFloor(hiddenNeighbors, rank, named, satisfiedByKnown)
+                TREASURE -> FruitDiggingBelief.FruitCeil(hiddenNeighbors, rank, named, satisfiedByKnown)
+                else -> error("dowsing mode $mode is not implemented")
             }
         }
 
-
         private fun pointValue(content: Fruit): Double = when (content) {
-            Fruit.APPLE -> 100.0 * (applesCollected + 1)
-            Fruit.CHERRY -> 200.0 + 300.0 * (cherriesCollected + 1)
-            Fruit.BOMB, Fruit.RUM, Fruit.UNKNOWN, Fruit.NO_FRUIT -> 0.0
+            APPLE -> 100.0 * (applesCollected + 1)
+            CHERRY -> 200.0 + 300.0 * (cherriesCollected + 1)
+            BOMB, RUM, UNKNOWN, NO_FRUIT -> 0.0
             else -> content.points.toDouble()
         }
 
@@ -192,7 +189,7 @@ class FruitDiggingSolver(private val size: Int = 7) {
         }
 
         private fun valueIncludingWatermelon(content: Fruit, cell: Int): Double {
-            if (content != Fruit.WATERMELON) return pointValue(content)
+            if (content != WATERMELON) return pointValue(content)
             val nearby = averageNearbyFruitValue(cell)
             val target = if (nearby > 0) nearby else averageRemainingFruitValue()
             return pointValue(content) + 0.5 * target
@@ -282,7 +279,7 @@ class FruitDiggingSolver(private val size: Int = 7) {
             return expected - risk + setup + information
         }
 
-        private fun shovelFor(cell: Int): String {
+        private fun shovelFor(cell: Int): DowsingMode {
             var expectedFruitNearby = 0.0
             for (nb in neighborsOf[cell]) {
                 if (!diggable[nb]) continue
@@ -293,7 +290,7 @@ class FruitDiggingSolver(private val size: Int = 7) {
                     for ((content, p) in distribution(nb)) if (content.isEdible) expectedFruitNearby += p
                 }
             }
-            return if (expectedFruitNearby >= 0.25) "Anchor" else "Mines"
+            return if (expectedFruitNearby >= 0.25) ANCHOR else MINES
         }
 
         fun recommend(): Recommendation? {

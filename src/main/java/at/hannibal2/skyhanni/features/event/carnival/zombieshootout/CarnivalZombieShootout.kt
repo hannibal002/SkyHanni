@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.carnival
+package at.hannibal2.skyhanni.features.event.carnival.zombieshootout
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.features.event.carnival.CarnivalAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -43,7 +44,6 @@ import kotlin.time.DurationUnit
 
 @SkyHanniModule
 object CarnivalZombieShootout {
-
     private val config get() = SkyHanniMod.feature.event.carnival.zombieShootout
 
     private data class ShootoutLamp(var pos: LorenzVec, var time: SimpleTimeMark)
@@ -229,7 +229,7 @@ object CarnivalZombieShootout {
             Renderable.item(lamp),
             Renderable.text("§6Disappears in $prefix$timer"),
             spacing = 1,
-            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            verticalAlign = CENTER,
         )
     }
 
