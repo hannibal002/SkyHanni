@@ -68,7 +68,7 @@ object SlayerQuestWarning {
         if (!config.questWarning) return
         if (lastWarning.passedSince() < 10.seconds) return
 
-        if (DianaApi.isDoingDiana()) return
+        if (DianaApi.isDoingDiana(strict = true)) return
         // prevent warnings when mobs are hit by other players
         if (lastWeaponUse.passedSince() > 500.milliseconds) return
 

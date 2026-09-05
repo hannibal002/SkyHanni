@@ -42,13 +42,38 @@ object DianaProfitTracker {
     private var allowedDrops = listOf<NeuInternalName>()
 
     private val patternGroup = RepoPattern.group("diana.chat")
+
+    /**
+     * REGEX-TEST: You dug out a Griffin Burrow!
+     * REGEX-TEST: You finished the Griffin burrow chain! (4/4)
+     */
     private val chatDugOutPattern by patternGroup.pattern(
         "burrow.dug",
-        "(?:§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*",
+        "(?:You dug out a Griffin Burrow!|You finished the Griffin burrow chain!).*",
     )
+
+    /**
+     * REGEX-TEST: Wow! You dug out 1,000 coins!
+     */
     private val chatDugOutCoinsPattern by patternGroup.pattern(
         "coins",
-        "§6§lWow! §r§eYou dug out §r§6(?<coins>.*) coins§r§e!",
+        "Wow! You dug out (?<coins>[\\d,.]+) coins!",
+    )
+
+    /**
+     * REGEX-TEST: RARE DROP! You dug out a Griffin Feather!
+     */
+    private val griffinFeatherDropPattern by patternGroup.pattern(
+        "griffin.feather.drop",
+        "RARE DROP! You dug out a Griffin Feather!",
+    )
+
+    /**
+     * REGEX-TEST: Follow the arrows to find the treasure!
+     */
+    private val treasureArrowPattern by patternGroup.pattern(
+        "treasure.arrow",
+        "Follow the arrows to find the treasure!",
     )
 
     private val tracker = SkyHanniItemTracker(
@@ -110,8 +135,8 @@ object DianaProfitTracker {
     }
 
     @HandleEvent
-    fun onItemAdd(event: ItemAddEvent) {
-        if (!(DianaApi.isDoingDiana())) return
+    private fun onItemAdd(event: ItemAddEvent) {
+        if (!(DianaApi.isDoingDiana(strict = true))) return
         val isCommand = event.source == ItemAddManager.Source.COMMAND
         if (isCommand && !config.enabled) return
 
@@ -127,27 +152,31 @@ object DianaProfitTracker {
         tracker.addItem(internalName, amount, command)
     }
 
-    @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        val message = event.message
+    @HandleEvent(onlyOnIsland = HUB)
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
+        val message = event.cleanMessage
         if (chatDugOutPattern.matches(message)) {
+            DianaApi.overrideActiveRitual()
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tracker.modify {
                 it.burrowsDug++
             }
             tryHide(event)
         }
-        if (!isAvariceConsuming()) {
-            chatDugOutCoinsPattern.matchMatcher(message) {
+        chatDugOutCoinsPattern.matchMatcher(message) {
+            DianaApi.overrideActiveRitual()
+            if (!isAvariceConsuming()) {
                 BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
                 tryAddItem(NeuInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
                 tryHide(event)
             }
         }
 
-        if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" ||
-            message == "§eFollow the arrows to find the §r§6treasure§r§e!"
+
+        if (griffinFeatherDropPattern.matches(message) ||
+            treasureArrowPattern.matches(message)
         ) {
+            DianaApi.overrideActiveRitual()
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tryHide(event)
         }
@@ -163,7 +192,7 @@ object DianaProfitTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand()) },
+            condition = { config.enabled && (DianaApi.isDoingDiana(strict = true) || DianaApi.hasSpadeInHand()) },
             onRender = {
                 if (DianaApi.hasSpadeInHand()) tracker.firstUpdate()
                 tracker.renderDisplay(config.position)
@@ -174,12 +203,12 @@ object DianaProfitTracker {
     private fun isAllowedItem(internalName: NeuInternalName): Boolean = internalName in allowedDrops
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         allowedDrops = event.getConstant<DianaDropsJson>("DianaDrops").dianaDrops
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetdianaprofittracker") {
             description = "Resets the Diana Profit Tracker"
             category = CommandCategory.USERS_RESET
@@ -196,7 +225,7 @@ object DianaProfitTracker {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         migrationMapping.forEach { (old, new) ->
             event.move(70, "#profile.diana.$old", "#profile.diana.$new")
         }

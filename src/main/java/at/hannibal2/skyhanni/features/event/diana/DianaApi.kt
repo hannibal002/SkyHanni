@@ -8,9 +8,12 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MythologicalCreatureType
+import at.hannibal2.skyhanni.events.ItemAbilityActivateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.RareDianaMobFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -25,14 +28,23 @@ object DianaApi {
 
     private var spades = emptySet<NeuInternalName>()
 
+    private var ritualActiveOverride: Boolean? = null
+
     fun hasSpadeInHand() = InventoryUtils.itemInHandId in spades
 
-    private fun isRitualActive() = (Perk.MYTHOLOGICAL_RITUAL.isActive || Perk.PERKPOCALYPSE.isActive) ||
-        SkyHanniMod.feature.dev.debug.assumeMayor.get() == ElectionCandidate.DIANA
+    fun isRitualActive(): Boolean {
+        ritualActiveOverride?.let { return it }
+        return (Perk.MYTHOLOGICAL_RITUAL.isActive || Perk.PERKPOCALYPSE.isActive) ||
+            SkyHanniMod.feature.dev.debug.assumeMayor.get() == ElectionCandidate.DIANA
+    }
 
     fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
 
-    fun isDoingDiana() = IslandType.HUB.isInIsland() && isRitualActive() && hasSpadeInHotbar()
+    fun isDoingDiana(strict: Boolean = false): Boolean {
+        if (!IslandType.HUB.isInIsland()) return false
+        if (strict && !isRitualActive()) return false
+        return hasSpadeInHotbar()
+    }
 
     val SafeItemStack.isDianaSpade get() = getInternalName() in spades
 
@@ -63,21 +75,50 @@ object DianaApi {
         "(?:Minos Inquisitor|Sphinx|King Minos|Manticore)\\s*",
     )
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onJoinWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
+    /**
+     * REGEX-TEST: The mythological ritual isn't active!
+     */
+    private val ritualNotActivePattern by group.pattern(
+        "ritual-not-active",
+        "The mythological ritual isn't active!",
+    )
+
+    @HandleEvent(onlyOnIsland = HUB)
+    private fun onJoinWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         val entity = event.entity
         // TODO: fetch rare mobs from repo instead
         if (rareDianaMobNamePattern.matches(entity.name.string.trim())) {
+            overrideActiveRitual()
             RareDianaMobFoundEvent(entity).post()
         }
     }
 
+    @HandleEvent(onlyOnIsland = HUB)
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
+        if (ritualNotActivePattern.matches(event.cleanMessage)) {
+            overrideActiveRitual(active = false)
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = HUB)
+    private fun onItemAbilityActivate(event: ItemAbilityActivateEvent) {
+        if (event.ability != ItemAbility.ECHO) return
+        if (ritualActiveOverride != null) return
+        overrideActiveRitual()
+    }
+
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val dianaJson = event.getConstant<DianaJson>("events/Diana")
 
         mythologicalCreatures = dianaJson.mythologicalCreatures
         sphinxQuestions = dianaJson.sphinxQuestions
         spades = dianaJson.spadeTypes.toSet()
+    }
+
+    fun overrideActiveRitual(active: Boolean = true) {
+        if (isRitualActive() != active) {
+            ritualActiveOverride = active
+        }
     }
 }
