@@ -7,8 +7,10 @@ import at.hannibal2.skyhanni.api.ExperimentationTableApi.experimentRenewPattern
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentsProfitTrackerConfig.IronmanProfitType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -16,6 +18,7 @@ import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.events.experiments.TableXPBottleUsedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
@@ -29,6 +32,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -187,6 +191,11 @@ object ExperimentsProfitTracker {
         return npcPrice.coerceAtLeast(price).toInt()
     }
 
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.ironmanProfitType.onToggle(tracker::update)
+    }
+
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lExperiments Profit Tracker")
         val startCost = when (SkyHanniMod.feature.misc.tracker.priceSource) {
@@ -203,16 +212,28 @@ object ExperimentsProfitTracker {
 
         val startCostFormat = startCost.absoluteValue
         val bitCostFormat = data.bitCost
-        add(
-            Renderable.hoverTips(
-                "§eTotal Cost: §c-${startCostFormat.shortFormat()}§e/§b-${bitCostFormat.shortFormat()}",
-                listOf(
-                    "§7You paid §c${startCostFormat.addSeparators()} §7coins and",
-                    "§b${bitCostFormat.addSeparators()} §7bits for starting",
-                    "§7experiments.",
-                ),
-            ).toSearchable(),
-        )
+        if (config.ironmanProfitType.get() == IronmanProfitType.NONE || (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
+            add(
+                Renderable.hoverTips(
+                    "§eTotal Cost: §b${bitCostFormat.shortFormat()}",
+                    listOf(
+                        "§7You paid §b${bitCostFormat.addSeparators()} §7bits",
+                        "§7for starting experiments.",
+                    ),
+                ).toSearchable(),
+            )
+        } else {
+            add(
+                Renderable.hoverTips(
+                    "§eTotal Cost: §c${startCostFormat.shortFormat()}§e/§b${bitCostFormat.shortFormat()}",
+                    listOf(
+                        "§7You paid §c${startCostFormat.addSeparators()} §7coins and",
+                        "§b${bitCostFormat.addSeparators()} §7bits for starting",
+                        "§7experiments.",
+                    ),
+                ).toSearchable(),
+            )
+        }
         val duration = data.getTotalUptime()
         addAll(tracker.addTotalProfit(profit, data.experimentsDone, "experiment", duration, "Experiments"))
 

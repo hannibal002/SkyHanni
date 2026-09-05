@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class FossilExcavatorConfig {
     @Expose
@@ -35,6 +37,18 @@ class FossilExcavatorConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var profitPerExcavation: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Ironman Profits", desc = "Select which profiles should use the Ironman price calculation option. §eRemoves the cost of Experience Bottles from the Profit.")
+    @ConfigEditorDropdown
+    val ironmanProfitType: Property<IronmanProfitType> = Property.of(IronmanProfitType.ONLY_IRONMAN)
+
+    enum class IronmanProfitType(private val displayName: String) {
+        NONE("§cNone"),
+        ONLY_IRONMAN("§7Only Ironman"),
+        ALL_PROFILES("§2All Profiles");
+        override fun toString(): String = displayName
+    }
 
     @Expose
     @ConfigOption(name = "Glacite Powder Stack", desc = "Show Glacite Powder as stack size in the Fossil Excavator.")

@@ -8,8 +8,10 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ExperimentsProfitTrackerConfig {
     @Expose
@@ -22,6 +24,18 @@ class ExperimentsProfitTrackerConfig {
     @ConfigOption(name = "Hide Messages", desc = "Change the messages to be hidden after completing Add-on/Main experiments.")
     @ConfigEditorDraggableList
     val hideMessages: MutableList<ExperimentationTableApi.ExperimentationMessages> = mutableListOf()
+
+    @Expose
+    @ConfigOption(name = "Ironman Profits", desc = "Select which profiles should use the Ironman price calculation option. §eRemoves the cost of Experience Bottles from the Profit.")
+    @ConfigEditorDropdown
+    val ironmanProfitType: Property<IronmanProfitType> = Property.of(IronmanProfitType.ONLY_IRONMAN)
+
+    enum class IronmanProfitType(private val displayName: String) {
+        NONE("§cNone"),
+        ONLY_IRONMAN("§7Only Ironman"),
+        ALL_PROFILES("§2All Profiles");
+        override fun toString(): String = displayName
+    }
 
     @Expose
     @ConfigOption(name = "Track Time Spent", desc = "Track time spent doing addons and experiments.")
@@ -41,7 +55,7 @@ class ExperimentsProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "",
     )
     @Accordion
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
