@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import kotlin.concurrent.fixedRateTimer
 
 @SkyHanniModule
 object GardenCropSpeed {
@@ -28,12 +27,10 @@ object GardenCropSpeed {
     private var blocksBroken = 0
     private var secondsStopped = 0
 
-    init {
-        // TODO use SecondPassedEvent + passedSince
-        fixedRateTimer(name = "skyhanni-crop-milestone-speed", daemon = true, period = 1000L) {
-            if (isEnabled()) {
-                checkSpeed()
-            }
+    @HandleEvent
+    private fun onSecondPassed() {
+        if (isEnabled()) {
+            checkSpeed()
         }
     }
 
