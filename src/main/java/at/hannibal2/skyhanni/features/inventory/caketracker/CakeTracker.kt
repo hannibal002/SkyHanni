@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.item.ItemStack
 import org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN
 import org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT
 import org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT
@@ -107,6 +108,14 @@ object CakeTracker {
     )
 
     /**
+     * REGEX-TEST: You     Steve
+     */
+    private val tradeMenuPattern by patternGroup.pattern(
+        "trade.menu",
+        "You\\s+.*",
+    )
+
+    /**
      * REGEX-TEST: §aYou claimed a §r§cNew Year Cake§r§a!
      */
     private val cakeBakerClaimedPattern by patternGroup.pattern(
@@ -121,11 +130,15 @@ object CakeTracker {
     private val cakeScrollValue = ScrollValue().apply { init(0.0) }
     private val cakePriceCache = TimeLimitedCache<Int, Double>(5.minutes)
     private val searchOverrideCache = TimeLimitedCache<Pair<Int, Int>, Int>(5.minutes)
+    private val tradeOfferSlots = ((0..3) + (5..8)).flatMap { x ->
+        (0..3).map { y -> x + 9 * y }
+    }.toSet()
 
     private var currentYear = 0
     private var inCakeInventory = false
     private var timeOpenedCakeInventory = SimpleTimeMark.farPast()
     private var inAuctionHouse = false
+    private var inTradeMenu = false
     private var slotHighlightCache = mapOf<Int, ChromaColour>()
     private var searchingForCakes = false
     private var knownCakesInCurrentInventory = listOf<Int>()
@@ -190,8 +203,9 @@ object CakeTracker {
         if (!config.enabled) return
 
         val inInvWithCakes = inCakeInventory && knownCakesInCurrentInventory.any()
-        val inAuctionWithCakes = inAuctionHouse && (slotHighlightCache.isNotEmpty() || searchingForCakes)
-        if (!inInvWithCakes && !inAuctionWithCakes) return
+        val inHighlightedMenuWithCakes = (inAuctionHouse || inTradeMenu) &&
+            (slotHighlightCache.isNotEmpty() || searchingForCakes)
+        if (!inInvWithCakes && !inHighlightedMenuWithCakes) return
 
         reRenderDisplay()
     }
@@ -200,9 +214,10 @@ object CakeTracker {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!config.enabled) return
         if (inCakeInventory) checkInventoryCakes()
-        if (!inAuctionHouse) return
+        if (!inAuctionHouse && !inTradeMenu) return
 
         val containerChest = event.container as? ChestMenu ?: return
+        if (inTradeMenu) updateTradeCakeHighlights(containerChest)
         containerChest.getUpperItems().forEach { (slot, _) ->
             slotHighlightCache[slot.containerSlot]?.let { color ->
                 slot.highlight(color)
@@ -216,6 +231,7 @@ object CakeTracker {
         knownCakesInCurrentInventory = listOf()
         checkCakeContainer(event)
         inAuctionHouse = checkAuctionCakes(event)
+        inTradeMenu = tradeMenuPattern.matches(event.inventoryName)
     }
 
     private fun reRenderDisplay() {
@@ -238,17 +254,29 @@ object CakeTracker {
         timeOpenedCakeInventory = SimpleTimeMark.now()
     }
 
+    private fun ItemStack.getCakeYear() =
+        cakeNamePattern.matchGroup(hoverName.formattedTextCompatLeadingWhiteLessResets(), "year")?.formatInt()
+
+    private fun ItemStack.getCakeHighlightColor(): ChromaColour? {
+        val year = getCakeYear() ?: return null
+        val owned = storage?.ownedCakes?.contains(year) ?: false
+        return if (owned) config.ownedColor else config.missingColor
+    }
+
     private fun checkAuctionCakes(event: InventoryFullyOpenedEvent): Boolean {
         if (!auctionBrowserPattern.matches(event.inventoryName)) return false
         searchingForCakes = auctionCakeSearchPattern.matches(event.inventoryName)
-        slotHighlightCache = event.inventoryItems.filter {
-            cakeNamePattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())
-        }.mapValues { (_, item) ->
-            val year = cakeNamePattern.matchGroup(item.hoverName.formattedTextCompatLeadingWhiteLessResets(), "year")?.toInt() ?: -1
-            val owned = storage?.ownedCakes?.contains(year) ?: false
-            if (owned) config.ownedColor else config.missingColor
-        }
+        slotHighlightCache = event.inventoryItems.mapNotNull { (slot, item) ->
+            item.getCakeHighlightColor()?.let { slot to it }
+        }.toMap()
         return true
+    }
+
+    private fun updateTradeCakeHighlights(containerChest: ChestMenu) {
+        slotHighlightCache = containerChest.getUpperItems().mapNotNull { (slot, item) ->
+            if (slot.containerSlot !in tradeOfferSlots) return@mapNotNull null
+            item.getCakeHighlightColor()?.let { slot.containerSlot to it }
+        }.toMap()
     }
 
     @HandleEvent
@@ -256,6 +284,7 @@ object CakeTracker {
         inCakeInventory = false
         knownCakesInCurrentInventory = listOf()
         inAuctionHouse = false
+        inTradeMenu = false
         slotHighlightCache = mapOf()
         searchingForCakes = false
     }
@@ -274,7 +303,7 @@ object CakeTracker {
     private fun checkInventoryCakes() {
         if (timeOpenedCakeInventory.passedSince() < 500.milliseconds) return
         val currentYears = InventoryUtils.getItemsInOpenChest().mapNotNull { item ->
-            cakeNamePattern.matchGroup(item.item.hoverName.formattedTextCompatLeadingWhiteLessResets(), "year")?.toInt()
+            item.item.getCakeYear()
         }
 
         val addedYears = currentYears.filter { it !in knownCakesInCurrentInventory }

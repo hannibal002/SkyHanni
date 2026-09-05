@@ -53,7 +53,7 @@ class CakeTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Missing Color",
-        desc = "The color that should be used to highlight unobtained cakes in the Auction House."
+        desc = "The color that should be used to highlight unobtained cakes in the Auction House and trade menu."
     )
     @ConfigEditorColour
     var missingColor: ChromaColour = LorenzColor.RED.toChromaColor(255)
@@ -61,7 +61,7 @@ class CakeTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Owned Color",
-        desc = "The color that should be used to highlight obtained cakes in the Auction House."
+        desc = "The color that should be used to highlight obtained cakes in the Auction House and trade menu."
     )
     @ConfigEditorColour
     var ownedColor: ChromaColour = LorenzColor.GREEN.toChromaColor(255)
