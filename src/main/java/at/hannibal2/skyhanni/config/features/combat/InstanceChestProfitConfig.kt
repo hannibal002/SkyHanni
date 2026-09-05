@@ -28,6 +28,11 @@ class InstanceChestProfitConfig {
     var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_SELL
 
     @Expose
+    @ConfigOption(name = "Ignore Essence", desc = "Ignore essence from chest profit.")
+    @ConfigEditorBoolean
+    var ignoreEssence: Boolean = false
+
+    @Expose
     @ConfigLink(owner = InstanceChestProfitConfig::class, field = "enabled")
     val position: Position = Position(107, 141)
 
