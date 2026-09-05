@@ -34,12 +34,8 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         projectionBuffer: ProjectionMatrixBuffer,
     ) {
         val colorTexture = texture ?: return
-        // TODO 26.3
-        @Suppress("UnusedVariable")
         val colorTextureView = textureView ?: return
         val depthTexture = depthTexture ?: return
-        // TODO 26.3
-        @Suppress("UnusedVariable")
         val depthTextureView = depthTextureView ?: return
 
         // Clear before rendering
@@ -54,26 +50,17 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         val bufferSlice = projectionBuffer.getBuffer(Projection().apply { setupOrtho(-1000f, 1000f, size, size, true) })
 
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
-        // TODO 26.3
-        //? if < 26.3 {
-        /*RenderSystem.outputColorTextureOverride = colorTextureView
-        RenderSystem.outputDepthTextureOverride = depthTextureView
-        *///?}
 
         state.renderItemToTexture(
             //~ if < 26.2 'submitNodeStorage' -> 'bufferSource'
             context.submitNodeStorage,
             context.featureRenderDispatcher,
+            colorTextureView,
+            depthTextureView,
             centerX = slotSize / 2.0f,
             centerY = slotSize / 2.0f,
             pixelSize = slotSize,
         )
-
-        // TODO 26.3
-        //? if < 26.3 {
-        /*RenderSystem.outputColorTextureOverride = null
-        RenderSystem.outputDepthTextureOverride = null
-        *///?}
 
         // Blit is submitted AFTER the texture override is cleared
         submitBlit(state, guiRenderState)

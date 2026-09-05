@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniAnimatedAtlasKey
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniAtlasKey
 import com.mojang.blaze3d.platform.Lighting
+import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.renderpearl.api.textures.GpuTextureView
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
@@ -19,7 +21,6 @@ import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
 
 //? if >= 26.3 {
-import com.mojang.blaze3d.systems.RenderSystem
 import org.joml.Vector4fc
 import java.util.Optional
 import java.util.OptionalDouble
@@ -106,6 +107,8 @@ data class SkyHanniGuiItemRenderState(
         //~ if < 26.2 'submitNodeStorage: SubmitNodeStorage' -> 'bufferSource: MultiBufferSource.BufferSource'
         submitNodeStorage: SubmitNodeStorage,
         featureRenderDispatcher: FeatureRenderDispatcher,
+        colorTextureView: GpuTextureView,
+        depthTextureView: GpuTextureView,
         centerX: Float,
         centerY: Float,
         pixelSize: Int,
@@ -125,6 +128,11 @@ data class SkyHanniGuiItemRenderState(
         )
         if (rotated) setAnimated()
 
+        //? if < 26.3 {
+        /*RenderSystem.outputColorTextureOverride = colorTextureView
+        RenderSystem.outputDepthTextureOverride = depthTextureView
+        *///?}
+
         //~ if < 26.2 'submitNodeStorage' -> 'featureRenderDispatcher.submitNodeStorage'
         trackingState.submit(ps, submitNodeStorage, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
         //? if >= 26.3 {
@@ -133,9 +141,9 @@ data class SkyHanniGuiItemRenderState(
                 .createCommandEncoder()
                 .createRenderPass(
                     Supplier { "SkyHanni Item to GUI item atlas" },
-                    TODO("colorTexture"),
+                    colorTextureView,
                     Optional.empty<Vector4fc>(),
-                    TODO("depthTexture"),
+                    depthTextureView,
                     OptionalDouble.empty(),
                 )
                 .use { renderPass ->
@@ -148,6 +156,11 @@ data class SkyHanniGuiItemRenderState(
         *///?} else {
         /*featureRenderDispatcher.renderAllFeatures()
         bufferSource.endBatch()
+        *///?}
+
+        //? if < 26.3 {
+        /*RenderSystem.outputColorTextureOverride = null
+        RenderSystem.outputDepthTextureOverride = null
         *///?}
     }
 }
