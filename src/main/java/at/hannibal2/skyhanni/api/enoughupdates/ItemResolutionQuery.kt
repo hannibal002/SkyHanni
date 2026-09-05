@@ -62,7 +62,7 @@ class ItemResolutionQuery {
          */
         private val petPattern by patternGroup.pattern(
             "pet",
-            "(?:§.)*\\[Lvl (?<level>\\d+)] (?:§.)*§(?<rarity>.)(?<name>[^§]+)(?:(?:§.)* ✦)?",
+            "(?:§.)*\\[Lvl (?<level>\\d+|\\{LVL})] (?:§.)*§(?<rarity>.)(?<name>[^§]+)(?:(?:§.)* ✦)?",
         )
 
         /**
@@ -114,9 +114,11 @@ class ItemResolutionQuery {
         ): NeuInternalName? {
             var itemName = displayName
             var petRarity: String? = null
+            var isPet = false
             petPattern.matchMatcher(itemName) {
                 itemName = group("name")
                 petRarity = group("rarity")
+                isPet = true
             }
             val cleanDisplayName = itemName.removeColor()
             var bestMatch: NeuInternalName? = null
@@ -126,7 +128,7 @@ class ItemResolutionQuery {
                 val unCleanItemDisplayName: String = EnoughUpdatesManager.getDisplayName(internalName)
                 var cleanItemDisplayName = unCleanItemDisplayName.removeColor()
                 if (cleanItemDisplayName.isEmpty()) continue
-                if (petPattern.matches(itemName)) {
+                if (isPet) {
                     if (!cleanItemDisplayName.contains("[Lvl {LVL}] ")) continue
                     cleanItemDisplayName = cleanItemDisplayName.replace("[Lvl {LVL}] ", "")
                     petPattern.matchMatcher(unCleanItemDisplayName) {

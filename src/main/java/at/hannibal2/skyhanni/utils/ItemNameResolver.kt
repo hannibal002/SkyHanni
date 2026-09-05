@@ -34,6 +34,10 @@ object ItemNameResolver {
             return itemNameCache.getOrPut(lowercase) { NeuInternalName.MISSING_ITEM }
         }
 
+        ItemResolutionQuery.attributeNameToInternalName(itemName.removeColor())?.let {
+            return itemNameCache.getOrPut(lowercase) { it.toInternalName() }
+        }
+
         ItemResolutionQuery.resolveEnchantmentByName(itemName)?.let {
             return itemNameCache.getOrPut(lowercase) { fixEnchantmentName(it.asString()) }
         }
@@ -60,6 +64,7 @@ object ItemNameResolver {
 
         val internalName = when (itemName) {
             "SUPERBOOM TNT" -> "SUPERBOOM_TNT".toInternalName()
+
             else -> {
                 ItemResolutionQuery.findInternalNameByDisplayName(itemName, true)?.let {
                     // This fixes a NEU bug with §9Hay Bale (cosmetic item)
