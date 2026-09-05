@@ -85,6 +85,14 @@ class SlayerConfig {
 
     @Expose
     @ConfigOption(
+        name = "Reminder To Swap",
+        desc = "Allows you to set a displayable text on the screen to remind yourself.",
+    )
+    @Accordion
+    val swapReminder: SwapReminderConfig = SwapReminderConfig()
+
+    @Expose
+    @ConfigOption(
         name = "Block Not Spawnable",
         desc = "Prevent clicking slayer bosses that cannot be spawned in the current dimension in Maddox's menu.",
     )
@@ -194,7 +202,7 @@ class SlayerConfig {
     @SkyHanniModule
     companion object {
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             val oldPath = "slayer."
             event.move(126, "${oldPath}hideIrrelevantMobsOpacity", "${oldPath}hideIrrelevantMobsTransparency")
             val remainingKillsPath = "${oldPath}slayerRemainingKills."
