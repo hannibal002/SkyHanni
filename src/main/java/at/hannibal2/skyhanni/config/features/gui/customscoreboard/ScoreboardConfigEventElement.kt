@@ -1,0 +1,65 @@
+package at.hannibal2.skyhanni.config.features.gui.customscoreboard
+
+enum class ScoreboardConfigEventElement {
+    VOTING,
+    SERVER_CLOSE,
+    DUNGEONS,
+    KUUDRA,
+    DOJO,
+    DARK_AUCTION,
+    JACOB_CONTEST,
+    JACOB_MEDALS,
+    TRAPPER,
+    GARDEN,
+    FLIGHT_DURATION,
+    WINTER,
+    NEW_YEAR,
+    SPOOKY,
+    BROODMOTHER,
+    MINING_EVENTS,
+    GALATEA,
+    SAFARI,
+    DAMAGE,
+    MAGMA_BOSS,
+    CARNIVAL,
+    RIFT,
+    ESSENCE,
+    QUEUE,
+    ANNIVERSARY,
+    ACTIVE_TABLIST_EVENTS,
+    STARTING_SOON_TABLIST_EVENTS,
+    REDSTONE,
+    ;
+
+    companion object {
+        @Suppress("StorageNeedsExpose")
+        @JvmField
+        val defaultOption = listOf(
+            VOTING,
+            SERVER_CLOSE,
+            DUNGEONS,
+            KUUDRA,
+            DOJO,
+            DARK_AUCTION,
+            JACOB_CONTEST,
+            JACOB_MEDALS,
+            GALATEA,
+            SAFARI,
+            TRAPPER,
+            GARDEN,
+            FLIGHT_DURATION,
+            NEW_YEAR,
+            WINTER,
+            SPOOKY,
+            BROODMOTHER,
+            MINING_EVENTS,
+            DAMAGE,
+            MAGMA_BOSS,
+            CARNIVAL,
+            RIFT,
+            ESSENCE,
+            ACTIVE_TABLIST_EVENTS,
+            REDSTONE,
+        )
+    }
+}
