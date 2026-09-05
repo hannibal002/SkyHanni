@@ -223,10 +223,11 @@ object LoadoutApi {
         return if (tunings.isEmpty()) null else tunings.map { it.formattedTextCompatLessResets() }
     }
 
-    fun clickSlot(slot: LoadoutSlot) {
-        if (!slot.isInCurrentPage() || slot.locked) return
+    fun clickSlot(slot: LoadoutSlot): Boolean {
+        if (!slot.isInCurrentPage() || slot.locked) return false
         currentSlot = slot.id
         InventoryUtils.clickSlot(slot.inventorySlot)
+        return true
     }
 
     @HandleEvent

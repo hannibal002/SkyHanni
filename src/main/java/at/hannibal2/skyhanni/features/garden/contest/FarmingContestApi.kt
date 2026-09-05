@@ -2,9 +2,12 @@ package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTag
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -47,11 +50,32 @@ object FarmingContestApi {
     )
 
     /**
+     * WRAPPED-REGEX-TEST: " ○ Cocoa Beans 2h"
+     * WRAPPED-REGEX-TEST: " ○ Cocoa Beans 2h15m"
+     * WRAPPED-REGEX-TEST: " ○ Cocoa Beans 2h15m14s"
      * WRAPPED-REGEX-TEST: " ○ Cocoa Beans 15m14s"
+     * WRAPPED-REGEX-TEST: " ○ Cocoa Beans 14s"
      */
     private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop.colorless",
-        "\\s*(?:○|${SkyblockStat.FARMING_FORTUNE.hypixelIcon}) (?<crop>.*) .*",
+        "\\s*(?:○|${SkyblockStat.FARMING_FORTUNE.hypixelIcon}) (?<crop>.*?)(?: \\d+(?:[hms]\\d*)+)?",
+    )
+
+    /**
+     * REGEX-TEST: Jacob's Contest
+     */
+    private val contestTitlePattern by patternGroup.pattern(
+        "title.colorless",
+        "Jacob's Contest",
+    )
+
+    /**
+     * REGEX-TEST: Jacob's Contest: 17m left
+     * REGEX-TEST: Jacob's Contest: 1m 36s left
+     */
+    private val contestTimeLeftPattern by patternGroup.pattern(
+        "timeleft.colorless",
+        "Jacob's Contest: \\d+(?:[hms] ?\\d*)* left",
     )
 
     /**
@@ -74,8 +98,13 @@ object FarmingContestApi {
 
     private val contests = mutableMapOf<Long, FarmingContest>()
     private var internalContest = false
+    private var scoreboardLines = emptyList<String>()
+    private var contestWidgetLines = emptyList<String>()
+    private var contestActive = false
     val inContest
         get() = internalContest && IslandTypeTag.CONTESTS_SHOWN.isInIsland()
+    val isContestActive
+        get() = contestActive && IslandTypeTag.CONTESTS_SHOWN.isInIsland()
     var contestCrop: CropType? = null
     private var startTime = SimpleTimeMark.farPast()
     var inInventory = false
@@ -91,11 +120,35 @@ object FarmingContestApi {
             FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).post()
             internalContest = false
         }
+    }
 
+    @HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true)
+    private fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+        scoreboardLines = event.new.map { it.removeColor() }
         @Suppress("IsInIslandEarlyReturn")
-        if (!GardenApi.inGarden()) return
+        if (GardenApi.inGarden()) checkActiveContest()
+    }
 
-        checkActiveContest()
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.JACOB_CONTEST)) return
+        contestWidgetLines = event.cleanLines.map { it.trim() }
+        contestActive = contestWidgetLines.any { contestTimeLeftPattern.matches(it) }
+    }
+
+    @HandleEvent
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Farming Contest")
+        event.addData {
+            add("contest island allowed: ${IslandTypeTag.CONTESTS_SHOWN.isInIsland()}")
+            add("Jacob tab widget visible: ${TabWidget.JACOB_CONTEST.isActive}")
+            add("contest active: $isContestActive")
+            add("internal contest: $internalContest")
+            add("contest crop: ${contestCrop?.cropName}")
+            add("Jacob tab widget lines:")
+            if (contestWidgetLines.isEmpty()) add("  none")
+            contestWidgetLines.forEachIndexed { index, line -> add("  [$index] '$line'") }
+        }
     }
 
     private fun checkActiveContest() {
@@ -122,8 +175,7 @@ object FarmingContestApi {
     }
 
     private fun readCurrentCrop(): CropType? {
-        val scoreboard = ScoreboardData.sidebarLinesRaw.map { it.removeColor() }
-        val line = scoreboard.nextAfter("Jacob's Contest") ?: return null
+        val line = scoreboardLines.nextAfter(after = { contestTitlePattern.matches(it) }) ?: return null
         return sidebarCropPattern.matchMatcher(line) {
             val cropName = group("crop")
             try {
@@ -133,7 +185,7 @@ object FarmingContestApi {
                     e, "Farming contest read current crop failed",
                     "cropName" to cropName,
                     "line" to line,
-                    "sidebarLinesFormatted" to scoreboard,
+                    "scoreboardLines" to scoreboardLines,
                 )
                 null
             }
