@@ -16,7 +16,7 @@ import kotlin.time.Duration
 @SkyHanniModule
 object ArachneKillTimer {
 
-    private val config get() = SkyHanniMod.feature.combat.mobs
+    private val config get() = SkyHanniMod.feature.combat.mobs.arachneSettings.boss
 
     private val patternGroup = RepoPattern.group("chat.arachne")
 
@@ -85,5 +85,5 @@ object ArachneKillTimer {
         arachneSpawnedTime = SimpleTimeMark.farPast()
     }
 
-    fun isEnabled() = IslandType.SPIDER_DEN.isInIsland() && config.arachneKillTimer
+    fun isEnabled() = IslandType.SPIDER_DEN.isInIsland() && config.killTimer
 }

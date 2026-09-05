@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.config.features.slayer.spider.SpiderConfig
 import at.hannibal2.skyhanni.config.features.slayer.vampire.VampireConfig
 import at.hannibal2.skyhanni.features.slayer.HideSlayerSpawnParticles.SpawnParticles
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -74,14 +75,19 @@ class SlayerConfig {
     val slayerTimeMessages: SlayerTimeMessagesConfig = SlayerTimeMessagesConfig()
 
     @Expose
-    @ConfigOption(name = "Remaining Kills Display", desc = "")
-    @Accordion
-    val slayerRemainingKills: SlayerRemainingKillsConfig = SlayerRemainingKillsConfig()
-
-    @Expose
     @ConfigOption(name = "Active Boss Transparency", desc = "")
     @Accordion
     val activeBossTransparency: ActiveBossTransparencyConfig = ActiveBossTransparencyConfig()
+
+    @Expose
+    @ConfigOption(name = "Miniboss Settings", desc = "")
+    @Accordion
+    val miniboss: MinibossConfig = MinibossConfig()
+
+    @Expose
+    @ConfigOption(name = "Remaining Kills Display", desc = "")
+    @Accordion
+    val slayerRemainingKills: SlayerRemainingKillsConfig = SlayerRemainingKillsConfig()
 
     @Expose
     @ConfigOption(
@@ -91,26 +97,6 @@ class SlayerConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var blockNotSpawnable: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight Slayer Mini-Boss in blue color.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var slayerMinibossHighlight: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Line to Miniboss", desc = "Add a line to every Slayer Mini-Boss around you.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var slayerMinibossLine: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Line to Miniboss Width",
-        desc = "The width of the line pointing to every Slayer Mini-Boss around you.",
-    )
-    @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 10f)
-    var slayerMinibossLineWidth: Int = 3
 
     @Expose
     @ConfigOption(
@@ -181,7 +167,7 @@ class SlayerConfig {
     @ConfigOption(
         name = "No Gummy Warning",
         desc = "Sends a warning when you don't have a Re-Heated Gummy Polar Bear active " +
-            "while you have Habanero Tactics on your gear, or are in the Smoldering Tomb."
+            "while you have Habanero Tactics on your gear, or are in the Smoldering Tomb.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -194,14 +180,44 @@ class SlayerConfig {
     @SkyHanniModule
     companion object {
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
             val oldPath = "slayer."
-            event.move(126, "${oldPath}hideIrrelevantMobsOpacity", "${oldPath}hideIrrelevantMobsTransparency")
             val remainingKillsPath = "${oldPath}slayerRemainingKills."
             event.move(138, "${oldPath}remainingKills", "${remainingKillsPath}display")
             event.move(138, "${oldPath}remainingKillsLevel", "${remainingKillsPath}includeMobLevel")
             event.move(138, "${oldPath}remainingKillsHealth", "${remainingKillsPath}includeMobHealth")
             event.move(138, "${oldPath}remainingKillsPosition", "${remainingKillsPath}remainingKillsPosition")
+            event.transform(146, "${oldPath}slayerMinibossHighlight") { element ->
+                val enabled = JsonPrimitive(element.asString != "OFF")
+                event.add(146, "${oldPath}miniboss.slayerMinibossHighlight") {
+                    enabled
+                }
+                event.add(146, "${oldPath}miniboss.cocoonHighlight") {
+                    enabled
+                }
+                element
+            }
+            event.transform(146, "${oldPath}slayerMinibossLine") { element ->
+                val enabled = JsonPrimitive(element.asString != "OFF")
+                event.add(146, "${oldPath}miniboss.minibossLine.showLine") {
+                    enabled
+                }
+                event.add(146, "${oldPath}miniboss.cocoonLine.showLine") {
+                    enabled
+                }
+                element
+            }
+            event.transform(146, "${oldPath}slayerMinibossLineWidth") { element ->
+                val width = JsonPrimitive(element.asInt)
+                event.add(146, "${oldPath}miniboss.minibossLine.lineWidth") {
+                    width
+                }
+                event.add(146, "${oldPath}miniboss.cocoonLine.lineWidth") {
+                    width
+                }
+                element
+            }
         }
     }
 }

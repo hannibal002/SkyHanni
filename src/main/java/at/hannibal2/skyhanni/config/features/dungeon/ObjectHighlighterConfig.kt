@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.generic.lineconfigs.LineToFelSkull
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -47,19 +51,24 @@ class ObjectHighlighterConfig {
 
     class FelConfig {
         @Expose
-        @ConfigOption(name = "Highlight Fels Skull", desc = "Highlights fels that are not active.")
+        @ConfigOption(name = "Line To Fel Skulls", desc = "")
+        @Accordion
+        val line: LineToFelSkull = LineToFelSkull()
+
+        @Expose
+        @ConfigOption(name = "Highlight Fels Skull", desc = "Highlights fels that are not active uses same Color as above line.")
         @ConfigEditorBoolean
         @FeatureToggle
         val highlight: Property<Boolean> = Property.of(true)
+    }
 
-        @Expose
-        @ConfigOption(name = "Draw Line", desc = "Draws a line to fels skulls. Requires highlight to be enabled.")
-        @ConfigEditorBoolean
-        var line: Boolean = false
-
-        @Expose
-        @ConfigOption(name = "Color", desc = "The color used to highlight fel skulls and draw the line.")
-        @ConfigEditorColour
-        val color: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(255, 0, 255, 200))
+    @SkyHanniModule
+    companion object {
+        @HandleEvent
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            val path = "dungeon.objectHighlighter"
+            event.move(146, "$path.fel.line", "$path.fel.line.showLine")
+            event.move(146, "$path.fel.color", "$path.fel.line.color")
+        }
     }
 }
