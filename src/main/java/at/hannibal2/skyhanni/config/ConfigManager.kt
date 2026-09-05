@@ -19,9 +19,7 @@ import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringFileHandler
@@ -32,7 +30,6 @@ import com.google.gson.Gson
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
-import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorKeybind
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
@@ -84,11 +81,10 @@ class ConfigManager {
             saveConfig(ConfigFileType.FEATURES, "auto-save-60s")
         }
 
-        val features = SkyHanniMod.feature
         recreateConfig()
 
         try {
-            findPositionLinks(features, mutableSetOf())
+            findPositionLinks()
         } catch (e: Exception) {
             ErrorManager.crashInDevEnv("Couldn't load config links") { e }
         }
@@ -100,18 +96,16 @@ class ConfigManager {
         OSUtils.deleteExpiredFiles(File("skyhanni/config/backup"), SkyHanniMod.feature.dev.configBackupExpiryTime.days)
     }
 
-    private fun findPositionLinks(obj: Any?, slog: MutableSet<IdentityCharacteristics<Any>>) {
-        if (obj == null) return
-        if (!obj.javaClass.name.startsWith("at.hannibal2.skyhanni.")) return
-        val ic = IdentityCharacteristics(obj)
-        if (ic in slog) return
-        slog.add(ic)
+    private fun findPositionLinks() {
         var missingConfigLink = false
-        for (field in obj.javaClass.declaredFields.map { it.makeAccessible() }) {
-            if (field.type != Position::class.java && field.type != PositionList::class.java) {
-                findPositionLinks(field.get(obj), slog)
-                continue
+
+        ConfigUtils.traverseConfig(SkyHanniMod.feature) { owner, field, _ ->
+            if (field.type != Position::class.java &&
+                field.type != PositionList::class.java
+            ) {
+                return@traverseConfig
             }
+
             val configLink = field.getAnnotation(ConfigLink::class.java)
             if (configLink == null) {
                 if (PlatformUtils.isDevEnvironment) {
@@ -123,14 +117,13 @@ class ConfigManager {
                         missingConfigLink = true
                     }
                 }
-                continue
+                return@traverseConfig
             }
-            if (field.type == Position::class.java) {
-                val position = field.get(obj) as Position
-                position.setLink(configLink)
-            } else if (field.type == PositionList::class.java) {
-                val list = field.get(obj) as PositionList
-                list.setLink(configLink)
+
+            val value = field.get(owner) ?: return@traverseConfig
+            when (value) {
+                is Position -> value.setLink(configLink)
+                is PositionList -> value.setLink(configLink)
             }
         }
         if (missingConfigLink) {
@@ -305,9 +298,6 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanni
             extraPath = categoryParent.split(".").last() + "."
         }
         extraPath += processedOption.getPath()
-        if (default is GuiOptionEditorKeybind) {
-            UpdateKeybinds.keybinds.add(extraPath)
-        }
 
         EnforcedConfigValues.isBlockedFromEditing(extraPath)?.let { extraMessage ->
             return GuiOptionEditorBlocked(default, extraMessage)
