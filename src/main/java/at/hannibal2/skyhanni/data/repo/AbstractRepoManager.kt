@@ -25,6 +25,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType
 import java.io.File
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +34,6 @@ import kotlinx.coroutines.withContext
 
 @Suppress("TooManyFunctions")
 abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
-
     /**
      * Should be user-friendly, e.g. "SkyHanni" or "NotEnoughUpdates".
      * Gets used in error messages and logging.
@@ -52,15 +52,28 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      */
     open val backupRepoResourcePath: String? = null
 
+    open val legacyConfigDirectory: File? = null
+
     abstract val config: AbstractRepoConfig
-    abstract val configDirectory: File
+
+    /**
+     * The root directory for this specific repo.
+     * Inheriting classes should provide the path, e.g.: `File(mcDataDir, "repo/skyhanni")`
+     */
+    val repoDirectory: File by lazy {
+        globalRepoDirectory.resolve("skyhanni-$commonShortName").toFile()
+    }
+
+    private val legacyRepoDirectory: File? by lazy {
+        legacyConfigDirectory?.resolve("repo")
+    }
+
+    private val legacyCommitFile: File? by lazy {
+        legacyConfigDirectory?.resolve("currentCommit.json")
+    }
 
     @PublishedApi
     internal val logger by lazy { RepoLogger(this) }
-    val repoDirectory by lazy {
-        // ~/.minecraft/config/[...]/repo
-        File(configDirectory, "repo")
-    }
     @Suppress("UNCHECKED_CAST")
     private val eventClass: Class<E> by lazy {
         (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<E>
@@ -70,17 +83,14 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         eventClass.getConstructor(AbstractRepoManager::class.java)
     }
     private val repoTgzFile by lazy {
-        // ~/.minecraft/config/[...]/repo/[name]-repo-[def_branch].tar.gz
-        // e.g., 'sh-repo-main' or 'neu-repo-master'
-        File(repoDirectory, "$commonShortName-repo-${config.location.defaultBranch}.tar.gz")
-    }
-    private val legacyRepoZipFile by lazy {
-        File(repoDirectory, "$commonShortName-repo-${config.location.defaultBranch}.zip")
+        // e.g. ~/.minecraft/repo/skyhanni-sh/sh-repo-main.tar.gz
+        repoDirectory.resolve("$commonShortName-repo-${config.location.defaultBranch}.tar.gz")
     }
     private val commitStorage: RepoCommitStorage by lazy {
-        // ~/.minecraft/config/[...]/currentCommit.json
-        RepoCommitStorage(File(configDirectory, "currentCommit.json"))
+        // e.g. ~/.minecraft/repo/skyhanni-neu/hash.json
+        RepoCommitStorage(repoDirectory.resolve("hash.json"))
     }
+
     private val commonShortName by lazy { commonShortNameCased.lowercase() }
     private val successfulConstants = mutableSetOf<String>()
     private val unsuccessfulConstants = mutableSetOf<String>()
@@ -561,7 +571,23 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private fun deleteArchiveFiles() {
         repoTgzFile.delete()
-        legacyRepoZipFile.delete()
+        deleteLegacyFiles()
+    }
+
+    private fun deleteLegacyFiles() {
+        legacyRepoDirectory?.let {
+            if (it.exists()) {
+                logger.warn("Deleting legacy repo directory: ${it.absolutePath}")
+                it.deleteRecursively()
+            }
+        }
+
+        legacyCommitFile?.let {
+            if (it.exists()) {
+                logger.warn("Deleting legacy commit file: ${it.absolutePath}")
+                it.delete()
+            }
+        }
     }
 
     internal fun dumpDiagnosticsToLog(vararg extraData: Pair<String, Any?>) = with(logger) {
@@ -581,6 +607,13 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         if (extraData.isNotEmpty()) {
             debug("  extra:")
             for ((key, value) in extraData) debug("    $key: $value")
+        }
+    }
+
+    companion object {
+        // PlatformUtils.gameDir cannot be called at init time, so must use lazy
+        private val globalRepoDirectory: Path by lazy {
+            PlatformUtils.gameDir.resolve("repo")
         }
     }
 }

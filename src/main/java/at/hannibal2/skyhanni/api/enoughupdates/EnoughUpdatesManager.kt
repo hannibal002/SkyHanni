@@ -40,7 +40,6 @@ import com.google.gson.JsonPrimitive
 import net.minecraft.nbt.StringTag
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStackTemplate
-import java.io.File
 import java.util.TreeMap
 import kotlin.math.floor
 import kotlinx.coroutines.coroutineScope
@@ -50,11 +49,6 @@ import kotlinx.coroutines.sync.withLock
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
 object EnoughUpdatesManager {
-
-    val configDirectory = File("config/notenoughupdates")
-    private val repoDirectory = File(configDirectory, "repo")
-    private val itemsFolder = File(repoDirectory, "items")
-
     private val loadingMutex = Mutex()
     private val itemMap = TreeMap<NeuInternalName, NeuItemJson>()
     private val internalNameSet: MutableSet<NeuInternalName> = mutableSetOf()
@@ -323,20 +317,6 @@ object EnoughUpdatesManager {
         if (itemMap.isNotEmpty()) {
             ChatUtils.chat("Reloaded ${itemMap.size.addSeparators()} items in the NEU repo")
         }
-    }
-
-    fun reportItemStatus() {
-        val loadedItems = itemMap.size
-        val directorySize = itemsFolder.listFiles()?.size ?: 0
-
-        val status = when {
-            directorySize == 0 -> "§cNo item directory entries found!"
-            loadedItems == 0 -> "§cNo items loaded!"
-            loadedItems < directorySize -> "§eLoaded $loadedItems/$directorySize items"
-            loadedItems > directorySize -> "§eLoaded Items: $loadedItems (more than directory size)"
-            else -> "§aLoaded all $loadedItems items!"
-        }
-        ChatUtils.chat("  §aNEU Repo Item Status:\n  $status", prefix = false)
     }
 
     fun reportRecipeStatus() {
