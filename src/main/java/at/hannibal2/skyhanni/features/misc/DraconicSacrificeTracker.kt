@@ -2,18 +2,26 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemPriceSource
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoinWithBrackets
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -23,6 +31,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import net.minecraft.world.phys.AABB
 
@@ -33,22 +42,22 @@ object DraconicSacrificeTracker {
     private val patternGroup = RepoPattern.group("misc.draconicsacrifice")
 
     /**
-     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§5Ender Boots §r§einto §r§d3 Dragon Essence§r§e!
-     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§5Ender Helmet §r§einto §r§d3 Dragon Essence§r§e!
-     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§6Old Dragon Helmet §r§einto §r§d25 Dragon Essence§r§e!
-     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§6Wise Dragon Helmet §r§einto §r§d25 Dragon Essence§r§e!
+     * REGEX-TEST: SACRIFICE! You turned Ender Boots into 3 Dragon Essence!
+     * REGEX-TEST: SACRIFICE! You turned Ender Helmet into 3 Dragon Essence!
+     * REGEX-TEST: SACRIFICE! You turned Old Dragon Helmet into 25 Dragon Essence!
+     * REGEX-TEST: SACRIFICE! You turned Wise Dragon Helmet into 25 Dragon Essence!
      */
     private val sacrificeLoot by patternGroup.pattern(
-        "sacrifice",
-        "§c§lSACRIFICE! §r§eYou turned §r(?<item>.*) §r§einto §r§d(?<amount>\\d+) Dragon Essence§r§e!",
+        "sacrifice.colorless",
+        "SACRIFICE! You turned (?<item>.*) into (?<amount>\\d+) Dragon Essence!",
     )
 
     /**
-     * REGEX-TEST: §c§lBONUS LOOT! §r§eYou also received §r§817x §r§5Wise Dragon Fragment §r§efrom your sacrifice!
+     * REGEX-TEST: BONUS LOOT! You also received 17x Wise Dragon Fragment from your sacrifice!
      */
     private val bonusLoot by patternGroup.pattern(
-        "bonus",
-        "§c§lBONUS LOOT! §r§eYou also received §r(?:§\\w(?<amount>\\d+)?x)?(?: §r)?(?<item>.*) §r§efrom your sacrifice!",
+        "bonus.colorless",
+        "BONUS LOOT! You also received (?:\\w(?<amount>\\d+)?x)? ?(?<item>.*) from your sacrifice!",
     )
 
     private val tracker =
@@ -66,7 +75,7 @@ object DraconicSacrificeTracker {
 
     data class Data(
         @Expose var itemsSacrificed: Long = 0L,
-        @Expose var sacrificedItemsMap: MutableMap<String, Long> = mutableMapOf(),
+        @Expose var sacrificedItemsMap: MutableMap<NeuInternalName, Long> = mutableMapOf(),
     ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / itemsSacrificed
@@ -92,32 +101,81 @@ object DraconicSacrificeTracker {
         addSearchString("§5§lDraconic Sacrifice Profit Tracker")
         val profit = tracker.drawItems(data, { true }, this)
 
+        val sacrificedItems = data.sacrificedItemsMap.map { (item, amount) ->
+            val price = item.getAdjustedPrice(config.perTrackerConfig.trackerConfig.priceSource)
+            Triple(item, amount, -amount * price)
+        }.sortedBy { it.third }
+        val sacrificedCost = sacrificedItems.sumOf { (_, _, totalCost) -> totalCost }
+
         add(
             Renderable.hoverTips(
                 "§b${data.itemsSacrificed.addSeparators()} §6Items Sacrificed",
-                data.sacrificedItemsMap.map { (item, amount) -> "$item: §b$amount" },
-            ).toSearchable(),
+                sacrificedItems.map { (item, amount, _) ->
+                    "${item.repoItemName}: §b${amount.addSeparators()}"
+                }
+            ).toSearchable()
+        )
+        add(
+            Renderable.hoverTips(
+                "§6Total Sacrifice Cost: ${sacrificedCost.formatCoinWithBrackets()}",
+                sacrificedItems.map { (item, amount, totalCost) ->
+                    "${item.repoItemName}: §b${amount.addSeparators()} ${totalCost.formatCoinWithBrackets()}"
+                }
+            ).toSearchable()
         )
 
         val duration = data.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, data.itemsSacrificed, "sacrifice", duration, "Sacrifices"))
+        addAll(
+            tracker.addTotalProfit(
+                profit + sacrificedCost,
+                data.itemsSacrificed,
+                "sacrifice",
+                duration,
+                "Sacrifices"
+            )
+        )
 
         tracker.addPriceFromButton(this)
     }
 
-    @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        sacrificeLoot.matchMatcher(event.message) {
-            val amount = group("amount").toInt()
-            val item = group("item")
-            tracker.addItem(ESSENCE_DRAGON, amount, command = false)
-            tracker.modify {
-                it.itemsSacrificed += 1
-                it.sacrificedItemsMap.addOrPut(item, 1)
+    // TODO: create getRecipePrice
+    private fun NeuInternalName.getAdjustedPrice(priceSource: ItemPriceSource): Double {
+        if (!config.fragmentPrice) return getPrice()
+        val ingredients = NeuItems.getRecipes(this)
+            .firstOrNull { it.recipeType == NeuRecipeType.CRAFTING }
+            ?.ingredients
+            ?: return getPrice(priceSource)
+
+        val uniqueIngredients = ingredients
+            .groupBy { it.internalName }
+            .mapValues { (_, list) -> list.sumOf { it.count } }
+
+        // Recipe consists solely of one fragment type
+        if (uniqueIngredients.size == 1) {
+            val (ingredient, amount) = uniqueIngredients.entries.first()
+            if ("FRAGMENT" in ingredient.asString()) {
+                return ingredient.getPrice(priceSource) * amount
             }
         }
 
-        bonusLoot.matchMatcher(event.message) {
+        return getPrice(priceSource)
+    }
+
+    @HandleEvent
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
+        val msg = event.cleanMessage
+        sacrificeLoot.matchMatcher(msg) {
+            val amount = group("amount").toInt()
+            val item = group("item")
+            tracker.addItem(ESSENCE_DRAGON, amount, command = false)
+            val internalName = NeuInternalName.fromItemNameOrNull(item) ?: return
+            tracker.modify {
+                it.itemsSacrificed += 1
+                it.sacrificedItemsMap.addOrPut(internalName, 1)
+            }
+        }
+
+        bonusLoot.matchMatcher(msg) {
             val item = group("item")
             val amount = groupOrNull("amount")?.toInt() ?: 1
             val internalName = NeuInternalName.fromItemNameOrNull(item) ?: return
@@ -138,11 +196,24 @@ object DraconicSacrificeTracker {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetdraconicsacrificetracker") {
             description = "Resets the Draconic Sacrifice Tracker."
             category = CommandCategory.USERS_RESET
             simpleCallback { tracker.resetCommand() }
+        }
+    }
+
+    @HandleEvent
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(141, "#profile.draconicSacrificeTracker.sacrificedItemsMap") { element ->
+            val oldMap = element.asJsonObject
+            val newMap = JsonObject()
+            for ((displayName, value) in oldMap.entrySet()) {
+                val internalName = NeuInternalName.fromItemNameOrNull(displayName.removeColor().trim()) ?: continue
+                newMap.addProperty(internalName.asString(), value.asLong)
+            }
+            newMap
         }
     }
 
