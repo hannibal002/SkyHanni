@@ -127,37 +127,37 @@ object PlayerChatManager {
     fun onChat(event: SkyHanniChatEvent.Allow) {
         val chatComponent = event.chatComponent.intoSpan().stripHypixelMessage()
         coopPattern.matchStyledMatcher(chatComponent) {
-            val author = groupOrThrow("author")
-            val message = groupOrThrow("message")
+            val author = group("author")
+            val message = group("message")
             CoopChatEvent.Allow(author, message, event.chatComponent).postChat(event)
             return
         }
         partyPattern.matchStyledMatcher(chatComponent) {
-            PartyChatEvent.Allow(groupOrThrow("author"), groupOrThrow("message"), event.chatComponent)
+            PartyChatEvent.Allow(group("author"), group("message"), event.chatComponent)
                 .postChat(event)
             return
         }
         guildPattern.matchStyledMatcher(chatComponent) {
             GuildChatEvent.Allow(
-                groupOrThrow("author"),
-                groupOrThrow("message"),
-                group("guildRank"),
+                group("author"),
+                group("message"),
+                groupOrNull("guildRank"),
                 event.chatComponent,
             ).postChat(event)
             return
         }
         privateMessagePattern.matchStyledMatcher(chatComponent) {
-            val direction = Direction.fromString(groupOrThrow("direction").getText())
-            val author = groupOrThrow("author")
-            val message = groupOrThrow("message")
+            val direction = Direction.fromString(group("direction").getText())
+            val author = group("author")
+            val message = group("message")
             PrivateMessageChatEvent.Allow(direction, author, message, event.chatComponent).postChat(event)
             return
         }
         itemShowPattern.matchStyledMatcher(chatComponent) {
-            val level = group("level")
-            val author = groupOrThrow("author")
-            val action = groupOrThrow("action")
-            val itemName = groupOrThrow("itemName")
+            val level = groupOrNull("level")
+            val author = group("author")
+            val action = group("action")
+            val itemName = group("itemName")
 
             PlayerShowItemChatEvent.Allow(
                 level,
@@ -180,37 +180,37 @@ object PlayerChatManager {
     fun onChat(event: SkyHanniChatEvent.Modify) {
         val chatComponent = event.chatComponent.intoSpan().stripHypixelMessage()
         coopPattern.matchStyledMatcher(chatComponent) {
-            val author = groupOrThrow("author")
-            val message = groupOrThrow("message")
+            val author = group("author")
+            val message = group("message")
             CoopChatEvent.Modify(author, message, event.chatComponent).postChat(event)
             return
         }
         partyPattern.matchStyledMatcher(chatComponent) {
-            PartyChatEvent.Modify(groupOrThrow("author"), groupOrThrow("message"), event.chatComponent)
+            PartyChatEvent.Modify(group("author"), group("message"), event.chatComponent)
                 .postChat(event)
             return
         }
         guildPattern.matchStyledMatcher(chatComponent) {
             GuildChatEvent.Modify(
-                groupOrThrow("author"),
-                groupOrThrow("message"),
-                group("guildRank"),
+                group("author"),
+                group("message"),
+                groupOrNull("guildRank"),
                 event.chatComponent,
             ).postChat(event)
             return
         }
         privateMessagePattern.matchStyledMatcher(chatComponent) {
-            val direction = Direction.fromString(groupOrThrow("direction").getText())
-            val author = groupOrThrow("author")
-            val message = groupOrThrow("message")
+            val direction = Direction.fromString(group("direction").getText())
+            val author = group("author")
+            val message = group("message")
             PrivateMessageChatEvent.Modify(direction, author, message, event.chatComponent).postChat(event)
             return
         }
         itemShowPattern.matchStyledMatcher(chatComponent) {
-            val level = group("level")
-            val author = groupOrThrow("author")
-            val action = groupOrThrow("action")
-            val itemName = groupOrThrow("itemName")
+            val level = groupOrNull("level")
+            val author = group("author")
+            val action = group("action")
+            val itemName = group("itemName")
 
             PlayerShowItemChatEvent.Modify(
                 level,
@@ -230,13 +230,13 @@ object PlayerChatManager {
     }
 
     private fun ComponentMatcher.isGlobalChat(event: SkyHanniChatEvent.Allow): Boolean {
-        var author = groupOrThrow("author")
-        val chatColor = groupOrThrow("chatColor")
+        var author = group("author")
+        val chatColor = group("chatColor")
         if (chatColor.length == 0 && !author.getText().removeColor().endsWith(PlayerUtils.getName())) {
             // The last format string is always present, unless this is the players own message
             return false
         }
-        val message = groupOrThrow("message").removePrefix("§f")
+        val message = group("message").removePrefix("§f")
         if (author.getText().contains("[NPC]")) {
             NpcChatEvent.Allow(author, message, event.chatComponent).postChat(event)
             return true
@@ -246,21 +246,21 @@ object PlayerChatManager {
         var privateIslandGuest: ComponentSpan? = null
         if (IslandTypeTag.PRIVATE_ISLAND.isInIsland()) {
             privateIslandGuestPattern.matchStyledMatcher(author) {
-                privateIslandGuest = groupOrThrow("guest")
-                val prefix = groupOrThrow("prefix")
-                val suffix = groupOrThrow("suffix")
+                privateIslandGuest = group("guest")
+                val prefix = group("prefix")
+                val suffix = group("suffix")
                 author = prefix + suffix
             }
             privateIslandRankPattern.matchStyledMatcher(author) {
-                privateIslandRank = groupOrThrow("privateIslandRank")
-                val prefix = groupOrThrow("prefix")
-                val suffix = groupOrThrow("suffix")
+                privateIslandRank = group("privateIslandRank")
+                val prefix = group("prefix")
+                val suffix = group("suffix")
                 author = prefix + suffix
             }
         }
 
         PlayerAllChatEvent.Allow(
-            levelComponent = group("level"),
+            levelComponent = groupOrNull("level"),
             privateIslandRank = privateIslandRank,
             privateIslandGuest = privateIslandGuest,
             chatColor = chatColor.getText(),
@@ -272,13 +272,13 @@ object PlayerChatManager {
     }
 
     private fun ComponentMatcher.isGlobalChat(event: SkyHanniChatEvent.Modify): Boolean {
-        var author = groupOrThrow("author")
-        val chatColor = groupOrThrow("chatColor")
+        var author = group("author")
+        val chatColor = group("chatColor")
         if (chatColor.length == 0 && !author.getText().removeColor().endsWith(PlayerUtils.getName())) {
             // The last format string is always present, unless this is the players own message
             return false
         }
-        val message = groupOrThrow("message").removePrefix("§f")
+        val message = group("message").removePrefix("§f")
         if (author.getText().contains("[NPC]")) {
             NpcChatEvent.Modify(author, message, event.chatComponent).postChat(event)
             return true
@@ -288,21 +288,21 @@ object PlayerChatManager {
         var privateIslandGuest: ComponentSpan? = null
         if (IslandTypeTag.PRIVATE_ISLAND.isInIsland()) {
             privateIslandGuestPattern.matchStyledMatcher(author) {
-                privateIslandGuest = groupOrThrow("guest")
-                val prefix = groupOrThrow("prefix")
-                val suffix = groupOrThrow("suffix")
+                privateIslandGuest = group("guest")
+                val prefix = group("prefix")
+                val suffix = group("suffix")
                 author = prefix + suffix
             }
             privateIslandRankPattern.matchStyledMatcher(author) {
-                privateIslandRank = groupOrThrow("privateIslandRank")
-                val prefix = groupOrThrow("prefix")
-                val suffix = groupOrThrow("suffix")
+                privateIslandRank = group("privateIslandRank")
+                val prefix = group("prefix")
+                val suffix = group("suffix")
                 author = prefix + suffix
             }
         }
 
         PlayerAllChatEvent.Modify(
-            levelComponent = group("level"),
+            levelComponent = groupOrNull("level"),
             privateIslandRank = privateIslandRank,
             privateIslandGuest = privateIslandGuest,
             chatColor = chatColor.getText(),

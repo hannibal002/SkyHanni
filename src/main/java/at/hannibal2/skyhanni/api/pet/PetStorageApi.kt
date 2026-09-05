@@ -121,11 +121,11 @@ object PetStorageApi {
         getPetSkinColorTagOrNull()?.replace(" ", "")
 
     private fun ComponentMatcher.getPetSkinColorTagOrNull(): String? =
-        component("skin")?.formattedTextForItemLookup()
-            ?: component("altskin")?.formattedTextForItemLookup()
+        componentOrNull("skin")?.formattedTextForItemLookup()
+            ?: componentOrNull("altskin")?.formattedTextForItemLookup()
 
     private fun ComponentMatcher.petNameAndRarityOrNull(): Pair<String, LorenzRarity>? {
-        val petSpan = groupOrThrow("pet")
+        val petSpan = group("pet")
         val petName = petSpan.getText().trim()
         val rarity = petSpan.sampleStyleAtStart().toLorenzRarityOrNull() ?: return null
         return petName to rarity
@@ -216,7 +216,7 @@ object PetStorageApi {
         PetStoragePatterns.petMenuPetStackNamePattern.matchStyledMatcher(hoverName) {
             val petInfo = getPetInfo()
             val level = matcher.group("level").formatInt()
-            val petSpan = groupOrThrow("pet")
+            val petSpan = group("pet")
             val petName = petSpan.getText().trim()
             val itemInternalName = getInternalNameOrNull()?.takeIf { PetUtils.getPetRarity(it) != null }
             val petInternalName = itemInternalName ?: run {
@@ -396,7 +396,7 @@ object PetStorageApi {
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         PetStoragePatterns.petItemHeldMessagePattern.matchStyledMatcher(event.chatComponent) {
-            val petHeldItemName = componentOrThrow("item").formattedTextForItemLookup()
+            val petHeldItemName = component("item").formattedTextForItemLookup()
             val petHeldItem = resolveAppliedPetItemOrNull(petHeldItemName) ?: return
             updateCurrentPetHeldItem(petHeldItem)
         }
@@ -418,7 +418,7 @@ object PetStorageApi {
             val hoverInfoComponents = event.chatComponent.hoverTextComponents()
             val hoverInfo = hoverInfoComponents.toColorlessText()
             val petHeldItemName = hoverInfoComponents.firstStyledMatcher(PetStoragePatterns.autoPetHoverHeldItemPattern) {
-                componentOrThrow("item").formattedTextForItemLookup()
+                component("item").formattedTextForItemLookup()
             }?.trim()
             val petHeldItem = petHeldItemName?.let(PetUtils::resolvePetItemOrNull)
 

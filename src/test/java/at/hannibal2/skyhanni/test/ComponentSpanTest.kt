@@ -59,21 +59,21 @@ class ComponentSpanTest {
             append("12345")
         }
         Pattern.compile("[0-9]*(?<middle>[a-z]+)[0-9]*").matchStyledMatcher(component) {
-            assertEquals(redColor, groupOrThrow("middle").sampleStyleAtStart().getColor()?.value)
+            assertEquals(redColor, group("middle").sampleStyleAtStart().getColor()?.value)
         }
         val middlePartExtracted =
             Pattern.compile("[0-9]*(?<middle>[0-9][a-z]+[0-9])[0-9]*").matchStyledMatcher(component) {
-                assertEquals(3, groupOrThrow("middle").sampleComponents().size)
+                assertEquals(3, group("middle").sampleComponents().size)
                 assertEquals(
                     redColor,
-                    groupOrThrow("middle").sampleStyles().find {
+                    group("middle").sampleStyles().find {
                         it.getColor() != null
                     }?.getColor()?.value
                 )
-                groupOrThrow("middle")
+                group("middle")
             }!!
         Pattern.compile("(?<whole>c)").findStyledMatcher(middlePartExtracted) {
-            assertEquals(redColor, groupOrThrow("whole").sampleStyleAtStart().getColor()?.value)
+            assertEquals(redColor, group("whole").sampleStyleAtStart().getColor()?.value)
         }
     }
 
@@ -83,8 +83,7 @@ class ComponentSpanTest {
             append("Selected pet: Rift Ferret")
         }
         Pattern.compile("Selected pet: (?<pet>[\\w ]+)(?<skin> ✦)?").matchStyledMatcher(component) {
-            assertNull(component("skin") ?: component("altskin"))
+            assertNull(componentOrNull("skin") ?: componentOrNull("altskin"))
         }
     }
-
 }
