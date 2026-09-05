@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -79,12 +80,11 @@ object PestApi {
     val patternGroup = RepoPattern.group("garden.pests-api")
 
     /**
-     * WRAPPED-REGEX-TEST: " §7 §aThe Garden §4§l§7 x1"
      * WRAPPED-REGEX-TEST: " §7 §cThe Garden §4§l§7 x8"
      */
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
-        " §7. §[ac]The Garden §4§l[\uE07F\uE018]§7 x(?<pests>.*)",
+        " §7. §[ac]The Garden §4§l${SkyblockIcon.PEST}§7 x(?<pests>.*)",
     )
 
     /**
@@ -101,7 +101,7 @@ object PestApi {
      */
     private val pestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*[\uE07F\uE018](?:§.)* x(?<pests>\\d+)",
+        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*${SkyblockIcon.PEST}(?:§.)* x(?<pests>\\d+)",
     )
 
     /**
@@ -117,7 +117,7 @@ object PestApi {
      */
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
-        "§4§l[\uE07F\uE018] §cThis plot has §.(?<amount>\\d+) §2[\uE07F\uE018] Pests?§c!",
+        "§4§l${SkyblockIcon.PEST} §cThis plot has §.(?<amount>\\d+) §2${SkyblockIcon.PEST} Pests?§c!",
     )
 
     /**

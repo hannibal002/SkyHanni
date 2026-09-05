@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -50,7 +50,7 @@ object ItemNameResolver {
             val split = lowercase.split(" ")
             if (split.size == 3) {
                 val gemstoneQuery = "${
-                    resolveGemstoneToStat(split[1])?.hypixelIcon ?: ' '
+                    resolveGemstoneToStat(split[1]) ?: ' '
                 } ${split.joinToString("_").allLettersFirstUppercase()}"
                 ItemResolutionQuery.findInternalNameByDisplayName(gemstoneQuery, true)?.let {
                     return itemNameCache.getOrPut(lowercase) { it }
@@ -72,7 +72,7 @@ object ItemNameResolver {
         return internalName
     }
 
-    private fun resolveGemstoneToStat(itemName: String): SkyblockStat? =
+    private fun resolveGemstoneToStat(itemName: String): SkyblockIcon? =
         when (itemName) {
             "jade" -> MINING_FORTUNE
             "peridot" -> FARMING_FORTUNE

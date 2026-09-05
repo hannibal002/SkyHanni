@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.rift.everywhere
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -36,7 +36,7 @@ object RiftTimer {
      */
     private val nametagPattern by patternGroup.pattern(
         "nametag.timer",
-        "(?<time>\\d+) ${SkyblockStat.RIFT_TIME.hypixelIcon}",
+        "(?<time>\\d+) ${SkyblockIcon.RIFT_TIME}",
     )
 
     private var display = emptyList<String>()
@@ -140,7 +140,7 @@ object RiftTimer {
         val time = nametagPattern.matchMatcher(nametag) {
             group("time")?.toIntOrNull()
         } ?: return
-        event.text = Component.literal("${time.seconds.format()} §a${SkyblockStat.RIFT_TIME.hypixelIcon}")
+        event.text = Component.literal("${time.seconds.format()} §a${SkyblockIcon.RIFT_TIME}")
     }
 
     fun isEnabled() = RiftApi.inRift() && config.enabled
