@@ -87,7 +87,7 @@ class MiningConfig {
     val fossilExcavator: FossilExcavatorConfig = FossilExcavatorConfig()
 
     @Expose
-    @Category(name = "Glacite Mineshaft", desc = "Settings for the Glacite Mineshaft.")
+    @Category(name = "Glacite Mineshaft", desc = "Settings for the Glacite Mineshaft Features.")
     val glaciteMineshaft: GlaciteMineshaftConfig = GlaciteMineshaftConfig()
 
     @Expose
