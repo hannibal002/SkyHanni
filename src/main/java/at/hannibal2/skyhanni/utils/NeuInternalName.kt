@@ -80,6 +80,7 @@ value class NeuInternalName private constructor(private val internalName: String
         val WISP_POTION = "WISP_POTION".toInternalName()
         val ENCHANTED_HAY_BLOCK = "ENCHANTED_HAY_BLOCK".toInternalName()
         val TIGHTLY_TIED_HAY_BALE = "TIGHTLY_TIED_HAY_BALE".toInternalName()
+        val TALBOTS_THEODOLITE = "TALBOTS_THEODOLITE".toInternalName()
 
         fun String.toInternalName(): NeuInternalName {
             val formatted = uppercase().replace(" ", "_")
