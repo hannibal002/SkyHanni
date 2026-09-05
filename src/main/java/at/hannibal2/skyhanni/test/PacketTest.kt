@@ -19,20 +19,29 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.common.ClientboundKeepAlivePacket
+import net.minecraft.network.protocol.common.ClientboundPingPacket
 import net.minecraft.network.protocol.common.ServerboundKeepAlivePacket
+import net.minecraft.network.protocol.common.ServerboundPongPacket
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket
+import net.minecraft.network.protocol.game.ClientboundBlockEventPacket
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket
+import net.minecraft.network.protocol.game.ClientboundBossEventPacket
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket
+import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket
+import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket
 import net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
 import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket
+import net.minecraft.network.protocol.game.ClientboundSetChunkCacheCenterPacket
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
 import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket
@@ -48,6 +57,7 @@ import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket
+import net.minecraft.network.protocol.game.ServerboundClientTickEndPacket
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Pos
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.PosRot
@@ -61,7 +71,6 @@ import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket.Rot as En
 
 @SkyHanniModule
 object PacketTest {
-
     private var enabled = false
     private var full = false
 
@@ -79,7 +88,7 @@ object PacketTest {
     }
 
     @HandleEvent
-    fun onSendPacket(event: PacketSentEvent) {
+    private fun onPacketSent(event: PacketSentEvent) {
         if (!enabled) return
 
         val packet = event.packet
@@ -92,15 +101,15 @@ object PacketTest {
         if (packetName == PosRot::class.simpleName) return
         if (packetName == ServerboundPlayerCommandPacket::class.simpleName) return
         if (packetName == Rot::class.simpleName) return
-        if (packetName == net.minecraft.network.protocol.common.ServerboundPongPacket::class.simpleName) return
-        if (packetName == net.minecraft.network.protocol.game.ServerboundClientTickEndPacket::class.simpleName) return
+        if (packetName == ServerboundPongPacket::class.simpleName) return
+        if (packetName == ServerboundClientTickEndPacket::class.simpleName) return
         if (packetName == ServerboundMovePlayerPacket::class.simpleName) return
 
         println("Send: [$packetName]")
     }
 
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
-    fun onPacketReceive(event: PacketReceivedEvent) {
+    private fun onPacketReceived(event: PacketReceivedEvent) {
         if (!enabled) return
         val packet = event.packet
         packet.print()
@@ -120,8 +129,8 @@ object PacketTest {
         // Keep alive
         if (packetName == ClientboundKeepAlivePacket::class.simpleName) return
         if (packetName == ServerboundKeepAlivePacket::class.simpleName) return
-        if (packetName == net.minecraft.network.protocol.common.ClientboundPingPacket::class.simpleName) return
-        if (packetName == net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket::class.simpleName) return
+        if (packetName == ClientboundPingPacket::class.simpleName) return
+        if (packetName == ClientboundPlayerInfoRemovePacket::class.simpleName) return
 
         // Gui
         if (packetName == ClientboundSetObjectivePacket::class.simpleName) return
@@ -137,9 +146,9 @@ object PacketTest {
         if (packetName == ClientboundLevelChunkWithLightPacket::class.simpleName) return
         if (packetName == ClientboundSectionBlocksUpdatePacket::class.simpleName) return
         if (packetName == ClientboundBlockUpdatePacket::class.simpleName) return
-        if (packetName == net.minecraft.network.protocol.game.ClientboundBlockEventPacket::class.simpleName) return
-        if (packetName == net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket::class.simpleName) return
-        if (packetName == net.minecraft.network.protocol.game.ClientboundSetChunkCacheCenterPacket::class.simpleName) return
+        if (packetName == ClientboundBlockEventPacket::class.simpleName) return
+        if (packetName == ClientboundForgetLevelChunkPacket::class.simpleName) return
+        if (packetName == ClientboundSetChunkCacheCenterPacket::class.simpleName) return
 
         // Chat
         if (packetName == ClientboundSystemChatPacket::class.simpleName) return
@@ -147,7 +156,7 @@ object PacketTest {
         // Others
         if (packetName == ClientboundSoundPacket::class.simpleName) return
         if (!full && packetName == ClientboundLevelParticlesPacket::class.simpleName) return
-        if (packetName == net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket::class.simpleName) return
+        if (packetName == ClientboundContainerSetSlotPacket::class.simpleName) return
 
         // Entity
         if (this is ClientboundRemoveEntitiesPacket) {
@@ -162,8 +171,8 @@ object PacketTest {
             if (packetName == EntityLookMove::class.simpleName) return
             if (packetName == ClientboundRotateHeadPacket::class.simpleName) return
             if (packetName == EntityLook::class.simpleName) return
-            if (packetName == net.minecraft.network.protocol.game.ClientboundBossEventPacket::class.simpleName) return
-            if (packetName == net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket::class.simpleName) return
+            if (packetName == ClientboundBossEventPacket::class.simpleName) return
+            if (packetName == ClientboundEntityPositionSyncPacket::class.simpleName) return
             if (packetName == ClientboundSetEntityMotionPacket::class.simpleName) return
             if (packetName == ClientboundSetEntityDataPacket::class.simpleName) return
             if (packetName == ClientboundUpdateAttributesPacket::class.simpleName) return
@@ -270,7 +279,7 @@ object PacketTest {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestpacket") {
             description = "Logs incoming and outgoing packets to the console"
             category = CommandCategory.DEVELOPER_TEST
