@@ -39,7 +39,6 @@ internal class SkyHanniItemAtlasRenderer(
         val size = sizePixels.toFloat()
         val bufferSlice = projectionBuffer.getBuffer(Projection().apply { setupOrtho(-1000f, 1000f, size, size, true) })
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
-
         block()
     }
 
