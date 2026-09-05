@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -27,7 +26,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.mojang.authlib.GameProfile
@@ -87,11 +85,9 @@ object ContributorManager {
         """[0-9A-Za-z_\]]$"""
     )
 
-    private val repoReloadCoroutine = CoroutineSettings("contributor list repo reload")
-
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
-        val map = event.getConstantAsync<ContributorsJson>("ContributorList").contributors
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
+        val map = event.getConstant<ContributorsJson>("ContributorList").contributors
 
         contributors = map.mapKeysNotNull {
             try {

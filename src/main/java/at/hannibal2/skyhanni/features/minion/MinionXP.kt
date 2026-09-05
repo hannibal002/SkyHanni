@@ -31,7 +31,6 @@ import java.util.EnumMap
 
 @SkyHanniModule
 object MinionXP {
-
     private val config get() = SkyHanniMod.feature.misc.minions
 
     private val xpItemMap: MutableMap<PrimitiveItemStack, String> = mutableMapOf()
@@ -187,7 +186,7 @@ object MinionXP {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         xpInfoMap = event.getConstant<MinionXPJson>("MinionXP").minionXP.mapNotNull { xpType ->
             xpType.value.mapNotNull { it.key.toInternalName() to XPInfo(SkillType.getByName(xpType.key), it.value) }
         }.flatten().toMap()

@@ -32,7 +32,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object WoodenButtonsHelper {
-
     private val config get() = RiftApi.config.enigmaSoulWaypoints
 
     private val patternGroup = RepoPattern.group("rift.area.dreadfarm.buttons")
@@ -53,7 +52,7 @@ object WoodenButtonsHelper {
     private var lastBlowgunFire = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<RiftWoodenButtonsJson>("rift/RiftWoodenButtons")
         buttonLocations = mutableMapOf<String, List<LorenzVec>>().apply {
             data.houses.forEach { (houseName, spots) ->

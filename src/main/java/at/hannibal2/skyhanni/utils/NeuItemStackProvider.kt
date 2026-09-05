@@ -19,8 +19,8 @@ class NeuItemStackProvider(
     companion object {
         private val providerCache = WeakHashMap<NeuItemStackProvider, SafeItemStack>()
 
-        @HandleEvent(priority = HandleEvent.LOW)
-        fun onNeuRepoReload() {
+        @HandleEvent(priorityLevel = LOW)
+        private suspend fun onNeuRepoReload() {
             providerCache.clear()
         }
     }

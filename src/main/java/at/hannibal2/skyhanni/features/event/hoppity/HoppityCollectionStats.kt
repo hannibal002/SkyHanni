@@ -309,7 +309,7 @@ object HoppityCollectionStats {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
         for ((island, residents) in data.residentLocations) {
             val storageSet = residentRabbitData.getOrPut(island) { mutableMapOf() }
@@ -325,7 +325,7 @@ object HoppityCollectionStats {
     }
 
     @HandleEvent
-    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.getConstant<NeuHoppityJson>("hoppity").hoppity
         neuCountData = data
         reCalcHotspotCount()

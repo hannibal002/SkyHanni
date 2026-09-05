@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowde
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.TREASURITE
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.WISHING_COMPASS
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.YOGGIE
-import at.hannibal2.skyhanni.config.features.chat.PowderMiningGemstoneConfig.GemstoneFilterEntry
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -27,7 +26,6 @@ import java.util.regex.Pattern
 
 @SkyHanniModule
 object PowderMiningChatFilter {
-
     private val config get() = SkyHanniMod.feature.chat.filterType.powderMining
     private val gemstoneConfig get() = config.gemstone
 
@@ -316,8 +314,8 @@ object PowderMiningChatFilter {
     private var rewardPatterns: Map<Pair<Pattern, PowderMiningConfig.SimplePowderMiningRewardTypes>, String> =
         emptyMap()
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    @HandleEvent(priorityLevel = HIGH)
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         rewardPatterns = mapOf(
             ascensionRopeRewardPattern to ASCENSION_ROPE to "powder_mining_ascension_rope",
             wishingCompassRewardPattern to WISHING_COMPASS to "powder_mining_wishing_compass",
@@ -344,21 +342,21 @@ object PowderMiningChatFilter {
 
     private fun blockGoblinEggs(ssMessage: String): String? {
         goblinEggPattern.matchMatcher(ssMessage) {
-            if (config.goblinEggs == PowderMiningConfig.GoblinEggEntry.SHOW_ALL) return "no_filter"
-            if (config.goblinEggs == PowderMiningConfig.GoblinEggEntry.HIDE_ALL) return "powder_mining_goblin_eggs"
+            if (config.goblinEggs == SHOW_ALL) return "no_filter"
+            if (config.goblinEggs == HIDE_ALL) return "powder_mining_goblin_eggs"
 
             return when (val colorStr = groupOrNull("color")?.lowercase()) {
                 // 'Colorless', base goblin eggs will never be shown in this code path
                 null -> "powder_mining_goblin_eggs"
-                "green" -> if (config.goblinEggs > PowderMiningConfig.GoblinEggEntry.GREEN_UP) {
+                "green" -> if (config.goblinEggs > GREEN_UP) {
                     "powder_mining_goblin_eggs"
                 } else "no_filter"
 
-                "yellow" -> if (config.goblinEggs > PowderMiningConfig.GoblinEggEntry.YELLOW_UP) {
+                "yellow" -> if (config.goblinEggs > YELLOW_UP) {
                     "powder_mining_goblin_eggs"
                 } else "no_filter"
 
-                "red" -> if (config.goblinEggs > PowderMiningConfig.GoblinEggEntry.RED_UP) {
+                "red" -> if (config.goblinEggs > RED_UP) {
                     "powder_mining_goblin_eggs"
                 } else "no_filter"
                 // BLUE_ONLY enum not explicitly used in comparison, as the only
@@ -394,17 +392,17 @@ object PowderMiningChatFilter {
                 else -> return "no_filter"
             }
 
-            if (gemSpecificFilterEntry == GemstoneFilterEntry.HIDE_ALL) return "powder_mining_gemstones"
+            if (gemSpecificFilterEntry == HIDE_ALL) return "powder_mining_gemstones"
 
             return when (tierStr) {
                 // Never allowed through, except for in SHOW_ALL,
                 // which is handled above
                 "rough" -> "powder_mining_gemstones"
-                "flawed" -> if (gemSpecificFilterEntry > GemstoneFilterEntry.FLAWED_UP) {
+                "flawed" -> if (gemSpecificFilterEntry > FLAWED_UP) {
                     "powder_mining_gemstones"
                 } else "no_filter"
 
-                "fine" -> if (gemSpecificFilterEntry > GemstoneFilterEntry.FINE_UP) {
+                "fine" -> if (gemSpecificFilterEntry > FINE_UP) {
                     "powder_mining_gemstones"
                 } else "no_filter"
                 // FLAWLESS_ONLY enum not explicitly used in comparison, as the only

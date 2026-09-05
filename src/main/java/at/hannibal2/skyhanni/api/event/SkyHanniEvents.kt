@@ -15,20 +15,31 @@ import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import java.lang.reflect.Method
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.coroutines.Continuation
+import kotlin.reflect.jvm.kotlinFunction
 
 @SkyHanniModule
 object SkyHanniEvents {
-
-    private val listeners: MutableMap<Class<out SkyHanniEvent>, EventListeners> = mutableMapOf()
+    private val listeners: MutableMap<Class<out AbstractSkyHanniEvent>, EventListeners> = mutableMapOf()
     private val handlers: MutableMap<Class<out SkyHanniEvent>, EventHandler<out SkyHanniEvent>> = mutableMapOf()
+    private val asyncHandlers: MutableMap<Class<out AsyncSkyHanniEvent>, AsyncEventHandler<out AsyncSkyHanniEvent>> =
+        mutableMapOf()
     private var disabledHandlers = emptySet<String>()
     private var disabledHandlerInvokers = emptySet<String>()
 
     fun init(instances: List<Any>) = instances.forEach(::register)
 
-    fun register(instance: Any) {
+    fun register(instance: Any) = register(instance, validateModule = true)
+
+    /**
+     * Registers an ad-hoc listener object that is deliberately not a `@SkyHanniModule`, which only unit tests
+     * exercising dispatch behaviour are allowed to do.
+     */
+    internal fun registerForTest(instance: Any) = register(instance, validateModule = false)
+
+    private fun register(instance: Any, validateModule: Boolean) {
         instance.javaClass.declaredMethods.forEach {
-            registerMethod(it, instance)
+            registerMethod(it, instance, validateModule)
         }
     }
 
@@ -42,96 +53,134 @@ object SkyHanniEvents {
         )
     } as EventHandler<T>
 
+    // The map key and EventHandler constructor preserve T, but the heterogeneous cache erases it.
+    @Suppress("UNCHECKED_CAST")
+    fun <T : AsyncSkyHanniEvent> getAsyncEventHandler(event: Class<T>): AsyncEventHandler<T> =
+        asyncHandlers.getOrPut(event) {
+            AsyncEventHandler(
+                event,
+                getEventClasses(event).mapNotNull { listeners[it] }.flatMap(EventListeners::getListeners),
+            )
+        } as AsyncEventHandler<T>
+
     fun isDisabledHandler(handler: String): Boolean = handler in disabledHandlers
     fun isDisabledInvoker(invoker: String): Boolean = invoker in disabledHandlerInvokers
 
-    private fun registerMethod(method: Method, instance: Any) {
-        val (options, eventTypes) = getEventData(method) ?: return
+    private fun registerMethod(method: Method, instance: Any, validateModule: Boolean) {
+        val (options, eventTypes, isSuspend) = getEventData(method, validateModule) ?: return
         eventTypes.forEach { eventType ->
             listeners.getOrPut(eventType) { EventListeners(eventType) }
-                .addListener(method, instance, options)
+                .addListener(method, instance, options, isSuspend)
+            unregisterHandler(eventType)
         }
     }
 
     @JvmStatic
-    val eventPrimaryFunctionNames: Map<String, Class<out SkyHanniEvent>> =
+    val eventPrimaryFunctionNames: Map<String, Class<out AbstractSkyHanniEvent>> =
         GeneratedEventPrimaryFunctionNames.map
 
     private val Method.fullyQualifiedName: String get() = "${declaringClass.name}.$name"
 
-    private fun handleZeroParameterMethod(
+    private fun resolveZeroParameterEventTypes(
         method: Method,
         options: HandleEvent,
-    ): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
-        val primaryFunctionEventType = eventPrimaryFunctionNames[method.name]
-        if (primaryFunctionEventType != null) return options to listOf(primaryFunctionEventType)
+    ): List<Class<out AbstractSkyHanniEvent>> {
+        eventPrimaryFunctionNames[method.name]?.let { return listOf(it) }
 
-        if (options.eventType != SkyHanniEvent::class) return options to listOf(options.eventType.java)
+        if (options.eventType != AbstractSkyHanniEvent::class) return listOf(options.eventType.java)
 
-        if (options.eventTypes.isEmpty()) {
-            ErrorManager.crashInDevEnv(
-                "Function ${method.fullyQualifiedName} must have an event parameter, a primary " +
-                    "function name, or an explicit event specification because it is annotated " +
-                    "with @HandleEvent",
-            )
-            return null
+        require(options.eventTypes.isNotEmpty()) {
+            "Function ${method.fullyQualifiedName} must have an event parameter, a primary " +
+                "function name, or an explicit event specification because it is annotated " +
+                "with @HandleEvent"
         }
-
-        return options to options.eventTypes.map { it.java }
+        return options.eventTypes.map { it.java }
     }
 
-    private fun handleSingleParameterMethod(
-        method: Method,
-        options: HandleEvent,
-    ): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
+    private fun resolveSingleParameterEventTypes(method: Method): List<Class<out AbstractSkyHanniEvent>> {
         val eventType = method.parameterTypes.first()
 
-        if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
-            ErrorManager.crashInDevEnv(
-                "Function ${method.fullyQualifiedName} must have an event assignable from " +
-                    "SkyHanniEvent because it is annotated with @HandleEvent",
-            )
-            return null
+        require(AbstractSkyHanniEvent::class.java.isAssignableFrom(eventType)) {
+            "Function ${method.fullyQualifiedName} must have an event assignable from " +
+                "AbstractSkyHanniEvent because it is annotated with @HandleEvent"
         }
 
         @Suppress("UNCHECKED_CAST")
-        return options to listOf(eventType as Class<out SkyHanniEvent>)
+        return listOf(eventType as Class<out AbstractSkyHanniEvent>)
     }
 
-    private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
+    /**
+     * @param validateModule Whether to reject handlers declared outside a `@SkyHanniModule` class. Only meaningful
+     *                       while registering, as module membership does not affect how a listener is removed.
+     */
+    private fun getEventData(method: Method, validateModule: Boolean): EventData? {
         val options = method.getAnnotation(HandleEvent::class.java) ?: return null
-        if (!method.declaringClass.isAnnotationPresent(SkyHanniModule::class.java)) {
+        if (validateModule && !method.declaringClass.isAnnotationPresent(SkyHanniModule::class.java)) {
             ErrorManager.crashInDevEnv(
                 "Function ${method.fullyQualifiedName} must be declared directly inside a class " +
                     "annotated with @SkyHanniModule because it is annotated with @HandleEvent",
             )
             return null
         }
-        return when (method.parameterCount) {
-            0 -> handleZeroParameterMethod(method, options)
-            1 -> handleSingleParameterMethod(method, options)
-            else -> {
-                ErrorManager.crashInDevEnv(
-                    "Function ${method.fullyQualifiedName} has too many parameters. It must have " +
-                        "exactly one event parameter, or be parameterless with a primary " +
-                        "function name or an explicit event specification because it is " +
-                        "annotated with @HandleEvent",
-                )
-                null
+        val kotlinFunction = method.kotlinFunction
+        val isSuspend = kotlinFunction?.isSuspend == true
+        val hasContinuation = method.parameterTypes.lastOrNull() == Continuation::class.java
+        require(!hasContinuation || isSuspend) {
+            "Function ${method.fullyQualifiedName} imitates a Kotlin suspend signature but is " +
+                "not a Kotlin suspend function"
+        }
+        if (isSuspend) {
+            require(kotlinFunction.returnType.classifier == Unit::class) {
+                "Suspend event handler ${method.fullyQualifiedName} must return Unit"
             }
         }
+
+        val logicalParameterCount = method.parameterCount - if (isSuspend) 1 else 0
+        val eventTypes = when (logicalParameterCount) {
+            0 -> resolveZeroParameterEventTypes(method, options)
+            1 -> resolveSingleParameterEventTypes(method)
+            else -> throw IllegalArgumentException(
+                "Function ${method.fullyQualifiedName} has too many parameters. It must have " +
+                    "exactly one event parameter, or be parameterless with a primary " +
+                    "function name or an explicit event specification because it is " +
+                    "annotated with @HandleEvent",
+            )
+        }
+
+        val hasSyncEvents = eventTypes.any { SkyHanniEvent::class.java.isAssignableFrom(it) }
+        val hasAsyncEvents = eventTypes.any { AsyncSkyHanniEvent::class.java.isAssignableFrom(it) }
+        require(
+            hasSyncEvents.xor(hasAsyncEvents) && eventTypes.all {
+                SkyHanniEvent::class.java.isAssignableFrom(it) || AsyncSkyHanniEvent::class.java.isAssignableFrom(it)
+            },
+        ) {
+            "Function ${method.fullyQualifiedName} must only handle events from one synchronous " +
+                "or asynchronous family"
+        }
+        require(isSuspend == hasAsyncEvents) {
+            val requiredKind = if (hasAsyncEvents) "a suspend" else "an ordinary"
+            "Function ${method.fullyQualifiedName} must be $requiredKind function for its event family"
+        }
+        return EventData(options, eventTypes, isSuspend)
     }
 
+    private data class EventData(
+        val options: HandleEvent,
+        val eventTypes: List<Class<out AbstractSkyHanniEvent>>,
+        val isSuspend: Boolean,
+    )
+
     private fun unregisterMethod(method: Method) {
-        val (_, eventTypes) = getEventData(method) ?: return
+        val (_, eventTypes) = getEventData(method, validateModule = false) ?: return
         eventTypes.forEach { event ->
             unregisterHandler(event)
             listeners.values.forEach { it.removeListener(method) }
         }
     }
 
-    private fun unregisterHandler(clazz: Class<out SkyHanniEvent>) {
-        handlers.removeIfKey { it.isAssignableFrom(clazz) }
+    private fun unregisterHandler(clazz: Class<out AbstractSkyHanniEvent>) {
+        handlers.removeIfKey { clazz.isAssignableFrom(it) }
+        asyncHandlers.removeIfKey { clazz.isAssignableFrom(it) }
     }
 
     private val listenerCacheGeneration = AtomicInteger(0)
@@ -167,8 +216,8 @@ object SkyHanniEvents {
 
     // This is marked highest priority to let it
     // disable other RepositoryReloadEvent listeners before they happen
-    @HandleEvent(priority = HandleEvent.HIGHEST)
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    @HandleEvent(priorityLevel = HIGHEST)
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         val version = SkyHanniMod.modVersion
 
@@ -177,7 +226,6 @@ object SkyHanniEvents {
         disabledHandlerInvokers = data.disabledInvokers + data.disabledInvokersVersioned.activeNames(version, mcVersion)
         markEventCacheDirty(DirtyReason.REPO_RELOAD)
     }
-
 
     private fun Set<DisabledEventVersionedJson>.activeNames(
         version: ModVersion,
@@ -194,13 +242,11 @@ object SkyHanniEvents {
     @HandleEvent
     private fun onSecondPassed(event: SecondPassedEvent) {
         try {
-            val list = handlers.values.toMutableList()
+            val list = allHandlerLogs()
 
             for (second in seconds) {
                 if (event.repeatSeconds(second)) {
-
-                    for (handler in list) {
-                        val log = handler.invokeLog
+                    for ((_, log) in list) {
                         val current = log.invokeCount
 
                         val storage = log.overTimeLog[second]
@@ -221,26 +267,27 @@ object SkyHanniEvents {
     class EventInvokeData(var oldValue: Long, var diff: Long)
 
     class EventInvokeLog {
-
         var invokeCount: Long = 0L
 
         var overTimeLog = mutableMapOf<Int, EventInvokeData>()
     }
+
+    private fun allHandlerLogs(): List<Pair<String, EventInvokeLog>> =
+        handlers.values.map { it.name to it.invokeLog } + asyncHandlers.values.map { it.name to it.invokeLog }
 
     @HandleEvent
     private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Events")
         event.addIrrelevant {
             add("- <event name> (<total invoke count> invokes per second: <last 10s, 60s, 5m, total>)")
-            handlers.values
-                .filter { it.invokeLog.invokeCount > 0 }
-                .sortedWith(compareBy({ -it.invokeLog.invokeCount }, { it.name }))
-                .forEach {
-                    val log = it.invokeLog
+            allHandlerLogs()
+                .filter { (_, log) -> log.invokeCount > 0 }
+                .sortedWith(compareBy({ (_, log) -> -log.invokeCount }, { (name, _) -> name }))
+                .forEach { (name, log) ->
 
                     add(
                         buildString {
-                            append("- ${it.name} ")
+                            append("- $name ")
                             append(log.invokeCount.addSeparators())
 
                             for (second in seconds) {
@@ -260,7 +307,7 @@ object SkyHanniEvents {
     }
 
     /**
-     * Returns a list of all super classes and the class itself up to [SkyHanniEvent].
+     * Returns a list of all event super classes and the class itself up to [AbstractSkyHanniEvent].
      */
     private fun getEventClasses(clazz: Class<*>): List<Class<*>> {
         val classes = mutableListOf<Class<*>>()
@@ -270,7 +317,9 @@ object SkyHanniEvents {
         @Suppress("LoopWithTooManyJumpStatements")
         while (current.superclass != null) {
             val superClass = current.superclass
+            if (superClass == AbstractSkyHanniEvent::class.java) break
             if (superClass == SkyHanniEvent::class.java) break
+            if (superClass == AsyncSkyHanniEvent::class.java) break
             if (superClass == GenericSkyHanniEvent::class.java) break
             if (superClass == RenderingSkyHanniEvent::class.java) break
             if (superClass == CancellableSkyHanniEvent::class.java) break

@@ -26,7 +26,6 @@ import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object CarnivalShopHelper {
-
     // Where the informational item stack will be placed in the GUI
     private const val CUSTOM_STACK_LOCATION = 8
     private inline val NAME_TAG_ITEM get() = Items.NAME_TAG
@@ -116,7 +115,7 @@ object CarnivalShopHelper {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val repoTokenShops = event.getConstant<NeuMiscJson>("carnivalshops").carnivalTokenShops
         repoEventShops = repoTokenShops.map { (key, value) ->
             EventShop(key.replace("_", " "), value.values.toMutableList())

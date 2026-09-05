@@ -44,7 +44,6 @@ import net.minecraft.world.item.Items
 
 // Code taken from NotEnoughUpdates
 class ItemResolutionQuery {
-
     private var compound: DataComponentMap = DataComponentMap.EMPTY
 
     private var itemType: Item? = null
@@ -53,7 +52,6 @@ class ItemResolutionQuery {
 
     @SkyHanniModule
     companion object {
-
         private val patternGroup = RepoPattern.group("misc.itemresolution")
 
         /**
@@ -82,7 +80,7 @@ class ItemResolutionQuery {
         private var shardNameOverrides: Map<String, String> = mapOf()
 
         @HandleEvent
-        fun onRepoReload(event: RepositoryReloadEvent) {
+        private suspend fun onRepoReload(event: RepositoryReloadEvent) {
             val data = event.getConstant<ItemsJson>("Items")
             renamedEnchantments = data.renamedEnchantments
             shardNameOverrides = data.shardNameOverrides

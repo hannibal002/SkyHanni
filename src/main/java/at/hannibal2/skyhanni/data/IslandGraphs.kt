@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandGraphSettingsJson
@@ -99,7 +98,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object IslandGraphs {
-
     private const val TARGET_REACHED_DISTANCE_SQ = 9.0
     private const val ON_PATH_MAX_DISTANCE_SQ = 49.0
     private const val FAST_MOVEMENT_THRESHOLD = 20.0
@@ -169,7 +167,7 @@ object IslandGraphs {
     )
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<IslandGraphSettingsJson>("misc/IslandGraphSettings")
         ignoredIslandTypes = data.ignoredIslandTypes
 
@@ -182,7 +180,6 @@ object IslandGraphs {
     private fun onIslandJoin(event: IslandJoinEvent) {
         enableAllNodes()
         if (currentIslandGraph != null) return
-        if (event.island == IslandType.NONE) return
         loadIsland(event.island)
     }
 
@@ -224,7 +221,7 @@ object IslandGraphs {
     }
 
     private fun loadIsland(newIsland: IslandType) {
-        if (newIsland == IslandType.DWARVEN_MINES) {
+        if (newIsland == DWARVEN_MINES) {
             loadDwarvenMines()
             return
         }
@@ -322,7 +319,7 @@ object IslandGraphs {
     /**
      * calling before [at.hannibal2.skyhanni.test.graph.GraphEditor], so that we always have the latest playerPosition.
      */
-    @HandleEvent(priority = -1)
+    @HandleEvent(priorityLevel = HIGH)
     private fun onTick(event: SkyHanniTickEvent) {
         GraphUtils.updatePlayerPosition()
         if (currentIslandGraph == null) return
@@ -594,7 +591,7 @@ object IslandGraphs {
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shreportlocation") {
             description = "Allows the user to report an error with pathfinding at the current location."
-            category = CommandCategory.USERS_BUG_FIX
+            category = USERS_BUG_FIX
             argCallback("reason", BrigadierArguments.greedyString()) { reason ->
                 sendReportLocation(
                     playerPosition,

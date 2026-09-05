@@ -293,7 +293,7 @@ object PetUtils {
     // </editor-fold>
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val petSkinData = event.getConstant<PetsJson>("Pets")
         val gameVariants = petSkinData.skins.gameVariants
         seasonalVariants = gameVariants["seasonal"].orEmpty()
@@ -302,7 +302,7 @@ object PetUtils {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val petData = event.getConstant<NeuPetsJson>("pets")
         basePetLeveling = petData.basePetLeveling
         customPetLeveling = petData.customPetLeveling

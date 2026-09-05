@@ -55,7 +55,7 @@ object GummyWarning {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<RemainingSlayerKills.SlayerData>("Slayer")
         slayerWeapons = data.weapons.mapValues { it.value.keys }
     }
