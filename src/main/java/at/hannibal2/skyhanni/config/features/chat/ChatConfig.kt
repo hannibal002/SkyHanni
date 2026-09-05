@@ -233,6 +233,14 @@ class ChatConfig {
 
     @Expose
     @ConfigOption(
+        name = "Hide Lootshare Messages",
+        desc = "Hides all lootshare messages.",
+    )
+    @ConfigEditorBoolean
+    var hideLootshareMessages: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Dark Auction Item Display",
         desc = "Adds the item name to the highest bidder message at the Dark Auction.",
     )
