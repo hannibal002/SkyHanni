@@ -30,7 +30,7 @@ object MagicalPowerDisplay {
     private val config get() = SkyHanniMod.feature.inventory.magicalPower
     private var contactAmount: Int?
         get() = ProfileStorageData.profileSpecific?.abiphoneContactAmount
-        private set(value) {
+        set(value) {
             ProfileStorageData.profileSpecific?.abiphoneContactAmount = value
         }
 

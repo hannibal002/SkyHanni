@@ -246,7 +246,7 @@ object EssenceShopHelper {
                 "Could not read current Essence Count from inventory",
                 extraData = listOf(
                     "inventoryName" to event.inventoryName,
-                    "essenceHeaderStack" to essenceHeaderStack?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty(),
+                    "essenceHeaderStack" to essenceHeaderStack?.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "populatedInventorySize" to event.inventoryItems.filter {
                         it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty()
                     }.size,

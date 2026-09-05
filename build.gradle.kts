@@ -331,6 +331,7 @@ tasks.withType<KotlinCompile> {
     compilerOptions {
         val jvmTargetStr = target.minecraftVersion.formattedKotlinJvmTarget
         jvmTarget.set(JvmTarget.fromTarget(jvmTargetStr))
+        extraWarnings = true
         allWarningsAsErrors = true
         optIn.addAll(
             "kotlin.concurrent.atomics.ExperimentalAtomicApi",

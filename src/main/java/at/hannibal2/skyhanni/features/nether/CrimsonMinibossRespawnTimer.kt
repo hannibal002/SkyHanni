@@ -199,7 +199,7 @@ object CrimsonMinibossRespawnTimer {
                 add(it.displayName)
                 add("   Timer ${it.nextSpawnTime?.timeUntil()?.format()}")
                 add(
-                    "   Possible Timer ${it.possibleSpawnTime?.first?.timeUntil()?.format()} - " + "${
+                    "   Possible Timer ${it.possibleSpawnTime?.first?.timeUntil()?.format()} - ${
                         it.possibleSpawnTime?.second?.timeUntil()?.format()
                     }",
                 )

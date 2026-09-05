@@ -38,8 +38,7 @@ object ScoreboardData {
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
     val objectiveTitle: String
-        get() =
-            MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.formattedTextCompat().orEmpty()
+        get() = MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.formattedTextCompat()
 
     private var dirty = false
 

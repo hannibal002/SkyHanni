@@ -337,11 +337,9 @@ object QuiverApi {
 
     fun hasBowInInventory() = hasBow
 
-    fun isHoldingBow(): Boolean {
-        InventoryUtils.getItemInHand()?.let {
-            return it.getItem() is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
-        } ?: return false
-    }
+    fun isHoldingBow(): Boolean = InventoryUtils.getItemInHand()?.let {
+        it.getItem() is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
+    } ?: false
 
     fun getArrowByNameOrNull(name: String): ArrowType? {
         return arrows.firstOrNull { it.arrow == name }

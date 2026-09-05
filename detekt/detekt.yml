@@ -204,3 +204,11 @@ potential-bugs:
             - 'java.util.concurrent.ConcurrentHashMap.remove'
             - 'kotlin.collections.MutableMap.put'
             - 'kotlin.collections.MutableMap.remove'
+    UnnecessaryNotNullOperator: # reported by compiler
+        active: false
+    UnnecessarySafeCall: # reported by compiler
+        active: false
+    UnsafeCast: # reported by compiler
+        active: false
+    UselessPostfixExpression: # reported by compiler
+        active: false
