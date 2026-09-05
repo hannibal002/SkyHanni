@@ -5,21 +5,16 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonElement
-import org.apache.http.HttpEntity
-import org.apache.http.client.HttpResponseException
-import org.apache.http.client.config.RequestConfig
-import org.apache.http.client.methods.CloseableHttpResponse
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.client.methods.HttpPost
-import org.apache.http.client.methods.HttpRequestBase
-import org.apache.http.client.protocol.RequestAcceptEncoding
-import org.apache.http.client.protocol.ResponseContentEncoding
-import org.apache.http.impl.client.CloseableHttpClient
-import org.apache.http.impl.client.HttpClients
-import org.apache.http.message.BasicHeader
 import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.net.ProxySelector
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
 import java.security.KeyStore
+import java.time.Duration
 import java.util.zip.GZIPInputStream
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.KeyManagerFactory
@@ -56,24 +51,17 @@ object ApiInternalUtils {
         connection.sslSocketFactory = it.socketFactory
     }
 
-    private val defaultHeaders = listOf(
-        BasicHeader("Pragma", "no-cache"),
-        BasicHeader("Cache-Control", "no-cache"),
-    )
-    private val gatedConnectionConfig = RequestConfig.custom()
-        .setConnectTimeout(10_000)
-        .setSocketTimeout(30_000)
-        .setConnectionRequestTimeout(5_000)
-        .build()
+    private val connectTimeout: Duration = Duration.ofSeconds(10)
+    internal val requestTimeout: Duration = Duration.ofSeconds(30)
+
+    /** Binary downloads are whole repository archives, which take far longer than a single API call. */
+    internal val binaryRequestTimeout: Duration = Duration.ofMinutes(5)
 
     @PublishedApi
-    internal val httpClient: CloseableHttpClient = HttpClients.custom()
-        .setUserAgent(SkyHanniMod.userAgent)
-        .setDefaultHeaders(defaultHeaders)
-        .setDefaultRequestConfig(gatedConnectionConfig)
-        .useSystemProperties()
-        .addInterceptorLast(RequestAcceptEncoding())
-        .addInterceptorLast(ResponseContentEncoding())
+    internal val httpClient: HttpClient = HttpClient.newBuilder()
+        .connectTimeout(connectTimeout)
+        .followRedirects(HttpClient.Redirect.NORMAL)
+        .apply { ProxySelector.getDefault()?.let { proxy(it) } }
         .build()
 
     /**
@@ -82,7 +70,7 @@ object ApiInternalUtils {
      * @param file The [File] to save the Binary response to.
      * @return A [BinaryApiResponse] containing the result of the request.
      */
-    internal suspend fun ApiStaticPath.internalGetBinaryResponse(file: File): BinaryApiResponse = withBinaryHttpClient<HttpGet>(file)
+    internal suspend fun ApiStaticPath.internalGetBinaryResponse(file: File): BinaryApiResponse = withBinaryHttpClient(file)
 
     /**
      * Driving logic for posting a JSON body to the API.
@@ -93,9 +81,10 @@ object ApiInternalUtils {
      */
     internal suspend inline fun <reified T : JsonElement> ApiStaticPostPath.internalPostJson(
         jsonBody: String,
-    ): JsonApiResponse<T> = withJsonHttpClient<T, HttpPost>(
-        entityHandler = { it.readEntityJsonResponse(failOnNoContentLength = failOnNoContentLength) },
+    ): JsonApiResponse<T> = withJsonHttpClient(
+        responseReader = { it.readJsonResponse(failOnNoContentLength = failOnNoContentLength) },
         requestFactory = { buildPostRequest(jsonBody) },
+        requestBody = jsonBody,
     )
 
     /**
@@ -106,58 +95,51 @@ object ApiInternalUtils {
      */
     @PublishedApi
     internal suspend inline fun <reified T : JsonElement> ApiStaticGetPath.internalGetJsonResponse(): JsonApiResponse<T> =
-        withJsonHttpClient<T, HttpGet>(
-            entityHandler = { it.readEntityJsonResponse(tryForceGzip) },
+        withJsonHttpClient(
+            responseReader = { it.readJsonResponse(tryForceGzip) },
             requestFactory = { buildGetRequest() },
         )
 
     // <editor-fold desc="Client Execution Wrappers">
     /**
-     * Generic method to execute an API request using the provided HttpClient.
+     * Generic method to execute an API request using the shared [httpClient].
      * Executes the given API intention and returns an [Res] (ApiResponse subtype).
-     * If the request fails, it will call the exceptionHandler with the error.
+     * If the request fails, the error is logged unless the intention is silent.
      * @param Res The type of ApiResponse expected (e.g., [BinaryApiResponse] or [JsonApiResponse]).
      * @param T The type of data expected in the ApiResponse (e.g., [Long] for Binary responses or [JsonElement] for JSON responses).
-     * @param Req The type of HttpRequestBase to be used (e.g., [HttpGet] or [HttpPost]).
-     * @param requestFactory Creates the HttpRequestBase for the API request.
-     * @param entityHandler Processes the HttpEntity from the response and returns data of type [T].
+     * @param requestFactory Creates the [HttpRequest] for the API request.
+     * @param responseReader Reads the response body and returns data of type [T].
      * @param dataConsumer Consumes the data and returns an ApiResponse of type [Res].
-     * @param entityGetter Extracts the HttpEntity from the CloseableHttpResponse.
+     * @param requestBody The body sent with the request, if any, used for error logging only.
+     * @param responseFilter Decides whether the response should be handed to the [responseReader] at all.
      * @return An ApiResponse of type [Res] containing the result of the request.
      */
     @PublishedApi
-    internal suspend inline fun <Res : ApiResponse<T>, T, Req : HttpRequestBase> ApiStaticPath.withHttpClient(
-        crossinline requestFactory: ApiStaticPath.() -> Req,
-        crossinline entityHandler: (HttpEntity?) -> T?,
+    internal suspend inline fun <Res : ApiResponse<T>, T> ApiStaticPath.withHttpClient(
+        crossinline requestFactory: ApiStaticPath.() -> HttpRequest,
+        crossinline responseReader: (HttpResponse<InputStream>?) -> T?,
         crossinline dataConsumer: (Boolean, String, T?) -> Res,
-        crossinline entityGetter: (CloseableHttpResponse) -> HttpEntity? = { it.getEntityOrNull() },
+        requestBody: String? = null,
+        crossinline responseFilter: (HttpResponse<InputStream>) -> HttpResponse<InputStream>? = { it.takeIfSuccessful() },
     ): Res = withContext(Dispatchers.IO) {
-        ApiIntentionContext(requestFactory(), this@withHttpClient).let { apiIntention ->
+        ApiIntentionContext(requestFactory(), this@withHttpClient, requestBody).let { apiIntention ->
             var responseData: T? = null
             runCatching {
-                httpClient.execute(apiIntention.request).use { resp ->
+                httpClient.send(apiIntention.request, HttpResponse.BodyHandlers.ofInputStream()).let { resp ->
                     apiIntention.response = resp
-                    val entity = entityGetter(resp)
-                    responseData = entityHandler(entity)
-                    if (resp.statusLine.statusCode !in 200..299)
-                        throw HttpResponseException(resp.statusLine.statusCode, resp.statusLine.reasonPhrase)
-                    val message = resp.statusLine?.reasonPhrase ?: "OK"
-                    dataConsumer(true, message, responseData)
+                    resp.body().use {
+                        responseData = responseReader(responseFilter(resp))
+                    }
+                    val statusCode = resp.statusCode()
+                    if (statusCode !in 200..299) throw IOException("Request failed with status code $statusCode")
+                    dataConsumer(true, "OK", responseData)
                 }
             }.getOrElse { e ->
                 val message = e.message ?: "Request to ${apiIntention.apiName} failed"
                 if (neverSilent || !apiIntention.silentError) ErrorManager.logErrorWithData(
                     e,
                     message,
-                    extraData = listOf(
-                        "api name" to apiIntention.apiName,
-                        "url" to apiIntention.url,
-                        "request method" to apiIntention.request.method,
-                        "response status" to apiIntention.response?.statusLine.toString(),
-                        "response headers" to apiIntention.response?.allHeaders?.joinToString { header ->
-                            "${header.name}: ${header.value}"
-                        },
-                    ).toTypedArray()
+                    extraData = apiIntention.collectInterestingFields().toTypedArray(),
                 )
                 dataConsumer(false, message, responseData)
             }
@@ -169,59 +151,75 @@ object ApiInternalUtils {
      * Specific to fetching a response expecting a JSON body of some type [T].
      * Executes the given API intention and returns a JsonApiResponse of type [T].
      * @param T The type of JsonElement expected in the ApiResponse.
-     * @param Req The type of HttpRequestBase to be used (e.g., [HttpPost] or [HttpGet]).
      * @param this The [ApiStaticPath] to execute on the client.
      * @return A [JsonApiResponse] containing the result of the request.
      */
     @PublishedApi
-    internal suspend inline fun <reified T : JsonElement, reified Req : HttpRequestBase> ApiStaticPath.withJsonHttpClient(
-        crossinline entityHandler: (HttpEntity?) -> T?,
-        crossinline requestFactory: ApiStaticPath.() -> Req = ApiStaticPath::buildRequest,
+    internal suspend inline fun <reified T : JsonElement> ApiStaticPath.withJsonHttpClient(
+        crossinline responseReader: (HttpResponse<InputStream>?) -> T?,
+        crossinline requestFactory: ApiStaticPath.() -> HttpRequest = ApiStaticPath::buildRequest,
+        requestBody: String? = null,
     ): JsonApiResponse<T> = withHttpClient(
         requestFactory,
-        entityHandler,
+        responseReader,
         ::JsonApiResponse,
-        entityGetter = CloseableHttpResponse::getEntity,
+        requestBody,
+        responseFilter = { it },
     )
 
     /**
      * See [withHttpClient] for general field definitions.
      * Specific to fetching a Binary response and saving it to a file.
      * Executes the given API intention and returns a BinaryApiResponse.
-     * @param Req The type of HttpRequestBase to be used (e.g., [HttpGet]).
      * @param this The [ApiStaticPath] to execute on the client.
      * @param file The [File] to save the Binary response to.
      * @return A [BinaryApiResponse] containing the result of the request.
      */
-    internal suspend inline fun <reified Req : HttpRequestBase> ApiStaticPath.withBinaryHttpClient(
+    internal suspend inline fun ApiStaticPath.withBinaryHttpClient(
         file: File,
-        crossinline entityHandler: (HttpEntity?) -> Long? = { it.readEntityToFile(file) },
-        crossinline requestFactory: ApiStaticPath.() -> Req = {
-            buildRequest { addHeader("Accept-Encoding", "gzip") }
-        }
-    ): BinaryApiResponse = withHttpClient(requestFactory, entityHandler, ::BinaryApiResponse)
+        crossinline responseReader: (HttpResponse<InputStream>?) -> Long? = { it.readBodyToFile(file) },
+        crossinline requestFactory: ApiStaticPath.() -> HttpRequest = {
+            buildRequest { timeout(binaryRequestTimeout) }
+        },
+    ): BinaryApiResponse = withHttpClient(requestFactory, responseReader, ::BinaryApiResponse)
 
     /**
-     * The default method to fetch an [HttpEntity] from a [CloseableHttpResponse] (this).
-     * @param this The [CloseableHttpResponse] from which to extract the [HttpEntity].
-     * @return The [HttpEntity] if the response status code is in the range 200-299, or null if the status code indicates an error.
+     * The default filter deciding whether a response carries a body worth reading.
+     * @param this The [HttpResponse] to check.
+     * @return The response if the status code is in the range 200-299 and a body is present, or null otherwise.
      */
     @PublishedApi
-    internal fun CloseableHttpResponse.getEntityOrNull(
+    internal fun HttpResponse<InputStream>.takeIfSuccessful(
         failOnNoContentLength: Boolean = true,
-    ): HttpEntity? = if (this.statusLine.statusCode in 200..299) {
-        this.entity.takeIf { it?.contentLength != 0L || !failOnNoContentLength }
-    } else null
+    ): HttpResponse<InputStream>? = takeIf {
+        statusCode() in 200..299 && (contentLength != 0L || !failOnNoContentLength)
+    }
+
+    /** The announced body length, or -1 if the server did not send a Content-Length header. */
+    @PublishedApi
+    internal val HttpResponse<*>.contentLength: Long
+        get() = headers().firstValueAsLong("content-length").orElse(-1L)
 
     /**
-     * Reads the content of the HttpEntity and writes it to a file.
-     * @param this The [HttpEntity] to read from.
-     * @param file The [File] to write the content to.
-     * @return The number of bytes written to the file, or null if the entity is null or an error occurs.
+     * The response body, gzip decoded when applicable. [java.net.http.HttpClient] never decodes content encodings itself.
+     * @param forceGzip If true, the body is gzip decoded even if the server did not announce the encoding.
      */
-    internal fun HttpEntity?.readEntityToFile(file: File): Long? =
+    @PublishedApi
+    internal fun HttpResponse<InputStream>.decodedBody(forceGzip: Boolean = false): InputStream {
+        val gzipped = forceGzip || headers().firstValue("content-encoding")
+            .map { it.equals("gzip", ignoreCase = true) }.orElse(false)
+        return if (gzipped) GZIPInputStream(body()) else body()
+    }
+
+    /**
+     * Reads the response body and writes it to a file.
+     * @param this The [HttpResponse] to read from.
+     * @param file The [File] to write the content to.
+     * @return The number of bytes written to the file, or null if the response is null or an error occurs.
+     */
+    internal fun HttpResponse<InputStream>?.readBodyToFile(file: File): Long? =
         this?.runCatching {
-            content.use { input ->
+            decodedBody().use { input ->
                 file.outputStream().use { output ->
                     input.copyTo(output)
                 }
@@ -230,22 +228,20 @@ object ApiInternalUtils {
         }?.getOrNull()
 
     /**
-     * Reads the content of the HttpEntity and parses it as a JsonElement.
-     * @param this The [HttpEntity] to read from.
-     * @param tryForceGzip If true, the content will be read as a GZIP stream.
+     * Reads the response body and parses it as a JsonElement.
+     * @param this The [HttpResponse] to read from.
+     * @param tryForceGzip If true, the body will be gzip decoded even if the server did not announce the encoding.
      * @param failOnNoContentLength If true, the method will return null if the content length is 0.
      * @return A parsed [JsonElement] or null if the content is empty or an error occurs.
      */
-    @Suppress("UNCHECKED_CAST")
     @PublishedApi
-    internal inline fun <reified T : JsonElement> HttpEntity?.readEntityJsonResponse(
+    internal inline fun <reified T : JsonElement> HttpResponse<InputStream>?.readJsonResponse(
         tryForceGzip: Boolean = false,
         failOnNoContentLength: Boolean = true,
     ): T? = when {
-        this == null || (this.contentLength == 0L && failOnNoContentLength) -> null
+        this == null || (contentLength == 0L && failOnNoContentLength) -> null
         else -> runCatching {
-            val raw = if (tryForceGzip) GZIPInputStream(this.content) else this.content
-            val text = raw.bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
+            val text = decodedBody(tryForceGzip).bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
             if (text.isBlank()) null
             else ConfigManager.gson.fromJson<T>(text)
         }.getOrNull()
