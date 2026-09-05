@@ -136,6 +136,11 @@ class MiningConfig {
     val gemstoneMoneyPerHour: GemstoneMoneyPerHourConfig = GemstoneMoneyPerHourConfig()
 
     @Expose
+    @ConfigOption(name = "Mining Profit Tracker", desc = "Enable/Disable the mining profit tracker.")
+    @Accordion
+    val miningTracker: MiningProfitTrackerConfig = MiningProfitTrackerConfig()
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
