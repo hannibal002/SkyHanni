@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
@@ -25,24 +26,26 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.StainedGlassBlock
 
 @SkyHanniModule
 object LivingCaveDefenseBlocks {
-
     private val config get() = RiftApi.config.area.livingCave.defenseBlock
+
     private var movingBlocks = mapOf<DefenseBlock, Long>()
     private var staticBlocks = emptyList<DefenseBlock>()
 
     class DefenseBlock(val entity: RemotePlayer, val location: LorenzVec, var hidden: Boolean = false)
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         staticBlocks = staticBlocks.editCopy { removeIf { it.entity.deceased } }
     }
 
     @HandleEvent(receiveCancelled = true)
-    fun onParticle(event: ParticleEvent) {
+    private fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
 
         movingBlocks = movingBlocks.editCopy {
@@ -80,7 +83,7 @@ object LivingCaveDefenseBlocks {
                 // read new entity data
                 val compareLocation = event.location.add(-0.5, -1.5, -0.5)
                 entity = compareLocation.getEntitiesNearby<RemotePlayer>(2.0)
-                    .filter { isCorrectMob(it.name.formattedTextCompatLessResets()) }
+                    .filter { it.isCorrectMob() }
                     .filter { !it.isAtFullHealth() }
                     .minByOrNull { it.distanceTo(compareLocation) }
             }
@@ -94,27 +97,23 @@ object LivingCaveDefenseBlocks {
         }
     }
 
-    private fun isCorrectMob(name: String) = when (name) {
+    private fun RemotePlayer.isCorrectMob(name: String) = name.string.equalsOneOf(
         "Autonull ",
-
         "Autocap ",
         "Autochest ",
         "Autopants ",
         "Autoboots ",
-        -> true
-
-        else -> false
-    }
+    )
 
     @HandleEvent
-    fun onBlockChange(event: ServerBlockChangeEvent) {
+    private fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled()) return
         val location = event.location
         val old = event.old
         val new = event.new
 
         // spawn block
-        if (old == "air" && (new == "stained_glass" || new == "diamond_block")) {
+        if (old == Blocks.AIR && (new is StainedGlassBlock || new == Blocks.DIAMOND_BLOCK)) {
             val entity = getNearestMovingDefenseBlock(location)?.entity ?: return
             staticBlocks = staticBlocks.editCopy {
                 add(DefenseBlock(entity, location))
@@ -127,7 +126,7 @@ object LivingCaveDefenseBlocks {
 
         // despawn block
         val nearestBlock = getNearestStaticDefenseBlock(location)
-        if (new == "air" && location == nearestBlock?.location) {
+        if (new == Blocks.AIR && location == nearestBlock?.location) {
             staticBlocks = staticBlocks.editCopy { remove(nearestBlock) }
         }
     }
@@ -140,7 +139,7 @@ object LivingCaveDefenseBlocks {
         staticBlocks.filter { it.location.distance(location) < 15 }.minByOrNull { it.location.distance(location) }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         for ((block, time) in movingBlocks) {
@@ -176,7 +175,7 @@ object LivingCaveDefenseBlocks {
     fun isEnabled() = RiftApi.inRift() && config.enabled && RiftApi.inLivingCave()
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.livingCaveConfig", "rift.area.livingCave")
 
         val basePath = "rift.area.livingCave"
