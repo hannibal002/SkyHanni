@@ -52,7 +52,7 @@ object ItemNameResolver {
                 val gemstoneQuery = "${
                     resolveGemstoneToStat(split[1])?.hypixelIcon ?: ' '
                 } ${split.joinToString("_").allLettersFirstUppercase()}"
-                ItemResolutionQuery.findInternalNameByDisplayName(gemstoneQuery, true)?.let {
+                ItemResolutionQuery.findInternalNameByDisplayName(gemstoneQuery, mayBeMangled = true)?.let {
                     return itemNameCache.getOrPut(lowercase) { it }
                 }
             }
@@ -61,7 +61,7 @@ object ItemNameResolver {
         val internalName = when (itemName) {
             "SUPERBOOM TNT" -> "SUPERBOOM_TNT".toInternalName()
             else -> {
-                ItemResolutionQuery.findInternalNameByDisplayName(itemName, true)?.let {
+                ItemResolutionQuery.findInternalNameByDisplayName(itemName, mayBeMangled = true)?.let {
                     // This fixes a NEU bug with §9Hay Bale (cosmetic item)
                     if (it == HAY_BALE) HAY_BLOCK else it
                 } ?: return null
