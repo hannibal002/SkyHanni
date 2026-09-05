@@ -1,100 +1,69 @@
-package at.hannibal2.skyhanni.features.nether
+package at.hannibal2.skyhanni.features.nether.miniboss
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawned
-import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawningSoon
-import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isTimerKnown
+import at.hannibal2.skyhanni.events.combat.CrimsonMiniBossEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.world.level.block.entity.BeaconBlockEntity
-import net.minecraft.world.phys.AABB
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CrimsonMinibossRespawnTimer {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
-    private val patternGroup = RepoPattern.group("crimson.miniboss")
-
-    /**
-     * REGEX-TEST: §c§lBEWARE - Bladesoul Is Spawning.
-     */
-    private val spawnPattern by patternGroup.pattern(
-        "spawn",
-        "§c§lBEWARE - (?<name>.+) Is Spawning\\.",
-    )
-
-    /**
-     * REGEX-TEST: §f                            §r§6§lBLADESOUL DOWN!
-     */
-    private val downPattern by patternGroup.pattern(
-        "down",
-        "§f\\s*§r§6§l(?<name>.+) DOWN!",
-    )
-
-    private var currentAreaBoss: MiniBoss? = null
+    private var currentAreaBoss: CrimsonMiniBoss? = null
 
     private var display: Renderable? = null
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!isEnabled()) return
-        val message = event.message
-        downPattern.matchMatcher(message) {
-            val miniBoss = MiniBoss.fromName(group("name")) ?: return
-            miniBoss.nextSpawnTime = SimpleTimeMark.now() + 2.minutes
-            miniBoss.spawned = false
-            miniBoss.possibleSpawnTime = null
-            miniBoss.foundBeacon = null
-            update()
-            return
-        }
-        spawnPattern.matchMatcher(message) {
-            val miniBoss = MiniBoss.fromName(group("name")) ?: return
-            miniBoss.spawned = true
-            miniBoss.possibleSpawnTime = null
-            miniBoss.foundBeacon = null
-            update()
-            return
-        }
+    fun onCrimsonMiniBossDeath(event: CrimsonMiniBossEvent.Death) {
+        val miniBoss = event.miniBoss
+        miniBoss.nextSpawnTime = ServerTimeMark.now() + 2.minutes
+        miniBoss.spawned = false
+        miniBoss.possibleSpawnTime = null
+        miniBoss.foundBeacon = null
+        update()
     }
 
     @HandleEvent
+    fun onCrimsonMiniBossSpawning(event: CrimsonMiniBossEvent.Spawning) {
+        val miniBoss = event.miniBoss
+        miniBoss.spawned = true
+        miniBoss.possibleSpawnTime = null
+        miniBoss.foundBeacon = null
+        update()
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onGuiRenderOverlay() {
-        if (!isEnabled()) return
+        if (!config.minibossRespawnTimer) return
         val renderable = display ?: drawDisplay()
         config.minibossTimerPosition.renderRenderable(renderable, posLabel = "Miniboss Timer")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onSecondPassed() {
-        if (!isEnabled()) return
+        if (!config.minibossRespawnTimer) return
         updateArea()
         update()
     }
 
     private fun updateArea() {
-        MiniBoss.entries.forEach {
+        CrimsonMiniBoss.entries.forEach {
             if (it.lastSeenArea.passedSince() > 2.minutes) {
                 it.nextSpawnTime = null
                 it.possibleSpawnTime = null
@@ -102,10 +71,10 @@ object CrimsonMinibossRespawnTimer {
                 it.spawned = null
             }
         }
-        currentAreaBoss = MiniBoss.entries.firstOrNull {
+        currentAreaBoss = CrimsonMiniBoss.entries.firstOrNull {
             it.area.isPlayerInside()
         }
-        val now = SimpleTimeMark.now()
+        val now = ServerTimeMark.now()
         currentAreaBoss?.lastSeenArea = now
         val boss = currentAreaBoss ?: return
         if (boss.isTimerKnown()) return
@@ -147,7 +116,7 @@ object CrimsonMinibossRespawnTimer {
     }
 
     private fun drawDisplay(): Renderable {
-        val lines = MiniBoss.entries.map {
+        val lines = CrimsonMiniBoss.entries.map {
             val timer = it.nextSpawnTime
             val possibleTimer = it.possibleSpawnTime
             Renderable.text(
@@ -175,12 +144,12 @@ object CrimsonMinibossRespawnTimer {
 
     @HandleEvent
     fun onWorldChange() {
-        MiniBoss.entries.forEach {
+        CrimsonMiniBoss.entries.forEach {
             it.nextSpawnTime = null
             it.possibleSpawnTime = null
             it.foundBeacon = null
             it.spawned = null
-            it.lastSeenArea = SimpleTimeMark.farPast()
+            it.lastSeenArea = ServerTimeMark.farPast()
         }
         currentAreaBoss = null
     }
@@ -189,12 +158,12 @@ object CrimsonMinibossRespawnTimer {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Crimson Isle Miniboss")
         event.addIrrelevant {
-            if (!isEnabled()) {
-                add("Feature is Disabled")
+            if (!IslandType.CRIMSON_ISLE.isInIsland()) {
+                add("Not in Crimson Isle")
                 return@addIrrelevant
             }
             add("Current Area Boss: ${currentAreaBoss?.displayName}")
-            MiniBoss.entries.forEach {
+            CrimsonMiniBoss.entries.forEach {
                 add("")
                 add(it.displayName)
                 add("   Timer ${it.nextSpawnTime?.timeUntil()?.format()}")
@@ -209,64 +178,4 @@ object CrimsonMinibossRespawnTimer {
             }
         }
     }
-
-    enum class MiniBoss(
-        val displayName: String,
-        val area: AABB,
-        var nextSpawnTime: SimpleTimeMark? = null,
-        var possibleSpawnTime: Pair<SimpleTimeMark, SimpleTimeMark>? = null,
-        var foundBeacon: Boolean? = null,
-        var spawned: Boolean? = null,
-        var lastSeenArea: SimpleTimeMark = SimpleTimeMark.farPast(),
-    ) {
-        BLADESOUL(
-            "Bladesoul",
-            LorenzVec(-330, 80, -486).axisAlignedTo(LorenzVec(-257, 107, -545)),
-        ),
-        MAGE_OUTLAW(
-            "Mage Outlaw",
-            LorenzVec(-200, 98, -843).axisAlignedTo(LorenzVec(-162, 116, -878)),
-        ),
-        BARBARIAN_DUKE_X(
-            "Barbarian Duke X",
-            LorenzVec(-550, 101, -890).axisAlignedTo(LorenzVec(-522, 131, -918)),
-        ),
-        ASHFANG(
-            "Ashfang",
-            LorenzVec(-462, 155, -1035).axisAlignedTo(LorenzVec(-507, 131, -955)),
-        ),
-        MAGMA_BOSS(
-            "Magma Boss",
-            LorenzVec(-318, 59, -751).axisAlignedTo(LorenzVec(-442, 90, -851)),
-        ),
-        ;
-
-        override fun toString() = displayName
-
-        companion object {
-            fun fromName(spawnName: String): MiniBoss? = entries.firstOrNull {
-                it.displayName.removeColor().equals(spawnName, ignoreCase = true)
-            }
-
-            fun MiniBoss.isTimerKnown(): Boolean {
-                val timer = nextSpawnTime ?: return false
-                return timer.passedSince() < 2.minutes + 5.seconds
-            }
-
-            fun MiniBoss.isSpawningSoon(): Boolean {
-                if (spawned == true) return false
-                val timer = nextSpawnTime ?: return false
-                return timer.passedSince() in 0.seconds..10.seconds
-            }
-
-            fun MiniBoss.isSpawned(): Boolean {
-                if (spawned == true) return true
-                val timer = nextSpawnTime ?: return false
-                return (timer.passedSince() - 2.minutes) in 0.seconds..20.seconds
-            }
-        }
-    }
-
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.minibossRespawnTimer
-
 }

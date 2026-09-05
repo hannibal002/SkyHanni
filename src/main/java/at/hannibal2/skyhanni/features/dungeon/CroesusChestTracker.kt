@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi.DungeonChest
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi.inDungeon
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -197,7 +198,7 @@ object CroesusChestTracker {
                     } ?: "0"
                     )
             if (run.floor == "F0" && kuudraPattern.matches(itemName)) run.floor =
-                ("T" + KuudraApi.getKuudraRunTierNumber(lore.firstNotNullOfOrNull { kuudraPattern.matchMatcher(it) { group("tier") } }))
+                ("T" + KuudraTier.getByDisplayName(lore.firstNotNullOf { kuudraPattern.matchMatcher(it) { group("tier") } })?.tierNumber)
             run.openState = OpenedState.getOpenState(lore)
         }
     }
@@ -268,7 +269,7 @@ object CroesusChestTracker {
 
     @HandleEvent
     private fun onKuudraComplete(event: KuudraCompleteEvent) {
-        addCroesusChest("T${event.kuudraTier}")
+        addCroesusChest("T${event.kuudraTier.tierNumber}")
     }
 
     @HandleEvent
