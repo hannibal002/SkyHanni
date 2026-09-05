@@ -7,13 +7,13 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class DarkMonolithConfig {
-
     @Expose
     @ConfigOption(
         name = "Tracker",
@@ -86,9 +86,9 @@ class DarkMonolithConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = "",
+        desc = "Click to open the settings that only apply to this tracker.",
     )
-    @Accordion
+    @ConfigEditorButton(buttonText = "OPEN")
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
     companion object {
