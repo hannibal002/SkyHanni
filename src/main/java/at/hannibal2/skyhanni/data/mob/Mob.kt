@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -20,10 +21,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getAllEquipment
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
+import net.minecraft.network.chat.TextColor
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -85,7 +86,6 @@ class Mob(
     val levelOrTier: Int = -1,
     val hypixelTypes: String = "",
 ) {
-
     private val uniqueId: UUID = UUID.randomUUID()
     val id = baseEntity.id
 
@@ -94,7 +94,6 @@ class Mob(
     val ownerNameOrEmpty: String get() = owner?.ownerName.orEmpty()
 
     companion object {
-
         fun Entity?.belongsToPlayer(): Boolean = this?.mob.belongsToPlayer()
         fun Mob?.belongsToPlayer(): Boolean = this?.owner?.equals(PlayerUtils.getName()) ?: false
     }
@@ -115,12 +114,11 @@ class Mob(
      */
     val isCorrupted get() = !RiftApi.inRift() && baseEntity.isCorrupted()
 
-    // TODO use component style
     /**
      * @property isRunic does not change.
      */
     val isRunic = !RiftApi.inRift() &&
-        armorStand?.name.formattedTextCompatLessResets().startsWith("§5") &&
+        armorStand?.name?.intoSpan()?.sampleStyleAtStart()?.color == TextColor.fromLegacyFormat(DARK_PURPLE) &&
         category == MobCategory.BASIC
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
