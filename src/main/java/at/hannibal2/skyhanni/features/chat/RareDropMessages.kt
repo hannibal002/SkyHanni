@@ -29,15 +29,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.isVowel
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object RareDropMessages {
-
     private val repoGroup = RepoPattern.group("raredrop")
     private val petGroup = repoGroup.group("pet")
 
@@ -122,7 +121,7 @@ object RareDropMessages {
     private val config get() = SkyHanniMod.feature.chat.rareDropMessages
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Modify) {
+    private fun onChat(event: SkyHanniChatEvent.Modify) {
         if (!config.petRarity) return
 
         petPatterns.matchMatchers(event.message) {
@@ -143,7 +142,7 @@ object RareDropMessages {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onItemAdd(event: ItemAddEvent) {
+    private fun onItemAdd(event: ItemAddEvent) {
         if (event.amount != 1 || event.source != ItemAddManager.Source.ITEM_ADD) return
         if (!config.enchantedBook || !config.enchantedBookMissingMessage) return
         val internalName = event.internalName
@@ -155,7 +154,7 @@ object RareDropMessages {
         var anyRecentMessage = false
         for (line in ChatUtils.chatMessages) {
             if (line.passedSinceSent() > 1.seconds) break
-            val message = line.content.string.removeColor()
+            val message = line.content.stripped
             if (itemName in message) return // the message already has the enchant name
             if (enchantedBookPattern.matches(message)) {
                 anyRecentMessage = true
@@ -187,13 +186,13 @@ object RareDropMessages {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(71, "chat.petRarityDropMessage", "chat.rareDropMessages.petRarity")
     }
 
     @Suppress("MaxLineLength")
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestenchantedbookname") {
             description = "Test Enchanted Book Name feature"
             category = CommandCategory.DEVELOPER_TEST
