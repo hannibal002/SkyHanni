@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.glfw.GLFW
 
 class PageScrollingConfig {
     @Expose
@@ -17,8 +17,8 @@ class PageScrollingConfig {
         name = "Bypass Key",
         desc = "When the key is held allows you to scroll even though you are over an item."
     )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_LEFT_SHIFT)
-    var bypassKey: Int = GLFW.GLFW_KEY_LEFT_SHIFT
+    @ConfigEditorKeybind(defaultKey = InputConstants.KEY_LSHIFT)
+    var bypassKey: Int = InputConstants.KEY_LSHIFT
 
     @Expose
     @ConfigOption(

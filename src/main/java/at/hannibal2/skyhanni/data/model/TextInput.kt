@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.KeyMapping
 import org.apache.commons.lang3.SystemUtils
-import org.lwjgl.glfw.GLFW
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlinx.coroutines.runBlocking
 
@@ -91,7 +91,7 @@ open class TextInput {
 
         fun onGuiInput(ci: CallbackInfoReturnable<Boolean>) {
             if (activeInstance != null) {
-                if (GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) {
+                if (InputConstants.KEY_ESCAPE.isKeyHeld()) {
                     disable()
                 } else {
                     ci.returnValue = false
@@ -138,11 +138,11 @@ open class TextInput {
             }
             val carriage = carriage
 
-            if (GLFW.GLFW_KEY_LEFT.isKeyClicked()) {
+            if (InputConstants.KEY_LEFT.isKeyClicked()) {
                 this.carriage = carriage?.moveCarriageLeft() ?: (textBox.length - 1)
                 return
             }
-            if (GLFW.GLFW_KEY_RIGHT.isKeyClicked()) {
+            if (InputConstants.KEY_RIGHT.isKeyClicked()) {
                 this.carriage = when {
                     carriage == null -> null
                     (carriage >= textBox.length - 1) -> null
@@ -150,7 +150,7 @@ open class TextInput {
                 }
                 return
             }
-            if (GLFW.GLFW_KEY_BACKSPACE.isKeyClicked() || (SystemUtils.IS_OS_MAC && GLFW.GLFW_KEY_DELETE.isKeyClicked())) {
+            if (InputConstants.KEY_BACKSPACE.isKeyClicked() || (SystemUtils.IS_OS_MAC && InputConstants.KEY_DELETE.isKeyClicked())) {
                 textBox = onRemove()
                 updated()
                 return
