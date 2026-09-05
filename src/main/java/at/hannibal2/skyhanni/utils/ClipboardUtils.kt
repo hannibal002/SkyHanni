@@ -43,6 +43,7 @@ object ClipboardUtils {
         var shouldRetry = false
 
         //? if >= 26.3 {
+        SDLError.SDL_ClearError()
         val clipboard = ClipboardManager().getClipboard()
         shouldRetry = SDLError.SDL_GetError() != null
         //?} else {
