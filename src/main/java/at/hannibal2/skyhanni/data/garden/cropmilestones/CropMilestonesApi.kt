@@ -321,24 +321,22 @@ object CropMilestonesApi {
 
         val cropName = crop.cropName
         val levelUpLine = "§r§b§lGARDEN MILESTONE §3$cropName §8$oldLevel➜§3$newLevel§r"
-        val messages = listOf(
-            "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r",
-            "  $levelUpLine",
-            if (goalReached)
-                listOf(
-                    "",
-                    "  §r§d§lGOAL REACHED!",
-                    "",
-                ).joinToString("\n")
-            else
-                "",
-            "  §r§a§lREWARDS§r",
-            rewards.joinToString("\n"),
-            "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r",
-        )
+
+        val messages = buildList {
+            add("§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r")
+            add("  $levelUpLine")
+            if (goalReached) {
+                add("")
+                add("  §r§d§lGOAL REACHED!")
+                add("")
+            }
+            add("  §r§a§lREWARDS§r")
+            addAll(rewards)
+            add("§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r")
+        }
 
         clickableChat(
-            messages.joinToString("\n"),
+            messages,
             { ClipboardUtils.copyToClipboard(levelUpLine.removeColor()) },
             "Click to copy!",
             prefix = false,
