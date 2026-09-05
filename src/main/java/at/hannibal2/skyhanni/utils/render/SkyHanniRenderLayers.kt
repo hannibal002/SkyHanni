@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.render
 
+import com.mojang.renderpearl.api.pipeline.RenderPipeline
 import net.minecraft.client.renderer.rendertype.LayeringTransform
 import net.minecraft.client.renderer.rendertype.RenderSetup
 import net.minecraft.client.renderer.rendertype.RenderType
@@ -100,6 +101,6 @@ object SkyHanniRenderLayers {
 
     fun getChromaTexturedWithIdentifier(identifier: Identifier) = CHROMA_TEXTURED.apply(identifier)
 
-    fun getChromaStandard(): com.mojang.renderpearl.api.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
-    fun getChromaTextured(): com.mojang.renderpearl.api.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_TEXT()
+    fun getChromaStandard(): RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
+    fun getChromaTextured(): RenderPipeline = SkyHanniRenderPipeline.CHROMA_TEXT()
 }

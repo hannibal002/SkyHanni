@@ -22,6 +22,7 @@ import net.minecraft.client.renderer.BindGroupLayouts
 
 //? if iris_compat {
 /*import at.hannibal2.skyhanni.compat.IrisCompat
+import at.hannibal2.skyhanni.compat.IrisCompat.IrisProgram
 *///?}
 
 //? if < 26.2
@@ -39,14 +40,14 @@ enum class SkyHanniRenderPipeline(
     uniforms: Map<String, UniformType> = emptyMap(),
     depthWrite: Boolean = true,
     //? if iris_compat
-    //val irisProgram: IrisCompat.IrisProgram = IrisCompat.IrisProgram.BASIC,
+    //val irisProgram: IrisProgram = BASIC,
 ) {
     LINES(
         snippet = RenderPipelines.LINES_SNIPPET,
         vFormat = PosColorNormal,
         vDrawMode = PrimitiveTopology.LINES,
         //? if iris_compat
-        //irisProgram = IrisCompat.IrisProgram.LINES,
+        //irisProgram = IrisProgram.LINES,
     ),
     LINES_XRAY(
         snippet = RenderPipelines.LINES_SNIPPET,
@@ -54,7 +55,7 @@ enum class SkyHanniRenderPipeline(
         vDrawMode = PrimitiveTopology.LINES,
         depthWrite = false,
         //? if iris_compat
-        //irisProgram = IrisCompat.IrisProgram.LINES,
+        //irisProgram = IrisProgram.LINES,
     ),
     FILLED(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
@@ -105,7 +106,7 @@ enum class SkyHanniRenderPipeline(
         sampler = "Sampler0",
         uniforms = commonChromaUniforms,
         //? if iris_compat
-        //irisProgram = IrisCompat.IrisProgram.TEXTURED,
+        //irisProgram = IrisProgram.TEXTURED,
     ),
     ROUNDED_RECT_DEFERRED(
         snippet = MATRICES_PROJECTION_SNIPPET,
@@ -136,7 +137,7 @@ enum class SkyHanniRenderPipeline(
         sampler = "Sampler0",
         depthWrite = false,
         //? if iris_compat
-        //irisProgram = IrisCompat.IrisProgram.TEXTURED,
+        //irisProgram = IrisProgram.TEXTURED,
     ),
     RADIAL_GRADIENT_CIRCLE_DEFERRED(
         snippet = MATRICES_PROJECTION_SNIPPET,
@@ -153,7 +154,7 @@ enum class SkyHanniRenderPipeline(
         sampler = "Sampler0",
         depthWrite = false,
         //? if iris_compat
-        //irisProgram = IrisCompat.IrisProgram.TEXTURED,
+        //irisProgram = IrisProgram.TEXTURED,
     ),
     ;
 
@@ -202,14 +203,15 @@ enum class SkyHanniRenderPipeline(
 }
 
 private object SkyHanniRenderPipelineUtils {
-    //? if >= 26.3 {
+    //? if >= 26.2 {
     val MATRICES_PROJECTION_SNIPPET = RenderPipeline.builder()
+        //? if >= 26.3 {
         .withBindGroupLayout(BindGroupLayouts.PROJECTION)
         .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
+        //?} else
+        //.withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
         .buildSnippet()
-    //?} elif >= 26.2 {
-    /*val MATRICES_PROJECTION_SNIPPET = RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).buildSnippet()
-    *///?} else
+    //?} else
     //val MATRICES_PROJECTION_SNIPPET = RenderPipelines.MATRICES_PROJECTION_SNIPPET
 
     val commonChromaUniforms = mapOf("SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER)
