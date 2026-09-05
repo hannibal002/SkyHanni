@@ -31,12 +31,11 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SeaCreatureFeatures {
-
     private val config get() = SkyHanniMod.feature.fishing.rareCatches
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
 
     @HandleEvent
-    fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+    private fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
 
@@ -46,7 +45,7 @@ object SeaCreatureFeatures {
     }
 
     @HandleEvent
-    fun onSkyblockMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
+    private fun onSkyblockMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
         val seaCreature = mob.seaCreature ?: return
@@ -65,7 +64,7 @@ object SeaCreatureFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
+    private fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         val fishedSCSettings = SeaCreatureSettings.getConfig(event.seaCreature) ?: return
         if (config.alertOwnCatches && fishedSCSettings.shouldSelfNotifyOnCatch == true) {
             val text = if (config.creatureName) "${event.seaCreature.displayName}!"
@@ -84,19 +83,19 @@ object SeaCreatureFeatures {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         entityIds.clear()
     }
 
     @HandleEvent
-    fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
-        if (isEnabled() && config.highlight && event.type === RenderEntityOutlineEvent.Type.NO_XRAY) {
+    private fun onRenderEntityOutline(event: RenderEntityOutlineEvent) {
+        if (isEnabled() && config.highlight) {
             event.queueEntitiesToOutline(getEntityOutlineColor)
         }
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "fishing.rareSeaCreatureHighlight", "fishing.rareCatches.highlight")
     }
 

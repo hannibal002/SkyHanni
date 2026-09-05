@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaFeatures
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllApi
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -467,6 +468,17 @@ object IslandGraphs {
         NavigationFeedback.setNavInactive()
     }
 
+    fun manualCancel() {
+        if (currentTarget == null) {
+            ChatUtils.userError("No navigation is currently active.")
+            return
+        }
+
+        stopNavigation()
+        NavigateAllApi.handleStop(errorMessage = false)
+        onManualCancel()
+    }
+
     /**
      * Activates pathfinding, with this graph node as goal.
      *
@@ -560,14 +572,9 @@ object IslandGraphs {
 
         val percentage = (1 - (distance / totalDistance)) * 100
         val component = "§e[SkyHanni] Navigating to §r$navigationLabel §f[§e$distance§f] §f(§c${percentage.roundTo(1)}%§f)".asComponent()
-        component.onClick(onClick = ::cancelClick)
+        component.onClick(onClick = ::manualCancel)
         component.hover = "§eClick to stop navigating!".asComponent()
         NavigationFeedback.sendPathFindMessage(component)
-    }
-
-    fun cancelClick() {
-        stopNavigation()
-        onManualCancel()
     }
 
     @HandleEvent
@@ -603,17 +610,6 @@ object IslandGraphs {
                         "pathfinding goes through wall, ignores obvious shortcut, " +
                         "missing npc/fishing hotspot/skyblock area name in /shnavigate..",
                 )
-            }
-        }
-        event.registerBrigadier("shstopnavigation") {
-            description = "Stops the current pathfinding."
-            category = CommandCategory.USERS_ACTIVE
-            simpleCallback {
-                if (currentTarget != null) {
-                    stopNavigation()
-                } else {
-                    ChatUtils.userError("No navigation is currently active.")
-                }
             }
         }
     }
