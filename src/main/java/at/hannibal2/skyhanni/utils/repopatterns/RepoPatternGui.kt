@@ -1,27 +1,24 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.XmlUtils
-import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 import io.github.notenoughupdates.moulconfig.xml.Bind
 
 /**
- * Gui for analyzing [RepoPattern]s
+ * GUI for analyzing [RepoPattern]s.
  */
 class RepoPatternGui private constructor() {
-
     @SkyHanniModule
     companion object {
-
         @HandleEvent
-        fun onCommandRegistration(event: CommandRegistrationEvent) {
-
+        private fun onCommandRegistration(event: CommandRegistrationEvent) {
             /**
              * Open the [RepoPatternGui]
              */
@@ -29,7 +26,7 @@ class RepoPatternGui private constructor() {
                 description = "See where regexes are loaded from"
                 category = CommandCategory.DEVELOPER_TEST
                 simpleCallback {
-                    val location = MyResourceLocation("skyhanni", "gui/regexes.xml")
+                    val location = SkyHanniMod.id("gui/regexes.xml")
                     XmlUtils.openXmlScreen(RepoPatternGui(), location)
                 }
             }
@@ -44,10 +41,7 @@ class RepoPatternGui private constructor() {
         .map { RepoPatternInfo(it) }
     private var searchCache = ObservableList(mutableListOf<RepoPatternInfo>())
 
-    class RepoPatternInfo(
-        repoPatternImpl: CommonPatternInfo<*, *>,
-    ) {
-
+    class RepoPatternInfo(repoPatternImpl: CommonPatternInfo<*, *>) {
         @field:Bind
         val key: StructuredText = repoPatternImpl.key.asStructuredText()
 

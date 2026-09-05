@@ -1,13 +1,18 @@
 package at.hannibal2.skyhanni.config
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.ConfigUtils.asMoulLocation
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
-import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.gui.KeyboardEvent
 import io.github.notenoughupdates.moulconfig.gui.MouseEvent
+import net.minecraft.resources.Identifier
 
-class GuiOptionEditorBlocked(private val base: GuiOptionEditor, private val extraMessage: String) : GuiOptionEditor(base.getOption()) {
+class GuiOptionEditorBlocked(
+    private val base: GuiOptionEditor,
+    private val extraMessage: String,
+) : GuiOptionEditor(base.getOption()) {
 
     override fun render(context: RenderContext, x: Int, y: Int, width: Int) {
         // No super. We delegate and overlay ourselves instead.
@@ -17,7 +22,7 @@ class GuiOptionEditorBlocked(private val base: GuiOptionEditor, private val extr
         context.drawColoredRect(x.toFloat(), y.toFloat(), (x + width).toFloat(), (y + height).toFloat(), -0x80000000)
 
         val iconWidth: Float = height * 96f / 64
-        context.drawTexturedRect(blockedTexture, x.toFloat(), y.toFloat(), iconWidth, height.toFloat())
+        context.drawTexturedRect(blockedTexture.asMoulLocation(), x.toFloat(), y.toFloat(), iconWidth, height.toFloat())
 
         val fontRenderer = context.minecraft.defaultFontRenderer
 
@@ -50,8 +55,6 @@ class GuiOptionEditorBlocked(private val base: GuiOptionEditor, private val extr
     }
 
     companion object {
-        val blockedTexture: MyResourceLocation = MyResourceLocation(
-            "skyhanni", "config_blocked.png",
-        )
+        val blockedTexture: Identifier = SkyHanniMod.id("config_blocked.png")
     }
 }

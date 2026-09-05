@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import net.minecraft.resources.Identifier
 
 @SkyHanniModule
 object EggAchievement {
-
     private val eggPatternPattern by AchievementManager.group.pattern(
         "laid-egg",
         "You laid an egg!",
@@ -23,7 +23,7 @@ object EggAchievement {
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             name = "Lay 25 Eggs".asComponent(),
-            description = TextHelper.createAtlasSprite("item/egg", "items", "minecraft"),
+            description = TextHelper.createAtlasSprite("items", Identifier.withDefaultNamespace("item/egg")),
             userLuckAmount = 1f,
             secret = true,
             tiers = listOf(25),

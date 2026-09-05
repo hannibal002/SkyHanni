@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.renderables
 
-
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.data.GuiData
@@ -28,7 +27,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullValue
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
-import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -51,7 +49,6 @@ import kotlin.math.max
 
 @Suppress("TooManyFunctions")
 interface Renderable {
-
     val width: Int
     val height: Int
 
@@ -77,7 +74,6 @@ interface Renderable {
     fun render(mouseOffsetX: Int, mouseOffsetY: Int)
 
     companion object {
-
         val logger = SkyHanniLogger("debug/renderable")
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
 
@@ -206,6 +202,7 @@ interface Renderable {
              */
             nonStandardClick: () -> Unit = {},
         ) = object : Renderable {
+
             override val width get() = render.width
             override val height get() = render.height
             override val horizontalAlign = render.horizontalAlign
@@ -268,7 +265,6 @@ interface Renderable {
             condition: () -> Boolean = { true },
             onHover: () -> Unit = {},
         ): Renderable {
-
             val render = fromAny(content) ?: text("Error")
             return object : Renderable {
                 override val width get() = render.width
@@ -372,6 +368,7 @@ interface Renderable {
             highlightsOnHoverSlots: List<Int> = emptyList(),
             onHover: () -> Unit = {},
         ) = object : Renderable {
+
             override val width = max(hovered.width, unHovered.width)
             override val height = max(hovered.height, unHovered.height)
             override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unHovered.horizontalAlign
@@ -413,6 +410,7 @@ interface Renderable {
             blockBottomHover: Boolean = true,
             forceBottomRenderFirst: Boolean = false,
         ) = object : Renderable {
+
             override val width = bottomLayer.width
             override val height = bottomLayer.height
             override val horizontalAlign = bottomLayer.horizontalAlign
@@ -467,6 +465,7 @@ interface Renderable {
             color: Color = Color.WHITE,
             key: Int = 0,
         ) = object : Renderable {
+
             val textBoxHeight = (9 * scale).toInt() + 1
 
             val isTextBoxEmpty get() = textInput.textBox.isEmpty()
@@ -559,6 +558,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
+
             override val width = width
             override val height = height
             override val horizontalAlign = horizontalAlign
@@ -590,12 +590,12 @@ interface Renderable {
                 } else {
                     if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
                         DrawContextUtils.drawContext.blitSprite(
-                            RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_background"),
+                            RenderCompat.getMinecraftGuiTextured(), Identifier.withDefaultNamespace("hud/experience_bar_background"),
                             mouseOffsetX, mouseOffsetY, width, height,
                         )
                     } else {
                         DrawContextUtils.drawContext.blit(
-                            RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                            RenderCompat.getMinecraftGuiTextured(), Identifier.parse(texture.path),
                             mouseOffsetX, mouseOffsetY, 0f, 0f, width, height, 182, 5, 256, 256, -1,
                         )
                     }
@@ -603,24 +603,24 @@ interface Renderable {
                     if (useChroma) {
                         if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
                             DrawContextUtils.drawContext.blitSprite(
-                                SkyHanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
+                                SkyHanniRenderLayers.getChromaTextured(), Identifier.withDefaultNamespace("hud/experience_bar_progress"),
                                 width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height,
                             )
                         } else {
                             DrawContextUtils.drawContext.blit(
-                                SkyHanniRenderLayers.getChromaTextured(), createResourceLocation(texture.path),
+                                SkyHanniRenderLayers.getChromaTextured(), Identifier.parse(texture.path),
                                 mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1,
                             )
                         }
                     } else {
                         if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
                             DrawContextUtils.drawContext.blitSprite(
-                                RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),
+                                RenderCompat.getMinecraftGuiTextured(), Identifier.withDefaultNamespace("hud/experience_bar_progress"),
                                 width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height,
                             )
                         } else {
                             DrawContextUtils.drawContext.blit(
-                                RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                                RenderCompat.getMinecraftGuiTextured(), Identifier.parse(texture.path),
                                 mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1,
                             )
                         }
@@ -693,6 +693,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
+
             val render = content
 
             override val width = width
@@ -710,6 +711,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
+
             val render = content
 
             override val width = width
@@ -738,6 +740,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
+
             val render = content
 
             override val width = render.width
@@ -763,6 +766,7 @@ interface Renderable {
             scrollbarTrackColor: ChromaColour = Companion.scrollbarTrackColor,
             scrollbarThumbColor: ChromaColour = Companion.scrollbarThumbColor,
         ) = object : Renderable {
+
             private val scrollUpTip = text("§7§oMore items above (scroll)")
             private val scrollDownTip = text("§7§oMore items below (scroll)")
 
@@ -820,6 +824,7 @@ interface Renderable {
             scrollbarTrackColor: ChromaColour = Companion.scrollbarTrackColor,
             scrollbarThumbColor: ChromaColour = Companion.scrollbarThumbColor,
         ) = object : Renderable {
+
             private var list: Set<Renderable> = filterList(content, textInput.textBox)
 
             private val scrollUpTip = text("§7§oMore items above (scroll)")
@@ -1014,6 +1019,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
+
             override val width = input.width + padding * 2
             override val height = input.height + padding * 2
             override val horizontalAlign = horizontalAlign
@@ -1040,6 +1046,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
+
             override val width = input.width + padding * 2
             override val height = input.height + padding * 2
             override val horizontalAlign = horizontalAlign
@@ -1067,6 +1074,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
+
             override val width = input.width + padding * 2
             override val height = input.height + padding * 2
             override val horizontalAlign = horizontalAlign
@@ -1091,6 +1099,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
+
             override val width = input.width + padding * 2
             override val height = input.height + padding * 2
             override val horizontalAlign = horizontalAlign
@@ -1125,6 +1134,7 @@ interface Renderable {
             radius: Int = 0,
             smoothness: Float = 0f,
         ) = object : Renderable {
+
             override val width = input.width + padding * 2
             override val height = input.height + padding * 2
             override val horizontalAlign = horizontalAlign
@@ -1162,6 +1172,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
+
             override val width = width
             override val height = height
             override val horizontalAlign = horizontalAlign

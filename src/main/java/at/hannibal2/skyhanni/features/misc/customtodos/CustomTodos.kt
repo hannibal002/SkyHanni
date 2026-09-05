@@ -9,21 +9,18 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.XmlUtils
-import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 import io.github.notenoughupdates.moulconfig.xml.Bind
 
-// Taken and modified from Not Enough Updates https://github.com/NotEnoughUpdates/NotEnoughUpdates
+// Taken and modified from NotEnoughUpdates (https://github.com/NotEnoughUpdates/NotEnoughUpdates)
 class CustomTodos(
     @field:Bind
     val todos: ObservableList<CustomTodoEditor>,
 ) {
-
     @SkyHanniModule
     companion object {
-
         @HandleEvent
-        fun onCommandRegistration(event: CommandRegistrationEvent) {
+        private fun onCommandRegistration(event: CommandRegistrationEvent) {
             event.registerBrigadier("shtodos") {
                 description = "Edit custom TODOs"
                 category = CommandCategory.USERS_ACTIVE
@@ -31,7 +28,7 @@ class CustomTodos(
                 simpleCallback {
                     val todosList = ObservableList<CustomTodoEditor>(mutableListOf())
                     SkyHanniMod.customTodos.customTodos.forEach { todosList.add(CustomTodoEditor(it, todosList)) }
-                    val location = MyResourceLocation("skyhanni", "gui/customtodos/overview.xml")
+                    val location = SkyHanniMod.id("gui/customtodos/overview.xml")
                     XmlUtils.openXmlScreen(CustomTodos(todosList), location)
                 }
             }
@@ -42,7 +39,6 @@ class CustomTodos(
             SkyHanniMod.customTodos.customTodos.forEach { todosList.add(CustomTodoEditor(it, todosList)) }
             CustomTodos(todosList).save()
         }
-
     }
 
     @Bind
@@ -63,7 +59,7 @@ class CustomTodos(
     fun viewCommunityTodos() {
         XmlUtils.openXmlScreen(
             CommunityTodoViewer(CustomTodoDownload.todos, todos),
-            MyResourceLocation("skyhanni", "gui/customtodos/communitytodos.xml"),
+            SkyHanniMod.id("gui/customtodos/communitytodos.xml"),
         )
     }
 
@@ -94,5 +90,4 @@ class CustomTodos(
         )
         save()
     }
-
 }

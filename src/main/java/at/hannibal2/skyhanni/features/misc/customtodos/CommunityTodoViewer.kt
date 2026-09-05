@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.customtodos
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CommunityTodo
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import io.github.notenoughupdates.moulconfig.common.IItemStack
-import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigPlatform
@@ -20,7 +20,6 @@ class CommunityTodoViewer(
     communityTodos: List<CommunityTodo>,
     private val currentTodos: ObservableList<CustomTodoEditor>,
 ) {
-
     @field:Bind
     var search: String = ""
 
@@ -46,7 +45,7 @@ class CommunityTodoViewer(
 
     @Bind
     fun openTodoMenu() {
-        XmlUtils.openXmlScreen(CustomTodos(currentTodos), MyResourceLocation("skyhanni", "gui/customtodos/overview.xml"))
+        XmlUtils.openXmlScreen(CustomTodos(currentTodos), SkyHanniMod.id("gui/customtodos/overview.xml"))
     }
 
     @Bind
@@ -72,7 +71,6 @@ class CommunityTodoViewer(
     }
 
     class CommunityTodoInfo(val communityInfo: CommunityTodo, private val currentTodos: ObservableList<CustomTodoEditor>) {
-
         val todo = CustomTodo.fromTemplate(communityInfo.todoData)
 
         var downloaded = false
@@ -125,5 +123,4 @@ class CommunityTodoViewer(
             )
         }
     }
-
 }

@@ -1,25 +1,24 @@
 package at.hannibal2.skyhanni.features.misc.customtodos
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.XmlUtils
 import io.github.notenoughupdates.moulconfig.common.IItemStack
-import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigPlatform
 import io.github.notenoughupdates.moulconfig.xml.Bind
 import kotlin.time.Duration.Companion.seconds
 
-// Taken and modified from Not Enough Updates https://github.com/NotEnoughUpdates/NotEnoughUpdates
+// Taken and modified from NotEnoughUpdates (https://github.com/NotEnoughUpdates/NotEnoughUpdates)
 @Suppress("TooManyFunctions")
 class CustomTodoEditor(
     private val from: CustomTodo,
     private val todos: ObservableList<CustomTodoEditor>,
 ) {
-
     @field:Bind
     var label: String = from.label
 
@@ -309,13 +308,13 @@ class CustomTodoEditor(
 
     @Bind
     fun close() {
-        XmlUtils.openXmlScreen(CustomTodos(todos), MyResourceLocation("skyhanni", "gui/customtodos/overview.xml"))
+        XmlUtils.openXmlScreen(CustomTodos(todos), SkyHanniMod.id("gui/customtodos/overview.xml"))
     }
 
     @Bind
     fun edit() {
         from.downloaded = false
         from.downloadedId = ""
-        XmlUtils.openXmlScreen(this, MyResourceLocation("skyhanni", "gui/customtodos/edit.xml"))
+        XmlUtils.openXmlScreen(this, SkyHanniMod.id("gui/customtodos/edit.xml"))
     }
 }
