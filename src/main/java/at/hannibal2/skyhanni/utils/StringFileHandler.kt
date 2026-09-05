@@ -40,4 +40,10 @@ class StringFileHandler(private val file: File) {
             throw e
         }
     }
+
+    fun delete() {
+        if (file.exists()) file.delete()
+        if (backupFile.exists()) backupFile.delete()
+        if (tempFile.exists()) tempFile.delete()
+    }
 }

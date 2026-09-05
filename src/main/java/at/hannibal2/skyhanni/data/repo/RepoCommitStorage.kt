@@ -2,26 +2,30 @@ package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringFileHandler
 import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.json.getJson
-import at.hannibal2.skyhanni.utils.json.writeJson
 import com.google.gson.annotations.Expose
 import java.io.File
 
-class RepoCommitStorage(val file: File) {
+@JvmInline
+value class RepoCommitStorage private constructor(private val fileHandler: StringFileHandler) {
+    constructor(file: File) : this(StringFileHandler(file))
 
     fun readFromFile(): RepoCommit? {
-        val currentCommitJson = file.getJson() ?: return deleteFile()
-        return runCatching { ConfigManager.gson.fromJson<RepoCommit>(currentCommitJson) }.getOrElse { deleteFile() }
+        return runCatching {
+            val currentCommitJson = fileHandler.load()
+            ConfigManager.gson.fromJson<RepoCommit>(currentCommitJson)
+        }.getOrElse { deleteFile() }
     }
 
     fun writeToFile(commit: RepoCommit): Boolean {
-        val newCurrentCommitJson = ConfigManager.gson.toJsonTree(commit).asJsonObject
-        return file.writeJson(newCurrentCommitJson)
+        val newCurrentCommitJson = ConfigManager.gson.toJson(commit)
+        runCatching { fileHandler.save(newCurrentCommitJson) }.getOrNull() ?: return false
+        return true
     }
 
     private fun deleteFile(): Nothing? {
-        file.delete()
+        fileHandler.delete()
         return null
     }
 }
