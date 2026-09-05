@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.utils.EnumUtils.next
 import at.hannibal2.skyhanni.utils.EnumUtils.previous
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import org.apache.commons.net.ntp.NTPUDPClient
-import java.net.InetAddress
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import kotlin.time.Duration
@@ -19,7 +17,6 @@ import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.toJavaDuration
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -69,9 +66,7 @@ object ComputerTimeOffset {
             if (state == State.TOTALLY_OFF) ErrorManager.logErrorStateWithData(
                 "Error when checking Computer Time Offset",
                 "trying to check again even though the previous check is still not done",
-            ) else if (state == State.SLOW) ChatUtils.chat(
-                "Computer Time Offset calculation took longer than normal. Checking less often now.",
-            )
+            ) else if (state == State.SLOW) sendSlowDownMessage("took longer than normal")
             return
         } else if (stableRuns++ > 10 && state != State.NORMAL) {
             stableRuns = 0
@@ -85,6 +80,17 @@ object ComputerTimeOffset {
                 tryDisplayOffset(wasOffsetBefore)
             }
         }
+    }
+
+    private fun sendSlowDownMessage(reason: String) = ChatUtils.chat(
+        "Computer Time Offset calculation $reason. Checking less often now.",
+    )
+
+    private fun onKissOfDeath() {
+        if (state != State.NORMAL) return
+        stableRuns = 0
+        state = State.SLOW
+        sendSlowDownMessage("hit a rate limit")
     }
 
     private fun getNtpOffset(ntpServer: String): Duration? = runCatching {
@@ -101,16 +107,12 @@ object ComputerTimeOffset {
             }
             return@runCatching null
         }
-        NTPUDPClient().apply {
-            setDefaultTimeout(10.seconds.toJavaDuration())
-        }.use { client ->
-            val address = InetAddress.getByName(ntpServer)
-            val timeInfo = client.getTime(address)
-            timeInfo.computeDetails()
-            timeInfo.offset.milliseconds
-        }
+        SntpClient.getOffset(ntpServer)
     }.onFailure { e ->
-        if (e is SocketTimeoutException || e is UnknownHostException) {
+        if (e is SntpClient.KissOfDeathException) {
+            onKissOfDeath()
+            return@onFailure
+        } else if (e is SocketTimeoutException || e is UnknownHostException) {
             timeoutMap.addOrPut(ntpServer, 1)
             return@onFailure
         } else if (SkyBlockUtils.inSkyBlock && config.warnAboutPcTimeOffset) ErrorManager.logErrorWithData(
