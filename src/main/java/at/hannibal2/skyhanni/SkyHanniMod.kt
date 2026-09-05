@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.utils.InitFinishedEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
@@ -105,8 +106,21 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     }
 
     @HandleEvent
+    private fun onSecondPassed(event: SecondPassedEvent) {
+        if (!::configManager.isInitialized) return
+
+        if (!event.repeatSeconds(ConfigManager.QUEUED_SAVE_INTERVAL)) return
+
+        if (event.repeatSeconds(ConfigManager.FEATURE_AUTO_SAVE_INTERVAL)) {
+            configManager.queueSave(ConfigFileType.FEATURES, "auto-save-60s")
+        }
+        configManager.flushQueuedSaves()
+    }
+
+    @HandleEvent
     private fun onClientShutdown() {
-        configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
+        configManager.queueSave(ConfigFileType.FEATURES, "shutdown-hook")
+        configManager.flushQueuedSaves()
         SkyHanniItemRenderCoordinator.closeAtlas()
     }
 
