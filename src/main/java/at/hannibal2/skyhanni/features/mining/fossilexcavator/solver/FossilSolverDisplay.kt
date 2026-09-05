@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.mining.glacite.FossilExcavatorSolverConfig.SolverMode
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -89,6 +90,7 @@ object FossilSolverDisplay {
         isCompleted = false
         inventoryItemNames = emptyList()
         possibleFossilTypes = emptySet()
+        FossilSolver.currentSnapshot = FossilSolver.SolverSnapshot()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
@@ -140,8 +142,30 @@ object FossilSolverDisplay {
             }
         }
 
-        SkyHanniMod.launchCoroutine("fossil solver findBestTile") {
-            FossilSolver.findBestTile(fossilLocations, dirtLocations, percentage)
+        SkyHanniMod.launchCoroutine("fossil solver findTile") {
+            FossilSolver.findTile(fossilLocations, dirtLocations, percentage)
+        }
+    }
+
+    fun shouldCancelClick(slotIndex: Int): Boolean {
+        val snapshot = FossilSolver.currentSnapshot
+        val totalTiles = snapshot.totalPossibleFossils
+        val guaranteedSlots = if (totalTiles > 0) {
+            snapshot.clickablePositions
+                .filterValues { it == totalTiles }
+                .keys
+                .map { it.toSlotIndex() }
+                .toSet()
+        } else {
+            emptySet()
+        }
+
+        val hasGuaranteedSlot = guaranteedSlots.isNotEmpty()
+        val isClickingGuaranteed: Boolean = slotIndex in guaranteedSlots
+
+        return when (config.mode) {
+            SolverMode.AVOID -> isClickingGuaranteed
+            SolverMode.FOSSIL -> hasGuaranteedSlot && !isClickingGuaranteed
         }
     }
 
@@ -150,10 +174,15 @@ object FossilSolverDisplay {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
 
+        val slotIndex = event.slot?.containerSlot ?: return
+        if (config.blockClicks && shouldCancelClick(slotIndex)) {
+            event.cancel()
+            return
+        }
+
         event.makePickblock()
 
-        val slot = event.slot ?: return
-        if (slot.containerSlot == slotToClick) {
+        if (slotIndex == slotToClick) {
             slotToClick = null
             correctPercentage = null
         }
