@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.WikiJson
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -15,14 +16,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.net.URLEncoder
 
@@ -49,12 +48,10 @@ object WikiManager {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onGuiKeyPress() {
+    private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.wikiKeybind.isKeyHeld()) return
 
-        val stack = stackUnderCursor()?.takeUnlessEmpty() ?: return
-        if (isIgnoredItem(stack)) return
-
+        val stack = event.stackUnderCursor ?: return
         wikiTheItem(stack, config.menuOpenWiki)
     }
 

@@ -15,44 +15,52 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.input.InputQuirks
 import net.minecraft.client.input.KeyEvent
 import org.apache.commons.lang3.SystemUtils
-import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule
 object KeyboardManager {
-
     // When a screen closes (e.g. chat closed via Enter), lock Enter so it does not
     // immediately fire as a key click in features that use isKeyClicked().
     @HandleEvent
-    fun onGuiOpen(event: GuiScreenOpenEvent) {
+    private fun onGuiOpen(event: GuiScreenOpenEvent) {
         if (event.gui != null) return
-        if (GLFW.GLFW_KEY_ENTER.isKeyHeld()) lockedKeys.add(GLFW.GLFW_KEY_ENTER)
-        if (GLFW.GLFW_KEY_KP_ENTER.isKeyHeld()) lockedKeys.add(GLFW.GLFW_KEY_KP_ENTER)
+        if (InputConstants.KEY_RETURN.isKeyHeld()) lockedKeys.add(InputConstants.KEY_RETURN)
+        if (InputConstants.KEY_NUMPADENTER.isKeyHeld()) lockedKeys.add(InputConstants.KEY_NUMPADENTER)
     }
 
-    const val LEFT_MOUSE = GLFW.GLFW_MOUSE_BUTTON_LEFT
-    const val RIGHT_MOUSE = GLFW.GLFW_MOUSE_BUTTON_RIGHT
-    const val MIDDLE_MOUSE = GLFW.GLFW_MOUSE_BUTTON_MIDDLE
+    // InputConstants.UNKNOWN exists, but is not a compile time constant
+    //~ if < 26.3 '0' -> '-1'
+    const val KEY_UNKNOWN: Int = 0
+
+    const val LEFT_MOUSE = InputConstants.MOUSE_BUTTON_LEFT
+    const val RIGHT_MOUSE = InputConstants.MOUSE_BUTTON_RIGHT
+    const val MIDDLE_MOUSE = InputConstants.MOUSE_BUTTON_MIDDLE
+
+    const val KEY_ADD = InputConstants.KEY_ADD
+    // This constant isn't defined in InputConstants for some reason
+    const val KEY_SUBTRACT = InputConstants.KEY_ADD - 1
 
     /**
      * Represents whether either the left or right Super key (also known as Windows key) is down.
      * On macOS, this is the Command key.
      */
-    private fun isSuperKeyDown() =
-        GLFW.GLFW_KEY_LEFT_SUPER.isKeyHeld() || GLFW.GLFW_KEY_RIGHT_SUPER.isKeyHeld()
+    private fun isSuperKeyDown(): Boolean {
+        //~ if < 26.3 'GUI' -> 'SUPER'
+        return InputConstants.KEY_LGUI.isKeyHeld() || InputConstants.KEY_RGUI.isKeyHeld()
+    }
 
     /**
      * Represents whether either the left or right Alt key is down.
      * On macOS, this is the Option key.
      */
     fun isMenuKeyDown() =
-        GLFW.GLFW_KEY_LEFT_ALT.isKeyHeld() || GLFW.GLFW_KEY_RIGHT_ALT.isKeyHeld()
+        InputConstants.KEY_LALT.isKeyHeld() || InputConstants.KEY_RALT.isKeyHeld()
 
     /**
      * Represents whether either the left or right Control (Ctrl) key is down,
      * regardless of platform.
      */
     fun isControlKeyDown() =
-        GLFW.GLFW_KEY_LEFT_CONTROL.isKeyHeld() || GLFW.GLFW_KEY_RIGHT_CONTROL.isKeyHeld()
+        InputConstants.KEY_LCONTROL.isKeyHeld() || InputConstants.KEY_RCONTROL.isKeyHeld()
 
     /**
      * Represents whether the operating system's modifier key is down.
@@ -66,34 +74,34 @@ object KeyboardManager {
      * On macOS, this is Option+Backspace, while on other platforms it is Ctrl+Backspace.
      */
     fun isDeleteWordDown() =
-        GLFW.GLFW_KEY_BACKSPACE.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isMenuKeyDown() else isControlKeyDown()
+        InputConstants.KEY_BACKSPACE.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isMenuKeyDown() else isControlKeyDown()
 
     /**
      * Represents whether the user is trying to use the operating system's "delete line" shortcut.
      * On macOS, this is Cmd+Shift+Backspace, while on other platforms it is Ctrl+Shift+Backspace.
      */
     fun isDeleteLineDown() =
-        GLFW.GLFW_KEY_BACKSPACE.isKeyHeld() && isModifierKeyDown() && isShiftKeyDown()
+        InputConstants.KEY_BACKSPACE.isKeyHeld() && isModifierKeyDown() && isShiftKeyDown()
 
     /**
      * Represents whether either the left or right Shift key is down.
      */
     fun isShiftKeyDown() =
-        GLFW.GLFW_KEY_LEFT_SHIFT.isKeyHeld() || GLFW.GLFW_KEY_RIGHT_SHIFT.isKeyHeld()
+        InputConstants.KEY_LSHIFT.isKeyHeld() || InputConstants.KEY_RSHIFT.isKeyHeld()
 
     /**
      * Represents whether the user is trying to use the operating system's "copy" shortcut.
      * On macOS, this is Cmd+C, while on other platforms it is Ctrl+C.
      */
     fun isCopyingKeysDown() =
-        isModifierKeyDown() && GLFW.GLFW_KEY_C.isKeyHeld()
+        isModifierKeyDown() && InputConstants.KEY_C.isKeyHeld()
 
     /**
      * Represents whether the user is trying to use the operating system's "paste" shortcut.
      * On macOS, this is Cmd+V, while on other platforms it is Ctrl+V.
      */
     fun isPastingKeysDown() =
-        isModifierKeyDown() && GLFW.GLFW_KEY_V.isKeyHeld()
+        isModifierKeyDown() && InputConstants.KEY_V.isKeyHeld()
 
     private fun Int.matchesClosureKey() =
         Minecraft.getInstance().options.keyInventory.matches(KeyEvent(this, this, 0))
@@ -103,7 +111,7 @@ object KeyboardManager {
         // Holding shift bypasses closure checks
         if (isShiftKeyDown()) return false
 
-        val isClose = keycode.matchesClosureKey() || keycode == GLFW.GLFW_KEY_ESCAPE
+        val isClose = keycode.matchesClosureKey() || keycode == InputConstants.KEY_ESCAPE
         if (!isClose) return false
 
         return AttemptedInventoryCloseEvent().post().isCancelled
@@ -138,8 +146,12 @@ object KeyboardManager {
         )
 
         this == -1 -> false
-        this in 0..5 -> MouseCompat.isButtonDown(this)
-        else -> InputConstants.isKeyDown(Minecraft.getInstance().window, this)
+        MouseCompat.isMouseButton(this) -> MouseCompat.isButtonDown(this)
+        else -> InputConstants.isKeyDown(
+            //? if < 26.3
+            //Minecraft.getInstance().window,
+            this,
+        )
     }
 
     private val lockedKeys = mutableSetOf<Int>()
@@ -174,7 +186,6 @@ object KeyboardManager {
 
         override fun iterator(): Iterator<KeyMapping> =
             object : Iterator<KeyMapping> {
-
                 var current = w
                 var finished = false
 

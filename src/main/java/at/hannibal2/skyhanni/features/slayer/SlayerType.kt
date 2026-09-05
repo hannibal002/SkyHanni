@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.slayer
 
 import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.monster.Blaze
-import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster.Enderman
 import net.minecraft.world.entity.monster.spider.Spider
 import net.minecraft.world.entity.monster.zombie.Zombie
 
@@ -36,7 +36,7 @@ enum class SlayerType(
     VOID(
         "Voidgloom Seraph",
         "voidgloom",
-        EnderMan::class.java,
+        Enderman::class.java,
         SlayerMiniBossType.VOIDLING,
     ),
     INFERNO(

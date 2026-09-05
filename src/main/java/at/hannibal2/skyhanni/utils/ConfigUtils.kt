@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.MoulConfigEditorComponent
 import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
@@ -113,4 +114,33 @@ object ConfigUtils {
         get() = MinecraftCompat.screen is MoulConfigScreenComponent
 
     fun String.asStructuredText() = StructuredText.of(this)
+
+
+    fun traverseConfig(
+        obj: Any?,
+        action: (owner: Any, field: Field, path: String) -> Unit,
+    ) {
+        traverseConfig(obj, "", mutableSetOf(), action)
+    }
+
+    private fun traverseConfig(
+        obj: Any?,
+        path: String,
+        visited: MutableSet<IdentityCharacteristics<Any>>,
+        action: (owner: Any, field: Field, path: String) -> Unit,
+    ) {
+        if (obj == null) return
+        if (!obj.javaClass.name.startsWith("at.hannibal2.skyhanni.")) return
+
+        val identity = IdentityCharacteristics(obj)
+        if (!visited.add(identity)) return
+
+        for (field in obj.javaClass.declaredFields.map { it.makeAccessible() }) {
+            val fieldPath = if (path.isEmpty()) field.name else "$path.${field.name}"
+
+            action(obj, field, fieldPath)
+
+            traverseConfig(field.get(obj), fieldPath, visited, action)
+        }
+    }
 }

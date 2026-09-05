@@ -2,60 +2,77 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
-import org.lwjgl.glfw.GLFW
+
+//? if >= 26.3 {
+import org.lwjgl.sdl.SDLVideo
+//?} else {
+/*import org.lwjgl.glfw.GLFW
+*///?}
 
 @SkyHanniModule
 object SeeThroughWindow {
-
     private val config get() = SkyHanniMod.feature.garden.seeThroughWindow
 
     private var isActive = false
-    private var opacityChanged = false
+    private var currentOpacity = 1f
+    private var unsupportedPlatform = false
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad() {
         config.seeThroughFarming.afterChange {
             setOpacity()
         }
     }
 
     @HandleEvent
-    fun onKeyPressed(event: KeyDownEvent) {
+    private fun onKeyDown(event: KeyDownEvent) {
         if (event.keyCode != config.keybind) return
         if (MinecraftCompat.screen != null) return
+
         isActive = !isActive
         setOpacity()
     }
 
     @HandleEvent
-    fun onWorldSwap(event: WorldChangeEvent) {
+    private fun onWorldChange() {
         isActive = false
         setOpacity()
     }
 
     private fun setOpacity() {
+        if (unsupportedPlatform) return
+
+        val targetOpacity = if (isActive) {
+            (config.seeThroughFarming.get() / 100f)
+                .coerceIn(0.05f, 1f)
+        } else {
+            1f
+        }
+
+        if (currentOpacity == targetOpacity) return
+        if (setWindowOpacity(targetOpacity)) {
+            currentOpacity = targetOpacity
+        } else {
+            unsupportedPlatform = true
+            ChatUtils.userError("Your platform doesn't support see through windows!")
+        }
+    }
+
+    private fun setWindowOpacity(alpha: Float): Boolean {
         val handle = Minecraft.getInstance().window.handle()
-        if (!isActive) {
-            if (opacityChanged) {
-                GLFW.glfwSetWindowOpacity(handle, 1f)
-                opacityChanged = false
-            }
-            return
-        }
-        val alpha = (config.seeThroughFarming.get() / 100f).coerceAtLeast(0.05f).coerceAtMost(1f)
-        if (alpha != 1f) {
-            GLFW.glfwSetWindowOpacity(handle, alpha)
-            opacityChanged = true
-        } else if (opacityChanged) {
-            GLFW.glfwSetWindowOpacity(handle, 1f)
-            opacityChanged = false
-        }
+
+        //? if >= 26.3 {
+        return SDLVideo.SDL_SetWindowOpacity(handle, alpha)
+        //?} else {
+        /*GLFW.glfwGetError(null) // Clear previous error
+        GLFW.glfwSetWindowOpacity(handle, alpha)
+        return GLFW.glfwGetError(null) == GLFW.GLFW_NO_ERROR
+        *///?}
     }
 }

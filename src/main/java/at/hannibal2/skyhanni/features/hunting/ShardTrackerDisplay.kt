@@ -31,12 +31,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.ChatFormatting
-import org.lwjgl.glfw.GLFW
 import java.util.zip.GZIPInputStream
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -66,7 +64,7 @@ object ShardTrackerDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
+    private fun onTick() {
         if (!isEnabled()) return
         if (trackedShards.isEmpty()) {
             renderables = null
@@ -131,7 +129,7 @@ object ShardTrackerDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRender(event: GuiRenderEvent.GuiOnTopRenderEvent) {
+    private fun onGuiRenderTop(event: GuiRenderEvent.GuiOnTopRenderEvent) {
         if (!isEnabled()) return
         renderables?.let {
             config.position.renderRenderables(it, posLabel = "Shard Tracker")
@@ -145,27 +143,27 @@ object ShardTrackerDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiKeyPress(event: GuiKeyPressEvent) {
+    private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!isEnabled()) return
         if (!config.selectShardKeybind.isKeyHeld()) return
         if (!isInsideShardsMenu()) return
-        val stack = stackUnderCursor() ?: return
+        val stack = event.stackUnderCursor ?: return
         val internalName = stack.getInternalName()
         if (internalName == NeuInternalName.NONE) return
         toggleShard(internalName)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltip(event: ToolTipTextEvent) {
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (!isInsideShardsMenu()) return
-        if (config.selectShardKeybind == GLFW.GLFW_KEY_UNKNOWN) return
+        if (config.selectShardKeybind == KeyboardManager.KEY_UNKNOWN) return
         if (!AttributeShardsData.isAttributeShard(event.itemStack.getInternalName())) return
         event.toolTip.add("§ePress ${KeyboardManager.getKeyName(config.selectShardKeybind)} to track this shard.")
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shimportskyshards") {
             description = "Imports SkyShards material export"
             category = CommandCategory.USERS_ACTIVE

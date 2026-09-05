@@ -37,17 +37,22 @@ import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
-import org.joml.Matrix4f
 import org.joml.Vector3f
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-//? if >= 26.2 {
-import net.fabricmc.fabric.api.client.rendering.v1.SubmitRenderPhases
+//? if < 26.3 {
+/*import org.joml.Matrix4f
+*///?}
+
+//? if = 26.2 {
+/*import net.fabricmc.fabric.api.client.rendering.v1.SubmitRenderPhases
 import net.minecraft.client.renderer.feature.TextFeatureRenderer
-//?} else {
+*///?}
+
+//? if < 26.2 {
 /*import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEventLegacy
 *///?}
@@ -70,8 +75,8 @@ object WorldRenderUtils {
         if (displayMode == SEE_THROUGH) {
             // MC-298659: the vanilla text phase renders before translucent terrain, letting water
             // draw over see-through text. Render only our own text after translucent terrain instead.
-            //? if >= 26.2 {
-            submitNodeCollector.submitCustom(
+            //? if = 26.2 {
+            /*submitNodeCollector.submitCustom(
                 SubmitRenderPhases.AFTER_TERRAIN,
                 TextFeatureRenderer.Submit(
                     Matrix4f(matrices.last().pose()),
@@ -86,12 +91,13 @@ object WorldRenderUtils {
                     0,
                 ),
             )
-            //?} else {
+            return
+            *///?} elif = 26.1 {
             /*queuedSeeThroughText.add(
                 SeeThroughText(Matrix4f(matrices.last().pose()), x, y, text, shadow, light, color, backgroundColor),
             )
-            *///?}
             return
+            *///?}
         }
 
         submitNodeCollector.submitText(
@@ -368,7 +374,8 @@ object WorldRenderUtils {
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
         )
-        matrices.mulPose(camera.rotation())
+        //~ if < 26.3 'rotate' -> 'mulPose'
+        matrices.rotate(camera.rotation())
         matrices.translate(0f, -yOffset * adjustedScale, 0f)
         matrices.scale(adjustedScale, -adjustedScale, adjustedScale)
         submitOrderedText(

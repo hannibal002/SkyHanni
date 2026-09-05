@@ -28,7 +28,8 @@ object GeyserFishing {
     fun onParticle(event: ParticleEvent) {
         if (!shouldProcessParticles()) return
         with(event) {
-            if (type != ParticleTypes.CLOUD || count != 15 || speed != 0.05f || offset != geyserOffset) return
+            // TODO verify on 26.3
+            if (type != ParticleTypes.CLOUD || count != 15 || !isSpeed(0.05f) || offset != geyserOffset) return
         }
         geyser = event.location
         val potentialGeyser = geyser ?: return

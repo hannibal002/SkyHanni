@@ -19,7 +19,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GriffinBurrowParticleFinder {
-
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val burrows = mutableMapOf<LorenzVec, Burrow>()
@@ -100,19 +99,20 @@ object GriffinBurrowParticleFinder {
 
     // TODO move to ParticleUtils or similar
     // TODO remove the roundTo calls as they are only workarounds
+    // TODO verify on 26.3
     private enum class ParticleType(val check: ParticleEvent.() -> Boolean) {
         EMPTY(
-            { type == ParticleTypes.ENCHANTED_HIT && count == 4 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
+            { type == ParticleTypes.ENCHANTED_HIT && count == 4 && isSpeed(0.01f) && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
         ),
         MOB(
-            { type == ParticleTypes.CRIT && count == 3 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
+            { type == ParticleTypes.CRIT && count == 3 && isSpeed(0.01f) && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
         ),
         TREASURE(
-            { type == ParticleTypes.DRIPPING_LAVA && count == 2 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.35, 0.1, 0.35) },
+            { type == ParticleTypes.DRIPPING_LAVA && count == 2 && isSpeed(0.01f) && offset.roundTo(2) == LorenzVec(0.35, 0.1, 0.35) },
         ),
         ENCHANT(
             {
-                type == ParticleTypes.ENCHANT && count == 5 && speed == 0.05f && offset.roundTo(2) ==
+                type == ParticleTypes.ENCHANT && count == 5 && isSpeed(0.05f) && offset.roundTo(2) ==
                     LorenzVec(0.5, 0.4, 0.5)
             },
         )
@@ -155,7 +155,6 @@ object GriffinBurrowParticleFinder {
         var found: Boolean = false,
         var lastSeen: SimpleTimeMark = SimpleTimeMark.now(),
     ) {
-
         fun getType(): BurrowType = when (this.type) {
             0 -> BurrowType.START
             1 -> BurrowType.MOB

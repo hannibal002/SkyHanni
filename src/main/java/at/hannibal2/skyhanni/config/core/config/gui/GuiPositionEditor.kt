@@ -36,9 +36,9 @@ import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import net.minecraft.client.Minecraft
-import org.lwjgl.glfw.GLFW
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField
@@ -97,7 +97,7 @@ class GuiPositionEditor(
 
         // When the mouse isn't currently hovering over a gui element
         val text = if (displayPos == -1) {
-            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == GLFW.GLFW_KEY_UNKNOWN
+            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == KeyboardManager.KEY_UNKNOWN
 
             buildList {
                 add("§cSkyHanni Position Editor")
@@ -211,12 +211,12 @@ class GuiPositionEditor(
             val elementWidth = position.getDummySize(true).x
             val elementHeight = position.getDummySize(true).y
             when (keyCode) {
-                GLFW.GLFW_KEY_DOWN -> position.moveY(dist, elementHeight)
-                GLFW.GLFW_KEY_UP -> position.moveY(-dist, elementHeight)
-                GLFW.GLFW_KEY_LEFT -> position.moveX(-dist, elementWidth)
-                GLFW.GLFW_KEY_RIGHT -> position.moveX(dist, elementWidth)
-                GLFW.GLFW_KEY_MINUS, GLFW.GLFW_KEY_KP_SUBTRACT -> position.scale -= .1F
-                GLFW.GLFW_KEY_EQUAL, GLFW.GLFW_KEY_KP_ADD -> position.scale += .1F
+                InputConstants.KEY_DOWN -> position.moveY(dist, elementHeight)
+                InputConstants.KEY_UP -> position.moveY(-dist, elementHeight)
+                InputConstants.KEY_LEFT -> position.moveX(-dist, elementWidth)
+                InputConstants.KEY_RIGHT -> position.moveX(dist, elementWidth)
+                InputConstants.KEY_MINUS, KeyboardManager.KEY_SUBTRACT -> position.scale -= .1F
+                InputConstants.KEY_EQUALS, KeyboardManager.KEY_ADD -> position.scale += .1F
             }
         }
     }
