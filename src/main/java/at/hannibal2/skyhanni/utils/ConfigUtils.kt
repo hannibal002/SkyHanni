@@ -115,7 +115,6 @@ object ConfigUtils {
 
     fun String.asStructuredText() = StructuredText.of(this)
 
-
     fun traverseConfig(
         obj: Any?,
         action: (owner: Any, field: Field, path: String) -> Unit,
