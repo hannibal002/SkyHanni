@@ -1,15 +1,12 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import net.minecraft.world.phys.AABB
 
 enum class IslandType(private val nameFallback: String, private val apiNameFallback: String?) {
@@ -93,9 +90,7 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
 
     @SkyHanniModule
     companion object {
-
         fun Collection<IslandType>.isInAnyIsland(): Boolean = any { it.isInIsland() }
-        private val repoReloadCoroutine = CoroutineSettings("island type repo reload")
 
         /**
          * The maximum amount of players that can be on an island.
@@ -116,9 +111,11 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
         fun getByIdOrNull(id: String): IslandType? = entries.find { it.apiName == id }
         fun getByIdOrUnknown(id: String): IslandType = getByIdOrNull(id) ?: UNKNOWN
 
-        @HandleEvent(priority = HIGHEST)
-        fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
-            val data = event.getConstantAsync<IslandTypeJson>("misc/IslandType")
+        // This is intentionally not async right now because using a fire-and-forget
+        // coroutine means priority won't be fully respected. PR #6064 will fix this.
+        @HandleEvent(priorityLevel = HIGH)
+        private fun onRepoReload(event: RepositoryReloadEvent) {
+            val data = event.getConstant<IslandTypeJson>("misc/IslandType")
 
             entries.forEach { islandType ->
                 islandType.islandData = data.islands[islandType.name]?.let { island ->

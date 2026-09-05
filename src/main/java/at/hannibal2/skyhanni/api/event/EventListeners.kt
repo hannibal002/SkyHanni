@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.api.event
 
+import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.effectivePriority
+import at.hannibal2.skyhanni.api.event.HandleEvent.Priority
 import at.hannibal2.skyhanni.utils.ReflectionUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -9,7 +11,6 @@ import java.util.function.Consumer
 typealias EventPredicate = (event: SkyHanniEvent) -> Boolean
 
 class EventListeners private constructor(val name: String, private val isGeneric: Boolean) {
-
     private val listeners: MutableList<Listener> = mutableListOf()
 
     constructor(event: Class<*>) : this(
@@ -77,7 +78,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
         private val generic: Class<*>?,
         extraPredicates: List<EventPredicate> = listOf(),
     ) {
-        val priority: Int = options.priority
+        val priority: Priority = options.effectivePriority
         val receiveCancelled: Boolean = options.receiveCancelled
         val indices: List<Int> = ListenerCollection.createListenerIndices(options)
 
