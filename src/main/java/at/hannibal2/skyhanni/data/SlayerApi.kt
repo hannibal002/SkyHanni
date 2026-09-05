@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -13,6 +15,7 @@ import at.hannibal2.skyhanni.events.slayer.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.slayer.SlayerJson
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -68,6 +71,22 @@ object SlayerApi {
     )
 
     /**
+     * REGEX-TEST: Revenant Horror RNG Meter
+     */
+    val rngMeterSlayerTypePattern by patternGroup.pattern(
+        "rngmeter.type",
+        "(?<type>.+) RNG Meter",
+    )
+
+    /**
+     * REGEX-TEST: Slayer
+     */
+    val inventoryNamePattern by patternGroup.pattern(
+        "inventory.name",
+        "Slayer",
+    )
+
+    /**
      * WRAPPED-REGEX-TEST: "  SLAYER QUEST FAILED!"
      */
     private val questFailedPattern by patternGroup.pattern(
@@ -85,6 +104,9 @@ object SlayerApi {
     // </editor-fold>
 
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
+
+    var jsonData: SlayerJson? = null
+        private set
 
     var questStartTime = SimpleTimeMark.farPast()
 
@@ -142,6 +164,25 @@ object SlayerApi {
      */
     fun isInBossFight() = state == ActiveQuestState.BOSS_FIGHT
 
+    const val COST_REDUCTION = 0.96 // -4% from Slayer Bonus Rewards level 7
+    const val BREWERY_CONTRIBUTION_REDUCTION = 0.95 // -5% from contributing to the brewery community project
+    const val COST_REDUCTION_LEVEL = 7 // Slayer Bonus Rewards level required to get the -4% discount
+
+    val storage: ProfileSpecificStorage.SlayerStorage?
+        get() = ProfileStorageData.profileSpecific?.slayer
+
+    var bonusRewardsLevel: Int
+        get() = storage?.bonusRewardsLevel ?: 0
+        private set(value) {
+            storage?.bonusRewardsLevel = value
+        }
+
+    var breweryContribution: Boolean
+        get() = storage?.breweryContributionReduction == true
+        private set(value) {
+            storage?.breweryContributionReduction = value
+        }
+
     private class SlayerData {
         var currentState: ActiveQuestState = ActiveQuestState.NO_ACTIVE_QUEST
         var currentStateRaw: String? = null
@@ -164,6 +205,16 @@ object SlayerApi {
 
             internalName.getPriceName(amount, pricePer = maxPrice) to totalPrice
         }
+
+    fun getItemDropAmountForTier(internalName: NeuInternalName, tier: Int): Pair<Int, Int?> {
+        val dropAmount = jsonData?.dropAmounts?.get(internalName) ?: return 1 to null
+        val dropAmountForTier = dropAmount[tier]?.split("-")
+
+        val min = dropAmountForTier?.get(0)?.toInt() ?: 1
+        val max = dropAmountForTier?.get(1)?.toInt() ?: 1
+
+        return min to max
+    }
 
     @HandleEvent
     private fun onDebugDataCollect(event: DebugDataCollectEvent) {
@@ -348,6 +399,14 @@ object SlayerApi {
         }
     }
 
+    fun updateBreweryContribution(value: Boolean) {
+        breweryContribution = value
+    }
+
+    fun updateBonusRewardsLevel(value: Int) {
+        bonusRewardsLevel = value
+    }
+
     @HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true)
     private fun onScoreboardChange() {
         updateSlayerState()
@@ -393,6 +452,11 @@ object SlayerApi {
                 updateArea()
             }
         }
+    }
+
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    private fun onRepoReload(event: RepositoryReloadEvent) {
+        jsonData = event.getConstant<SlayerJson>("Slayer")
     }
 
     @HandleEvent

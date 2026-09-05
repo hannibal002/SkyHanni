@@ -976,17 +976,28 @@ class ProfileSpecificStorage(
 
     // - slayer
     @Expose
-    var slayerProfitData: MutableMap<String, SlayerProfitTracker.Data> = mutableMapOf()
+    var slayer: SlayerStorage = SlayerStorage()
 
-    @Expose
-    var slayerRngMeter: MutableMap<String, SlayerRngMeterStorage> = mutableMapOf()
+    class SlayerStorage {
+        @Expose
+        var profitData: MutableMap<String, SlayerProfitTracker.Data> = mutableMapOf()
 
-    data class SlayerRngMeterStorage(
-        @Expose var currentMeter: Long = -1,
-        @Expose var gainPerBoss: Long = -1,
-        @Expose var goalNeeded: Long = -1,
-        @Expose var itemGoal: String = "?",
-    )
+        @Expose
+        var rngMeter: MutableMap<String, RngMeterStorage> = mutableMapOf()
+
+        data class RngMeterStorage(
+            @Expose var currentMeter: Long? = null,
+            @Expose var gainPerBoss: Long? = null,
+            @Expose var goalNeeded: Long? = null,
+            @Expose var itemGoal: String? = null,
+        )
+
+        @Expose
+        var bonusRewardsLevel: Int = 0
+
+        @Expose
+        var breweryContributionReduction: Boolean = false
+    }
 
     // data
     @Expose

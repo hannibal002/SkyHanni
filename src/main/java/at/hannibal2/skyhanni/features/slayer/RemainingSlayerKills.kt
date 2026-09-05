@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.data.SlayerApi
@@ -10,7 +9,6 @@ import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.misc.effects.NonGodPotEffectDisplay
@@ -19,7 +17,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -54,7 +51,7 @@ object RemainingSlayerKills {
      */
     private val progressPattern by patternGroup.pattern(
         "progress",
-        "\\((?<current>[\\d,.]+[kmb]?)\\/(?<max>[\\d,.]+[kmb]?)\\) .*",
+        "\\((?<current>[\\d,.]+[kmb]?)/(?<max>[\\d,.]+[kmb]?)\\) .*",
     )
 
     /**
@@ -73,38 +70,6 @@ object RemainingSlayerKills {
         "\\+\\d+ Kill Combo \\+(?<wisdom>\\d+)☯ Combat Wisdom",
     )
 
-    data class SlayerData(
-        @Expose @SerializedName("normal_mobs")
-        val normalMobs: Map<SlayerType, Map<String, List<Mob>>>,
-
-        @Expose @SerializedName("mini_bosses")
-        val miniBosses: Map<SlayerType, Map<String, List<Mob>>>,
-
-        @Expose
-        val weapons: Map<SlayerType, Map<NeuInternalName, Int>>,
-
-        @Expose
-        val equipments: Map<SlayerType, Map<NeuInternalName, Int>>,
-
-        @Expose
-        val pets: Map<SlayerType, Map<String, SlayerSpecificPetData>>,
-
-        @Expose
-        val champion: List<Double>,
-
-        @Expose @SerializedName("habanero_wisdom_per_level") val habaneroMultiplier: Double,
-
-        @Expose @SerializedName("multiplicative_mayor_perks") val multiplicativeMayors: Map<String, Double>,
-
-        @Expose @SerializedName("arbitrary_multiplier") val arbitraryMultiplier: Double,
-    )
-
-    data class SlayerSpecificPetData(
-        // These are only the first halves of a pet's Internal Name, this is the name used within PetData/PetUtils for these.
-        @Expose @SerializedName("proper_pet_names") val properPetNames: List<String>? = null,
-        @Expose @SerializedName("scaling") val perLevelMultiplier: List<Float>,
-    )
-
     data class Mob(
         @Expose val name: String,
         @Expose val level: Int,
@@ -112,17 +77,11 @@ object RemainingSlayerKills {
         @Expose val xp: Double,
     )
 
-    private var data: SlayerData? = null
     private var display = emptyList<Renderable>()
     private var lastMissing: Double? = null
     private var lastMax: Double? = null
     private var lastReminder = SimpleTimeMark.farPast()
     private var killComboWisdom = 0
-
-    @HandleEvent(priority = HIGHEST)
-    private fun onRepoReload(event: RepositoryReloadEvent) {
-        data = event.getConstant<SlayerData>("Slayer")
-    }
 
     @HandleEvent(ProfileJoinEvent::class)
     private fun onProfileJoin() {
@@ -203,7 +162,7 @@ object RemainingSlayerKills {
     }
 
     private fun getMobs(): List<Mob>? {
-        val data = data ?: return null
+        val data = SlayerApi.jsonData ?: return null
         val areas = data.normalMobs[SlayerApi.currentAreaType] ?: mapOf()
         val normalMobs = areas[SkyBlockUtils.graphArea] ?: listOf()
 
@@ -228,7 +187,7 @@ object RemainingSlayerKills {
         combatWisdom += killComboWisdom
         debugMessage("kill combo wisdom is $killComboWisdom")
 
-        data?.let { data ->
+        SlayerApi.jsonData?.let { data ->
             data.weapons[SlayerApi.activeType]?.get(InventoryUtils.itemInHandId)?.let { wisdom ->
                 combatWisdom += wisdom
                 combatWisdom += countHabaneroOnArmor()
@@ -252,7 +211,7 @@ object RemainingSlayerKills {
 
     private fun getMultiplicativeMultiplier(): Double {
         var multiplier = 1.0
-        val data = data ?: return 1.0
+        val data = SlayerApi.jsonData ?: return 1.0
 
         ElectionApi.getAllActivePerks().forEach { multiplier *= data.multiplicativeMayors[it.name] ?: 1.0 }
 
@@ -279,6 +238,8 @@ object RemainingSlayerKills {
         var additiveWithMultMultipliers = 1.0
 
         val championLevel = (InventoryUtils.getItemInHand()?.getHypixelEnchantments().orEmpty()["champion"] ?: 0) - 1
+
+        val data = SlayerApi.jsonData
 
         if (championLevel != -1) additiveWithMultMultipliers += (data?.champion?.getOrNull(championLevel) ?: 0.0)
 
@@ -322,7 +283,7 @@ object RemainingSlayerKills {
                 }
             }
         }
-        return data?.habaneroMultiplier?.times(counter) ?: 0.0
+        return SlayerApi.jsonData?.habaneroMultiplier?.times(counter) ?: 0.0
     }
 
     private fun Mob.names(xp: Double, totalQuestXP: Double) = buildString {
