@@ -187,7 +187,7 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
             val displayName = if (hidden) "§8§m$formattedName" else cleanName
 
             val loreText = getLoreList.invoke(internalName, itemProfit)
-            val lore: List<String> = buildLore(loreText, hidden, newDrop, internalName)
+            val lore: List<String> = buildLore(loreText, hidden, newDrop, internalName, displayAmount)
 
             // TODO add row abstraction to api, with common click+hover behaviour
             fun string(string: String): Renderable = if (isInventoryOpen()) Renderable.clickable(
@@ -211,7 +211,7 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
             }
 
             row[TextPart.TOTAL_PRICE] = string(" $priceFormat")
-            row[TextPart.AMOUNT] = string(" $numberColor${displayAmount.addSeparators()}x")
+            row[TextPart.AMOUNT] = string(" $numberColor${formatItemAmount(displayAmount)}x")
 
             val line = itemTrackerConfig.textOrder.get().mapNotNull { row[it] }
             table[line] = cleanName
@@ -240,8 +240,12 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         hidden: Boolean,
         newDrop: Boolean,
         internalName: NeuInternalName,
+        displayAmount: Long,
     ) = buildList {
         add(internalName.repoItemName)
+        if (shouldShowExactItemAmount(displayAmount)) {
+            add("§7Exact amount: §e${displayAmount.addSeparators()}x")
+        }
         add("")
         addAll(loreFormat)
         add("")
@@ -262,6 +266,10 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
             add("§7$internalName")
         }
     }
+
+    protected open fun formatItemAmount(amount: Long): String = amount.addSeparators()
+
+    protected open fun shouldShowExactItemAmount(amount: Long): Boolean = false
 
     fun addTotalProfit(
         profit: Double,

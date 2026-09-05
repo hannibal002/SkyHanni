@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -28,7 +29,7 @@ class GardenVisitorTooltipTest {
         SkyHanniMod.feature.garden.visitors.rewardWarning.notifyInChat = false
         SkyHanniMod.feature.garden.visitors.rewardWarning.drops.add(VisitorReward.VISITORS_GRATITUDE)
         itemNameCache()["§9Enchanted Sugar Cane"] = "ENCHANTED_SUGAR_CANE".toInternalName()
-        itemNameCache()["Visitors' Gratitude"] = "VISITORS_GRATITUDE".toInternalName()
+        itemNameCache()["Visitors' Gratitude"] = "VISITOR_GRATITUDE".toInternalName()
     }
 
     @AfterEach
@@ -52,8 +53,16 @@ class GardenVisitorTooltipTest {
         }
 
         assertNotNull(visitor.pricePerCopper)
-        assertTrue("VISITORS_GRATITUDE".toInternalName() in visitor.allRewards)
+        assertTrue("VISITOR_GRATITUDE".toInternalName() in visitor.allRewards)
         assertTrue(VisitorReward.VISITORS_GRATITUDE in visitor.getRewardWarningAwards())
+    }
+
+    @Test
+    fun `visitor gratitude reward accepts old internal name`() {
+        assertEquals(
+            VisitorReward.VISITORS_GRATITUDE,
+            VisitorReward.getByInternalName("VISITORS_GRATITUDE".toInternalName()),
+        )
     }
 
     companion object {

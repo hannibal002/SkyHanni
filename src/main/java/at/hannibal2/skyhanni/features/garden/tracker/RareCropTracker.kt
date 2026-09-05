@@ -18,7 +18,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -53,6 +55,15 @@ object RareCropTracker {
         "(?:HELIANTHUS|FERMENTO|CROPIE|SQUASH|MELON)_(?:LEGGINGS|CHESTPLATE|BOOTS|HELMET)",
     )
 
+    /**
+     * REGEX-TEST: WOW! [MVP+] Eisengolem found a Wild Strawberry Dye!
+     * REGEX-TEST: WOW! [MVP+] Eisengolem found a Dung Dye!
+     */
+    internal val dyeDropPattern by patternGroup.pattern(
+        "dye.drop",
+        "^WOW! (?:\\[[^]]+] )?(?<player>[A-Za-z0-9_]{2,16}) found an? (?<item>.+ Dye)!$",
+    )
+
     val hasArmor by RecalculatingValue(1.seconds) {
         GardenApi.inGarden() && checkArmor()
     }
@@ -74,17 +85,22 @@ object RareCropTracker {
 
 
     init {
-        RareCropDropType.entries.forEach { it.chatPattern }
+        RareCropDropType.entries.filter { it.hasRareCropMessage }.forEach { it.chatPattern }
 
         tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
-    enum class RareCropDropType(val dropName: String, val pestType: PestType? = null) {
+    enum class RareCropDropType(
+        val dropName: String,
+        val pestType: PestType? = null,
+        val isItemDrop: Boolean = true,
+        val hasRareCropMessage: Boolean = true,
+    ) {
         CROPIE("§aCropie"),
         SQUASH("§9Squash"),
         FERMENTO("§5Fermento"),
         HELIANTHUS("§6Helianthus"),
-        SEASONING("§2Seasoning"),
+        SEASONING("§2Seasoning", isItemDrop = false),
         CORNUCOPIA("§aCornucopia", PestType.FLY),
         CARROT_ZEST("§aCarrot Zest", PestType.CRICKET),
         DEEPFRIES("§aDeepfries", PestType.LOCUST),
@@ -101,6 +117,7 @@ object RareCropTracker {
         RAREFINDER_CHIP("§9Rarefinder Chip"),
         BURROWING_SPORES("§9Burrowing Spores"),
         WARTY("§5Warty"),
+        WILD_STRAWBERRY_DYE("§dWild Strawberry Dye", hasRareCropMessage = false),
         // These intentionally do not match drops from pests, since those are not "RARE CROP".
         COMPOST("§aCompost"),
         PLANT_MATTER("§aPlant Matter"),
@@ -128,15 +145,22 @@ object RareCropTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        for (dropType in RareCropDropType.entries) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
+        for (dropType in RareCropDropType.entries.filter { it.hasRareCropMessage }) {
             if (!dropType.chatPattern.matches(event.cleanMessage)) continue
-            addDrop(dropType)
-            PestProfitTracker.addRareCropDrop(dropType)
-            if (config.hideChat) {
-                event.blockedReason = "rare_crop_tracker"
-            }
+            event.trackDrop(dropType)
         }
+        dyeDropPattern.matchMatcher(event.cleanMessage) {
+            if (group("player") != PlayerUtils.getName()) return@matchMatcher
+            if (group("item") != "Wild Strawberry Dye") return@matchMatcher
+            event.trackDrop(RareCropDropType.WILD_STRAWBERRY_DYE)
+        }
+    }
+
+    private fun SkyHanniChatEvent.Allow.trackDrop(dropType: RareCropDropType) {
+        addDrop(dropType)
+        PestProfitTracker.addRareCropDrop(dropType)
+        if (config.hideChat) blockedReason = "rare_crop_tracker"
     }
 
     private fun addDrop(drop: RareCropDropType) {
@@ -164,12 +188,12 @@ object RareCropTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onIslandJoin(event: IslandJoinEvent) {
+    private fun onIslandJoin(event: IslandJoinEvent) {
         tracker.firstUpdate()
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+    private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
         val data = event.getConstantAsync<RareCropDropsJson>("ArmorDrops")
         rareCropDropInfo = data.specialCrops
     }
@@ -208,7 +232,7 @@ object RareCropTracker {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.farmingArmorDropsEnabled", "garden.farmingArmorDrop.enabled")
         event.move(3, "garden.farmingArmorDropsHideChat", "garden.farmingArmorDrop.hideChat")
         event.move(3, "garden.farmingArmorDropsPos", "garden.farmingArmorDrop.pos")
@@ -230,7 +254,7 @@ object RareCropTracker {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetrarecroptracker") {
             description = "Resets the Rare Crop Tracker"
             category = CommandCategory.USERS_RESET
