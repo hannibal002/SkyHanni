@@ -661,6 +661,7 @@ object WorldRenderUtils {
         seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
+        color: Color? = null,
     ) = drawDynamicText(
         location,
         text.asComponent(),
@@ -671,6 +672,7 @@ object WorldRenderUtils {
         seeThroughBlocks,
         ignoreY,
         maxDistance,
+        color,
     )
 
     fun SkyHanniRenderWorldEvent.drawDynamicText(
@@ -687,6 +689,7 @@ object WorldRenderUtils {
         seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
+        color: Color? = null,
     ) {
         val (viewerX, viewerY, viewerZ) = getViewerPos()
 
@@ -722,7 +725,7 @@ object WorldRenderUtils {
 
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
-        drawString(renderLocation, text, seeThroughBlocks, null, scale, true, yOff, 0)
+        drawString(renderLocation, text, seeThroughBlocks, color, scale, true, yOff, 0)
     }
 
     // TODO add chroma color support
