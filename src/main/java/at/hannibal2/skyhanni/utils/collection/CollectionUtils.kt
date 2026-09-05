@@ -18,7 +18,6 @@ import kotlinx.coroutines.coroutineScope
 
 @Suppress("TooManyFunctions")
 object CollectionUtils {
-
     inline fun <reified T : Queue<E>, reified E> T.drainForEach(action: (E) -> Unit): T {
         while (true) action(this.poll() ?: break)
         return this
@@ -47,14 +46,8 @@ object CollectionUtils {
         this[pairs.first] = pairs.second
     }
 
-    // Taken and modified from Skytils
     @JvmStatic
-    fun <T> T?.equalsOneOf(vararg other: T): Boolean {
-        for (obj in other) {
-            if (this == obj) return true
-        }
-        return false
-    }
+    fun <T> T?.equalsOneOf(vararg other: T): Boolean = this in other
 
     fun <T : Any> T?.toSingletonListOrEmpty(): List<T> = listOfNotNull(this)
 

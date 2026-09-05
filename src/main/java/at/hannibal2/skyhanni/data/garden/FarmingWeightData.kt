@@ -23,13 +23,13 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onEnable
-import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
@@ -88,7 +88,7 @@ object FarmingWeightData {
     @HandleEvent
     private fun onCollectionUpdate(event: CropCollectionAddEvent) {
         if (event.cropCollectionType == MOOSHROOM_COW) {
-            if (lastGainedCrop?.isAnyOf(CACTUS, SUGAR_CANE) == true) {
+            if (lastGainedCrop.equalsOneOf(CACTUS, SUGAR_CANE)) {
                 addWeight(event.amount / (event.crop.getFactor() * 2))
                 return
             }
