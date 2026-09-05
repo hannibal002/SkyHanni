@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.fishing
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishingConfig
+import at.hannibal2.skyhanni.config.features.fishing.trophyfrog.TrophyFrogsConfig
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager.CompactDoubleHookPosition
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -19,6 +20,10 @@ class FishingConfig {
     @Expose
     @Category(name = "Trophy Fishing", desc = "Trophy Fishing Settings")
     val trophyFishing: TrophyFishingConfig = TrophyFishingConfig()
+
+    @Expose
+    @Category(name = "Trophy Frogs", desc = "Trophy Frogs Settings")
+    val trophyFrogs: TrophyFrogsConfig = TrophyFrogsConfig()
 
     @Expose
     @ConfigOption(name = "Wormhole Finder", desc = "Settings for the Wormhole Finder on Lotus Atoll and Crimson Isle.")

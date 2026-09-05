@@ -1,41 +1,40 @@
-package at.hannibal2.skyhanni.features.fishing.trophy
+package at.hannibal2.skyhanni.features.fishing.trophyfrog
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyTotalCaught
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object OdgerTotalCaught : TrophyTotalCaught() {
+object RiberyTotalCaught : TrophyTotalCaught() {
 
-    private val config get() = SkyHanniMod.feature.fishing.trophyFishing
+    private val config get() = SkyHanniMod.feature.fishing.trophyFrogs
 
-    private val patternGroup = RepoPattern.group("fishing.trophy.odger")
+    private val patternGroup = RepoPattern.group("fishing.trophy.ribery")
 
     /**
      * REGEX-TEST: Discovered
      */
     override val discoveredPattern by patternGroup.pattern(
-        "discovered.new",
+        "discovered",
         "Discovered",
     )
 
     /**
+     * REGEX-TEST: Bronze ✔ (615)
      * REGEX-TEST: Bronze ✖
-     * REGEX-TEST: Bronze ✔ (4)
      */
     override val bronzePattern by patternGroup.pattern(
-        "bronze.new",
+        "bronze",
         "^Bronze.*",
     )
 
-    override fun isInInventory() = TrophyFishManager.odgerInventory.isInside()
-    override fun isEnabled() = config.totalFishCaught
-    override fun countsFor(cleanName: String) =
-        TrophyFishManager.fish?.get(TrophyFishApi.getInternalName(cleanName))
+    override fun isInInventory() = TrophyFrogManager.riberyInventory.isInside()
+    override fun isEnabled() = config.totalFrogsCaught
+    override fun countsFor(cleanName: String) = TrophyFrogManager.frog?.get(cleanName)
 
-    // Not island-gated because Odger has an Abiphone contact
     @HandleEvent(onlyOnSkyblock = true)
     private fun onToolTipEvent(event: ToolTipTextEvent) {
         handleToolTip(event)
