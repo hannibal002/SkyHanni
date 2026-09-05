@@ -60,6 +60,12 @@ class ForagingTrackerConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Disable Gifts", desc = "Disable the chat messages when you receive a tree gift.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var disableGiftChats: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Only Holding Axe", desc = "Only show the tracker while holding an axe.")
     @ConfigEditorBoolean
     var onlyHoldingAxe: Boolean = true
