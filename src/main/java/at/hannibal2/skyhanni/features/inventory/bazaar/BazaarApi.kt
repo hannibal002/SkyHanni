@@ -159,7 +159,12 @@ object BazaarApi {
         if (SkyBlockUtils.noTradeMode) return
         if (DungeonApi.inDungeon() || KuudraApi.inKuudra) return
         HypixelCommands.bazaar(displayName.removeColor())
-        amount?.let { OSUtils.copyToClipboard(it.toString()) }
+        amount?.let {
+            CoroutineSettings("searchForBazaarItem copyToClipboard").launchCoroutine {
+                val copied = OSUtils.copyToClipboardAsync(it.toString()) ?: false
+                if (!copied) ChatUtils.chat("§cFailed to copy amount to clipboard")
+            }
+        }
         currentSearchedItem = displayName.removeColor()
     }
 
