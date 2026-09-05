@@ -35,6 +35,10 @@ import kotlin.time.Duration.Companion.seconds
 object InventoryUtils {
     var itemInHandId = NeuInternalName.NONE
 
+    /**
+     * The slot indexes of the inner inventory of a 6 row chest.
+     * This is used to filter out the border slots of the chest.
+     */
     val innerInventorySlots: Set<Int> = listOf(
         10..16,
         19..25,
@@ -265,7 +269,5 @@ object InventoryUtils {
         return InventoryCompat.containerSlots(this)
     }
 
-    fun <T> Map<Int, T>.filterInnerSlots(): Map<Int, T> {
-        return this.filter { it.key in innerInventorySlots }
-    }
+    fun <T> Map<Int, T>.filterInnerSlots(): Map<Int, T> = filter { it.key in innerInventorySlots }
 }
