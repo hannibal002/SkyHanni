@@ -5,12 +5,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.minutes
 
 @JvmInline
 value class NeuInternalName private constructor(private val internalName: String) : Comparable<NeuInternalName> {
-
     override fun compareTo(other: NeuInternalName): Int = internalName.compareTo(other.internalName)
 
     fun asString() = internalName
@@ -61,7 +62,6 @@ value class NeuInternalName private constructor(private val internalName: String
         get() = getItemStackOrNull()?.`is`(Items.ENCHANTED_BOOK) == true
 
     companion object {
-
         val NONE = "NONE".toInternalName()
         val MISSING_ITEM = "MISSING_ITEM".toInternalName()
 
@@ -106,6 +106,9 @@ value class NeuInternalName private constructor(private val internalName: String
                 ?: SkyblockCurrency.getByLoreNameOrNull(itemName)?.internalName
         }
 
+        fun fromItemNameOrNull(itemName: Component): NeuInternalName? =
+            fromItemNameOrNull(itemName.formattedTextCompatLeadingWhiteLessResets())
+
         fun fromItemNameOrInternalName(itemName: String): NeuInternalName = fromItemNameOrNull(itemName) ?: itemName.toInternalName()
 
         private val categoryCache = TimeLimitedCache<NeuInternalName, ItemCategory>(10.minutes)
@@ -117,5 +120,8 @@ value class NeuInternalName private constructor(private val internalName: String
             ItemUtils.addMissingRepoItem(name, "Could not find internal name for $name")
             MISSING_ITEM
         }
+
+        fun fromItemName(itemName: Component): NeuInternalName =
+            fromItemName(itemName.formattedTextCompatLeadingWhiteLessResets())
     }
 }
