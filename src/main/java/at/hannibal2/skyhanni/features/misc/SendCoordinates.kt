@@ -3,10 +3,12 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -16,7 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -55,9 +57,38 @@ object SendCoordinates {
 
                 split.first().toFloat()
             } else end.toFloat()
-            waypoints.add(SharedWaypoint(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000))
+
+            val waypoint = SharedWaypoint(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000)
+            waypoints.add(waypoint)
+
+            if (config.pathfinder) {
+                pathfindTo(waypoint)
+            } else {
+                sendPathfindAction(waypoint)
+            }
+
             logger.log("got waypoint coords and username")
         }
+    }
+
+    private fun pathfindTo(waypoint: SharedWaypoint) {
+        if (waypoint !in waypoints || IslandGraphs.currentIslandGraph == null) return
+
+        IslandGraphs.pathFind(
+            location = waypoint.location,
+            label = waypoint.name,
+            color = config.color.toColor(),
+            condition = { waypoint in waypoints },
+        )
+    }
+
+    private fun sendPathfindAction(waypoint: SharedWaypoint) {
+        ChatUtils.clickableChat(
+            message = "Pathfind to ${waypoint.name}",
+            onClick = { pathfindTo(waypoint) },
+            hover = "§eClick to start pathfinding",
+            oneTimeClick = true,
+        )
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
@@ -72,7 +103,12 @@ object SendCoordinates {
             // TODO add chroma color support via config
             event.drawColor(location, LorenzColor.DARK_GREEN.toChromaColor(), alpha = 1f)
             event.drawWaypointFilled(location, config.color.toColor(), seeThroughBlocks = true, beacon = true)
-            event.drawString(location.blockCenter(), beacon.name + " §e[${formattedDistance}m]", true, LorenzColor.DARK_BLUE.toColor())
+            event.drawDynamicText(
+                location,
+                "§1${beacon.name} §e[${formattedDistance}m]",
+                1.0,
+                hideTooCloseAt = 0.0,
+            )
         }
     }
 
