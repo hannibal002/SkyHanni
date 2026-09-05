@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -8,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
-import org.lwjgl.glfw.GLFW
 
 class VisitorConfig {
     @Expose
@@ -102,9 +102,8 @@ class VisitorConfig {
             "§eUseful for getting Ephemeral Gratitudes during the Great Spook event."
     )
     @SearchTag("halloween")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var acceptHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
-
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var acceptHotkey: Int = KeyboardManager.KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Highlight Visitors in SkyBlock", desc = "Highlight visitors outside of the Garden.")

@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.config.features.event.diana
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.glfw.GLFW
 
 class RareMobSharingConfig {
 
@@ -32,8 +32,8 @@ class RareMobSharingConfig {
 
     @Expose
     @ConfigOption(name = "Share Key", desc = "Press this key to share your Rare Diana Mob Waypoint.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_Y)
-    var keyBindShare: Int = GLFW.GLFW_KEY_Y
+    @ConfigEditorKeybind(defaultKey = InputConstants.KEY_Y)
+    var keyBindShare: Int = InputConstants.KEY_Y
 
     @Expose
     @ConfigOption(name = "Rare Diana Mob Sound", desc = "")
