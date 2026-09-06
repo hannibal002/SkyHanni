@@ -16,7 +16,6 @@ class FairySoulConfig {
     )
     @FeatureToggle
     @ConfigEditorBoolean
-    var fastFairySouls: Boolean = true
 
     @Expose
     @ConfigOption(

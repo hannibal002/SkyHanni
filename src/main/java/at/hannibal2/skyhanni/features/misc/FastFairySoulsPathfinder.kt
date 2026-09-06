@@ -382,7 +382,7 @@ object FastFairySoulsPathfinder {
         ChatUtils.clickableChat(
             "§cFairy Souls are disabled. Click to enable!",
             onClick = {
-                config.fastFairySouls = true
+                config.fastFairySoul = true
             },
         )
         return true
@@ -402,5 +402,5 @@ object FastFairySoulsPathfinder {
 
     private fun getTargetNodes(nodes: List<GraphNode>): List<GraphNode> = nodes.filter { it.hasTag(GraphNodeTag.FAIRY_SOUL) }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.fastFairySouls
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.fastFairySoul
 }
