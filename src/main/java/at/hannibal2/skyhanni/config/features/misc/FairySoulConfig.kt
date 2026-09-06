@@ -1,0 +1,42 @@
+package at.hannibal2.skyhanni.config.features.misc
+
+import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+
+
+class FairySoulConfig {
+    @Expose
+    @ConfigOption(
+        name = "Fast Fairy Soul Tracking",
+        desc = "Enables Fast Fairy Soul tracking."
+    )
+    @FeatureToggle
+    @ConfigEditorBoolean
+    var fastFairySoul: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Fairy Soul Overlay",
+        desc = "Enables the Fairy Soul helper overlay in the Quest menu."
+    )
+    @FeatureToggle
+    @ConfigEditorBoolean
+    var fairySoulOverlay: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Fairy Soul Stack Size",
+        desc = "Sets the stack size for each island to number of remaining fairy souls in the Quest menu."
+    )
+    @FeatureToggle
+    @ConfigEditorBoolean
+    var fairySoulStackSize: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = FairySoulConfig::class, field = "fairySoulQuestOverlay")
+    val pos: Position = Position(445, 225)
+}
