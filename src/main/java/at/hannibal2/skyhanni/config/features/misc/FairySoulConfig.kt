@@ -37,6 +37,6 @@ class FairySoulConfig {
     var fairySoulStackSize: Boolean = true
 
     @Expose
-    @ConfigLink(owner = FairySoulConfig::class, field = "fairySoulQuestOverlay")
+    @ConfigLink(owner = FairySoulConfig::class, field = "fairySoulOverlay")
     val pos: Position = Position(445, 225)
 }
