@@ -42,7 +42,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object FastFairySoulsPathfinder {
-    val config get() = SkyHanniMod.feature.misc
+    val config get() = SkyHanniMod.feature.misc.fairySouls
 
     // TODO this does not work with glacite tunnels, should prob use strings and add the same workaround we have for graph area
     // TODO also once this is fixed, add a chat message when finding the last soul in dwarven mines and have not yet found the souls in glacite tunnels
