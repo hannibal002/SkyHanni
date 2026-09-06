@@ -150,11 +150,11 @@ object BazaarApi {
     fun NeuInternalName.getOpenSellOfferAmount(): Int =
         BazaarOrderApi.getOpenAmount(this, SimpleTransactionType.SELL_OFFER)
 
-    fun searchForBazaarItem(internalName: NeuInternalName, amount: Int? = null) {
+    fun searchForBazaarItem(internalName: NeuInternalName, amount: Number? = null) {
         searchForBazaarItem(internalName.itemNameWithoutColor, amount)
     }
 
-    fun searchForBazaarItem(displayName: String, amount: Int? = null) {
+    fun searchForBazaarItem(displayName: String, amount: Number? = null) {
         if (!SkyBlockUtils.inSkyBlock) return
         if (SkyBlockUtils.noTradeMode) return
         if (DungeonApi.inDungeon() || KuudraApi.inKuudra) return
@@ -163,11 +163,11 @@ object BazaarApi {
         currentSearchedItem = displayName.removeColor()
     }
 
-    fun searchForBazaarItemOrRecipe(internalName: NeuInternalName, amount: Int? = null) {
+    fun searchForBazaarItemOrRecipe(internalName: NeuInternalName, amount: Number? = null) {
         searchForBazaarItemOrRecipe(internalName.itemNameWithoutColor, amount)
     }
 
-    fun searchForBazaarItemOrRecipe(displayName: String, amount: Int? = null) {
+    fun searchForBazaarItemOrRecipe(displayName: String, amount: Number? = null) {
         if (!SkyBlockUtils.noTradeMode) searchForBazaarItem(displayName, amount)
         else HypixelCommands.recipe(displayName)
     }

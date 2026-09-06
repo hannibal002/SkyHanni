@@ -60,7 +60,7 @@ object BazaarOrderHelper {
     }
 
     private fun highlightColor(order: BazaarOrder, data: BazaarData): LorenzColor? {
-        if (order.filled >= order.amount) return LorenzColor.GREEN
+        if (order.isFull) return LorenzColor.GREEN
         val badPrice = when (order.type) {
             BazaarApi.SimpleTransactionType.BUY_ORDER -> order.pricePerUnit < data.instantSellPrice
             BazaarApi.SimpleTransactionType.SELL_OFFER -> order.pricePerUnit > data.instantBuyPrice

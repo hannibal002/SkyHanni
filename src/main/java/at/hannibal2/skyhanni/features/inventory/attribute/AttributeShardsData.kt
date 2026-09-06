@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.inventory.attribute
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.inventory.AttributeShardsConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
@@ -33,17 +32,19 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object AttributeShardsData {
-
     val config get(): AttributeShardsConfig = SkyHanniMod.feature.inventory.attributeShards
     private val storage get() = ProfileStorageData.profileSpecific?.attributeShards
 
@@ -52,6 +53,7 @@ object AttributeShardsData {
     private var attributeInfo = mapOf<String, NeuAttributeShardData>()
     private var internalNameToShard = mapOf<NeuInternalName, String>()
     private var attributeAbilityNameToShard = mapOf<String, String>()
+    private val validItemSlots = 9..44
 
     var maxShards = 0
         private set
@@ -71,15 +73,19 @@ object AttributeShardsData {
 
     private var lastSyphonedMessage = SimpleTimeMark.farPast()
 
+    private val huntingBoxSeenShards = mutableSetOf<String>()
+    private val huntingBoxSeenPages = mutableSetOf<Int>()
+
     private val patternGroup = RepoPattern.group("inventory.attributeshards")
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: (1/3) Oddities ➜ Shards
      * REGEX-TEST: Oddities ➜ Shards
      */
     val bazaarShardsInventoryPattern by patternGroup.pattern(
         "bazaar.shards.inventory",
-        "(?:\\(\\d+/\\d+\\) )?Oddities ➜ Shards",
+        """(?:\(\d+/\d+\) )?Oddities ➜ Shards""",
     )
 
     /**
@@ -89,7 +95,7 @@ object AttributeShardsData {
      */
     private val attributeMenuPattern by patternGroup.pattern(
         "attribute-menu",
-        "(?:\\(\\d+/\\d+\\) )?Attribute Menu",
+        """(?:\(\d+/\d+\) )?Attribute Menu""",
     )
 
     /**
@@ -99,7 +105,26 @@ object AttributeShardsData {
      */
     private val huntingBoxPattern by patternGroup.pattern(
         "hunting-box",
-        "(?:\\(\\d+/\\d+\\) )?Hunting Box",
+        """(?:\(\d+/\d+\) )?Hunting Box""",
+    )
+
+    /**
+     * REGEX-TEST: Hunting Box
+     * REGEX-TEST: (1/3) Hunting Box
+     * REGEX-TEST: (10/13) Hunting Box
+     */
+    private val huntingBoxPagePattern by patternGroup.pattern(
+        "hunting-box.page",
+        """(?:\((?<page>\d+)/(?<pages>\d+)\) )?Hunting Box""",
+    )
+
+    /**
+     * REGEX-TEST: Query: hey
+     * REGEX-TEST: Query: Voracious Spider
+     */
+    private val huntingBoxSearchQueryPattern by patternGroup.pattern(
+        "hunting-box.search-query.colorless",
+        "Query: .+",
     )
 
     /**
@@ -117,7 +142,7 @@ object AttributeShardsData {
      */
     private val fusionBoxPattern by patternGroup.pattern(
         "fusion-box",
-        "(?:\\(\\d+/\\d+\\) )?Fusion Box",
+        """(?:\(\d+/\d+\) )?Fusion Box""",
     )
 
     private val shardFusionPattern by patternGroup.pattern(
@@ -152,7 +177,7 @@ object AttributeShardsData {
      */
     private val syphonAmountPattern by patternGroup.pattern(
         "syphon.amount.colorless",
-        "Syphon (?<amount>\\d+) shards? to (?:level up|unlock)!",
+        """Syphon (?<amount>\d+) shards? to (?:level up|unlock)!""",
     )
 
     /**
@@ -161,7 +186,7 @@ object AttributeShardsData {
      */
     private val attributeShardNameLorePattern by patternGroup.pattern(
         "name.lore.colorless",
-        "(?<name>.+?) ?(?<tier>[IVXL]+)? \\(\\w+\\)$",
+        """(?<name>.+?) ?(?<tier>[IVXL]+)? \(\w+\)$""",
     )
 
     /**
@@ -172,7 +197,7 @@ object AttributeShardsData {
      */
     val amountOwnedPattern by patternGroup.pattern(
         "owned.colorless",
-        "Owned: (?<amount>[\\d,]+) Shards?",
+        """Owned: (?<amount>[\d,]+) Shards?""",
     )
 
     /**
@@ -180,7 +205,7 @@ object AttributeShardsData {
      */
     val requiredToFusePattern by patternGroup.pattern(
         "fuse.required.colorless",
-        "Required to fuse: (?<amount>\\d+)",
+        """Required to fuse: (?<amount>\d+)""",
     )
 
     /**
@@ -192,7 +217,7 @@ object AttributeShardsData {
      */
     private val shardSyphonedPattern by patternGroup.pattern(
         "chat.syphoned.colorless",
-        "\\+(?<amount>\\d+) (?<attributeName>.+) Attribute \\(Level (?<level>\\d+)\\) - (?<untilNext>\\d+) more to upgrade!",
+        """\+(?<amount>\d+) (?<attributeName>.+) Attribute \(Level (?<level>\d+)\) - (?<untilNext>\d+) more to upgrade!""",
     )
 
     /**
@@ -201,7 +226,7 @@ object AttributeShardsData {
      */
     private val shardSyphonedMaxedPattern by patternGroup.pattern(
         "chat.syphoned.maxed.colorless",
-        "\\+(?<amount>\\d+) (?<attributeName>.+) Attribute \\(Level (?<level>\\d+)\\) MAXED",
+        """\+(?<amount>\d+) (?<attributeName>.+) Attribute \(Level (?<level>\d+)\) MAXED""",
     )
 
     /**
@@ -209,7 +234,7 @@ object AttributeShardsData {
      */
     private val andMoreMessagePattern by patternGroup.pattern(
         "chat.and.more.colorless",
-        "and (?<amount>\\d+) more\\.\\.\\.",
+        """and (?<amount>\d+) more\.\.\.""",
     )
 
     private val advancedModeNotUnlockedPattern by patternGroup.pattern(
@@ -243,7 +268,7 @@ object AttributeShardsData {
      */
     private val caughtShardsPattern by patternGroup.pattern(
         "caught.shards.colorless",
-        "You caught(?: [an]+)?(?: x(?<amount>\\d+))? (?<shardName>.+) Shards?!",
+        """You caught(?: [an]+)?(?: x(?<amount>\d+))? (?<shardName>.+) Shards?!""",
     )
 
     /**
@@ -253,7 +278,7 @@ object AttributeShardsData {
      */
     private val caughtMultipleShardsPattern by patternGroup.pattern(
         "caught-multiple.shards",
-        "\uE025 .+ CATCH! You caught(?: [an]+)? (?<shardName>.+) Shard(?: x(?<amount>\\d+))?!"
+        """\uE025 .+ CATCH! You caught(?: [an]+)? (?<shardName>.+) Shard(?: x(?<amount>\d+))?!"""
     )
 
     /**
@@ -264,7 +289,7 @@ object AttributeShardsData {
      */
     private val lootShareShardPattern by patternGroup.pattern(
         "loot.share.shard.colorless",
-        "LOOT SHARE!? You received (?:an?|(?<amount>\\d+)x?) (?<shardName>.+) Shards? (?:for assisting .*|from .*)!",
+        """LOOT SHARE!? You received (?:an?|(?<amount>\d+)x?) (?<shardName>.+) Shards? (?:for assisting .*|from .*)!""",
     )
 
     /**
@@ -275,18 +300,16 @@ object AttributeShardsData {
      */
     private val fusionShardPattern by patternGroup.pattern(
         "fusion.shard.colorless",
-        "FUSION! You obtained(?: an?)? (?<shardName>.+) Shard(?: x(?<amount>\\d+))?!(?: NEW!)?",
+        """FUSION! You obtained(?: an?)? (?<shardName>.+) Shard(?: x(?<amount>\d+))?!(?: NEW!)?""",
     )
 
     /**
-     * REGEX-TEST: SALT You charmed a Magma Slug and captured 3 Shards from it.
-     * REGEX-TEST: SALT You charmed a Lapis Zombie and captured its Shard.
-     * REGEX-TEST: CHARM You charmed a Lapis Zombie and captured its Shard.
-     * REGEX-TEST: NAGA You charmed a Lapis Zombie and captured its Shard.
+     * REGEX-TEST: CHARM! You charmed the Haggard and received 3 Haggard Shards!
+     * REGEX-TEST: CHARM! You charmed the Slug and received 1 Keeled Slug Shard!
      */
     private val charmedShardPattern by patternGroup.pattern(
         "charmed.shard.colorless",
-        "(?<charmType>CHARM|SALT|NAGA) You charmed an? (?<shardName>.+) and captured (?:(?<amount>\\d+) Shards from it|its Shard)\\.",
+        """CHARM! You charmed the .+ and received (?<amount>\d+) (?<shardName>.+) Shards?!""",
     )
 
     /**
@@ -297,7 +320,7 @@ object AttributeShardsData {
      */
     private val sentToHuntingBoxPattern by patternGroup.pattern(
         "sent.to.hunting.box.colorless",
-        "You sent (?:an?|(?<amount>\\d+)) (?<shardName>.+) Shards? to your Hunting Box.",
+        """You sent (?:an?|(?<amount>\d+)) (?<shardName>.+) Shards? to your Hunting Box.""",
     )
 
     /**
@@ -311,7 +334,7 @@ object AttributeShardsData {
     @Suppress("MaxLineLength")
     private val capturedShardPattern by patternGroup.pattern(
         "captured.shard",
-        "CAPTURE! You (?:caught an?|found) .+ and (?:gained|as a reward (?:he|she|they) gave you) (?:an?|(?<amount>\\d+)x) (?<shardName>.+) Shard!",
+        """CAPTURE! You (?:caught an?|found) .+ and (?:gained|as a reward (?:he|she|they) gave you) (?:an?|(?<amount>\d+)x) (?<shardName>.+) Shard!""",
     )
 
     /**
@@ -331,16 +354,25 @@ object AttributeShardsData {
         "You have been given a (?<shardName>.+)!",
     )
 
-    // the boolean is if it should post the shard gain event
-    private val shardGainChatPatterns = mapOf(
-        caughtShardsPattern to (true to ShardSource.HUNT),
-        caughtMultipleShardsPattern to (true to ShardSource.FISHING),
-        lootShareShardPattern to (true to ShardSource.HUNT),
-        charmedShardPattern to (true to null),
-        sentToHuntingBoxPattern to (false to ShardSource.SENT_TO_HUNTING_BOX),
-        capturedShardPattern to (true to ShardSource.CAPTURED),
-        floorDropShardPattern to (true to ShardSource.FLOOR_DROP),
-        givenShardsPattern to (true to ShardSource.GIVEN),
+    /**
+     * REGEX-TEST: SHARD! Your contribution earned you the End Stone Protector Shard!
+     */
+    private val bossShardPattern by patternGroup.pattern(
+        "boss.shard",
+        "SHARD! Your contribution earned you the (?<shardName>.+) Shard!",
+    )
+    // </editor-fold>
+
+    private val shardGainChatPatterns = mapOf<Pattern, ShardSource>(
+        caughtShardsPattern to HUNT,
+        caughtMultipleShardsPattern to FISHING,
+        lootShareShardPattern to HUNT,
+        charmedShardPattern to CHARM,
+        sentToHuntingBoxPattern to SENT_TO_HUNTING_BOX,
+        capturedShardPattern to CAPTURED,
+        floorDropShardPattern to FLOOR_DROP,
+        givenShardsPattern to GIVEN,
+        bossShardPattern to BOSS,
     )
 
     @HandleEvent(priority = HandleEvent.LOWEST)
@@ -413,7 +445,7 @@ object AttributeShardsData {
             setAttributeState(shardInternalName, false)
         }
 
-        for ((pattern, shouldPostGainEvent) in shardGainChatPatterns) {
+        for ((pattern, source) in shardGainChatPatterns) {
             pattern.matchMatcher(message) {
                 val shardName = group("shardName")
                 val amount = groupOrNull("amount")?.toInt() ?: 1
@@ -424,24 +456,10 @@ object AttributeShardsData {
                     return
                 }
 
-                val source = shouldPostGainEvent.second
-                val newSource = if (source == null) {
-                    val type = groupOrNull("charmType")
-                    when (type) {
-                        "CHARM" -> ShardSource.CHARM
-                        "NAGA" -> ShardSource.NAGA
-                        "SALT" -> ShardSource.SALT
-
-                        else -> ShardSource.UNKNOWN
-                    }
+                if (source == SENT_TO_HUNTING_BOX) {
+                    ShardEvent(shardInternalName, amount, source).post()
                 } else {
-                    source
-                }
-
-                if (shouldPostGainEvent.first) {
-                    ShardGainEvent(shardInternalName, amount, newSource).post()
-                } else {
-                    ShardEvent(shardInternalName, amount, newSource).post()
+                    ShardGainEvent(shardInternalName, amount, source).post()
                 }
                 return
             }
@@ -512,39 +530,75 @@ object AttributeShardsData {
     private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!huntingBoxInventory.isInside()) return
         val items = event.inventoryItems
-        for ((_, item) in items) {
+        val shardsInBox = mutableSetOf<String>()
+        var searchActive = false
+
+        for ((slot, item) in items) {
+            if (!isValidSlotNumber(slot)) {
+                if (huntingBoxSearchQueryPattern.anyMatches(item.getCleanLore())) searchActive = true
+                continue
+            }
             val internalName = item.getInternalNameOrNull() ?: continue
             if (!isAttributeShard(internalName)) continue
-            var tier = 0
-            var toNextTier = 0
-            for (line in item.getCleanLore()) {
-                attributeShardNameLorePattern.matchMatcher(line) {
-                    tier = groupOrNull("tier")?.romanToDecimal() ?: 0
-                }
-                syphonAmountPattern.matchMatcher(line) {
-                    toNextTier = group("amount").toInt()
-                }
-                amountOwnedPattern.matchMatcher(line) {
-                    val amount = group("amount").formatInt()
-                    val attributeName = shardInternalNameToShardName(internalName)
-                    storage?.getOrPut(attributeName) {
-                        ProfileSpecificStorage.AttributeShardData()
-                    }?.amountInBox = amount
-                }
-            }
-            processShard(internalName, tier, toNextTier)
+            shardsInBox.add(readShardInHuntingBox(internalName, item))
         }
+
+        syncHuntingBoxAmounts(event.inventoryName, shardsInBox, searchActive)
         HuntingBoxValue.processInventory(items)
+    }
+
+    private fun readShardInHuntingBox(internalName: NeuInternalName, item: SafeItemStack): String {
+        val attributeName = shardInternalNameToShardName(internalName)
+        var tier = 0
+        var toNextTier = 0
+        for (line in item.getCleanLore()) {
+            attributeShardNameLorePattern.matchMatcher(line) {
+                tier = groupOrNull("tier")?.romanToDecimal() ?: 0
+            }
+            syphonAmountPattern.matchMatcher(line) {
+                toNextTier = group("amount").toInt()
+            }
+            amountOwnedPattern.matchMatcher(line) {
+                setAmountInBox(attributeName, group("amount").formatInt())
+            }
+        }
+        processShard(internalName, tier, toNextTier)
+        return attributeName
+    }
+
+    /**
+     * Shards missing from the box are gone, not unknown. Skipped while a search or an unvisited page hides shards.
+     */
+    private fun syncHuntingBoxAmounts(inventoryName: String, shardsInBox: Set<String>, searchActive: Boolean) {
+        if (searchActive) return
+        val (page, totalPages) = huntingBoxPagePattern.matchMatcher(inventoryName) {
+            (groupOrNull("page")?.toInt() ?: 1) to (groupOrNull("pages")?.toInt() ?: 1)
+        } ?: return
+
+        if (page == 1) {
+            huntingBoxSeenShards.clear()
+            huntingBoxSeenPages.clear()
+        }
+        huntingBoxSeenShards.addAll(shardsInBox)
+        huntingBoxSeenPages.add(page)
+        if (huntingBoxSeenPages.size < totalPages) return
+
+        storage?.forEach { (shardName, shardData) ->
+            if (shardName !in huntingBoxSeenShards) shardData.amountInBox = 0
+        }
+    }
+
+    private fun setAmountInBox(attributeName: String, amount: Int) {
+        storage?.getOrPut(attributeName) {
+            ProfileSpecificStorage.AttributeShardData()
+        }?.amountInBox = amount
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     private fun onShardGain(event: ShardEvent) {
         val attributeName = shardInternalNameToShardName(event.shardInternalName)
         val existing = storage?.get(attributeName)?.amountInBox ?: 0
-        val newAmount = (existing + event.amount).coerceAtLeast(0)
-        storage?.getOrPut(attributeName) {
-            ProfileSpecificStorage.AttributeShardData()
-        }?.amountInBox = newAmount
+        setAmountInBox(attributeName, (existing + event.amount).coerceAtLeast(0))
     }
 
     private fun processShard(
@@ -627,12 +681,10 @@ object AttributeShardsData {
         return internalName
     }
 
-    fun shardNameToAttributeInformation(shardName: String): NeuAttributeShardData? {
-        val info = attributeInfo[shardName]
-        if (info == null) {
-            ItemUtils.addMissingRepoItem(shardName, "Could not find information for attribute shard: $shardName")
-        }
-        return info
+    fun isValidSlotNumber(slot: Int): Boolean {
+        if (slot !in validItemSlots) return false
+        val modNine = slot % 9
+        return modNine != 0 && modNine != 8
     }
 
     fun isAttributeShard(internalName: NeuInternalName): Boolean =
@@ -683,7 +735,7 @@ object AttributeShardsData {
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresethuntingbox") {
             description = "Resets stored hunting box shards"
-            category = CommandCategory.USERS_RESET
+            category = USERS_RESET
             simpleCallback {
                 resetHuntingBoxShards()
             }

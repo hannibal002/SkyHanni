@@ -1,16 +1,9 @@
 package at.hannibal2.skyhanni.utils.render
 
-import at.hannibal2.skyhanni.shader.RoundedShader
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawFilledCircle
-import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRadialGradientFilledCircle
-import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRoundGradientRect
-import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRoundRect
-import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRoundRectOutline
-import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRoundTexturedRect
 import at.hannibal2.skyhanni.utils.render.states.RoundedRenderStateParams
 import at.hannibal2.skyhanni.utils.render.states.SkyHanniCircleRenderState
 import at.hannibal2.skyhanni.utils.render.states.SkyHanniRadialGradientCircleRenderState
@@ -21,7 +14,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.resources.Identifier
 import org.joml.Matrix3x2f
-import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.max
 
@@ -37,33 +29,6 @@ object ShaderRenderUtils {
         this.toColor().blue.toFloat() / 255f,
         this.alpha.toFloat() / 255f,
     )
-
-    /**
-     * Helper method to assist with setting up the shader for drawing rounded shapes.
-     */
-    private fun <T : RoundedShader<T>> T.applyBaseSettings(
-        radius: Int,
-        width: Int, height: Int, x: Int, y: Int,
-        smoothness: Float = 0f,
-        extraApplies: (T.() -> Unit)? = null,
-    ) = this.apply {
-        val scaleFactor = GuiScreenUtils.scaleFactor
-        val widthIn = width * scaleFactor
-        val heightIn = height * scaleFactor
-        val xIn = x * scaleFactor
-        val yIn = y * scaleFactor
-
-        this.scaleFactor = scaleFactor.toFloat()
-        this.radius = radius.toFloat()
-        this.smoothness = smoothness
-        this.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
-        this.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
-
-        val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.pose())
-        this.modelViewMatrix = Matrix4f()
-            .setTranslation(matrix3x2f.m20(), matrix3x2f.m21(), -11000.0f)
-            .scale(matrix3x2f.m00(), matrix3x2f.m11(), 1.0f)
-    }.also { extraApplies?.invoke(this) }
 
     /**
      * Method to draw a rounded textured rect.

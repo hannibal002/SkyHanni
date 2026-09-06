@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object GeorgeHelper {
 
     private val config get() = SkyHanniMod.feature.misc.pets.tamingSixty
-    private val useIndependentWiki get() = SkyHanniMod.feature.misc.commands.betterWiki.useIndependent
     private const val SPAWN_EGG_SLOT = 41
 
     private val patternGroup = RepoPattern.group("george.taming-sixty")
@@ -110,12 +109,12 @@ object GeorgeHelper {
                 onLeftClick = { HypixelCommands.auctionSearch("] $petName") },
             )
         } else {
-            val wiki = if (useIndependentWiki) WikiManager.data.unofficial else WikiManager.data.official
+            val wiki = WikiManager.wiki
             Renderable.clickable(
                 text = " §7- $formattedPet: §cNo price found. §eSee the ${wiki.name}.",
                 tips = listOf("§eView the ${wiki.name} article for $formattedPet§e."),
                 onLeftClick = {
-                    OSUtils.openBrowser(WikiManager.getSearchUrl("$petName Pet", useIndependent = useIndependentWiki))
+                    OSUtils.openBrowser(WikiManager.getSearchUrl("$petName Pet"))
                 },
             )
         }

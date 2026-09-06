@@ -65,7 +65,7 @@ object NavigationFeedback {
         val guiFormattedText = component.formattedTextCompat().replace("§e[SkyHanni] ", "§e")
         guiRenderable = Renderable.clickable(
             Renderable.text(guiFormattedText),
-            onLeftClick = IslandGraphs::cancelClick,
+            onLeftClick = IslandGraphs::manualCancel,
             tips = listOf("§eClick to stop navigating!"),
         )
         return true

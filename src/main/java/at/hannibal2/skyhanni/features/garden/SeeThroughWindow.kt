@@ -17,6 +17,7 @@ object SeeThroughWindow {
     private val config get() = SkyHanniMod.feature.garden.seeThroughWindow
 
     private var isActive = false
+    private var opacityChanged = false
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -42,10 +43,19 @@ object SeeThroughWindow {
     private fun setOpacity() {
         val handle = Minecraft.getInstance().window.handle()
         if (!isActive) {
-            GLFW.glfwSetWindowOpacity(handle, 1f)
+            if (opacityChanged) {
+                GLFW.glfwSetWindowOpacity(handle, 1f)
+                opacityChanged = false
+            }
             return
         }
         val alpha = (config.seeThroughFarming.get() / 100f).coerceAtLeast(0.05f).coerceAtMost(1f)
-        GLFW.glfwSetWindowOpacity(handle, alpha)
+        if (alpha != 1f) {
+            GLFW.glfwSetWindowOpacity(handle, alpha)
+            opacityChanged = true
+        } else if (opacityChanged) {
+            GLFW.glfwSetWindowOpacity(handle, 1f)
+            opacityChanged = false
+        }
     }
 }

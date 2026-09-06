@@ -8,5 +8,5 @@ fun shouldHideArmor(): Boolean = getEntity()?.let {
     it is Player && HideArmor.shouldHideArmor(it)
 } ?: false
 
-fun shouldHideHead(slot: EquipmentSlot) = shouldHideArmor() && !(HideArmor.config.onlyHelmet && slot != EquipmentSlot.HEAD)
+fun shouldHideSlot(slot: EquipmentSlot) = shouldHideArmor() && !(HideArmor.config.onlyHelmet && slot != EquipmentSlot.HEAD)
 

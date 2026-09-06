@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
@@ -56,9 +56,9 @@ object EntityMovementData {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    private fun onIslandJoin(event: IslandJoinEvent) {
         val nextData = nextTeleport ?: return
-        if (nextData.island != event.newIsland) return
+        if (nextData.island != event.island) return
         val passedSince = nextData.startTime.passedSince()
         if (passedSince > 5.seconds) {
             nextTeleport = null
@@ -72,7 +72,7 @@ object EntityMovementData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
+    private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         val nextData = nextTeleport ?: return
 
         val passedSince = nextData.startTime.passedSince()
@@ -88,7 +88,7 @@ object EntityMovementData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
+    private fun onTick() {
         addToTrack(MinecraftCompat.localPlayerOrThrow)
 
         for (entity in entityLocation.keys) {
@@ -105,7 +105,7 @@ object EntityMovementData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!warpingPattern.matches(event.message)) return
         DelayedRun.runNextTick {
             SkyHanniWarpEvent.post()
@@ -113,7 +113,7 @@ object EntityMovementData {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         entityLocation.clear()
     }
 }

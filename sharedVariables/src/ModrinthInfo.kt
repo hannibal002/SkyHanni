@@ -12,7 +12,15 @@ enum class ModrinthInfo(
             ModrinthDependency.FABRIC_API to DependencyType.REQUIRED,
             ModrinthDependency.FABRIC_LANGUAGE_KOTLIN to DependencyType.REQUIRED,
         )
-    )
+    ),
+    FABRIC_26_2(
+        minecraftVersions = listOf("26.2"),
+        loader = "fabric",
+        dependencies = mapOf(
+            ModrinthDependency.FABRIC_API to DependencyType.REQUIRED,
+            ModrinthDependency.FABRIC_LANGUAGE_KOTLIN to DependencyType.REQUIRED,
+        ),
+    ),
 }
 
 enum class ModrinthDependency(

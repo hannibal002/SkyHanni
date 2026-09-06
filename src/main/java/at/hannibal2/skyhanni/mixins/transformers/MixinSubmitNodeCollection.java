@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+//? if < 26.2 {
+/*import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -17,9 +18,18 @@ import java.util.List;
 
 @Mixin(SubmitNodeCollection.class)
 public abstract class MixinSubmitNodeCollection<E> {
-
-    @WrapOperation(method = "submitItem", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"))
-    private boolean onSubmitItem(List<E> list, E itemCommand, Operation<Boolean> original) {
+    @WrapOperation(
+        method = "submitItem",
+        at = @At(
+            value = "INVOKE",
+            target = "Ljava/util/List;add(Ljava/lang/Object;)Z"
+        )
+    )
+    private boolean onSubmitItem(
+        List<E> list,
+        E itemCommand,
+        Operation<Boolean> original
+    ) {
         skyhanni$markCustomOutline(itemCommand);
         return original.call(list, itemCommand);
     }
@@ -66,3 +76,4 @@ public abstract class MixinSubmitNodeCollection<E> {
         }
     }
 }
+*///?}
