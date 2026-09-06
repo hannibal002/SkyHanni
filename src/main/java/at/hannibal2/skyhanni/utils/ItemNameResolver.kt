@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -89,13 +90,32 @@ object ItemNameResolver {
             else -> null
         }
 
-    private fun resolvePetWithRarity(itemName: String): NeuInternalName? {
+    private fun parsePetString(itemName: String): Pair<LorenzRarity, String>? {
+        // Parse pet string using color codes
+        val petPattern = ".*§(?<color>\\d)(?<pet>.+)$".toPattern()
+        val patternResult = petPattern.matchMatcher(itemName) {
+            val groupPet = groupOrNull("pet") ?: return@matchMatcher null
+            val groupColor = groupOrNull("color")?.first() ?: return@matchMatcher null
+            val petName = groupPet.removeColor().split(" ").joinToString("_").uppercase()
+            val petRarity = LorenzRarity.getByColorCode(groupColor) ?: return@matchMatcher null
+            petRarity to petName
+        }
+
+        if (patternResult != null) return patternResult
+
+        // fallback to parsing without color and rarity string
         val splits = itemName.split(" ").takeIf { it.size > 1 } ?: return null
         val rarityLocation = splits.indexOfFirst { LorenzRarity.getByName(it) != null }
         val expectedRarityLocations = listOf(0, splits.size - 1)
         if (rarityLocation !in expectedRarityLocations) return null
         val petName = splits.filterIndexed { index, _ -> index != rarityLocation }.joinToString("_").uppercase()
         val petRarity = LorenzRarity.getByName(splits[rarityLocation]) ?: return null
+
+        return petRarity to petName
+    }
+
+    private fun resolvePetWithRarity(itemName: String): NeuInternalName? {
+        val (petRarity, petName) = parsePetString(itemName) ?: return null
         val internalName = "$petName;${petRarity.id}".toInternalName()
         return internalName.takeIf { it.getItemStackOrNull() != null }
     }
