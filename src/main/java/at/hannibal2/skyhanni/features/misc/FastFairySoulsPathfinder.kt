@@ -214,7 +214,7 @@ object FastFairySoulsPathfinder {
             val island = remainingMap[islandSlot]?.genericName ?: continue
             val found = remainingMap[islandSlot]?.soulsFound ?: continue
 
-            if (island.isInIsland()){
+            if (island.isInIsland()) {
                 data?.checkHaveAll()
             }
             totalFound[island] = found

@@ -38,7 +38,7 @@ object FairySoulQuestOverlay {
                 if (it > 0) {
                     islandList.add(
                         "§2${remainingMap[islandSlot]?.islandName}§7: " +
-                        "§e${remainingMap[islandSlot]?.soulsFound}§7/§d${remainingMap[islandSlot]?.soulsTotal}"
+                            "§e${remainingMap[islandSlot]?.soulsFound}§7/§d${remainingMap[islandSlot]?.soulsTotal}"
                     )
                 }
             }
