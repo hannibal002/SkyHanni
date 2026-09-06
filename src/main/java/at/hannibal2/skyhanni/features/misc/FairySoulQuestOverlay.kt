@@ -50,7 +50,7 @@ object FairySoulQuestOverlay {
             val island = item.cleanName
 
             visitedPattern.firstMatcher(lore) {
-                soulsfound += group("soulsfound").formatLong()
+                soulsfound = group("soulsfound").formatLong()
                 soulstotal = group("soulstotal").formatLong()
                 soulsremaining = soulstotal - soulsfound
 

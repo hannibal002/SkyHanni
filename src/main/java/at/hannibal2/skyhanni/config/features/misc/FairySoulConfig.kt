@@ -21,7 +21,7 @@ class FairySoulConfig {
     @Expose
     @ConfigOption(
         name = "Fairy Soul Overlay",
-        desc = "Enables the Fairy Soul overlay in the quest menu."
+        desc = "Enables the Fairy Soul overlay in the Fairy Soul quest menu."
     )
     @FeatureToggle
     @ConfigEditorBoolean
@@ -30,7 +30,7 @@ class FairySoulConfig {
     @Expose
     @ConfigOption(
         name = "Fairy Soul Stack Size",
-        desc = "Enables the display of remaining Fairy Souls in the stack size."
+        desc = "Enables the display of remaining Fairy Souls in each island's stack size in the Fairy Soul quest menu."
     )
     @FeatureToggle
     @ConfigEditorBoolean
