@@ -143,10 +143,25 @@ internal object SkyLayoutsLayoutCodec {
         }
     }
 
-    private fun layoutFromCells(cells: List<String?>): SkyShardsLayoutCodec.Layout =
-        SkyShardsLayoutCodec.Layout(
+    internal fun layoutFromCells(cells: List<String?>): SkyShardsLayoutCodec.Layout {
+        val occupied = mutableSetOf<Int>()
+        return SkyShardsLayoutCodec.Layout(
             cells.mapIndexedNotNull { index, cropId ->
                 cropId ?: return@mapIndexedNotNull null
+                if (index in occupied) return@mapIndexedNotNull null
+                val size = GreenhouseMutation.fromSkyShardsId(normalizeId(cropId))?.size ?: 1
+                // SkyLayouts stores every covered cell, including for touching large plants.
+                // Consume one square at a time in row order and keep its top-left cell.
+                repeat(size) { rowOffset ->
+                    repeat(size) { columnOffset ->
+                        val row = index / GRID_SIZE + rowOffset
+                        val column = index % GRID_SIZE + columnOffset
+                        val covered = row * GRID_SIZE + column
+                        require(row < GRID_SIZE && column < GRID_SIZE && cells.getOrNull(covered) == cropId && occupied.add(covered)) {
+                            "The SkyLayouts board contains an incomplete or overlapping mutation footprint."
+                        }
+                    }
+                }
                 SkyShardsLayoutCodec.Placement(
                     cropId = normalizeId(cropId),
                     row = index / GRID_SIZE,
@@ -155,6 +170,7 @@ internal object SkyLayoutsLayoutCodec {
                 )
             },
         )
+    }
 
     private fun shortValue(token: Char): Int = SHORT_ALPHABET.indexOf(token).also {
         require(it >= 0) { "The SkyLayouts short code contains an invalid character: $token" }

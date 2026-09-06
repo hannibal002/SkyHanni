@@ -21,12 +21,33 @@ class SkyLayoutsLayoutCodecTest {
     fun `decode SkyLayouts short link`() {
         val layout = SkyLayoutsLayoutCodec.decode(SHORT_FIXTURE)
 
-        assertEquals(85, layout.inputs.size)
+        assertEquals(58, layout.inputs.size)
         assertEquals(0, layout.targets.size)
-        assertEquals(36, layout.inputs.count { it.cropId == "noctilume" })
+        assertEquals(9, layout.inputs.count { it.cropId == "noctilume" })
         assertEquals(41, layout.inputs.count { it.cropId == "soggybud" })
         assertEquals(2, layout.inputs.count { it.cropId == "cindershade" })
         assertEquals(1, layout.inputs.count { it.cropId == "wild_rose" })
+    }
+
+    @Test
+    fun `compressed Noctilume layout contains nine plants instead of thirty-six`() {
+        val layout = SkyLayoutsLayoutCodec.decode(
+            "https://skylayouts.io/l/1AB~zKHPNf3qekLc01uFltErY3bDoAwCENL1znv_v_fGpjjwfhoszTZoVAji0RK1Q0kugVTMkGDuXcW_2A-fa1NZLOZxNKyw_Le-ksHyFI376ga2ntQED9kOS25kYebJxTPhSg4zuuJ3Q",
+        )
+        assertEquals(
+            listOf(0 to 1, 0 to 6, 2 to 1, 2 to 6, 4 to 6, 5 to 2, 6 to 6, 8 to 1, 8 to 6),
+            layout.inputs.filter { it.cropId == "noctilume" }.map { it.row to it.column },
+        )
+    }
+
+    @Test
+    fun `touching three by three plants retain separate top-left placements`() {
+        val cells = MutableList<String?>(100) { null }
+        for (row in 0..2) {
+            for (column in 0..5) cells[row * 10 + column] = "SNOOZLING"
+        }
+        val layout = SkyLayoutsLayoutCodec.layoutFromCells(cells)
+        assertEquals(listOf(0 to 0, 0 to 3), layout.inputs.map { it.row to it.column })
     }
 
     @Test

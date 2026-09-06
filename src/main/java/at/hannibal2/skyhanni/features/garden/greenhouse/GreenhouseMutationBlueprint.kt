@@ -82,12 +82,11 @@ object GreenhouseMutationBlueprint {
                 val mutation = GreenhouseMutation.fromInternalId(saved.mutationId) ?: return@forEachIndexed
                 if (mutation == targetMutation) return@forEachIndexed
                 val expected = saved.worldPosition(plot, blueprint.importedCells.isNotEmpty())
-                val matchIndex = liveMutations.indices.minByOrNull { liveIndex ->
+                val matchIndex = liveMutations.indices.filter { liveIndex ->
                     val live = liveMutations[liveIndex]
-                    if (live.mutation != mutation) Double.MAX_VALUE else live.position.distanceSq(expected)
-                }
-                val match = matchIndex?.let(liveMutations::get)
-                if (match == null || match.mutation != mutation || !match.position.matchesAnchor(expected, saved.size)) {
+                    live.mutation == mutation && live.position.matchesAnchor(expected, saved.size)
+                }.minByOrNull { liveMutations[it].position.distanceSq(expected) }
+                if (matchIndex == null) {
                     add(index)
                 } else {
                     liveMutations.removeAt(matchIndex)
@@ -695,9 +694,14 @@ object GreenhouseMutationBlueprint {
     private fun currentGreenhousePlot(): GardenPlot? =
         GardenPlotApi.getCurrentPlot()?.takeIf { it.greenhouse && GreenhouseUtils.isInGreenhouse() }
 
-    private fun LorenzVec.matchesAnchor(other: LorenzVec, size: Int): Boolean {
+    internal fun LorenzVec.matchesAnchor(other: LorenzVec, size: Int): Boolean {
         val horizontalTolerance = if (size <= 1) ANCHOR_HORIZONTAL_TOLERANCE else size / 2.0 + 0.25
-        return distanceSqIgnoreY(other) <= horizontalTolerance * horizontalTolerance &&
+        val matchesHorizontal = if (size <= 1) {
+            distanceSqIgnoreY(other) <= horizontalTolerance * horizontalTolerance
+        } else {
+            kotlin.math.abs(x - other.x) <= horizontalTolerance && kotlin.math.abs(z - other.z) <= horizontalTolerance
+        }
+        return matchesHorizontal &&
             kotlin.math.abs(y - other.y) <= ANCHOR_VERTICAL_TOLERANCE
     }
 
