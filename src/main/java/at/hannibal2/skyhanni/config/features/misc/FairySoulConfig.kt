@@ -16,7 +16,7 @@ class FairySoulConfig {
     )
     @FeatureToggle
     @ConfigEditorBoolean
-    var fastFairySouls: Boolean = true
+    var fastFairySouls: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -35,6 +35,15 @@ class FairySoulConfig {
     @FeatureToggle
     @ConfigEditorBoolean
     var fairySoulStackSize: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Highlight Incomplete Islands",
+        desc = "Highlights islands with missing Fairy Souls in the Fairy Soul quest menu."
+    )
+    @FeatureToggle
+    @ConfigEditorBoolean
+    var fairySoulQuestHighlight: Boolean = true
 
     @Expose
     @ConfigLink(owner = FairySoulConfig::class, field = "fairySoulOverlay")

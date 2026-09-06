@@ -20,15 +20,12 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -49,6 +46,8 @@ object FastFairySoulsPathfinder {
     private val foundSouls get() = ProfileStorageData.profileSpecific?.fairySouls?.found ?: mutableMapOf()
     private val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound
         ?: mutableMapOf()
+
+    private var remainingMap = mapOf<Int, FairySoulApi.remainingMapData>() // slot id -> (soulsfound, soulstotal)
 
     private var data: Data? = null
 
@@ -213,17 +212,13 @@ object FastFairySoulsPathfinder {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Fairy Souls Guide") return
 
-        for (stack in event.inventoryItems.values) {
-            val island = IslandType.getByNameOrNull(stack.cleanName) ?: continue
-            // The group is named "found" rather than "have", because "having" a fairy soul means trading it to Tia the Fairy for XP,
-            // which is distinct from finding it on an island.
-            val found = stack.getLoreComponent().firstOrNull()?.let {
-                loreSoulPattern.matchMatcher(it.string) {
-                    group("found").toIntOrNull()
-                }
-            } ?: continue
+        remainingMap = FairySoulApi.getRemainingMap(event)
 
-            if (island.isInIsland()) {
+        for (islandSlot in remainingMap.keys){
+            val island = remainingMap[islandSlot]?.genericName ?: continue
+            val found = remainingMap[islandSlot]?.soulsFound ?: continue
+
+            if (island.isInIsland()){
                 data?.checkHaveAll()
             }
             totalFound[island] = found
