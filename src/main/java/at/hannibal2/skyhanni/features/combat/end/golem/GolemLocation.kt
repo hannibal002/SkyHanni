@@ -29,6 +29,10 @@ object GolemLocation {
 
     private val config get() = SkyHanniMod.feature.combat.endIsland.golem
 
+    /**
+     * Deliberately one word: the entity is named "Endstone Protector", while the chat messages
+     * around the fight spell it "End Stone Protector". Both spellings are current.
+     */
     internal const val GOLEM_NAME = "Endstone Protector"
 
     /** How far a golem may be from a known point and still count as that point. */

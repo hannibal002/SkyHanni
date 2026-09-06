@@ -33,7 +33,7 @@ object GolemSpawnTimer {
     private const val MILLIS_PER_TICK = 50.0
 
     /**
-     * REGEX-TEST: §5☬ §r§dThe ground begins to shake as an End Stone Protector rises from below!
+     * REGEX-TEST: ☬ The ground begins to shake as an End Stone Protector rises from below!
      */
     private val risingPattern by repoGroup.pattern(
         "chat.rising",
@@ -58,7 +58,7 @@ object GolemSpawnTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        val message = event.message
+        val message = event.cleanMessage
         if (risingPattern.matches(message)) {
             spawnTick = MinecraftData.totalServerTicks + SPAWN_DELAY_TICKS
             return

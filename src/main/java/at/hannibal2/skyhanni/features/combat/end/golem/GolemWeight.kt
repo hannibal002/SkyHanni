@@ -30,11 +30,11 @@ object GolemWeight {
     private val repoGroup = RepoPattern.group("combat.boss.protector.2.weight")
 
     /**
-     * WRAPPED-REGEX-TEST: "                       §r§eZealots Contributed: §r§a27§r§e/100"
+     * WRAPPED-REGEX-TEST: "                       Zealots Contributed: 27/100"
      */
     private val zealotsPattern by repoGroup.pattern(
         "chat.end.zealot",
-        "\\s+§r§eZealots Contributed: §r§a(?<amount>\\d+)§r§e/100",
+        "\\s+Zealots Contributed: (?<amount>\\d+)/100",
     )
 
     private var pendingResult: EndBossFightEndEvent? = null
@@ -86,7 +86,7 @@ object GolemWeight {
             pendingResult = null
             return
         }
-        zealotsPattern.matchMatcher(event.message) {
+        zealotsPattern.matchMatcher(event.cleanMessage) {
             val zealots = group("amount").toInt()
             weight = calculateWeight(zealots, result.place, result.topDamage, result.yourDamage)
             if (config.weightChat) {

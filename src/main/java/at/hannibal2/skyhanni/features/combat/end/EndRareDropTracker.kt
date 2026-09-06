@@ -89,22 +89,19 @@ object EndRareDropTracker {
      * Kept apart because Pet Luck only applies to pet drops: the Tier Boost Core is a pet item,
      * not a pet, so it is boosted by Magic Find alone.
      */
-    private var bothBonus = 0.0
-    private var magicFindBonus = 0.0
+    private var magicFind = 0.0
+    private var petLuck = 0.0
 
     @HandleEvent
     private fun onEndBossDeath(event: EndBossDeathEvent) {
-        val magicFind = SkyblockStat.MAGIC_FIND.lastKnownValue ?: 0.0
-        val petLuck = SkyblockStat.PET_LUCK.lastKnownValue ?: 0.0
-        bothBonus = (magicFind + petLuck) / 100.0
-        magicFindBonus = magicFind / 100.0
+        magicFind = SkyblockStat.MAGIC_FIND.lastKnownValue ?: 0.0
+        petLuck = SkyblockStat.PET_LUCK.lastKnownValue ?: 0.0
     }
 
-    /** Chance = BaseChance x (1 + (MagicFind + PetLuck) / 100). */
-    private fun withPetBonus(baseChance: Double) = baseChance * (1 + bothBonus)
+    private fun withPetBonus(baseChance: Double) = baseChance * (1 + (magicFind + petLuck) / 100)
 
-    /** Chance = BaseChance x (1 + MagicFind / 100), for drops that are not pets themselves. */
-    private fun withMagicFindBonus(baseChance: Double) = baseChance * (1 + magicFindBonus)
+    /** Pet Luck only applies to pets, and the Tier Boost Core is a pet item rather than a pet. */
+    private fun withMagicFindBonus(baseChance: Double) = baseChance * (1 + magicFind / 100)
 
     @HandleEvent
     private fun onEndLootFound(event: EndLootFoundEvent) {

@@ -39,73 +39,73 @@ object DragonFightAPI {
     private val endGroup = group.group("chat.end")
     private val scoreboardGroup = group.group("scoreboard")
 
-    // <editor-fold desc="Patterns">
+
 
     /**
-     * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lProtector Dragon§r§d§l has spawned!
-     * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lYoung Dragon§r§d§l has spawned!
+     * REGEX-TEST: ☬ The Protector Dragon has spawned!
+     * REGEX-TEST: ☬ The Young Dragon has spawned!
      */
     private val dragonSpawnPattern by chatGroup.pattern(
         "spawn",
-        "§5☬ §r§d§lThe §r§5§c§l(?<dragon>$dragonNames) Dragon§r§d§l has spawned!",
+        "☬ The (?<dragon>$dragonNames) Dragon has spawned!",
     )
 
     /**
-     * REGEX-TEST: §5☬ §r§dYou placed a Summoning Eye! §r§7(§r§e2§r§7/§r§a8§r§7)
-     * REGEX-TEST: §5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7(§r§a8§r§7/§r§a8§r§7)
+     * REGEX-TEST: ☬ You placed a Summoning Eye! (2/8)
+     * REGEX-TEST: ☬ You placed a Summoning Eye! Brace yourselves! (8/8)
      */
     @Suppress("MaxLineLength")
     private val eyePlacedPattern by chatGroup.pattern(
         "eye.placed.you",
-        "§5☬ §r§dYou placed a Summoning Eye! §r§7\\(§r§e\\d§r§7\\/§r§a8§r§7\\)|§5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7\\(§r§a8§r§7\\/§r§a8§r§7\\)",
+        "☬ You placed a Summoning Eye!(?: Brace yourselves!)? \\(\\d/8\\)",
     )
 
     /**
-     * REGEX-TEST: §5You recovered a Summoning Eye!
+     * REGEX-TEST: You recovered a Summoning Eye!
      */
-    private val eyeRemovedPattern by chatGroup.pattern("eye.removed.you", "§5You recovered a Summoning Eye!")
+    private val eyeRemovedPattern by chatGroup.pattern("eye.removed.you", "You recovered a Summoning Eye!")
 
     /**
-     * REGEX-TEST: §5☬ §r§dThe Dragon Egg has spawned!
+     * REGEX-TEST: ☬ The Dragon Egg has spawned!
      */
-    private val eggSpawnedPattern by chatGroup.pattern("egg.spawn", "§5☬ §r§dThe Dragon Egg has spawned!")
+    private val eggSpawnedPattern by chatGroup.pattern("egg.spawn", "☬ The Dragon Egg has spawned!")
 
     /**
-     * WRAPPED-REGEX-TEST: "                          §r§6§lPROTECTOR DRAGON DOWN!"
-     * WRAPPED-REGEX-TEST: "                          §r§6§lYOUNG DRAGON DOWN!"
+     * WRAPPED-REGEX-TEST: "                          PROTECTOR DRAGON DOWN!"
+     * WRAPPED-REGEX-TEST: "                          YOUNG DRAGON DOWN!"
      */
     private val dragonDownPattern by endGroup.pattern(
         "down.dragon",
-        "\\s+§r§6§l(?:PROTECTOR|OLD|UNSTABLE|YOUNG|STRONG|WISE|SUPERIOR) DRAGON DOWN!",
+        "\\s+(?:PROTECTOR|OLD|UNSTABLE|YOUNG|STRONG|WISE|SUPERIOR) DRAGON DOWN!",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: "                    §r§6§lEND STONE PROTECTOR DOWN!"
+     * WRAPPED-REGEX-TEST: "                    END STONE PROTECTOR DOWN!"
      */
     private val protectorDownPattern by endGroup.pattern(
         "down.protector",
-        "\\s+§r§6§lEND ?STONE PROTECTOR DOWN!",
+        "\\s+END STONE PROTECTOR DOWN!",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: "             §r§e§l1st Damager §r§7- §r§b[MVP§r§c+§r§b] hordiniii§r§f §r§7- §r§e5,057,018"
-     * WRAPPED-REGEX-TEST: "          §r§6§l2nd Damager §r§7- §r§7Andromeda126785§r§7 §r§7- §r§e3,372,454"
-     * WRAPPED-REGEX-TEST: "             §r§c§l3rd Damager §r§7- §r§b[MVP§r§c+§r§b] AvitasG§r§f §r§7- §r§e1,975,795"
+     * WRAPPED-REGEX-TEST: "             1st Damager - [MVP+] hordiniii - 5,057,018"
+     * WRAPPED-REGEX-TEST: "          2nd Damager - Andromeda126785 - 3,372,454"
+     * WRAPPED-REGEX-TEST: "             3rd Damager - [MVP+] AvitasG - 1,975,795"
      */
     @Suppress("MaxLineLength")
     private val leaderboardPattern by endGroup.pattern(
         "place",
-        "\\s+§r§.§l(?<position>\\d+).. Damager §r§7- §r§.(?:\\[[^ ]+\\] )?(?<name>.*)§r§. §r§7- §r§e(?<damage>[\\d.,]+)",
+        "\\s+(?<position>\\d+).. Damager - (?:\\[[^ ]+\\] )?(?<name>.*) - (?<damage>[\\d.,]+)",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: "                      §r§eYour Damage: §r§a0 §r§7(Position #24)"
-     * WRAPPED-REGEX-TEST: "                 §r§eYour Damage: §r§a5,057,018 §r§7(Position #1)"
+     * WRAPPED-REGEX-TEST: "                      Your Damage: 0 (Position #24)"
+     * WRAPPED-REGEX-TEST: "                 Your Damage: 5,057,018 (Position #1)"
      */
     @Suppress("MaxLineLength")
     private val yourDamagePattern by endGroup.pattern(
         "position",
-        "\\s+§r§eYour Damage: §r§a(?<damage>[\\d.,]+) (?:§r§d§l\\(NEW RECORD!\\) )?§r§7\\(Position #(?<position>\\d+)\\)",
+        "\\s+Your Damage: (?<damage>[\\d.,]+) (?:\\(NEW RECORD!\\) )?\\(Position #(?<position>\\d+)\\)",
     )
 
     /**
@@ -122,20 +122,20 @@ object DragonFightAPI {
     )
 
     /**
-     * REGEX-TEST: Dragon HP: §a14,659,354 §c❤
-     * REGEX-TEST: Protector HP: §a2,317,156 §c❤
+     * REGEX-TEST: Dragon HP: 14,659,354 ❤
+     * REGEX-TEST: Protector HP: 2,317,156 ❤
      */
     private val scoreboardHpPattern by scoreboardGroup.pattern(
         "hp",
-        "(?:Protector|Dragon) HP: §a(?<hp>[\\d,.]+) .*",
+        "(?:Protector|Dragon) HP: (?<hp>[\\d,.]+) .*",
     )
 
     /**
-     * REGEX-TEST: Your Damage: §c2,003.2
+     * REGEX-TEST: Your Damage: 2,003.2
      */
     private val scoreboardDamagePattern by scoreboardGroup.pattern(
         "your-damage",
-        "Your Damage: §c(?<damage>[\\w,.]+)",
+        "Your Damage: (?<damage>[\\w,.]+)",
     )
 
     private val nestAreaPattern by group.pattern("area.nest", "Dragon's Nest")
@@ -167,7 +167,7 @@ object DragonFightAPI {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        val message = event.message
+        val message = event.cleanMessage
 
         when {
             eyePlacedPattern.matches(message) -> DragonFightState.eyesPlaced++
@@ -235,14 +235,17 @@ object DragonFightAPI {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     private fun onScoreboard(event: ScoreboardUpdateEvent) {
-        val index = event.new.indexOfFirst { scoreboardHpPattern.matches(it) }
+        // The scoreboard event carries the raw lines, so they are stripped here - the patterns
+        // themselves stay colorless like everywhere else.
+        val lines = event.new.map { it.removeColor() }
+        val index = lines.indexOfFirst { scoreboardHpPattern.matches(it) }
         if (index == -1) return
 
         if (DragonFightState.eggSpawned) DragonFightState.dragonSpawned = true
-        scoreboardHpPattern.matchMatcher(event.new[index]) {
-            currentHp = group("hp").removeColor().formatIntOrNull()
+        scoreboardHpPattern.matchMatcher(lines[index]) {
+            currentHp = group("hp").formatIntOrNull()
         }
-        scoreboardDamagePattern.matchMatcher(event.new[index + 1]) {
+        scoreboardDamagePattern.matchMatcher(lines[index + 1]) {
             DragonFightState.yourDamage = group("damage").formatDouble()
         }
     }

@@ -6,7 +6,10 @@ import at.hannibal2.skyhanni.events.EndLootFoundEvent
 import at.hannibal2.skyhanni.features.combat.end.RareDropAlert
 import at.hannibal2.skyhanni.features.combat.end.RareDropAlert.Drop
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 /**
  * Announces the major loot of a dragon fight. Special drops also interrupt the screen with a
@@ -21,7 +24,7 @@ object DragonDropAlert {
 
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragon
 
-    /** Special drops: rare enough to be worth covering the screen for. */
+
     private val specialDrops = mapOf(
         // NEU rarity suffixes: 3 is epic, 4 is legendary.
         "ENDER_DRAGON;4".toInternalName() to Drop(RareDropAlert.LEGENDARY, "LEGENDARY ENDER DRAGON PET"),
@@ -40,79 +43,32 @@ object DragonDropAlert {
             Drop(RareDropAlert.EPIC, "Travel Scroll to Dragon's Nest", withTitle = false),
     )
 
-    /**
-     * Listed by hand rather than derived from [DragonType]: a dragon added in the future will
-     * not be tracked until its four pieces are added here.
-     */
-    private val dragonArmor = mapOf(
-        "PROTECTOR_DRAGON_HELMET".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Protector Dragon Helmet", withTitle = false),
-        "PROTECTOR_DRAGON_CHESTPLATE".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Protector Dragon Chestplate", withTitle = false),
-        "PROTECTOR_DRAGON_LEGGINGS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Protector Dragon Leggings", withTitle = false),
-        "PROTECTOR_DRAGON_BOOTS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Protector Dragon Boots", withTitle = false),
-        "OLD_DRAGON_HELMET".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Old Dragon Helmet", withTitle = false),
-        "OLD_DRAGON_CHESTPLATE".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Old Dragon Chestplate", withTitle = false),
-        "OLD_DRAGON_LEGGINGS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Old Dragon Leggings", withTitle = false),
-        "OLD_DRAGON_BOOTS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Old Dragon Boots", withTitle = false),
-        "UNSTABLE_DRAGON_HELMET".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Unstable Dragon Helmet", withTitle = false),
-        "UNSTABLE_DRAGON_CHESTPLATE".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Unstable Dragon Chestplate", withTitle = false),
-        "UNSTABLE_DRAGON_LEGGINGS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Unstable Dragon Leggings", withTitle = false),
-        "UNSTABLE_DRAGON_BOOTS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Unstable Dragon Boots", withTitle = false),
-        "YOUNG_DRAGON_HELMET".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Young Dragon Helmet", withTitle = false),
-        "YOUNG_DRAGON_CHESTPLATE".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Young Dragon Chestplate", withTitle = false),
-        "YOUNG_DRAGON_LEGGINGS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Young Dragon Leggings", withTitle = false),
-        "YOUNG_DRAGON_BOOTS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Young Dragon Boots", withTitle = false),
-        "STRONG_DRAGON_HELMET".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Strong Dragon Helmet", withTitle = false),
-        "STRONG_DRAGON_CHESTPLATE".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Strong Dragon Chestplate", withTitle = false),
-        "STRONG_DRAGON_LEGGINGS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Strong Dragon Leggings", withTitle = false),
-        "STRONG_DRAGON_BOOTS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Strong Dragon Boots", withTitle = false),
-        "WISE_DRAGON_HELMET".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Wise Dragon Helmet", withTitle = false),
-        "WISE_DRAGON_CHESTPLATE".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Wise Dragon Chestplate", withTitle = false),
-        "WISE_DRAGON_LEGGINGS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Wise Dragon Leggings", withTitle = false),
-        "WISE_DRAGON_BOOTS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Wise Dragon Boots", withTitle = false),
-        "SUPERIOR_DRAGON_HELMET".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Superior Dragon Helmet", withTitle = false),
-        "SUPERIOR_DRAGON_CHESTPLATE".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Superior Dragon Chestplate", withTitle = false),
-        "SUPERIOR_DRAGON_LEGGINGS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Superior Dragon Leggings", withTitle = false),
-        "SUPERIOR_DRAGON_BOOTS".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Superior Dragon Boots", withTitle = false),
-    )
+    /** Every dragon drops the same four pieces. */
+    private val ARMOR_PIECES = listOf("HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS")
 
-    private val watchedDrops = specialDrops + rareDrops + dragonArmor
+    /**
+     * Derived from [DragonType] rather than listing all 28 items: a dragon added later is covered
+     * on its own, and the names are read from the repo instead of being written out again.
+     */
+    private val dragonArmor: Set<NeuInternalName> = DragonType.entries
+        .filter { it != DragonType.UNKNOWN }
+        .flatMap { type -> ARMOR_PIECES.map { "${type.name}_DRAGON_$it".toInternalName() } }
+        .toSet()
+
+    private val watchedDrops = specialDrops + rareDrops
 
     @HandleEvent
     private fun onEndLootFound(event: EndLootFoundEvent) {
         // No boss check: the drop tables of the two bosses do not overlap, and a drop collected
         // long after the kill cannot be attributed to a boss reliably anyway.
         if (!config.dropAlert) return
-        // Everything else is caught by its rarity colour, so armour and weapons are reported
-        // even when the label cannot be resolved to a known item.
-        val drop = watchedDrops[event.internalName] ?: return
+        val drop = watchedDrops[event.internalName] ?: armorDrop(event.internalName) ?: return
         RareDropAlert.show(event.internalName, drop, event.amount)
+    }
+
+    /** Resolved on the drop rather than up front, so the repo is guaranteed to be loaded. */
+    private fun armorDrop(internalName: NeuInternalName): Drop? {
+        if (internalName !in dragonArmor) return null
+        return Drop(RareDropAlert.LEGENDARY, internalName.repoItemName.removeColor(), withTitle = false)
     }
 }
