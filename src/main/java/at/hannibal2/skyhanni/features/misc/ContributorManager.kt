@@ -139,11 +139,11 @@ object ContributorManager {
                     ) { playerRef ->
                         callback {
                             val gameProfile = getArg(playerRef).gameProfile
-                            addTestContributor(gameProfile.id, gameProfile.name, null)
+                            addTestContributor(gameProfile.id, gameProfile.name, null, true)
                         }
                         argCallback("suffix", ComponentArgumentType.component(allowPlainText = true)) { suffix ->
                             val gameProfile = getArg(playerRef).gameProfile
-                            addTestContributor(gameProfile.id, gameProfile.name, suffix)
+                            addTestContributor(gameProfile.id, gameProfile.name, suffix, true)
                         }
                     }
                 }
@@ -154,14 +154,14 @@ object ContributorManager {
                                 addTestContributor(
                                     getArg(uuidRef),
                                     getArg(displayNameRef),
-                                    null,
+                                    null, true
                                 )
                             }
                             argCallback("suffix", ComponentArgumentType.component(allowPlainText = true)) { suffix ->
                                 addTestContributor(
                                     getArg(uuidRef),
                                     getArg(displayNameRef),
-                                    suffix,
+                                    suffix, true
                                 )
                             }
                         }
@@ -186,12 +186,13 @@ object ContributorManager {
         }
     }
 
-    private fun addTestContributor(uuid: UUID, displayName: String, suffix: Component?) {
+    private fun addTestContributor(uuid: UUID, displayName: String, suffix: Component?, deferAchievement: Boolean) {
         val alreadyExists = contributors.containsKey(uuid)
 
         val testEntry = ContributorJsonEntry(
             displayName = displayName,
             componentSuffix = suffix,
+            deferAchievement = deferAchievement,
         )
         contributors = contributors + (uuid to testEntry)
 
@@ -352,6 +353,7 @@ object ContributorManager {
 
     fun shouldSpin(uuid: UUID): Boolean = contributors[uuid]?.spinny ?: false
     fun shouldBeUpsideDown(uuid: UUID): Boolean = contributors[uuid]?.upsideDown ?: false
+    fun shouldDeferAchievement(uuid: UUID): Boolean = contributors[uuid]?.deferAchievement ?: false
 
     fun isSelfContributor(): Boolean {
         isContributor?.let { return it }

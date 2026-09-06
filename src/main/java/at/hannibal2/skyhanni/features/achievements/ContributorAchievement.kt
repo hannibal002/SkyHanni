@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.FriendAddEvent
 import at.hannibal2.skyhanni.events.FriendRequestDeclinedEvent
 import at.hannibal2.skyhanni.events.FriendRequestExpiredEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -31,6 +32,8 @@ object ContributorAchievement {
     private const val CONTRIBUTOR_FAMOUS_ACHIEVEMENT = "Contrib Famous"
 
     const val CONTRIBUTOR_ACHIEVEMENT_GOT = "Achievement Get! EEEEKK!!"
+
+    private var contributorQueue = mutableListOf<GameProfile>()
 
     @HandleEvent
     private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
@@ -130,7 +133,23 @@ object ContributorAchievement {
         }
     }
 
+    @HandleEvent
+    private fun onWorldChange(event: WorldChangeEvent) {
+        for (contributor in contributorQueue) {
+            grantAchievement(contributor)
+        }
+        contributorQueue.clear()
+    }
+
     fun onUniqueContributorSeen(profile: GameProfile) {
+        if (ContributorManager.shouldDeferAchievement(profile.id)) {
+            contributorQueue.add(profile)
+        } else {
+            grantAchievement(profile)
+        }
+    }
+
+    private fun grantAchievement(profile: GameProfile) {
         val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
         if (showContributorAchievement(profile, completed)) return
         showContributorDiscovered(profile)
@@ -160,6 +179,11 @@ object ContributorAchievement {
             append(player)
             appendWithColor(" ${profile.name}", ChatFormatting.AQUA)
             appendWithColor(" for the first time!", ChatFormatting.GRAY)
+            if (ContributorManager.shouldDeferAchievement(profile.id)) {
+                append("\n")
+                appendWithColor("However, they wanted to avoid the attention,\n", ChatFormatting.GRAY)
+                appendWithColor("so you have been notified with a delay.", ChatFormatting.GRAY)
+            }
         }
     }
 
