@@ -91,12 +91,10 @@ object FairySoulQuestOverlay {
             }
         }
 
-        if (true) {
-            config.pos.renderRenderables(
-                displayList,
-                extraSpace = 1,
-                posLabel = "Fairy Soul Quest Overlay",
-            )
-        }
+        config.pos.renderRenderables(
+            displayList,
+            extraSpace = 1,
+            posLabel = "Fairy Soul Quest Overlay",
+        )
     }
 }
