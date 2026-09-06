@@ -127,7 +127,11 @@ object GreenhouseMutationBlueprint {
         missingPlacements.forEach { index ->
             val saved = blueprint.mutations.getOrNull(index) ?: return@forEach
             val mutation = GreenhouseMutation.fromInternalId(saved.mutationId) ?: return@forEach
-            val position = saved.worldPosition(plot, blueprint.importedCells.isNotEmpty())
+            val anchor = saved.worldPosition(plot, blueprint.importedCells.isNotEmpty())
+            // Placement guidance starts at the footprint's top-left cell, while matching
+            // continues to use the detected mutation anchor.
+            val footprintOffset = (mutation.size / 2).toDouble()
+            val position = anchor.add(x = -footprintOffset, z = -footprintOffset)
             event.drawWaypointFilled(
                 position,
                 LorenzColor.RED.addOpacity(90),
