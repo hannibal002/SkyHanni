@@ -33,7 +33,7 @@ object ContributorAchievement {
 
     const val CONTRIBUTOR_ACHIEVEMENT_GOT = "Achievement Get! EEEEKK!!"
 
-    private var contributorQueue = mutableListOf<GameProfile>()
+    private val contributorQueue = mutableListOf<GameProfile>()
 
     @HandleEvent
     private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
@@ -134,7 +134,7 @@ object ContributorAchievement {
     }
 
     @HandleEvent
-    private fun onWorldChange(event: WorldChangeEvent) {
+    private fun onWorldChange() {
         for (contributor in contributorQueue) {
             grantAchievement(contributor)
         }
