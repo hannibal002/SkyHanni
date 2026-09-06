@@ -20,7 +20,7 @@ object FairySoulQuestOverlay {
 
     private var inFairySoulQuestMenu = false
 
-    private var islandList = mutableListOf<String>()
+    private val islandList = mutableListOf<String>()
     private var displayList = emptyList<Renderable>()
 
     private var remainingMap = mapOf<Int, FairySoulApi.remainingMapData>()
@@ -29,15 +29,17 @@ object FairySoulQuestOverlay {
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inFairySoulQuestMenu = event.inventoryName == "Fairy Souls Guide"
 
-        if(!inFairySoulQuestMenu) return
+        if (!inFairySoulQuestMenu) return
 
         remainingMap = FairySoulApi.getRemainingMap(event)
 
-        for (islandSlot in remainingMap.keys){
+        for (islandSlot in remainingMap.keys) {
             remainingMap[islandSlot]?.soulsRemaining?.let {
-                if (it > 0){
-                    islandList.add("§2${remainingMap[islandSlot]?.islandName}§7: " +
-                        "§e${remainingMap[islandSlot]?.soulsFound}§7/§d${remainingMap[islandSlot]?.soulsTotal}")
+                if (it > 0) {
+                    islandList.add(
+                        "§2${remainingMap[islandSlot]?.islandName}§7: " +
+                        "§e${remainingMap[islandSlot]?.soulsFound}§7/§d${remainingMap[islandSlot]?.soulsTotal}"
+                    )
                 }
             }
         }
@@ -54,7 +56,7 @@ object FairySoulQuestOverlay {
     }
 
     @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, onlyOnSkyblock = true)
-    fun onBackgroundDrawn() {
+    private fun onBackgroundDrawn() {
         if (!inFairySoulQuestMenu) return
         if (!config.fairySoulQuestHighlight) return
 
@@ -69,7 +71,7 @@ object FairySoulQuestOverlay {
 
     private fun getStackTip(slotIndex: Int): String {
         val soulsRemaining = remainingMap[slotIndex]?.soulsRemaining ?: return ""
-        return if (soulsRemaining > 0) "§e${soulsRemaining}" else ""
+        return if (soulsRemaining > 0) "§e$soulsRemaining" else ""
     }
 
     @HandleEvent

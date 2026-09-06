@@ -28,7 +28,7 @@ object FairySoulApi {
         val soulsTotal: Int,
         val soulsRemaining: Int,
         val islandName: String,
-        val genericName: IslandType
+        val genericName: IslandType,
     )
 
     fun getRemainingMutableMap(event: InventoryFullyOpenedEvent): MutableMap<Int, remainingMapData> {
@@ -59,7 +59,7 @@ object FairySoulApi {
         return remainingMap
     }
 
-    fun getRemainingMap(event: InventoryFullyOpenedEvent): Map<Int, remainingMapData>{
+    fun getRemainingMap(event: InventoryFullyOpenedEvent): Map<Int, remainingMapData> {
         return getRemainingMutableMap(event).toMap()
     }
 }

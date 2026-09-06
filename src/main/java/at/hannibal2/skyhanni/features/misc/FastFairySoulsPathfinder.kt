@@ -73,10 +73,6 @@ object FastFairySoulsPathfinder {
     /**
      * REGEX-TEST: Fairy Souls: 11/11
      */
-    private val loreSoulPattern by patternGroup.pattern(
-        "new.colorless",
-        "Fairy Souls: (?<found>.*)\\/(?<total>.*)",
-    )
 
     private class Data(
         var found: Int,
@@ -214,7 +210,7 @@ object FastFairySoulsPathfinder {
 
         remainingMap = FairySoulApi.getRemainingMap(event)
 
-        for (islandSlot in remainingMap.keys){
+        for (islandSlot in remainingMap.keys) {
             val island = remainingMap[islandSlot]?.genericName ?: continue
             val found = remainingMap[islandSlot]?.soulsFound ?: continue
 
