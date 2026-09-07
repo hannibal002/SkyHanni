@@ -20,8 +20,8 @@ object FairySoulQuestOverlay {
 
     private var inFairySoulQuestMenu = false
 
-    private val islandList = mutableListOf<String>()
-    private var displayList = emptyList<Renderable>()
+    private val islands = mutableListOf<String>()
+    private var display = emptyList<Renderable>()
 
     private var remainingMap = mapOf<Int, FairySoulApi.remainingMapData>()
 
@@ -36,7 +36,7 @@ object FairySoulQuestOverlay {
         for (islandSlot in remainingMap.keys) {
             remainingMap[islandSlot]?.soulsRemaining?.let {
                 if (it > 0) {
-                    islandList.add(
+                    islands.add(
                         "§2${remainingMap[islandSlot]?.islandName}§7: " +
                             "§e${remainingMap[islandSlot]?.soulsFound}§7/§d${remainingMap[islandSlot]?.soulsTotal}"
                     )
@@ -76,8 +76,11 @@ object FairySoulQuestOverlay {
 
     @HandleEvent
     private fun onInventoryClose() {
-        inFairySoulQuestMenu = false
-        islandList.clear()
+        if (inFairySoulQuestMenu) {
+            inFairySoulQuestMenu = false
+            islands.clear()
+            display = emptyList()
+        }
     }
 
     @HandleEvent
@@ -85,14 +88,16 @@ object FairySoulQuestOverlay {
         if (!SkyBlockUtils.onHypixel) return
         if (!(inFairySoulQuestMenu && config.fairySoulOverlay)) return
 
-        displayList = buildList {
-            for (island in islandList) {
-                addString(island)
+        if (display.isEmpty()) {
+            display = buildList {
+                for (island in islands) {
+                    addString(island)
+                }
             }
         }
 
         config.pos.renderRenderables(
-            displayList,
+            display,
             extraSpace = 1,
             posLabel = "Fairy Soul Quest Overlay",
         )
