@@ -126,6 +126,7 @@ object NeuItems {
         val tempNoColor = TreeMap<String, NeuInternalName>()
         val duplicates = mutableMapOf<String, MutableList<NeuInternalName>>()
         val nonPetsWithPetSuffix = mutableListOf<NeuInternalName>()
+        val leftoverLevelNames = mutableListOf<String>()
 
         allNeuRepoItems().forEach { (internalName, itemInfo) ->
             allInternalNames[internalName.asString()] = internalName
@@ -148,10 +149,7 @@ object NeuItems {
 
             if (!isKnownPet && cleanName.endsWith(" pet")) nonPetsWithPetSuffix.add(internalName)
 
-            if (cleanName.contains("[lvl 1➡100]")) {
-                if (PlatformUtils.isDevEnvironment) error("wrong name: '$cleanName'")
-                else println("wrong name: '$cleanName'")
-            }
+            if (cleanName.contains("[lvl 1➡100]")) leftoverLevelNames.add("${internalName.asString()}: '$cleanName'")
 
             val newCleanName = normalizeDisplayName(cleanName)
             if (newCleanName in ambiguousDisplayNames) return@forEach
@@ -170,6 +168,7 @@ object NeuItems {
         ChatUtils.debug("Cleared the NEUItems stack resolution cache")
         reportDuplicateDisplayNames(duplicates)
         reportNonPetsWithPetSuffix(nonPetsWithPetSuffix)
+        reportLeftoverLevelNames(leftoverLevelNames)
     }
 
     /**
@@ -196,6 +195,21 @@ object NeuItems {
             "Found non-pet items ending in ' Pet', please report this in discord",
             "Non-pet items ending in ' Pet' cannot be resolved via NeuInternalName.fromItemNameOrNull",
             "internal names" to nonPetsWithPetSuffix.sorted().map { it.asString() },
+            betaOnly = true,
+        )
+    }
+
+    /**
+     * A name that still contains the "[lvl 1➡100]" marker slipped past [neuPetLevelRegex].
+     * [normalizeDisplayName] then drops the non-ASCII arrow, and the lookup side never applies
+     * that normalization to a query, so the item is cached under a key nothing can ask for.
+     */
+    private fun reportLeftoverLevelNames(leftoverLevelNames: List<String>) {
+        if (leftoverLevelNames.isEmpty()) return
+        ErrorManager.logErrorStateWithData(
+            "Found item names with a leftover pet level marker, please report this in discord",
+            "Item names still contain '[lvl 1➡100]', which neuPetLevelRegex should have removed",
+            "names" to leftoverLevelNames.sorted(),
             betaOnly = true,
         )
     }
