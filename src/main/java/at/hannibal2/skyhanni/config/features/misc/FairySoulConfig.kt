@@ -47,5 +47,5 @@ class FairySoulConfig {
 
     @Expose
     @ConfigLink(owner = FairySoulConfig::class, field = "fairySoulOverlay")
-    val pos: Position = Position(445, 225)
+    val pos: Position = Position(5, 5)
 }
