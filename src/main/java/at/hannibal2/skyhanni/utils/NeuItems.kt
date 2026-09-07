@@ -125,6 +125,7 @@ object NeuItems {
         val tempAllItemCache = mutableMapOf<String, NeuInternalName>()
         val tempNoColor = TreeMap<String, NeuInternalName>()
         val duplicates = mutableMapOf<String, MutableList<NeuInternalName>>()
+        val nonPetsWithPetSuffix = mutableListOf<NeuInternalName>()
 
         allNeuRepoItems().forEach { (internalName, itemInfo) ->
             allInternalNames[internalName.asString()] = internalName
@@ -135,12 +136,17 @@ object NeuItems {
             // Every ignored item is named "§cBugged Item", see ItemUtils.getSpecialRepoItemName.
             if (ignoreItemsFilter.match(internalName.asString())) return@forEach
 
-            // Pet repo names carry a " Pet" suffix, which NeuInternalName.fromItemNameOrNull strips before the lookup.
+            // The " Pet" suffix is added by ItemUtils.getSpecialRepoItemName, and
+            // NeuInternalName.fromItemNameOrNull strips it from every query before the lookup.
+            // Stripping it from a non-pet would cache that item under a key no query can reach.
+            val isKnownPet = PetUtils.isKnownPetInternalName(internalName)
             val cleanName = internalName.getRepoItemNameFromJson(itemInfo)?.lowercase()?.removePrefix(neuPetLevelRegex)
-                ?.removeSuffix(" pet")?.takeIf { it.isNotEmpty() } ?: run {
+                ?.let { if (isKnownPet) it.removeSuffix(" pet") else it }?.takeIf { it.isNotEmpty() } ?: run {
                 ChatUtils.debug("skipped `$internalName` from readAllNeuItems")
                 return@forEach
             }
+
+            if (!isKnownPet && cleanName.endsWith(" pet")) nonPetsWithPetSuffix.add(internalName)
 
             if (cleanName.contains("[lvl 1➡100]")) {
                 if (PlatformUtils.isDevEnvironment) error("wrong name: '$cleanName'")
@@ -163,6 +169,7 @@ object NeuItems {
         NeuInternalName.clearItemNameCache()
         ChatUtils.debug("Cleared the NEUItems stack resolution cache")
         reportDuplicateDisplayNames(duplicates)
+        reportNonPetsWithPetSuffix(nonPetsWithPetSuffix)
     }
 
     /**
@@ -176,6 +183,21 @@ object NeuItems {
             val all = internalNames.joinToString(", ") { it.asString() }
             println("duplicate item display name '$displayName': $all")
         }
+    }
+
+    /**
+     * Only known pets are expected to end in " Pet", ItemUtils.getSpecialRepoItemName adds the suffix there.
+     * Any other item named this way cannot be resolved through NeuInternalName.fromItemNameOrNull,
+     * since that strips the suffix from every query.
+     */
+    private fun reportNonPetsWithPetSuffix(nonPetsWithPetSuffix: List<NeuInternalName>) {
+        if (nonPetsWithPetSuffix.isEmpty()) return
+        ErrorManager.logErrorStateWithData(
+            "Found non-pet items ending in ' Pet', please report this in discord",
+            "Non-pet items ending in ' Pet' cannot be resolved via NeuInternalName.fromItemNameOrNull",
+            "internal names" to nonPetsWithPetSuffix.sorted().map { it.asString() },
+            betaOnly = true,
+        )
     }
 
     fun getInternalName(itemStack: SafeItemStack): NeuInternalName? = ItemResolutionQuery()
