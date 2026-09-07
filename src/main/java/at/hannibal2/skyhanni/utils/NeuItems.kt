@@ -135,9 +135,9 @@ object NeuItems {
             // Every ignored item is named "§cBugged Item", see ItemUtils.getSpecialRepoItemName.
             if (ignoreItemsFilter.match(internalName.asString())) return@forEach
 
-            val cleanName = internalName.getRepoItemNameFromJson(itemInfo)?.lowercase()?.removePrefix(neuPetLevelRegex)?.takeIf {
-                it.isNotEmpty()
-            } ?: run {
+            // Pet repo names carry a " Pet" suffix, which NeuInternalName.fromItemNameOrNull strips before the lookup.
+            val cleanName = internalName.getRepoItemNameFromJson(itemInfo)?.lowercase()?.removePrefix(neuPetLevelRegex)
+                ?.removeSuffix(" pet")?.takeIf { it.isNotEmpty() } ?: run {
                 ChatUtils.debug("skipped `$internalName` from readAllNeuItems")
                 return@forEach
             }

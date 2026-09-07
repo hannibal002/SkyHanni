@@ -1,16 +1,23 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
+import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 
 /**
- * Event that is fired when a key is pressed while a SkyHanniGuiContainer is open.
- * This event is cancellable, and if canceled, the key press will not be processed by the GUI.
- * Users of this function should use [at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld]
- * or [at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked]
- * if they want to see which key was pressed.
+ * Fired when a key is pressed or a mouse button is clicked while a container screen is open.
+ * Despite the name, this covers mouse input as well.
+ *
+ * The event carries no information about which input triggered it, so listeners have to check the
+ * key or mouse button themselves, for example through `KeyboardManager.isKeyHeld()` or
+ * `KeyboardManager.isKeyClicked()`.
+ * Cancelling it stops the screen from handling the input.
+ *
+ * For mouse input specifically, prefer [GuiMouseInputEvent], which is fired alongside this one.
+ *
+ * @param guiContainer The container screen that received the input.
  */
 @PrimaryFunction("onGuiKeyPress")
 sealed class GuiKeyPressEvent(

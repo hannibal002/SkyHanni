@@ -361,6 +361,10 @@
 + Improved default settings for Garden features when using SkyHanni for the first time. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6357)
 + Added /shnavigateall undo to go back to the previous location. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6320)
 + Improved entity glowing performance on Minecraft 26.2. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6411)
++ Disabled the Boost Warning Volume option by default based on user feedback. - Luna (https://github.com/hannibal002/SkyHanni/pull/6484)
+    + The volume boost was always on by default, just under a different name, but it has been broken for a long time.
+    + If you want it enabled, you'll have to turn it back on manually after this update.
++ Made Hotbar, XP Bar, Action Bar, and Held Item Tooltip customization options searchable by typing moveable. - Luna (https://github.com/hannibal002/SkyHanni/pull/6498)
 
 ### Fixes
 
@@ -555,6 +559,7 @@
 + Fixed an error when hovering over the Traveling Zoo event in the Calendar. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6255)
 + Fixed an error message when opening the Lukas the Aquarist menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6454)
 + Fixed an error when reading item data of the new rabbits. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6496)
++ Fixed Bouncy Ball Line pointing to wrong landing spots. - 3d3n-pyc (https://github.com/hannibal002/SkyHanni/pull/6470)
 
 #### Fishing
 
@@ -737,6 +742,7 @@
 + Fixed mining features showing up on the Critter Safari. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6324)
 + Fixed an error message when the Mining Event Tracker could not load data. - 3d3n-pyc (https://github.com/hannibal002/SkyHanni/pull/6474)
 + Fixed an error when clicking fast in the Heart of the Mountain and Heart of the Forest menus. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6466)
++ Fixed End Stone Protector Shards obtained from the boss not being detected. - Luna (https://github.com/hannibal002/SkyHanni/pull/6505)
 
 #### Chat
 
@@ -914,6 +920,13 @@
     + Example: Fishing and Lily Pad Minion name tags, depending on placement.
 + Fixed excessive memory usage when many entities glow on Minecraft 26.2. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6411)
 + Fixed Limbo playtime in Detailed Playtime showing one hour less than the actual time when close to a full hour. - 3d3n-pyc (https://github.com/hannibal002/SkyHanni/pull/6473)
++ Fixed Boost Warning Volume also boosting non-warning sounds from SkyHanni. - Luna (https://github.com/hannibal002/SkyHanni/pull/6484)
++ Fixed particle-tracking items sometimes pointing at a completely wrong location. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6504)
+    + Especially noticeable with Hoppity Egg Locator in The End, Torrhus Canyon and Lotus Atoll.
++ Fixed the game crashing on launch with certain mods (e.g. MusicDisplay) installed on Minecraft 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/6499)
+    + This fixes the following crash: "Caused by: java.util.NoSuchElementException: Collection contains no element matching the predicate".
++ Fixed the movable Action Bar making Minecraft's GUI shift around and go off-screen while the Action Bar is empty. - Luna (https://github.com/hannibal002/SkyHanni/pull/6498)
+    + This could happen when outside Hypixel, when your internet or the server lagged for more than 2 seconds, or with Skyblocker's Fancy Bars feature enabled.
 
 ### Technical Details
 
@@ -1332,6 +1345,10 @@
 + Replaced the remaining `EntityRemovedEvent` usages with `EntityLeaveWorldEvent`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6487)
 + Switched to a dedicated library for non-X-Ray entity glowing. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6411)
 + Updated Detekt from 2.0.0-alpha.5 to 2.0.0-alpha.6. - Luna (https://github.com/hannibal002/SkyHanni/pull/6289)
++ Added MouseClickType to SlotClickEvent and deprecated the raw clickedButton value. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6494)
++ Bumped Render Chest to 1.0.3. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6508)
++ Cleaned up some deprecated and redundant code in the Gradle build scripts. - Luna (https://github.com/hannibal002/SkyHanni/pull/6419)
++ Fixed IntelliJ run configurations not being generated. - Luna (https://github.com/hannibal002/SkyHanni/pull/6419)
 
 ### Removed Features
 
