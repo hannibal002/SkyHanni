@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
  * Event that is fired when a key is pressed while a SkyHanniGuiContainer is open.
  * This event is cancellable, and if canceled, the key press will not be processed by the GUI.
  * Users of this function should use [at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld]
- * Or [at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked]
+ * or [at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked]
  * if they want to see which key was pressed.
  */
 @PrimaryFunction("onGuiKeyPress")
