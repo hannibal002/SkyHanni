@@ -51,4 +51,13 @@ class GetFromSackConfig {
     )
     @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
     var keybind: Int = KeyboardManager.KEY_UNKNOWN
+ 
+    @Expose
+    @ConfigOption(
+        name = "Compactor GfS Keybind",
+        desc = "While held, marks every item in your inventory that can reach its next craft step. " +
+            "Click one to grab the missing amount from your sacks."
+    )
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var compactorKeybind: Int = KeyboardManager.KEY_UNKNOWN
 }

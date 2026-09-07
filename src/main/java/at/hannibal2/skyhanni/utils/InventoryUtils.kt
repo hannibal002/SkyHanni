@@ -34,6 +34,18 @@ import kotlin.time.Duration.Companion.seconds
 @Suppress("MemberVisibilityCanBePrivate", "TooManyFunctions", "Unused")
 object InventoryUtils {
     var itemInHandId = NeuInternalName.NONE
+
+    /**
+     * The slot indexes of the inner inventory of a 6 row chest.
+     * This is used to filter out the border slots of the chest.
+     */
+    val innerInventorySlots: Set<Int> = listOf(
+        10..16,
+        19..25,
+        28..34,
+        37..43,
+    ).flatten().toSet()
+
     fun NeuInternalName.recentlyHeld(): Boolean = this in recentItemsInHand
 
     val recentItemsInHand = TimeLimitedSet<NeuInternalName>(30.seconds)
@@ -256,4 +268,6 @@ object InventoryUtils {
     fun SkyHanniGuiContainer.slots(): List<Slot> {
         return InventoryCompat.containerSlots(this)
     }
+
+    fun <T> Map<Int, T>.filterInnerSlots(): Map<Int, T> = filter { it.key in innerInventorySlots }
 }
