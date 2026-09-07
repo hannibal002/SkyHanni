@@ -34,7 +34,7 @@ object SeasonLockedChat {
             if (month == 0) return
             val start = nextStartOfMonth(month)
             // delayed so the line ends up below the message that triggered it
-            DelayedRun.runNextTickEnd {
+            DelayedRun.runNextTick {
                 ChatUtils.chat("§e$name §7opens in §b${start.formatTimeUntilWithDate()}")
             }
         }
