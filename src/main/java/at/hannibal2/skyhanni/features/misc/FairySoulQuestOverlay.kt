@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
@@ -47,7 +46,7 @@ object FairySoulQuestOverlay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     private fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!(inFairySoulQuestMenu && config.fairySoulStackSize)) return
 
@@ -76,7 +75,7 @@ object FairySoulQuestOverlay {
         return if (soulsRemaining > 0) "§e$soulsRemaining" else ""
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryClose() {
         if (inFairySoulQuestMenu) {
             inFairySoulQuestMenu = false
@@ -85,9 +84,8 @@ object FairySoulQuestOverlay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     private fun onChestGuiRender() {
-        if (!SkyBlockUtils.onHypixel) return
         if (!(inFairySoulQuestMenu && config.fairySoulOverlay)) return
 
         if (display.isEmpty()) {
