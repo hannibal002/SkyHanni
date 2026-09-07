@@ -33,13 +33,15 @@ object FairySoulQuestOverlay {
 
         remainingMap = FairySoulApi.getRemainingMap(event)
 
-        for (islandSlot in remainingMap.keys) {
-            remainingMap[islandSlot]?.soulsRemaining?.let {
-                if (it > 0) {
-                    islands.add(
-                        "§2${remainingMap[islandSlot]?.islandName}§7: " +
-                            "§e${remainingMap[islandSlot]?.soulsFound}§7/§d${remainingMap[islandSlot]?.soulsTotal}"
-                    )
+        display = buildList {
+            for (islandSlot in remainingMap.keys) {
+                remainingMap[islandSlot]?.soulsRemaining?.let {
+                    if (it > 0) {
+                        addString(
+                            "§2${remainingMap[islandSlot]?.islandName}§7: " +
+                                "§e${remainingMap[islandSlot]?.soulsFound}§7/§d${remainingMap[islandSlot]?.soulsTotal}"
+                        )
+                    }
                 }
             }
         }
