@@ -23,7 +23,7 @@ object FairySoulApi {
         "Fairy Souls: (?<soulsFound>[0-9]+)/(?<soulsTotal>[0-9]+)",
     )
 
-    class remainingMapData(
+    class islandSoulInfoData(
         val soulsFound: Int,
         val soulsTotal: Int,
         val soulsRemaining: Int,
@@ -31,8 +31,8 @@ object FairySoulApi {
         val genericName: IslandType,
     )
 
-    fun getRemainingMutableMap(event: InventoryFullyOpenedEvent): MutableMap<Int, remainingMapData> {
-        val remainingMap = mutableMapOf<Int, remainingMapData>()
+    fun getMutableIslandSoulInfo(event: InventoryFullyOpenedEvent): MutableMap<Int, islandSoulInfoData> {
+        val remainingMap = mutableMapOf<Int, islandSoulInfoData>()
 
         for ((slot, item) in event.inventoryItems) {
             val lore = item.getCleanLore()
@@ -55,13 +55,13 @@ object FairySoulApi {
                 soulsTotal = group("soulsTotal").toInt()
             }
 
-            remainingMap[slot] = remainingMapData(soulsFound, soulsTotal, soulsTotal - soulsFound, islandName, genericName)
+            remainingMap[slot] = islandSoulInfoData(soulsFound, soulsTotal, soulsTotal - soulsFound, islandName, genericName)
         }
 
         return remainingMap
     }
 
-    fun getRemainingMap(event: InventoryFullyOpenedEvent): Map<Int, remainingMapData> {
-        return getRemainingMutableMap(event).toMap()
+    fun getIslandSoulInfo(event: InventoryFullyOpenedEvent): Map<Int, islandSoulInfoData> {
+        return getMutableIslandSoulInfo(event).toMap()
     }
 }

@@ -23,7 +23,7 @@ object FairySoulQuestOverlay {
     private val islands = mutableListOf<String>()
     private var display = emptyList<Renderable>()
 
-    private var remainingMap = mapOf<Int, FairySoulApi.remainingMapData>()
+    private var islandSoulInfo = mapOf<Int, FairySoulApi.islandSoulInfoData>()
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -31,15 +31,15 @@ object FairySoulQuestOverlay {
 
         if (!inFairySoulQuestMenu) return
 
-        remainingMap = FairySoulApi.getRemainingMap(event)
+        islandSoulInfo = FairySoulApi.getIslandSoulInfo(event)
 
         display = buildList {
-            for (islandSlot in remainingMap.keys) {
-                remainingMap[islandSlot]?.soulsRemaining?.let {
+            for (islandSlot in islandSoulInfo.keys) {
+                islandSoulInfo[islandSlot]?.soulsRemaining?.let {
                     if (it > 0) {
                         addString(
-                            "§2${remainingMap[islandSlot]?.islandName}§7: " +
-                                "§e${remainingMap[islandSlot]?.soulsFound}§7/§d${remainingMap[islandSlot]?.soulsTotal}"
+                            "§2${islandSoulInfo[islandSlot]?.islandName}§7: " +
+                                "§e${islandSoulInfo[islandSlot]?.soulsFound}§7/§d${islandSoulInfo[islandSlot]?.soulsTotal}"
                         )
                     }
                 }
@@ -52,7 +52,7 @@ object FairySoulQuestOverlay {
         if (!(inFairySoulQuestMenu && config.fairySoulStackSize)) return
 
         val slotIndex = event.slot.index
-        if (slotIndex !in remainingMap) return
+        if (slotIndex !in islandSoulInfo) return
 
         event.stackTip = getStackTip(slotIndex)
     }
@@ -62,8 +62,8 @@ object FairySoulQuestOverlay {
         if (!inFairySoulQuestMenu) return
         if (!config.fairySoulQuestHighlight) return
 
-        for (slot in remainingMap.keys) {
-            val soulsRemaining = remainingMap[slot]?.soulsRemaining ?: continue
+        for (slot in islandSoulInfo.keys) {
+            val soulsRemaining = islandSoulInfo[slot]?.soulsRemaining ?: continue
 
             if (soulsRemaining > 0) {
                 InventoryUtils.getSlotAtIndex(slot)?.highlight(LorenzColor.RED)
@@ -72,7 +72,7 @@ object FairySoulQuestOverlay {
     }
 
     private fun getStackTip(slotIndex: Int): String {
-        val soulsRemaining = remainingMap[slotIndex]?.soulsRemaining ?: return ""
+        val soulsRemaining = islandSoulInfo[slotIndex]?.soulsRemaining ?: return ""
         return if (soulsRemaining > 0) "§e$soulsRemaining" else ""
     }
 
