@@ -211,13 +211,13 @@ object FastFairySoulsPathfinder {
         islandSoulInfo = FairySoulApi.getIslandSoulInfo(event)
 
         for (islandSlot in islandSoulInfo.keys) {
-            val genericIslandName = islandSoulInfo[islandSlot]?.genericName ?: continue
+            val islandType = islandSoulInfo[islandSlot]?.islandType ?: continue
             val found = islandSoulInfo[islandSlot]?.soulsFound ?: continue
 
-            if (genericIslandName.isInIsland()) {
+            if (islandType.isInIsland()) {
                 data?.checkHaveAll()
             }
-            totalFound[genericIslandName] = found
+            totalFound[islandType] = found
         }
     }
 

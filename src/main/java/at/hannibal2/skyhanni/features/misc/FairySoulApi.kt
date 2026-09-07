@@ -28,7 +28,7 @@ object FairySoulApi {
         val soulsTotal: Int,
         val soulsRemaining: Int,
         val islandName: String,
-        val genericName: IslandType,
+        val islandType: IslandType,
     )
 
     fun getMutableIslandSoulInfo(event: InventoryFullyOpenedEvent): MutableMap<Int, islandSoulInfoData> {
@@ -37,7 +37,7 @@ object FairySoulApi {
         for ((slot, item) in event.inventoryItems) {
             val lore = item.getCleanLore()
             val islandName = item.cleanName
-            val genericName = IslandType.getByNameOrNull(item.cleanName) ?: run {
+            val islandType = IslandType.getByNameOrNull(item.cleanName) ?: run {
                 if (islandName == "Safari") {
                     IslandType.SAFARI
                 } else if (islandName == "Miscellaneous") {
@@ -55,7 +55,7 @@ object FairySoulApi {
                 soulsTotal = group("soulsTotal").toInt()
             }
 
-            remainingMap[slot] = islandSoulInfoData(soulsFound, soulsTotal, soulsTotal - soulsFound, islandName, genericName)
+            remainingMap[slot] = islandSoulInfoData(soulsFound, soulsTotal, soulsTotal - soulsFound, islandName, islandType)
         }
 
         return remainingMap
