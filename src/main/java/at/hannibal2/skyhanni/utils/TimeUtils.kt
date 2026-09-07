@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -90,12 +91,15 @@ object TimeUtils {
         return prefix + result.trim()
     }
 
-    fun Duration.timerColor(default: String = "§f") = when (this) {
+    fun Duration.timerColor(default: String = "§f"): String = when (this) {
         in 0.seconds..60.seconds -> "§c"
         in 60.seconds..3.minutes -> "§6"
         in 3.minutes..10.minutes -> "§e"
         else -> default
     }
+
+    fun Duration.timerColorChatFormatting(default: ChatFormatting = ChatFormatting.WHITE): ChatFormatting =
+        ChatFormatting.getByCode(timerColor(default.toString())[1]) ?: ChatFormatting.WHITE
 
     fun Iterable<Duration>.average(): Duration {
         var sum: Duration = Duration.ZERO
@@ -126,7 +130,7 @@ object TimeUtils {
      */
     private val skyblockTimePattern by patternGroup.pattern(
         "24-hour-time",
-        "(?<hour>\\d+):(?<minute>\\d+)\\s*(?<period>am|pm)"
+        "(?<hour>\\d+):(?<minute>\\d+)\\s*(?<period>am|pm)",
     )
 
     fun String.parse12HourTime(): Pair<Int, Int>? {

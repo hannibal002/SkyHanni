@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
 import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
@@ -240,7 +241,10 @@ object TextHelper {
         return newComponent.takeIf { it.string.isNotEmpty() }
     }
 
-    fun split(component: Component, delimiter: String): List<Component>? {
+    fun split(
+        component: Component,
+        delimiter: String,
+    ): List<Component>? {
         val newComponents = mutableListOf<MutableComponent>()
         var currentComponent = Component.empty()
 
@@ -294,6 +298,35 @@ object TextHelper {
             if (index < size - 1) component.append(" ")
         }
         return component
+    }
+
+    /**
+     * Creates a comma-separated list using natural formatting (a, b, and c).
+     * this = the list of strings to join into a string, containing 0 or more elements.
+     * @param delimiterColor - the ChatFormatting of the delimiter, applied to each delimiter (commas and "and").
+     * @return a TextComponent of the list joined with the Oxford comma and the word "and".
+     */
+    fun List<Component>.createCommaSeparatedList(
+        delimiterColor: ChatFormatting = ChatFormatting.GRAY,
+    ): Component {
+        if (isEmpty()) return Component.empty()
+        if (size == 1) return this[0]
+        val startingList = this
+        if (size == 2) {
+            return componentBuilder {
+                append(startingList[0])
+                appendWithColor(" and ", delimiterColor)
+                append(startingList[1])
+            }
+        }
+        val lastIndex = size - 1
+        val allButLast = subList(0, lastIndex)
+
+        return componentBuilder {
+            append(join(allButLast, separator = ", ".asComponent().withColor(delimiterColor)))
+            appendWithColor(", and ", delimiterColor)
+            append(startingList[lastIndex])
+        }
     }
 
     fun GameProfile.asComponent(): Component {

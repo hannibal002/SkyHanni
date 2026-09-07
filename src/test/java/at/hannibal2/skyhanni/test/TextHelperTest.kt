@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.test
 
+import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
@@ -22,5 +25,38 @@ class TextHelperTest {
         Assertions.assertFalse(split.any { "\n" in it.string })
         Assertions.assertEquals("§dCookie Buff", split[0].formattedTextCompatLessResets())
         Assertions.assertEquals("§a10 months, 19 days", split[1].formattedTextCompatLessResets())
+    }
+
+    @Test
+    fun `create Oxford Comma separated components`() {
+        val componentList: MutableList<Component> = mutableListOf()
+        val stringList: MutableList<String> = mutableListOf()
+        Assertions.assertTrue(componentList.createCommaSeparatedList() == Component.empty())
+
+        val plotNamedWheat = "Wheat".asComponent().withColor(ChatFormatting.AQUA)
+        val wheatPlotLegacy = plotNamedWheat.formattedTextCompatLessResets()
+
+        stringList.add(wheatPlotLegacy)
+        componentList.add(plotNamedWheat)
+        oxfordCommaComparer(componentList, stringList)
+
+        componentList.add(plotNamedWheat)
+        stringList.add(wheatPlotLegacy)
+        oxfordCommaComparer(componentList, stringList)
+
+        componentList.add(plotNamedWheat)
+        stringList.add(wheatPlotLegacy)
+        oxfordCommaComparer(componentList, stringList)
+    }
+
+    private fun oxfordCommaComparer(
+        componentList: List<Component>,
+        stringList: List<String>,
+    ) {
+        Assertions.assertEquals(
+            stringList.createCommaSeparatedList("§7"),
+            componentList.createCommaSeparatedList(ChatFormatting.GRAY)
+                .formattedTextCompatLessResets()
+        )
     }
 }
