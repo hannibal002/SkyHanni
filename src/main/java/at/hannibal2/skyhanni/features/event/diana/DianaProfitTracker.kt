@@ -48,7 +48,7 @@ object DianaProfitTracker {
      * REGEX-TEST: You finished the Griffin burrow chain! (4/4)
      */
     private val chatDugOutPattern by patternGroup.pattern(
-        "burrow.dug",
+        "burrow.dug.colorless",
         "(?:You dug out a Griffin Burrow!|You finished the Griffin burrow chain!).*",
     )
 
@@ -56,7 +56,7 @@ object DianaProfitTracker {
      * REGEX-TEST: Wow! You dug out 1,000 coins!
      */
     private val chatDugOutCoinsPattern by patternGroup.pattern(
-        "coins",
+        "coins.colorless",
         "Wow! You dug out (?<coins>[\\d,.]+) coins!",
     )
 
