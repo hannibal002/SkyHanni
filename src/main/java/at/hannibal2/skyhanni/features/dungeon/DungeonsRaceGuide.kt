@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object DungeonsRaceGuide {
-
     private val config get() = SkyHanniMod.feature.dungeon.dungeonsRaceGuide
 
     private val CANCEL_RACE_ITEM = "CANCEL_RACE_ITEM".toInternalName()
@@ -43,7 +42,7 @@ object DungeonsRaceGuide {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DungeonHubRacesJson>("DungeonHubRaces")
         for ((key, map) in data.data) {
             val nothingNoReturn = map["nothing:no_return"]

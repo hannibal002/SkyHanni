@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
 
+import at.hannibal2.skyhanni.api.event.AbstractSkyHanniEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFStrayRabbitWarningConfig.StrayTypeEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -43,7 +43,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CFStrayWarning {
-
     private val config get() = CFApi.config
     private val warningConfig get() = config.rabbitWarning
     private val chromaColor = ChromaColour.fromRGB(255, 85, 85, 2500, 255)
@@ -175,7 +174,7 @@ object CFStrayWarning {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         destructiveSlots = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations").destructiveSlots
     }
 
@@ -194,7 +193,7 @@ object CFStrayWarning {
         event.sendPreventCloseTitle()
     }
 
-    private fun SkyHanniEvent.Cancellable.sendPreventCloseTitle() {
+    private fun AbstractSkyHanniEvent.Cancellable.sendPreventCloseTitle() {
         TitleManager.sendTitle(
             "§cStray Rabbit Prevented Close",
             subtitleText = "§7Hold §eShift §7to bypass",

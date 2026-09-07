@@ -27,7 +27,6 @@ import java.util.regex.PatternSyntaxException
  */
 @SkyHanniModule
 object RepoPatternManager {
-
     val allPatterns: Collection<CommonPatternInfo<*, *>> get() = usedKeys.values
 
     /**
@@ -150,7 +149,7 @@ object RepoPatternManager {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         loadPatternsFromDump(event.getConstant<RepoPatternDump>("regexesModern"))
     }
 
@@ -326,5 +325,4 @@ object RepoPatternManager {
             true
         }.map { it.value.toPattern() }
     }
-
 }

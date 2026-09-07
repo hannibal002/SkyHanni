@@ -107,7 +107,7 @@ object DungeonLividFinder {
     )
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         lividTextureToColor.clear()
         val data = event.getConstant<LividSolverJson>("dungeons/LividSolver")
         val names = mutableMapOf<String, LorenzColor>()

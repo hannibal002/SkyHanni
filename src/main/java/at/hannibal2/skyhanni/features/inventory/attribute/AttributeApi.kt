@@ -15,7 +15,6 @@ import java.util.regex.Pattern
 
 @SkyHanniModule
 object AttributeApi {
-
     private var goodRolls = listOf<GoodRollItem>()
 
     enum class AttributeType(val displayName: String, val internalName: String, val shortName: String) {
@@ -62,7 +61,6 @@ object AttributeApi {
         override fun toString() = "§b$displayName"
 
         companion object {
-
             fun getByInternalNameOrNull(internalName: String) = entries.find { it.internalName == internalName }
 
             fun getByInternalName(internalName: String) = getByInternalNameOrNull(internalName) ?: UNKNOWN
@@ -72,7 +70,7 @@ object AttributeApi {
     private data class GoodRollItem(val regex: Pattern, val attributes: List<Pair<AttributeType, AttributeType>>)
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<AttributeGoodRollsJson>("AttributeGoodRolls")
         goodRolls = data.goodRolls.values.map {
             val regex = it.regex.toPattern()

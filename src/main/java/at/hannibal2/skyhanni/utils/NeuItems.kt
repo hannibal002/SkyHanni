@@ -91,7 +91,7 @@ object NeuItems {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val ignoredItems = event.getConstant<MultiFilterJson>("IgnoredItems")
         ignoreItemsFilter.load(ignoredItems)
         commonItemAliases = event.getConstant<ItemAliases>("ItemAliases")
@@ -105,7 +105,7 @@ object NeuItems {
     }
 
     @HandleEvent
-    private fun onNeuRepoReload() {
+    private suspend fun onNeuRepoReload() {
         multiplierCache.clear()
         itemIdCache.clear()
         DelayedRun.runOrNextTick(::readAllNeuItems)

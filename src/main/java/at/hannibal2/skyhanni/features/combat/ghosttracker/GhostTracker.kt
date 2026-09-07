@@ -53,7 +53,6 @@ import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object GhostTracker {
-
     private val config get() = SkyHanniMod.feature.combat.ghostCounter
 
     private val storage get() = ProfileStorageData.profileSpecific?.ghostStorage
@@ -315,7 +314,7 @@ object GhostTracker {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val ghostDropsConstant = event.getConstant<GhostDropsJson>("GhostDrops")
         allowedDrops = ghostDropsConstant.ghostDrops
         allowedSackDrops = ghostDropsConstant.sacksDrops
@@ -393,7 +392,6 @@ object GhostTracker {
 
     @HandleEvent
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-
         fun migrateItem(oldData: JsonElement): JsonElement {
             val oldAmount = oldData.asInt
             return JsonObject().apply {

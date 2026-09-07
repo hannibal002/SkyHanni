@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object AnitaExtraFarmingFortune {
-
     private val config get() = GardenApi.config.anitaShop
 
     private val patternGroup = RepoPattern.group("garden.inventory.anita.extrafortune")
@@ -153,7 +152,7 @@ object AnitaExtraFarmingFortune {
     )
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<AnitaUpgradeCostsJson>("AnitaUpgradeCosts")
         levelPrice = data.levelPrice
     }

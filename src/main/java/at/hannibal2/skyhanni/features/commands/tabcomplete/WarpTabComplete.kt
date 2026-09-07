@@ -10,12 +10,11 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 @SkyHanniModule
 object WarpTabComplete {
-
     private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
     private var warps = emptyList<String>()
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<WarpsJson>("Warps")
         warps = data.warpCommands
     }

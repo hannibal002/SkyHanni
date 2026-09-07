@@ -17,12 +17,11 @@ import kotlin.time.Duration.Companion.INFINITE
 
 @SkyHanniModule
 object EnforcedConfigValues {
-
     private var enforcedConfigValuesData: List<EnforcedValueData> = listOf()
     private var hasSentPSAsOnce = false
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val constant = event.getConstant<EnforcedConfigValuesJson>("misc/EnforcedConfigValues").enforcedConfigValues
         val oldEnforcedValues = enforcedConfigValuesData
         enforcedConfigValuesData = constant.filter {
@@ -88,5 +87,4 @@ object EnforcedConfigValues {
         } ?: return null
         return firstEnforcedValue.extraMessage.orEmpty()
     }
-
 }

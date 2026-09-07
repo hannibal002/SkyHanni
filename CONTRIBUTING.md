@@ -275,8 +275,8 @@ Make sure such pull requests have a good explanation in the **What** section.
           would only be received by listeners registered for that type. Generic events
           are also cancellable.
         - RenderingSkyHanniEvent: An event in which listeners are allowed to do GUI rendering.
-    - Events can also use the `SkyHanniEvent.Cancellable` and `SkyHanniEvent.Rendering`
-      interfaces directly if needed.
+    - Events can also use the `AbstractSkyHanniEvent.Cancellable` and `SkyHanniEvent.Rendering`
+      interfaces directly if needed. `Cancellable` works for both synchronous and asynchronous events.
     - Functions annotated with `@HandleEvent` must be declared `private`.
       The [SkyHanni IntelliJ plugin](https://github.com/hannibal002/SkyHanniDevelopment) flags non-private handlers and provides a quick
       fix.

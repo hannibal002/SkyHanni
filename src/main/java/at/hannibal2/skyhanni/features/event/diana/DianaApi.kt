@@ -22,7 +22,6 @@ import net.minecraft.client.player.RemotePlayer
 
 @SkyHanniModule
 object DianaApi {
-
     private var spades = emptySet<NeuInternalName>()
 
     fun hasSpadeInHand() = InventoryUtils.itemInHandId in spades
@@ -73,7 +72,7 @@ object DianaApi {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val dianaJson = event.getConstant<DianaJson>("events/Diana")
 
         mythologicalCreatures = dianaJson.mythologicalCreatures

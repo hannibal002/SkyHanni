@@ -39,7 +39,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object InfernoMinionProfitTracker {
-
     private val config get() = SkyHanniMod.feature.misc.minions.infernoProfitTracker
 
     private val eyedropsItem = "CAPSAICIN_EYEDROPS_NO_CHARGES".toInternalName()
@@ -62,7 +61,6 @@ object InfernoMinionProfitTracker {
     data class Data(
         @Expose var totalFuelCost: Double = 0.0,
     ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
-
         override fun getDescription(timesGained: Long): List<String> {
             val totalItems = items.values.sumOf { it.timesGained }
             val shareOfDrops = if (totalItems > 0) timesGained.toDouble() / totalItems else 0.0
@@ -124,7 +122,7 @@ object InfernoMinionProfitTracker {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<MinionDropsJson>("MinionDrops")
         fuelDropMap = data.fuelDrops
         minionDropMap = data.minions

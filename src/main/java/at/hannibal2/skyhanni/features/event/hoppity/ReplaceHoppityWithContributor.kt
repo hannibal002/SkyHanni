@@ -21,22 +21,21 @@ import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object ReplaceHoppityWithContributor {
-
     private val config get() = CFApi.config
 
     private val replaceMap = mutableMapOf<String, String>()
 
-    @HandleEvent(priority = 5)
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    @HandleEvent(priorityLevel = LOWEST)
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         update()
     }
 
-    @HandleEvent(priority = HandleEvent.LOW)
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    @HandleEvent(priorityLevel = LOW)
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         update()
     }
 
-    fun update() {
+    private fun update() {
         replaceMap.clear()
 
         val contributors = ContributorManager.contributorNames
@@ -53,8 +52,8 @@ object ReplaceHoppityWithContributor {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onTooltip(event: ToolTipTextEvent) {
+    @HandleEvent(priorityLevel = LOWEST)
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (!HoppityCollectionStats.inInventory) return
 

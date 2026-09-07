@@ -26,7 +26,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ReplaceRomanNumerals {
-
     private val patternGroup = RepoPattern.group("romannumerals")
     private val inventoryGroup = patternGroup.group("inventory")
 
@@ -277,8 +276,8 @@ object ReplaceRomanNumerals {
     private val cachedStrings = TimeLimitedCache<String, String>(5.seconds)
 
     // LOW runs after default priority, so RepoPatternManager has already replaced the patterns
-    @HandleEvent(priority = HandleEvent.LOW)
-    private fun onRepoReload() {
+    @HandleEvent(priorityLevel = LOW)
+    private suspend fun onRepoReload() {
         cachedStrings.clear()
         inventoryPatterns = buildInventoryPatterns()
     }
