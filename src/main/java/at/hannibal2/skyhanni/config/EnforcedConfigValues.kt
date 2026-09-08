@@ -70,10 +70,10 @@ object EnforcedConfigValues {
         return oldEnforcedValues != enforcedConfigValuesData
     }
 
-    @HandleEvent
-    private fun onWorldChange() = trySendPSAs()
-
     // PSAs need a player to be shown to, so they wait until the user is actually on Hypixel.
+    @HandleEvent
+    private fun onTick() = trySendPSAs()
+
     private fun trySendPSAs() {
         if (hasSentPSAsOnce || !SkyBlockUtils.onHypixel) return
         hasSentPSAsOnce = true
@@ -118,16 +118,15 @@ object EnforcedConfigValues {
         val shimmy = Shimmy(config, enforcedValue.path.split("."))
             ?: ErrorManager.skyHanniError("Could not create shimmy for path ${enforcedValue.path}")
         val currentValue = shimmy.getJson()
-        if (enforcedValue.persist) {
-            // Persistent values replace the user's value for good, so there is nothing to restore later
-            userValues.remove(enforcedValue.path)
-        } else if (currentValue != enforcedValue.value) {
-            // When the option is already enforced, the current value is a previously enforced one, not the user's
-            val userValue = userValues[enforcedValue.path]?.userValue ?: currentValue
-            userValues[enforcedValue.path] = UserValue(userValue, enforcedValue.value)
-        }
+        // Persistent values replace the user's value for good, so there is nothing to restore later
+        if (enforcedValue.persist) userValues.remove(enforcedValue.path)
         if (currentValue == enforcedValue.value) return
         shimmy.setJson(enforcedValue.value)
+        if (enforcedValue.persist) return
+        // Only recorded after a successful update, so a rejected value cannot corrupt the backup.
+        // When the option is already enforced, the current value is a previously enforced one, not the user's
+        val userValue = userValues[enforcedValue.path]?.userValue ?: currentValue
+        userValues[enforcedValue.path] = UserValue(userValue, enforcedValue.value)
     }
 
     private fun restoreNoLongerEnforced(config: Any, enforcedPaths: Set<String>) {

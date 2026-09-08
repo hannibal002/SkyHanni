@@ -187,8 +187,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * Returns null if the constant is not cached locally yet or could not be parsed.
      */
     inline fun <reified T : Any> readLocalConstantOrNull(constant: String): T? {
-        val json = readJsonElement(resolvePath("constants", constant), logMissing = false) ?: return null
-        return runCatching { ConfigManager.gson.fromJson<T>(json) }.getOrElse { e ->
+        return runCatching {
+            val json = readJsonElement(resolvePath("constants", constant), logMissing = false)
+            json?.let { ConfigManager.gson.fromJson<T>(it) }
+        }.getOrElse { e ->
             logger.error("Could not read local constant '$constant': ${e.message}")
             null
         }
