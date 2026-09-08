@@ -6,21 +6,13 @@ import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.chat.ChatComponentUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.command
-import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.toChatFormatting
-import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
-import at.hannibal2.skyhanni.utils.compat.value
-import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.ComponentRenderUtils
-import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.HoverEvent
-import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import java.net.URLEncoder
 import java.util.Base64
@@ -43,7 +35,6 @@ object StringUtils {
     private val lettersAndNumbersPattern = "(§.)|[^a-zA-Z0-9 ]".toPattern()
     private val formattingChars = "kmolnrKMOLNR".toSet()
     private val colorChars = "abcdefABCDEF0123456789zZ".toSet()
-    private val colorMap = ChatFormatting.entries.associateBy { it.toString()[1] }
 
     fun String.removeAllNonLettersAndNumbers(): String = lettersAndNumbersPattern.matcher(this).replaceAll("")
     fun String.cleanString(): String = removeAllNonLettersAndNumbers().trimWhiteSpaceAndResets().lowercase()
@@ -350,122 +341,42 @@ object StringUtils {
     fun String.insert(pos: Int, char: Char): String =
         substring(0, pos) + char + substring(pos)
 
+    // TODO remove this deprecated alias in November 2026
+    @Deprecated(
+        "Moved to ChatComponentUtils",
+        ReplaceWith(
+            "ChatComponentUtils.replaceIfNeeded(original, newText)",
+            "at.hannibal2.skyhanni.utils.chat.ChatComponentUtils",
+        ),
+    )
     fun replaceIfNeeded(original: Component, newText: String): Component? =
-        replaceIfNeeded(original, newText.asComponent())
+        ChatComponentUtils.replaceIfNeeded(original, newText)
 
-    fun enumChatFormattingByCode(char: Char): ChatFormatting? = colorMap[char]
-
-    fun doLookTheSame(left: Component, right: Component): Boolean {
-        class ChatIterator(var component: Component) {
-            var queue = mutableListOf<Component>()
-            var idx = 0
-            var colorOverride = defaultStyleConstructor
-            fun next(): Pair<Char, Style>? {
-                while (true) {
-                    while (idx >= component.unformattedTextForChatCompat().length) {
-                        queue.addAll(0, component.siblings)
-                        colorOverride = defaultStyleConstructor
-                        component = queue.removeFirstOrNull() ?: return null
-                    }
-                    val char = component.unformattedTextForChatCompat()[idx++]
-                    if (char == '§' && idx < component.unformattedTextForChatCompat().length) {
-                        val formattingChar = component.unformattedTextForChatCompat()[idx++]
-                        val formatting = enumChatFormattingByCode(formattingChar) ?: continue
-                        when (formatting) {
-                            ChatFormatting.OBFUSCATED -> {
-                                colorOverride.withObfuscated(true)
-                            }
-
-                            ChatFormatting.BOLD -> {
-                                colorOverride.withBold(true)
-                            }
-
-                            ChatFormatting.STRIKETHROUGH -> {
-                                colorOverride.withStrikethrough(true)
-                            }
-
-                            ChatFormatting.UNDERLINE -> {
-                                colorOverride.withUnderlined(true)
-                            }
-
-                            ChatFormatting.ITALIC -> {
-                                colorOverride.withItalic(true)
-                            }
-
-                            else -> {
-                                colorOverride = defaultStyleConstructor.withColor(formatting)
-                            }
-                        }
-                    } else {
-                        return Pair(char, colorOverride.applyTo(component.style))
-                    }
-                }
-            }
-        }
-
-        val leftIt = ChatIterator(left)
-        val rightIt = ChatIterator(right)
-        while (true) {
-            val leftChar = leftIt.next()
-            val rightChar = rightIt.next()
-            if (leftChar == null && rightChar == null) return true
-            if (leftChar != rightChar) return false
-        }
-    }
-
+    // TODO remove in November 2026
+    @Deprecated(
+        "Moved to ChatComponentUtils",
+        ReplaceWith(
+            "ChatComponentUtils.replaceIfNeeded(original, newText)",
+            "at.hannibal2.skyhanni.utils.chat.ChatComponentUtils",
+        ),
+    )
     fun <T : Component> replaceIfNeeded(
         original: T,
         newText: T,
-    ): T? {
-        if (doLookTheSame(original, newText)) return null
-        return newText
-    }
+    ): T? = ChatComponentUtils.replaceIfNeeded(original, newText)
 
-    /**
-     * Applies a transformation on the message of a SystemMessageEvent if possible.
-     */
+    // TODO remove in November 2026
+    @Deprecated(
+        "Moved to ChatComponentUtils",
+        ReplaceWith(
+            "this.applyIfPossible(transformationReason, transform)",
+            "at.hannibal2.skyhanni.utils.chat.ChatComponentUtils.applyIfPossible",
+        ),
+    )
     fun SystemMessageEvent.Modify.applyIfPossible(
         transformationReason: String? = null,
         transform: (String) -> String,
-    ) {
-        val original = chatComponent.formattedTextCompat()
-        val new = transform(original)
-        if (new == original) return
-
-        val clickEvents = mutableListOf<ClickEvent>()
-        val hoverEvents = mutableListOf<HoverEvent>()
-        chatComponent.findAllEvents(clickEvents, hoverEvents)
-
-        if (clickEvents.size > 1 || hoverEvents.size > 1) return
-
-        val newComponent = new.asComponent().apply {
-            if (clickEvents.size == 1) command = clickEvents.first().value()
-            if (hoverEvents.size == 1) hover = hoverEvents.first().value()
-        }
-
-        replaceComponent(newComponent, transformationReason.orEmpty())
-    }
-
-    private fun Component.findAllEvents(
-        clickEvents: MutableList<ClickEvent>,
-        hoverEvents: MutableList<HoverEvent>,
-    ) {
-        siblings.forEach { it.findAllEvents(clickEvents, hoverEvents) }
-
-        val clickEvent = style.clickEvent
-        val hoverEvent = style.hoverEvent
-
-        if (clickEvent?.action() != null && clickEvents.none { it.value() == clickEvent.value() }) {
-            clickEvents.add(clickEvent)
-        }
-
-        if (hoverEvent?.action() != null && hoverEvents.none {
-                it.value() == hoverEvent.value()
-            }
-        ) {
-            hoverEvents.add(hoverEvent)
-        }
-    }
+    ) = with(ChatComponentUtils) { applyIfPossible(transformationReason, transform) }
 
     fun String.replaceAll(oldValue: String, newValue: String, ignoreCase: Boolean = false): String {
         var text = this
@@ -493,15 +404,41 @@ object StringUtils {
         return message
     }
 
+    // TODO remove this deprecated alias in November 2026
+    @Deprecated(
+        "Moved to ComponentMatcherUtils",
+        ReplaceWith(
+            "this.applyFormattingFrom(original)",
+            "at.hannibal2.skyhanni.utils.ComponentMatcherUtils.applyFormattingFrom",
+        ),
+    )
     fun String.applyFormattingFrom(original: ComponentSpan): Component =
-        asComponent { style = original.sampleStyleAtStart() }
+        with(ComponentMatcherUtils) { applyFormattingFrom(original) }
 
+    // TODO remove this deprecated alias in November 2026
+    @Deprecated(
+        "Moved to TextHelper",
+        ReplaceWith(
+            "this.applyFormattingFrom(original)",
+            "at.hannibal2.skyhanni.utils.chat.TextHelper.applyFormattingFrom",
+        ),
+    )
     fun String.applyFormattingFrom(original: Component): Component =
-        asComponent { style = original.style }
+        with(TextHelper) { applyFormattingFrom(original) }
 
-    fun Component.contains(other: String): Boolean = string.contains(other)
+    // TODO remove this deprecated alias in November 2026
+    @Deprecated(
+        "Moved to TextHelper",
+        ReplaceWith("this.contains(other)", "at.hannibal2.skyhanni.utils.chat.TextHelper.contains"),
+    )
+    fun Component.contains(other: String): Boolean = with(TextHelper) { contains(other) }
 
-    fun Component.startsWith(other: String): Boolean = string.startsWith(other)
+    // TODO remove this deprecated alias in November 2026
+    @Deprecated(
+        "Moved to TextHelper",
+        ReplaceWith("this.startsWith(other)", "at.hannibal2.skyhanni.utils.chat.TextHelper.startsWith"),
+    )
+    fun Component.startsWith(other: String): Boolean = with(TextHelper) { startsWith(other) }
 
     fun String.width(): Int = Minecraft.getInstance().font.width(this)
 

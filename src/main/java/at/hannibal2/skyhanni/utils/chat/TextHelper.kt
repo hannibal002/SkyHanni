@@ -66,6 +66,13 @@ object TextHelper {
     fun Component.suffix(suffix: String): Component = join(this, suffix)
     fun Component.wrap(prefix: String, suffix: String) = this.prefix(prefix).suffix(suffix)
 
+    fun String.applyFormattingFrom(original: Component): Component =
+        asComponent { style = original.style }
+
+    fun Component.contains(other: String): Boolean = string.contains(other)
+
+    fun Component.startsWith(other: String): Boolean = string.startsWith(other)
+
     fun Component.width(): Int = Minecraft.getInstance().font.width(this.string)
 
     fun Component.fitToChat(): Component {
