@@ -16,11 +16,19 @@ import java.lang.reflect.Type
  * this shimmy points inside a moulconfig [Property], where the field type is erased to [Object] and the real type is
  * recovered from the property declaration instead.
  */
-class Shimmy private constructor(val source: Any, val reflectField: Field, val type: Type) {
+class Shimmy private constructor(
+    val source: Any,
+    val reflectField: Field,
+    val type: Type,
+    // Set when this shimmy points inside a moulconfig property, so that writes notify its observers
+    private val property: Property<Any?>? = null,
+) {
     val clazz: Class<*> = reflectField.type
     var value: Any?
         get() = reflectField.get(source)
-        set(v) = reflectField.set(source, v)
+        set(v) {
+            if (property != null) property.set(v) else reflectField.set(source, v)
+        }
 
     fun getJson(): JsonElement = ConfigManager.gson.toJsonTree(value, type)
     fun setJson(element: JsonElement) {
@@ -45,10 +53,12 @@ class Shimmy private constructor(val source: Any, val reflectField: Field, val t
             val field = field(parent, path.last()) ?: return null
             val shimmy = Shimmy(parent, field, field.genericType)
             if (shimmy.clazz != Property::class.java) return shimmy
-            val propertySource = traverse(parent, path.last()) ?: return shimmy
-            val valueField = field(propertySource, "value") ?: return shimmy
+            // The property's own type argument is not known at runtime, so the value can only be set unchecked
+            @Suppress("UNCHECKED_CAST")
+            val property = traverse(parent, path.last()) as? Property<Any?> ?: return shimmy
+            val valueField = field(property, "value") ?: return shimmy
             val propertyType = (field.genericType as? ParameterizedType)?.actualTypeArguments?.firstOrNull()
-            return Shimmy(propertySource, valueField, propertyType ?: valueField.genericType)
+            return Shimmy(property, valueField, propertyType ?: valueField.genericType, property)
         }
     }
 }

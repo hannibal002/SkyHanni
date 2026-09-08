@@ -131,8 +131,10 @@ object EnforcedConfigValues {
             userValues.remove(enforcedValue.path)
             return
         }
-        // When the option is already enforced, the current value is a previously enforced one, not the user's
-        val userValue = userValues[enforcedValue.path]?.userValue ?: currentValue
+        // When the option is already enforced, the current value is a previously enforced one, not the user's,
+        // unless the user changed it in the meantime (e.g. via /shconfig set)
+        val previous = userValues[enforcedValue.path]
+        val userValue = if (previous != null && currentValue == previous.enforcedValue) previous.userValue else currentValue
         // The value is re-read so that the backup compares equal to what the field serializes to later
         // (e.g. a float from the repo JSON does not equal the same float serialized by Gson)
         userValues[enforcedValue.path] = UserValue(userValue, shimmy.getJson())
@@ -161,6 +163,8 @@ object EnforcedConfigValues {
             } as? JsonObject ?: continue
             // Options that are not part of the file (e.g. not exposed) have nothing to restore
             if (!parent.has(segments.last())) continue
+            // Keep the current value if anything changed it after it was enforced
+            if (Shimmy(config, segments)?.getJson() != backup.enforcedValue) continue
             parent.add(segments.last(), backup.userValue)
         }
         json
