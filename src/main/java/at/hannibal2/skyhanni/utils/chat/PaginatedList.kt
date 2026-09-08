@@ -37,7 +37,7 @@ object PaginatedList {
         emptyMessage: String,
         currentPage: Int = 1,
         maxPerPage: Int = 15,
-        dividerColor: ChatFormatting = ChatFormatting.BLUE,
+        dividerColor: ChatFormatting = BLUE,
         formatter: (T) -> Component,
     ): Unit = DelayedRun.runOrNextTick("paginated list: $title") {
         val text = mutableListOf<Component>()
