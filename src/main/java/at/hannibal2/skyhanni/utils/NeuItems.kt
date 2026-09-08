@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.allItemsCache
 import at.hannibal2.skyhanni.utils.NeuItems.ambiguousDisplayNames
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isVanillaItem
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonPrimitive
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
@@ -65,9 +65,21 @@ object NeuItems {
      * WRAPPED-REGEX-TEST: "§f§f§7[lvl 1➡100] "
      * WRAPPED-REGEX-TEST: "§f§f§7[Lvl {LVL}] "
      */
-    private val neuPetLevelRegex by patternGroup.pattern(
+    private val neuPetLevelPattern by patternGroup.pattern(
         "pet-level",
         "(?i)(?:§.)+\\[lvl (?:\\d+➡\\d+|\\{lvl})\\] ",
+    )
+
+    /**
+     * Deliberately looser than [neuPetLevelPattern]: a marker that is still in the name is one
+     * that pattern did not match at the start of the name.
+     * REGEX-TEST: [lvl 1➡100]
+     * REGEX-TEST: [Lvl 1➡200]
+     * REGEX-TEST: [lvl {lvl}]
+     */
+    private val leftoverPetLevelPattern by patternGroup.pattern(
+        "pet-level-leftover",
+        "(?i)\\[lvl (?:\\d+➡\\d+|\\{lvl})\\]",
     )
 
     /** Keys are internal names as String */
@@ -125,6 +137,8 @@ object NeuItems {
         val tempAllItemCache = mutableMapOf<String, NeuInternalName>()
         val tempNoColor = TreeMap<String, NeuInternalName>()
         val duplicates = mutableMapOf<String, MutableList<NeuInternalName>>()
+        val nonPetsWithPetSuffix = mutableListOf<NeuInternalName>()
+        val leftoverLevelNames = mutableListOf<String>()
 
         allNeuRepoItems().forEach { (internalName, itemInfo) ->
             allInternalNames[internalName.asString()] = internalName
@@ -135,17 +149,19 @@ object NeuItems {
             // Every ignored item is named "§cBugged Item", see ItemUtils.getSpecialRepoItemName.
             if (ignoreItemsFilter.match(internalName.asString())) return@forEach
 
-            // Pet repo names carry a " Pet" suffix, which NeuInternalName.fromItemNameOrNull strips before the lookup.
-            val cleanName = internalName.getRepoItemNameFromJson(itemInfo)?.lowercase()?.removePrefix(neuPetLevelRegex)
-                ?.removeSuffix(" pet")?.takeIf { it.isNotEmpty() } ?: run {
+            // The " Pet" suffix is added by ItemUtils.getSpecialRepoItemName, and
+            // NeuInternalName.fromItemNameOrNull strips it from every query before the lookup.
+            // Stripping it from a non-pet would cache that item under a key no query can reach.
+            val isKnownPet = PetUtils.isKnownPetInternalName(internalName)
+            val cleanName = internalName.getRepoItemNameFromJson(itemInfo)?.lowercase()?.removePrefix(neuPetLevelPattern)
+                ?.let { if (isKnownPet) it.removeSuffix(" pet") else it }?.takeIf { it.isNotEmpty() } ?: run {
                 ChatUtils.debug("skipped `$internalName` from readAllNeuItems")
                 return@forEach
             }
 
-            if (cleanName.contains("[lvl 1➡100]")) {
-                if (PlatformUtils.isDevEnvironment) error("wrong name: '$cleanName'")
-                else println("wrong name: '$cleanName'")
-            }
+            if (!isKnownPet && cleanName.endsWith(" pet")) nonPetsWithPetSuffix.add(internalName)
+
+            if (leftoverPetLevelPattern.find(cleanName)) leftoverLevelNames.add("${internalName.asString()}: '$cleanName'")
 
             val newCleanName = normalizeDisplayName(cleanName)
             if (newCleanName in ambiguousDisplayNames) return@forEach
@@ -163,6 +179,8 @@ object NeuItems {
         NeuInternalName.clearItemNameCache()
         ChatUtils.debug("Cleared the NEUItems stack resolution cache")
         reportDuplicateDisplayNames(duplicates)
+        reportNonPetsWithPetSuffix(nonPetsWithPetSuffix)
+        reportLeftoverLevelNames(leftoverLevelNames)
     }
 
     /**
@@ -176,6 +194,37 @@ object NeuItems {
             val all = internalNames.joinToString(", ") { it.asString() }
             println("duplicate item display name '$displayName': $all")
         }
+    }
+
+    /**
+     * Only known pets are expected to end in " Pet", ItemUtils.getSpecialRepoItemName adds the suffix there.
+     * Any other item named this way cannot be resolved through NeuInternalName.fromItemNameOrNull,
+     * since that strips the suffix from every query.
+     */
+    private fun reportNonPetsWithPetSuffix(nonPetsWithPetSuffix: List<NeuInternalName>) {
+        if (nonPetsWithPetSuffix.isEmpty()) return
+        ErrorManager.logErrorStateWithData(
+            "Found non-pet items ending in ' Pet', please report this in discord",
+            "Non-pet items ending in ' Pet' cannot be resolved via NeuInternalName.fromItemNameOrNull",
+            "internal names" to nonPetsWithPetSuffix.sorted().map { it.asString() },
+            betaOnly = true,
+        )
+    }
+
+    /**
+     * A pet level marker [neuPetLevelPattern] did not strip, either because it does not match
+     * or because the marker does not sit at the start of the name.
+     * [normalizeDisplayName] then drops the non-ASCII arrow, and the lookup side never applies
+     * that normalization to a query, so the item is cached under a key nothing can ask for.
+     */
+    private fun reportLeftoverLevelNames(leftoverLevelNames: List<String>) {
+        if (leftoverLevelNames.isEmpty()) return
+        ErrorManager.logErrorStateWithData(
+            "Found item names with a leftover pet level marker, please report this in discord",
+            "Item names still contain a pet level marker that neuPetLevelPattern did not strip",
+            "names" to leftoverLevelNames.sorted(),
+            betaOnly = true,
+        )
     }
 
     fun getInternalName(itemStack: SafeItemStack): NeuInternalName? = ItemResolutionQuery()
