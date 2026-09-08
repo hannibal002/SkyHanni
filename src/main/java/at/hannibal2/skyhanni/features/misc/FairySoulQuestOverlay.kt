@@ -48,7 +48,7 @@ object FairySoulQuestOverlay {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (!(inFairySoulQuestMenu && config.fairySoulStackSize)) return
+        if (!(inFairySoulQuestMenu && config.stackSize)) return
 
         val slotIndex = event.slot.index
         if (slotIndex !in islandSoulInfo) return
@@ -59,7 +59,7 @@ object FairySoulQuestOverlay {
     @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, onlyOnSkyblock = true)
     private fun onBackgroundDrawn() {
         if (!inFairySoulQuestMenu) return
-        if (!config.fairySoulQuestHighlight) return
+        if (!config.questHighlight) return
 
         for (slot in islandSoulInfo.keys) {
             val soulsRemaining = islandSoulInfo[slot]?.soulsRemaining ?: continue
@@ -86,15 +86,7 @@ object FairySoulQuestOverlay {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onChestGuiRender() {
-        if (!(inFairySoulQuestMenu && config.overl)) return
-
-        if (display.isEmpty()) {
-            display = buildList {
-                for (island in islands) {
-                    addString(island)
-                }
-            }
-        }
+        if (!(inFairySoulQuestMenu && config.overlay)) return
 
         config.pos.renderRenderables(
             display,

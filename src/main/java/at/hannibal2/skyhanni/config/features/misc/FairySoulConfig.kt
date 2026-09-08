@@ -25,7 +25,7 @@ class FairySoulConfig {
     )
     @FeatureToggle
     @ConfigEditorBoolean
-    var overl: Boolean = true
+    var overlay: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -34,7 +34,7 @@ class FairySoulConfig {
     )
     @FeatureToggle
     @ConfigEditorBoolean
-    var fairySoulStackSize: Boolean = true
+    var stackSize: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -43,9 +43,9 @@ class FairySoulConfig {
     )
     @FeatureToggle
     @ConfigEditorBoolean
-    var fairySoulQuestHighlight: Boolean = true
+    var questHighlight: Boolean = true
 
     @Expose
-    @ConfigLink(owner = FairySoulConfig::class, field = "fairySoulOverlay")
+    @ConfigLink(owner = FairySoulConfig::class, field = "overlay")
     val pos: Position = Position(5, 5)
 }
