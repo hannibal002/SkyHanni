@@ -9,10 +9,12 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.toChatFormatting
 import at.hannibal2.skyhanni.utils.compat.withColor
 import com.mojang.authlib.GameProfile
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.components.ComponentRenderUtils
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
@@ -74,6 +76,8 @@ object TextHelper {
 
     fun Component.width(): Int = Minecraft.getInstance().font.width(this.string)
 
+    fun String.width(): Int = Minecraft.getInstance().font.width(this)
+
     fun Component.fitToChat(): Component {
         val width = this.width()
         val maxWidth = MinecraftCompat.hud.chat.width
@@ -91,6 +95,59 @@ object TextHelper {
         val spaceWidth = SPACE.width().coerceAtLeast(1)
         val padding = (width - textWidth).coerceAtLeast(0) / 2
         return join(" ".repeat(padding / spaceWidth), this)
+    }
+
+    fun String.capAtMinecraftLength(limit: Int) = capAtLength(limit) {
+        Minecraft.getInstance().font.width(it.toString())
+    }
+
+    private fun String.capAtLength(limit: Int, lengthJudger: (Char) -> Int): String {
+        var i = 0
+        return takeWhile {
+            i += lengthJudger(it)
+            i < limit
+        }
+    }
+
+    fun String.splitLines(width: Int): String = splitText(
+        this,
+        width,
+    ).joinToString("\n") { it.removePrefix("§r") }
+
+    private fun splitText(text: String, width: Int): List<String> {
+        val lines = ComponentRenderUtils.wrapComponents(Component.literal(text), width, Minecraft.getInstance().font)
+        val strings: MutableList<String> = ArrayList(lines.size)
+        for (line in lines) {
+            var newLine = ""
+            var lastColor: TextColor? = null
+            var lastFormatting = ""
+            line.accept { _, style, codePoint ->
+                val color = style.color
+                if (color != lastColor) {
+                    lastColor = color
+                    lastFormatting = ""
+                    if (color != null) {
+                        newLine += color.toChatFormatting()
+                    }
+                }
+                var newFormatting = ""
+                newFormatting = if (style.isBold) "§l"
+                else if (style.isItalic) "§o"
+                else if (style.isUnderlined) "§n"
+                else if (style.isStrikethrough) "§m"
+                else if (style.isObfuscated) "§k"
+                else ""
+
+                if (newFormatting != lastFormatting) {
+                    lastFormatting = newFormatting
+                    newLine += newFormatting
+                }
+                newLine += codePoint.toChar()
+                true
+            }
+            strings.add(newLine)
+        }
+        return strings
     }
 
     fun Component.send(id: Int = 0, bypassSelfMessages: Boolean = false) =

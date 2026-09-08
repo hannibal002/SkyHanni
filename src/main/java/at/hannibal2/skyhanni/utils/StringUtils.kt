@@ -8,12 +8,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.chat.ChatComponentUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.toChatFormatting
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.components.ComponentRenderUtils
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.TextColor
 import java.net.URLEncoder
 import java.util.Base64
 import java.util.Locale
@@ -192,46 +187,12 @@ object StringUtils {
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
     fun Double.removeUnusedDecimal() = if (this % 1 == 0.0) toInt().toString() else toString()
 
-    fun String.splitLines(width: Int): String = splitText(
-        this,
-        width,
-    ).joinToString("\n") { it.removePrefix("§r") }
-
-    private fun splitText(text: String, width: Int): List<String> {
-        val lines = ComponentRenderUtils.wrapComponents(Component.literal(text), width, Minecraft.getInstance().font)
-        val strings: MutableList<String> = ArrayList(lines.size)
-        for (line in lines) {
-            var newLine = ""
-            var lastColor: TextColor? = null
-            var lastFormatting = ""
-            line.accept { _, style, codePoint ->
-                val color = style.color
-                if (color != lastColor) {
-                    lastColor = color
-                    lastFormatting = ""
-                    if (color != null) {
-                        newLine += color.toChatFormatting()
-                    }
-                }
-                var newFormatting = ""
-                newFormatting = if (style.isBold) "§l"
-                else if (style.isItalic) "§o"
-                else if (style.isUnderlined) "§n"
-                else if (style.isStrikethrough) "§m"
-                else if (style.isObfuscated) "§k"
-                else ""
-
-                if (newFormatting != lastFormatting) {
-                    lastFormatting = newFormatting
-                    newLine += newFormatting
-                }
-                newLine += codePoint.toChar()
-                true
-            }
-            strings.add(newLine)
-        }
-        return strings
-    }
+    // TODO remove this deprecated alias in November 2026
+    @Deprecated(
+        "Moved to TextHelper",
+        ReplaceWith("this.splitLines(width)", "at.hannibal2.skyhanni.utils.chat.TextHelper.splitLines"),
+    )
+    fun String.splitLines(width: Int): String = with(TextHelper) { splitLines(width) }
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
@@ -280,17 +241,15 @@ object StringUtils {
         return builder.toString()
     }
 
-    fun String.capAtMinecraftLength(limit: Int) = capAtLength(limit) {
-        Minecraft.getInstance().font.width(it.toString())
-    }
-
-    private fun String.capAtLength(limit: Int, lengthJudger: (Char) -> Int): String {
-        var i = 0
-        return takeWhile {
-            i += lengthJudger(it)
-            i < limit
-        }
-    }
+    // TODO remove this deprecated alias in November 2026
+    @Deprecated(
+        "Moved to TextHelper",
+        ReplaceWith(
+            "this.capAtMinecraftLength(limit)",
+            "at.hannibal2.skyhanni.utils.chat.TextHelper.capAtMinecraftLength",
+        ),
+    )
+    fun String.capAtMinecraftLength(limit: Int) = with(TextHelper) { capAtMinecraftLength(limit) }
 
     fun String.getPlayerNameFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("username")
 
@@ -440,7 +399,12 @@ object StringUtils {
     )
     fun Component.startsWith(other: String): Boolean = with(TextHelper) { startsWith(other) }
 
-    fun String.width(): Int = Minecraft.getInstance().font.width(this)
+    // TODO remove this deprecated alias in November 2026
+    @Deprecated(
+        "Moved to TextHelper",
+        ReplaceWith("this.width()", "at.hannibal2.skyhanni.utils.chat.TextHelper.width"),
+    )
+    fun String.width(): Int = with(TextHelper) { width() }
 
     private val vowels = "aeiouAEIOU".toSet()
 
