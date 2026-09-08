@@ -184,6 +184,8 @@ enum class SkyblockCurrency(
     // TODO add these currencies, each one needs a real cost line from its shop first
     //  - North Stars, waiting on the winter event
     //  - Bingo Points, waiting on the bingo event
+    // not missing: essence has a bazaar price and its own map in CurrencyApi, and the powders and
+    // whispers only show up in the perk trees, which NpcTradeApi skips entirely
     ;
 
     val coloredName: String = color.getChatColor() + displayName
