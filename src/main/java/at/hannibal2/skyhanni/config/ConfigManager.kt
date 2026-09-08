@@ -214,9 +214,7 @@ class ConfigManager {
     private fun serialize(fileType: ConfigFileType, data: Any): String {
         if (fileType != ConfigFileType.FEATURES) return gson.toJson(data)
         // Enforced values only ever exist in memory, the file keeps the user's own values
-        val json = gson.toJsonTree(data)
-        EnforcedConfigValues.writeUserValues(json)
-        return gson.toJson(json)
+        return gson.toJson(EnforcedConfigValues.toUserJsonTree(data))
     }
 
     private fun saveFile(file: File, fileType: ConfigFileType, data: Any, reason: String) {

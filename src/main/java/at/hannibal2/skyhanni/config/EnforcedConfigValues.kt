@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.json.Shimmy
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.INFINITE
 
 /**
@@ -33,8 +32,8 @@ object EnforcedConfigValues {
     private var hasSentPSAsOnce = false
 
     // The user's own values of the options that are currently enforced, keyed by config path.
-    // Accessed from the config auto-save thread as well, hence the concurrent map.
-    private val userValues = ConcurrentHashMap<String, UserValue>()
+    // Guarded by its own monitor: the config auto-save thread reads it while it serializes the config.
+    private val userValues = mutableMapOf<String, UserValue>()
 
     private class UserValue(val userValue: JsonElement, val enforcedValue: JsonElement)
 
@@ -97,7 +96,7 @@ object EnforcedConfigValues {
         }
     }
 
-    private fun enforceOntoConfig(config: Any) {
+    private fun enforceOntoConfig(config: Any) = synchronized(userValues) {
         val enforcedValues = enforcedConfigValuesData.flatMap { it.enforcedValues }
         restoreNoLongerEnforced(config, enforcedValues.mapTo(mutableSetOf()) { it.path })
 
@@ -118,15 +117,18 @@ object EnforcedConfigValues {
         val shimmy = Shimmy(config, enforcedValue.path.split("."))
             ?: ErrorManager.skyHanniError("Could not create shimmy for path ${enforcedValue.path}")
         val currentValue = shimmy.getJson()
-        // Persistent values replace the user's value for good, so there is nothing to restore later
-        if (enforcedValue.persist) userValues.remove(enforcedValue.path)
-        if (currentValue == enforcedValue.value) return
         shimmy.setJson(enforcedValue.value)
-        if (enforcedValue.persist) return
-        // Only recorded after a successful update, so a rejected value cannot corrupt the backup.
+        // Only touched after a successful update, so a rejected value can neither corrupt nor drop the backup
+        if (enforcedValue.persist) {
+            // Persistent values replace the user's value for good, so there is nothing to restore later
+            userValues.remove(enforcedValue.path)
+            return
+        }
         // When the option is already enforced, the current value is a previously enforced one, not the user's
         val userValue = userValues[enforcedValue.path]?.userValue ?: currentValue
-        userValues[enforcedValue.path] = UserValue(userValue, enforcedValue.value)
+        // The value is re-read so that the backup compares equal to what the field serializes to later
+        // (e.g. a float from the repo JSON does not equal the same float serialized by Gson)
+        userValues[enforcedValue.path] = UserValue(userValue, shimmy.getJson())
     }
 
     private fun restoreNoLongerEnforced(config: Any, enforcedPaths: Set<String>) {
@@ -140,19 +142,21 @@ object EnforcedConfigValues {
     }
 
     /**
-     * Replaces every enforced option in the serialized [config] with the value the user set themselves,
+     * Serializes [config] with every enforced option replaced by the value the user set themselves,
      * so that the enforced values never end up in the config file.
      */
-    fun writeUserValues(config: JsonElement) {
+    fun toUserJsonTree(config: Any): JsonElement = synchronized(userValues) {
+        val json = ConfigManager.gson.toJsonTree(config)
         for ((path, backup) in userValues) {
             val segments = path.split(".")
-            val parent = segments.dropLast(1).fold<String, JsonElement?>(config) { element, segment ->
+            val parent = segments.dropLast(1).fold<String, JsonElement?>(json) { element, segment ->
                 (element as? JsonObject)?.get(segment)
             } as? JsonObject ?: continue
             // Options that are not part of the file (e.g. not exposed) have nothing to restore
             if (!parent.has(segments.last())) continue
             parent.add(segments.last(), backup.userValue)
         }
+        json
     }
 
     fun isBlockedFromEditing(optionPath: String): String? {
