@@ -160,6 +160,12 @@ enum class SkyblockCurrency(
         ownedAmount = { getFromStorage() },
     ),
 
+    // Grand Bakery from Feast Baker Scott in the Hub, earned by donating Seasonings during a Grand Feast
+    KERNEL(
+        NeuInternalName.SKYBLOCK_KERNEL, "Kernel", GOLD, loreNames = setOf("kernel", "kernels"),
+        ownedAmount = { getFromStorage() },
+    ),
+
     // TODO add these currencies, each one needs a real cost line from its shop first
     //  - North Stars, waiting on the winter event
     //  - Bingo Points, waiting on the bingo event
