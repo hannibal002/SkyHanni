@@ -43,7 +43,14 @@ object EnforcedConfigValues {
      */
     fun loadFromLocalRepo() {
         val json = SkyHanniRepoManager.readLocalConstantOrNull<EnforcedConfigValuesJson>(CONSTANT) ?: return
-        updateData(json)
+        try {
+            updateData(json)
+        } catch (e: Exception) {
+            // Gson does not enforce Kotlin nullability, so a malformed cache can still fail here.
+            // Nothing is enforced until the repo reload delivers proper data, rather than failing the config load.
+            enforcedConfigValuesData = listOf()
+            ErrorManager.logErrorWithData(e, "Failed to apply cached enforced config values")
+        }
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
