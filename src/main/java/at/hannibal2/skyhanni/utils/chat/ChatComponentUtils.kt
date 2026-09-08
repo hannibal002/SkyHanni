@@ -48,23 +48,23 @@ object ChatComponentUtils {
                         val formattingChar = component.unformattedTextForChatCompat()[idx++]
                         val formatting = enumChatFormattingByCode(formattingChar) ?: continue
                         when (formatting) {
-                            ChatFormatting.OBFUSCATED -> {
+                            OBFUSCATED -> {
                                 colorOverride.withObfuscated(true)
                             }
 
-                            ChatFormatting.BOLD -> {
+                            BOLD -> {
                                 colorOverride.withBold(true)
                             }
 
-                            ChatFormatting.STRIKETHROUGH -> {
+                            STRIKETHROUGH -> {
                                 colorOverride.withStrikethrough(true)
                             }
 
-                            ChatFormatting.UNDERLINE -> {
+                            UNDERLINE -> {
                                 colorOverride.withUnderlined(true)
                             }
 
-                            ChatFormatting.ITALIC -> {
+                            ITALIC -> {
                                 colorOverride.withItalic(true)
                             }
 
