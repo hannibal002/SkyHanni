@@ -13,12 +13,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
 import at.hannibal2.skyhanni.utils.StringUtils.removeAllNonLettersAndNumbers
 import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -52,7 +52,7 @@ object AbiphoneFeatures {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (InventoryUtils.inInventory()) return
-        if (config.abiphoneAcceptKey == GLFW.GLFW_KEY_UNKNOWN || config.abiphoneAcceptKey != event.keyCode) return
+        if (config.abiphoneAcceptKey == KeyboardManager.KEY_UNKNOWN || config.abiphoneAcceptKey != event.keyCode) return
         val acceptUUID = acceptUUID ?: return
         HypixelCommands.callback(acceptUUID)
         AbiphoneFeatures.acceptUUID = null
