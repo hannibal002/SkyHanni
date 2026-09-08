@@ -34,6 +34,10 @@ import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import java.util.concurrent.CompletableFuture
 
+//? if < 26.2 {
+/*import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEventLegacy
+*///?}
+
 @SkyHanniModule
 object ClientEvents {
     var totalTicks = 0
@@ -59,17 +63,20 @@ object ClientEvents {
             WorldChangeEvent.post()
         }
 
-        //~ if < 26.2 'COLLECT_SUBMITS' -> 'AFTER_TRANSLUCENT_TERRAIN'
         LevelRenderEvents.COLLECT_SUBMITS.register { ctx ->
             SkyHanniRenderWorldEvent(
                 ctx.poseStack(),
                 ctx.levelState().cameraRenderState,
                 ctx.submitNodeCollector(),
-                //? if < 26.2
-                //ctx.bufferSource(),
                 Minecraft.getInstance().deltaTracker.getGameTimeDeltaPartialTick(true),
             ).post()
         }
+
+        //? if < 26.2 {
+        /*LevelRenderEvents.AFTER_TRANSLUCENT_TERRAIN.register { ctx ->
+            SkyHanniRenderWorldEventLegacy(ctx.bufferSource()).post()
+        }
+        *///?}
 
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             Identifier.fromNamespaceAndPath("skyhanni", "resources"),

@@ -10,7 +10,9 @@ import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LoreCostUtils
+import at.hannibal2.skyhanni.utils.LoreCostUtils.hasTradeLine
 import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -20,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -28,11 +31,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 object PesthunterProfit {
 
     private val config get() = GardenApi.config.pests.pesthunterShop
-    private val DENY_LIST_ITEMS = listOf(
-        "Close",
-        "Pesthunter's Wares",
-        " ",
-    )
     private var display = emptyList<Renderable>()
     private var inInventory = false
     private val PESTS_ITEM = SkyblockCurrency.PESTS.internalName
@@ -62,14 +60,12 @@ object PesthunterProfit {
     }
 
     private fun readItem(slot: Int, item: SafeItemStack): DisplayTableEntry? {
-        val itemName = item.hoverName.takeIf {
-            it.string !in DENY_LIST_ITEMS && it.string.trim().isNotEmpty()
-        } ?: return null
-        if (slot == 49) return null
+        val lore = item.getLoreComponent().map { it.formattedTextCompatLessResets() }
+        if (!lore.hasTradeLine()) return null
 
-        val costs = item.readLoreCosts()
+        val nameString = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val costs = lore.readLoreCosts(nameString)
         val totalCost = getFullCost(costs).takeIf { it >= 0 } ?: return null
-        val nameString = itemName.formattedTextCompatLeadingWhiteLessResets()
         val (name, amount) = ItemUtils.readItemAmount(nameString) ?: return null
         val fixedDisplayName = name.replace("[Lvl 100]", "[Lvl {LVL}]")
         val internalName = NeuInternalName.fromItemNameOrNull(fixedDisplayName)

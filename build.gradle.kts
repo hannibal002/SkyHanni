@@ -30,8 +30,6 @@ plugins {
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
 val primaryTarget = ProjectTarget.MODERN_26200
 
-fun dependencyNotation(dep: Any): Any = (dep as? Provider<*>)?.get() ?: dep
-
 // Toolchains:
 java {
     toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
@@ -52,33 +50,33 @@ loom.apply {
         println("No classTweaker file for ${target.minecraftVersion}")
     }
 
-    fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json")
-
     runs {
         named("client") {
+            isIdeConfigGenerated = true
+            preferGradleTask = true
             appendProjectPathToDisplayName.set(true)
-            this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
+            this.runDirectory = rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir)
             if (System.getenv("repo_action") != "true") {
-                property("devauth.configDir", rootProject.file(".devauth").absolutePath)
+                systemProperties.put("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
-            vmArgs("-Xmx4G", "-Dnarrator.none=true")
+            jvmArguments.addAll("-Xmx4G", "-Dnarrator.none=true")
         }
         removeIf { it.name == "server" }
     }
 }
 
-val shadowImpl: Configuration by configurations.creating {
+val shadowImpl = configurations.create("shadowImpl") {
     configurations.implementation.get().extendsFrom(this)
 }
 
-val shadowOnly: Configuration by configurations.creating
+val shadowOnly = configurations.create("shadowOnly")
 
-val mixinTestRuntime: Configuration by configurations.creating {
+val mixinTestRuntime = configurations.create("mixinTestRuntime") {
     isCanBeConsumed = false
     extendsFrom(configurations.testRuntimeClasspath.get())
 }
 
-val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
+val includeBackupRepo = tasks.register<DownloadBackupRepo>("includeBackupRepo") {
     this.user = "hannibal002"
     this.repo = "SkyHanni-Repo"
     this.branch = "main"
@@ -86,7 +84,7 @@ val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
 }
 
-val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
+val includeBackupNeuRepo = tasks.register<DownloadBackupRepo>("includeBackupNeuRepo") {
     this.user = "NotEnoughUpdates"
     this.repo = "NotEnoughUpdates-Repo"
     this.branch = "master"
@@ -94,7 +92,7 @@ val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedNeuRepo"))
 }
 
-val publishToModrinth by tasks.registering(PublishToModrinth::class)
+val publishToModrinth = tasks.register<PublishToModrinth>("publishToModrinth")
 
 tasks.named<JavaExec>("runClient") {
     this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
@@ -126,21 +124,19 @@ dependencies {
     ksp(libs.autoservice.ksp)
     implementation(libs.autoservice.annotations)
 
-    target.fabricLoaderVersion?.let {
+    target.fabricLoaderVersion.let {
         implementation(it)
         "productionRuntimeMods"(it)
         mixinTestRuntime("net.fabricmc:fabric-loader-junit:${it.substringAfterLast(':')}")
     }
-    target.fabricApiVersion?.let {
+    target.fabricApiVersion.let {
         implementation(it)
         "productionRuntimeMods"(it)
     }
     implementation(libs.fabricLanguageKotlin)
     "productionRuntimeMods"(libs.fabricLanguageKotlin)
 
-    target.modMenuVersion?.let {
-        implementation("maven.modrinth:modmenu:$it")
-    }
+    implementation("maven.modrinth:modmenu:${target.modMenuVersion}")
 
     runtimeOnly(libs.devauth)
     "productionRuntimeMods"(libs.devauth)
@@ -181,11 +177,11 @@ dependencies {
     "minecraftTestClientRuntimeLibraries"(libs.basicMath)
 
     // getting clock offset
-    includeImplementation(libs.commons.net)
+    shadowImpl(libs.commons.net)
     "minecraftTestClientRuntimeLibraries"(libs.commons.net)
 
     // Calculator
-    includeImplementation(libs.keval) {
+    shadowImpl(libs.keval) {
         exclude(group = "org.jetbrains.kotlin")
     }
     "minecraftTestClientRuntimeLibraries"(libs.keval)
@@ -196,15 +192,30 @@ dependencies {
 
     shadowImpl(libs.httpclient)
     "minecraftTestClientRuntimeLibraries"(libs.httpclient)
+
+    target.renderChestVersion?.let {
+        includeImplementation("net.azureaaron:render-chest:$it")
+        "productionRuntimeMods"("net.azureaaron:render-chest:$it")
+        "minecraftTestClientRuntimeLibraries"("net.azureaaron:render-chest:$it")
+    }
 }
 
-fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit = {}) {
-    add("shadowImpl", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+/**
+ * Includes [dep] as jar-in-jar (puts the .jar into `skyhanni.jar/META-INF/jars`).
+ * Use this when you intentionally want to deduplicate a dependency between mods;
+ * prefer `shadowImpl` if it's local to us and shouldn't interfere with other mods.
+ *
+ * A configuration block is intentionally not provided, as it is not possible to
+ * exclude something from a nested jar without a manual repackage step.
+ */
+fun DependencyHandler.includeImplementation(dep: Any) {
+    include(dep)
+    implementation(dep)
 }
 
 afterEvaluate {
     loom.runs.named("client") {
-        programArgs("--quickPlayMultiplayer", "hypixel.net")
+        programArguments.addAll("--quickPlayMultiplayer", "hypixel.net")
     }
 
     ksp {
@@ -232,7 +243,7 @@ tasks.withType<Test> {
     )
 }
 
-val mixinTest by tasks.registering(Test::class) {
+val mixinTest = tasks.register<Test>("mixinTest") {
     description = "Audits mixin application under Fabric Loader."
     group = "verification"
     testClassesDirs = sourceSets.test.get().output.classesDirs
@@ -259,14 +270,16 @@ kotlin {
 tasks.processResources {
     from(includeBackupRepo)
     from(includeBackupNeuRepo)
-    val fapiVersion = target.fabricApiVersion?.split(":")?.last() ?: ""
+    val fapiVersion = target.fabricApiVersion.split(":").last()
     val hypixelModApiVersion = target.hypixelModApiFabricVersion.split(":").last()
     val minecraftVersion = target.minecraftVersion.fabricModJsonVersion
+    val renderChestVersion = target.renderChestVersion ?: ""
     val props = buildMap {
         put("version", version)
         put("minecraft", minecraftVersion)
         put("fapi", fapiVersion)
         put("hypixelmodapi", hypixelModApiVersion)
+        put("renderchest", renderChestVersion)
     }
 
     props.forEach(inputs::property)
@@ -359,8 +372,9 @@ tasks.shadowJar {
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
-    relocate("net.hypixel.modapi.tweaker", "at.hannibal2.skyhanni.deps.hypixel.modapi.tweaker")
 }
+// Loom only nests `include`d jars into the default jar task; wire them into the final jar too
+loom.nestJars(tasks.shadowJar, configurations.named("include"))
 tasks.jar {
     archiveClassifier.set("nodeps")
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
@@ -368,7 +382,7 @@ tasks.jar {
 
 tasks.assemble.get().dependsOn(tasks.shadowJar)
 
-val sourcesJar by tasks.registering(Jar::class) {
+val sourcesJar = tasks.register<Jar>("sourcesJar") {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
     from(sourceSets.main.get().allSource)

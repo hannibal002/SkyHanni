@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.inventory.attribute
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.inventory.AttributeShardsConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
@@ -46,7 +45,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object AttributeShardsData {
-
     val config get(): AttributeShardsConfig = SkyHanniMod.feature.inventory.attributeShards
     private val storage get() = ProfileStorageData.profileSpecific?.attributeShards
 
@@ -80,13 +78,14 @@ object AttributeShardsData {
 
     private val patternGroup = RepoPattern.group("inventory.attributeshards")
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: (1/3) Oddities ➜ Shards
      * REGEX-TEST: Oddities ➜ Shards
      */
     val bazaarShardsInventoryPattern by patternGroup.pattern(
         "bazaar.shards.inventory",
-        "(?:\\(\\d+/\\d+\\) )?Oddities ➜ Shards",
+        """(?:\(\d+/\d+\) )?Oddities ➜ Shards""",
     )
 
     /**
@@ -96,7 +95,7 @@ object AttributeShardsData {
      */
     private val attributeMenuPattern by patternGroup.pattern(
         "attribute-menu",
-        "(?:\\(\\d+/\\d+\\) )?Attribute Menu",
+        """(?:\(\d+/\d+\) )?Attribute Menu""",
     )
 
     /**
@@ -106,7 +105,7 @@ object AttributeShardsData {
      */
     private val huntingBoxPattern by patternGroup.pattern(
         "hunting-box",
-        "(?:\\(\\d+/\\d+\\) )?Hunting Box",
+        """(?:\(\d+/\d+\) )?Hunting Box""",
     )
 
     /**
@@ -116,7 +115,7 @@ object AttributeShardsData {
      */
     private val huntingBoxPagePattern by patternGroup.pattern(
         "hunting-box.page",
-        "(?:\\((?<page>\\d+)/(?<pages>\\d+)\\) )?Hunting Box",
+        """(?:\((?<page>\d+)/(?<pages>\d+)\) )?Hunting Box""",
     )
 
     /**
@@ -143,7 +142,7 @@ object AttributeShardsData {
      */
     private val fusionBoxPattern by patternGroup.pattern(
         "fusion-box",
-        "(?:\\(\\d+/\\d+\\) )?Fusion Box",
+        """(?:\(\d+/\d+\) )?Fusion Box""",
     )
 
     private val shardFusionPattern by patternGroup.pattern(
@@ -178,7 +177,7 @@ object AttributeShardsData {
      */
     private val syphonAmountPattern by patternGroup.pattern(
         "syphon.amount.colorless",
-        "Syphon (?<amount>\\d+) shards? to (?:level up|unlock)!",
+        """Syphon (?<amount>\d+) shards? to (?:level up|unlock)!""",
     )
 
     /**
@@ -187,7 +186,7 @@ object AttributeShardsData {
      */
     private val attributeShardNameLorePattern by patternGroup.pattern(
         "name.lore.colorless",
-        "(?<name>.+?) ?(?<tier>[IVXL]+)? \\(\\w+\\)$",
+        """(?<name>.+?) ?(?<tier>[IVXL]+)? \(\w+\)$""",
     )
 
     /**
@@ -198,7 +197,7 @@ object AttributeShardsData {
      */
     val amountOwnedPattern by patternGroup.pattern(
         "owned.colorless",
-        "Owned: (?<amount>[\\d,]+) Shards?",
+        """Owned: (?<amount>[\d,]+) Shards?""",
     )
 
     /**
@@ -206,7 +205,7 @@ object AttributeShardsData {
      */
     val requiredToFusePattern by patternGroup.pattern(
         "fuse.required.colorless",
-        "Required to fuse: (?<amount>\\d+)",
+        """Required to fuse: (?<amount>\d+)""",
     )
 
     /**
@@ -218,7 +217,7 @@ object AttributeShardsData {
      */
     private val shardSyphonedPattern by patternGroup.pattern(
         "chat.syphoned.colorless",
-        "\\+(?<amount>\\d+) (?<attributeName>.+) Attribute \\(Level (?<level>\\d+)\\) - (?<untilNext>\\d+) more to upgrade!",
+        """\+(?<amount>\d+) (?<attributeName>.+) Attribute \(Level (?<level>\d+)\) - (?<untilNext>\d+) more to upgrade!""",
     )
 
     /**
@@ -227,7 +226,7 @@ object AttributeShardsData {
      */
     private val shardSyphonedMaxedPattern by patternGroup.pattern(
         "chat.syphoned.maxed.colorless",
-        "\\+(?<amount>\\d+) (?<attributeName>.+) Attribute \\(Level (?<level>\\d+)\\) MAXED",
+        """\+(?<amount>\d+) (?<attributeName>.+) Attribute \(Level (?<level>\d+)\) MAXED""",
     )
 
     /**
@@ -235,7 +234,7 @@ object AttributeShardsData {
      */
     private val andMoreMessagePattern by patternGroup.pattern(
         "chat.and.more.colorless",
-        "and (?<amount>\\d+) more\\.\\.\\.",
+        """and (?<amount>\d+) more\.\.\.""",
     )
 
     private val advancedModeNotUnlockedPattern by patternGroup.pattern(
@@ -269,7 +268,7 @@ object AttributeShardsData {
      */
     private val caughtShardsPattern by patternGroup.pattern(
         "caught.shards.colorless",
-        "You caught(?: [an]+)?(?: x(?<amount>\\d+))? (?<shardName>.+) Shards?!",
+        """You caught(?: [an]+)?(?: x(?<amount>\d+))? (?<shardName>.+) Shards?!""",
     )
 
     /**
@@ -279,7 +278,7 @@ object AttributeShardsData {
      */
     private val caughtMultipleShardsPattern by patternGroup.pattern(
         "caught-multiple.shards",
-        "\uE025 .+ CATCH! You caught(?: [an]+)? (?<shardName>.+) Shard(?: x(?<amount>\\d+))?!"
+        """\uE025 .+ CATCH! You caught(?: [an]+)? (?<shardName>.+) Shard(?: x(?<amount>\d+))?!"""
     )
 
     /**
@@ -290,7 +289,7 @@ object AttributeShardsData {
      */
     private val lootShareShardPattern by patternGroup.pattern(
         "loot.share.shard.colorless",
-        "LOOT SHARE!? You received (?:an?|(?<amount>\\d+)x?) (?<shardName>.+) Shards? (?:for assisting .*|from .*)!",
+        """LOOT SHARE!? You received (?:an?|(?<amount>\d+)x?) (?<shardName>.+) Shards? (?:for assisting .*|from .*)!""",
     )
 
     /**
@@ -301,7 +300,7 @@ object AttributeShardsData {
      */
     private val fusionShardPattern by patternGroup.pattern(
         "fusion.shard.colorless",
-        "FUSION! You obtained(?: an?)? (?<shardName>.+) Shard(?: x(?<amount>\\d+))?!(?: NEW!)?",
+        """FUSION! You obtained(?: an?)? (?<shardName>.+) Shard(?: x(?<amount>\d+))?!(?: NEW!)?""",
     )
 
     /**
@@ -310,7 +309,7 @@ object AttributeShardsData {
      */
     private val charmedShardPattern by patternGroup.pattern(
         "charmed.shard.colorless",
-        "CHARM! You charmed the .+ and received (?<amount>\\d+) (?<shardName>.+) Shards?!",
+        """CHARM! You charmed the .+ and received (?<amount>\d+) (?<shardName>.+) Shards?!""",
     )
 
     /**
@@ -321,7 +320,7 @@ object AttributeShardsData {
      */
     private val sentToHuntingBoxPattern by patternGroup.pattern(
         "sent.to.hunting.box.colorless",
-        "You sent (?:an?|(?<amount>\\d+)) (?<shardName>.+) Shards? to your Hunting Box.",
+        """You sent (?:an?|(?<amount>\d+)) (?<shardName>.+) Shards? to your Hunting Box.""",
     )
 
     /**
@@ -335,7 +334,7 @@ object AttributeShardsData {
     @Suppress("MaxLineLength")
     private val capturedShardPattern by patternGroup.pattern(
         "captured.shard",
-        "CAPTURE! You (?:caught an?|found) .+ and (?:gained|as a reward (?:he|she|they) gave you) (?:an?|(?<amount>\\d+)x) (?<shardName>.+) Shard!",
+        """CAPTURE! You (?:caught an?|found) .+ and (?:gained|as a reward (?:he|she|they) gave you) (?:an?|(?<amount>\d+)x) (?<shardName>.+) Shard!""",
     )
 
     /**
@@ -355,6 +354,15 @@ object AttributeShardsData {
         "You have been given a (?<shardName>.+)!",
     )
 
+    /**
+     * REGEX-TEST: SHARD! Your contribution earned you the End Stone Protector Shard!
+     */
+    private val bossShardPattern by patternGroup.pattern(
+        "boss.shard",
+        "SHARD! Your contribution earned you the (?<shardName>.+) Shard!",
+    )
+    // </editor-fold>
+
     private val shardGainChatPatterns = mapOf<Pattern, ShardSource>(
         caughtShardsPattern to HUNT,
         caughtMultipleShardsPattern to FISHING,
@@ -364,6 +372,7 @@ object AttributeShardsData {
         capturedShardPattern to CAPTURED,
         floorDropShardPattern to FLOOR_DROP,
         givenShardsPattern to GIVEN,
+        bossShardPattern to BOSS,
     )
 
     @HandleEvent(priority = HandleEvent.LOWEST)
@@ -726,7 +735,7 @@ object AttributeShardsData {
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresethuntingbox") {
             description = "Resets stored hunting box shards"
-            category = CommandCategory.USERS_RESET
+            category = USERS_RESET
             simpleCallback {
                 resetHuntingBoxShards()
             }

@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.data.GlobalRender;
 import at.hannibal2.skyhanni.data.GuiData;
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.data.model.TextInput;
-import at.hannibal2.skyhanni.events.DrawScreenAfterEvent;
 import at.hannibal2.skyhanni.events.GuiContainerEvent;
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
@@ -16,6 +15,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -25,7 +25,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -41,8 +40,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.List;
 
 @Mixin(AbstractContainerScreen.class)
-public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMenu> extends Screen {
-
+public abstract class MixinAbstractContainerScreen extends Screen {
     @Shadow
     @Nullable
     protected Slot hoveredSlot;
@@ -68,7 +66,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
 
     @Inject(method = "extractRenderState", at = @At(value = "TAIL"), cancellable = true)
     private void renderTail(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        if (new DrawScreenAfterEvent(context, mouseX, mouseY, ci).post().isCancelled()) ci.cancel();
+        skyhanni$hook.onDrawScreenAfter(context, mouseX, mouseY, ci);
     }
 
     @Inject(method = "extractContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", shift = At.Shift.AFTER))
@@ -179,9 +177,11 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         skyhanni$hook.onDrawSlotPost(slot);
     }
 
-    @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", at = @At("HEAD"), cancellable = true)
-    private void onMouseClick(Slot slot, int slotId, int button, ContainerInput actionType, CallbackInfo cir) {
-        skyhanni$hook.onMouseClick(slot, slotId, button, actionType, cir);
+    @WrapMethod(
+        method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V"
+    )
+    private void onMouseClick(Slot slot, int slotId, int buttonNum, ContainerInput containerInput, Operation<Void> original) {
+        skyhanni$hook.onMouseClick(original, slot, slotId, buttonNum, containerInput);
     }
 
     @Inject(

@@ -8,6 +8,7 @@ enum class ProjectTarget(
     val hypixelModApiVersion: String,
     val hypixelModApiFabricVersion: String,
     val modMenuVersion: String,
+    val renderChestVersion: String?,
     val modrinthInfo: ModrinthInfo,
 ) {
     MODERN_26100(
@@ -18,6 +19,7 @@ enum class ProjectTarget(
         hypixelModApiVersion = "net.hypixel:mod-api:1.0.2",
         hypixelModApiFabricVersion = "maven.modrinth:hypixel-mod-api:1.0.2+build.1+mc26.1",
         modMenuVersion = "18.0.0",
+        renderChestVersion = null,
         modrinthInfo = ModrinthInfo.FABRIC_26_1,
     ),
     MODERN_26200(
@@ -29,6 +31,7 @@ enum class ProjectTarget(
         // There is no 26.2 version; the 26.1 version works on 26.2.
         hypixelModApiFabricVersion = "maven.modrinth:hypixel-mod-api:1.0.2+build.1+mc26.1",
         modMenuVersion = "20.0.0-beta.4",
+        renderChestVersion = "1.0.3+26.2",
         modrinthInfo = ModrinthInfo.FABRIC_26_2,
     ),
 
