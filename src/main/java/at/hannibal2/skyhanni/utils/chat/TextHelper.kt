@@ -115,7 +115,7 @@ object TextHelper {
     ).joinToString("\n") { it.removePrefix("§r") }
 
     private fun splitText(text: String, width: Int): List<String> {
-        val lines = ComponentRenderUtils.wrapComponents(Component.literal(text), width, Minecraft.getInstance().font)
+        val lines = ComponentRenderUtils.wrapComponents(text.asComponent(), width, Minecraft.getInstance().font)
         val strings: MutableList<String> = ArrayList(lines.size)
         for (line in lines) {
             var newLine = ""
