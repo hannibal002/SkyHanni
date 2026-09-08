@@ -29,7 +29,7 @@ object KeyboardManager {
     }
 
     // InputConstants.UNKNOWN exists, but is not a compile time constant
-    // TODO: For 26.3 This is 0
+    //~ if < 26.3 '0' -> '-1'
     const val KEY_UNKNOWN: Int = -1
 
     const val LEFT_MOUSE = InputConstants.MOUSE_BUTTON_LEFT
