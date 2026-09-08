@@ -22,7 +22,7 @@ object FairySoulQuestOverlay {
     private val islands = mutableListOf<String>()
     private var display = emptyList<Renderable>()
 
-    private var islandSoulInfo = mapOf<Int, FairySoulApi.islandSoulInfoData>()
+    private var islandSoulInfo = mapOf<Int, FairySoulApi.IslandSoulInfo>()
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -86,7 +86,7 @@ object FairySoulQuestOverlay {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onChestGuiRender() {
-        if (!(inFairySoulQuestMenu && config.fairySoulOverlay)) return
+        if (!(inFairySoulQuestMenu && config.overl)) return
 
         if (display.isEmpty()) {
             display = buildList {

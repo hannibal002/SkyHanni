@@ -47,7 +47,7 @@ object FastFairySoulsPathfinder {
     private val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound
         ?: mutableMapOf()
 
-    private var islandSoulInfo = mapOf<Int, FairySoulApi.islandSoulInfoData>() // slot id -> (soulsfound, soulstotal)
+    private var islandSoulInfo = mapOf<Int, FairySoulApi.IslandSoulInfo>() // slot id -> (soulsfound, soulstotal)
 
     private var data: Data? = null
 
@@ -217,7 +217,10 @@ object FastFairySoulsPathfinder {
             if (islandType.isInIsland()) {
                 data?.checkHaveAll()
             }
-            totalFound[islandType] = found
+
+            if (islandType != IslandType.NONE) {
+                totalFound[islandType] = found
+            }
         }
     }
 

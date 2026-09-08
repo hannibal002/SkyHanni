@@ -25,7 +25,7 @@ class FairySoulConfig {
     )
     @FeatureToggle
     @ConfigEditorBoolean
-    var fairySoulOverlay: Boolean = true
+    var overl: Boolean = true
 
     @Expose
     @ConfigOption(
