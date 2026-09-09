@@ -5,7 +5,6 @@ jbAnnotations = "26.1.0"
 fabricLanguageKotlin = "1.13.13+kotlin.2.4.10"
 skyblockitemlist = "0.0.17+26.1.2"
 basicMath = "0.6.1"
-skyblockitemlist = "0.0.17+26.1.2"
 autoservice-ksp = "1.2.0"
 autoservice-annotations = "1.1.1"
 gson = "2.13.2"
@@ -35,7 +34,6 @@ autoservice-annotations = { module = "com.google.auto.service:auto-service-annot
 fabricLanguageKotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabricLanguageKotlin" }
 skyblockitemlist = { module = "com.operationpotato:skyblock-item-list-api", version.ref = "skyblockitemlist" }
 basicMath = { module = "me.shedaniel.cloth:basic-math", version.ref = "basicMath" }
-skyblockitemlist = { module = "com.operationpotato:skyblock-item-list-api", version.ref = "skyblockitemlist" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 changelog-builder = { module = "com.github.SkyHanniStudios:SkyHanniChangelogBuilder", version.ref = "changelog-builder" }
