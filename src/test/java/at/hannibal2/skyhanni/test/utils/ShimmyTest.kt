@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test.utils
 
 import at.hannibal2.skyhanni.config.features.About
 import at.hannibal2.skyhanni.utils.json.Shimmy
+import com.google.gson.JsonNull
 import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -116,6 +117,15 @@ abstract class ShimmyTestBase {
         val source = WithEnumProperty()
         assertThrows<IllegalArgumentException> {
             shimmy(source, listOf("prop"))!!.setJson(JsonPrimitive("THIRD"))
+        }
+        assertEquals(Example.FIRST, source.prop.get())
+    }
+
+    @Test
+    fun `setJson rejects null instead of writing it`() {
+        val source = WithEnumProperty()
+        assertThrows<IllegalArgumentException> {
+            shimmy(source, listOf("prop"))!!.setJson(JsonNull.INSTANCE)
         }
         assertEquals(Example.FIRST, source.prop.get())
     }
