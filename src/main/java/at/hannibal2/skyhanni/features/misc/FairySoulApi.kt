@@ -1,25 +1,25 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.SafeItemStack
 
 @SkyHanniModule
 object FairySoulApi {
 
-    private val groupPattern = RepoPattern.group("misc.fairysoulquestoverlay")
+    private val patternGroup = RepoPattern.group("misc.fairysouls.questmenu")
 
     /**
      * REGEX-TEST: Fairy Souls: 1/5
      * REGEX-TEST: Fairy Souls: 11/11
      * REGEX-TEST: Fairy Souls: 0/8
      */
-    val visitedPattern by groupPattern.pattern(
-        "souls.islandname",
+    private val soulsIslandNamePattern by patternGroup.pattern(
+        "inventory.island-souls.colourless",
         "Fairy Souls: (?<soulsFound>[0-9]+)/(?<soulsTotal>[0-9]+)",
     )
 
@@ -31,10 +31,10 @@ object FairySoulApi {
         val islandType: IslandType,
     )
 
-    fun getMutableIslandSoulInfo(event: InventoryFullyOpenedEvent): MutableMap<Int, IslandSoulInfo> {
+    fun getIslandSoulInfo(event: Map<Int, SafeItemStack>): Map<Int, IslandSoulInfo> {
         val remainingMap = mutableMapOf<Int, IslandSoulInfo>()
 
-        for ((slot, item) in event.inventoryItems) {
+        for ((slot, item) in event) {
             val lore = item.getCleanLore()
             val islandName = item.cleanName
             val islandType = IslandType.getByNameOrNull(item.cleanName) ?: run {
@@ -50,7 +50,7 @@ object FairySoulApi {
             var soulsTotal = 0
             var soulsFound = 0
 
-            visitedPattern.firstMatcher(lore) {
+            soulsIslandNamePattern.firstMatcher(lore) {
                 soulsFound = group("soulsFound").toInt()
                 soulsTotal = group("soulsTotal").toInt()
             }
@@ -58,10 +58,38 @@ object FairySoulApi {
             remainingMap[slot] = IslandSoulInfo(soulsFound, soulsTotal, soulsTotal - soulsFound, islandName, islandType)
         }
 
-        return remainingMap
+        return remainingMap.toMap()
     }
 
-    fun getIslandSoulInfo(event: InventoryFullyOpenedEvent): Map<Int, IslandSoulInfo> {
-        return getMutableIslandSoulInfo(event).toMap()
+    /*
+    fun getIslandSoulInfo(inventoryItems: Map<Int, SafeItemStack>): Map<Int, IslandSoulInfo> {
+        val remainingMap = mutableMapOf<Int, IslandSoulInfo>()
+
+        for ((slot, item) in inventoryItems) {
+            val lore = item.getCleanLore()
+            val islandName = item.cleanName
+            val islandType = IslandType.getByNameOrNull(item.cleanName) ?: run {
+                if (islandName == "Safari") {
+                    IslandType.SAFARI
+                } else if (islandName == "Miscellaneous") {
+                    IslandType.NONE
+                } else continue
+            }
+
+            if (islandName == "") continue
+
+            var soulsTotal = 0
+            var soulsFound = 0
+
+            questMenuPattern.firstMatcher(lore) {
+                soulsFound = group("soulsFound").toInt()
+                soulsTotal = group("soulsTotal").toInt()
+            }
+
+            remainingMap[slot] = IslandSoulInfo(soulsFound, soulsTotal, soulsTotal - soulsFound, islandName, islandType)
+        }
+
+        return remainingMap.toMap()
     }
+    */
 }

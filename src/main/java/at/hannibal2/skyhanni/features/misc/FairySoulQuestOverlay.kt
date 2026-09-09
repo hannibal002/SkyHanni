@@ -19,7 +19,6 @@ object FairySoulQuestOverlay {
 
     private var inFairySoulQuestMenu = false
 
-    private val islands = mutableListOf<String>()
     private var display = emptyList<Renderable>()
 
     private var islandSoulInfo = mapOf<Int, FairySoulApi.IslandSoulInfo>()
@@ -30,7 +29,7 @@ object FairySoulQuestOverlay {
 
         if (!inFairySoulQuestMenu) return
 
-        islandSoulInfo = FairySoulApi.getIslandSoulInfo(event)
+        islandSoulInfo = FairySoulApi.getIslandSoulInfo(event.inventoryItems)
 
         display = buildList {
             for (islandSlot in islandSoulInfo.keys) {
@@ -79,7 +78,6 @@ object FairySoulQuestOverlay {
     private fun onInventoryClose() {
         if (inFairySoulQuestMenu) {
             inFairySoulQuestMenu = false
-            islands.clear()
             display = emptyList()
         }
     }

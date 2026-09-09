@@ -53,7 +53,7 @@ object FastFairySoulsPathfinder {
     private var data: Data? = null
 
     private val pathfindCoroutine = CoroutineSettings("fairy souls pathfind")
-    private val patternGroup = RepoPattern.group("misc.fairy-souls")
+    private val patternGroup = RepoPattern.group("misc.fairy-soul-chat-detection")
 
     /**
      * REGEX-TEST: You have already found that Fairy Soul!
@@ -70,10 +70,6 @@ object FastFairySoulsPathfinder {
         "chat.new.colorless",
         "^SOUL! You found a Fairy Soul!$",
     )
-
-    /**
-     * REGEX-TEST: Fairy Souls: 11/11
-     */
 
     private class Data(
         var found: Int,
@@ -209,7 +205,7 @@ object FastFairySoulsPathfinder {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Fairy Souls Guide") return
 
-        islandSoulInfo = FairySoulApi.getIslandSoulInfo(event)
+        islandSoulInfo = FairySoulApi.getIslandSoulInfo(event.inventoryItems)
 
         for (islandSlot in islandSoulInfo.keys) {
             val islandType = islandSoulInfo[islandSlot]?.islandType ?: continue
@@ -377,7 +373,7 @@ object FastFairySoulsPathfinder {
         ChatUtils.clickableChat(
             "§cFairy Souls are disabled. Click to enable!",
             onClick = {
-                config.fastFairySouls = true
+                config.pathfinder = true
             },
         )
         return true
@@ -397,7 +393,7 @@ object FastFairySoulsPathfinder {
 
     private fun getTargetNodes(nodes: List<GraphNode>): List<GraphNode> = nodes.filter { it.hasTag(GraphNodeTag.FAIRY_SOUL) }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.fastFairySouls
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.pathfinder
 
     @HandleEvent
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
