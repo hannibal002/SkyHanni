@@ -12,7 +12,12 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.Test
 
 class EnforcedConfigValuesTest {
-    private class Config { val enabled: Property<Boolean> = Property.of(true) }
+    private enum class Channel { RELEASES, BETA }
+
+    private class Config {
+        val enabled: Property<Boolean> = Property.of(true)
+        val channel: Property<Channel> = Property.of(Channel.RELEASES)
+    }
 
     @AfterEach
     fun cleanup() = EnforcedConfigValues.userValues.clear()
@@ -43,6 +48,19 @@ class EnforcedConfigValuesTest {
 
         assertFalse(config.enabled.get())
         assertNull(EnforcedConfigValues.userValues["enabled"])
+    }
+
+    @Test
+    fun `keeps the backup when a persistent override fails to deserialize`() {
+        val config = Config()
+        EnforcedConfigValues.enforceValue(config, EnforcedValue("channel", JsonPrimitive("BETA")))
+
+        assertThrows<IllegalArgumentException> {
+            EnforcedConfigValues.enforceValue(config, EnforcedValue("channel", JsonPrimitive("NIGHTLY"), persist = true))
+        }
+
+        assertEquals(Channel.BETA, config.channel.get())
+        assertEquals(JsonPrimitive("RELEASES"), EnforcedConfigValues.userValues["channel"]?.userValue)
     }
 
     @Test

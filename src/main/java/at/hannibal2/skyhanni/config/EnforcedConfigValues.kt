@@ -138,8 +138,10 @@ object EnforcedConfigValues {
         // unless the user changed it in the meantime (e.g. via /shconfig set)
         val previous = userValues[enforcedValue.path]
         val userValue = if (previous != null && currentValue == previous.enforcedValue) previous.userValue else currentValue
+        // A value that cannot be deserialized fails here, before the write, and leaves any existing backup untouched
+        val newValue = shimmy.fromJson(enforcedValue.value)
         try {
-            shimmy.setJson(enforcedValue.value)
+            shimmy.value = newValue
         } finally {
             // A property observer can throw after the value has already been applied, so the bookkeeping happens
             // regardless. Persistent values replace the user's value for good, so there is nothing to restore later.

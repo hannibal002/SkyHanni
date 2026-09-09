@@ -27,19 +27,25 @@ class Shimmy private constructor(
     var value: Any?
         get() = reflectField.get(source)
         set(v) {
+            // Property.set notifies observers even for an unchanged value, which e.g. resets the update checker
+            if (value == v) return
             if (property != null) property.set(v) else reflectField.set(source, v)
         }
 
     fun getJson(): JsonElement = ConfigManager.gson.toJsonTree(value, type)
     fun setJson(element: JsonElement) {
+        value = fromJson(element)
+    }
+
+    /** Deserializes [element] into the field's type without writing it. */
+    fun fromJson(element: JsonElement): Any? {
         val newValue = ConfigManager.gson.fromJson<Any?>(element, type)
         // Gson silently returns null for unknown enum constants, which would crash whoever reads the field later.
         // An explicit null is left to the caller: storage has nullable fields, config options do not
         require(newValue != null || element.isJsonNull) {
             "Could not deserialize $element into ${TypeToken.get(type).rawType.name} for field ${reflectField.name}"
         }
-        // Property.set notifies observers even for an unchanged value, which e.g. resets the update checker
-        if (value != newValue) value = newValue
+        return newValue
     }
 
     companion object {
