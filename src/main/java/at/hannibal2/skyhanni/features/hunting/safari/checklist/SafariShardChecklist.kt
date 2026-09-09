@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.hunting.safari.checklist
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.features.foraging.SafariConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -41,11 +42,12 @@ object SafariShardChecklist {
      * REGEX-TEST: CAPTURE! You caught a Strongarm and gained a Strongarm Shard!
      * REGEX-TEST: CAPTURE! You caught a Solsnatcher and gained 2x Solsnatcher Shard!
      * REGEX-TEST: CAPTURE! You found Hideyho, and as a reward he gave you 4x Hideyho Shard!
+     * REGEX-TEST: CAPTURE! You found the Hideyho, and as a reward it gave you a Hideyho Shard!
      */
     @Suppress("MaxLineLength")
     private val capturedShardPattern by patternGroup.pattern(
         "capture",
-        """CAPTURE! You (?:caught an?|found) .+ and (?:gained|as a reward (?:he|she|they) gave you) (?:an?|(?<amount>\d+)x) (?<shardName>.+) Shard!""",
+        """CAPTURE! You (?:(?:caught an?|found) .+ and (?:gained|as a reward (?:he|she|they) gave you)|found (?:the )?Hideyho, and as a reward it gave you) (?:an?|(?<amount>\d+)x) (?<shardName>.+) Shard!""",
     )
 
     private val shardCounts = SafariShard.entries.associateWithTo(mutableMapOf()) { 0 }
@@ -90,10 +92,18 @@ object SafariShardChecklist {
     }
 
     private fun createDisplay(): List<Renderable> = buildList {
-        SafariBiome.entries.forEach { biome ->
+        val biomes = when (config.runShardChecklistDisplay) {
+            SafariConfig.ChecklistDisplay.ALL -> SafariBiome.entries
+            SafariConfig.ChecklistDisplay.CURRENT_ON_TOP -> getCurrentBiome()?.let { currentBiome ->
+                SafariBiome.entries.sortedByDescending { it == currentBiome }
+            } ?: SafariBiome.entries
+
+            SafariConfig.ChecklistDisplay.ONLY_CURRENT -> getCurrentBiome()?.let { listOf(it) } ?: emptyList()
+        }
+        biomes.forEach { biome ->
             val status = if (isBiomeDone(biome)) "§aDone" else "§cUndone"
             add(Renderable.text("${biome.formattedName} §7- $status"))
-            biome.shards.forEach { shard ->
+            biome.shards.filter { !config.hideCollectedRunShards || shardCounts.getValue(it) == 0 }.forEach { shard ->
                 val marker = if (shardCounts.getValue(shard) > 0) "§a✔" else "§c✖"
                 val row = buildList {
                     add(Renderable.text("§7- ($marker§7)"))
