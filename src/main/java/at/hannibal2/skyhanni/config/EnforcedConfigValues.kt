@@ -34,9 +34,9 @@ object EnforcedConfigValues {
 
     // The user's own values of the options that are currently enforced, keyed by config path.
     // Guarded by its own monitor: the config auto-save thread reads it while it serializes the config.
-    private val userValues = mutableMapOf<String, UserValue>()
+    internal val userValues = mutableMapOf<String, UserValue>()
 
-    private class UserValue(val userValue: JsonElement, val enforcedValue: JsonElement)
+    internal class UserValue(val userValue: JsonElement, val enforcedValue: JsonElement)
 
     /**
      * Applies the values cached in the local repo, so that enforcement does not have to wait for the
@@ -125,7 +125,7 @@ object EnforcedConfigValues {
         }
     }
 
-    private fun enforceValue(config: Any, enforcedValue: EnforcedValue) {
+    internal fun enforceValue(config: Any, enforcedValue: EnforcedValue) {
         val shimmy = Shimmy(config, enforcedValue.path.split("."))
         if (shimmy == null) {
             ChatUtils.debug("EnforcedConfigValues: Could not create shimmy for path ${enforcedValue.path}; skipping")
@@ -134,20 +134,20 @@ object EnforcedConfigValues {
         // Config options are never null, and Shimmy leaves explicit nulls to the caller
         require(!enforcedValue.value.isJsonNull) { "Enforced value for ${enforcedValue.path} is null" }
         val currentValue = shimmy.getJson()
-        shimmy.setJson(enforcedValue.value)
-        // Only touched after a successful update, so a rejected value can neither corrupt nor drop the backup
-        if (enforcedValue.persist) {
-            // Persistent values replace the user's value for good, so there is nothing to restore later
-            userValues.remove(enforcedValue.path)
-            return
-        }
         // When the option is already enforced, the current value is a previously enforced one, not the user's,
         // unless the user changed it in the meantime (e.g. via /shconfig set)
         val previous = userValues[enforcedValue.path]
         val userValue = if (previous != null && currentValue == previous.enforcedValue) previous.userValue else currentValue
-        // The value is re-read so that the backup compares equal to what the field serializes to later
-        // (e.g. a float from the repo JSON does not equal the same float serialized by Gson)
-        userValues[enforcedValue.path] = UserValue(userValue, shimmy.getJson())
+        try {
+            shimmy.setJson(enforcedValue.value)
+        } finally {
+            // A property observer can throw after the value has already been applied, so the backup is recorded
+            // regardless. It is re-read so that it compares equal to what the field serializes to later
+            // (e.g. a float from the repo JSON does not equal the same float serialized by Gson)
+            userValues[enforcedValue.path] = UserValue(userValue, shimmy.getJson())
+        }
+        // Persistent values replace the user's value for good, so there is nothing to restore later
+        if (enforcedValue.persist) userValues.remove(enforcedValue.path)
     }
 
     private fun restoreNoLongerEnforced(config: Any, enforcedPaths: Set<String>) {

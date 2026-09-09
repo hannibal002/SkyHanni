@@ -138,6 +138,16 @@ abstract class ShimmyTestBase {
     fun `returns null when intermediate path segment is null`() =
         assertNull(shimmy(WithNullable(), listOf("inner", "value")))
 
+    // Enforced values are re-applied on every repo reload, which must not keep resetting observers
+    @Test
+    fun `setJson with an unchanged value does not notify observers`() {
+        val source = WithProperty()
+        var notifications = 0
+        source.prop.whenChanged { _, _ -> notifications++ }
+        shimmy(source, listOf("prop"))!!.setJson(JsonPrimitive("propertyValue"))
+        assertEquals(0, notifications)
+    }
+
     // This is the shape EnforcedConfigValues uses to remotely override an enum option
     @Test
     fun `enforces an enum onto the real config class`() {

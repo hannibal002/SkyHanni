@@ -38,7 +38,8 @@ class Shimmy private constructor(
         require(newValue != null || element.isJsonNull) {
             "Could not deserialize $element into ${TypeToken.get(type).rawType.name} for field ${reflectField.name}"
         }
-        value = newValue
+        // Property.set notifies observers even for an unchanged value, which e.g. resets the update checker
+        if (value != newValue) value = newValue
     }
 
     companion object {
