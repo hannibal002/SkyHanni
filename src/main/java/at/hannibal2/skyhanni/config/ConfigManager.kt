@@ -94,11 +94,15 @@ class ConfigManager {
             period = QUEUED_SAVE_INTERVAL.inWholeMilliseconds,
             initialDelay = QUEUED_SAVE_INTERVAL.inWholeMilliseconds,
         ) {
-            if (lastFeatureAutoSave.passedSince() >= FEATURE_AUTO_SAVE_INTERVAL) {
-                lastFeatureAutoSave = SimpleTimeMark.now()
-                queueSave(ConfigFileType.FEATURES, "auto-save-60s")
+            try {
+                if (lastFeatureAutoSave.passedSince() >= FEATURE_AUTO_SAVE_INTERVAL) {
+                    lastFeatureAutoSave = SimpleTimeMark.now()
+                    queueSave(ConfigFileType.FEATURES, "auto-save-60s")
+                }
+                flushQueuedSaves()
+            } catch (e: Throwable) {
+                ErrorManager.logErrorWithData(e, "Failed to save config")
             }
-            flushQueuedSaves()
         }
 
         val features = SkyHanniMod.feature
