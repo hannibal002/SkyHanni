@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -17,11 +16,11 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.getLorenzVec
 
 @SkyHanniModule
 object RiftApi {
-
     fun inRift() = IslandType.THE_RIFT.isInIsland()
 
     val config: RiftConfig get() = SkyHanniMod.feature.rift
@@ -53,8 +52,10 @@ object RiftApi {
     var trackingButtons = false
     var allButtonsHit = false
 
+    val motes: Long? = SkyblockCurrency.MOTES.getOwnedAmountOrNull()
+
     @HandleEvent
-    fun onAreaChange(event: GraphAreaChangeEvent) {
+    private fun onAreaChange(event: GraphAreaChangeEvent) {
         inMirrorVerse = event.area == "Mirrorverse"
         inColosseum = event.area == "Colosseum"
     }
@@ -62,21 +63,21 @@ object RiftApi {
     private val temporalPillars = mutableListOf<Mob>()
 
     @HandleEvent
-    fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+    private fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (event.mob.name == "Temporal Pillar") {
             temporalPillars.add(event.mob)
         }
     }
 
     @HandleEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    private fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob.name == "Temporal Pillar") {
             temporalPillars.remove(event.mob)
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed() {
         if (!config.temporalPillarDodge) {
             if (IslandGraphs.disabledNodesReason == "Temporal Pillar") {
                 IslandGraphs.enableAllNodes()
