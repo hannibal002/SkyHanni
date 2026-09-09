@@ -3,27 +3,24 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
@@ -42,48 +39,49 @@ object StarlynSisterCouponProfit {
     private var currentSisterType: StarlynSisterType? = null
 
     @HandleEvent
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         currentSisterType = null
         display = emptyList()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.starlynCouponProfitEnabled) return
-        StarlynSisterType.entries.forEach { sisterType ->
-            if (event.inventoryName == sisterType.inventoryName) currentSisterType = sisterType
-        }
-        if (currentSisterType == null) return
+        val sisterType = StarlynSisterType.entries.firstOrNull { it.inventoryName == event.inventoryName } ?: return
 
-        val table = mutableListOf<DisplayTableEntry>()
-        for ((slot, item) in event.inventoryItems) {
-            try {
-                readItem(slot, item)?.let {
-                    table.add(it)
+        DelayedRun.runOrNextTick {
+            currentSisterType = sisterType
+
+            val table = mutableListOf<DisplayTableEntry>()
+            for ((slot, item) in event.inventoryItems) {
+                try {
+                    readItem(slot, item)?.let {
+                        table.add(it)
+                    }
+                } catch (e: Throwable) {
+                    ErrorManager.logErrorWithData(
+                        e, "Error in StarlynSisterCouponProfit while reading item '${item.repoItemName}'",
+                        "item" to item,
+                        "name" to item.repoItemName,
+                        "inventory name" to event.inventoryName,
+                    )
                 }
-            } catch (e: Throwable) {
-                ErrorManager.logErrorWithData(
-                    e, "Error in StarlynSisterCouponProfit while reading item '${item.repoItemName}'",
-                    "item" to item,
-                    "name" to item.repoItemName,
-                    "inventory name" to event.inventoryName,
-                )
             }
-        }
 
-        display = buildList {
-            addString("§eProfit per Coupon")
-            add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
+            display = buildList {
+                addString("§eProfit per Coupon")
+                add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
+            }
         }
     }
 
     private fun readItem(slot: Int, item: SafeItemStack): DisplayTableEntry? {
         if (!isValidSlotNumber(slot)) return null
         val (internalName, itemName) = workOutInternalNameOrNull(item) ?: return null
-        val requiredItems = getRequiredItems(item)
+        val requiredItems = item.readLoreCosts()
         val price = internalName.getPrice()
         var totalCost = 0.0
-        var couponAmount = 0
+        var couponAmount = 0L
         for ((name, amount) in requiredItems) {
             val itemPrice = name.getPriceOrNull() ?: continue
             totalCost += itemPrice * amount
@@ -131,33 +129,6 @@ object StarlynSisterCouponProfit {
         }
     }
 
-    private fun getRequiredItems(item: SafeItemStack): MutableMap<NeuInternalName, Int> {
-        val items = mutableMapOf<NeuInternalName, Int>()
-
-        val lore = item.getLore()
-        val costLines = lore
-            .sublistAfter({ it == "§7Cost" }, skip = 1, amount = lore.size)
-            .takeWhile { it.isNotEmpty() }
-
-        for (line in costLines) {
-            val rawItemName = line.replace("§8 ", " §8")
-
-            val originalPair = ItemUtils.readItemAmount(rawItemName)
-            if (originalPair == null) {
-                ErrorManager.logErrorStateWithData(
-                    "Error in StarlynSisterCouponProfit", "Could not read item amount",
-                    "rawItemName" to rawItemName,
-                    "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
-                    "lore" to lore,
-                )
-                continue
-            }
-            val newPair = NeuInternalName.fromItemName(originalPair.first) to originalPair.second
-            items.add(newPair)
-        }
-        return items
-    }
-
     private fun isValidSlotNumber(slot: Int): Boolean {
         if (slot !in 9..44) return false
         val modNine = slot % 9
@@ -165,7 +136,7 @@ object StarlynSisterCouponProfit {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    private fun onChestGuiRender() {
         if (currentSisterType == null) return
         config.starlynCouponProfitPos.renderRenderables(
             display,
@@ -175,7 +146,7 @@ object StarlynSisterCouponProfit {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(139, "foraging.starlynContest.agathaCouponProfitEnabled", "foraging.starlynContest.starlynCouponProfitEnabled")
         event.move(139, "foraging.starlynContest.agathaCouponProfitPos", "foraging.starlynContest.starlynCouponProfitPos")
     }

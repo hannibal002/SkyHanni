@@ -58,13 +58,18 @@ class PrimaryFunctionProcessor(
         val dependencies = Dependencies(true, *symbols.mapNotNull { it.containingFile }.toTypedArray())
         val file = codeGenerator.createNewFile(dependencies, "at.hannibal2.skyhanni.api.event", "GeneratedEventPrimaryFunctionNames")
         OutputStreamWriter(file).use {
-            it.write("package at.hannibal2.skyhanni.api.event\n\n")
-            it.write("object GeneratedEventPrimaryFunctionNames {\n")
-            it.write("    val map: Map<String, Class<out SkyHanniEvent>> = mapOf(\n")
-            it.write("        $entries\n")
-            it.write("    )\n")
-            it.write("}\n")
+            it.appendLine(
+                """
+                |package at.hannibal2.skyhanni.api.event
+                |
+                |object GeneratedEventPrimaryFunctionNames {
+                |    val map: Map<String, Class<out SkyHanniEvent>> = mapOf(
+                |        $entries
+                |    )
+                |}
+                """.trimMargin(),
+            )
         }
-        logger.warn("Generated GeneratedEventPrimaryFunctionNames with ${symbols.size} entries")
+        println("Generated GeneratedEventPrimaryFunctionNames with ${symbols.size} entries")
     }
 }

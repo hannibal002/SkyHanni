@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractHurtingProjectile.class)
-public class MixinAbstractHurtingProjectile {
+public abstract class MixinAbstractHurtingProjectile {
 
     @SuppressWarnings("ConstantConditions")
     @Inject(method = "createParticleTrail", at = @At("HEAD"), cancellable = true)

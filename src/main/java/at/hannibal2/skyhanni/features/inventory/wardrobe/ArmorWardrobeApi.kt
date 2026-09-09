@@ -24,20 +24,22 @@ object ArmorWardrobeApi : AbstractWardrobeApi() {
 
     override val storage get() = ProfileStorageData.profileSpecific?.wardrobe
 
-    var inCustomWardrobe = false
-
     @HandleEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
-        val matched = handleInventoryOpen(event.inventoryName)
-        if (CustomWardrobe.config.enabled) inCustomWardrobe = matched
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
+        handleInventoryOpen(event.inventoryName)
     }
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) = handleInventoryUpdated(event)
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) = handleInventoryUpdated(event)
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) = handleInventoryClose()
+    private fun onInventoryClose(event: InventoryCloseEvent) = handleInventoryClose()
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) = handleDebugDataCollect(event)
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) = handleDebugDataCollect(event)
+
+    // This also modifies the "inWardrobe" property
+    internal fun matchesInventoryName(inventoryName: String): Boolean {
+        return handleInventoryOpen(inventoryName)
+    }
 }

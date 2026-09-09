@@ -1,41 +1,36 @@
 package at.hannibal2.skyhanni.compat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.features.inventory.wardrobe.ArmorWardrobeApi
-import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
+import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import me.shedaniel.math.Rectangle
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin
-import me.shedaniel.rei.api.client.registry.screen.ExclusionZones
-import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import me.shedaniel.rei.api.client.registry.screen.DisplayBoundsProvider
+import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.world.InteractionResult
 
 class SkyHanniReiPlugin : REIClientPlugin {
+    override fun registerScreens(registry: ScreenRegistry) {
+        registry.registerDecider(SkyHanniDisplayBoundsProvider())
+    }
+}
 
-    override fun registerExclusionZones(zones: ExclusionZones) {
-        zones.register(ContainerScreen::class.java) { screen ->
-            if (ArmorWardrobeApi.inCustomWardrobe) {
-                if (CustomWardrobe.renderableTopCorner == Pair(0, 0)) {
-                    listOf(screen.fullRectangle())
-                } else {
-                    listOf(screen.customWardrobeExclusionRect())
-                }
-            } else {
-                listOf()
-            }
+private class SkyHanniDisplayBoundsProvider : DisplayBoundsProvider<SkyHanniBaseScreen> {
+    override fun <R : Screen?> shouldScreenBeOverlaid(screen: R?): InteractionResult? {
+        val customScreen = screen as? SkyHanniBaseScreen ?: return InteractionResult.PASS
+        return if (customScreen.shouldShowItemList()) {
+            InteractionResult.SUCCESS
+        } else {
+            InteractionResult.FAIL
         }
     }
 
-    private fun ContainerScreen.fullRectangle(): Rectangle {
-        return Rectangle(0, 0, this.width, this.height)
+    override fun getScreenBounds(screen: SkyHanniBaseScreen): Rectangle {
+        val rectangle = screen.rectangle
+        val position = rectangle.position
+        return Rectangle(position.x, position.y, rectangle.width, rectangle.height)
     }
 
-    private fun ContainerScreen.customWardrobeExclusionRect(): Rectangle {
-        val showReiItems = SkyHanniMod.feature.inventory.customWardrobe.showReiItems
-        if (!showReiItems) {
-            return fullRectangle()
-        }
-        return Rectangle(
-            CustomWardrobe.renderableTopCorner.first, CustomWardrobe.renderableTopCorner.second,
-            CustomWardrobe.renderableDimensions.first, CustomWardrobe.renderableDimensions.second,
-        )
+    override fun <R : Screen> isHandingScreen(screen: Class<R>): Boolean {
+        return SkyHanniBaseScreen::class.java.isAssignableFrom(screen)
     }
 }

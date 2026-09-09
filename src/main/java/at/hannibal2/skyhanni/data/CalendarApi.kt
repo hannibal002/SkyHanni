@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
@@ -163,7 +164,7 @@ object CalendarApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH)
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
         if (calendarGuiPattern.matches(event.inventoryName)) {
             inMainCalendar = true
         }
@@ -175,7 +176,7 @@ object CalendarApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOW)
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose(event: InventoryCloseEvent) {
         if (!event.reopenSameName) {
             inMainCalendar = false
             inCalendar = false
@@ -193,15 +194,13 @@ object CalendarApi {
         val lore = item.getCleanLore()
         if (lore.size < 2) return null
         val eventName = item.cleanName
-        val startTimeLine = lore[0]
-        val durationLine = lore[1]
 
-        val startTime = mainCalendarStartsInPattern.matchMatcher(startTimeLine) {
+        val startTime = mainCalendarStartsInPattern.firstMatcher(lore) {
             val timeString = group("time")
             TimeUtils.getDurationOrNull(timeString)?.fromNow()
         } ?: return null
 
-        val duration = mainCalendarDurationPattern.matchMatcher(durationLine) {
+        val duration = mainCalendarDurationPattern.firstMatcher(lore) {
             val timeString = group("time")
             TimeUtils.getDurationOrNull(timeString)
         } ?: return null

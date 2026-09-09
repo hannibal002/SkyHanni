@@ -29,6 +29,7 @@ import kotlin.time.Duration.Companion.minutes
 object FarmingContestApi {
 
     private val patternGroup = RepoPattern.group("garden.farming.contest")
+
     /**
      * REGEX-TEST: Spring 31st, Year 494
      */
@@ -60,6 +61,7 @@ object FarmingContestApi {
         "bulkclaim.colorless",
         "Claim multiple farming contest",
     )
+
     /**
      * REGEX-TEST: (1/2) Your Contests
      * REGEX-TEST: (2/2) Your Contests
@@ -131,7 +133,7 @@ object FarmingContestApi {
                     e, "Farming contest read current crop failed",
                     "cropName" to cropName,
                     "line" to line,
-                    "sidebarLinesFormatted" to scoreboard
+                    "sidebarLinesFormatted" to scoreboard,
                 )
                 null
             }

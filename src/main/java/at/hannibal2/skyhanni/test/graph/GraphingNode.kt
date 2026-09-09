@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 
-// The node object the graph editor is working with
+/**
+ * The node object the graph editor is working with
+ */
 class GraphingNode(
     val id: Int,
     override var position: LorenzVec,

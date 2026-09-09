@@ -31,6 +31,9 @@ enum class Deployable(
     UMBERELLA("Umberella", "§9Umberella", 30, DeployableType.UMBERELLA),
     ;
 
+    /**
+     * REGEX-TEST: Umberella 298s
+     */
     val pattern by RepoPattern.pattern(
         "combat.deployable.${name.lowercase().replace("_", "-")}",
         "$deployableName (?<time>\\d+)s",

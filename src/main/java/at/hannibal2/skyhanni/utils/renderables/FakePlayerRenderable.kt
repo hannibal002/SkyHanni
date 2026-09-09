@@ -67,6 +67,5 @@ private fun drawEntityWithoutScissor(
     mouseY: Float,
     entity: LivingEntity,
 ) {
-    //~ if < 26.1 'extractEntityInInventoryFollowsMouse' -> 'renderEntityInInventoryFollowsMouse'
     InventoryScreen.extractEntityInInventoryFollowsMouse(guiGraphics, x1, y1, x2, y2, size, scale, mouseX, mouseY, entity)
 }

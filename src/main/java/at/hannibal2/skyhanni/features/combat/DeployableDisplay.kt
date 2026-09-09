@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -29,24 +30,25 @@ object DeployableDisplay {
     }
 
     // todo should this be a set?
-    private val activeDeployables = mutableListOf<Deployable>()
+    private val knownDeployables = mutableListOf<Deployable>()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntitySpawn(event: EntityCustomNameUpdateEvent<ArmorStand>) {
-        if (!config.enabled) return
+        // TODO: Have some way to not list all the features that need this
+        if (!config.enabled && !config.deployableReminder.enabled) return
         val entity = event.entity
         for (deployable in Deployable.entries) {
-            deployable.pattern.matchMatcher(entity.name) {
+            deployable.pattern.matchMatcher(entity.cleanName) {
                 if (!deployable.isInRange(entity)) return@matchMatcher
                 val time = SimpleTimeMark.now() + group("time").formatInt().toDuration(DurationUnit.SECONDS)
                 if (deployable.expiryTime > time && deployable.isActive()) return@matchMatcher
                 deployable.entity = entity
                 deployable.expiryTime = time
-                for (entry in activeDeployables) {
+                for (entry in knownDeployables) {
                     val entryEntity = entry.entity ?: continue
                     if (entryEntity.getLorenzVec().equalsIgnoreY(entity.getLorenzVec())) return@matchMatcher
                 }
-                activeDeployables.add(deployable)
+                knownDeployables.add(deployable)
             }
         }
     }
@@ -67,22 +69,22 @@ object DeployableDisplay {
 
     @HandleEvent
     fun onWorldChange() {
-        activeDeployables.clear()
+        knownDeployables.clear()
         Deployable.entries.forEach { it.reset() }
     }
 
     private fun buildDisplay() {
-        activeDeployables.removeIf { !it.isActive() }
+        knownDeployables.removeIf { !it.isActive() }
         Deployable.entries.forEach { if (!it.isActive()) it.reset() }
         display.clear()
-        for (deployable in activeDeployables) {
+        for (deployable in knownDeployables) {
             if (deployable.type !in config.displayTypes) continue
-            if (config.highestTierOnly && activeDeployables.any { it.type == deployable.type && it.tier > deployable.tier }) continue
+            if (config.highestTierOnly && knownDeployables.any { it.type == deployable.type && it.tier > deployable.tier }) continue
             display.add(Renderable.text("$deployable §e${deployable.expiryTime.timeUntil().format()}"))
         }
     }
 
     fun getActiveDeployables(): List<Deployable> {
-        return activeDeployables.toList()
+        return knownDeployables.filter { it.isActive() }
     }
 }

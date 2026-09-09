@@ -103,7 +103,7 @@ object SlayerQuestWarning {
             if (slayerType != it) {
                 val activeSlayerName = it.displayName
                 val slayerName = slayerType.displayName
-                SlayerApi.latestWrongAreaWarning = SimpleTimeMark.now()
+                SlayerApi.latestWrongAreaWarningTime = SimpleTimeMark.now()
                 warn(
                     "Wrong Slayer!",
                     "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!",

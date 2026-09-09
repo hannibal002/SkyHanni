@@ -20,7 +20,7 @@ class HideonleafHighlightConfig {
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color for the Hideonleaf highlight")
+    @ConfigOption(name = "Color", desc = "Color for the Hideonleaf highlight.")
     @ConfigEditorColour
     @SearchTag("shulker")
     var color: ChromaColour = Color.MAGENTA.toChromaColor()

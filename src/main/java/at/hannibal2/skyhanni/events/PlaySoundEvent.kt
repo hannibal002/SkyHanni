@@ -27,7 +27,6 @@ class PlaySoundEvent(
     val pitch: Float,
     val volume: Float,
 ) : CancellableWorldEvent() {
-
     val distanceToPlayer by lazy { location.distanceToPlayer() }
     override fun toString(): String {
         return "PlaySoundEvent(soundName='$soundName', pitch=$pitch, volume=$volume, location=${location.roundTo(1)}, distanceToPlayer=${
@@ -40,6 +39,6 @@ class PlaySoundEvent(
      */
     fun replaceWithOther(soundName: String) {
         this.cancel()
-        SoundUtils.createSound(soundName, pitch, volume).playSound()
+        SoundUtils.createSound(soundName, pitch, volume, isWarning = false).playSound()
     }
 }

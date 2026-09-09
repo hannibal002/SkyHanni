@@ -11,9 +11,8 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
 object ConfigUpdaterMigrator {
-
     val logger = SkyHanniLogger("ConfigMigration")
-    const val CONFIG_VERSION = 139
+    const val CONFIG_VERSION = 146
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -33,7 +32,6 @@ object ConfigUpdaterMigrator {
         var movesPerformed: Int,
         val dynamicPrefix: Map<String, List<String>>,
     ) : SkyHanniEvent() {
-
         init {
             dynamicPrefix.entries
                 .filter { it.value.isEmpty() }
@@ -117,6 +115,7 @@ object ConfigUpdaterMigrator {
                         "$realPrefix.${toPath.substringAfter('.')}", transform,
                     )
                 }
+                return
             }
             val oldElem = old.at(op, false)
             if (oldElem == null) {
@@ -165,6 +164,7 @@ object ConfigUpdaterMigrator {
                 for (realPrefix in realPrefixes) {
                     remove(since, "$realPrefix.${oldPath.substringAfter('.')}")
                 }
+                return
             }
             val oldElem = old.at(op, false)
             if (oldElem == null) {

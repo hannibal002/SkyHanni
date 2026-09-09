@@ -11,8 +11,7 @@ import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addCollectionCounter
-import at.hannibal2.skyhanni.data.model.SkyblockStat.FARMING_FORTUNE
-import at.hannibal2.skyhanni.data.model.SkyblockStat.OVERBLOOM
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -32,6 +31,7 @@ import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker.drawDispl
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -79,21 +79,20 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
     /**
      * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §8x9 §e(§e+134)
-     * REGEX-TEST: §6§lRARE DROP! §9Enchanted Cookie §8x9 §6(§6+1,810)
-     * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300)
      * REGEX-TEST: §6§lPET DROP! §r§6Slug §e(§e+78)
-     * REGEX-TEST: §6§lRARE DROP! §9Squeaky Toy §6(§6+1,549)
-     * REGEX-TEST: §6§lRARE DROP! §6Squeaky Mousemat §6(§6+1,549)
+     * REGEX-TEST: §r§6§lPET DROP! §r§6Slug §r§e(+140)
+     * REGEX-TEST: §6§lPET DROP! §6Slug §e(§e+145)
      * REGEX-TEST: §6§lRARE DROP! §aWings of Harmony Vinyl §e(§e+139.5)
      * REGEX-TEST: §6§lRARE DROP! §r§aNot Just a Pest Vinyl §r§6(Cocoaleech)
+     * REGEX-TEST: §6§lRARE DROP! §aDynaMITES Vinyl §e(§e+130)
      * REGEX-FAIL: §6§lRARE CROP! §aCane Knot §e(§e+139.5)
      */
-    // TODO consider if we want to add Harvest Feast drops to Pest Profit Tracker - we need a way to distinguish drops
-    //  from breaking crops vs. killing pests since they use the same message
+    // Harvest Feast drops are handled elsewhere; they're added here if determined to come from a pest.
+    // This pattern intentionally does not match them.
     @Suppress("MaxLineLength")
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>\\d+))? (?:§.)*\\((?:§.)?(?:\\+[\\d.,]+[${FARMING_FORTUNE.hypixelIcon}${OVERBLOOM.hypixelIcon}]|Cocoaleech)\\)",
+        "(?:§r)?§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>[\\d,]+))? (?:§.)*\\((?:§.)?(?:\\+[\\d.,]+${SkyblockStat.OVERBLOOM.hypixelIcon}|Cocoaleech)\\)",
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
@@ -101,7 +100,6 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     val OVERCLOCKER = "OVERCLOCKER_3000".toInternalName()
     val BITS = "SKYBLOCK_BIT".toInternalName()
     const val KILL_BITS = 5
-    private val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
 
     private val noMessageDrops = setOf(
         "PESTERMINATOR;1",
@@ -170,7 +168,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onItemAdd(event: ItemAddEvent) {
+    private fun onItemAdd(event: ItemAddEvent) {
         if (config.enabled && event.source == ItemAddManager.Source.COMMAND) {
             event.addItemFromEvent()
             return
@@ -186,13 +184,13 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         event.checkPestChats()
         event.checkSprayChats()
     }
 
     @HandleEvent
-    fun onPestKill(event: PestKillEvent) {
+    private fun onPestKill(event: PestKillEvent) {
         if (BitsApi.bitsAvailable > 0) {
             val bitsAmount = KILL_BITS * BitsApi.bitsMultiplier()
             addItem(event.pestType, BITS, bitsAmount.toInt(), false)
@@ -200,7 +198,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         ConditionalUtils.onToggle(config.coinsPerBit, config.includeBits) { update() }
     }
 
@@ -212,7 +210,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
                 "full_message" to message,
             )
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
-            val amount = group("amount").toInt()
+            val amount = group("amount").formatInt()
 
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
@@ -238,7 +236,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             val itemGroup = group("item")
             val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
             val pest = PestType.getByItemInternalNameOrNull(internalName) ?: return@matchMatcher
-            val amount = groupOrNull("amount")?.toIntOrNull() ?: 1
+            val amount = groupOrNull("amount")?.formatInt() ?: 1
 
             addItem(pest, internalName, amount, command = false)
 
@@ -252,9 +250,10 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onShardGain(event: ShardGainEvent) {
-        if (event.shardInternalName != PEST_SHARD) return
-        addItem(PestType.UNKNOWN, PEST_SHARD, event.amount, command = false)
+    private fun onShardGain(event: ShardGainEvent) {
+        if (!event.source.isAnyOf(CHARM, HUNT)) return
+        val pestType = PestType.getByItemInternalNameOrNull(event.shardInternalName) ?: return
+        addItem(pestType, event.shardInternalName, event.amount, command = false)
     }
 
     private fun SkyHanniChatEvent.Allow.checkSprayChats() {
@@ -358,7 +357,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onPurseChange(event: PurseChangeEvent) {
+    private fun onPurseChange(event: PurseChangeEvent) {
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL || lastPestKillTimes.isEmpty()) return
         val coins = event.coins.takeIf { it in 1000.0..10000.0 } ?: return
 
@@ -369,13 +368,13 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent
-    fun onIslandJoin(event: IslandJoinEvent) {
+    private fun onIslandJoin(event: IslandJoinEvent) {
         if (event.island != IslandType.GARDEN) return
         firstUpdate()
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetpestprofittracker") {
             description = "Resets the Pest Profit Tracker"
             category = CommandCategory.USERS_RESET
@@ -384,7 +383,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         // Move any items that are in pestProfitTracker.items as the object as a map themselves,
         // migrate them to the new format of PestType -> Drop Count. All entries will be mapped to
         // respective PestType when possible, and the rest will be moved to UNKNOWN.

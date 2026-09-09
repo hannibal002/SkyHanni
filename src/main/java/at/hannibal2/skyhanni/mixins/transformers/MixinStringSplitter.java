@@ -9,7 +9,6 @@ import net.minecraft.network.chat.Style;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-
 import java.util.List;
 
 @Mixin(StringSplitter.class)
@@ -18,7 +17,7 @@ public abstract class MixinStringSplitter {
     @WrapMethod(
         method = "splitLines(Lnet/minecraft/network/chat/FormattedText;ILnet/minecraft/network/chat/Style;)Ljava/util/List;"
     )
-    private List<FormattedText> dontWrapOtherLines(FormattedText text, int maxWidth, Style style, Operation<List<FormattedText>> original) {
+    private List<FormattedText> doNotWrapOtherLines(FormattedText text, int maxWidth, Style style, Operation<List<FormattedText>> original) {
         return VisualWordsHook.withoutWordChanges(() -> original.call(text, maxWidth, style));
     }
 
@@ -31,5 +30,4 @@ public abstract class MixinStringSplitter {
     private FormattedText modifyStringVisitable(FormattedText visitable) {
         return VisualWordsHook.modifyFormattedText(visitable);
     }
-
 }

@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.api.hypixelapi
 
-import at.hannibal2.skyhanni.api.event.EventListeners
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents.DirtyReason
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -45,7 +46,10 @@ object HypixelLocationApi {
         private set
 
     var island: IslandType = IslandType.NONE
-        private set
+        private set(value) {
+            field = value
+            SkyHanniEvents.markEventCacheDirty(DirtyReason.LOCATION_CHANGED)
+        }
 
     var serverId: String? = null
         private set
@@ -152,7 +156,6 @@ object HypixelLocationApi {
         val oldIsland = island
         island = internalIsland
         logger.log("Island change: '$oldIsland' -> '$island'")
-        EventListeners.markEventCacheDirty()
 
         if (oldIsland != IslandType.NONE) {
             DelayedRun.runOrNextTick {
@@ -208,7 +211,6 @@ object HypixelLocationApi {
         isGuest = false
         sentIslandEvent = false
         internalIsland = IslandType.NONE
-        EventListeners.markEventCacheDirty()
     }
 
     private val debugData

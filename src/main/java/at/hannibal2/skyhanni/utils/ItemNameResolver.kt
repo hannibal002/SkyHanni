@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -20,6 +18,9 @@ object ItemNameResolver {
 
     @Suppress("ReturnCount", "CyclomaticComplexMethod")
     internal fun getInternalNameOrNull(itemName: String): NeuInternalName? {
+        // Without this the fallback below would resolve the name anyway, just to a random candidate.
+        if (NeuItems.isAmbiguousDisplayName(itemName)) return null
+
         val lowercase = itemName.lowercase()
         itemNameCache[lowercase]?.let {
             return it
@@ -144,8 +145,7 @@ object ItemNameResolver {
         return NeuItems.allItemsCache.filter { it.key.removeColor() == removeColor }.values.firstOrNull()
     }
 
-    @HandleEvent(NeuRepositoryReloadEvent::class)
-    fun onNeuRepoReload() {
+    internal fun clearCache() {
         itemNameCache.clear()
     }
 }

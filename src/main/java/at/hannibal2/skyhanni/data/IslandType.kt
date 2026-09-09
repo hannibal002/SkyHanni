@@ -38,7 +38,7 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
 
     // Foraging
     THE_PARK("The Park", "foraging_1"),
-    GALATEA("Galatea", "foraging_2"),
+    GALATEA("Moonglade Marsh", "foraging_2"),
     TORRHUS_CANYON("Torrhus Canyon", "foraging_3"),
 
     // Combat
@@ -53,7 +53,7 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
 
     // Special
     THE_RIFT("The Rift", "rift"),
-    SAFARI("Safari", "safari"),
+    SAFARI("Critter Safari", "safari"),
 
     // Special values
     NONE("", null),

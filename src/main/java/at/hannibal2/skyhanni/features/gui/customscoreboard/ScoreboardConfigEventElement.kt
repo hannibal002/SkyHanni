@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEven
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventQueue
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventRedstone
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventRift
+import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventSafari
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventServerClose
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventSpooky
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventStartingSoonTablist
@@ -55,6 +56,7 @@ enum class ScoreboardConfigEventElement(val event: ScoreboardEvent) {
     BROODMOTHER(ScoreboardEventBroodmother),
     MINING_EVENTS(ScoreboardEventMining),
     GALATEA(ScoreboardEventGalatea),
+    SAFARI(ScoreboardEventSafari),
     DAMAGE(ScoreboardEventDamage),
     MAGMA_BOSS(ScoreboardEventMagmaBoss),
     CARNIVAL(ScoreboardEventCarnival),
@@ -83,6 +85,7 @@ enum class ScoreboardConfigEventElement(val event: ScoreboardEvent) {
             JACOB_CONTEST,
             JACOB_MEDALS,
             GALATEA,
+            SAFARI,
             TRAPPER,
             GARDEN,
             FLIGHT_DURATION,

@@ -8,8 +8,9 @@ import com.google.common.base.Splitter
 
 object SkillUtil {
 
-    val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
     private const val XP_NEEDED_FOR_60 = 111_672_425L
+
+    val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
 
     fun getSkillInfo(skill: SkillType): SkillApi.SkillInfo? {
         return SkillApi.storage?.get(skill)
@@ -52,64 +53,40 @@ object SkillUtil {
         return SkillApi.levelArray.asSequence().take(level + 1).sumOf { it.toDouble() }
     }
 
-    fun calculateXPForCurrentLevel(level: Int): Long {
-        return SkillApi.levelArray.getOrNull(level)?.toLong() ?: 4000000L
-    }
-
-    fun calculateXPToNextLevel(currentLevel: Int): Long {
-        val xpForCurrentLevel = SkillApi.levelArray.getOrNull(currentLevel)?.toLong() ?: 4000000L
-        val xpForNextLevel = SkillApi.levelArray.getOrNull(currentLevel + 1)?.toLong() ?: 4300000L
-
-        return xpForNextLevel - xpForCurrentLevel
-    }
-
+    /**
+     * The returned level is uncapped, so it keeps counting past [maxSkillCap]. Only
+     * [SkillLevel.overflowXP] is relative to the cap; callers that want the capped level have to
+     * coerce it themselves.
+     */
     fun calculateSkillLevel(currentXP: Long, maxSkillCap: Int): SkillLevel {
         var xpCurrent = currentXP
         var level = 0
-        val maxLevel = maxSkillCap.coerceAtMost(60)
 
-        while (level < maxLevel && xpCurrent >= (levelingMap[level + 1]?.toLong() ?: Long.MAX_VALUE)) {
-            val xpForNextLevel = levelingMap[level + 1]?.toLong() ?: Long.MAX_VALUE
+        // Up to level 60 the cost of every single level is listed in the leveling table
+        while (level < 60) {
+            val xpForNextLevel = levelingMap[level + 1]?.toLong() ?: break
+            if (xpCurrent < xpForNextLevel) break
             xpCurrent -= xpForNextLevel
             level++
         }
 
         var xpForNext = levelingMap[level + 1]?.toLong() ?: 0L
-        var overflowXP = 0L
 
-        if (level >= maxLevel) {
-            val xpNeeded = xpRequiredForLevel(maxLevel)
-
-            if (currentXP >= xpNeeded) {
-                overflowXP = currentXP - xpNeeded
-
-                xpCurrent = overflowXP
-                var slope = calculateXPToNextLevel(maxLevel)
-                var xpForCurr = calculateXPForCurrentLevel(maxLevel) + slope
-
-                while (xpCurrent >= xpForCurr && level < 60) {
-                    level++
-                    xpCurrent -= xpForCurr
-                    slope = calculateXPToNextLevel(level)
-                    xpForCurr += slope
-                }
-
-                if (level >= 60) {
-                    slope = 600000L
-                    xpForCurr = 7000000L + slope
-                    while (xpCurrent >= xpForCurr) {
-                        level++
-                        xpCurrent -= xpForCurr
-                        xpForCurr += slope
-                        if (level % 10 == 0) slope *= 2
-                    }
-                }
-
-                xpForNext = xpForCurr
+        // Past level 60 the cost grows by a slope that doubles every tenth level instead
+        if (level >= 60) {
+            var slope = 600_000L
+            xpForNext = 7_000_000L + slope
+            while (xpCurrent >= xpForNext) {
+                level++
+                xpCurrent -= xpForNext
+                xpForNext += slope
+                if (level % 10 == 0) slope *= 2
             }
         }
 
+        val xpForCap = xpRequiredForLevel(maxSkillCap.coerceAtMost(60))
+        val overflowXP = (currentXP - xpForCap).coerceAtLeast(0L)
+
         return SkillLevel(level, xpCurrent, xpForNext, overflowXP)
     }
-
 }

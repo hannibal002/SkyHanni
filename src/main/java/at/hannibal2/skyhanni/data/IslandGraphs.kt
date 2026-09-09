@@ -18,9 +18,9 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaFeatures
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllApi
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -136,7 +136,10 @@ object IslandGraphs {
     private var lastCacheUpdate = SimpleTimeMark.farPast()
 
     private var currentTarget: LorenzVec? = null
-    private var currentTargetNode: GraphNode? = null
+
+    var currentTargetNode: GraphNode? = null
+        private set
+
     private var navigationLabel = ""
     private var lastDisplayedDistance = 0.0
     private var totalDistance = 0.0
@@ -169,7 +172,7 @@ object IslandGraphs {
     )
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<IslandGraphSettingsJson>("misc/IslandGraphSettings")
         ignoredIslandTypes = data.ignoredIslandTypes
 
@@ -179,7 +182,7 @@ object IslandGraphs {
     }
 
     @HandleEvent
-    fun onIslandJoin(event: IslandJoinEvent) {
+    private fun onIslandJoin(event: IslandJoinEvent) {
         enableAllNodes()
         if (currentIslandGraph != null) return
         if (event.island == IslandType.NONE) return
@@ -187,16 +190,18 @@ object IslandGraphs {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         currentIslandGraph = null
-        if (currentTarget != null) NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped because of world switch!")
+        if (currentTarget != null) {
+            NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped because of world switch!", force = true)
+        }
         resetNavigation()
     }
 
     private fun isGlaciteTunnelsArea(area: String?): Boolean = glaciteTunnelsPattern.matches(area)
 
-    @HandleEvent(ScoreboardAreaChangeEvent::class)
-    fun onAreaChange() {
+    @HandleEvent
+    private fun onScoreboardAreaChange() {
         if (!IslandType.DWARVEN_MINES.isInIsland()) {
             inGlaciteTunnels = null
             return
@@ -237,7 +242,7 @@ object IslandGraphs {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Island Graphs")
         val islandType = SkyBlockUtils.currentIsland.name
         val isPersonal = IslandTypeTag.PERSONAL_ISLAND.isInIsland()
@@ -323,7 +328,7 @@ object IslandGraphs {
      * calling before [at.hannibal2.skyhanni.test.graph.GraphEditor], so that we always have the latest playerPosition.
      */
     @HandleEvent(priority = -1)
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         GraphUtils.updatePlayerPosition()
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
@@ -346,11 +351,13 @@ object IslandGraphs {
         GraphUtils.updatePlayerPosition()
         currentTarget?.let {
             if (distanceSqToPlayer(it) < TARGET_REACHED_DISTANCE_SQ) {
-                NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation reached §r$navigationLabel§e!")
+                NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation reached §r$navigationLabel§e!", force = true)
                 resetNavigation()
                 onFound()
+                return@let
             }
             if (!activeCondition()) {
+                NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!", force = true)
                 resetNavigation()
             }
         }
@@ -413,9 +420,8 @@ object IslandGraphs {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        val graph = currentIslandGraph
-        if (graph == null) return
+    private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
+        val graph = currentIslandGraph ?: return
         hasMoved = true
 
         if (event.distance > FAST_MOVEMENT_THRESHOLD) {
@@ -455,11 +461,12 @@ object IslandGraphs {
         }
     }
 
+    /**
+     * Resets the navigation state silently. Aborting an active navigation and telling the player about it
+     * is up to the caller.
+     */
     fun stopNavigation() {
-        if (currentTarget != null) {
-            NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
-            currentTarget = null
-        }
+        currentTarget = null
         goal = null
         pathRenderer = null
         currentTargetNode = null
@@ -467,6 +474,20 @@ object IslandGraphs {
         totalDistance = 0.0
         lastDisplayedDistance = 0.0
         NavigationFeedback.setNavInactive()
+    }
+
+    fun manualCancel() {
+        val hadOwnTarget = currentTarget != null
+        if (!hadOwnTarget && !NavigateAllApi.currentlyNavigating) {
+            ChatUtils.userError("No navigation is currently active.")
+            return
+        }
+
+        // sent before stopNavigation(), which marks the feedback as inactive
+        NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!", force = true)
+        stopNavigation()
+        NavigateAllApi.handleStop()
+        if (hadOwnTarget) onManualCancel()
     }
 
     /**
@@ -562,18 +583,13 @@ object IslandGraphs {
 
         val percentage = (1 - (distance / totalDistance)) * 100
         val component = "§e[SkyHanni] Navigating to §r$navigationLabel §f[§e$distance§f] §f(§c${percentage.roundTo(1)}%§f)".asComponent()
-        component.onClick(onClick = ::cancelClick)
+        component.onClick(onClick = ::manualCancel)
         component.hover = "§eClick to stop navigating!".asComponent()
         NavigationFeedback.sendPathFindMessage(component)
     }
 
-    fun cancelClick() {
-        stopNavigation()
-        onManualCancel()
-    }
-
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (currentIslandGraph == null) return
         pathRenderer?.render(event)
     }
@@ -586,7 +602,7 @@ object IslandGraphs {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shreportlocation") {
             description = "Allows the user to report an error with pathfinding at the current location."
             category = CommandCategory.USERS_BUG_FIX
@@ -605,17 +621,6 @@ object IslandGraphs {
                         "pathfinding goes through wall, ignores obvious shortcut, " +
                         "missing npc/fishing hotspot/skyblock area name in /shnavigate..",
                 )
-            }
-        }
-        event.registerBrigadier("shstopnavigation") {
-            description = "Stops the current pathfinding."
-            category = CommandCategory.USERS_ACTIVE
-            simpleCallback {
-                if (currentTarget != null) {
-                    stopNavigation()
-                } else {
-                    ChatUtils.userError("No navigation is currently active.")
-                }
             }
         }
     }

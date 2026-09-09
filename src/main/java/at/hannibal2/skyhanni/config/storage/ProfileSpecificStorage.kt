@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.Locat
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.event.yearofthepig.ShinyOrbTracker
+import at.hannibal2.skyhanni.features.event.yearoftheseal.BeachBallTracker
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
@@ -75,6 +76,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
+import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.network.chat.Component
@@ -104,6 +106,14 @@ class ProfileSpecificStorage(
 
     @Expose
     var crimsonIsleFaction: FactionType? = null
+
+    /** Written and read by [at.hannibal2.skyhanni.data.CurrencyApi]. */
+    @Expose
+    var currencies: MutableMap<SkyblockCurrency, Long> = enumMapOf()
+
+    /** Written and read by [at.hannibal2.skyhanni.data.CurrencyApi]. */
+    @Expose
+    var essences: MutableMap<NeuInternalName, Long> = mutableMapOf()
 
     // features
     // - combat
@@ -221,6 +231,9 @@ class ProfileSpecificStorage(
     // -- year of the [___]
     @Expose
     var shinyOrbTracker: ShinyOrbTracker.ShinyOrbData = ShinyOrbTracker.ShinyOrbData()
+
+    @Expose
+    var beachBallTracker: BeachBallTracker.Data = BeachBallTracker.Data()
 
     // -- hoppity
     @Expose
@@ -752,6 +765,20 @@ class ProfileSpecificStorage(
         var riftSlots: MutableList<SafeItemStack?> = CurrentEquipmentApi.getEmptyEquipment()
     }
 
+    @Expose
+    var bazaarOrders: BazaarOrdersStorage = BazaarOrdersStorage()
+
+    class BazaarOrdersStorage {
+        @Expose
+        var buyOrders: MutableMap<NeuInternalName, Int> = mutableMapOf()
+
+        @Expose
+        var sellOffers: MutableMap<NeuInternalName, Int> = mutableMapOf()
+    }
+
+    @Expose
+    val notSellableItems: MutableList<String> = mutableListOf()
+
     // - foraging
     @Expose
     val foraging: ForagingStorage = ForagingStorage()
@@ -772,6 +799,9 @@ class ProfileSpecificStorage(
         // todo when we're fully 1.21, change ForagingTrackerLegacy to ForagingTracker
         @Expose
         var trackerData: ForagingTrackerLegacy.BucketData = ForagingTrackerLegacy.BucketData()
+
+        @Expose
+        var honeyhiveRemindTime: SimpleTimeMark = farPast()
     }
 
     // - mining
