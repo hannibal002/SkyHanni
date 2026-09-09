@@ -171,10 +171,9 @@ object EnforcedConfigValues {
             val parent = segments.dropLast(1).fold<String, JsonElement?>(json) { element, segment ->
                 (element as? JsonObject)?.get(segment)
             } as? JsonObject ?: continue
-            // Options that are not part of the file (e.g. not exposed) have nothing to restore
-            if (!parent.has(segments.last())) continue
-            // Keep the current value if anything changed it after it was enforced
-            if (Shimmy(config, segments)?.getJson() != backup.enforcedValue) continue
+            // Skips options that are not part of the file (e.g. not exposed) and values changed after enforcement.
+            // The snapshot is compared rather than the live field, which the client thread can change in between
+            if (parent.get(segments.last()) != backup.enforcedValue) continue
             parent.add(segments.last(), backup.userValue)
         }
         json
