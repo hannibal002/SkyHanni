@@ -18,14 +18,13 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object FocusMode {
-
     private val config get() = SkyHanniMod.feature.inventory.focusMode
 
     private var active = false
     private var inAuctionHouse = false
 
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onTooltip(event: ToolTipTextEvent) {
+    @HandleEvent(priorityLevel = LOW)
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (event.toolTip.isEmpty()) return
         if (config.hideMenuItems) {
@@ -71,7 +70,7 @@ object FocusMode {
     }
 
     @HandleEvent
-    fun onKeyDown(event: KeyDownEvent) {
+    private fun onKeyDown(event: KeyDownEvent) {
         if (!isEnabled()) return
         if (config.alwaysEnabled) return
         if (event.keyCode != config.toggleKey) return
@@ -79,7 +78,7 @@ object FocusMode {
     }
 
     @HandleEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
         inAuctionHouse = event.inventoryName.startsWith("Auctions")
     }
 

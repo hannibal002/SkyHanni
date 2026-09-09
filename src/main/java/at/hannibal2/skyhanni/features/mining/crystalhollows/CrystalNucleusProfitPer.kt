@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.JUNGLE_KEY_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,8 +16,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 object CrystalNucleusProfitPer {
     private val config get() = SkyHanniMod.feature.mining.crystalNucleusTracker
 
-    @HandleEvent(priority = HIGH)
-    fun onCrystalNucleusLoot(event: CrystalNucleusLootEvent) {
+    @HandleEvent(priorityLevel = HIGH)
+    private fun onCrystalNucleusLoot(event: CrystalNucleusLootEvent) {
         if (!config.profitPer) return
         val loot = event.loot
 

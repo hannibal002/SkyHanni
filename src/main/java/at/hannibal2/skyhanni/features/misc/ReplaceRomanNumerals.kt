@@ -26,7 +26,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ReplaceRomanNumerals {
-
     private val patternGroup = RepoPattern.group("romannumerals")
     private val inventoryGroup = patternGroup.group("inventory")
 
@@ -277,15 +276,15 @@ object ReplaceRomanNumerals {
     private val cachedStrings = TimeLimitedCache<String, String>(5.seconds)
 
     // LOW runs after default priority, so RepoPatternManager has already replaced the patterns
-    @HandleEvent(priority = HandleEvent.LOW)
+    @HandleEvent(priorityLevel = LOW)
     private fun onRepoReload() {
         cachedStrings.clear()
         inventoryPatterns = buildInventoryPatterns()
     }
 
-    // LOWEST to also cover lines added by other ToolTipTextEvent listeners.
+    // LOW to also cover lines added by other ToolTipTextEvent listeners.
     // The deprecated ToolTipEvent runs later regardless of priority.
-    @HandleEvent(priority = HandleEvent.LOWEST)
+    @HandleEvent(priorityLevel = LOW)
     private fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
 
@@ -341,17 +340,17 @@ object ReplaceRomanNumerals {
     private fun findMenuContext(): ToolTipContext? {
         val inventoryName = InventoryUtils.openInventoryName()
         return when {
-            upgradeMenuPattern.matches(inventoryName) -> ToolTipContext.UPGRADE_MENU
-            collectionMenuPattern.matches(inventoryName) -> ToolTipContext.COLLECTION
+            upgradeMenuPattern.matches(inventoryName) -> UPGRADE_MENU
+            collectionMenuPattern.matches(inventoryName) -> COLLECTION
             else -> null
         }
     }
 
     private fun findLineContext(line: Component): ToolTipContext? = when {
-        taskListPattern.matches(line) -> ToolTipContext.TASK_LIST
-        perkShopPattern.find(line) -> ToolTipContext.PERK_SHOP
-        cropMilestonePattern.find(line) -> ToolTipContext.CROP_MILESTONE
-        collectionItemPattern.find(line) -> ToolTipContext.COLLECTION
+        taskListPattern.matches(line) -> TASK_LIST
+        perkShopPattern.find(line) -> PERK_SHOP
+        cropMilestonePattern.find(line) -> CROP_MILESTONE
+        collectionItemPattern.find(line) -> COLLECTION
         else -> null
     }
 

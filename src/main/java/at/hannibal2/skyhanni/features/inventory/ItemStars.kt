@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.CRIMSON_ARMOR
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures.isSelected
@@ -21,7 +21,6 @@ import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object ItemStars {
-
     private val config get() = SkyHanniMod.feature.inventory
 
     private val patternGroup = RepoPattern.group("inventory.itemstars")
@@ -35,8 +34,8 @@ object ItemStars {
         "^(?<name>.+) (?<stars>(?:(?:§.)?✪)+)",
     )
 
-    @HandleEvent(priority = HandleEvent.LOW)
-    fun onTooltip(event: ToolTipTextEvent) {
+    @HandleEvent
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         val stack = event.itemStack
         if (stack.count != 1) return
@@ -48,8 +47,8 @@ object ItemStars {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!CRIMSON_ARMOR.isSelected()) return
+    private fun onRenderItemTip(event: RenderItemTipEvent) {
+        if (!ItemNumberEntry.CRIMSON_ARMOR.isSelected()) return
         val stack = event.stack
         if (stack.getInternalNameOrNull()?.isKuudraArmor() != true) return
         val stars = stack.grabStarCount() ?: return

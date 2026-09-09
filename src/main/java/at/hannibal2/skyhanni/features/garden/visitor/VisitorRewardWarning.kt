@@ -5,10 +5,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.ACCEPT_SLOT
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.REFUSE_SLOT
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.VisitorBlockReason
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.lastClickedNpc
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -20,7 +18,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.network.chat.Component
-import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -29,19 +26,21 @@ import kotlin.time.Duration.Companion.seconds
 object VisitorRewardWarning {
     private val config get() = VisitorApi.config.rewardWarning
 
+    private fun getLastClickedVisitor() = VisitorApi.getVisitor(VisitorApi.lastClickedNpc)
+
     @HandleEvent
-    fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    private fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!VisitorApi.inInventory) return
 
-        val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
-        val refuseOfferSlot = event.container.getSlot(REFUSE_SLOT)
-        val acceptOfferSlot = event.container.getSlot(ACCEPT_SLOT)
+        val visitor = getLastClickedVisitor() ?: return
+        val refuseOfferSlot = event.container.getSlot(VisitorApi.REFUSE_SLOT)
+        val acceptOfferSlot = event.container.getSlot(VisitorApi.ACCEPT_SLOT)
         val blockReason = visitor.blockReason ?: return
 
         if (blockReason.blockRefusing) {
-            renderColor(refuseOfferSlot, acceptOfferSlot, LorenzColor.GREEN)
+            renderColor(refuseOfferSlot, acceptOfferSlot, GREEN)
         } else {
-            renderColor(acceptOfferSlot, refuseOfferSlot, LorenzColor.RED)
+            renderColor(acceptOfferSlot, refuseOfferSlot, RED)
         }
     }
 
@@ -54,12 +53,12 @@ object VisitorRewardWarning {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    @HandleEvent(priorityLevel = HIGH)
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorApi.inInventory) return
         val stack = event.slot?.item ?: return
 
-        val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
+        val visitor = getLastClickedVisitor() ?: return
         val blockReason = visitor.blockReason
 
         val isRefuseSlot = stack.hoverName.string == "Refuse Offer"
@@ -71,9 +70,9 @@ object VisitorRewardWarning {
             return
         }
 
-        if (event.clickType == ContainerInput.QUICK_MOVE) return
+        if (event.clickType == QUICK_MOVE) return
         if (isRefuseSlot) {
-            VisitorApi.changeStatus(visitor, VisitorApi.VisitorStatus.REFUSED, "refused")
+            VisitorApi.changeStatus(visitor, REFUSED, "refused")
             // fallback if tab list is disabled
             DelayedRun.runDelayed(10.seconds) {
                 VisitorApi.removeVisitor(visitor.visitorName)
@@ -81,16 +80,16 @@ object VisitorRewardWarning {
             return
         }
         if (isAcceptSlot && stack.getLoreComponent().any { it.string.contains("Click to give!") }) {
-            VisitorApi.changeStatus(visitor, VisitorApi.VisitorStatus.ACCEPTED, "accepted")
+            VisitorApi.changeStatus(visitor, ACCEPTED, "accepted")
             return
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
-    fun onTooltip(event: ToolTipTextEvent) {
+    @HandleEvent(priorityLevel = HIGHEST)
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!GardenApi.onBarnPlot) return
         if (!VisitorApi.inInventory) return
-        val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
+        val visitor = getLastClickedVisitor() ?: return
         if (config.bypassKey.isKeyHeld()) return
 
         val isRefuseSlot = event.itemStack.cleanName == "Refuse Offer"
@@ -141,10 +140,10 @@ object VisitorRewardWarning {
         loss: Double,
         formattedLoss: String,
     ) = blockReason.description + when (blockReason) {
-        VisitorBlockReason.CHEAP_COPPER, VisitorBlockReason.EXPENSIVE_COPPER ->
+        CHEAP_COPPER, EXPENSIVE_COPPER ->
             " §7(paying §6$pricePerCopper §7per)"
 
-        VisitorBlockReason.LOW_LOSS, VisitorBlockReason.HIGH_LOSS ->
+        LOW_LOSS, HIGH_LOSS ->
             " §7(§6$formattedLoss §7${if (loss > 0) "loss" else "profit"} selling §9Green Thumb I§7)"
 
         else -> ""

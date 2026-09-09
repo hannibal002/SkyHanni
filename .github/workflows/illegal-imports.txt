@@ -11,5 +11,10 @@ at/hannibal2/skyhanni/ io.netty.util.internal.
 at/hannibal2/skyhanni/ org.spongepowered.asm.mixin.Overwrite
 at/hannibal2/skyhanni/ org.spongepowered.asm.mixin.injection.ModifyConstant
 at/hannibal2/skyhanni/ org.spongepowered.asm.mixin.injection.Redirect
+# Deprecated aliases, the enum constants should be used via context-sensitive resolution instead of importing these.
+at/hannibal2/skyhanni/ at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
+at/hannibal2/skyhanni/ at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
+at/hannibal2/skyhanni/ at.hannibal2.skyhanni.api.event.HandleEvent.Companion.LOW
+at/hannibal2/skyhanni/ at.hannibal2.skyhanni.api.event.HandleEvent.Companion.LOWEST
 # Here because SkyHanniDebugsAndTests references way too much stuff and this way we keep the internal dependencies lower
 at/hannibal2/skyhanni/ at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests

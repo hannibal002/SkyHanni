@@ -23,14 +23,10 @@ import net.minecraft.world.inventory.Slot
 
 @SkyHanniModule
 object CompactorGfSKeybind {
-
     private val config get() = SkyHanniMod.feature.inventory.gfs
 
     private const val OVERLAY_OPACITY = 130
     private const val BORDER_OPACITY = 200
-
-    // HideNotClickableItems clears the whole tooltip at LOWEST, so this has to run after it.
-    private const val TOOLTIP_PRIORITY = HandleEvent.LOWEST + 1
 
     private fun isActive(): Boolean = config.compactorKeybind.isKeyHeld()
 
@@ -97,7 +93,8 @@ object CompactorGfSKeybind {
         GetFromSackApi.getFromSack(internalName, missing.amount)
     }
 
-    @HandleEvent(onlyOnSkyblock = true, priority = TOOLTIP_PRIORITY)
+    // HideNotClickableItems clears the whole tooltip at LOW, so this has to run after it.
+    @HandleEvent(onlyOnSkyblock = true, priorityLevel = LOWEST)
     private fun onToolTip(event: ToolTipTextEvent) {
         if (!isActive()) return
         val slot = event.slot ?: return

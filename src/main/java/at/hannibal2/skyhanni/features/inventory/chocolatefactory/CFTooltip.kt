@@ -10,11 +10,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 
 @SkyHanniModule
 object CFTooltip {
-
     private val config get() = CFApi.config
 
-    @HandleEvent(priority = HandleEvent.HIGH)
-    fun onTooltip(event: ToolTipTextEvent) {
+    @HandleEvent(priorityLevel = HIGHEST)
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!CFApi.inChocolateFactory) return
         if (!config.extraTooltipStats) return
 

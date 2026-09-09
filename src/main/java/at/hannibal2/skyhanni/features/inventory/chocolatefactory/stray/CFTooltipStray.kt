@@ -24,8 +24,8 @@ object CFTooltipStray {
         "(?:Rabbit, so )?(?:[Yy]ou )?(?:gained |received )?\\+?(?<amount>[\\d,]+)(?: Chocolate!)?",
     )
 
-    @HandleEvent(priority = HandleEvent.HIGH)
-    fun onTooltip(event: ToolTipTextEvent) {
+    @HandleEvent(priorityLevel = HIGHEST)
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!CFApi.inChocolateFactory) return
         if (!config.showStrayTime) return
         event.slot ?: return
