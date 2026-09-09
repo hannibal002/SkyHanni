@@ -1,15 +1,15 @@
 package at.hannibal2.skyhanni.compat
 
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import com.operationpotato.itemlist.api.Plugin
 import com.operationpotato.itemlist.api.supportedscreen.ScreenBounds
 import com.operationpotato.itemlist.api.supportedscreen.SupportedScreenManager
+import com.operationpotato.itemlist.api.HoveredItemManager
 import java.util.Optional
 
 object SkyBlockItemListPlugin : Plugin {
-
-    // Getting the hovered item in SBIL requires a key event,
-    // so all the currently existing stackUnderCursor() would need to get reworked.
 
     override fun registerSupportedScreens(manager: SupportedScreenManager) {
         manager.addProvider(SkyHanniBaseScreen::class.java) { screen, _, _ ->
@@ -20,4 +20,12 @@ object SkyBlockItemListPlugin : Plugin {
         }
     }
 
+    override fun registerHoveredItems(manager: HoveredItemManager) {
+        manager.addConsumer { screen, stack, _ ->
+            if (screen !is SkyHanniGuiContainer) return@addConsumer false
+            val event = GuiKeyPressEvent.GuiKeyboardKeyPressEvent(screen, stack)
+            event.post()
+            return@addConsumer event.isCancelled
+        }
+    }
 }

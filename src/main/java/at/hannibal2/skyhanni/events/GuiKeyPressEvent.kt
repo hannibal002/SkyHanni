@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.events
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 
@@ -18,22 +19,26 @@ import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
  * For mouse input specifically, prefer [GuiMouseInputEvent], which is fired alongside this one.
  *
  * @param guiContainer The container screen that received the input.
+ * @param hoveredStack The hovered ItemStack if provided directly externally.
  */
 @PrimaryFunction("onGuiKeyPress")
 sealed class GuiKeyPressEvent(
     val guiContainer: SkyHanniGuiContainer,
+    private val hoveredStack: SafeItemStack? = null,
 ) : CancellableSkyHanniEvent() {
     val stackUnderCursor by lazy {
-        InventoryCompat.stackUnderCursor()
+        hoveredStack ?: InventoryCompat.stackUnderCursor()
     }
 
     @PrimaryFunction("onGuiKeyboardKeyPress")
     class GuiKeyboardKeyPressEvent(
         guiContainer: SkyHanniGuiContainer,
-    ) : GuiKeyPressEvent(guiContainer)
+        hoveredStack: SafeItemStack? = null,
+    ) : GuiKeyPressEvent(guiContainer, hoveredStack)
 
     @PrimaryFunction("onGuiMouseKeyPress")
     class GuiMouseKeyPressEvent(
         guiContainer: SkyHanniGuiContainer,
-    ) : GuiKeyPressEvent(guiContainer)
+        hoveredStack: SafeItemStack? = null,
+    ) : GuiKeyPressEvent(guiContainer, hoveredStack)
 }
