@@ -98,7 +98,7 @@ object SafariShardChecklist {
                 SafariBiome.entries.sortedByDescending { it == currentBiome }
             } ?: SafariBiome.entries
 
-            SafariConfig.ChecklistDisplay.ONLY_CURRENT -> getCurrentBiome()?.let { listOf(it) } ?: emptyList()
+            SafariConfig.ChecklistDisplay.ONLY_CURRENT -> getCurrentBiome()?.let { listOf(it) }.orEmpty()
         }
         biomes.forEach { biome ->
             val status = if (isBiomeDone(biome)) "§aDone" else "§cUndone"
@@ -135,7 +135,7 @@ object SafariShardChecklist {
             playerLocation.x < centerX && playerLocation.z >= centerZ -> SafariBiome.CAVERN
             playerLocation.x >= centerX && playerLocation.z >= centerZ -> SafariBiome.FOREST
             playerLocation.x >= centerX && playerLocation.z < centerZ -> SafariBiome.HAUNTED
-            else -> null;
+            else -> null
         }
     }
 }

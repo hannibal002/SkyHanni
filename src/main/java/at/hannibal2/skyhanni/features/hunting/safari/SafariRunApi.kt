@@ -24,7 +24,7 @@ object SafariRunApi {
 
     @HandleEvent
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        if(runStartMessage.matches(event.messageComponent.getText().removeColor())) {
+        if (runStartMessage.matches(event.messageComponent.getText().removeColor())) {
             SafariRunStartEvent().post()
         }
     }
