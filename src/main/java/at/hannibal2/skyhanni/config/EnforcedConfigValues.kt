@@ -141,13 +141,13 @@ object EnforcedConfigValues {
         try {
             shimmy.setJson(enforcedValue.value)
         } finally {
-            // A property observer can throw after the value has already been applied, so the backup is recorded
-            // regardless. It is re-read so that it compares equal to what the field serializes to later
+            // A property observer can throw after the value has already been applied, so the bookkeeping happens
+            // regardless. Persistent values replace the user's value for good, so there is nothing to restore later.
+            // The backup is re-read so that it compares equal to what the field serializes to later
             // (e.g. a float from the repo JSON does not equal the same float serialized by Gson)
-            userValues[enforcedValue.path] = UserValue(userValue, shimmy.getJson())
+            if (enforcedValue.persist) userValues.remove(enforcedValue.path)
+            else userValues[enforcedValue.path] = UserValue(userValue, shimmy.getJson())
         }
-        // Persistent values replace the user's value for good, so there is nothing to restore later
-        if (enforcedValue.persist) userValues.remove(enforcedValue.path)
     }
 
     private fun restoreNoLongerEnforced(config: Any, enforcedPaths: Set<String>) {
@@ -156,7 +156,15 @@ object EnforcedConfigValues {
             val shimmy = Shimmy(config, path.split(".")) ?: continue
             // Keep the current value if anything changed it after it was enforced
             if (shimmy.getJson() != backup.enforcedValue) continue
-            shimmy.setJson(backup.userValue)
+            try {
+                shimmy.setJson(backup.userValue)
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(
+                    e, "Failed to restore a config value that is no longer enforced",
+                    "path" to path,
+                    "value" to backup.userValue,
+                )
+            }
         }
     }
 

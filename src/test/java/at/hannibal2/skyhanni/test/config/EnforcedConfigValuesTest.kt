@@ -7,6 +7,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.Test
 
@@ -29,6 +30,19 @@ class EnforcedConfigValuesTest {
         val backup = EnforcedConfigValues.userValues["enabled"]
         assertEquals(JsonPrimitive(true), backup?.userValue)
         assertEquals(JsonPrimitive(false), backup?.enforcedValue)
+    }
+
+    @Test
+    fun `drops the backup of a persistent value even when a property observer throws`() {
+        val config = Config()
+        config.enabled.whenChanged { _, _ -> error("observer failed") }
+
+        assertThrows<IllegalStateException> {
+            EnforcedConfigValues.enforceValue(config, EnforcedValue("enabled", JsonPrimitive(false), persist = true))
+        }
+
+        assertFalse(config.enabled.get())
+        assertNull(EnforcedConfigValues.userValues["enabled"])
     }
 
     @Test
