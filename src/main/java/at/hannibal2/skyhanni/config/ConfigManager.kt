@@ -225,6 +225,7 @@ class ConfigManager {
         return output
     }
 
+    @Synchronized
     fun saveConfig(fileType: ConfigFileType, reason: String) {
         queuedSaves.remove(fileType)
         val json = jsonHolder[fileType] ?: error("Could not find json object for $fileType")
@@ -243,6 +244,8 @@ class ConfigManager {
         queuedSaves[fileType] = reason
     }
 
+    /** Writes every queued file. Blocks until any save already running on another thread has finished. */
+    @Synchronized
     fun flushQueuedSaves() {
         for (fileType in ConfigFileType.entries) {
             val reason = queuedSaves[fileType] ?: continue
