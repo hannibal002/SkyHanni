@@ -33,9 +33,9 @@ class Shimmy private constructor(
     fun getJson(): JsonElement = ConfigManager.gson.toJsonTree(value, type)
     fun setJson(element: JsonElement) {
         val newValue = ConfigManager.gson.fromJson<Any?>(element, type)
-        // Config options are never null. Gson also silently returns null for unknown enum constants,
-        // and either would crash whoever reads the field later
-        require(newValue != null) {
+        // Gson silently returns null for unknown enum constants, which would crash whoever reads the field later.
+        // An explicit null is left to the caller: storage has nullable fields, config options do not
+        require(newValue != null || element.isJsonNull) {
             "Could not deserialize $element into ${TypeToken.get(type).rawType.name} for field ${reflectField.name}"
         }
         value = newValue

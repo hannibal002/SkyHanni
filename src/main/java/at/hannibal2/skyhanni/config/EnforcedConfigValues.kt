@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -55,12 +56,16 @@ object EnforcedConfigValues {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     private fun onRepoReload(event: RepositoryReloadEvent) {
-        if (!updateData(event.getConstant<EnforcedConfigValuesJson>(CONSTANT))) return
-        hasSentPSAsOnce = false
-        // We have to recreate the whole config when a value changes
-        // so that the option is blocked off inside the config
-        SkyHanniMod.configManager.recreateConfig()
-        trySendPSAs()
+        val json = event.getConstant<EnforcedConfigValuesJson>(CONSTANT)
+        // The repo reloads from a coroutine, but property observers expect the client thread
+        DelayedRun.runOrNextTick("EnforcedConfigValues.onRepoReload") {
+            if (!updateData(json)) return@runOrNextTick
+            hasSentPSAsOnce = false
+            // We have to recreate the whole config when a value changes
+            // so that the option is blocked off inside the config
+            SkyHanniMod.configManager.recreateConfig()
+            trySendPSAs()
+        }
     }
 
     // Returns whether the set of enforced values changed.
@@ -126,6 +131,8 @@ object EnforcedConfigValues {
             ChatUtils.debug("EnforcedConfigValues: Could not create shimmy for path ${enforcedValue.path}; skipping")
             return
         }
+        // Config options are never null, and Shimmy leaves explicit nulls to the caller
+        require(!enforcedValue.value.isJsonNull) { "Enforced value for ${enforcedValue.path} is null" }
         val currentValue = shimmy.getJson()
         shimmy.setJson(enforcedValue.value)
         // Only touched after a successful update, so a rejected value can neither corrupt nor drop the backup

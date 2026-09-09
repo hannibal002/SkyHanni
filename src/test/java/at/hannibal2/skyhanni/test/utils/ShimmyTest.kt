@@ -22,6 +22,7 @@ abstract class ShimmyTestBase {
     protected class WithNullable { val inner: Simple? = null }
     protected enum class Example { FIRST, SECOND }
     protected class WithEnumProperty { val prop: Property<Example> = Property.of(Example.FIRST) }
+    protected class WithNullableEnum { var value: Example? = Example.FIRST }
 
     protected abstract fun shimmy(source: Any?, path: List<String>): ShimmyCompat?
 
@@ -121,13 +122,12 @@ abstract class ShimmyTestBase {
         assertEquals(Example.FIRST, source.prop.get())
     }
 
+    // /shconfig set clears nullable storage fields this way
     @Test
-    fun `setJson rejects null instead of writing it`() {
-        val source = WithEnumProperty()
-        assertThrows<IllegalArgumentException> {
-            shimmy(source, listOf("prop"))!!.setJson(JsonNull.INSTANCE)
-        }
-        assertEquals(Example.FIRST, source.prop.get())
+    fun `setJson writes an explicit null`() {
+        val source = WithNullableEnum()
+        shimmy(source, listOf("value"))!!.setJson(JsonNull.INSTANCE)
+        assertNull(source.value)
     }
 
     @Test
