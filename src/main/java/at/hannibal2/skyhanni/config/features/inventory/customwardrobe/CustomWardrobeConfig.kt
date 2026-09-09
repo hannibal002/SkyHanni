@@ -62,6 +62,7 @@ class CustomWardrobeConfig {
     @Expose
     @ConfigOption(name = "Show Item List Items", desc = "Enables showing the items in Item Lists while in the custom wardrobe.")
     @ConfigEditorBoolean
+    // TODO: probably rename this option
     var showReiItems: Boolean = true
 
     @Expose
