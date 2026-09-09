@@ -224,6 +224,15 @@ dependencies {
         modCompileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
         modCompileOnly(libs.skyblockitemlist)
     }
+    val reiApi = "me.shedaniel:RoughlyEnoughItems-api:$reiVersion"
+    compileOnly(reiApi) { isTransitive = false }
+    compileOnly(libs.skyblockitemlist)
+    "minecraftTestClientRuntimeLibraries"(reiApi) {
+        isTransitive = false
+    }
+    "minecraftTestClientRuntimeLibraries"(libs.skyblockitemlist)
+    compileOnly(libs.basicMath)
+    "minecraftTestClientRuntimeLibraries"(libs.basicMath)
 
     // getting clock offset
     includeImplementation(libs.commons.net)
