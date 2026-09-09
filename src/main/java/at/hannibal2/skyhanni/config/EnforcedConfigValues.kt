@@ -122,7 +122,10 @@ object EnforcedConfigValues {
 
     private fun enforceValue(config: Any, enforcedValue: EnforcedValue) {
         val shimmy = Shimmy(config, enforcedValue.path.split("."))
-            ?: ErrorManager.skyHanniError("Could not create shimmy for path ${enforcedValue.path}")
+        if (shimmy == null) {
+            ChatUtils.debug("EnforcedConfigValues: Could not create shimmy for path ${enforcedValue.path}; skipping")
+            return
+        }
         val currentValue = shimmy.getJson()
         shimmy.setJson(enforcedValue.value)
         // Only touched after a successful update, so a rejected value can neither corrupt nor drop the backup
