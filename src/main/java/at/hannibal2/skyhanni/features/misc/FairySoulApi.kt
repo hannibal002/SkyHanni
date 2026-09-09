@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object FairySoulApi {
@@ -19,7 +19,7 @@ object FairySoulApi {
      * REGEX-TEST: Fairy Souls: 0/8
      */
     private val soulsIslandNamePattern by patternGroup.pattern(
-        "inventory.island-souls.colourless",
+        "inventory.island-souls.colorless",
         "Fairy Souls: (?<soulsFound>[0-9]+)/(?<soulsTotal>[0-9]+)",
     )
 
