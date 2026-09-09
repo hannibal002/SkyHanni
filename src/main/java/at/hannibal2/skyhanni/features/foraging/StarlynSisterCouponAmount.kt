@@ -30,8 +30,7 @@ object StarlynSisterCouponAmount {
     private const val CUSTOM_STACK_LOCATION = 4
     private val DEBOUNCE_DELAY = 0.3.seconds
     private var couponAmountItemStack: SafeItemStack? = null
-
-    private val emptyGlassItem = Blocks.STAINED_GLASS_PANE.black().asItem()
+    private val EMPTY_INVENTORY_ITEM = Blocks.STAINED_GLASS_PANE.black().asItem()
 
     private var itemReplaced: Boolean = false
     private var canReplace: Boolean = false
@@ -44,7 +43,7 @@ object StarlynSisterCouponAmount {
         onOpen = { event, sister ->
             generateCouponAmountItemStack(sister)
 
-            if (event.inventoryItems[CUSTOM_STACK_LOCATION]?.itemType == emptyGlassItem) {
+            if (event.inventoryItems[CUSTOM_STACK_LOCATION]?.itemType == EMPTY_INVENTORY_ITEM) {
                 canReplace = true
             } else {
                 ErrorManager.logErrorStateWithData(
@@ -52,7 +51,7 @@ object StarlynSisterCouponAmount {
                     "Unexpected item found in Starlyn Shop Coupon Amount slot",
                     "slot" to CUSTOM_STACK_LOCATION,
                     "found item" to event.inventoryItems[CUSTOM_STACK_LOCATION],
-                    "expected item type" to emptyGlassItem,
+                    "expected item type" to EMPTY_INVENTORY_ITEM,
                 )
             }
         },
