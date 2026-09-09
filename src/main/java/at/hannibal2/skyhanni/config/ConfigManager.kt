@@ -227,6 +227,8 @@ class ConfigManager {
 
     @Synchronized
     fun saveConfig(fileType: ConfigFileType, reason: String) {
+        if (disableSaving) return
+        if (HypixelData.hypixelAlpha && !PlatformUtils.isDevEnvironment) return
         queuedSaves.remove(fileType)
         val json = jsonHolder[fileType] ?: error("Could not find json object for $fileType")
         saveFile(fileType.file, fileType.fileName, json, reason)
@@ -254,8 +256,6 @@ class ConfigManager {
     }
 
     private fun saveFile(file: File, fileName: String, data: Any, reason: String) {
-        if (disableSaving) return
-        if (HypixelData.hypixelAlpha && !PlatformUtils.isDevEnvironment) return
         logger.log("saveConfig: $reason")
         try {
             logger.log("Saving $fileName file")
