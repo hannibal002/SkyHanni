@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryArmorUpdateEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.effects.NonGodPotEffectDisplay
@@ -16,7 +15,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -46,18 +44,11 @@ object GummyWarning {
 
     private var inSmolderingArea = false
     private var holdingSlayerWeapon = false
-    private var slayerWeapons: Map<SlayerType, Set<NeuInternalName>> = emptyMap()
     private val display = Renderable.text("§4§lNo Polar Bear Active!", scale = 2.0)
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onAreaChange(event: GraphAreaChangeEvent) {
         inSmolderingArea = smolderingAreaPattern.matches(event.area)
-    }
-
-    @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<RemainingSlayerKills.SlayerData>("Slayer")
-        slayerWeapons = data.weapons.mapValues { it.value.keys }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -78,7 +69,8 @@ object GummyWarning {
             holdingSlayerWeapon = false
             return
         }
-        holdingSlayerWeapon = slayerWeapons[activeSlayer]?.contains(event.newItem) == true
+
+        holdingSlayerWeapon = SlayerApi.jsonData?.weapons?.get(activeSlayer)?.contains(event.newItem) == true
     }
 
     @HandleEvent(onlyOnSkyblock = true)
