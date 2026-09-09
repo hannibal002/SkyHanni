@@ -336,7 +336,7 @@ object PestSpawnTimer {
             duration = 1.seconds,
             intention = PestTitleIntention.COOLDOWN_COUNTDOWN,
             addType = FORCE_FIRST,
-            // countDownDisplayType = WHOLE_SECONDS,
+            // countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS,
         )
         ChatUtils.notifyOrDisable(
             text,
