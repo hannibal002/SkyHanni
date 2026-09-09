@@ -39,7 +39,10 @@ object StarlynSisterCouponProfit {
 
     private var cachedItemData: Set<ItemProfitData> = emptySet()
 
-    private val validInventorySlots: Set<Int> = (13..44).filterTo(mutableSetOf()) { it % 9 !in setOf(0, 8) }
+    private val IGNORED_COLUMNS = setOf(0, 8)
+    private val SLOT_RANGE = (13..44).toSet()
+
+    private val VALID_INVENTORY_SLOTS: Set<Int> = SLOT_RANGE.filterTo(mutableSetOf()) { it % 9 !in IGNORED_COLUMNS }
 
     private data class ItemProfitData(
         val slot: Int,
@@ -138,7 +141,7 @@ object StarlynSisterCouponProfit {
     }
 
     private fun readItem(slot: Int, item: SafeItemStack, sister: StarlynSisterType): ItemProfitData? {
-        if (slot !in validInventorySlots) return null
+        if (slot !in VALID_INVENTORY_SLOTS) return null
 
         val nameStr = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val internalName = item.getInternalNameOrNull() ?: NeuInternalName.fromItemNameOrNull(nameStr) ?: return null

@@ -59,6 +59,7 @@ class ItemResolutionQuery {
         /**
          * REGEX-TEST: §r§7[Lvl 100] §r§6Scatha
          * REGEX-TEST: §r§7[Lvl 200] §r§6Golden Dragon§5 ✦
+         * REGEX-TEST: §r§7[Lvl {LVL}] §r§fSloth
          */
         private val petPattern by patternGroup.pattern(
             "pet",
