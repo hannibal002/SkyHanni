@@ -25,11 +25,25 @@ sealed class GuiKeyPressEvent(
         InventoryCompat.stackUnderCursor()
     }
 
+    /**
+     * Fired when a keyboard key is pressed while a container screen is open.
+     *
+     * Cancelling this event stops the screen from handling the keyboard input.
+     *
+     * @param guiContainer The container screen that received the keyboard input.
+     */
     @PrimaryFunction("onGuiKeyboardKeyPress")
     class GuiKeyboardKeyPressEvent(
         guiContainer: SkyHanniGuiContainer,
     ) : GuiKeyPressEvent(guiContainer)
 
+    /**
+     * Fired when a mouse button is pressed or clicked while a container screen is open.
+     *
+     * Cancelling this event stops the screen from handling the mouse input.
+     *
+     * @param guiContainer The container screen that received the mouse input.
+     */
     @PrimaryFunction("onGuiMouseKeyPress")
     class GuiMouseButtonPressEvent(
         guiContainer: SkyHanniGuiContainer,
