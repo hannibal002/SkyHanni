@@ -319,6 +319,20 @@ object EnoughUpdatesManager {
         }
     }
 
+    fun reportItemStatus() {
+        val loadedItems = itemMap.size
+        val directorySize = EnoughUpdatesRepoManager.repoFileSystem.list("items").size
+
+        val status = when {
+            directorySize == 0 -> "§cNo item directory entries found!"
+            loadedItems == 0 -> "§cNo items loaded!"
+            loadedItems < directorySize -> "§eLoaded $loadedItems/$directorySize items"
+            loadedItems > directorySize -> "§eLoaded Items: $loadedItems (more than directory size)"
+            else -> "§aLoaded all $loadedItems items!"
+        }
+        ChatUtils.chat("  §aNEU Repo Item Status:\n  $status", prefix = false)
+    }
+
     fun reportRecipeStatus() {
         val loadedRecipes = recipesMap.values.sumOf { it.size }
         val status = when {
