@@ -5,55 +5,29 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.foraging.SafariChecklistConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.item.ShardGainEvent
+import at.hannibal2.skyhanni.events.item.ShardSource
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object SafariShardChecklist {
 
     private val checklistConfig get() = SkyHanniMod.feature.hunting.safari.checklist
 
-    private val patternGroup = RepoPattern.group("hunting.safari.run.shard-tracker")
-
-    /**
-     * REGEX-TEST: LOOT SHARE! You received 2x Parakeet Shard from meowgirlemily catching a Parakeet!
-     * REGEX-TEST: LOOT SHARE! You received an Areita Shard from VirulentNyx catching an Areita!
-     * REGEX-TEST: LOOT SHARE! You received a Hideyho Shard from TCrest finding the Hideyho!
-     */
-    private val lootShareShardPattern by patternGroup.pattern(
-        "loot-share",
-        """LOOT SHARE! You received (?:an?|(?<amount>\d+)x) (?<shardName>.+) Shards? from .*!""",
-    )
-
-    /**
-     * REGEX-TEST: CAPTURE! You caught a Strongarm and gained a Strongarm Shard!
-     * REGEX-TEST: CAPTURE! You caught a Solsnatcher and gained 2x Solsnatcher Shard!
-     * REGEX-TEST: CAPTURE! You found Hideyho, and as a reward he gave you 4x Hideyho Shard!
-     * REGEX-TEST: CAPTURE! You found the Hideyho, and as a reward it gave you a Hideyho Shard!
-     */
-    @Suppress("MaxLineLength")
-    private val capturedShardPattern by patternGroup.pattern(
-        "capture",
-        """CAPTURE! You (?:(?:caught an?|found) .+ and (?:gained|as a reward (?:he|she|they) gave you)|found (?:the )?Hideyho, and as a reward it gave you) (?:an?|(?<amount>\d+)x) (?<shardName>.+) Shard!""",
-    )
-
     private val shardCounts = SafariShard.entries.associateWithTo(mutableMapOf()) { 0 }
 
     @HandleEvent
-    fun onWorldSwap(event: WorldChangeEvent) {
+    private fun onWorldSwap(event: WorldChangeEvent) {
         reset()
     }
 
@@ -63,19 +37,10 @@ object SafariShardChecklist {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.SAFARI)
-    private fun onChat(event: SkyHanniChatEvent.Allow) {
-        processChatMessage(event.cleanMessage)
-    }
-
-
-    internal fun processChatMessage(message: String) {
-        lootShareShardPattern.matchMatcher(message) {
-            addShard(group("shardName"), groupOrNull("amount")?.toInt() ?: 1)
-        }
-
-        capturedShardPattern.matchMatcher(message) {
-            addShard(group("shardName"), groupOrNull("amount")?.toInt() ?: 1)
-        }
+    private fun onShardGain(event: ShardGainEvent) {
+        if (event.source != ShardSource.HUNT && event.source != ShardSource.CAPTURED) return
+        val shard = SafariShard.entries.firstOrNull { it.internalName == event.shardInternalName } ?: return
+        addShard(shard.displayName, event.amount)
     }
 
     private fun addShard(name: String, amount: Int) {
@@ -84,7 +49,7 @@ object SafariShardChecklist {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.SAFARI)
-    private fun onRender(event: GuiRenderEvent.GuiOnTopRenderEvent) {
+    private fun onGuiRenderTop(event: GuiRenderEvent.GuiOnTopRenderEvent) {
         if (!checklistConfig.runShardChecklist) return
         checklistConfig.runShardChecklistPosition.renderRenderables(createDisplay(), posLabel = "Safari Shard Checklist")
     }
