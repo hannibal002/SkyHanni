@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MythologicalCreatureType
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.RareDianaMobFoundEvent
@@ -23,6 +24,9 @@ import net.minecraft.client.player.RemotePlayer
 
 @SkyHanniModule
 object DianaApi {
+
+    var holdingSpade = false
+        private set
 
     private var spades = emptySet<NeuInternalName>()
 
@@ -93,6 +97,12 @@ object DianaApi {
         if (ritualNotActivePattern.matches(event.cleanMessage)) {
             overrideActiveRitual(active = false)
         }
+    }
+
+    @HandleEvent(onlyOnIsland = HUB, priority = HandleEvent.HIGH)
+    private fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        val item = event.newItem.takeUnless { it == NeuInternalName.NONE } ?: return
+        holdingSpade = item.isDianaSpade
     }
 
     @HandleEvent

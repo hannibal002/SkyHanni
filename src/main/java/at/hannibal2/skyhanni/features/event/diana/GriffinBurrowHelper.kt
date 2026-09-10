@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
@@ -429,9 +428,8 @@ object GriffinBurrowHelper {
     }
 
     fun shouldBurrowParticlesBeVisible(timeInPast: Duration = 2.seconds): Boolean {
-        val spade = InventoryUtils.getItemInHand()?.isDianaSpade == true
         val time = InventoryUtils.lastItemChangeTime.passedSince()
-        return spade && time > timeInPast
+        return DianaApi.holdingSpade && time > timeInPast
     }
 
     fun removeSpadeWarnTitle() {
@@ -565,11 +563,12 @@ object GriffinBurrowHelper {
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
+        if (!DianaApi.holdingSpade) return
 
         val location = event.position
 
         getGuess(location)?.let {
-            if (event.itemInHand?.isDianaSpade == true && it.burrowType == BurrowType.UNKNOWN && it.getCurrent() == location) {
+            if (it.burrowType == BurrowType.UNKNOWN && it.getCurrent() == location) {
                 DelayedRun.runDelayed(
                     200.milliseconds,
                     {
