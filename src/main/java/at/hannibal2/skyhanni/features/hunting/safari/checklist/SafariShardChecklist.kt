@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.features.foraging.SafariChecklistConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.hunting.SafariRunStartEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
@@ -52,10 +52,8 @@ object SafariShardChecklist {
 
     private val shardCounts = SafariShard.entries.associateWithTo(mutableMapOf()) { 0 }
 
-    val collectedShards: Map<SafariShard, Int> get() = shardCounts
-
     @HandleEvent
-    private fun onSafariRunStart(event: SafariRunStartEvent) {
+    fun onWorldSwap(event: WorldChangeEvent) {
         reset()
     }
 
