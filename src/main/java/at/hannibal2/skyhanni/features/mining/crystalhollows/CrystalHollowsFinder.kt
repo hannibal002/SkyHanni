@@ -65,7 +65,7 @@ object CrystalHollowsFinder {
                 found.add(node)
             }
         }
-        println(    "done checking nodes in ${start.passedSince()}")
+        println("done checking nodes in ${start.passedSince()}")
         if (found.isEmpty()) {
             ChatUtils.userError("No $areaName nodes found!")
             return
