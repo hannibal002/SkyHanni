@@ -429,7 +429,7 @@ object GriffinBurrowHelper {
 
     fun shouldBurrowParticlesBeVisible(timeInPast: Duration = 2.seconds): Boolean {
         val time = InventoryUtils.lastItemChangeTime.passedSince()
-        return DianaApi.holdingSpade && time > timeInPast
+        return DianaApi.hasSpadeInHand() && time > timeInPast
     }
 
     fun removeSpadeWarnTitle() {
@@ -563,7 +563,7 @@ object GriffinBurrowHelper {
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
-        if (!DianaApi.holdingSpade) return
+        if (!DianaApi.hasSpadeInHand()) return
 
         val location = event.position
 

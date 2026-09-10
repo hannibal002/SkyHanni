@@ -75,7 +75,7 @@ object PreciseGuessBurrow {
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
-        if (!DianaApi.holdingSpade) return
+        if (!DianaApi.hasSpadeInHand()) return
         if (event.clickType != InteractClickType.RIGHT_CLICK) {
             DelayedRun.runOrNextTick { GriffinBurrowHelper.removeInaccurateIfLooking() }
             return

@@ -86,7 +86,7 @@ object DianaFixChat {
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != InteractClickType.RIGHT_CLICK) return
-        if (!DianaApi.holdingSpade) return
+        if (!DianaApi.hasSpadeInHand()) return
 
         if (lastSpadeUse.passedSince() > 5.seconds) {
             lastSpadeUse = SimpleTimeMark.now()
