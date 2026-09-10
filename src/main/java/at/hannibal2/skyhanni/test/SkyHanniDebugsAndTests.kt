@@ -519,7 +519,7 @@ object SkyHanniDebugsAndTests {
         skinIdTime = SimpleTimeMark.now()
     }
 
-    fun onKeyPressCopyCosmeticsData(stack: SafeItemStack) {
+    private fun onKeyPressCopyCosmeticsData(stack: SafeItemStack) {
         if (!stack.`is`(Items.PLAYER_HEAD)) return
         val skinId = skinId ?: return
         if (skinIdTime.passedSince() > 2.minutes) return

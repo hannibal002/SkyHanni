@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.events
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 
@@ -23,7 +24,7 @@ import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 sealed class GuiKeyPressEvent(
     val guiContainer: SkyHanniGuiContainer,
 ) : CancellableSkyHanniEvent() {
-    val stackUnderCursor by lazy {
+    val stackUnderCursor: SafeItemStack? by lazy {
         InventoryCompat.stackUnderCursor()
     }
 
@@ -33,7 +34,7 @@ sealed class GuiKeyPressEvent(
     ) : GuiKeyPressEvent(guiContainer)
 
     @PrimaryFunction("onGuiMouseKeyPress")
-    class GuiMouseKeyPressEvent(
+    class GuiMouseButtonPressEvent(
         guiContainer: SkyHanniGuiContainer,
     ) : GuiKeyPressEvent(guiContainer)
 }

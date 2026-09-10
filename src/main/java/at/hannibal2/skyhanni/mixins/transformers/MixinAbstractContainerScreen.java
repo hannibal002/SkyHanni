@@ -94,7 +94,7 @@ public abstract class MixinAbstractContainerScreen extends Screen {
     @Inject(method = "mouseClicked", at = @At(value = "HEAD"), cancellable = true)
     private void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfoReturnable<Boolean> cir) {
         AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) (Object) this;
-        if (new GuiKeyPressEvent.GuiMouseKeyPressEvent(screen).post().isCancelled()) {
+        if (new GuiKeyPressEvent.GuiMouseButtonPressEvent(screen).post().isCancelled()) {
             cir.setReturnValue(false);
         }
         if (new GuiMouseInputEvent(screen).post().isCancelled()) {
