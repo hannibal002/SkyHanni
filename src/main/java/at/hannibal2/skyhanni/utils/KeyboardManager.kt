@@ -140,11 +140,11 @@ object KeyboardManager {
     }
 
     fun Int.isKeyHeld(): Boolean = when {
-        this < -1 -> ErrorManager.skyHanniError(
+        this < KEY_UNKNOWN -> ErrorManager.skyHanniError(
             "Error while checking if a key is pressed. Key code is invalid: $this",
         )
 
-        this == -1 -> false
+        this == KEY_UNKNOWN -> false
         MouseCompat.isMouseButton(this) -> MouseCompat.isButtonDown(this)
         else -> InputConstants.isKeyDown(Minecraft.getInstance().window, this)
     }

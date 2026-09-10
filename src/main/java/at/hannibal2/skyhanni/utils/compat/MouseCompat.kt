@@ -39,7 +39,7 @@ object MouseCompat {
 
     private val mouse by lazy { Minecraft.getInstance().mouseHandler }
 
-    fun isMouseButton(button: Int) = button in 0..5
+    fun isMouseButton(button: Int) = button in 0..NUMBER_OF_MOUSE_BUTTONS
 
     fun isButtonDown(button: Int): Boolean {
         return isMouseButton(button) && buttonStates[button]

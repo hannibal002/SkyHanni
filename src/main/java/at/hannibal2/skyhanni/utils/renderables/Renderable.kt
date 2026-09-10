@@ -163,7 +163,7 @@ interface Renderable {
             /**
              * This should be a direct map of key code int, to the unit that should be invoked.
              * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
-             * For keyboard codes, use the [com.mojang.blaze3d.platform.InputConstants] enums.
+             * For keyboard codes, use [com.mojang.blaze3d.platform.InputConstants] constants.
              */
             onAnyClick: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,
@@ -177,7 +177,7 @@ interface Renderable {
             /**
              * This should be a direct map of key code int, to the unit that should be invoked.
              * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
-             * For keyboard codes, use the [com.mojang.blaze3d.platform.InputConstants] enums.
+             * For keyboard codes, use [com.mojang.blaze3d.platform.InputConstants] constants.
              */
             onAnyClick: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,

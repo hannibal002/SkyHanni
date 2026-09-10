@@ -59,8 +59,8 @@ class GraphEditorConfig {
 
     @Expose
     @ConfigOption(name = "Exit Key", desc = "Exit out of text edit mode. If not in text edit mode, disables the graph editor.")
-    @ConfigEditorKeybind(defaultKey = InputConstants.KEY_HOME)
-    var exitKey: Int = InputConstants.KEY_HOME
+    @ConfigEditorKeybind(defaultKey = InputConstants.KEY_RETURN)
+    var exitKey: Int = InputConstants.KEY_RETURN
 
     // TODO rename to nodeMoveKey
     @Expose

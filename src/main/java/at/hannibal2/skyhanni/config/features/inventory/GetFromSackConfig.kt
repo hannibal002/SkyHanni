@@ -51,6 +51,7 @@ class GetFromSackConfig {
     )
     @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
     var keybind: Int = KeyboardManager.KEY_UNKNOWN
+
     @Expose
     @ConfigOption(
         name = "Compactor GfS Keybind",
