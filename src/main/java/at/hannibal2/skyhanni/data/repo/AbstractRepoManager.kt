@@ -86,9 +86,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private val eventCtor by lazy {
         eventClass.getConstructor(AbstractRepoManager::class.java)
     }
-    private val repoTgzFile by lazy {
+    private val repoTgzFile: File by lazy {
         // e.g. ~/.minecraft/repo/skyhanni-sh/sh-repo-main.tar.gz
-        repoDirectory.resolve("$commonShortName-repo-${config.location.defaultBranch}.tar.gz")
+        globalRepoDirectory.resolve("$commonShortName-repo-${config.location.defaultBranch}.tar.gz").toFile()
     }
     private val commitStorage: RepoCommitStorage by lazy {
         // e.g. ~/.minecraft/repo/skyhanni-neu/hash.json
