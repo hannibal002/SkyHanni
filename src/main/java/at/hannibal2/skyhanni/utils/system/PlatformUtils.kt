@@ -37,7 +37,7 @@ object PlatformUtils {
     @JvmStatic
     @get:JvmName("dataDir")
     val dataDir: Path by lazy {
-        gameDir.resolve("data/skyhanni")
+        gameDir.resolve("data")
     }
 
     private val allowedFabricReports = setOf(

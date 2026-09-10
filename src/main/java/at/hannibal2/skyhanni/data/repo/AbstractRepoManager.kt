@@ -641,7 +641,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     companion object {
         // PlatformUtils.dataDir cannot be called at init time, so must use lazy
         private val globalRepoDirectory: Path by lazy {
-            PlatformUtils.dataDir.resolve("repo")
+            PlatformUtils.dataDir.resolve("skyhanni/repo")
         }
     }
 }
