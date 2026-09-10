@@ -61,7 +61,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * Inheriting classes should provide the path, e.g.: `File(mcDataDir, "repo/skyhanni")`
      */
     val repoDirectory: File by lazy {
-        globalRepoDirectory.resolve("skyhanni-$commonShortName").toFile()
+        globalRepoDirectory.resolve(commonShortName).toFile()
+    }
+
+    val commitFile by lazy {
+        globalRepoDirectory.resolve("$commonShortName-currentCommit.json")
     }
 
     private val legacyRepoDirectory: File? by lazy {
@@ -88,7 +92,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
     private val commitStorage: RepoCommitStorage by lazy {
         // e.g. ~/.minecraft/repo/skyhanni-neu/hash.json
-        RepoCommitStorage(repoDirectory.resolve("hash.json"))
+        RepoCommitStorage(commitFile)
     }
 
     private val commonShortName by lazy { commonShortNameCased.lowercase() }
@@ -255,6 +259,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun initRepo() = progressCategory.startBlock("auto loading on init") { progress ->
         shouldManuallyReload = true
         repoInitCoroutineConfig.launch {
+            // TODO: Remove in 10.0.0
+            updateLegacyFiles()
             if (config.repoAutoUpdate) {
                 if (!fetchAndUnpackRepo(progress, command = false).canContinue) {
                     progress.end("Failed to fetch & unpack repo - aborting.")
@@ -571,21 +577,20 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private fun deleteArchiveFiles() {
         repoTgzFile.delete()
-        deleteLegacyFiles()
     }
 
-    private fun deleteLegacyFiles() {
-        legacyRepoDirectory?.let {
-            if (it.exists()) {
-                logger.warn("Deleting legacy repo directory: ${it.absolutePath}")
-                it.deleteRecursively()
+    private fun updateLegacyFiles() {
+        legacyRepoDirectory?.let { legacyDirectory ->
+            if (legacyDirectory.exists()) {
+                logger.debug("Moving legacy repo directory to: ${repoDirectory.absolutePath}")
+                legacyDirectory.renameTo(repoDirectory)
             }
         }
 
-        legacyCommitFile?.let {
-            if (it.exists()) {
-                logger.warn("Deleting legacy commit file: ${it.absolutePath}")
-                it.delete()
+        legacyCommitFile?.let { legacyFile ->
+            if (legacyFile.exists()) {
+                logger.debug("Moving legacy commit file to: ${commitFile.absolutePath}")
+                legacyFile.renameTo(commitFile)
             }
         }
     }
@@ -611,9 +616,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     companion object {
-        // PlatformUtils.gameDir cannot be called at init time, so must use lazy
+        // PlatformUtils.dataDir cannot be called at init time, so must use lazy
         private val globalRepoDirectory: Path by lazy {
-            PlatformUtils.gameDir.resolve("repo")
+            PlatformUtils.dataDir.resolve("repo")
         }
     }
 }

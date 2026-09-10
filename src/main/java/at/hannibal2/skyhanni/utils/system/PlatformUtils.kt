@@ -34,6 +34,12 @@ object PlatformUtils {
         FabricLoader.getInstance().gameDir
     }
 
+    @JvmStatic
+    @get:JvmName("dataDir")
+    val dataDir: Path by lazy {
+        FabricLoader.getInstance().gameDir.resolve("data/skyhanni")
+    }
+
     private val allowedFabricReports = setOf(
         "fabricloader",
         "fabric-api",
