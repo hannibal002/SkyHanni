@@ -8,12 +8,10 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MythologicalCreatureType
-import at.hannibal2.skyhanni.events.ItemAbilityActivateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.RareDianaMobFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
-import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -40,11 +38,8 @@ object DianaApi {
 
     fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
 
-    fun isDoingDiana(strict: Boolean = false): Boolean {
-        if (!IslandType.HUB.isInIsland()) return false
-        if (strict && !isRitualActive()) return false
-        return hasSpadeInHotbar()
-    }
+    fun isDoingDiana(): Boolean =
+        IslandType.HUB.isInIsland() && isRitualActive() && hasSpadeInHotbar()
 
     val SafeItemStack.isDianaSpade get() = getInternalName() in spades
 
@@ -98,13 +93,6 @@ object DianaApi {
         if (ritualNotActivePattern.matches(event.cleanMessage)) {
             overrideActiveRitual(active = false)
         }
-    }
-
-    @HandleEvent(onlyOnIsland = HUB)
-    private fun onItemAbilityActivate(event: ItemAbilityActivateEvent) {
-        if (event.ability != ItemAbility.ECHO) return
-        if (ritualActiveOverride != null) return
-        overrideActiveRitual()
     }
 
     @HandleEvent
