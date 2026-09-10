@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ParticleEvent
-import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
+import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -75,7 +75,7 @@ object InvisibugHighlighter {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
+    private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
         invisibugEntities.remove(event.entity)
     }
 

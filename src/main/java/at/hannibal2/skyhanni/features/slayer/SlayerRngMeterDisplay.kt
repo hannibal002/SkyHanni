@@ -223,8 +223,9 @@ object SlayerRngMeterDisplay {
             val currentSlayer = getCurrentSlayer()
             storage.goalNeeded = rngScore[currentSlayer]?.get(internalName) ?: run {
                 ErrorManager.logErrorStateWithData(
-                    "Failed reading RNG Meter goal needed amount",
-                    "rngScore does not contain current slayer and current item data",
+                    "RNG Meter data for item $internalName on $currentSlayer not found in NEU repo. " +
+                        "Please report this on Discord.",
+                    "rngScore does not contain data for current slayer and item combination",
                     "internalName" to internalName,
                     "currentSlayer" to currentSlayer,
                     "rngScore" to rngScore,

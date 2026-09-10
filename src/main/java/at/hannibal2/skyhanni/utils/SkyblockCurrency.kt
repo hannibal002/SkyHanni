@@ -126,7 +126,7 @@ enum class SkyblockCurrency(
     // the lore only writes "Tokens", the island is what makes it unambiguous
     KUUDRA_TOKEN(
         "KUUDRA_TOKEN".toInternalName(), "Tokens", DARK_PURPLE, loreNames = setOf("token", "tokens"),
-        island = IslandType.KUUDRA_ARENA,
+        island = KUUDRA_ARENA,
         ownedAmount = { getFromStorage() },
     ),
 
@@ -153,9 +153,15 @@ enum class SkyblockCurrency(
         ownedAmount = { getFromStorage() },
     ),
 
+    // Carnival upgrades in the Hub
+    CARNIVAL_TOKEN(
+        "SKYBLOCK_CARNIVAL_POINT".toInternalName(), "Carnival Token", YELLOW,
+        loreNames = setOf("carnival token", "carnival tokens"),
+        ownedAmount = { getFromStorage() },
+    ),
+
     // TODO add these currencies, each one needs a real cost line from its shop first
     //  - North Stars, waiting on the winter event
-    //  - Carnival Tokens, waiting on the carnival event, the item is SKYBLOCK_CARNIVAL_POINT
     //  - Bingo Points, waiting on the bingo event
     ;
 
@@ -177,7 +183,6 @@ enum class SkyblockCurrency(
 
     @SkyHanniModule
     companion object {
-
         /**
          * REGEX-TEST: 5,000 Bits
          * REGEX-TEST: 40 Pests
@@ -214,8 +219,9 @@ enum class SkyblockCurrency(
          */
         @HandleEvent
         private fun onNeuRepoReload() {
-            // the item name lookup needs NeuItems.allItemsCache, which is filled by another handler of this event
-            DelayedRun.runNextTick {
+            // The item name lookup needs NeuItems.allItemsCache, which another handler of this event rebuilds
+            // on the next tick. Running at the end of that tick puts this check after the rebuild.
+            DelayedRun.runNextTickEnd {
                 val conflicts = entries.mapNotNull { currency ->
                     val id = currency.internalName
                     val resolved = ItemNameResolver.getInternalNameOrNull(currency.displayName)
@@ -227,7 +233,7 @@ enum class SkyblockCurrency(
                         else -> null
                     }
                 }
-                if (conflicts.isEmpty()) return@runNextTick
+                if (conflicts.isEmpty()) return@runNextTickEnd
 
                 ErrorManager.logErrorStateWithData(
                     "A SkyHanni currency uses a wrong id, please report this in discord",

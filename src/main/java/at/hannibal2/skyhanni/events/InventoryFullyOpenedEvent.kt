@@ -62,6 +62,9 @@ class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : Inven
  * and again on any subsequent slot update while the inventory remains open.
  * Updates after the initial open are delayed by one tick and therefore run on the main thread,
  * only the initial post comes from the packet handler.
+ *
+ * An update still pending when the inventory closes is dropped, so this never fires after the
+ * [InventoryCloseEvent] of that inventory.
  */
 @PrimaryFunction("onInventoryUpdated")
 class InventoryUpdatedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
