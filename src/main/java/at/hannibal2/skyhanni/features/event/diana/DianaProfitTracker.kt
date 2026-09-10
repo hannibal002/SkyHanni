@@ -136,7 +136,7 @@ object DianaProfitTracker {
 
     @HandleEvent
     private fun onItemAdd(event: ItemAddEvent) {
-        if (!(DianaApi.isDoingDiana(strict = true))) return
+        if (!(DianaApi.isDoingDiana())) return
         val isCommand = event.source == ItemAddManager.Source.COMMAND
         if (isCommand && !config.enabled) return
 
