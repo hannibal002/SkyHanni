@@ -932,7 +932,7 @@ object EstimatedItemValueCalculator {
         val list = NbtCompat.getStringTagList(extraAttributes, "boosters")
         if (list.isEmpty) return emptyList()
         val boosters = mutableListOf<NeuInternalName>()
-        for (i in 0..list.size) {
+        for (i in 0 until list.size) {
             var internalName = list.getStringOrDefault(i)
             if (internalName.isBlank()) continue
             internalName += "_BOOSTER"

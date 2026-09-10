@@ -89,12 +89,26 @@ open class BezierFitter(private val degree: Int) {
             return false
         }
         val distToLast = getLastPoint()?.distance(location) ?: return false
-        if (distToLast == 0.0) return false
         if (distToLast > maxDistanceToLast) return false
+        if (isAlreadyUsed(location)) return false
         if (endCondition(location)) return false
 
         addPoint(location)
         return true
+    }
+
+    /**
+     * Hypixel repeats particle positions, usually right after each other, sometimes interleaved as A, B, A, B.
+     * Comparing against the last point alone therefore lets a used position back in, so every point is checked.
+     * [addPoint] uses a point's position in the list as its curve parameter, so a repeat stalls the curve and
+     * distorts the derivative at the start that [ParticlePathBezierFitter.solve] extrapolates from. With degree 3
+     * the result can land thousands of blocks away.
+     */
+    private fun isAlreadyUsed(location: LorenzVec) = points.any { it.distanceSq(location) < REPEAT_TOLERANCE_SQ }
+
+    companion object {
+        /** 0.01 blocks, squared. */
+        private const val REPEAT_TOLERANCE_SQ = 0.0001
     }
 }
 
