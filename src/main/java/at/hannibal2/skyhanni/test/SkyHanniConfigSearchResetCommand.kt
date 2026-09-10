@@ -194,7 +194,7 @@ object SkyHanniConfigSearchResetCommand {
         return "§eCopied search result ($size) to clipboard."
     }
 
-    // TODO: Use ConfigManager.traverseConfig instead of reflection to find config elements
+    // TODO: Use ConfigUtils.traverseConfig instead of reflection to find config elements
     private fun findConfigElements(
         configFilter: (String) -> Boolean,
         classFilter: (String) -> Boolean,
