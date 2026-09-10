@@ -58,12 +58,20 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     /**
      * The root directory for this specific repo.
-     * Inheriting classes should provide the path, e.g.: `File(mcDataDir, "repo/skyhanni")`
+     *
+     * For example:
+     * `.minecraft/data/skyhanni/repo/sh`
      */
     val repoDirectory: File by lazy {
         globalRepoDirectory.resolve(commonShortName).toFile()
     }
 
+    /**
+     * Stores the currently checked-out commit for this repo.
+     *
+     * For example:
+     * `.minecraft/data/skyhanni/repo/sh-currentCommit.json`
+     */
     val commitFile: File by lazy {
         globalRepoDirectory.resolve("$commonShortName-currentCommit.json").toFile()
     }
@@ -78,6 +86,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     @PublishedApi
     internal val logger by lazy { RepoLogger(this) }
+
     @Suppress("UNCHECKED_CAST")
     private val eventClass: Class<E> by lazy {
         (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<E>
@@ -86,12 +95,26 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private val eventCtor by lazy {
         eventClass.getConstructor(AbstractRepoManager::class.java)
     }
+
+    /**
+     * Local archive of the repo's default branch.
+     *
+     * For example:
+     * `.minecraft/data/skyhanni/repo/sh-repo-main.tar.gz`
+     */
     private val repoTgzFile: File by lazy {
-        // e.g. ~/.minecraft/repo/skyhanni-sh/sh-repo-main.tar.gz
-        globalRepoDirectory.resolve("$commonShortName-repo-${config.location.defaultBranch}.tar.gz").toFile()
+        globalRepoDirectory
+            .resolve("$commonShortName-repo-${config.location.defaultBranch}.tar.gz")
+            .toFile()
     }
+
+    /**
+     * Stores commit metadata for this repo.
+     *
+     * For example:
+     * `.minecraft/data/skyhanni/repo/sh-currentCommit.json`
+     */
     private val commitStorage: RepoCommitStorage by lazy {
-        // e.g. ~/.minecraft/repo/skyhanni-neu/hash.json
         RepoCommitStorage(commitFile)
     }
 
