@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.hunting.safari.checklist
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.foraging.SafariConfig
+import at.hannibal2.skyhanni.config.features.foraging.SafariChecklistConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object SafariShardChecklist {
 
-    private val config get() = SkyHanniMod.feature.hunting.safari
+    private val checklistConfig get() = SkyHanniMod.feature.hunting.safari.checklist
 
     private val patternGroup = RepoPattern.group("hunting.safari.run.shard-tracker")
 
@@ -87,23 +87,23 @@ object SafariShardChecklist {
 
     @HandleEvent(onlyOnIsland = IslandType.SAFARI)
     private fun onRender(event: GuiRenderEvent.GuiOnTopRenderEvent) {
-        if (!config.runShardChecklist) return
-        config.runShardChecklistPosition.renderRenderables(createDisplay(), posLabel = "Safari Shard Checklist")
+        if (!checklistConfig.runShardChecklist) return
+        checklistConfig.runShardChecklistPosition.renderRenderables(createDisplay(), posLabel = "Safari Shard Checklist")
     }
 
     private fun createDisplay(): List<Renderable> = buildList {
-        val biomes = when (config.runShardChecklistDisplay) {
-            SafariConfig.ChecklistDisplay.ALL -> SafariBiome.entries
-            SafariConfig.ChecklistDisplay.CURRENT_ON_TOP -> getCurrentBiome()?.let { currentBiome ->
+        val biomes = when (checklistConfig.runShardChecklistDisplay) {
+            SafariChecklistConfig.ChecklistDisplay.ALL -> SafariBiome.entries
+            SafariChecklistConfig.ChecklistDisplay.CURRENT_ON_TOP -> getCurrentBiome()?.let { currentBiome ->
                 SafariBiome.entries.sortedByDescending { it == currentBiome }
             } ?: SafariBiome.entries
 
-            SafariConfig.ChecklistDisplay.ONLY_CURRENT -> getCurrentBiome()?.let { listOf(it) }.orEmpty()
+            SafariChecklistConfig.ChecklistDisplay.ONLY_CURRENT -> getCurrentBiome()?.let { listOf(it) }.orEmpty()
         }
         biomes.forEach { biome ->
             val status = if (isBiomeDone(biome)) "§aDone" else "§cUndone"
             add(Renderable.text("${biome.formattedName} §7- $status"))
-            biome.shards.filter { !config.hideCollectedRunShards || shardCounts.getValue(it) == 0 }.forEach { shard ->
+            biome.shards.filter { !checklistConfig.hideCollectedRunShards || shardCounts.getValue(it) == 0 }.forEach { shard ->
                 val marker = if (shardCounts.getValue(shard) > 0) "§a✔" else "§c✖"
                 val row = buildList {
                     add(Renderable.text("§7- ($marker§7)"))
