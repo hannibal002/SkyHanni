@@ -31,8 +31,6 @@ import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
