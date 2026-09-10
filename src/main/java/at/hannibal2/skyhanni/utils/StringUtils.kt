@@ -421,16 +421,6 @@ object StringUtils {
         return newText
     }
 
-    private fun addComponent(foundCommands: MutableList<Component>, message: Component) {
-        val clickEvent = message.command
-        if (clickEvent != null) {
-            if (foundCommands.size == 1 && foundCommands[0].command == clickEvent) {
-                return
-            }
-            foundCommands.add(message)
-        }
-    }
-
     /**
      * Applies a transformation on the message of a SystemMessageEvent if possible.
      */
