@@ -64,8 +64,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         globalRepoDirectory.resolve(commonShortName).toFile()
     }
 
-    val commitFile by lazy {
-        globalRepoDirectory.resolve("$commonShortName-currentCommit.json")
+    val commitFile: File by lazy {
+        globalRepoDirectory.resolve("$commonShortName-currentCommit.json").toFile()
     }
 
     private val legacyRepoDirectory: File? by lazy {
