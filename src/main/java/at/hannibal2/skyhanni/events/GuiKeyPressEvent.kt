@@ -16,8 +16,6 @@ import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
  * `KeyboardManager.isKeyClicked()`.
  * Cancelling it stops the screen from handling the input.
  *
- * For mouse input specifically, prefer [GuiMouseInputEvent], which is fired alongside this one.
- *
  * @param guiContainer The container screen that received the input.
  */
 @PrimaryFunction("onGuiKeyPress")

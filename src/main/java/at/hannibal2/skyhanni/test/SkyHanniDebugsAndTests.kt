@@ -383,15 +383,15 @@ object SkyHanniDebugsAndTests {
     private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (debugConfig.copyCosmeticsSkullData.isKeyHeld()) {
             val stack = event.stackUnderCursor ?: return
-            onKeyPressCopyCosmeticsData(stack)
+            copyCosmeticsData(stack)
         }
         if (debugConfig.copyInternalName.isKeyHeld()) {
             val stack = event.stackUnderCursor ?: return
-            onKeybind(stack)
+            copyInternalName(stack)
         }
     }
 
-    private fun onKeybind(stack: SafeItemStack) {
+    private fun copyInternalName(stack: SafeItemStack) {
         val internalName = stack.getInternalNameOrNull() ?: return
         val rawInternalName = internalName.asString()
         OSUtils.copyToClipboard(rawInternalName)
@@ -519,7 +519,7 @@ object SkyHanniDebugsAndTests {
         skinIdTime = SimpleTimeMark.now()
     }
 
-    private fun onKeyPressCopyCosmeticsData(stack: SafeItemStack) {
+    private fun copyCosmeticsData(stack: SafeItemStack) {
         if (!stack.`is`(Items.PLAYER_HEAD)) return
         val skinId = skinId ?: return
         if (skinIdTime.passedSince() > 2.minutes) return
