@@ -421,16 +421,6 @@ object StringUtils {
         return newText
     }
 
-    private fun addComponent(foundCommands: MutableList<Component>, message: Component) {
-        val clickEvent = message.command
-        if (clickEvent != null) {
-            if (foundCommands.size == 1 && foundCommands[0].command == clickEvent) {
-                return
-            }
-            foundCommands.add(message)
-        }
-    }
-
     /**
      * Applies a transformation on the message of a SystemMessageEvent if possible.
      */
@@ -525,9 +515,10 @@ object StringUtils {
 
     fun String.isValidUuid(): Boolean = runCatching(UUID::fromString).isSuccess
 
-    fun optionalAn(string: String): String {
-        if (string.isEmpty()) return ""
-        return if (string[0] in "aeiou") "an" else "a"
+    fun optionalAn(string: String): String = when {
+        string.isEmpty() -> ""
+        string.first().isVowel() -> "an"
+        else -> "a"
     }
 
     fun String.hasWhitespace(): Boolean = any { it.isWhitespace() }
