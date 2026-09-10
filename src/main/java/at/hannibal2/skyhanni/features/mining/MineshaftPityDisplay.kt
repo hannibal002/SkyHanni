@@ -99,13 +99,12 @@ object MineshaftPityDisplay {
 
     private const val MAX_COUNTER = 2000
 
-    private val group = RepoPattern.group("mineshaft.pity")
-
+    private val patternGroup = RepoPattern.group("mineshaft.pity")
 
     /**
      * WRAPPED-REGEX-TEST: " Glacite Mineshafts: 124/2,000"
      */
-    private val tabPityPattern by group.pattern(
+    private val tabPityPattern by patternGroup.pattern(
         "tablist",
         " Glacite Mineshafts: (?<pity>[\\d,]+)/2,000",
     )

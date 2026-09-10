@@ -9,10 +9,10 @@ import java.util.regex.Pattern
 
 @SkyHanniModule
 object ScoreboardPattern {
-    private val group = RepoPattern.group("features.gui.customscoreboard")
+    private val patternGroup = RepoPattern.group("features.gui.customscoreboard")
 
     // Lines from the scoreboard
-    private val scoreboardGroup by group.exclusiveGroup("scoreboard")
+    private val scoreboardGroup by patternGroup.exclusiveGroup("scoreboard")
 
     @HandleEvent(RepositoryReloadEvent::class)
     fun onRepoReload() {
@@ -1003,7 +1003,7 @@ object ScoreboardPattern {
      * REGEX-TEST: §d᠅ §fGemstone§f
      * REGEX-TEST: §d᠅ §fGemstone§f§e(+1)
      */
-    val brokenPatterns by group.list(
+    val brokenPatterns by patternGroup.list(
         "broken",
         "\\s*§.§l⚡ §cRedston",
         "\\s*§ce: §e§b\\d+%",
@@ -1012,7 +1012,7 @@ object ScoreboardPattern {
     )
 
     // Lines from the tablist
-    private val tablistGroup = group.group("tablist-no-color")
+    private val tablistGroup = patternGroup.group("tablist-no-color")
 
     /**
      * WRAPPED-REGEX-TEST: " Ends In: 27h"

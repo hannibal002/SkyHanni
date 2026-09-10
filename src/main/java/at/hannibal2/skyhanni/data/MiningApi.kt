@@ -44,28 +44,28 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object MiningApi {
 
-    private val group = RepoPattern.group("data.miningapi")
+    private val patternGroup = RepoPattern.group("data.miningapi")
 
     /**
      * REGEX-TEST: Glacite Tunnels
      * REGEX-TEST: Great Glacite Lake
      */
-    private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")
-    private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
+    private val glaciteAreaPattern by patternGroup.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")
+    private val dwarvenBaseCampPattern by patternGroup.pattern("area.basecamp", "Dwarven Base Camp")
 
     /**
      * REGEX-TEST: Mines of Divan
      */
-    private val minesOfDivanPattern by group.pattern("area.minesofdivan", "Mines of Divan")
+    private val minesOfDivanPattern by patternGroup.pattern("area.minesofdivan", "Mines of Divan")
 
-    private val icyBiomePattern by group.pattern("area.icybiome", "Icy Biome")
+    private val icyBiomePattern by patternGroup.pattern("area.icybiome", "Icy Biome")
 
     /**
      * REGEX-TEST: §6The warmth of the campfire reduced your §r§b Cold §r§6to §r§a0§r§6!
      * REGEX-TEST: §c ☠ §r§7You froze to death§r§7.
      */
     @Suppress("MaxLineLength")
-    private val coldResetPattern by group.pattern(
+    private val coldResetPattern by patternGroup.pattern(
         "cold.reset",
         "§6The warmth of the campfire reduced your §r§b${SkyblockStat.COLD_RESISTANCE.hypixelIcon} Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
     )
@@ -76,7 +76,7 @@ object MiningApi {
      * REGEX-TEST: Heat: §c14♨
      * REGEX-TEST: Heat: §c0♨
      */
-    val heatPattern by group.pattern(
+    val heatPattern by patternGroup.pattern(
         "heat.scoreboard",
         "^Heat: (?<scoreboard>§.(?<heat>\\d+|IMMUNE)♨?)\$",
     )
@@ -86,12 +86,12 @@ object MiningApi {
      * REGEX-TEST: Cold: §b-1❄
      * REGEX-TEST: Cold: §b-3❄
      */
-    val coldPattern by group.pattern(
+    val coldPattern by patternGroup.pattern(
         "cold",
         "(?:§.)*Cold: §.(?<cold>-?\\d+)❄",
     )
 
-    private val pickobulusGroup = group.group("pickobulus")
+    private val pickobulusGroup = patternGroup.group("pickobulus")
 
     /**
      * REGEX-TEST: §aYou used your §r§6Pickobulus §r§aPickaxe Ability!

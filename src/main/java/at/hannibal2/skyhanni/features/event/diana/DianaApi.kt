@@ -50,7 +50,7 @@ object DianaApi {
     var sphinxQuestions = emptyMap<String, String>()
         private set
 
-    private val group = RepoPattern.group("event-diana")
+    private val patternGroup = RepoPattern.group("event-diana")
 
     /**
      * REGEX-TEST: Minos Inquisitor
@@ -58,7 +58,7 @@ object DianaApi {
      * REGEX-TEST: King Minos
      * REGEX-TEST: Manticore
      */
-    private val rareDianaMobNamePattern by group.pattern(
+    private val rareDianaMobNamePattern by patternGroup.pattern(
         "rare-mob-name",
         "(?:Minos Inquisitor|Sphinx|King Minos|Manticore)\\s*",
     )

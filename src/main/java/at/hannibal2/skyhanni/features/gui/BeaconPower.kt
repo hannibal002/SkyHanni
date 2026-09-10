@@ -33,9 +33,9 @@ object BeaconPower {
     private val storage get() = ProfileStorageData.profileSpecific?.beaconPower
     private val config get() = SkyHanniMod.feature.gui
 
-    private val group = RepoPattern.group("gui.beaconpower-no-color")
+    private val patternGroup = RepoPattern.group("gui.beaconpower-no-color")
 
-    private val deactivatedPattern by group.pattern(
+    private val deactivatedPattern by patternGroup.pattern(
         "deactivated",
         "Beacon Deactivated - No Power Remaining",
     )
@@ -43,7 +43,7 @@ object BeaconPower {
     /**
      * REGEX-TEST: Power Remaining: 0d 5h 53m 12s
      */
-    private val timeRemainingPattern by group.pattern(
+    private val timeRemainingPattern by patternGroup.pattern(
         "time",
         "Power Remaining: (?<time>.+)",
     )
@@ -51,7 +51,7 @@ object BeaconPower {
     /**
      * REGEX-TEST: Current Stat: +5✯ Magic Find
      */
-    private val boostedStatPattern by group.pattern(
+    private val boostedStatPattern by patternGroup.pattern(
         "stat",
         "Current Stat: (?<stat>.+)",
     )

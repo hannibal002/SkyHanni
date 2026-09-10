@@ -20,12 +20,12 @@ object DragonFightAPI {
     var currentHp: Int? = null
     private var yourDamage: Int? = null
 
-    private val group = RepoPattern.group("combat.end-dragon-fight")
+    private val patternGroup = RepoPattern.group("combat.end-dragon-fight")
 
     /**
      * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lOld Dragon§r§d§l has spawned!§r
      */
-    private val chatSpawnPattern by group.pattern(
+    private val chatSpawnPattern by patternGroup.pattern(
         "chat.spawn",
         "§5☬ §r§d§lThe §r§5§c§l(?<type>.*)§r§d§l has spawned!§r",
     )
@@ -33,7 +33,7 @@ object DragonFightAPI {
     /**
      * REGEX-TEST: §r§f                           §r§6§lOLD DRAGON DOWN!§r
      */
-    private val chatDeath by group.pattern(
+    private val chatDeath by patternGroup.pattern(
         "chat.death",
         "§r§f {27}§r§6§l(?<type>.*) DOWN!§r",
     )
@@ -41,7 +41,7 @@ object DragonFightAPI {
     /**
      * REGEX-TEST: Dragon HP: 4,824,217 
      */
-    private val scoreboardHPPattern by group.pattern(
+    private val scoreboardHPPattern by patternGroup.pattern(
         "scoreboard.hp",
         "Dragon HP: (?<hp>.*) ${SkyblockStat.HEALTH.hypixelIcon}",
     )
@@ -49,12 +49,12 @@ object DragonFightAPI {
     /**
      * REGEX-TEST: Your Damage: 0
      */
-    private val scoreboardYourDamagePattern by group.pattern(
+    private val scoreboardYourDamagePattern by patternGroup.pattern(
         "scoreboard.your-damage",
         "Your Damage: (?<damage>[\\d.,]+)",
     )
 
-    private val nestAreaPattern by group.pattern("area.nest", "Dragon's Nest")
+    private val nestAreaPattern by patternGroup.pattern("area.nest", "Dragon's Nest")
 
     fun inNestArea() = IslandType.THE_END.isInIsland() && nestAreaPattern.matches(SkyBlockUtils.graphArea)
 

@@ -26,7 +26,7 @@ object SkillAchievements {
     /**
      * REGEX-TEST: Ores mined: 2,449,790
      */
-    private val oresPattern by AchievementManager.group.pattern(
+    private val oresPattern by AchievementManager.patternGroup.pattern(
         "ores",
         "Ores mined: (?<amount>[\\d,]+)",
     )
@@ -34,7 +34,7 @@ object SkillAchievements {
     /**
      * REGEX-TEST: Sea Creatures killed: 63,641
      */
-    private val seaCreaturesPattern by AchievementManager.group.pattern(
+    private val seaCreaturesPattern by AchievementManager.patternGroup.pattern(
         "sea-creatures",
         "Sea Creatures killed: (?<amount>[\\d,]+)",
     )
@@ -43,7 +43,7 @@ object SkillAchievements {
      * REGEX-TEST: Fishing Skill
      * REGEX-TEST: Mining Skill
      */
-    private val petSkillMenuPattern by AchievementManager.group.pattern(
+    private val petSkillMenuPattern by AchievementManager.patternGroup.pattern(
         "pet-skill-menu",
         "(?:Fishing|Mining) Skill",
     )
