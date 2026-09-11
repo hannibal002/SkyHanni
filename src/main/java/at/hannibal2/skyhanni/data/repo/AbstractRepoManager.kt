@@ -54,26 +54,48 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     open val legacyConfigDirectory: File? = null
 
+    abstract val repoFolderName: String
+
     abstract val config: AbstractRepoConfig
 
     /**
      * The root directory for this specific repo.
      *
      * For example:
-     * `.minecraft/data/skyhanni/repo/sh`
+     * `.minecraft/data/skyhanni/repo` or `.minecraft/data/skyhanni/neurepo`
      */
     val repoDirectory: File by lazy {
-        globalRepoDirectory.resolve(commonShortName).toFile()
+        skyhanniDataDir.resolve(repoFolderName).toFile()
     }
 
     /**
      * Stores the currently checked-out commit for this repo.
      *
      * For example:
-     * `.minecraft/data/skyhanni/repo/sh-currentCommit.json`
+     * `.minecraft/data/skyhanni/repo.metadata.json`
      */
     val commitFile: File by lazy {
-        globalRepoDirectory.resolve("$commonShortName-currentCommit.json").toFile()
+        skyhanniDataDir.resolve("$repoFolderName.metadata.json").toFile()
+    }
+
+    /**
+     * Local archive of the repo's default branch.
+     *
+     * For example:
+     * `.minecraft/data/skyhanni/repo.tar.gz`
+     */
+    private val repoTgzFile: File by lazy {
+        skyhanniDataDir.resolve("$repoFolderName.tar.gz").toFile()
+    }
+
+    /**
+     * Stores commit metadata for this repo.
+     *
+     * For example:
+     * `.minecraft/data/skyhanni/repo/sh-currentCommit.json`
+     */
+    private val commitStorage: RepoCommitStorage by lazy {
+        RepoCommitStorage(commitFile)
     }
 
     private val legacyRepoDirectory: File? by lazy {
@@ -94,28 +116,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private val eventCtor by lazy {
         eventClass.getConstructor(AbstractRepoManager::class.java)
-    }
-
-    /**
-     * Local archive of the repo's default branch.
-     *
-     * For example:
-     * `.minecraft/data/skyhanni/repo/sh-repo-main.tar.gz`
-     */
-    private val repoTgzFile: File by lazy {
-        globalRepoDirectory
-            .resolve("$commonShortName-repo-${config.location.defaultBranch}.tar.gz")
-            .toFile()
-    }
-
-    /**
-     * Stores commit metadata for this repo.
-     *
-     * For example:
-     * `.minecraft/data/skyhanni/repo/sh-currentCommit.json`
-     */
-    private val commitStorage: RepoCommitStorage by lazy {
-        RepoCommitStorage(commitFile)
     }
 
     private val commonShortName by lazy { commonShortNameCased.lowercase() }
@@ -640,8 +640,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     companion object {
         // PlatformUtils.dataDir cannot be called at init time, so must use lazy
-        private val globalRepoDirectory: Path by lazy {
-            PlatformUtils.dataDir.resolve("skyhanni/repo")
+        private val skyhanniDataDir: Path by lazy {
+            PlatformUtils.dataDir.resolve("skyhanni")
         }
     }
 }
