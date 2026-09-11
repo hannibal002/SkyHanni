@@ -523,7 +523,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private fun prepCleanRepoFileSystem(progress: ChatProgressUpdates) {
         progress.update("deleteRecursively")
-        repoDirectory.listFiles()?.forEach { if (it != logger.logsDir) it.deleteRecursively() }
+        repoDirectory.listFiles()?.forEach { it.deleteRecursively() }
 
         progress.update("createAndClean")
         repoFileSystem = repoDirectory.let { root ->
