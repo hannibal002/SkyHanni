@@ -82,7 +82,6 @@ import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AnnotationNode
 import org.objectweb.asm.tree.ClassNode
 import org.spongepowered.asm.mixin.Mixin
-import java.io.File
 import java.util.Locale
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -279,7 +278,7 @@ object SkyHanniDebugsAndTests {
     private fun reloadListeners() {
         // TODO: use repo for this and implement it correctly
         val blockedFeatures = try {
-            File("config/skyhanni/blocked-features.txt").readLines().toList()
+            SkyHanniMod.configDir.resolve("blocked-features.txt").readLines().toList()
         } catch (_: Exception) {
             emptyList()
         }

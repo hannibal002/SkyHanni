@@ -45,6 +45,7 @@ import net.minecraft.resources.Identifier
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.io.File
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -140,6 +141,14 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
+
+    val dataDir: File by lazy {
+        PlatformUtils.dataDir.resolve(MODID).toFile()
+    }
+
+    val configDir: File by lazy {
+        PlatformUtils.configDir.resolve(MODID).toFile()
+    }
 
     val modules: MutableList<Any> = ArrayList()
 

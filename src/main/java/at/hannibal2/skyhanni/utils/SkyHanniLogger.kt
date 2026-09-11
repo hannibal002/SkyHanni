@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.days
 open class SkyHanniLogger(private val filePath: String) {
 
     private val format = SimpleDateFormat("HH:mm:ss")
-    internal open val logsDir = File("config/skyhanni/logs")
+    internal open val logsDir = SkyHanniMod.configDir.resolve("logs")
     internal open val timedFormattedDir by lazy { "$logsDir/$fullFormat" }
     private val logFileName by lazy { "$timedFormattedDir/$filePath.log" }
 

@@ -25,7 +25,6 @@ import com.mojang.brigadier.arguments.BoolArgumentType
 import java.io.File
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +64,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * `.minecraft/data/skyhanni/repo` or `.minecraft/data/skyhanni/neurepo`
      */
     val repoDirectory: File by lazy {
-        skyhanniDataDir.resolve(repoFolderName).toFile()
+        SkyHanniMod.dataDir.resolve(repoFolderName).toFile()
     }
 
     /**
@@ -75,7 +74,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * `.minecraft/data/skyhanni/repo.meta.json`
      */
     val commitFile: File by lazy {
-        skyhanniDataDir.resolve("$repoFolderName.meta.json").toFile()
+        SkyHanniMod.dataDir.resolve("$repoFolderName.meta.json").toFile()
     }
 
     /**
@@ -85,7 +84,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * `.minecraft/data/skyhanni/repo.tar.gz`
      */
     private val repoTgzFile: File by lazy {
-        skyhanniDataDir.resolve("$repoFolderName.tar.gz").toFile()
+        SkyHanniMod.dataDir.resolve("$repoFolderName.tar.gz").toFile()
     }
 
     /**
@@ -655,13 +654,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         if (extraData.isNotEmpty()) {
             debug("  extra:")
             for ((key, value) in extraData) debug("    $key: $value")
-        }
-    }
-
-    companion object {
-        // PlatformUtils.dataDir cannot be called at init time, so must use lazy
-        private val skyhanniDataDir: Path by lazy {
-            PlatformUtils.dataDir.resolve("skyhanni")
         }
     }
 }
