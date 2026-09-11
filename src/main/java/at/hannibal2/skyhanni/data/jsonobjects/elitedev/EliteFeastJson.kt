@@ -44,8 +44,8 @@ data class EliteFeastJson(
 
 @KSerializable
 data class EliteFeastData(
-    @Expose var year: Int,
-    @Expose var month: Int,
+    @Expose val year: Int,
+    @Expose val month: Int,
     @Expose val complete: Boolean,
     @Expose val current: List<String>,
     @Expose @SerializedName("next") private val _next: Map<String, Long?>,
