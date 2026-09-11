@@ -72,10 +72,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * Stores the currently checked-out commit for this repo.
      *
      * For example:
-     * `.minecraft/data/skyhanni/repo.metadata.json`
+     * `.minecraft/data/skyhanni/repo.meta.json`
      */
     val commitFile: File by lazy {
-        skyhanniDataDir.resolve("$repoFolderName.metadata.json").toFile()
+        skyhanniDataDir.resolve("$repoFolderName.meta.json").toFile()
     }
 
     /**
