@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.RareDianaMobFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -83,7 +84,7 @@ object DianaApi {
     private fun onJoinWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         val entity = event.entity
         // TODO: fetch rare mobs from repo instead
-        if (rareDianaMobNamePattern.matches(entity.name.string.trim())) {
+        if (rareDianaMobNamePattern.matches(entity.cleanName.trim())) {
             overrideActiveRitual()
             RareDianaMobFoundEvent(entity).post()
         }
