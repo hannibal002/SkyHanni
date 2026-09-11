@@ -6,6 +6,9 @@ import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.combat.mobs.AreaMiniBossFeatures
@@ -19,11 +22,14 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeFirst
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.animal.golem.IronGolem
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon
 import net.minecraft.world.entity.boss.wither.WitherBoss
+import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.monster.Ghast
 import net.minecraft.world.entity.monster.cubemob.MagmaCube
 
@@ -31,27 +37,27 @@ import net.minecraft.world.entity.monster.cubemob.MagmaCube
 object HideFarEntities {
     private val config get() = SkyHanniMod.feature.misc.hideFarEntities
 
-    private var ignored = emptySet<Int>()
-    private var neverHide = emptySet<Int>()
+    private var ignored = mutableMapOf<Int, Double>()
+    private var neverHide = mutableSetOf<Int>()
 
-    // TODO: use entity events
-    @OptIn(AllEntitiesGetter::class)
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onEntitySpawn(event: EntityEnterWorldEvent<*>) {
         if (GlobalRender.renderDisabled) return
         if (!isEnabled()) return
-        if (event.isMod(20)) {
-            updateNeverHide()
-        }
+        updateNeverHide(event.entity)
+    }
 
+    @HandleEvent
+    private fun onEntityMoveEvent(event: EntityMoveEvent<*>) {
+        if (GlobalRender.renderDisabled) return
+        if (!isEnabled()) return
+        val (entityID, distance) = event.entity.id to event.entity.distanceToPlayer()
+        if (entityID in neverHide) return
         val maxAmount = config.maxAmount.coerceAtLeast(1)
         val minDistance = config.minDistance.coerceAtLeast(3)
-
-        ignored = EntityUtils.getAllEntities()
-            .map { it.id to it.distanceToPlayer() }
-            .filter { it.second > minDistance && it.first !in neverHide }
-            .sortedBy { it.second }.drop(maxAmount)
-            .map { it.first }.toSet()
+        if (distance < minDistance) return
+        ignored += entityID to distance
+        ignored = ignored.map { it.key to it.value }.sortedBy { it.second }.drop(maxAmount).toMap().toMutableMap()
     }
 
     /**
@@ -69,44 +75,65 @@ object HideFarEntities {
      * dungeon mini bosses: sa, frozen adventurer
      * 1b hp mob in dungeon
      */
-    // TODO: use entity events
-    @OptIn(AllEntitiesGetter::class)
-    private fun updateNeverHide() {
-        val list = mutableSetOf<Entity>()
-        val allEntities = EntityUtils.getAllEntities()
+    private fun updateNeverHide(entity: Entity) {
+        val entityID = entity.id
 
         if (DungeonApi.inDungeon()) {
-            list += allEntities.filter { it.mob?.name == "Mort" }
-            list += allEntities.filter { it is WitherBoss || it is EnderDragon }
-            list += DungeonMobManager.starredVisibleMobs.map { it.baseEntity }
-            // other party members
-            list += allEntities.filter { it is RemotePlayer && !it.isNpc() }
+            when {
+                entity.mob?.name == "Mort" -> neverHide += entityID
+                entity is WitherBoss || entity is EnderDragon -> neverHide += entityID // M7 Withers/Wither Dragons
+                entity is RemotePlayer && !entity.isNpc() -> neverHide += entityID // Party Members
+                DungeonMobManager.starredVisibleMobs.contains(entity.mob) -> neverHide += entityID // All Non-Invisible Starred mobs
+                DungeonMobManager.staredInvisible.contains(entity.mob) -> neverHide += entityID // Starred Fels
+            }
+            return
         }
         if (KuudraApi.inKuudra) {
-            list += allEntities.filter { it.mob?.name == "Elle" }
-            // other party members
-            list += allEntities.filter { it is RemotePlayer && !it.isNpc() }
+            when {
+                entity.mob?.name == "Elle" -> neverHide += entityID
+                entity is RemotePlayer && !entity.isNpc() -> neverHide += entityID // Party Members
+            }
+            return
         }
         if (IslandType.WINTER.isInIsland()) {
-            list += allEntities.filter { it is MagmaCube }
+            if (entity is MagmaCube) neverHide += entityID // Jerry Island Magma Cubes
+            return
         }
         if (IslandType.DWARVEN_MINES.isInIsland()) {
-            // powder ghast & golem defender (from goblin raid event)
-            list += allEntities.filter { it is Ghast || it is IronGolem }
+            if (entity is Ghast || entity is IronGolem) neverHide += entityID // powder ghast & golem defender (from goblin raid event)
+            return
         }
 
-        // Always show boss bar
-        list += allEntities.filter { it is WitherBoss && it.id < 0 }
+        if (entity is WitherBoss && entityID < 0) {
+            neverHide += entityID
+            return
+        } // Always show boss bar Mobs
 
-        list += allEntities.filter { it is RemotePlayer && it.name.string in PartyApi.partyMembers }
-        list += DamageIndicatorManager.getAllMobs()
-        list += AreaMiniBossFeatures.currentMobs.map { it.baseEntity }
+        if (entity is RemotePlayer && entity.name.string in PartyApi.partyMembers) {
+            neverHide += entityID
+            return
+        }
+        if (DamageIndicatorManager.getAllMobs().contains(entity)) {
+            neverHide += entityID
+            return
+        }
+        if (AreaMiniBossFeatures.currentMobs.map { it.baseEntity }.contains(entity)) {
+            neverHide += entityID
+            return
+        }
+    }
 
-        neverHide = list.map { it.id }.toSet()
+    @HandleEvent
+    private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<*>) {
+        val iterator = neverHide.iterator()
+        while (iterator.hasNext()) {
+            val next = iterator.next()
+            if (next == event.entity.id) iterator.remove()
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
+    private fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!isEnabled()) return
         val entity = event.entity
         if (entity.id in ignored) {

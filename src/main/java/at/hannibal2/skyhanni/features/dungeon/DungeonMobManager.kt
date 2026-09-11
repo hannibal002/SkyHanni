@@ -28,7 +28,7 @@ object DungeonMobManager {
     private val starredConfig get() = config.starred
     private val fel get() = config.fel
 
-    private val staredInvisible = mutableSetOf<Mob>()
+    val staredInvisible = mutableSetOf<Mob>()
     val starredVisibleMobs = mutableSetOf<Mob>()
     private val felOnTheGround = mutableSetOf<Mob>()
     private val felMoving = mutableSetOf<Mob>()
