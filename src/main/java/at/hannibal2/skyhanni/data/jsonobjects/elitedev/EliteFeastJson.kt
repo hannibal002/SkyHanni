@@ -44,8 +44,8 @@ data class EliteFeastJson(
 
 @KSerializable
 data class EliteFeastData(
-    @Expose val year: Int,
-    @Expose val month: Int,
+    @Expose var year: Int,
+    @Expose var month: Int,
     @Expose val complete: Boolean,
     @Expose val current: List<String>,
     @Expose @SerializedName("next") private val _next: Map<String, Long?>,
@@ -53,8 +53,12 @@ data class EliteFeastData(
 ) {
     val next: Map<String, SimpleTimeMark?> = _next.mapValues { it.value?.let(SimpleTimeMark::fromUnixSeconds) }
 
-    private val monthEndTime: SimpleTimeMark
-        get() = SkyBlockTime(year, month + 1, 1).toTimeMark()
+    private fun monthEndTime(): SimpleTimeMark {
+        val now = SkyBlockTime.now()
+        year = now.year
+        month = now.month
+        return SkyBlockTime(year, month + 1, 1).toTimeMark()
+    }
 
     fun getBody(): String = ApiUtils.serializeNullsGson.toJson(this)
 
@@ -68,12 +72,12 @@ data class EliteFeastData(
     }
 
     fun getActiveDuration(): Duration {
-        if (next.values.all { it == null }) return monthEndTime.timeUntil()
+        if (next.values.all { it == null }) return monthEndTime().timeUntil()
 
         return getDurations()
             .filter(Duration::isPositive)
             .minByOrNull { it.inWholeMilliseconds }
-            ?: monthEndTime.timeUntil()
+            ?: monthEndTime().timeUntil()
     }
 
     fun getCurrentCrops(): List<CropType> {
