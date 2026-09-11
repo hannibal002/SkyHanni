@@ -64,7 +64,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * `.minecraft/data/skyhanni/repo` or `.minecraft/data/skyhanni/neurepo`
      */
     val repoDirectory: File by lazy {
-        SkyHanniMod.dataDir.resolve(repoFolderName).toFile()
+        SkyHanniMod.dataDir.resolve(repoFolderName)
     }
 
     /**
@@ -74,7 +74,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * `.minecraft/data/skyhanni/repo.meta.json`
      */
     val commitFile: File by lazy {
-        SkyHanniMod.dataDir.resolve("$repoFolderName.meta.json").toFile()
+        SkyHanniMod.dataDir.resolve("$repoFolderName.meta.json")
     }
 
     /**
@@ -84,7 +84,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * `.minecraft/data/skyhanni/repo.tar.gz`
      */
     private val repoTgzFile: File by lazy {
-        SkyHanniMod.dataDir.resolve("$repoFolderName.tar.gz").toFile()
+        SkyHanniMod.dataDir.resolve("$repoFolderName.tar.gz")
     }
 
     /**
