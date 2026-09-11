@@ -609,14 +609,14 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private fun updateLegacyFiles() {
         legacyRepoDirectory?.let { legacyDirectory ->
             if (legacyDirectory.exists()) {
-                logger.debug("Moving legacy repo directory to: ${repoDirectory.absolutePath}")
+                logger.warn("Moving legacy repo directory to: ${repoDirectory.absolutePath}")
                 legacyDirectory.renameTo(repoDirectory)
             }
         }
 
         legacyCommitFile?.let { legacyFile ->
             if (legacyFile.exists()) {
-                logger.debug("Moving legacy commit file to: ${commitFile.absolutePath}")
+                logger.warn("Moving legacy commit file to: ${commitFile.absolutePath}")
                 legacyFile.renameTo(commitFile)
             }
         }
