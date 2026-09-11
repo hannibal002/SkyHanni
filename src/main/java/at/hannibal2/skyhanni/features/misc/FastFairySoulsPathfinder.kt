@@ -48,8 +48,6 @@ object FastFairySoulsPathfinder {
     private val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound
         ?: mutableMapOf()
 
-    private var islandSoulInfo = mapOf<Int, FairySoulApi.IslandSoulInfo>() // slot id -> (soulsfound, soulstotal)
-
     private var data: Data? = null
 
     private val pathfindCoroutine = CoroutineSettings("fairy souls pathfind")
@@ -205,7 +203,7 @@ object FastFairySoulsPathfinder {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Fairy Souls Guide") return
 
-        islandSoulInfo = FairySoulApi.getIslandSoulInfo(event.inventoryItems)
+        val islandSoulInfo = FairySoulApi.getIslandSoulInfo(event.inventoryItems)
 
         for (islandSlot in islandSoulInfo.keys) {
             val islandType = islandSoulInfo[islandSlot]?.islandType ?: continue
