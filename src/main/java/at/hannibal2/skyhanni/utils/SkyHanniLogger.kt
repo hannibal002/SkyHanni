@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.days
 open class SkyHanniLogger(private val filePath: String) {
 
     private val format = SimpleDateFormat("HH:mm:ss")
-    private val logFilePath: File by lazy { timedFormattedDir.resolve("$filePath.log") }
+    private val logFile: File by lazy { timedFormattedDir.resolve("$filePath.log") }
 
     companion object {
         private var deletedExpired = false
@@ -27,8 +27,8 @@ open class SkyHanniLogger(private val filePath: String) {
     private val logger: Logger by lazy {
         Logger.getLogger("SkyHanni-Logger-" + System.nanoTime()).apply {
             try {
-                logFilePath.parentFile?.takeIf { !it.isDirectory }?.mkdirs()
-                FileHandler(logFilePath.path).apply {
+                logFile.parentFile?.takeIf { !it.isDirectory }?.mkdirs()
+                FileHandler(logFile.path).apply {
                     encoding = Charsets.UTF_8.name()
                     formatter = object : Formatter() {
                         override fun format(logRecord: LogRecord) = "${format.formatCurrentTime()} ${logRecord.message}\n"
