@@ -60,36 +60,4 @@ object FairySoulApi {
 
         return remainingMap.toMap()
     }
-
-    /*
-    fun getIslandSoulInfo(inventoryItems: Map<Int, SafeItemStack>): Map<Int, IslandSoulInfo> {
-        val remainingMap = mutableMapOf<Int, IslandSoulInfo>()
-
-        for ((slot, item) in inventoryItems) {
-            val lore = item.getCleanLore()
-            val islandName = item.cleanName
-            val islandType = IslandType.getByNameOrNull(item.cleanName) ?: run {
-                if (islandName == "Safari") {
-                    IslandType.SAFARI
-                } else if (islandName == "Miscellaneous") {
-                    IslandType.NONE
-                } else continue
-            }
-
-            if (islandName == "") continue
-
-            var soulsTotal = 0
-            var soulsFound = 0
-
-            questMenuPattern.firstMatcher(lore) {
-                soulsFound = group("soulsFound").toInt()
-                soulsTotal = group("soulsTotal").toInt()
-            }
-
-            remainingMap[slot] = IslandSoulInfo(soulsFound, soulsTotal, soulsTotal - soulsFound, islandName, islandType)
-        }
-
-        return remainingMap.toMap()
-    }
-    */
 }
