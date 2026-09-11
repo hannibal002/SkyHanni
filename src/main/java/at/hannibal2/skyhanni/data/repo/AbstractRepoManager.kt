@@ -605,21 +605,47 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private fun deleteArchiveFiles() {
         repoTgzFile.delete()
     }
-
     private fun updateLegacyFiles() {
         legacyRepoDirectory?.let { legacyDirectory ->
-            if (legacyDirectory.exists()) {
-                logger.warn("Moving legacy repo directory to: ${repoDirectory.absolutePath}")
-                legacyDirectory.renameTo(repoDirectory)
+            if (!legacyDirectory.exists()) return@let
+            logger.warn("Migrating legacy repo directory to: ${repoDirectory.absolutePath}")
+            repoDirectory.mkdirs()
+
+            val copied = legacyDirectory.copyRecursively(
+                target = repoDirectory,
+                overwrite = false,
+                onError = { _, exception ->
+                    if (exception is FileAlreadyExistsException) {
+                        OnErrorAction.SKIP
+                    } else {
+                        OnErrorAction.TERMINATE
+                    }
+                }
+            )
+
+            if (copied) {
+                legacyDirectory.deleteRecursively()
+            } else {
+                logger.error("Failed to copy legacy repo directory from ${legacyDirectory.absolutePath}")
             }
         }
 
         legacyCommitFile?.let { legacyFile ->
-            if (legacyFile.exists()) {
-                logger.warn("Moving legacy commit file to: ${commitFile.absolutePath}")
-                legacyFile.renameTo(commitFile)
+            if (!legacyFile.exists()) return@let
+            if (commitFile.exists()) {
+                legacyFile.delete()
+                return@let
+            }
+            logger.warn("Moving legacy commit file to: ${commitFile.absolutePath}")
+            commitFile.parentFile?.mkdirs()
+            runCatching {
+                Files.move(legacyFile.toPath(), commitFile.toPath())
+            }.onFailure {
+                runCatching { legacyFile.copyTo(commitFile, overwrite = false) }
+                legacyFile.delete()
             }
         }
+
         legacyRepoZipFile.delete()
     }
 
