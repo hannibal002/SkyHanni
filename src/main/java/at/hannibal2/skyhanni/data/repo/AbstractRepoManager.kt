@@ -605,6 +605,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private fun deleteArchiveFiles() {
         repoTgzFile.delete()
     }
+
     private fun updateLegacyFiles() {
         legacyRepoDirectory?.let { legacyDirectory ->
             if (!legacyDirectory.exists()) return@let
