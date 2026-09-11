@@ -106,10 +106,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         legacyConfigDirectory?.resolve("currentCommit.json")
     }
 
-    private val legacyRepoZipFile: File? by lazy {
-        legacyRepoDirectory?.resolve("$commonShortName-repo-${config.location.defaultBranch}.zip")
-    }
-
     @PublishedApi
     internal val logger by lazy { RepoLogger(this) }
 
@@ -646,8 +642,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                 legacyFile.delete()
             }
         }
-
-        legacyRepoZipFile?.delete()
     }
 
     internal fun dumpDiagnosticsToLog(vararg extraData: Pair<String, Any?>) = with(logger) {
