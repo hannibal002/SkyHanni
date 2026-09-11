@@ -14,15 +14,14 @@ import kotlin.time.Duration.Companion.days
 open class SkyHanniLogger(private val filePath: String) {
 
     private val format = SimpleDateFormat("HH:mm:ss")
-    internal open val logsDir = SkyHanniMod.logsDir
-    internal open val timedFormattedDir by lazy { "$logsDir/$fullFormat" }
-    private val logFileName by lazy { "$timedFormattedDir/$filePath.log" }
+    private val logFileName by lazy {
+        "${SkyHanniMod.logsDir}/" +
+            "${SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()}/" +
+            "$filePath.log"
+    }
 
     companion object {
         private var deletedExpired = false
-        private val fullFormat by lazy {
-            SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()
-        }
     }
 
     @Suppress("PrintStackTrace")
@@ -43,7 +42,7 @@ open class SkyHanniLogger(private val filePath: String) {
 
             if (!deletedExpired && SkyBlockUtils.onHypixel) {
                 deletedExpired = true
-                OSUtils.deleteExpiredFiles(logsDir, SkyHanniMod.feature.dev.logExpiryTime.days)
+                OSUtils.deleteExpiredFiles(SkyHanniMod.logsDir, SkyHanniMod.feature.dev.logExpiryTime.days)
             }
         }
     }
