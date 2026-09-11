@@ -28,26 +28,18 @@ object PlatformUtils {
         FabricLoader.getInstance().isDevelopmentEnvironment
     }
 
-    @JvmStatic
-    @get:JvmName("gameDir")
     val gameDir: Path by lazy {
         FabricLoader.getInstance().gameDir
     }
 
-    @JvmStatic
-    @get:JvmName("dataDir")
     val dataDir: Path by lazy {
         gameDir.resolve("data")
     }
 
-    @JvmStatic
-    @get:JvmName("configDir")
     val configDir: Path by lazy {
-        gameDir.resolve("config")
+        FabricLoader.getInstance().configDir
     }
 
-    @JvmStatic
-    @get:JvmName("logsDir")
     val logsDir: Path by lazy {
         dataDir.resolve("logs")
     }
