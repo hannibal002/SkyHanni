@@ -20,8 +20,9 @@ open class SkyHanniLogger(private val filePath: String) {
         private var deletedExpired = false
 
         private val format = SimpleDateFormat("HH:mm:ss")
-        private val timedFormattedDir =
+        private val timedFormattedDir: Path by lazy {
             SkyHanniMod.logsDir.toPath().resolve(SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime())
+        }
     }
 
     @Suppress("PrintStackTrace")
