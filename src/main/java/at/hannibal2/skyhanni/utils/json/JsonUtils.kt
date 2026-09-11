@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.utils.StringFileHandler
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
@@ -53,15 +52,6 @@ fun File.writeJson(json: JsonElement, gson: Gson = ConfigManager.gson): Boolean 
     ).use { it.write(gson.toJson(json)) }
     true
 }.getOrElse { return false }
-
-fun StringFileHandler.getJson(gson: Gson = ConfigManager.gson): JsonElement? = runCatching {
-    gson.fromJson(load(), JsonElement::class.java)
-}.getOrNull()
-
-fun StringFileHandler.writeJson(json: JsonElement, gson: Gson = ConfigManager.gson): Boolean = runCatching {
-    save(gson.toJson(json))
-    true
-}.getOrElse { false }
 
 /**
  * Straight forward deep copy. This is included in gson as well, but different versions have it exposed privately instead of publicly,
