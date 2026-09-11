@@ -3,24 +3,23 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.TimeUtils.formatCurrentTime
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import java.nio.file.Path
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.logging.FileHandler
 import java.util.logging.Formatter
 import java.util.logging.LogRecord
 import java.util.logging.Logger
-import kotlin.io.path.pathString
 import kotlin.time.Duration.Companion.days
 
 open class SkyHanniLogger(private val filePath: String) {
 
     private val format = SimpleDateFormat("HH:mm:ss")
-    private val logFilePath: Path by lazy { timedFormattedDir.resolve("$filePath.log") }
+    private val logFilePath: File by lazy { timedFormattedDir.resolve("$filePath.log") }
 
     companion object {
         private var deletedExpired = false
-        private val timedFormattedDir: Path by lazy {
-            SkyHanniMod.logsDir.toPath().resolve(SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime())
+        private val timedFormattedDir: File by lazy {
+            SkyHanniMod.logsDir.resolve(SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime())
         }
     }
 
@@ -28,8 +27,8 @@ open class SkyHanniLogger(private val filePath: String) {
     private val logger: Logger by lazy {
         Logger.getLogger("SkyHanni-Logger-" + System.nanoTime()).apply {
             try {
-                logFilePath.toFile().parentFile?.takeIf { !it.isDirectory }?.mkdirs()
-                FileHandler(logFilePath.pathString).apply {
+                logFilePath.parentFile?.takeIf { !it.isDirectory }?.mkdirs()
+                FileHandler(logFilePath.path).apply {
                     encoding = Charsets.UTF_8.name()
                     formatter = object : Formatter() {
                         override fun format(logRecord: LogRecord) = "${format.formatCurrentTime()} ${logRecord.message}\n"
