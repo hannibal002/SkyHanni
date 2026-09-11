@@ -134,9 +134,9 @@ object DianaProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = HUB)
     private fun onItemAdd(event: ItemAddEvent) {
-        if (!(DianaApi.isDoingDiana())) return
+        if (!DianaApi.isDoingDiana()) return
         val isCommand = event.source == ItemAddManager.Source.COMMAND
         if (isCommand && !config.enabled) return
 
