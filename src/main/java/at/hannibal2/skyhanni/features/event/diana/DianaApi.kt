@@ -25,13 +25,11 @@ import net.minecraft.client.player.RemotePlayer
 
 @SkyHanniModule
 object DianaApi {
-    private var holdingSpade = false
-
     private var spades = emptySet<NeuInternalName>()
 
     private var ritualActiveOverride: Boolean? = null
 
-    fun hasSpadeInHand() = holdingSpade
+    fun hasSpadeInHand() = InventoryUtils.itemInHandId in spades
 
     fun isRitualActive(): Boolean {
         ritualActiveOverride?.let { return it }
@@ -98,14 +96,9 @@ object DianaApi {
         }
     }
 
-    @HandleEvent(onlyOnIsland = HUB, priority = HandleEvent.HIGH)
-    private fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        holdingSpade = event.newItem.isDianaSpade
-    }
-
     @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.HIGHEST)
     private fun onItemClick(event: ItemClickEvent) {
-        if (!holdingSpade) return
+        if (!hasSpadeInHand()) return
         if (event.clickType != RIGHT_CLICK) return
 
         if (ritualActiveOverride != false) {
