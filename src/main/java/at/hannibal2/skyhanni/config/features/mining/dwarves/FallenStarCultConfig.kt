@@ -16,7 +16,7 @@ class FallenStarCultConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    var enabled: Boolean = false
 
     @Expose
     @ConfigOption(
