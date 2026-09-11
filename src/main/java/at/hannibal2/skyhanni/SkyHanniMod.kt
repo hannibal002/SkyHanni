@@ -150,6 +150,10 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
         PlatformUtils.configDir.resolve(MODID).toFile()
     }
 
+    val logsDir: File by lazy {
+        PlatformUtils.logsDir.resolve(MODID).toFile()
+    }
+
     val modules: MutableList<Any> = ArrayList()
 
     var screenToOpen: Screen? = null

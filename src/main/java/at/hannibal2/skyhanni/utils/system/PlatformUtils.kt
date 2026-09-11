@@ -46,6 +46,12 @@ object PlatformUtils {
         gameDir.resolve("config")
     }
 
+    @JvmStatic
+    @get:JvmName("logsDir")
+    val logsDir: Path by lazy {
+        dataDir.resolve("logs")
+    }
+
     private val allowedFabricReports = setOf(
         "fabricloader",
         "fabric-api",
