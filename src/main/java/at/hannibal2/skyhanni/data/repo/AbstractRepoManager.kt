@@ -98,14 +98,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         RepoCommitStorage(commitFile)
     }
 
-    private val legacyRepoDirectory: File? by lazy {
-        legacyConfigDirectory?.resolve("repo")
-    }
-
-    private val legacyCommitFile: File? by lazy {
-        legacyConfigDirectory?.resolve("currentCommit.json")
-    }
-
     @PublishedApi
     internal val logger by lazy { RepoLogger(this) }
 
@@ -603,8 +595,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     private fun updateLegacyFiles() {
+        val configDirectory = legacyConfigDirectory ?: return
+
+        val legacyRepoDirectory = configDirectory.resolve("repo").takeIf { it.exists() }
         legacyRepoDirectory?.let { legacyDirectory ->
-            if (!legacyDirectory.exists()) return@let
             logger.warn("Migrating legacy repo directory to: ${repoDirectory.absolutePath}")
             repoDirectory.mkdirs()
 
@@ -627,8 +621,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             }
         }
 
+        val legacyCommitFile = configDirectory.resolve("currentCommit.json").takeIf { it.exists() }
         legacyCommitFile?.let { legacyFile ->
-            if (!legacyFile.exists()) return@let
             if (commitFile.exists()) {
                 legacyFile.delete()
                 return@let
