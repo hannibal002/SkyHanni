@@ -63,9 +63,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * For example:
      * `.minecraft/data/skyhanni/repo` or `.minecraft/data/skyhanni/neurepo`
      */
-    val repoDirectory: File by lazy {
-        SkyHanniMod.dataDir.resolve(repoFolderName)
-    }
+    val repoDirectory: File = SkyHanniMod.dataDir.resolve(repoFolderName)
 
     /**
      * Stores the currently checked-out commit for this repo.
@@ -73,9 +71,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * For example:
      * `.minecraft/data/skyhanni/repo.meta.json`
      */
-    val commitFile: File by lazy {
-        SkyHanniMod.dataDir.resolve("$repoFolderName.meta.json")
-    }
+    val commitFile: File = SkyHanniMod.dataDir.resolve("$repoFolderName.meta.json")
 
     /**
      * Local archive of the repo's default branch.
@@ -83,9 +79,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * For example:
      * `.minecraft/data/skyhanni/repo.tar.gz`
      */
-    private val repoTgzFile: File by lazy {
-        SkyHanniMod.dataDir.resolve("$repoFolderName.tar.gz")
-    }
+    private val repoTgzFile: File = SkyHanniMod.dataDir.resolve("$repoFolderName.tar.gz")
 
     /**
      * Stores commit metadata for this repo.
