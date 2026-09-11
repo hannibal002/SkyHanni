@@ -142,11 +142,17 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
 
-    val dataDir: File = PlatformUtils.dataDir.resolve(MODID).toFile()
+    val dataDir: File by lazy {
+        PlatformUtils.dataDir.resolve(MODID).toFile()
+    }
 
-    val configDir: File = PlatformUtils.configDir.resolve(MODID).toFile()
+    val configDir: File by lazy {
+        PlatformUtils.configDir.resolve(MODID).toFile()
+    }
 
-    val logsDir: File = PlatformUtils.logsDir.resolve(MODID).toFile()
+    val logsDir: File by lazy {
+        PlatformUtils.logsDir.resolve(MODID).toFile()
+    }
 
     val modules: MutableList<Any> = ArrayList()
 
