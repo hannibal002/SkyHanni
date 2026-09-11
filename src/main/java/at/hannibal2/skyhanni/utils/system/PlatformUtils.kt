@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.MarkdownBuilder
@@ -21,40 +20,20 @@ import kotlin.system.exitProcess
  */
 @SkyHanniModule
 object PlatformUtils {
-    private val platform: Platform =
-        if (runCatching { Class.forName("org.junit.jupiter.api.Test") }.isSuccess) {
-            TestPlatform()
-        } else {
-            FabricPlatform()
-        }
 
-    val MC_VERSION: String
-        get() = platform.mcVersion
+    val MC_VERSION: String = SharedConstants.getCurrentVersion().name()
 
     @JvmStatic
     @get:JvmName("isDevEnvironment")
-    val isDevEnvironment: Boolean
-        get() = platform.isDevEnvironment
+    val isDevEnvironment: Boolean = FabricLoader.getInstance().isDevelopmentEnvironment
 
-    val gameDir: Path
-        get() = platform.gameDir
+    val gameDir: Path = FabricLoader.getInstance().gameDir
 
-    val dataDir: Path
-        get() = platform.dataDir
+    val dataDir: Path = gameDir.resolve("data")
 
-    val configDir: Path
-        get() = platform.configDir
+    val configDir: Path = FabricLoader.getInstance().configDir
 
-    val logsDir: Path
-        get() = platform.logsDir
-
-    fun shutdownMinecraft(reason: String? = null) =
-        platform.shutdownMinecraft(reason)
-
-    fun isModInstalled(modId: String): Boolean =
-        platform.isModInstalled(modId)
-
-    fun getLoadedMods(): List<ModInstance> = platform.getLoadedMods()
+    val logsDir: Path = dataDir.resolve("logs")
 
     private val allowedFabricReports = setOf(
         "fabricloader",
@@ -90,6 +69,21 @@ object PlatformUtils {
         }
     }
 
+    private fun getLoadedMods(): List<ModInstance> = buildList {
+        FabricLoader.getInstance().allMods.forEach {
+            if (it.origin.toString().contains(":META-INF")) return@forEach
+            val origin = it.origin.toString().substringAfterLast('\\')
+            add(ModInstance(it.metadata.id, it.metadata.name, it.metadata.version.toString(), origin))
+        }
+    }
+
+    fun shutdownMinecraft(reason: String? = null) {
+        val reasonLine = reason?.let { " Reason: $it" }.orEmpty()
+        System.err.println("SkyHanni-${VersionConstants.MOD_VERSION} ${"forced the game to shutdown.$reasonLine"}")
+
+        exitProcess(-1)
+    }
+
     private fun getModFromPackage(packageName: String?): ModInstance? {
         packageName ?: return null
         if (packageName.startsWith("at.hannibal2.skyhanni")) return ModInstance("skyhanni", "SkyHanni", VersionConstants.MOD_VERSION, "")
@@ -97,6 +91,10 @@ object PlatformUtils {
     }
 
     fun Class<*>.getModInstance(): ModInstance? = getModFromPackage(canonicalName?.substringBeforeLast('.'))
+
+    fun isModInstalled(modId: String): Boolean {
+        return FabricLoader.getInstance().isModLoaded(modId)
+    }
 
     fun isMcAbove(version: String): Boolean {
         return MCVersion.fromString(version) > MCVersion.currentMcVersion
@@ -121,3 +119,5 @@ object PlatformUtils {
         return dumpDirective
     }
 }
+
+data class ModInstance(val id: String, val name: String, val version: String, val sourceJar: String)
