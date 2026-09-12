@@ -15,7 +15,7 @@ import net.minecraft.core.registries.BuiltInRegistries
  * suppresses the particle later in the packet handler, after other mixins have
  * had a chance to process it.
  *
- * Runs on the network thread.
+ * Runs on the render thread.
  * Will only fire if the player is in the world
  *
  * @param type the particle type
@@ -36,7 +36,6 @@ class ParticleEvent(
     val longDistance: Boolean,
     val particleArgs: IntArray? = null,
 ) : CancellableWorldEvent() {
-
     val distanceToPlayer by lazy { location.distanceToPlayer() }
 
     override fun toString(): String {
