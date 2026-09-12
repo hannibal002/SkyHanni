@@ -46,18 +46,18 @@ class ChatConfig {
     @ConfigEditorDraggableList
     val dungeonFilteredMessageTypes: MutableList<DungeonMessageTypes> = mutableListOf()
 
-    enum class DungeonMessageTypes(private val displayName: String) {
-        PREPARE("§bPreparation"),
-        START("§aClass Buffs §r/ §cMort Dialogue"),
-        AMBIENCE("§bAmbience"),
-        PICKUP("§ePickup"),
-        REMINDER("§cReminder"),
-        BUFF("§dBlessings"),
-        NOT_POSSIBLE("§cNot possible"),
-        DAMAGE("§cDamage"),
-        ABILITY("§dAbilities"),
-        PUZZLE("§dPuzzle §r/ §cQuiz"),
-        END("§cEnd §a(End of run spam)"),
+    enum class DungeonMessageTypes(private val displayName: String, val blockReason: String) {
+        PREPARE("§bPreparation", "prepare"),
+        START("§aClass Buffs §r/ §cMort Dialogue", "start"),
+        AMBIENCE("§bAmbience", "ambience"),
+        PICKUP("§ePickup", "pickup"),
+        REMINDER("§cReminder", "reminder"),
+        BUFF("§dBlessings", "buff"),
+        NOT_POSSIBLE("§cNot possible", "not_possible"),
+        DAMAGE("§cDamage", "damage"),
+        ABILITY("§dAbilities", "ability"),
+        PUZZLE("§dPuzzle §r/ §cQuiz", "puzzle"),
+        END("§cEnd §a(End of run spam)", "end"),
         ;
 
         override fun toString() = displayName
