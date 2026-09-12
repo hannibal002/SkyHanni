@@ -26,7 +26,6 @@ import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object TreeProgressDisplay {
-
     private val config get() = SkyHanniMod.feature.foraging.trees.progress
 
     private data class TreeProgressDisplay(
@@ -97,8 +96,8 @@ object TreeProgressDisplay {
     }
 
     private fun ComponentMatcher.formatCompact(): Component {
-        val treeType = componentOrThrow("treeType")
-        val percent = groupOrThrow("percent")
+        val treeType = component("treeType")
+        val percent = group("percent")
         val percentStyle = percent.sampleStyleAtStart()
 
         return componentBuilder {

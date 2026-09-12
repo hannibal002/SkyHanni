@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data.hypixel.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
+import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig.MessagePart
 import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentSpan
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.applyFormattingFrom
@@ -62,7 +61,7 @@ object PlayerNameFormatter {
     )
 
     @HandleEvent
-    fun onPlayerAllChat(event: PlayerAllChatEvent.Modify) {
+    private fun onPlayerAllChat(event: PlayerAllChatEvent.Modify) {
         if (!isEnabled()) return
         val levelColor = event.levelColor
         val levelComponent = event.levelComponent
@@ -86,7 +85,7 @@ object PlayerNameFormatter {
         all.append(": ")
         all.append(chatColor.asComponent())
         all.append(
-            if (config.sameChatColor) message.intoComponent().changeColor(LorenzColor.WHITE)
+            if (config.sameChatColor) message.intoComponent().changeColor(WHITE)
             else message.intoComponent(),
         )
         val component = StringUtils.replaceIfNeeded(event.chatComponent, all) ?: return
@@ -94,7 +93,7 @@ object PlayerNameFormatter {
     }
 
     @HandleEvent
-    fun onCoopChat(event: CoopChatEvent.Modify) {
+    private fun onCoopChat(event: CoopChatEvent.Modify) {
         if (!isEnabled()) return
         val component = StringUtils.replaceIfNeeded(
             event.chatComponent,
@@ -108,7 +107,7 @@ object PlayerNameFormatter {
     }
 
     @HandleEvent
-    fun onGuildChat(event: GuildChatEvent.Modify) {
+    private fun onGuildChat(event: GuildChatEvent.Modify) {
         if (!isEnabled()) return
         val component = StringUtils.replaceIfNeeded(
             event.chatComponent,
@@ -122,7 +121,7 @@ object PlayerNameFormatter {
     }
 
     @HandleEvent
-    fun onPartyChat(event: PartyChatEvent.Modify) {
+    private fun onPartyChat(event: PartyChatEvent.Modify) {
         if (!isEnabled()) return
         val component = StringUtils.replaceIfNeeded(
             event.chatComponent,
@@ -136,7 +135,7 @@ object PlayerNameFormatter {
     }
 
     @HandleEvent
-    fun onPrivateChat(event: PrivateMessageChatEvent.Modify) {
+    private fun onPrivateChat(event: PrivateMessageChatEvent.Modify) {
         if (!isEnabled()) return
         val component = StringUtils.replaceIfNeeded(
             event.chatComponent,
@@ -145,7 +144,7 @@ object PlayerNameFormatter {
                 append(nameFormat(event.authorComponent))
                 append("§f: ")
                 append(
-                    if (config.sameChatColor) event.messageComponent.intoComponent().changeColor(LorenzColor.WHITE)
+                    if (config.sameChatColor) event.messageComponent.intoComponent().changeColor(WHITE)
                     else event.messageComponent.intoComponent(),
                 )
             },
@@ -154,7 +153,7 @@ object PlayerNameFormatter {
     }
 
     @HandleEvent
-    fun onPlayerShowItemChat(event: PlayerShowItemChatEvent.Modify) {
+    private fun onPlayerShowItemChat(event: PlayerShowItemChatEvent.Modify) {
         if (!isEnabled()) return
         val component = StringUtils.replaceIfNeeded(
             event.chatComponent,
@@ -168,7 +167,7 @@ object PlayerNameFormatter {
                 )
 
                 append(" ")
-                append(event.action.intoComponent().changeColor(LorenzColor.GRAY))
+                append(event.action.intoComponent().changeColor(GRAY))
 
                 append(" ")
                 append(event.item.intoComponent())
@@ -189,8 +188,8 @@ object PlayerNameFormatter {
 
         var emblemFormat: Component? = null
         emblemPattern.matchStyledMatcher(author) {
-            emblemFormat = componentOrThrow("emblem")
-            cleanAuthor = groupOrThrow("author").stripHypixelMessage()
+            emblemFormat = component("emblem")
+            cleanAuthor = group("author").stripHypixelMessage()
         }
 
         val name = formatAuthor(cleanAuthor, levelColor)
@@ -207,16 +206,17 @@ object PlayerNameFormatter {
             listOf(faction, ironman, bingo)
         } ?: listOf(null, null, null)
 
-        val map = mutableMapOf<PlayerMessagesConfig.MessagePart, Component?>()
-        map[PlayerMessagesConfig.MessagePart.SKYBLOCK_LEVEL] = levelFormat
-        map[PlayerMessagesConfig.MessagePart.EMBLEM] = emblemFormat
-        map[PlayerMessagesConfig.MessagePart.PLAYER_NAME] = name.intoComponent()
-        map[PlayerMessagesConfig.MessagePart.CRIMSON_FACTION] = faction
-        map[PlayerMessagesConfig.MessagePart.MODE_IRONMAN] = ironman
-        map[PlayerMessagesConfig.MessagePart.BINGO_LEVEL] = bingo
-        map[PlayerMessagesConfig.MessagePart.GUILD_RANK] = guildRankFormat
-        map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_RANK] = privateIslandRankFormat
-        map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_GUEST] = privateIslandGuestFormat
+        val map = mapOf(
+            MessagePart.SKYBLOCK_LEVEL to levelFormat,
+            MessagePart.EMBLEM to emblemFormat,
+            MessagePart.PLAYER_NAME to name.intoComponent(),
+            MessagePart.CRIMSON_FACTION to faction,
+            MessagePart.MODE_IRONMAN to ironman,
+            MessagePart.BINGO_LEVEL to bingo,
+            MessagePart.GUILD_RANK to guildRankFormat,
+            MessagePart.PRIVATE_ISLAND_RANK to privateIslandRankFormat,
+            MessagePart.PRIVATE_ISLAND_GUEST to privateIslandGuestFormat,
+        )
 
         val components = config.partsOrder.mapNotNull { map[it] }
         components.find { it.unformattedTextCompat().endsWith(" ") }?.let {
@@ -292,7 +292,7 @@ object PlayerNameFormatter {
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(41, "chat.PlayerMessagesConfig.partsOrder") { element ->
             val newList = JsonArray()
             for (entry in element.asJsonArray) {
