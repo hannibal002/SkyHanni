@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager.isChroma
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Style
@@ -37,7 +38,6 @@ object OrderedTextUtils {
 
     @JvmStatic
     fun legacyTextToOrderedText(legacyString: String): FormattedCharSequence {
-
         return legacyToTextCache.getOrPut(legacyString) {
             val isNoReplace = legacyString.startsWith("§§")
 
@@ -70,10 +70,9 @@ object OrderedTextUtils {
         if (((from.color != to.color) && to.color != null) || (reset && to.color != null)) {
             if (!exclusive) sb.append(ChatFormatting.RESET.toString())
 
-            if (to.color?.name == "chroma") {
+            if (to.color?.isChroma() == true) {
                 sb.append("§z")
             } else {
-
                 val colorFormatting = to.color?.toChatFormatting()
 
                 if (colorFormatting != null) {
