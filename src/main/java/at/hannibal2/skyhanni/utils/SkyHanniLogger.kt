@@ -14,12 +14,11 @@ import kotlin.time.Duration.Companion.days
 
 open class SkyHanniLogger(private val filePath: String) {
 
-    private val logFilePath: Path by lazy {
+    private val logFilePath: Path =
         SkyHanniMod.logsDir
             .toPath()
             .resolve(startTimeFormatted)
             .resolve("$filePath.log")
-    }
 
     companion object {
         private var deletedExpired = false
