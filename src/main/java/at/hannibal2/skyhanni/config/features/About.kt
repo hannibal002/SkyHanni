@@ -36,9 +36,9 @@ class About {
     @Expose
     val licenses: Licenses = Licenses()
 
-    enum class UpdateStream(private val label: String, val stream: String) {
-        BETA("Beta", "pre"),
-        RELEASES("Full", "full");
+    enum class UpdateStream(private val label: String) {
+        BETA("Beta"),
+        RELEASES("Full");
 
         override fun toString() = label
 
@@ -69,10 +69,6 @@ class About {
         @ConfigOption(name = "Fabric API", desc = "Fabric API is available under the Apache-2.0 license")
         @ConfigEditorButton(buttonText = "Source")
         val fabricApi: Runnable = Runnable { openBrowser("https://github.com/FabricMC/fabric-api") }
-
-        @ConfigOption(name = "LibAutoUpdate", desc = "LibAutoUpdate is available under the BSD 2 Clause License")
-        @ConfigEditorButton(buttonText = "Source")
-        val libAutoUpdate: Runnable = Runnable { openBrowser("https://github.com/nea89o/libautoupdate") }
 
         @ConfigOption(name = "Mixin", desc = "Mixin is available under the MIT License")
         @ConfigEditorButton(buttonText = "Source")
