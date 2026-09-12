@@ -26,12 +26,12 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -458,7 +458,7 @@ object PestApi {
             return
         }
         val disabled = with(config.pestFinder) {
-            !showDisplay && !showPlotInWorld && teleportHotkey == KeyboardManager.KEY_UNKNOWN
+            !showDisplay && !showPlotInWorld && teleportHotkey == InputCode.UNKNOWN
         }
         if (disabled) {
             event.addIrrelevant("disabled in config")

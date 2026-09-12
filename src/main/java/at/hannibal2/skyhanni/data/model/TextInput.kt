@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.model
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
-import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.KeyMapping
 import org.apache.commons.lang3.SystemUtils
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
@@ -91,7 +91,7 @@ open class TextInput {
 
         fun onGuiInput(ci: CallbackInfoReturnable<Boolean>) {
             if (activeInstance != null) {
-                if (InputConstants.KEY_ESCAPE.isKeyHeld()) {
+                if (InputCode.KEY_ESCAPE.isKeyHeld()) {
                     disable()
                 } else {
                     ci.returnValue = false
@@ -138,11 +138,11 @@ open class TextInput {
             }
             val carriage = carriage
 
-            if (InputConstants.KEY_LEFT.isKeyClicked()) {
+            if (InputCode.KEY_LEFT.isKeyClicked()) {
                 this.carriage = carriage?.moveCarriageLeft() ?: (textBox.length - 1)
                 return
             }
-            if (InputConstants.KEY_RIGHT.isKeyClicked()) {
+            if (InputCode.KEY_RIGHT.isKeyClicked()) {
                 this.carriage = when {
                     carriage == null -> null
                     (carriage >= textBox.length - 1) -> null
@@ -150,7 +150,7 @@ open class TextInput {
                 }
                 return
             }
-            if (InputConstants.KEY_BACKSPACE.isKeyClicked() || (SystemUtils.IS_OS_MAC && InputConstants.KEY_DELETE.isKeyClicked())) {
+            if (InputCode.KEY_BACKSPACE.isKeyClicked() || (SystemUtils.IS_OS_MAC && InputCode.KEY_DELETE.isKeyClicked())) {
                 textBox = onRemove()
                 updated()
                 return

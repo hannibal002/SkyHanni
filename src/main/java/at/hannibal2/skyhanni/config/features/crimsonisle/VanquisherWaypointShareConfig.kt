@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.config.features.crimsonisle
 
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
-import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class VanquisherWaypointShareConfig {
@@ -21,8 +21,8 @@ class VanquisherWaypointShareConfig {
 
     @Expose
     @ConfigOption(name = "Keybind Share", desc = "Manually share your Vanquisher spawns with a keybind.")
-    @ConfigEditorKeybind(defaultKey = InputConstants.KEY_Y)
-    var keybindSharing: Int = InputConstants.KEY_Y
+    @ConfigEditorKeymapping(defaultKey = KEY_Y)
+    var keybindSharing = InputCode.KEY_Y
 
     @Expose
     @ConfigOption(name = "Read Global Chat", desc = "Register Vanquisher spawns from All Chat.")

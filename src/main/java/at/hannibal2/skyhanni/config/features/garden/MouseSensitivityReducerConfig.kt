@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.config.features.garden
 
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.garden.MouseSensitivityReducer.AutoEnableMode
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
-import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -33,8 +33,8 @@ class MouseSensitivityReducerConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "When selected above, press this key to reduce the mouse sensitivity.")
-    @ConfigEditorKeybind(defaultKey = InputConstants.KEY_N)
-    var keybind: Int = InputConstants.KEY_N
+    @ConfigEditorKeymapping(defaultKey = KEY_N)
+    var keybind = InputCode.KEY_N
 
     @Expose
     @ConfigOption(name = "Show GUI", desc = "Show the GUI element while the feature is enabled.")

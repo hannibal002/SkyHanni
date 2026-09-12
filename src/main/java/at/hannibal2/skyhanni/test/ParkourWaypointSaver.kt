@@ -57,6 +57,7 @@ object ParkourWaypointSaver {
                 locations.add(newLocation)
                 update()
             }
+            else -> return
         }
     }
 

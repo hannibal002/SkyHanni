@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.config.features.event.diana
 
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
-import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -135,8 +135,8 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(name = "Warp Key", desc = "Press this key to warp to the nearest burrow waypoint.")
-    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
-    var keyBindWarp: Int = KeyboardManager.KEY_UNKNOWN
+    @ConfigEditorKeymapping
+    var keyBindWarp = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(

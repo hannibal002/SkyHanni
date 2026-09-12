@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.config.features.mining.glacite
 
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -49,8 +49,8 @@ class TunnelMapsConfig {
         name = "Campfire Hotkey",
         desc = "Hotkey to warp to the campfire. If the travel scroll is not unlocked, show a path to the campfire instead."
     )
-    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
-    var campfireKey: Int = KeyboardManager.KEY_UNKNOWN
+    @ConfigEditorKeymapping
+    var campfireKey = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(
@@ -62,8 +62,8 @@ class TunnelMapsConfig {
 
     @Expose
     @ConfigOption(name = "Next Spot Hotkey", desc = "Hotkey to select the next spot.")
-    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
-    var nextSpotHotkey: Int = KeyboardManager.KEY_UNKNOWN
+    @ConfigEditorKeymapping
+    var nextSpotHotkey = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Left Click Pigeon", desc = "Left click the Royal Pigeon to go to the next spot.")

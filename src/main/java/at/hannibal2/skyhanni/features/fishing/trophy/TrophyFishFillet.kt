@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import com.mojang.blaze3d.platform.InputConstants
 
 @SkyHanniModule
 object TrophyFishFillet {
@@ -35,7 +35,7 @@ object TrophyFishFillet {
         val info = TrophyFishManager.getInfo(trophyFishName) ?: return
         val rarity = TrophyRarity.getByName(trophyRarityName) ?: return
 
-        val multiplier = if (InputConstants.KEY_LSHIFT.isKeyHeld()) event.itemStack.count else 1
+        val multiplier = if (InputCode.KEY_LSHIFT.isKeyHeld()) event.itemStack.count else 1
         val filletValue = info.getFilletValue(rarity) * multiplier
 
         val filletPrice = filletValue * MAGMA_FISH.getPrice()

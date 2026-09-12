@@ -7,12 +7,11 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
@@ -27,8 +26,8 @@ object GardenCustomKeybinds {
     private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getInstance().options
 
-    private var map: Map<KeyMapping, Int> = emptyMap()
-    private val pressedToggleKeys = mutableMapOf<KeyMapping, Int>()
+    private var map: Map<KeyMapping, InputCode> = emptyMap()
+    private val pressedToggleKeys = mutableMapOf<KeyMapping, InputCode>()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
     private var wasActive = false
 
@@ -36,7 +35,7 @@ object GardenCustomKeybinds {
     fun isKeyDown(keyBinding: KeyMapping, isDown: Boolean, cir: CallbackInfoReturnable<Boolean>) {
         if (!updateActiveState()) return
         val override = map[keyBinding] ?: run {
-            if (map.containsValue(keyBinding.key.value)) {
+            if (map.contains(keyBinding)) {
                 cir.returnValue = false
             }
             return
@@ -53,7 +52,7 @@ object GardenCustomKeybinds {
     fun isKeyPressed(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
         if (!updateActiveState()) return
         val override = map[keyBinding] ?: run {
-            if (map.containsValue(keyBinding.key.value)) {
+            if (map.contains(keyBinding)) {
                 cir.returnValue = false
             }
             return
@@ -66,7 +65,7 @@ object GardenCustomKeybinds {
     }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (!isEnabled()) return
         val screen = MinecraftCompat.screen ?: return
         if (screen !is SignEditScreen) return
@@ -74,7 +73,7 @@ object GardenCustomKeybinds {
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(attack, useItem, left, right, forward, back, jump, sneak) {
                 update()
@@ -89,7 +88,7 @@ object GardenCustomKeybinds {
         with(config) {
             with(mcSettings) {
                 map = buildMap {
-                    fun add(keyBinding: KeyMapping, property: Property<Int>) {
+                    fun add(keyBinding: KeyMapping, property: Property<InputCode>) {
                         put(keyBinding, property.get())
                     }
                     add(keyAttack, attack)
@@ -127,10 +126,10 @@ object GardenCustomKeybinds {
     private fun KeyMapping.isToggle(): Boolean =
         this is ToggleKeyMapping && needsToggle.asBoolean
 
-    private fun KeyMapping.isRemappedFrom(override: Int): Boolean =
-        key.value != override
+    private fun KeyMapping.isRemappedFrom(override: InputCode): Boolean =
+        key.value != override.value
 
-    private fun KeyMapping.updateToggleState(override: Int, isDown: Boolean): Boolean {
+    private fun KeyMapping.updateToggleState(override: InputCode, isDown: Boolean): Boolean {
         if (!override.isKeyHeld()) {
             pressedToggleKeys.remove(this, override)
             return isDown
@@ -142,7 +141,8 @@ object GardenCustomKeybinds {
         return !isDown
     }
 
-    private fun KeyMapping.consumeToggleClick(override: Int): Boolean {
+
+    private fun KeyMapping.consumeToggleClick(override: InputCode): Boolean {
         if (!override.isKeyHeld()) {
             pressedToggleKeys.remove(this, override)
             return false
@@ -174,36 +174,39 @@ object GardenCustomKeybinds {
 
     private fun hasGuiOpen() = MinecraftCompat.screen != null
 
+    private fun Map<KeyMapping, InputCode>.contains(value: KeyMapping): Boolean =
+        values.any { it.value == value.key.value }
+
     @JvmStatic
     fun disableAll() {
         with(config) {
-            attack.set(KeyboardManager.KEY_UNKNOWN)
-            useItem.set(KeyboardManager.KEY_UNKNOWN)
-            left.set(KeyboardManager.KEY_UNKNOWN)
-            right.set(KeyboardManager.KEY_UNKNOWN)
-            forward.set(KeyboardManager.KEY_UNKNOWN)
-            back.set(KeyboardManager.KEY_UNKNOWN)
-            jump.set(KeyboardManager.KEY_UNKNOWN)
-            sneak.set(KeyboardManager.KEY_UNKNOWN)
+            attack.set(InputCode.UNKNOWN)
+            useItem.set(InputCode.UNKNOWN)
+            left.set(InputCode.UNKNOWN)
+            right.set(InputCode.UNKNOWN)
+            forward.set(InputCode.UNKNOWN)
+            back.set(InputCode.UNKNOWN)
+            jump.set(InputCode.UNKNOWN)
+            sneak.set(InputCode.UNKNOWN)
         }
     }
 
     @JvmStatic
     fun defaultAll() {
         with(config) {
-            attack.set(KeyboardManager.LEFT_MOUSE)
-            useItem.set(KeyboardManager.RIGHT_MOUSE)
-            left.set(InputConstants.KEY_A)
-            right.set(InputConstants.KEY_D)
-            forward.set(InputConstants.KEY_W)
-            back.set(InputConstants.KEY_S)
-            jump.set(InputConstants.KEY_SPACE)
-            sneak.set(InputConstants.KEY_LSHIFT)
+            attack.set(InputCode.LEFT_MOUSE)
+            useItem.set(InputCode.RIGHT_MOUSE)
+            left.set(InputCode.KEY_A)
+            right.set(InputCode.KEY_D)
+            forward.set(InputCode.KEY_W)
+            back.set(InputCode.KEY_S)
+            jump.set(InputCode.KEY_SPACE)
+            sneak.set(InputCode.KEY_LSHIFT)
         }
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.keyBindEnabled", "garden.keyBind.enabled")
         event.move(3, "garden.keyBindAttack", "garden.keyBind.attack")
         event.move(3, "garden.keyBindUseItem", "garden.keyBind.useItem")

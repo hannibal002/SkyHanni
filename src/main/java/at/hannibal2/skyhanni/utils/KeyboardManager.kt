@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.core.elements.GuiOptionEditorKeyMapping
 import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -10,6 +13,9 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
+import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
+import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.input.InputQuirks
@@ -22,44 +28,32 @@ object KeyboardManager {
     // When a screen closes (e.g. chat closed via Enter), lock Enter so it does not
     // immediately fire as a key click in features that use isKeyClicked().
     @HandleEvent
-    fun onGuiOpen(event: GuiScreenOpenEvent) {
+    private fun onGuiOpen(event: GuiScreenOpenEvent) {
         if (event.gui != null) return
-        if (InputConstants.KEY_RETURN.isKeyHeld()) lockedKeys.add(InputConstants.KEY_RETURN)
-        if (InputConstants.KEY_NUMPADENTER.isKeyHeld()) lockedKeys.add(InputConstants.KEY_NUMPADENTER)
+        if (InputCode.KEY_RETURN.isKeyHeld()) lockedKeys.add(InputCode.KEY_RETURN)
+        if (InputCode.KEY_NUMPADENTER.isKeyHeld()) lockedKeys.add(InputCode.KEY_NUMPADENTER)
     }
-
-    // InputConstants.UNKNOWN exists, but is not a compile time constant
-    //~ if < 26.3 '0' -> '-1'
-    const val KEY_UNKNOWN: Int = -1
-
-    const val LEFT_MOUSE = InputConstants.MOUSE_BUTTON_LEFT
-    const val RIGHT_MOUSE = InputConstants.MOUSE_BUTTON_RIGHT
-    const val MIDDLE_MOUSE = InputConstants.MOUSE_BUTTON_MIDDLE
-
-    const val KEY_ADD = InputConstants.KEY_ADD
-    // This constant isn't defined in InputConstants for some reason
-    const val KEY_SUBTRACT = InputConstants.KEY_ADD - 1
 
     /**
      * Represents whether either the left or right Super key (also known as Windows key) is down.
      * On macOS, this is the Command key.
      */
     private fun isSuperKeyDown() =
-        InputConstants.KEY_LSUPER.isKeyHeld() || InputConstants.KEY_RSUPER.isKeyHeld()
+        InputCode.KEY_LSUPER.isKeyHeld() || InputCode.KEY_RSUPER.isKeyHeld()
 
     /**
      * Represents whether either the left or right Alt key is down.
      * On macOS, this is the Option key.
      */
     fun isMenuKeyDown() =
-        InputConstants.KEY_LALT.isKeyHeld() || InputConstants.KEY_RALT.isKeyHeld()
+        InputCode.KEY_LALT.isKeyHeld() || InputCode.KEY_RALT.isKeyHeld()
 
     /**
      * Represents whether either the left or right Control (Ctrl) key is down,
      * regardless of platform.
      */
     fun isControlKeyDown() =
-        InputConstants.KEY_LCONTROL.isKeyHeld() || InputConstants.KEY_RCONTROL.isKeyHeld()
+        InputCode.KEY_LCONTROL.isKeyHeld() || InputCode.KEY_RCONTROL.isKeyHeld()
 
     /**
      * Represents whether the operating system's modifier key is down.
@@ -73,34 +67,34 @@ object KeyboardManager {
      * On macOS, this is Option+Backspace, while on other platforms it is Ctrl+Backspace.
      */
     fun isDeleteWordDown() =
-        InputConstants.KEY_BACKSPACE.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isMenuKeyDown() else isControlKeyDown()
+        InputCode.KEY_BACKSPACE.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isMenuKeyDown() else isControlKeyDown()
 
     /**
      * Represents whether the user is trying to use the operating system's "delete line" shortcut.
      * On macOS, this is Cmd+Shift+Backspace, while on other platforms it is Ctrl+Shift+Backspace.
      */
     fun isDeleteLineDown() =
-        InputConstants.KEY_BACKSPACE.isKeyHeld() && isModifierKeyDown() && isShiftKeyDown()
+        InputCode.KEY_BACKSPACE.isKeyHeld() && isModifierKeyDown() && isShiftKeyDown()
 
     /**
      * Represents whether either the left or right Shift key is down.
      */
     fun isShiftKeyDown() =
-        InputConstants.KEY_LSHIFT.isKeyHeld() || InputConstants.KEY_RSHIFT.isKeyHeld()
+        InputCode.KEY_LSHIFT.isKeyHeld() || InputCode.KEY_RSHIFT.isKeyHeld()
 
     /**
      * Represents whether the user is trying to use the operating system's "copy" shortcut.
      * On macOS, this is Cmd+C, while on other platforms it is Ctrl+C.
      */
     fun isCopyingKeysDown() =
-        isModifierKeyDown() && InputConstants.KEY_C.isKeyHeld()
+        isModifierKeyDown() && InputCode.KEY_C.isKeyHeld()
 
     /**
      * Represents whether the user is trying to use the operating system's "paste" shortcut.
      * On macOS, this is Cmd+V, while on other platforms it is Ctrl+V.
      */
     fun isPastingKeysDown() =
-        isModifierKeyDown() && InputConstants.KEY_V.isKeyHeld()
+        isModifierKeyDown() && InputCode.KEY_V.isKeyHeld()
 
     private fun Int.matchesClosureKey() =
         Minecraft.getInstance().options.keyInventory.matches(KeyEvent(this, this, 0))
@@ -110,11 +104,13 @@ object KeyboardManager {
         // Holding shift bypasses closure checks
         if (isShiftKeyDown()) return false
 
-        val isClose = keycode.matchesClosureKey() || keycode == InputConstants.KEY_ESCAPE
+        val isClose = keycode.matchesClosureKey() || keycode == InputCode.KEY_ESCAPE.value
         if (!isClose) return false
 
         return AttemptedInventoryCloseEvent().post().isCancelled
     }
+
+    fun checkIsInventoryClosure(keycode: InputCode): Boolean = checkIsInventoryClosure(keycode.value)
 
     fun getModifierKeyName(short: Boolean = false): String =
         if (InputQuirks.REPLACE_CTRL_KEY_WITH_CMD_KEY) {
@@ -127,7 +123,7 @@ object KeyboardManager {
     // and in renderable calls have time to react first, and lock this key press event properly.
     fun KeyMapping.isActive(): Boolean {
         try {
-            if (key.value.isKeyHeld()) return true
+            if (InputCode.fromValue(key.value).isKeyHeld()) return true
         } catch (e: IndexOutOfBoundsException) {
             ErrorManager.logErrorWithData(
                 e,
@@ -139,31 +135,94 @@ object KeyboardManager {
         return isDown || consumeClick()
     }
 
-    fun Int.isKeyHeld(): Boolean = when {
-        this < KEY_UNKNOWN -> ErrorManager.skyHanniError(
-            "Error while checking if a key is pressed. Key code is invalid: $this",
-        )
-
-        this == KEY_UNKNOWN -> false
-        MouseCompat.isMouseButton(this) -> MouseCompat.isButtonDown(this)
-        else -> InputConstants.isKeyDown(Minecraft.getInstance().window, this)
+    fun InputCode.isKeyHeld(): Boolean = when {
+        this == InputCode.UNKNOWN -> false
+        MouseCompat.isMouseButton(this.value) -> MouseCompat.isButtonDown(this.value)
+        else -> InputCode.isKeyDown(this)
     }
 
-    private val lockedKeys = mutableSetOf<Int>()
+    private val lockedKeys = mutableSetOf<InputCode>()
 
     /**
      * Can only be used once per click, since the function locks itself until the key is no longer
      * held. Do not use in [KeyPressEvent], since it won't be unlocked again – use [KeyDownEvent]
      * instead.
      */
-    fun Int.isKeyClicked(): Boolean = if (isKeyHeld()) {
+    fun InputCode.isKeyClicked(): Boolean = if (isKeyHeld()) {
         lockedKeys.add(this)
     } else {
         lockedKeys.remove(this)
         false
     }
 
-    fun getKeyName(keyCode: Int): String = IMinecraft.INSTANCE.getKeyName(keyCode).text
+    fun KeyMapping.isKeyClicked(): Boolean = InputCode.fromValue(key.value).isKeyClicked()
+
+    fun getKeyName(keyCode: InputCode): String = IMinecraft.INSTANCE.getKeyName(keyCode.value).text
+
+    private val SKYHANNI_CONFIG_CATEGORY = KeyMapping.Category.register(
+        SkyHanniMod.id("keys")
+    )
+
+    fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
+        processor.registerConfigEditor(ConfigEditorKeymapping::class.java) { option, annotation ->
+            val mapping = getOrCreateKeyMapping(
+                option,
+                annotation.defaultKey.value,
+            )
+            GuiOptionEditorKeyMapping(option, mapping)
+        }
+    }
+
+    private val keyMappingMap = mutableMapOf<String, KeyMapping>()
+
+    private fun getOrCreateKeyMapping(option: ProcessedOption, defaultKey: Int): KeyMapping =
+        keyMappingMap.computeIfAbsent(option.path) {
+            createKeyMapping(option, defaultKey)
+        }
+
+    fun createKeyMapping(option: ProcessedOption, defaultKey: Int): KeyMapping {
+        val keyValue = option.get() as Int
+        val type = if (keyValue in 0 until MouseCompat.NUMBER_OF_MOUSE_BUTTONS) InputConstants.Type.MOUSE else InputConstants.Type.KEYSYM
+        val displayName = getDisplayNameForKeyMapping(option)
+
+        val keyMapping = KeyMapping(
+            // HACK: This is meant to be a translation key
+            displayName,
+            type,
+            defaultKey,
+            SKYHANNI_CONFIG_CATEGORY,
+        )
+
+        val key = type.getOrCreate(keyValue)
+        keyMapping.setKey(key)
+        KeyMappingHelper.registerKeyMapping(keyMapping)
+        return keyMapping
+    }
+
+    private fun getDisplayNameForKeyMapping(option: ProcessedOption): String {
+        val parts = option.path.split(".")
+        // wardrobe.keybinds.open -> wardrobe.open
+        // dev.chat.peekKey -> chat.peekKey
+        val name = if (
+            parts.size >= 3 &&
+            parts[parts.lastIndex - 1].startsWith("keybind", true)
+        ) {
+            listOf(parts[parts.lastIndex - 2], parts.last())
+        } else {
+            parts.takeLast(2)
+        }
+
+        return name
+            .joinToString(" ")
+            .replace(Regex("(?i)keybindConfig"), "")
+            .replace(Regex("(?i)keybind(?=Option)"), "")
+            .replace(Regex("([a-z])([A-Z])"), "$1 $2")
+            .replace(Regex("([A-Za-z])([0-9])"), "$1 $2")
+            .replace(Regex("\\s+"), " ")
+            .trim()
+            .split(" ")
+            .joinToString(" ") { it.replaceFirstChar(Char::uppercase) }
+    }
 
     object WasdInputMatrix : Iterable<KeyMapping> {
         operator fun contains(keyBinding: KeyMapping) = when (keyBinding) {
@@ -207,6 +266,5 @@ object KeyboardManager {
                 }
 
             }
-
     }
 }

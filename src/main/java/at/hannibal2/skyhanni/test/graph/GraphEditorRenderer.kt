@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -214,9 +215,9 @@ object GraphEditorRenderer {
         else -> nodeColor
     }
 
-    private fun Int.name() = KeyboardManager.getKeyName(this)
+    private fun InputCode.name() = KeyboardManager.getKeyName(this)
 
-    private fun KeyMapping.name() = key.value.name()
+    private fun KeyMapping.name() = KeyboardManager.getKeyName(InputCode.fromValue(key.value))
 
     private fun isEnabled() = GraphEditor.isEnabled()
 }

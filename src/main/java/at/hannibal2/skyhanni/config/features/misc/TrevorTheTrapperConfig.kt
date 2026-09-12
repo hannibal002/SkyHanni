@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.config.features.misc
 
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -117,8 +117,8 @@ class TrevorTheTrapperConfig {
         desc = "Press this key to warp to Trevor's Den or to accept the quest. " +
             "§eRequires the relevant above settings to be toggled"
     )
-    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
-    var keyBind: Int = KeyboardManager.KEY_UNKNOWN
+    @ConfigEditorKeymapping
+    var keyBind = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Trapper Cooldown", desc = "Change the color of Trevor and adds a cooldown over his head.")

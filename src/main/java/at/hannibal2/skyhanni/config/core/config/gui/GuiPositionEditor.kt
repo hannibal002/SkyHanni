@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -36,7 +37,6 @@ import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import net.minecraft.client.Minecraft
 import kotlin.reflect.full.createInstance
@@ -97,7 +97,7 @@ class GuiPositionEditor(
 
         // When the mouse isn't currently hovering over a gui element
         val text = if (displayPos == -1) {
-            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == KeyboardManager.KEY_UNKNOWN
+            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == InputCode.UNKNOWN
 
             buildList {
                 add("§cSkyHanni Position Editor")
@@ -182,7 +182,7 @@ class GuiPositionEditor(
 
                 when (mouseButton) {
                     1 -> position.jumpToConfigOptions()
-                    2 -> if (config.keyBindReset == KeyboardManager.MIDDLE_MOUSE) position.resetPositionAndScale()
+                    2 -> if (config.keyBindReset == InputCode.MIDDLE_MOUSE) position.resetPositionAndScale()
                     0 -> if (!position.clicked) {
                         clickedPos = i
                         position.clicked = true
@@ -197,7 +197,7 @@ class GuiPositionEditor(
         }
     }
 
-    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
+    override fun onKeyTyped(typedChar: Char?, keyCode: InputCode) {
         if (keyCode == config.keyBindReset) {
             positions.firstOrNull { it.isHoveredWithMetrics() }?.resetPositionAndScale()
             return
@@ -211,12 +211,13 @@ class GuiPositionEditor(
             val elementWidth = position.getDummySize(true).x
             val elementHeight = position.getDummySize(true).y
             when (keyCode) {
-                InputConstants.KEY_DOWN -> position.moveY(dist, elementHeight)
-                InputConstants.KEY_UP -> position.moveY(-dist, elementHeight)
-                InputConstants.KEY_LEFT -> position.moveX(-dist, elementWidth)
-                InputConstants.KEY_RIGHT -> position.moveX(dist, elementWidth)
-                InputConstants.KEY_MINUS, KeyboardManager.KEY_SUBTRACT -> position.scale -= .1F
-                InputConstants.KEY_EQUALS, KeyboardManager.KEY_ADD -> position.scale += .1F
+                InputCode.KEY_DOWN -> position.moveY(dist, elementHeight)
+                InputCode.KEY_UP -> position.moveY(-dist, elementHeight)
+                InputCode.KEY_LEFT -> position.moveX(-dist, elementWidth)
+                InputCode.KEY_RIGHT -> position.moveX(dist, elementWidth)
+                InputCode.KEY_MINUS, InputCode.KEY_SUBTRACT -> position.scale -= .1F
+                InputCode.KEY_EQUALS, InputCode.KEY_ADD -> position.scale += .1F
+                else -> return@withPositionMetrics
             }
         }
     }

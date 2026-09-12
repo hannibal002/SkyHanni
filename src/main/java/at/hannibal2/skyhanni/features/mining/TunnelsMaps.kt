@@ -23,11 +23,12 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.InputCode.LEFT_MOUSE
+import at.hannibal2.skyhanni.utils.InputCode.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
-import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -496,7 +497,7 @@ object TunnelsMaps {
         nextSpot()
     }
 
-    private fun campfireKey(keyCode: Int) {
+    private fun campfireKey(keyCode: InputCode) {
         if (keyCode != config.campfireKey) return
         if (lastBaseCampWarp.passedSince() < 2.seconds) return
         lastBaseCampWarp = SimpleTimeMark.now()
@@ -520,7 +521,7 @@ object TunnelsMaps {
 
     private var nextSpotDelay = SimpleTimeMark.farPast()
 
-    private fun nextSpotKey(keyCode: Int) {
+    private fun nextSpotKey(keyCode: InputCode) {
         if (keyCode == config.nextSpotHotkey) {
             nextSpot()
         }

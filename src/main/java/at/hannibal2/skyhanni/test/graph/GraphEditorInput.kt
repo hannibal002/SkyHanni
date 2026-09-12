@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
-import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.player.LocalPlayer
 
@@ -163,11 +163,11 @@ object GraphEditorInput {
 
     private fun handleUndoRedo(): Boolean {
         if (MinecraftCompat.screen == null) {
-            if (KeyboardManager.isControlKeyDown() && InputConstants.KEY_Y.isKeyClicked()) {
+            if (KeyboardManager.isControlKeyDown() && InputCode.KEY_Y.isKeyClicked()) {
                 GraphEditorHistory.undo()
                 return true
             }
-            if (KeyboardManager.isControlKeyDown() && InputConstants.KEY_Z.isKeyClicked()) {
+            if (KeyboardManager.isControlKeyDown() && InputCode.KEY_Z.isKeyClicked()) {
                 GraphEditorHistory.redo()
                 return true
             }
@@ -308,7 +308,7 @@ object GraphEditorInput {
     }
 
     private fun KeyMapping.handleEditClicks(vector: LorenzVec) {
-        if (!this.key.value.isKeyClicked()) return
+        if (!isKeyClicked()) return
         GraphEditorHistory.save("moved node")
         state.activeNode?.let {
             it.position += vector

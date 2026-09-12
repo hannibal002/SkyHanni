@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.minecraft.CharEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent;
-import at.hannibal2.skyhanni.utils.KeyboardManager;
+import at.hannibal2.skyhanni.utils.InputCode;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.CharacterEvent;
@@ -22,11 +22,12 @@ public abstract class MixinKeyboardHandler {
     private void onKey(long window, int action, KeyEvent input, CallbackInfo ci) {
         int key = input.key();
         if (Minecraft.getInstance().player == null) return;
-        if (key == KeyboardManager.KEY_UNKNOWN) return;
+        if (key == InputCode.UNKNOWN.value) return;
         //System.out.println("Key: " + key + " Scancode: " + scancode + " Action: " + action + " Modifiers: " + modifiers);
 
         // Don't send key events if REI search bar is selected
         if (ReiCompat.searchHasFocus()) return;
+        var inputKey = InputCode.fromValue(key);
 
         /*
          * action = 0: Key released
@@ -44,13 +45,13 @@ public abstract class MixinKeyboardHandler {
         // there is also an onChar method we could mixin to and use for typing fields and replace TextInput.isActive() with that somehow
         // the extension functions such as isActive() and isKeyHeld() still work from keyboard manager
         // this only replaces the posting of events
-        if (action == 0) new KeyUpEvent(key).post();
+        if (action == 0) new KeyUpEvent(inputKey).post();
         if (action == 1) {
-            new KeyDownEvent(key).post();
+            new KeyDownEvent(inputKey).post();
             // on 1.21 it takes like 1 full second before the key press event will get posted so im doing it here
-            new KeyPressEvent(key).post();
+            new KeyPressEvent(inputKey).post();
         }
-        if (action == 2) new KeyPressEvent(key).post();
+        if (action == 2) new KeyPressEvent(inputKey).post();
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"))

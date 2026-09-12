@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.SignUtils.isGardenSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
-import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
@@ -39,7 +39,7 @@ object GuiEditManager {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
-        if (event.keyCode == InputConstants.KEY_RETURN) {
+        if (event.keyCode == InputCode.KEY_RETURN) {
             ChatUtils.chat("You can't use Enter as a keybind to open the gui editor!")
             return
         }

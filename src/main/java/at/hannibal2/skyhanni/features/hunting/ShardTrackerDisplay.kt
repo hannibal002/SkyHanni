@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
@@ -158,7 +159,7 @@ object ShardTrackerDisplay {
     fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (!isInsideShardsMenu()) return
-        if (config.selectShardKeybind == KeyboardManager.KEY_UNKNOWN) return
+        if (config.selectShardKeybind == InputCode.UNKNOWN) return
         if (!AttributeShardsData.isAttributeShard(event.itemStack.getInternalName())) return
         event.toolTip.add("§ePress ${KeyboardManager.getKeyName(config.selectShardKeybind)} to track this shard.")
     }

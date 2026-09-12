@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -31,14 +32,14 @@ object SnakeGame {
 
     private var inInventory = false
 
-    private val keys
+    private val keys: Map<InputCode, Int>
         get() = with(Minecraft.getInstance().options) {
             mapOf(
-                keyLeft.key.value to 24,
-                keyUp.key.value to 16,
-                keyRight.key.value to 26,
-                keyDown.key.value to 34,
-            )
+                keyLeft to 24,
+                keyUp to 16,
+                keyRight to 26,
+                keyDown to 34,
+            ).mapKeys { InputCode.fromValue(it.key.key.value) }
         }
 
     @HandleEvent

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.InputCode
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
@@ -65,15 +66,16 @@ abstract class SkyHanniBaseScreen(title: Component = Component.empty()) : Screen
         return super.charTyped(input)
     }
 
-    private fun postKeyTyped(typedChar: Char?, keyCode: Int?) {
+    private fun postKeyTyped(typedChar: Char?, rawKeyCode: Int?) {
         try {
+            val keyCode = InputCode.fromValue(rawKeyCode ?: 0)
             onKeyTyped(typedChar, keyCode)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error while typing key", "screen" to this)
         }
     }
 
-    open fun onKeyTyped(typedChar: Char?, keyCode: Int?) {}
+    open fun onKeyTyped(typedChar: Char?, keyCode: InputCode) {}
 
     override fun mouseReleased(click: MouseButtonEvent): Boolean {
         postMouseReleased(click.x.toInt(), click.y.toInt(), click.button())

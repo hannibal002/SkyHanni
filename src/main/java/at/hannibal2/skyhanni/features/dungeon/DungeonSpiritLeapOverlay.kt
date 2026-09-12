@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -146,14 +147,14 @@ object DungeonSpiritLeapOverlay {
     }
 
     private val spiritLeapKeybinds
-        get() = intArrayOf(
+        get() = arrayOf(
             config.spiritLeapKeybindConfig.keybindOption1,
             config.spiritLeapKeybindConfig.keybindOption2,
             config.spiritLeapKeybindConfig.keybindOption3,
             config.spiritLeapKeybindConfig.keybindOption4,
         )
 
-    private fun getKeybindIndex(keyCode: Int): Int = spiritLeapKeybinds.indexOf(keyCode)
+    private fun getKeybindIndex(keyCode: InputCode): Int = spiritLeapKeybinds.indexOf(keyCode)
 
     private fun createOverlayTable(layout: List<List<Renderable>>): Renderable {
         return if (layout.isNotEmpty()) Renderable.table(

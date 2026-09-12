@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantsJson
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -36,7 +37,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import com.mojang.blaze3d.platform.InputConstants
 import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -110,10 +110,10 @@ object EstimatedItemValue {
         if (!currentlyShowing) return
 
         if (SkyBlockUtils.debug) {
-            if (InputConstants.KEY_RIGHT.isKeyClicked()) {
+            if (InputCode.KEY_RIGHT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange += 1
                 cache.clear()
-            } else if (InputConstants.KEY_LEFT.isKeyClicked()) {
+            } else if (InputCode.KEY_LEFT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange -= 1
                 cache.clear()
             }
