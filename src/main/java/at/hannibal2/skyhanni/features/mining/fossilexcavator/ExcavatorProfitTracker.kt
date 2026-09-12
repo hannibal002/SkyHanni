@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.mining.glacite.ExcavatorProfitTrackerConfig.IronmanProfitType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -71,8 +72,10 @@ object ExcavatorProfitTracker {
                 listOf("§7You excavated §e${timesExcavated.addSeparators()} §7times."),
             ).toSearchable(),
         )
-
-        profit = addScrap(timesExcavated, profit)
+        if (config.ironmanProfitType.get() == IronmanProfitType.NONE ||
+            (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
+            profit = addScrap(timesExcavated, profit)
+        }
         if (config.showFossilDust) {
             profit = addFossilDust(data.fossilDustGained, profit)
         }

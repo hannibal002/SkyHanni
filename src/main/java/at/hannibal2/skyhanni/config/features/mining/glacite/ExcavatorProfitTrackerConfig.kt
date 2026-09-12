@@ -6,8 +6,10 @@ import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualI
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ExcavatorProfitTrackerConfig {
     @Expose
@@ -28,6 +30,18 @@ class ExcavatorProfitTrackerConfig {
     @ConfigOption(name = "Track Fossil Dust", desc = "Track Fossil Dust and use it for profit calculation.")
     @ConfigEditorBoolean
     var showFossilDust: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Ironman Profits", desc = "Select which profiles should use the Ironman price calculation option. §eRemoves the cost of Scrap from the Profit.")
+    @ConfigEditorDropdown
+    val ironmanProfitType: Property<IronmanProfitType> = Property.of(IronmanProfitType.ONLY_IRONMAN)
+
+    enum class IronmanProfitType(private val displayName: String) {
+        NONE("§cNone"),
+        ONLY_IRONMAN("§7Only Ironman"),
+        ALL_PROFILES("§2All Profiles");
+        override fun toString(): String = displayName
+    }
 
     @Expose
     @ConfigOption(
