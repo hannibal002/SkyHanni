@@ -75,6 +75,11 @@ class DebugConfig {
     var copyInternalName: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
+    @ConfigOption(name = "Copy Sub-Location", desc = "Copies the current SkyBlock sub-location to the clipboard.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var copySubLocation: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
     @ConfigOption(
         name = "Copy Cosmetics Skull Data",
         desc = "Copies the cosmetic data for skins with different variants but no animations."
