@@ -170,7 +170,7 @@ object KeyboardManager {
     fun ConfigKeybind.isKeyClicked(): Boolean = value.isKeyClicked()
     fun ConfigKeybind.isUnknown(): Boolean = value == InputCode.UNKNOWN.value
 
-    fun getKeyName(keyCode: Int): String = IMinecraft.INSTANCE.getKeyName(keyCode.value).text
+    fun getKeyName(keyCode: Int): String = IMinecraft.INSTANCE.getKeyName(keyCode).text
     fun getKeyName(keyCode: InputCode): String = getKeyName(keyCode.value)
     fun getKeyName(keyCode: ConfigKeybind): String = getKeyName(keyCode.value)
 

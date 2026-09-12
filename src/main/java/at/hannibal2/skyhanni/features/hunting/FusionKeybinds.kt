@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.hunting
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigKeybind
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -52,14 +53,14 @@ object FusionKeybinds {
 
         config.repeatFusionKeybind.afterChange {
             if (!this.isUnknown() && this == confirmFusionKeybind) {
-                config.repeatFusionKeybind.set(InputCode.UNKNOWN)
+                config.repeatFusionKeybind.get().value = InputCode.UNKNOWN
                 warnDuplicateKeybinds()
             }
         }
 
         config.confirmFusionKeybind.afterChange {
             if (!this.isUnknown() && this == repeatFusionKeybind) {
-                config.confirmFusionKeybind.set(InputCode.UNKNOWN)
+                config.confirmFusionKeybind.get().value = InputCode.UNKNOWN
                 warnDuplicateKeybinds()
             }
         }
