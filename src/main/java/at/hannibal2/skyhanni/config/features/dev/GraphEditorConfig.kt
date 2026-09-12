@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
+import at.hannibal2.skyhanni.config.ConfigKeybind
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.test.graph.GraphEditor
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
@@ -28,8 +28,8 @@ class GraphEditorConfig {
         desc = "Place a new node at the current position. If a node is active automatically connects. " +
             "Deletes a node if you are only 3 blocks away instead of placing a new one."
     )
-    @ConfigEditorKeymapping(defaultKey = KEY_F)
-    var placeKey = InputCode.KEY_F
+    @ConfigEditorKeyMapping(defaultKey = KEY_F)
+    var placeKey = ConfigKeybind(KEY_F)
 
     @Expose
     @ConfigOption(name = "Auto Select Node", desc = "Automatically select a node after placing it.")
@@ -39,27 +39,27 @@ class GraphEditorConfig {
     // TODO rename to selectNearestNodeKey
     @Expose
     @ConfigOption(name = "Select Nearest Node", desc = "Select the nearest node to be active. Double press to unselect.")
-    @ConfigEditorKeymapping(defaultKey = LEFT_MOUSE)
-    var selectKey = InputCode.LEFT_MOUSE
+    @ConfigEditorKeyMapping(defaultKey = LEFT_MOUSE)
+    var selectKey = ConfigKeybind(LEFT_MOUSE)
 
     // TODO rename to selectNodeByLookingKey
     @Expose
     @ConfigOption(name = "Select Node by Looking", desc = "Select the node you are pointing your cursor at.")
-    @ConfigEditorKeymapping
-    var selectRaycastKey = InputCode.UNKNOWN
+    @ConfigEditorKeyMapping
+    var selectRaycastKey = ConfigKeybind()
 
     @Expose
     @ConfigOption(
         name = "Connect Key",
         desc = "Connect the nearest node with the active node. If the nodes are already connected removes the connection."
     )
-    @ConfigEditorKeymapping(defaultKey = KEY_C)
-    var connectKey = InputCode.KEY_C
+    @ConfigEditorKeyMapping(defaultKey = KEY_C)
+    var connectKey = ConfigKeybind(KEY_C)
 
     @Expose
     @ConfigOption(name = "Exit Key", desc = "Exit out of text edit mode. If not in text edit mode, disables the graph editor.")
-    @ConfigEditorKeymapping(defaultKey = KEY_RETURN)
-    var exitKey = InputCode.KEY_RETURN
+    @ConfigEditorKeyMapping(defaultKey = KEY_RETURN)
+    var exitKey = ConfigKeybind(KEY_RETURN)
 
     // TODO rename to nodeMoveKey
     @Expose
@@ -67,13 +67,13 @@ class GraphEditorConfig {
         name = "Node Move Key",
         desc = "While holding the Key, edit the position of the active node or the selection block with the minecraft movement controls."
     )
-    @ConfigEditorKeymapping(defaultKey = KEY_TAB)
-    var editKey = InputCode.KEY_TAB
+    @ConfigEditorKeyMapping(defaultKey = KEY_TAB)
+    var editKey = ConfigKeybind(KEY_TAB)
 
     @Expose
     @ConfigOption(name = "Text Key", desc = "Start text mode, which allows editing a name of a node.")
-    @ConfigEditorKeymapping(defaultKey = KEY_Y)
-    var textKey = InputCode.KEY_Y
+    @ConfigEditorKeyMapping(defaultKey = KEY_Y)
+    var textKey = ConfigKeybind(KEY_Y)
 
     // TODO rename to navigateToNodeKey
     @Expose
@@ -81,31 +81,31 @@ class GraphEditorConfig {
         name = "Navigate to Node",
         desc = "On key press, show the shortest path to the active node."
     )
-    @ConfigEditorKeymapping(defaultKey = KEY_G)
-    var dijkstraKey = InputCode.KEY_G
+    @ConfigEditorKeyMapping(defaultKey = KEY_G)
+    var dijkstraKey = ConfigKeybind(KEY_G)
 
     @Expose
     @ConfigOption(name = "Save Key", desc = "Save the current graph to the clipboard.")
-    @ConfigEditorKeymapping(defaultKey = KEY_O)
-    var saveKey = InputCode.KEY_O
+    @ConfigEditorKeyMapping(defaultKey = KEY_O)
+    var saveKey = ConfigKeybind(KEY_O)
 
     @Expose
     @ConfigOption(name = "Load Key", desc = "Load a graph from clipboard, if valid.")
-    @ConfigEditorKeymapping(defaultKey = KEY_I)
-    var loadKey = InputCode.KEY_I
+    @ConfigEditorKeyMapping(defaultKey = KEY_I)
+    var loadKey = ConfigKeybind(KEY_I)
 
     @Expose
     @ConfigOption(
         name = "Clear Key",
         desc = "Clear the graph. Also saves the graph to the clipboard, in case of a misclick."
     )
-    @ConfigEditorKeymapping
-    var clearKey = InputCode.UNKNOWN
+    @ConfigEditorKeyMapping
+    var clearKey = ConfigKeybind()
 
     @Expose
     @ConfigOption(name = "Vision Key", desc = "Toggle if the graph should render trough blocks.")
-    @ConfigEditorKeymapping(defaultKey = KEY_M)
-    var throughBlocksKey = InputCode.KEY_M
+    @ConfigEditorKeyMapping(defaultKey = KEY_M)
+    var throughBlocksKey = ConfigKeybind(KEY_M)
 
     // TODO rename to feedbackKey
     @Expose
@@ -113,21 +113,21 @@ class GraphEditorConfig {
         name = "Feedback Key",
         desc = "Toggle the feedback mode. In this mode, you will get a chat message explaining on everything you do in the Graph Editor."
     )
-    @ConfigEditorKeymapping(defaultKey = KEY_K)
-    var tutorialKey = InputCode.KEY_K
+    @ConfigEditorKeyMapping(defaultKey = KEY_K)
+    var tutorialKey = ConfigKeybind(KEY_K)
 
     @Expose
     @ConfigOption(
         name = "Split Key",
         desc = "Key for splitting an edge that is between the active and the closest node."
     )
-    @ConfigEditorKeymapping
-    var splitKey = InputCode.UNKNOWN
+    @ConfigEditorKeyMapping
+    var splitKey = ConfigKeybind()
 
     @Expose
     @ConfigOption(name = "Dissolve Key", desc = "Dissolve the active node into one edge if it only has two edges.")
-    @ConfigEditorKeymapping
-    var dissolveKey = InputCode.UNKNOWN
+    @ConfigEditorKeyMapping
+    var dissolveKey = ConfigKeybind()
 
     // TODO rename to oneDirectionalKey
     @Expose
@@ -135,8 +135,8 @@ class GraphEditorConfig {
         name = "One Directional Key",
         desc = "Cycles the direction of the edge that is between the active and the closest node. (Used to make one-directional ways)"
     )
-    @ConfigEditorKeymapping(defaultKey = KEY_H)
-    var edgeCycle = InputCode.KEY_H
+    @ConfigEditorKeyMapping(defaultKey = KEY_H)
+    var edgeCycle = ConfigKeybind(KEY_H)
 
     @Expose
     @ConfigLink(owner = GraphEditorConfig::class, field = "enabled")

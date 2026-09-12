@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
+import at.hannibal2.skyhanni.config.ConfigKeybind
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -65,8 +65,8 @@ class AuctionHouseConfig {
         name = "Copy Underbid Keybind",
         desc = "Copy the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding."
     )
-    @ConfigEditorKeymapping
-    var copyUnderbidKeybind = InputCode.UNKNOWN
+    @ConfigEditorKeyMapping
+    var copyUnderbidKeybind = ConfigKeybind()
 
     @Expose
     @ConfigOption(

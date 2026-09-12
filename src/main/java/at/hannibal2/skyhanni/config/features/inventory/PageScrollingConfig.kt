@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
+import at.hannibal2.skyhanni.config.ConfigKeybind
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -17,8 +17,8 @@ class PageScrollingConfig {
         name = "Bypass Key",
         desc = "When the key is held allows you to scroll even though you are over an item."
     )
-    @ConfigEditorKeymapping(defaultKey = KEY_LSHIFT)
-    var bypassKey = InputCode.KEY_LSHIFT
+    @ConfigEditorKeyMapping(defaultKey = KEY_LSHIFT)
+    var bypassKey = ConfigKeybind(KEY_LSHIFT)
 
     @Expose
     @ConfigOption(

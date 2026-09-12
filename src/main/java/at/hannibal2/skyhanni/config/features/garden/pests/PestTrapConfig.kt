@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.config.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
+import at.hannibal2.skyhanni.config.ConfigKeybind
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
@@ -28,8 +28,8 @@ class PestTrapConfig {
         name = "Release All Hotkey",
         desc = "Release all pests in a pest trap when you press this keybind."
     )
-    @ConfigEditorKeymapping
-    var releaseHotkey = InputCode.UNKNOWN
+    @ConfigEditorKeyMapping
+    var releaseHotkey = ConfigKeybind()
 
     @Expose
     @ConfigOption(name = "Warnings", desc = "")

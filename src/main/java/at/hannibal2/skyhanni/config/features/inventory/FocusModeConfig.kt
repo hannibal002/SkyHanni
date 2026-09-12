@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
+import at.hannibal2.skyhanni.config.ConfigKeybind
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -21,8 +21,8 @@ class FocusModeConfig {
 
     @Expose
     @ConfigOption(name = "Toggle Key", desc = "Key to toggle the focus mode on and off.")
-    @ConfigEditorKeymapping
-    var toggleKey = InputCode.UNKNOWN
+    @ConfigEditorKeyMapping
+    var toggleKey = ConfigKeybind()
 
     @Expose
     @ConfigOption(

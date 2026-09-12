@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
+import at.hannibal2.skyhanni.config.ConfigKeybind
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -12,13 +12,13 @@ class WaypointsConfig {
         name = "Save Hotkey",
         desc = "Saves block location to a temporary parkour and copies everything to your clipboard."
     )
-    @ConfigEditorKeymapping
-    var saveKey = InputCode.UNKNOWN
+    @ConfigEditorKeyMapping
+    var saveKey = ConfigKeybind()
 
     @Expose
     @ConfigOption(name = "Delete Hotkey", desc = "Deletes the last saved location for when you make a mistake.")
-    @ConfigEditorKeymapping
-    var deleteKey = InputCode.UNKNOWN
+    @ConfigEditorKeyMapping
+    var deleteKey = ConfigKeybind()
 
     @Expose
     @ConfigOption(name = "Show Platform Number", desc = "Show the index number over the platform for every parkour.")

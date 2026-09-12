@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds
 import at.hannibal2.skyhanni.utils.InputCode
@@ -69,41 +69,41 @@ class KeyBindConfig {
 
     @Expose
     @ConfigOption(name = "Attack", desc = "")
-    @ConfigEditorKeymapping(defaultKey = LEFT_MOUSE)
+    @ConfigEditorKeyMapping(defaultKey = LEFT_MOUSE)
     val attack: Property<InputCode> = Property.of(InputCode.LEFT_MOUSE)
 
     @Expose
     @ConfigOption(name = "Use Item", desc = "")
-    @ConfigEditorKeymapping(defaultKey = RIGHT_MOUSE)
+    @ConfigEditorKeyMapping(defaultKey = RIGHT_MOUSE)
     val useItem: Property<InputCode> = Property.of(InputCode.RIGHT_MOUSE)
 
     @Expose
     @ConfigOption(name = "Move Left", desc = "")
-    @ConfigEditorKeymapping(defaultKey = KEY_A)
+    @ConfigEditorKeyMapping(defaultKey = KEY_A)
     val left: Property<InputCode> = Property.of(InputCode.KEY_A)
 
     @Expose
     @ConfigOption(name = "Move Right", desc = "")
-    @ConfigEditorKeymapping(defaultKey = KEY_D)
+    @ConfigEditorKeyMapping(defaultKey = KEY_D)
     val right: Property<InputCode> = Property.of(InputCode.KEY_D)
 
     @Expose
     @ConfigOption(name = "Move Forward", desc = "")
-    @ConfigEditorKeymapping(defaultKey = KEY_W)
+    @ConfigEditorKeyMapping(defaultKey = KEY_W)
     val forward: Property<InputCode> = Property.of(InputCode.KEY_W)
 
     @Expose
     @ConfigOption(name = "Move Back", desc = "")
-    @ConfigEditorKeymapping(defaultKey = KEY_S)
+    @ConfigEditorKeyMapping(defaultKey = KEY_S)
     val back: Property<InputCode> = Property.of(InputCode.KEY_S)
 
     @Expose
     @ConfigOption(name = "Jump", desc = "")
-    @ConfigEditorKeymapping(defaultKey = KEY_SPACE)
+    @ConfigEditorKeyMapping(defaultKey = KEY_SPACE)
     val jump: Property<InputCode> = Property.of(InputCode.KEY_SPACE)
 
     @Expose
     @ConfigOption(name = "Sneak", desc = "")
-    @ConfigEditorKeymapping(defaultKey = KEY_LSHIFT)
+    @ConfigEditorKeyMapping(defaultKey = KEY_LSHIFT)
     val sneak: Property<InputCode> = Property.of(InputCode.KEY_LSHIFT)
 }

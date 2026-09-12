@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
+import at.hannibal2.skyhanni.config.ConfigKeybind
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListC
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig
 import at.hannibal2.skyhanni.data.GuiEditManager.openGuiPositionEditor
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -52,13 +52,13 @@ class GuiConfig {
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
-    @ConfigEditorKeymapping
-    var keyBindOpen = InputCode.UNKNOWN
+    @ConfigEditorKeyMapping
+    var keyBindOpen = ConfigKeybind()
 
     @Expose
     @ConfigOption(name = "Reset Hotkey", desc = "Key to press hovering a gui element to reset it's position and scale in the GUI Editor.")
-    @ConfigEditorKeymapping(defaultKey = KEY_R)
-    var keyBindReset = InputCode.KEY_R
+    @ConfigEditorKeyMapping(defaultKey = KEY_R)
+    var keyBindReset = ConfigKeybind(KEY_R)
 
     @Expose
     @ConfigOption(name = "Global GUI Scale", desc = "Globally scale all SkyHanni GUIs.")

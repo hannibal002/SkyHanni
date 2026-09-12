@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
+import at.hannibal2.skyhanni.config.ConfigKeybind
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -28,8 +28,8 @@ class JacobFarmingContestConfig {
         name = "Open On Elite",
         desc = "Open the contest on §eeliteskyblock.com§7 when pressing this key in Jacob's menu or the calendar."
     )
-    @ConfigEditorKeymapping
-    var openOnElite = InputCode.UNKNOWN
+    @ConfigEditorKeyMapping
+    var openOnElite = ConfigKeybind()
 
     @Expose
     @ConfigOption(

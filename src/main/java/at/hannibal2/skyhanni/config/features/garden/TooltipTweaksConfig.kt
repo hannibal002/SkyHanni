@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.garden
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
+import at.hannibal2.skyhanni.config.ConfigKeybind
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -23,8 +23,8 @@ class TooltipTweaksConfig {
         name = "Breakdown Hotkey",
         desc = "When the keybind is pressed, show a breakdown of all fortune sources on a tool."
     )
-    @ConfigEditorKeymapping(defaultKey = KEY_LSHIFT)
-    var fortuneTooltipKeybind = InputCode.KEY_LSHIFT
+    @ConfigEditorKeyMapping(defaultKey = KEY_LSHIFT)
+    var fortuneTooltipKeybind = ConfigKeybind(KEY_LSHIFT)
 
     @Expose
     @ConfigOption(
