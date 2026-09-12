@@ -1,32 +1,35 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.compat.ReiCompat;
 import at.hannibal2.skyhanni.events.minecraft.CharEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent;
+import at.hannibal2.skyhanni.utils.KeyboardManager;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
-import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//? if rei_compat {
+/*import at.hannibal2.skyhanni.compat.ReiCompat;
+*///?}
+
 @Mixin(KeyboardHandler.class)
 public abstract class MixinKeyboardHandler {
-
     @Inject(method = "keyPress", at = @At("HEAD"))
     private void onKey(long window, int action, KeyEvent input, CallbackInfo ci) {
         int key = input.key();
         if (Minecraft.getInstance().player == null) return;
-        if (key == GLFW.GLFW_KEY_UNKNOWN) return;
+        if (key == KeyboardManager.KEY_UNKNOWN) return;
         //System.out.println("Key: " + key + " Scancode: " + scancode + " Action: " + action + " Modifiers: " + modifiers);
 
         // Don't send key events if REI search bar is selected
-        if (ReiCompat.searchHasFocus()) return;
+        //? if rei_compat
+        //if (ReiCompat.searchHasFocus()) return;
 
         /*
          * action = 0: Key released

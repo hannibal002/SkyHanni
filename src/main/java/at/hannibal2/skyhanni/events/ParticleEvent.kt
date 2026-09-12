@@ -21,7 +21,9 @@ import net.minecraft.core.registries.BuiltInRegistries
  * @param type the particle type
  * @param location the particle spawn location
  * @param count number of particles to spawn
- * @param speed particle speed
+ * @param xSpeed particle speed on the X axis
+ * @param ySpeed particle speed on the Y axis
+ * @param zSpeed particle speed on the Z axis
  * @param offset particle spawn offset
  * @param longDistance whether the packet bypasses normal distance checks
  * @param particleArgs optional particle-specific arguments
@@ -31,16 +33,22 @@ class ParticleEvent(
     val type: ParticleType<*>,
     override val location: LorenzVec,
     val count: Int,
-    val speed: Float,
+    val xSpeed: Float,
+    val ySpeed: Float,
+    val zSpeed: Float,
     val offset: LorenzVec,
     val longDistance: Boolean,
     val particleArgs: IntArray? = null,
 ) : CancellableWorldEvent() {
-
     val distanceToPlayer by lazy { location.distanceToPlayer() }
 
+    /**
+     * Checks whether the particle's [xSpeed], [ySpeed], and [zSpeed] all equal [speed].
+     */
+    fun isSpeed(speed: Float): Boolean = xSpeed == speed && ySpeed == speed && zSpeed == speed
+
     override fun toString(): String {
-        return "${javaClass.simpleName}(type='${BuiltInRegistries.PARTICLE_TYPE.getKey(type)}', location=${location.roundTo(1)}, count=$count, speed=$speed, offset=$offset, longDistance=$longDistance, distanceToPlayer=${
+        return "${javaClass.simpleName}(type='${BuiltInRegistries.PARTICLE_TYPE.getKey(type)}', location=${location.roundTo(1)}, count=$count, xSpeed=$xSpeed, ySpeed=$ySpeed, zSpeed=$zSpeed, offset=$offset, longDistance=$longDistance, distanceToPlayer=${
             distanceToPlayer.roundTo(1)
         })"
     }

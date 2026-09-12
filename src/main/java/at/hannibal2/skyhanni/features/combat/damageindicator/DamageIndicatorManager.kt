@@ -66,7 +66,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster.Enderman
 import net.minecraft.world.entity.monster.cubemob.MagmaCube
 import net.minecraft.world.entity.monster.zombie.Zombie
 import java.util.UUID
@@ -82,7 +82,6 @@ typealias EntityData = DamageIndicatorEntityData
 @SkyHanniModule
 @Suppress("LargeClass")
 object DamageIndicatorManager {
-
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
     // TODO use repoPattern
@@ -470,7 +469,6 @@ object DamageIndicatorManager {
         entity: LivingEntity,
         maxHealth: Long,
     ): String? {
-
         when (entityData.bossType) {
             BossType.DUNGEON_F4_THORN -> {
                 val thorn = checkThorn(health, maxHealth)
@@ -509,7 +507,7 @@ object DamageIndicatorManager {
             BossType.SLAYER_ENDERMAN_2,
             BossType.SLAYER_ENDERMAN_3,
             BossType.SLAYER_ENDERMAN_4,
-            -> return checkEnderSlayer(entity as EnderMan, entityData, health.toInt(), maxHealth.toInt())
+            -> return checkEnderSlayer(entity as Enderman, entityData, health.toInt(), maxHealth.toInt())
 
             BossType.SLAYER_BLOODFIEND_1,
             BossType.SLAYER_BLOODFIEND_2,
@@ -564,9 +562,7 @@ object DamageIndicatorManager {
 
             BossType.BACTE -> return checkBacte(entityData)
 
-
             BossType.END_ENDER_DRAGON -> return checkEnderDragon(entityData)
-
 
             else -> return ""
         }
@@ -724,7 +720,7 @@ object DamageIndicatorManager {
     }
 
     private fun checkEnderSlayer(
-        entity: EnderMan,
+        entity: Enderman,
         entityData: EntityData,
         health: Int,
         maxHealth: Int,

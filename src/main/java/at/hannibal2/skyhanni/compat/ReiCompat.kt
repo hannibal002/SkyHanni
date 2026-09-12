@@ -1,6 +1,9 @@
+@file:Suppress("NoEmptyFile")
+
 package at.hannibal2.skyhanni.compat
 
-import at.hannibal2.skyhanni.utils.SafeItemStack
+//? if rei_compat {
+/*import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -16,7 +19,6 @@ import net.minecraft.client.gui.components.events.GuiEventListener
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 
 object ReiCompat {
-
     private val isReiLoaded by lazy { PlatformUtils.isModInstalled("roughlyenoughitems") }
 
     @JvmStatic
@@ -68,3 +70,4 @@ object ReiCompat {
 
     private fun currentMousePoint(): Point = Point(MouseCompat.getX(), MouseCompat.getY())
 }
+*///?}

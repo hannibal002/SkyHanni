@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniAnimatedAtlasKey
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniAtlasKey
 import com.mojang.blaze3d.platform.Lighting
+import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.renderpearl.api.textures.GpuTextureView
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
@@ -17,6 +19,13 @@ import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
+
+//? if >= 26.3 {
+import org.joml.Vector4fc
+import java.util.Optional
+import java.util.OptionalDouble
+import java.util.function.Supplier
+//?}
 
 //? if >= 26.2 {
 import net.minecraft.client.renderer.SubmitNodeStorage
@@ -98,6 +107,8 @@ data class SkyHanniGuiItemRenderState(
         //~ if < 26.2 'submitNodeStorage: SubmitNodeStorage' -> 'bufferSource: MultiBufferSource.BufferSource'
         submitNodeStorage: SubmitNodeStorage,
         featureRenderDispatcher: FeatureRenderDispatcher,
+        colorTextureView: GpuTextureView,
+        depthTextureView: GpuTextureView,
         centerX: Float,
         centerY: Float,
         pixelSize: Int,
@@ -117,13 +128,39 @@ data class SkyHanniGuiItemRenderState(
         )
         if (rotated) setAnimated()
 
+        //? if < 26.3 {
+        /*RenderSystem.outputColorTextureOverride = colorTextureView
+        RenderSystem.outputDepthTextureOverride = depthTextureView
+        *///?}
+
         //~ if < 26.2 'submitNodeStorage' -> 'featureRenderDispatcher.submitNodeStorage'
         trackingState.submit(ps, submitNodeStorage, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
-        //? if >= 26.2 {
-        featureRenderDispatcher.renderAllFeatures(submitNodeStorage)
-        //?} else {
+        //? if >= 26.3 {
+        featureRenderDispatcher.prepareFrame(submitNodeStorage).use { frame ->
+            RenderSystem.getDevice()
+                .createCommandEncoder()
+                .createRenderPass(
+                    Supplier { "SkyHanni Item to GUI item atlas" },
+                    colorTextureView,
+                    Optional.empty<Vector4fc>(),
+                    depthTextureView,
+                    OptionalDouble.empty(),
+                )
+                .use { renderPass ->
+                    RenderSystem.bindDefaultUniforms(renderPass)
+                    FeatureRenderDispatcher.renderAllFeatures(renderPass, frame)
+                }
+        }
+        //?} elif >= 26.2 {
+        /*featureRenderDispatcher.renderAllFeatures(submitNodeStorage)
+        *///?} else {
         /*featureRenderDispatcher.renderAllFeatures()
         bufferSource.endBatch()
+        *///?}
+
+        //? if < 26.3 {
+        /*RenderSystem.outputColorTextureOverride = null
+        RenderSystem.outputDepthTextureOverride = null
         *///?}
     }
 }

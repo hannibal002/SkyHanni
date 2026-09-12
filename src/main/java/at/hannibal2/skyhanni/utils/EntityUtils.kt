@@ -30,7 +30,7 @@ import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster.Enderman
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
@@ -44,7 +44,6 @@ annotation class AllEntitiesGetter
 
 @SkyHanniModule
 object EntityUtils {
-
     inline val ALWAYS get(): (Entity) -> Boolean = { true }
 
     // TODO remove this relatively heavy call everywhere
@@ -179,7 +178,7 @@ object EntityUtils {
         }.normalizeAsArray()
     }
 
-    fun EnderMan.getBlockInHand(): BlockState? = carriedBlock
+    fun Enderman.getBlockInHand(): BlockState? = carriedBlock
 
     @AllEntitiesGetter
     inline fun <reified R : Entity> getEntities(): Sequence<R> = getAllEntities().filterIsInstance<R>()

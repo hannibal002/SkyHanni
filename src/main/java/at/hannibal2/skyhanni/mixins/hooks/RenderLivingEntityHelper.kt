@@ -8,15 +8,15 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.hasVisibleEquipment
 import com.mojang.blaze3d.systems.RenderSystem
-import net.minecraft.util.ARGB
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import java.awt.Color
 
-//? if >= 26.2 {
-import net.azureaaron.renderchest.api.CustomGlowCallback
+//? if render_chest {
+/*import net.azureaaron.renderchest.api.CustomGlowCallback
 import net.azureaaron.renderchest.api.GlowConstants
-//?}
+import net.minecraft.util.ARGB
+*///?}
 
 @SkyHanniModule
 object RenderLivingEntityHelper {
@@ -31,14 +31,14 @@ object RenderLivingEntityHelper {
 
     private var currentGlowEvent: RenderEntityOutlineEvent? = null
 
-    //? if >= 26.2 {
-    init {
+    //? if render_chest {
+    /*init {
         CustomGlowCallback.EVENT.register { entity, _ ->
             // Minecraft already renders all glow as opaque, and non-opaque values are reserved by Render Chest.
             getEntityGlowColor(entity)?.let(ARGB::opaque) ?: GlowConstants.NO_GLOW
         }
     }
-    //?} else {
+    *///?} elif < 26.2 {
     /*@JvmStatic
     var isUsingCustomGlow = false
         private set
