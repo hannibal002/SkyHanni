@@ -96,8 +96,12 @@ object IslandExceptions {
         armorStand: ArmorStand?,
         baseEntity: LivingEntity,
     ): MobData.MobResult? {
-        val dummyArmorStand = armorStand ?: MobUtils.getClosestArmorStand(baseEntity, 4.0)
-        if (dummyArmorStand != null && MobFilter.dummyMobNamePattern.matches(dummyArmorStand.cleanName)) {
+        val dummyArmorStand = sequenceOf(armorStand)
+            .plus(MobUtils.getArmorStandByRangeAll(baseEntity, 4.0))
+            .filterNotNull()
+            .firstOrNull { MobFilter.dummyMobNamePattern.matches(it.cleanName) }
+
+        if (dummyArmorStand != null) {
             return MobData.MobResult.found(
                 Mob(
                     baseEntity = baseEntity,

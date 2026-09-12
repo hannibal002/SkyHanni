@@ -164,7 +164,7 @@ object MobFilter {
      */
     val dummyMobNamePattern by patternGroup.pattern(
         "pattern.privateisland.dummy",
-        ".* Dummy .*",
+        ".*Dummy.*",
     )
 
     internal val RAT_SKULL_TEXTURE by SkullTextureHolder.texture("MOB_RAT")
