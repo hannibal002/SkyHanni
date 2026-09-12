@@ -374,6 +374,10 @@ object FishingApi {
             .eachCount()
             .any { (_, count) -> count >= 2 }
 
+    // Unlike isWearingTrophyArmor(), this counts pieces across all tiers (mixed tiers allowed).
+    fun isWearingAnyTrophyArmor(): Boolean =
+        InventoryUtils.getArmor().count { trophyArmorNames.matches(it?.getInternalName()?.asString()) } >= 2
+
     fun isWearingEmberArmor(): Boolean =
         InventoryUtils.getArmor().all {
             emberArmorNames.matches(it?.getInternalName()?.asString())
