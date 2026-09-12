@@ -1,16 +1,14 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantGlint
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPeace
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 
-@ExtendWith(BootstrapExtension::class)
 class ItemModifierTest {
 
     @Test

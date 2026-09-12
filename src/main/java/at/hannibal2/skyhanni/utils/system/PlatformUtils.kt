@@ -24,25 +24,15 @@ object PlatformUtils {
 
     @JvmStatic
     @get:JvmName("isDevEnvironment")
-    val isDevEnvironment: Boolean by lazy {
-        FabricLoader.getInstance().isDevelopmentEnvironment
-    }
+    val isDevEnvironment: Boolean = FabricLoader.getInstance().isDevelopmentEnvironment
 
-    val gameDir: Path by lazy {
-        FabricLoader.getInstance().gameDir
-    }
+    val gameDir: Path = FabricLoader.getInstance().gameDir
 
-    val dataDir: Path by lazy {
-        gameDir.resolve("data")
-    }
+    val dataDir: Path = gameDir.resolve("data")
 
-    val configDir: Path by lazy {
-        FabricLoader.getInstance().configDir
-    }
+    val configDir: Path = FabricLoader.getInstance().configDir
 
-    val logsDir: Path by lazy {
-        dataDir.resolve("logs")
-    }
+    val logsDir: Path = dataDir.resolve("logs")
 
     private val allowedFabricReports = setOf(
         "fabricloader",
