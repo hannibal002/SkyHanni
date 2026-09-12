@@ -402,6 +402,10 @@ object CurrentPetDisplay {
     }
 
     private fun PetData.withAnimatedExp(): PetData {
+        if (!config.general.smoothXp.get()) {
+            xpAnimation = null
+            return this
+        }
         val targetExp = exp ?: return this
         val petUuid = uuid
         val currentAnimation = xpAnimation
@@ -424,6 +428,10 @@ object CurrentPetDisplay {
     }
 
     private fun List<ExpSharePetState>.withAnimatedExpShare(): List<ExpSharePetState> {
+        if (!config.general.smoothXp.get()) {
+            expShareXpAnimations.clear()
+            return this
+        }
         val activeUuids = mapNotNull { it.petData.uuid }.toSet()
         expShareXpAnimations.keys.removeAll { it !in activeUuids }
         return map { it.copy(petData = it.petData.withAnimatedExpShare()) }
