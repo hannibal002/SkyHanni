@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 object EnumUtils {
-
     inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
         val enums = enumValues<T>()
         return enums.firstOrNull { it.name == name }
@@ -12,8 +11,6 @@ object EnumUtils {
 
     inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
         enumValues<T>().joinToString("|", transform = transform)
-
-    inline fun <reified T : Enum<T>> T.isAnyOf(vararg array: T): Boolean = array.contains(this)
 
     fun <T : Enum<T>> Enum<T>.toFormattedName(): String =
         name.split("_").joinToString(" ") { it.lowercase().replaceFirstChar(Char::uppercase) }
@@ -37,5 +34,4 @@ object EnumUtils {
             else -> null
         }
     }
-
 }
