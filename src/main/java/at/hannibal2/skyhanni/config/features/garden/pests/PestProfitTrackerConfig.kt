@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.garden.GardenIndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -71,9 +71,9 @@ class PestProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "Click to open the settings that only apply to this tracker."
     )
-    @Accordion
+    @ConfigEditorButton(buttonText = "OPEN")
     val perTrackerConfig: GardenIndividualItemTrackerConfig = GardenIndividualItemTrackerConfig()
 
     @Expose
