@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ElectionApi.derpy
-import at.hannibal2.skyhanni.events.AttributeWatcherUpdateEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.entity.EntityAttributeUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
@@ -42,7 +42,7 @@ object EntityData {
     )
 
     @HandleEvent
-    private fun onAttributeWatcherUpdate(event: AttributeWatcherUpdateEvent<LivingEntity>) {
+    private fun onEntityAttributeUpdate(event: EntityAttributeUpdateEvent<LivingEntity>) {
         val entity = event.entity
         if (entity.javaClass in ignoredEntities) return
         val attribute = event.attribute

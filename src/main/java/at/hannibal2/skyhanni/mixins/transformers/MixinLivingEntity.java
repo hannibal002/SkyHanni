@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.AttributeWatcherUpdateEvent;
+import at.hannibal2.skyhanni.events.entity.EntityAttributeUpdateEvent;
 import at.hannibal2.skyhanni.events.entity.EntityDeathEvent;
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent;
 import net.minecraft.core.Holder;
@@ -29,6 +29,6 @@ public abstract class MixinLivingEntity {
 
     @Inject(method = "onAttributeUpdated", at = @At("TAIL"))
     public void onAttributeUpdated(Holder<Attribute> attribute, CallbackInfo ci) {
-        new AttributeWatcherUpdateEvent<>((LivingEntity) (Object) this, attribute).post();
+        new EntityAttributeUpdateEvent<>((LivingEntity) (Object) this, attribute).post();
     }
 }
