@@ -101,9 +101,7 @@ object DianaApi {
         if (!hasSpadeInHand()) return
         if (event.clickType != RIGHT_CLICK) return
 
-        if (ritualActiveOverride != false) {
-            overrideActiveRitual()
-        }
+        overrideActiveRitual()
     }
 
     @HandleEvent
