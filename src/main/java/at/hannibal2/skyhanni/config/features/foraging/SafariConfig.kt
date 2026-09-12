@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.foraging
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -25,4 +26,8 @@ class SafariConfig {
     @FeatureToggle
     var hideyhoFinder: Boolean = true
 
+    @Expose
+    @ConfigOption(name = "Safari Checklist", desc = "")
+    @Accordion
+    val checklist = SafariChecklistConfig()
 }
