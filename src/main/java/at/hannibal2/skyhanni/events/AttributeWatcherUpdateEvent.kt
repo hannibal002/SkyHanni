@@ -9,5 +9,5 @@ import net.minecraft.world.entity.ai.attributes.Attribute
 @PrimaryFunction("onAttributeWatcherUpdate")
 data class AttributeWatcherUpdateEvent<T : LivingEntity>(
     val entity: T,
-    val attribute: Holder<Attribute>
-): GenericSkyHanniEvent<T>(entity.javaClass)
+    val attribute: Holder<Attribute>,
+) : GenericSkyHanniEvent<T>(entity.javaClass)
