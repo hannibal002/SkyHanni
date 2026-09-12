@@ -8,6 +8,7 @@ import net.minecraft.world.entity.LivingEntity
  * Event that is called when an entity's max health is updated.
  * [maxHealth] accounts for global health modifiers, such as Derpy mayor.
  *
+ * @param T The type of the entity.
  * @property entity The entity whose max health was updated.
  * @property maxHealth The new max health of the entity.
  */
