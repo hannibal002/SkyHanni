@@ -21,7 +21,7 @@ import net.minecraft.world.entity.item.ItemEntity
 @SkyHanniModule
 object DataWatcherApi {
 
-    val ignoredEntities = setOf(
+    private val ignoredEntities = setOf(
         ArmorStand::class.java,
         ExperienceOrb::class.java,
         ItemEntity::class.java,
