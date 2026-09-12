@@ -44,6 +44,12 @@ class HuntingConfig {
     val lassoDisplayPosition: Position = Position(380, 210)
 
     @Expose
+    @ConfigOption(name = "Reel Alert", desc = "Plays a sound alert when it's time to reel in your lasso.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var reelAlert = true
+
+    @Expose
     @ConfigOption(name = "Fusion Keybinds", desc = "")
     @SearchTag("hunting box")
     @Accordion
