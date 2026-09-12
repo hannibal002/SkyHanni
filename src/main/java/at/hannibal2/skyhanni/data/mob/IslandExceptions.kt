@@ -96,16 +96,11 @@ object IslandExceptions {
         armorStand: ArmorStand?,
         baseEntity: LivingEntity,
     ) = when {
-
         // Dummy can have either 2b or Int.MAX_VALUE health
         // This does not check for the armor stand name because that is sometimes
         // delayed when switching mobs for the dummy too quickly
         baseEntity.baseMaxHealth >= 2_000_000_000 -> MobData.MobResult.found(
-            Mob(
-                baseEntity = baseEntity,
-                category = MobCategory.SPECIAL,
-                name = "Dummy",
-            )
+            MobFactories.special(baseEntity, "Dummy", armorStand)
         )
 
         armorStand?.isDefaultValue() != false ->
