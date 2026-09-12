@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.features.event.yearoftheseal.BeachBallTracker
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
+import at.hannibal2.skyhanni.features.fishing.tracker.TreasureFishingTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
 import at.hannibal2.skyhanni.features.garden.CropAccessory
@@ -445,6 +446,9 @@ class ProfileSpecificStorage(
     class FishingStorage {
         @Expose
         var fishingProfitTracker: FishingProfitTracker.Data = FishingProfitTracker.Data()
+
+        @Expose
+        var treasureFishingTracker: TreasureFishingTracker.Data = TreasureFishingTracker.Data()
 
         @Expose
         var seaCreatureTracker: SeaCreatureTracker.Data = SeaCreatureTracker.Data()
