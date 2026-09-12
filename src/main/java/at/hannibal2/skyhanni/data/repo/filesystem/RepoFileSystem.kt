@@ -18,7 +18,9 @@ sealed interface RepoFileSystem {
     fun exists(path: String): Boolean
     fun readAllBytes(path: String): ByteArray
     fun write(path: String, data: ByteArray)
-    fun list(path: String): List<String>
+    fun list(path: String): List<String> = listFiles(path, "json")
+    fun listFiles(path: String, extension: String): List<String>
+    fun listDirectories(path: String): List<String>
     fun validatePath(relativePath: String) = Unit
     suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem = this
 
