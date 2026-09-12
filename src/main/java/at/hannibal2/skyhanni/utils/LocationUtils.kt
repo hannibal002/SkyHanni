@@ -23,7 +23,6 @@ typealias FacePointSet = MutableMap<Direction, PointSet>
 
 @Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object LocationUtils {
-
     fun canSee(a: LorenzVec, b: LorenzVec, offset: Double? = null): Boolean {
         return canSee0(a, b) && offset?.let { canSee0(a.add(y = it), b.add(y = it)) } ?: true
     }
@@ -60,7 +59,7 @@ object LocationUtils {
     fun Entity.distanceToIgnoreY(location: LorenzVec) = getLorenzVec().distanceIgnoreY(location)
 
     fun playerEyeLocation(): LorenzVec {
-        val player = MinecraftCompat.localPlayerOrThrow
+        val player = MinecraftCompat.localPlayerOrNull ?: return LorenzVec()
         val vec = player.getLorenzVec()
         return vec.up(player.eyeHeight.toDouble())
     }
@@ -194,12 +193,12 @@ object LocationUtils {
     }
 
     private fun Direction.getCenterPos(center: LorenzVec, aabb: AABB) = when (this) {
-        Direction.DOWN -> LorenzVec(center.x, aabb.minY, center.z)
-        Direction.UP -> LorenzVec(center.x, aabb.maxY, center.z)
-        Direction.NORTH -> LorenzVec(center.x, center.y, aabb.minZ)
-        Direction.SOUTH -> LorenzVec(center.x, center.y, aabb.maxZ)
-        Direction.WEST -> LorenzVec(aabb.minX, center.y, center.z)
-        Direction.EAST -> LorenzVec(aabb.maxX, center.y, center.z)
+        DOWN -> LorenzVec(center.x, aabb.minY, center.z)
+        UP -> LorenzVec(center.x, aabb.maxY, center.z)
+        NORTH -> LorenzVec(center.x, center.y, aabb.minZ)
+        SOUTH -> LorenzVec(center.x, center.y, aabb.maxZ)
+        WEST -> LorenzVec(aabb.minX, center.y, center.z)
+        EAST -> LorenzVec(aabb.maxX, center.y, center.z)
     }
 
     private val xIdentityVector = LorenzVec(1.0, 0.0, 0.0)
@@ -229,9 +228,9 @@ object LocationUtils {
         // The identity vectors for each face
         val (axis1Iden, axis2Iden) = faceMap[this] ?: return null
         return when (this) {
-            Direction.UP, Direction.DOWN -> FaceRayConfig(axis1Iden, axis2Iden, halfX, halfZ)
-            Direction.NORTH, Direction.SOUTH -> FaceRayConfig(axis1Iden, axis2Iden, halfX, halfY)
-            Direction.WEST, Direction.EAST -> FaceRayConfig(axis1Iden, axis2Iden, halfZ, halfY)
+            UP, DOWN -> FaceRayConfig(axis1Iden, axis2Iden, halfX, halfZ)
+            NORTH, SOUTH -> FaceRayConfig(axis1Iden, axis2Iden, halfX, halfY)
+            WEST, EAST -> FaceRayConfig(axis1Iden, axis2Iden, halfZ, halfY)
         }
     }
 
