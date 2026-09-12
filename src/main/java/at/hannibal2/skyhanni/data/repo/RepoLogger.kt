@@ -3,12 +3,10 @@ package at.hannibal2.skyhanni.data.repo
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
-import java.io.File
 
-class RepoLogger(manager: AbstractRepoManager<*>) : SkyHanniLogger(manager.commonName) {
+class RepoLogger(manager: AbstractRepoManager<*>) : SkyHanniLogger(manager.repoFolderName) {
 
     private val loggingPrefix = "[Repo - ${manager.commonName}]"
-    override val logsDir = File(manager.repoDirectory, "logs")
 
     fun debug(message: String) = log("[DEBUG] $loggingPrefix $message")
     fun warn(message: String) = log("[WARN] $loggingPrefix $message")
