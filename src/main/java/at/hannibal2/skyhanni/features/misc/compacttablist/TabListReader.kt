@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -15,11 +16,11 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.TextColor
 
 // heavily inspired by SBA code
 @SkyHanniModule
 object TabListReader {
-
     private val config get() = SkyHanniMod.feature.gui.compactTabList
     private val patternGroup = RepoPattern.group("misc.compacttablist")
 
@@ -238,7 +239,7 @@ object TabListReader {
         }
         upgradesPattern.matchMatcher(component) {
             if (!inUpgrades) return@matchMatcher
-            if (!component.formattedTextCompat().startsWith("§e")) return@matchMatcher
+            if (component.intoSpan().sampleStyleAtStart().color != TextColor.fromLegacyFormat(YELLOW)) return@matchMatcher
 
             val firstComponent = TextHelper.matcher(component, group("firstPart")) ?: return@apply
             val secondComponent = TextHelper.matcher(component, group("secondPart")) ?: return@apply

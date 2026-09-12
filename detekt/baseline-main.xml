@@ -248,13 +248,6 @@
     <ID>PrivateEventListener:BarnFishingTimer.kt:BarnFishingTimer$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:BarnFishingTimer.kt:BarnFishingTimer$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
     <ID>PrivateEventListener:BarnFishingTimer.kt:BarnFishingTimer$@Suppress("UNUSED_PARAMETER") @HandleEvent(onlyOnIsland = IslandType.HUB) fun onPlayerMove</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent fun onSlotClick</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent fun onTick</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent(onlyOnSkyblock = true) fun onBackgroundDrawn</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:BazaarApi.kt:BazaarApi$@HandleEvent(priority = HandleEvent.HIGHEST) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:BazaarBestSellMethod.kt:BazaarBestSellMethod$@HandleEvent fun onBazaarOpenedProduct</ID>
     <ID>PrivateEventListener:BazaarBestSellMethod.kt:BazaarBestSellMethod$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:BazaarBestSellMethod.kt:BazaarBestSellMethod$@HandleEvent fun onInventoryClose</ID>
@@ -920,13 +913,6 @@
     <ID>PrivateEventListener:DungeonCleanEnd.kt:DungeonCleanEnd$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onEntityHealthUpdate</ID>
     <ID>PrivateEventListener:DungeonCleanEnd.kt:DungeonCleanEnd$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onParticle</ID>
     <ID>PrivateEventListener:DungeonCleanEnd.kt:DungeonCleanEnd$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onPlaySound</ID>
-    <ID>PrivateEventListener:DungeonCopilot.kt:DungeonCopilot$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:DungeonCopilot.kt:DungeonCopilot$@HandleEvent fun onDungeonBossRoomEnter</ID>
-    <ID>PrivateEventListener:DungeonCopilot.kt:DungeonCopilot$@HandleEvent fun onDungeonStart</ID>
-    <ID>PrivateEventListener:DungeonCopilot.kt:DungeonCopilot$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:DungeonCopilot.kt:DungeonCopilot$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onChat</ID>
-    <ID>PrivateEventListener:DungeonCopilot.kt:DungeonCopilot$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onCheckRender</ID>
-    <ID>PrivateEventListener:DungeonCopilot.kt:DungeonCopilot$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:DungeonCreationCooldown.kt:DungeonCreationCooldown$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:DungeonCreationCooldown.kt:DungeonCreationCooldown$@HandleEvent fun onCommand</ID>
     <ID>PrivateEventListener:DungeonCreationCooldown.kt:DungeonCreationCooldown$@HandleEvent fun onGuiRenderOverlay</ID>
@@ -950,16 +936,6 @@
     <ID>PrivateEventListener:DungeonHighlightClickedBlocks.kt:DungeonHighlightClickedBlocks$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:DungeonHighlightClickedBlocks.kt:DungeonHighlightClickedBlocks$@HandleEvent fun onDungeonClickedBlock</ID>
     <ID>PrivateEventListener:DungeonHighlightClickedBlocks.kt:DungeonHighlightClickedBlocks$@HandleEvent fun onRenderWorld</ID>
-    <ID>PrivateEventListener:DungeonLividFinder.kt:DungeonLividFinder$@HandleEvent fun onBlockChange</ID>
-    <ID>PrivateEventListener:DungeonLividFinder.kt:DungeonLividFinder$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:DungeonLividFinder.kt:DungeonLividFinder$@HandleEvent fun onRenderWorld</ID>
-    <ID>PrivateEventListener:DungeonLividFinder.kt:DungeonLividFinder$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:DungeonLividFinder.kt:DungeonLividFinder$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:DungeonLividFinder.kt:DungeonLividFinder$@HandleEvent(ConfigLoadEvent::class) fun onConfigLoad</ID>
-    <ID>PrivateEventListener:DungeonLividFinder.kt:DungeonLividFinder$@HandleEvent(DungeonBossRoomEnterEvent::class) fun onBossStart</ID>
-    <ID>PrivateEventListener:DungeonLividFinder.kt:DungeonLividFinder$@HandleEvent(DungeonCompleteEvent::class) fun onBossEnd</ID>
-    <ID>PrivateEventListener:DungeonLividFinder.kt:DungeonLividFinder$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
-    <ID>PrivateEventListener:DungeonLividFinder.kt:DungeonLividFinder$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onCheckRender</ID>
     <ID>PrivateEventListener:DungeonMilestonesDisplay.kt:DungeonMilestonesDisplay$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:DungeonMilestonesDisplay.kt:DungeonMilestonesDisplay$@HandleEvent fun onDungeonStart</ID>
     <ID>PrivateEventListener:DungeonMilestonesDisplay.kt:DungeonMilestonesDisplay$@HandleEvent fun onTick</ID>
@@ -1301,8 +1277,6 @@
     <ID>PrivateEventListener:FossilSolverDisplay.kt:FossilSolverDisplay$@HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES) fun onRenderItemTip</ID>
     <ID>PrivateEventListener:FossilSolverDisplay.kt:FossilSolverDisplay$@HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES) fun onSlotClick</ID>
     <ID>PrivateEventListener:FossilSolverDisplay.kt:FossilSolverDisplay$@HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES) fun onTick</ID>
-    <ID>PrivateEventListener:FriendApi.kt:FriendApi$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:FriendApi.kt:FriendApi$@HandleEvent fun onHypixelJoin</ID>
     <ID>PrivateEventListener:FrogMaskFeatures.kt:FrogMaskFeatures$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:FrogMaskFeatures.kt:FrogMaskFeatures$@HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:FrogMaskFeatures.kt:FrogMaskFeatures$@HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true) fun onSecondPassed</ID>
@@ -2974,9 +2948,6 @@
     <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent fun onTick</ID>
     <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent(receiveCancelled = true) fun onPacketReceive</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent fun onConfigLoad</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent(onlyOnSkyblock = true) fun onTabListFooterUpdate</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent(onlyOnSkyblock = true) fun onTabListUpdate</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent fun onSkipTablistLine</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent(onlyOnSkyblock = true) fun onRenderOverlayPre</ID>
