@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 
 private typealias StatsEntry = DropsStatisticsConfig.DropsStatisticsTextEntry
 
-enum class VisitorReward(rawInternalName: String, val displayName: String) {
+enum class VisitorReward(rawInternalName: String, val displayName: String, vararg aliasInternalNames: String) {
     FLOWERING_BOUQUET("FLOWERING_BOUQUET", "§9Flowering Bouquet"),
     OVERGROWN_GRASS("OVERGROWN_GRASS", "§9Overgrown Grass"),
     GREEN_BANDANA("GREEN_BANDANA", "§9Green Bandana"),
@@ -35,7 +35,7 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
     SATIN_TROUSERS("SATIN_TROUSERS", "§9Satin Trousers"),
     OXFORD_SHOES("OXFORD_SHOES", "§9Oxford Shoes"),
     CARNIVAL_TICKET("CARNIVAL_TICKET", "§aCarnival Ticket"),
-    VISITORS_GRATITUDE("VISITORS_GRATITUDE", "§fVisitors' Gratitude"),
+    VISITORS_GRATITUDE("VISITOR_GRATITUDE", "§fVisitors' Gratitude", "VISITORS_GRATITUDE"),
     FARMING_CONTEST_DISPLAY("FARMING_CONTEST_DISPLAY", "§aFarming Contest Display"),
     ASTRONAUT_PERSONALITY("ASTRONAUT_PERSONALITY", "§fAstronaut Minion Skin"),
     FAST_FOOD_BARN_SKIN("FAST_FOOD_BARN_SKIN", "§6Fast Food Barn Skin"),
@@ -43,12 +43,13 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
     ;
 
     private val internalName = rawInternalName.toInternalName()
+    private val internalNames = (listOf(rawInternalName) + aliasInternalNames).map { it.toInternalName() }
     val itemStack by AutoUpdatingItemStack(internalName)
     // TODO use this instead of hard coded item names once moulconfig no longer calls toString before the neu repo gets loaded
 //     val displayName by lazy { itemStack.nameWithEnchantment ?: internalName.asString() }
 
     companion object {
-        fun getByInternalName(internalName: NeuInternalName) = entries.firstOrNull { it.internalName == internalName }
+        fun getByInternalName(internalName: NeuInternalName) = entries.firstOrNull { internalName in it.internalNames }
     }
 
     // Todo: Remove this when enum names of this and DropsStatisticsTextEntry are in sync
