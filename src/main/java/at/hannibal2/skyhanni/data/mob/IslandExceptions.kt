@@ -109,7 +109,7 @@ object IslandExceptions {
                             category = MobCategory.SPECIAL,
                             armorStand = stand,
                             name = "Dummy",
-                            hypixelTypes = group("types"),
+                            hypixelTypes = group("mobTypes"),
                         )
                     }
                 }
