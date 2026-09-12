@@ -235,7 +235,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
                 }
                 loot.clear()
             }
-            if (config.compactGiftChats) blockedReason = "TREE_GIFT"
+            if (config.compactGiftChats || config.disableGiftChats) blockedReason = "TREE_GIFT"
         }
         if (!openLootLoop) return
 
@@ -300,7 +300,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     }
 
     private fun SkyHanniChatEvent.Allow.tryBlock() {
-        if (!config.compactGiftChats || !openLootLoop) return
+        if (!config.compactGiftChats || !config.disableGiftChats || !openLootLoop) return
         blockedReason = "TREE_GIFT"
     }
 
