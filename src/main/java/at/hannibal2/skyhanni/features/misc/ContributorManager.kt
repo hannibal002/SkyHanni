@@ -352,6 +352,7 @@ object ContributorManager {
 
     fun shouldSpin(uuid: UUID): Boolean = contributors[uuid]?.spinny ?: false
     fun shouldBeUpsideDown(uuid: UUID): Boolean = contributors[uuid]?.upsideDown ?: false
+    fun shouldDeferAchievement(uuid: UUID): Boolean = contributors[uuid]?.deferAchievement ?: false
 
     fun isSelfContributor(): Boolean {
         isContributor?.let { return it }

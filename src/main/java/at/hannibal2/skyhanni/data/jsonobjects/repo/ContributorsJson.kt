@@ -13,5 +13,6 @@ data class ContributorJsonEntry(
     @Expose @SerializedName(value = "component_suffix", alternate = ["componentSuffix"]) val componentSuffix: Component? = null,
     @Expose val spinny: Boolean = false,
     @Expose @SerializedName(value = "upside_down", alternate = ["upsideDown"]) val upsideDown: Boolean = false,
+    @Expose @SerializedName(value = "defer_achievement") val deferAchievement: Boolean = false,
     @Expose @SerializedName("display_name") val displayName: String? = null,
 )
