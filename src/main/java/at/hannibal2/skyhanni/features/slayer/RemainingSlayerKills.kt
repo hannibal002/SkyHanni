@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -67,7 +68,7 @@ object RemainingSlayerKills {
      */
     private val killCombatWisdomPattern by patternGroup.pattern(
         "kill-combat-wisdom",
-        "\\+\\d+ Kill Combo \\+(?<wisdom>\\d+)☯ Combat Wisdom",
+        "\\+\\d+ Kill Combo \\+(?<wisdom>\\d+)${SkyblockIcon.COMBAT_WISDOM} Combat Wisdom",
     )
 
     data class SlayerData(

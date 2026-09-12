@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.model.SkyblockMobType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -17,10 +18,7 @@ object HideMobNames {
     private val lastMobName = TimeLimitedCache<Int, String>(2.minutes)
     private val mobNamesHidden = mutableListOf<Int>()
 
-    // TODO: use SkyblockIcons instead of hardcoding the mob types
-    private const val ALL_MOB_TYPES =
-        "\uE070\uE071\uE072\uE073\uE074\uE075\uE076\uE077\uE078\uE079\uE07A\uE07B" +
-            "\uE07C\uE07D\uE07E\uE018\uE07F\uE080\uE081\uE082\uE083\uE084\uE085\uE086\uE087"
+    private val ALL_MOB_TYPES = SkyblockMobType.entries.map { it.hypixelIcon }.joinToString("")
 
     /**
      * REGEX-TEST: [Lv1]  Graveyard Zombie 100/100❤
