@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
-import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isLavaRod
@@ -142,7 +141,7 @@ object GoldenFishTimer {
     private var display: Renderable? = null
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isActive()) return
         if (spawnPattern.matches(event.message)) {
             lastChatMessage = SimpleTimeMark.now()
@@ -178,7 +177,7 @@ object GoldenFishTimer {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isActive()) return
         if (!config.nametag) return
         val entity = confirmedGoldenFishEntity ?: return
@@ -191,7 +190,7 @@ object GoldenFishTimer {
     }
 
     @HandleEvent
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!isActive()) return
         display?.let {
             config.position.renderRenderable(it, posLabel = "Golden Fish Timer")
@@ -288,7 +287,7 @@ object GoldenFishTimer {
     }
 
     @HandleEvent
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!isEnabled()) return
         hasLavaRodInInventory = InventoryUtils.containsInLowerInventoryInternalName { it.isLavaRod() }
 
@@ -313,7 +312,7 @@ object GoldenFishTimer {
     }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (!isActive()) return
         // This makes it only count as the rod being throw into lava if the rod goes down, up, and down again.
         // Not confirmed that this is correct, but it's the best solution found.
@@ -328,24 +327,24 @@ object GoldenFishTimer {
         }
     }
 
-    @HandleEvent(FishingBobberCastEvent::class)
-    fun onBobberThrow() {
+    @HandleEvent
+    private fun onBobberCast() {
         if (!isActive()) return
         goingDownInit = true
         goingDownPost = false
     }
 
     @HandleEvent
-    fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
+    private fun onEntityMaxHealthUpdate(event: EntityMaxHealthUpdateEvent<ArmorStand>) {
         if (!isActive()) return
         if (isGoldenFishActive()) return
-        val entity = event.entity as? ArmorStand ?: return
+        val entity = event.entity
 
         DelayedRun.runDelayed(1.seconds) { checkGoldenFish(entity) }
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         lastChatMessage = SimpleTimeMark.farPast()
         lastFishEntity = SimpleTimeMark.farPast()
         lastGoldenFishTime = ServerTimeMark.farPast()
@@ -358,7 +357,7 @@ object GoldenFishTimer {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
             97,
             "fishing.trophyFishing.goldenFishTimer.showHead",
@@ -371,7 +370,7 @@ object GoldenFishTimer {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Golden Fish Timer")
         if (!isEnabled()) {
             event.addIrrelevant("Not Enabled")

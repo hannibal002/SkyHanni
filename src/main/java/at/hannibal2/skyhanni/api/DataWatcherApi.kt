@@ -8,12 +8,27 @@ import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.boss.wither.WitherBoss
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.decoration.ItemFrame
+import net.minecraft.world.entity.item.ItemEntity
 
 @SkyHanniModule
 object DataWatcherApi {
+
+    val ignoredEntities = setOf(
+        ArmorStand::class.java,
+        ExperienceOrb::class.java,
+        ItemEntity::class.java,
+        ItemFrame::class.java,
+        RemotePlayer::class.java,
+        LocalPlayer::class.java,
+    )
 
     @HandleEvent
     private fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<Entity>) {
@@ -26,7 +41,7 @@ object DataWatcherApi {
                 val health = (updatedEntry.value as? Float)?.toInt() ?: continue
 
                 val entity = EntityUtils.getEntityByID(event.entity.id) ?: continue
-                if (entity.javaClass in EntityData.ignoredEntities) continue
+                if (entity.javaClass in ignoredEntities) continue
 
                 if (event.entity is WitherBoss && health == 300 && event.entity.id < 0) continue
                 if (event.entity is LivingEntity) {

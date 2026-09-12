@@ -11,17 +11,11 @@ import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import net.minecraft.client.player.LocalPlayer
-import net.minecraft.client.player.RemotePlayer
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attributes
-import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.entity.decoration.ItemFrame
-import net.minecraft.world.entity.item.ItemEntity
 import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -32,19 +26,9 @@ object EntityData {
     private val healthDisplayCache = TimeLimitedCache<Component, Component>(50.milliseconds)
     private val lastVisibilityCheck = TimeLimitedCache<Int, Boolean>(200.milliseconds)
 
-    val ignoredEntities = setOf(
-        ArmorStand::class.java,
-        ExperienceOrb::class.java,
-        ItemEntity::class.java,
-        ItemFrame::class.java,
-        RemotePlayer::class.java,
-        LocalPlayer::class.java,
-    )
-
     @HandleEvent
     private fun onEntityAttributeUpdate(event: EntityAttributeUpdateEvent<LivingEntity>) {
         val entity = event.entity
-        if (entity.javaClass in ignoredEntities) return
         val attribute = event.attribute
         if (attribute.`is`(Attributes.MAX_HEALTH)) {
             val maxHealth = entity.baseMaxHealth
