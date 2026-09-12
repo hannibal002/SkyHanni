@@ -69,6 +69,8 @@ object VanquisherApi {
         if (mob != null && data != null) data.postDespawn()
     }
 
+    fun getVanquishers() = vanquishers.values
+
     private val vanquisherShortTimeout = 2.seconds
     private val vanquisherLongTimeout = 5.seconds
 
@@ -150,7 +152,7 @@ object VanquisherApi {
 
     @HandleEvent
     fun onWorldChange() {
-        vanquishers.values.forEach { it.postDespawn() }
+        getVanquishers().forEach { it.postDespawn() }
         vanquishers.clear()
         lastPossibleSpawnEntity = null
         lastSpawnEntityPos = null
