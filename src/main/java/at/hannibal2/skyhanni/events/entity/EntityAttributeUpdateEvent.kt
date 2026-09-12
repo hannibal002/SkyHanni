@@ -10,7 +10,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute
  * Event that is called when an entity's attribute is updated.
  * Like max health, movement speed, absorption etc.
  *
- * @param T The type of the entity whose attribute was updated.
+ * @param T The type of the entity.
  * @property entity The entity whose attribute was updated.
  * @property attribute The attribute that was updated.
  */
