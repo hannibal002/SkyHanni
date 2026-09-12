@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.render.item.atlas
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniAbstractAtlas
 import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniAtlasBinPacker
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
@@ -9,9 +10,8 @@ import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.resources.Identifier
 
 internal class SkyHanniItemAtlas : SkyHanniAbstractAtlas<SkyHanniAtlasKey, SkyHanniItemAtlasEntry>() {
-
     override val identifier: Identifier by lazy {
-        Identifier.fromNamespaceAndPath("skyhanni", "item_atlas")
+        SkyHanniMod.id("item_atlas")
     }
 
     override val colorLabel = "SkyHanni item atlas"

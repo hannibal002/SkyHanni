@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import net.minecraft.resources.Identifier
 
 @SkyHanniModule
 object SpookyAchievement {
-
     /**
      * WRAPPED-REGEX-TEST: "                   Your Candy: 4,036 (Position #342)"
      */
@@ -25,8 +25,8 @@ object SpookyAchievement {
     private const val SPOOKY_ACHIEVEMENT = "Spooky Double Points"
 
     @HandleEvent
-    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
-        val netheriteIngot = TextHelper.createAtlasSprite("item/netherite_ingot", "items", "minecraft")
+    private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+        val netheriteIngot = TextHelper.createAtlasSprite("items", Identifier.withDefaultNamespace("item/netherite_ingot"))
         val achievement = Achievement(
             name = "Netherite Spooky Bracket".asComponent(),
             description = componentBuilder {
@@ -40,7 +40,7 @@ object SpookyAchievement {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         candyPattern.matchMatcher(event.cleanMessage) {
             if (group("candy").formatInt() >= 10_000) {
                 AchievementManager.completeAchievement(SPOOKY_ACHIEVEMENT)

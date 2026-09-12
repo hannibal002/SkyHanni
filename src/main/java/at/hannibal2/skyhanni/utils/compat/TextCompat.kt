@@ -23,7 +23,6 @@ import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
-import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStackTemplate
 import java.net.URI
 import java.util.Optional
@@ -160,16 +159,6 @@ fun MutableComponent.withColor(color: TextColor): MutableComponent {
  */
 fun MutableComponent.withColor(hex: String): MutableComponent {
     return this.withStyle { it.withColor(ColorUtils.getColorFromHex(hex)) }
-}
-
-fun createResourceLocation(domain: String, path: String): Identifier {
-    val textureLocation = Identifier.fromNamespaceAndPath(domain, path)
-    return textureLocation
-}
-
-fun createResourceLocation(path: String): Identifier {
-    val textureLocation = Identifier.parse(path)
-    return textureLocation
 }
 
 var Component.hover: Component?
@@ -314,7 +303,6 @@ fun ClickEvent.value(): String {
         // todo use error manager here probably, not doing it now because it doesn't compile on 1.21
         else -> ""
     }
-
 }
 
 fun HoverEvent.value(): Component = when (action()) {

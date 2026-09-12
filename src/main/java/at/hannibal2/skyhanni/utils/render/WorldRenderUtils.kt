@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.position
 import at.hannibal2.skyhanni.utils.compat.rotation
@@ -32,6 +31,7 @@ import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.Identifier
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.entity.Entity
@@ -55,7 +55,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEventLegacy
 @SkyHanniModule
 @Suppress("LargeClass")
 object WorldRenderUtils {
-    private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
+    private val beaconBeam = Identifier.withDefaultNamespace("textures/entity/beacon/beacon_beam.png")
 
     private fun SkyHanniRenderWorldEvent.submitOrderedText(
         x: Float,

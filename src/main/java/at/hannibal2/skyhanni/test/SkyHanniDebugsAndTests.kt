@@ -15,8 +15,6 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
@@ -73,7 +71,6 @@ import net.minecraft.client.gui.components.debug.DebugScreenDisplayer
 import net.minecraft.client.gui.components.debug.DebugScreenEntries
 import net.minecraft.client.gui.components.debug.DebugScreenEntry
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.chunk.LevelChunk
@@ -89,7 +86,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SkyHanniDebugsAndTests {
-
     private val config get() = DevApi.config
     private val debugConfig get() = config.debug
 
@@ -157,7 +153,7 @@ object SkyHanniDebugsAndTests {
     private var testLocation: LorenzVec? = null
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         testLocation?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
             event.drawDynamicText(it, "Debug Test", 1.5)
@@ -357,7 +353,7 @@ object SkyHanniDebugsAndTests {
         condition: () -> Boolean = { true },
         lineBuilder: MutableList<String>.() -> Unit,
     ) {
-        val id = Identifier.fromNamespaceAndPath("skyhanni", name)
+        val id = SkyHanniMod.id(name)
         DebugScreenEntries.register(
             id,
             object : DebugScreenEntry {
@@ -379,8 +375,8 @@ object SkyHanniDebugsAndTests {
     private var skinId: String? = null
     private var skinIdTime: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    @HandleEvent(GuiKeyPressEvent::class, onlyOnSkyblock = true)
-    fun onGuiKeyPress() {
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onGuiKeyPress() {
         onKeyPressCopyCosmeticsData()
         onKeybind()
     }
@@ -394,119 +390,118 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onShowInternalName(event: ToolTipTextEvent) {
+    private fun ToolTipTextEvent.showInternalName() {
         if (!debugConfig.showInternalName) return
-        val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
         if ((internalName == NeuInternalName.NONE) && !debugConfig.showEmptyNames) return
-        event.toolTip.add("Internal Name: '${internalName.asString()}'")
+        toolTip.add("Internal Name: '${internalName.asString()}'")
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun showItemRarity(event: ToolTipTextEvent) {
+    private fun ToolTipTextEvent.showItemRarity() {
         if (!debugConfig.showItemRarity) return
-        val itemStack = event.itemStack
 
         val rarity = itemStack.getItemRarityOrNull()
-        event.toolTip.add("Item rarity: $rarity")
+        toolTip.add("Item rarity: $rarity")
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun showItemCategory(event: ToolTipTextEvent) {
+    private fun ToolTipTextEvent.showItemCategory() {
         if (!debugConfig.showItemCategory) return
-        val itemStack = event.itemStack
 
         val category = itemStack.getItemCategoryOrNull()?.name ?: "UNCLASSIFIED"
-        event.toolTip.add("Item category: $category")
+        toolTip.add("Item category: $category")
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onShowNpcPrice(event: ToolTipTextEvent) {
+    private fun ToolTipTextEvent.showNpcPrice() {
         if (!debugConfig.showNpcPrice) return
-        val internalName = event.itemStack.getInternalNameOrNull() ?: return
+        val internalName = itemStack.getInternalNameOrNull() ?: return
 
         val npcPrice = internalName.getNpcPriceOrNull() ?: return
-        event.toolTip.add("§7NPC price: ${npcPrice.addSeparators()}")
+        toolTip.add("§7NPC price: ${npcPrice.addSeparators()}")
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onShowBaseStats(event: ToolTipTextEvent) {
+    private fun ToolTipTextEvent.showBaseStats() {
         if (!debugConfig.showBaseValues) return
-        val internalName = event.itemStack.getInternalNameOrNull() ?: return
+        val internalName = itemStack.getInternalNameOrNull() ?: return
 
         val stats = internalName.getRawBaseStats()
         if (stats.isEmpty()) return
 
-        event.toolTip.add("§7Base stats:")
+        toolTip.add("§7Base stats:")
         for ((name, value) in stats) {
-
-            event.toolTip.add("§7$name: $value")
+            toolTip.add("§7$name: $value")
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onShowCraftPrice(event: ToolTipTextEvent) {
+    private fun ToolTipTextEvent.showCraftPrice() {
         if (!debugConfig.showCraftPrice) return
-        val price = event.itemStack.getInternalNameOrNull()?.getRawCraftCostOrNull() ?: return
+        val price = itemStack.getInternalNameOrNull()?.getRawCraftCostOrNull() ?: return
 
-        event.toolTip.add("§7Craft price: ${price.addSeparators()}")
+        toolTip.add("§7Craft price: ${price.addSeparators()}")
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onShowBzPrice(event: ToolTipTextEvent) {
+    private fun ToolTipTextEvent.showBzPrice() {
         if (!debugConfig.showBZPrice) return
-        val internalName = event.itemStack.getInternalNameOrNull() ?: return
+        val internalName = itemStack.getInternalNameOrNull() ?: return
 
         val data = internalName.getBazaarData() ?: return
         val instantSellPrice = data.instantSellPrice
         val instantBuyPrice = data.instantBuyPrice
 
-        event.toolTip.add("§7BZ instantSellPrice: ${instantSellPrice.addSeparators()}")
-        event.toolTip.add("§7BZ instantBuyPrice: ${instantBuyPrice.addSeparators()}")
+        toolTip.add("§7BZ instantSellPrice: ${instantSellPrice.addSeparators()}")
+        toolTip.add("§7BZ instantBuyPrice: ${instantBuyPrice.addSeparators()}")
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onShowBinPrice(event: ToolTipTextEvent) {
+    private fun ToolTipTextEvent.showBinPrice() {
         if (!debugConfig.showBinPrice) return
-        val internalName = event.itemStack.getInternalNameOrNull() ?: return
+        val internalName = itemStack.getInternalNameOrNull() ?: return
         if (!internalName.isAuctionHouseItem()) return
 
         val binPrice = internalName.getPrice()
 
-        event.toolTip.add("§7Bin Price: ${binPrice.addSeparators()}")
+        toolTip.add("§7Bin Price: ${binPrice.addSeparators()}")
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onShowItemName(event: ToolTipTextEvent) {
+    private fun ToolTipTextEvent.showItemName() {
         if (!debugConfig.showItemName) return
-        val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
         if (internalName == NeuInternalName.NONE) {
-            event.toolTip.add("Item name: no item.")
+            toolTip.add("Item name: no item.")
             return
         }
         val name = itemStack.repoItemName
-        event.toolTip.add("Item name: '$name§7'")
+        toolTip.add("Item name: '$name§7'")
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
-    fun onGuiRenderOverlay() {
-        // TODO: make this not tied to debug HUD
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onToolTip(event: ToolTipTextEvent) {
+        event.showInternalName()
+        event.showItemRarity()
+        event.showItemCategory()
+        event.showNpcPrice()
+        event.showBaseStats()
+        event.showCraftPrice()
+        event.showBzPrice()
+        event.showBinPrice()
+        event.showItemName()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onGuiRenderOverlay() {
+        // TODO make this not tied to debug HUD
         if (!debugConfig.enabled || !MinecraftCompat.showDebugHud) return
         config.debugPos.renderRenderables(displayList, posLabel = "Test Display")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onOreMined(event: OreMinedEvent) {
+    private fun onOreMined(event: OreMinedEvent) {
         if (!debugConfig.oreEventMessages) return
         val originalOre = event.originalOre?.let { "$it " }.orEmpty()
         val extraBlocks = event.extraBlocks.map { "${it.key.name}: ${it.value}" }
         ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
     }
 
-    @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
-    fun onGuiRender() {
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onGuiRender() {
         val stack = stackUnderCursor() ?: return
         if (!stack.getLoreComponent().any { it.string.contains("Right-click to preview!") }) return
 
@@ -533,7 +528,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.debugEnabled", "dev.debug.enabled")
         event.move(3, "dev.showInternalName", "dev.debug.showInternalName")
         event.move(3, "dev.showEmptyNames", "dev.debug.showEmptyNames")
@@ -545,7 +540,7 @@ object SkyHanniDebugsAndTests {
 
     @Suppress("LongMethod")
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetconfig") {
             description = "Reloads the config manager and rendering processors of MoulConfig. " +
                 "This §cWILL RESET §7your config, but also update the config files " +

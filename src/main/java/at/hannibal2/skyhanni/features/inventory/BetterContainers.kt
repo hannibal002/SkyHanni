@@ -46,19 +46,16 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 @SkyHanniModule
 object BetterContainers {
-
     private val patternGroup = RepoPattern.group("inventory.bettercontainers")
 
     private val config get() = SkyHanniMod.feature.inventory.improvedSBMenus
 
-    private val x: Identifier = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54")
-
-    private val toggleOff = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/toggle_off.png")
-    private val toggleOn = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/toggle_on.png")
-    private val dynamic54Base = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/style1/dynamic_54.png")
-    private val dynamic54Slot = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/style1/dynamic_54_slot_ctm.png")
-    private val dynamic54Button = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/style1/dynamic_54_button_ctm.png")
-    private val customDynamicChest = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_chest_inventory.png")
+    private val toggleOff = SkyHanniMod.id("dynamic_54/toggle_off.png")
+    private val toggleOn = SkyHanniMod.id("dynamic_54/toggle_on.png")
+    private val dynamic54Base = SkyHanniMod.id("dynamic_54/style1/dynamic_54.png")
+    private val dynamic54Slot = SkyHanniMod.id("dynamic_54/style1/dynamic_54_slot_ctm.png")
+    private val dynamic54Button = SkyHanniMod.id("dynamic_54/style1/dynamic_54_button_ctm.png")
+    private val customDynamicChest = SkyHanniMod.id("dynamic_chest_inventory.png")
 
     /**
      * REGEX-TEST: navigate the maze
@@ -113,7 +110,7 @@ object BetterContainers {
     }
 
     @HandleEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isOverriding) return
         val slot = event.slot ?: return
         val isBlankStack = isBlankStack(slot.item)
@@ -124,7 +121,7 @@ object BetterContainers {
     }
 
     @HandleEvent
-    fun onSlotPre(event: GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre) {
+    private fun onSlotPre(event: GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre) {
         if (!isOverriding) return
         val slot = event.slot
         val shouldRender = shouldRenderStack(slot.item)
@@ -132,7 +129,7 @@ object BetterContainers {
     }
 
     @HandleEvent
-    fun onGuiContainerPreDraw(event: GuiContainerEvent.PreDraw) {
+    private fun onGuiContainerPreDraw(event: GuiContainerEvent.PreDraw) {
         if (event.gui !is ContainerScreen) return reset()
         chestOpen = SkyBlockUtils.inSkyBlock && config.enabled
         if (!chestOpen) return
