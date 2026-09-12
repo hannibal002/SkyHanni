@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.combat.VanquisherEvent
-import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -90,7 +90,7 @@ object VanquisherApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    private fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
+    private fun onEntityMaxHealthUpdate(event: EntityMaxHealthUpdateEvent<ArmorStand>) {
         val entity = event.entity
         val helmet = entity.getStandHelmet() ?: return
         if (!helmet.`is`(Items.WITHER_SKELETON_SKULL)) return
