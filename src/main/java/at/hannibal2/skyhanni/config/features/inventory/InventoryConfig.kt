@@ -80,6 +80,11 @@ class InventoryConfig {
     val craftableItemList: CraftableItemListConfig = CraftableItemListConfig()
 
     @Expose
+    @Category(name = "Compact Item Recipes", desc = "Quickly open recipes for compacting items.")
+    @Accordion
+    val compactItemFormRecipe: CompactItemRecipeConfig = CompactItemRecipeConfig()
+
+    @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "Better not click that item.")
     @Accordion
     val hideNotClickable: HideNotClickableConfig = HideNotClickableConfig()
@@ -371,7 +376,10 @@ class InventoryConfig {
     var essenceShopHelper: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone/PlantBoy Advance snake game.")
+    @ConfigOption(
+        name = "Snake Game Keybinds",
+        desc = "Use WASD-Keys to move around in the Abiphone/PlantBoy Advance snake game."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var snakeGameKeybinds: Boolean = true
