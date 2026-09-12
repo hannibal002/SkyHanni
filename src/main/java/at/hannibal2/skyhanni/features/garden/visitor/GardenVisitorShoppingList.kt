@@ -62,25 +62,21 @@ object GardenVisitorShoppingList {
     private fun drawDisplay() = buildList {
         if (!config.enabled) return@buildList
         val (shoppingList, activeVisitors) = prepareDrawingData()
-        val (newVisitors, knownVisitors) = activeVisitors.partition { visitor ->
-            visitor.shoppingList.isEmpty()
+        val (newVisitors, knownVisitors) = activeVisitors.partition {
+            it.shoppingList.isEmpty()
         }
 
-        drawShoppingList(shoppingList)
-        drawVisitorSection(
-            visitors = newVisitors,
-            header = "New Visitor",
-            renderer = {
-                drawNewVisitor(it)
-            },
-        )
-        drawVisitorSection(
-            visitors = knownVisitors,
-            header = "Visitor",
-            renderer = {
-                drawVisitor(it)
-            },
-        )
+        if (config.hideKnownVisitors) {
+            drawShoppingList(shoppingList)
+            if (newVisitors.isNotEmpty()) {
+                drawVisitorSection(newVisitors, "New Visitor") { drawNewVisitor(it) }
+            }
+        } else {
+            drawShoppingList(shoppingList)
+            drawVisitorSection(newVisitors, "New Visitor") { drawNewVisitor(it) }
+            drawVisitorSection(knownVisitors, "Visitor") { drawVisitor(it) }
+        }
+
     }
 
     private fun MutableList<Renderable>.drawVisitorSection(

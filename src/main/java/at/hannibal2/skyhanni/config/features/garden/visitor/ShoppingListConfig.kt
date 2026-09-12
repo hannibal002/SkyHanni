@@ -25,6 +25,14 @@ class ShoppingListConfig {
 
     @Expose
     @ConfigOption(
+        name = "Hide Known Visitors",
+        desc = "Hide known visitors from display, only show new visitors."
+    )
+    @ConfigEditorBoolean
+    var hideKnownVisitors: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Bazaar Alley",
         desc = "Show the Visitor Items List while inside the Bazaar Alley in the Hub.\n" +
             "§eHelps in buying the correct amount when not having a §6Booster Cookie §ebuff active."
