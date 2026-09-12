@@ -3,14 +3,13 @@ package at.hannibal2.skyhanni.data.hypixel.chat.event
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import net.minecraft.network.chat.Component
 
 /**
  * Gets fired for any chat message not sent by another player or an [NPC][NpcChatEvent].
  */
 object SystemMessageEvent {
-
     /**
      * Fired during the read-only phase of the chat processing pipeline.
      * Use this event to read the message or to completely block it from being shown in the chat.
@@ -26,9 +25,8 @@ object SystemMessageEvent {
         open val chatComponent: Component,
         open var blockedReason: String? = null,
     ) : SkyHanniEvent() {
-
         /** The plain text message without any color codes. */
-        open val cleanMessage: String = chatComponent.string.removeColor()
+        open val cleanMessage: String = chatComponent.stripped
     }
 
     /**
@@ -44,10 +42,9 @@ object SystemMessageEvent {
         @set:Deprecated("Use replaceComponent() instead")
         open var chatComponent: Component,
     ) : SkyHanniEvent() {
-
         /** The plain text message without any color codes. */
         open val cleanMessage: String
-            get() = chatComponent.string.removeColor()
+            get() = chatComponent.stripped
 
         fun replaceComponent(newComponent: Component, reason: String) {
             ChatManager.addReplacementContext(chatComponent, reason)

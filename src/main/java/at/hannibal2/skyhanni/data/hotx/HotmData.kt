@@ -27,8 +27,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.inventory.Slot
 import java.util.regex.Matcher
@@ -57,7 +57,6 @@ enum class HotmData(
     override val rewardFun: (Int) -> (Map<HotmReward, Double>),
     val powderType: HotmApi.PowderType?,
 ) : HotxData<HotmReward> {
-
     MINING_SPEED(
         "Mining Speed",
         50,
@@ -422,7 +421,6 @@ enum class HotmData(
     // TODO move all object functions into hotm api?
     @SkyHanniModule
     companion object : HotxHandler<HotmData, HotmReward>(entries) {
-
         override val name: String = "HotM"
         override val islandTypeTag = IslandTypeTag.MINING
         val skyMallSlot = RotatingPerkSlot(SKY_MALL, SkymallPerk.entries)
@@ -632,7 +630,7 @@ enum class HotmData(
         private fun onWidgetUpdate(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.POWDER)) return
             event.lines.forEach { line ->
-                powderPattern.matchMatcher(line.string.removeColor()) {
+                powderPattern.matchMatcher(line.stripped) {
                     val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                     val amount = group("amount").formatLong()
                     type.setAmount(amount, postEvent = true)

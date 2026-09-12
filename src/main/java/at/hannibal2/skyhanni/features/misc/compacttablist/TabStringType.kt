@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import net.minecraft.network.chat.Component
 
 enum class TabStringType {
@@ -10,9 +10,8 @@ enum class TabStringType {
     PLAYER;
 
     companion object {
-
         fun fromComponent(component: Component): TabStringType {
-            val unformattedLine: String = component.string.removeColor()
+            val unformattedLine: String = component.stripped
             if (unformattedLine.startsWith(" ")) {
                 return TEXT
             }

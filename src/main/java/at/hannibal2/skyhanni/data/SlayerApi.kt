@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -37,7 +38,6 @@ import at.hannibal2.skyhanni.features.slayer.SlayerType as Type
 
 @SkyHanniModule
 object SlayerApi {
-
     val config get() = SkyHanniMod.feature.slayer
     private val trackerConfig get() = config.itemProfitTracker
 
@@ -239,7 +239,7 @@ object SlayerApi {
             .dropWhile { it != "Slayer Quest" }
         if (scoreboardLines.isNotEmpty()) return scoreboardLines to SlayerLinesSource.SCOREBOARD
 
-        val tabLines = TabWidget.SLAYER.lines.map { it.string.removeColor().trim() }
+        val tabLines = TabWidget.SLAYER.lines.map { it.stripped.trim() }
         if (tabLines.isNotEmpty()) return tabLines to SlayerLinesSource.TAB
 
         return emptyList<String>() to SlayerLinesSource.NONE

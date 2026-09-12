@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -44,6 +43,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.network.chat.Component
@@ -190,12 +190,12 @@ object SkillApi {
         }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    private fun onTabListUpdate(event: TabListUpdateEvent) {
         lastTabComponents = event.tabList
     }
 
-    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
-    fun onSecondPassed() {
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onSecondPassed() {
         val activeSkill = activeSkill ?: return
         val info = skillXPInfoMap[activeSkill] ?: return
         if (!info.sessionTimerActive) return
@@ -217,8 +217,8 @@ object SkillApi {
     }
 
     @HandleEvent
-    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
-        val actionBar = event.chatComponent.string.removeColor()
+    private fun onActionBarUpdate(event: ActionBarUpdateEvent) {
+        val actionBar = event.chatComponent.stripped
         val components = SPACE_SPLITTER.splitToList(actionBar)
         for (component in components) {
             val matcher = listOf(skillPercentPattern, skillMultiplierPattern).firstOrNull {
@@ -255,7 +255,7 @@ object SkillApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         for (message in event.message.removeColor().removeResets().lineSequence().map { it.trim() }) {
             if (lilySplosionStartPattern.matcher(message).matches()) {
                 lastLilySplosion = SimpleTimeMark.now()
@@ -321,7 +321,7 @@ object SkillApi {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.getConstant<NeuSkillLevelJson>("leveling")
 
         levelArray = data.levelingXP
@@ -330,18 +330,18 @@ object SkillApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onAccessoryBagUpdate(event: AccessoryBagUpdateEvent) {
+    private fun onAccessoryBagUpdate(event: AccessoryBagUpdateEvent) {
         updateGiftTalismanBonus(event.inventoryItems.values)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onItemAddInInventory(event: ItemAddInInventoryEvent) {
+    private fun onItemAddInInventory(event: ItemAddInInventoryEvent) {
         val bonus = GIFT_TALISMAN_BONUSES[event.internalName] ?: return
         updateGiftTalismanBonus(bonus)
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!skillMenuNamePattern.matches(event.inventoryName)) return
         for (stack in event.inventoryItems.values) {
             val lore = stack.getLore()
@@ -444,7 +444,7 @@ object SkillApi {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Skills")
         val storage = storage
         if (storage == null) {
@@ -599,7 +599,7 @@ object SkillApi {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.remove(113, "#profile.skillData.null")
         event.move(138, "#profile.skillData", "#profile.skills.skillData")
         event.move(138, "#profile.giftTalismanSkillXpBonus", "#profile.skills.giftTalismanSkillXpBonus")
@@ -741,7 +741,7 @@ object SkillApi {
     )
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shskills") {
             description = "Skills XP/Level related command"
             category = CommandCategory.USERS_ACTIVE

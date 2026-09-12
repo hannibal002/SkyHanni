@@ -16,12 +16,12 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
@@ -39,7 +39,6 @@ import kotlin.math.floor
 
 @SkyHanniModule
 object ChatManager {
-
     private val config get() = SkyHanniMod.feature.dev
 
     private val loggerAll = SkyHanniLogger("chat/all")
@@ -78,7 +77,7 @@ object ChatManager {
 
     private fun getRecentMessageHistoryWithSearch(searchTerm: String): List<MessageFilteringResult> =
         messageHistory.toList().map { it.second }
-            .filter { it.message.string.removeColor().contains(searchTerm, ignoreCase = true) }
+            .filter { it.message.stripped.contains(searchTerm, ignoreCase = true) }
 
     enum class ActionKind(format: Any) {
         BLOCKED(ChatFormatting.RED.toString() + ChatFormatting.BOLD),
@@ -93,7 +92,6 @@ object ChatManager {
         val renderedString = "$format$name"
 
         companion object {
-
             val maxLength by lazy {
                 entries.maxOf { Minecraft.getInstance().font.width(it.renderedString) }
             }
@@ -111,7 +109,7 @@ object ChatManager {
     )
 
     @HandleEvent
-    fun onPacketSent(event: PacketSentEvent) {
+    private fun onPacketSent(event: PacketSentEvent) {
         val message = getMessageFromPacket(event.packet) ?: return
         val component = message.asComponent()
         val originatingModCall = event.findOriginatingModCall()
@@ -365,7 +363,7 @@ object ChatManager {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shchathistory") {
             description = "Show the unfiltered chat history"
             category = CommandCategory.DEVELOPER_TEST

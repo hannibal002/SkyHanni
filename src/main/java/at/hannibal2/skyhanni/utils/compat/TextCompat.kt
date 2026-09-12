@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -33,6 +34,12 @@ import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
 
 // TODO do the same thing here as in EntityCompat, no more functions/members that are classless
+object TextCompat {
+    /**
+     * Returns the text without any chat style formatting applied and with all formatting codes stripped.
+     */
+    val Component.stripped: String get() = string.removeColor()
+}
 
 private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)
 private val formattedTextCache = TimeLimitedCache<TextCacheKey, String>(3.minutes)
@@ -314,7 +321,6 @@ fun ClickEvent.value(): String {
         // todo use error manager here probably, not doing it now because it doesn't compile on 1.21
         else -> ""
     }
-
 }
 
 fun HoverEvent.value(): Component = when (action()) {

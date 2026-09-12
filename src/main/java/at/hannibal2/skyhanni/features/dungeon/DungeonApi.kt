@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -414,18 +413,13 @@ object DungeonApi {
         nextItem@ for (stack in inventoryItems.values) {
             var name = ""
             var kills = 0
-            nextLine@ for (line in stack.getLoreComponent()) {
-                val colorlessLine = line.string.removeColor()
-                bossPattern.matchMatcher(colorlessLine) {
-                    if (matches()) {
-                        name = group("name")
-                    }
+            nextLine@ for (line in stack.getCleanLore()) {
+                bossPattern.matchMatcher(line) {
+                    name = group("name")
                 }
-                levelPattern.matchMatcher(colorlessLine) {
-                    if (matches()) {
-                        kills = group("kills").toInt()
-                        break@nextLine
-                    }
+                levelPattern.matchMatcher(line) {
+                    kills = group("kills").toInt()
+                    break@nextLine
                 }
             }
             val floor = DungeonFloor.byBossName(name) ?: continue

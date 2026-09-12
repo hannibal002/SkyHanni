@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.animal.golem.IronGolem
 import net.minecraft.world.entity.monster.Endermite
@@ -23,7 +23,6 @@ import net.minecraft.world.entity.monster.cubemob.Slime
 
 @SkyHanniModule
 object HighlightMiningCommissionMobs {
-
     private val config get() = SkyHanniMod.feature.mining
 
     // TODO Commission API
@@ -55,7 +54,7 @@ object HighlightMiningCommissionMobs {
 
     @OptIn(AllEntitiesGetter::class)
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
 
@@ -74,18 +73,18 @@ object HighlightMiningCommissionMobs {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    private fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
 
         // TODO Commission API
         active = commissionMobs.filter { (name, _) ->
-            event.tabList.findLast { line -> line.string.removeColor().trim().startsWith(name) }
+            event.tabList.findLast { line -> line.stripped.trim().startsWith(name) }
                 ?.let { !it.string.endsWith("DONE") } ?: false
         }.values.toList()
     }
 
     @HandleEvent
-    fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
+    private fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         if (!isEnabled()) return
 
         val entity = event.entity
@@ -100,7 +99,7 @@ object HighlightMiningCommissionMobs {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.mining", "mining")
     }
 

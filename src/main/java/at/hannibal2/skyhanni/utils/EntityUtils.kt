@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
@@ -20,6 +19,7 @@ import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.render.FrustumUtils
@@ -44,7 +44,6 @@ annotation class AllEntitiesGetter
 
 @SkyHanniModule
 object EntityUtils {
-
     inline val ALWAYS get(): (Entity) -> Boolean = { true }
 
     // TODO remove this relatively heavy call everywhere
@@ -230,7 +229,7 @@ object EntityUtils {
     fun LivingEntity.isRunicAndCorrupt() = baseMaxHealth == findHealthReal().toInt().derpy() * 3 * 4
 
     val Entity.cleanName
-        get() = this.name.string.removeColor()
+        get() = this.name.stripped
 
     // TODO use derpy() on every use case
     val LivingEntity.baseMaxHealth: Int

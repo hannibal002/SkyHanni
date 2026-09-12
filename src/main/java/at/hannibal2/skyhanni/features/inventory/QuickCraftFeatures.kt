@@ -14,14 +14,13 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.inventory.ChestMenu
 
 @SkyHanniModule
 object QuickCraftFeatures {
-
     private val config get() = SkyHanniMod.feature.inventory
     private val quickCraftSlots = listOf(16, 25, 34)
     private var quickCraftableItems = emptyList<String>()
@@ -37,19 +36,19 @@ object QuickCraftFeatures {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         quickCraftableItems = event.getConstant<List<String>>("QuickCraftableItems")
     }
 
     @HandleEvent
-    fun onToolTip(event: ToolTipTextEvent) {
+    private fun onToolTip(event: ToolTipTextEvent) {
         event.slot ?: return
         val inventoryType = getInventoryType() ?: return
         if (inventoryType.ignoreSlot(event.slot.index)) return
 
         if (needsQuickCraftConfirmation(event.itemStack)) {
             for ((index, line) in event.toolTip.withIndex()) {
-                if (line.string.removeColor() == "Click to craft!") {
+                if (line.stripped == "Click to craft!") {
                     event.toolTip[index] = Component.literal("§c${KeyboardManager.getModifierKeyName()} + Click to craft!")
                     break
                 }
@@ -58,7 +57,7 @@ object QuickCraftFeatures {
     }
 
     @HandleEvent
-    fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    private fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         val inventoryType = getInventoryType() ?: return
         if (KeyboardManager.isModifierKeyDown()) return
         if (event.gui !is ContainerScreen) return
@@ -74,7 +73,7 @@ object QuickCraftFeatures {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val inventoryType = getInventoryType() ?: return
         if (inventoryType.ignoreSlot(event.slot?.index)) return
 
