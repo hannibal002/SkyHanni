@@ -97,6 +97,7 @@ object IslandExceptions {
         baseEntity: LivingEntity,
     ) = when {
 
+        // Dummy can have either 2b or Int.MAX_VALUE health
         baseEntity.baseMaxHealth >= 2_000_000_000 -> MobData.MobResult.found(
             Mob(
                 baseEntity = baseEntity,
