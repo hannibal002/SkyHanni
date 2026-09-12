@@ -1,44 +1,59 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-//? if < 26.2 {
-/*import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
-import at.hannibal2.skyhanni.mixins.hooks.SkyHanniOutlineHook;
+import at.hannibal2.skyhanni.mixins.hooks.RenderAlphaStore;
+import at.hannibal2.skyhanni.utils.render.AlphaVertexConsumer;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+
+//? if < 26.2 {
+/*import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
+import at.hannibal2.skyhanni.mixins.hooks.SkyHanniOutlineHook;
 import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
+*///?}
 
 @Mixin(ModelFeatureRenderer.class)
 public abstract class MixinModelFeatureRenderer {
-    @WrapOperation(
-        method = "renderModel",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V"
-        )
-    )
-    private void setSkyHanniOutlineColor(
-        OutlineBufferSource instance,
+    //~ if < 26.2 'prepareModel' -> 'renderModel'
+    @WrapOperation(method = "prepareModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/Model;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V", ordinal = 0))
+    private void applyRenderAlpha(
+        net.minecraft.client.model.Model<?> instance,
+        com.mojang.blaze3d.vertex.PoseStack poseStack,
+        VertexConsumer vertexConsumer,
+        int light,
+        int overlay,
         int color,
         Operation<Void> original,
-        @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model
+        //~ if < 26.2 'ModelFeatureRenderer.Submit' -> 'SubmitNodeStorage.ModelSubmit'
+        @Local(argsOnly = true) ModelFeatureRenderer.Submit<?> model
     ) {
+        Object object = model;
+        int alpha = object instanceof RenderAlphaStore alphaStore ? alphaStore.skyhanni$getRenderAlpha() : 255;
+        original.call(instance, poseStack, alpha < 255 ? new AlphaVertexConsumer(vertexConsumer, alpha) : vertexConsumer, light, overlay, color);
+    }
+
+    //? if < 26.2 {
+    /*@WrapOperation(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V"))
+    private void setSkyHanniOutlineColor(OutlineBufferSource instance, int color, Operation<Void> original, @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model) {
         if (skyhanni$usesCustomOutline(model)) {
             original.call(SkyHanniOutlineHook.getVertexConsumers(), color);
         } else {
             original.call(instance, color);
         }
     }
+    *///?}
 
-    @WrapOperation(
+    // Beta's legacy outline hooks are 26.1-only; 26.2 uses RenderChest.
+    //? if < 26.2 {
+    /*@WrapOperation(
         method = "renderModel",
         at = @At(
             value = "INVOKE",
@@ -68,5 +83,5 @@ public abstract class MixinModelFeatureRenderer {
         return model.state() instanceof EntityRenderState currentState &&
             currentState.skyhanni$isUsingCustomOutline();
     }
+    *///?}
 }
-*///?}
