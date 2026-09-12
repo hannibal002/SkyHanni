@@ -87,33 +87,30 @@ class MobFinder {
         DungeonApi.inDungeon() -> tryAddDungeon(mob)
         RiftApi.inRift() -> tryAddRift(mob)
         GardenApi.inGarden() -> tryAddGarden(mob)
+        IslandType.PRIVATE_ISLAND.isInIsland() && mob.name == "Dummy" -> EntityResult(bossType = BossType.DUMMY)
         else -> {
-            if (mob.name == "Dummy") {
-                EntityResult(bossType = BossType.DUMMY)
-            } else {
-                when (val entity = mob.baseEntity) {
-                    /*
-                     * Note that the order does matter here.
-                     * For example, if you put EntityZombie before EntityPigZombie,
-                     * EntityPigZombie will never be reached because EntityPigZombie extends EntityZombie.
-                     * Please take this into consideration if you are to modify this.
-                     */
-                    is RemotePlayer -> tryAddEntityOtherPlayerMP(mob)
-                    is IronGolem -> tryAddEntityIronGolem(mob)
-                    is ZombifiedPiglin -> tryAddEntityPigZombie(mob)
-                    is MagmaCube -> tryAddEntityMagmaCube(mob)
-                    is EnderMan -> tryAddEntityEnderman(mob)
-                    is AbstractSkeleton -> tryAddEntitySkeleton(mob)
-                    is Guardian -> tryAddEntityGuardian(mob)
-                    is Zombie -> tryAddEntityZombie(mob)
-                    is WitherBoss -> tryAddEntityWither(mob)
-                    is EnderDragon -> tryAddEntityDragon(mob)
-                    is Spider -> tryAddEntitySpider(mob)
-                    is Horse -> tryAddEntityHorse(mob)
-                    is Blaze -> tryAddEntityBlaze(mob)
-                    is Wolf -> tryAddEntityWolf(mob)
-                    else -> null
-                }
+            when (mob.baseEntity) {
+                /*
+                 * Note that the order does matter here.
+                 * For example, if you put EntityZombie before EntityPigZombie,
+                 * EntityPigZombie will never be reached because EntityPigZombie extends EntityZombie.
+                 * Please take this into consideration if you are to modify this.
+                 */
+                is RemotePlayer -> tryAddEntityOtherPlayerMP(mob)
+                is IronGolem -> tryAddEntityIronGolem(mob)
+                is ZombifiedPiglin -> tryAddEntityPigZombie(mob)
+                is MagmaCube -> tryAddEntityMagmaCube(mob)
+                is EnderMan -> tryAddEntityEnderman(mob)
+                is AbstractSkeleton -> tryAddEntitySkeleton(mob)
+                is Guardian -> tryAddEntityGuardian(mob)
+                is Zombie -> tryAddEntityZombie(mob)
+                is WitherBoss -> tryAddEntityWither(mob)
+                is EnderDragon -> tryAddEntityDragon(mob)
+                is Spider -> tryAddEntitySpider(mob)
+                is Horse -> tryAddEntityHorse(mob)
+                is Blaze -> tryAddEntityBlaze(mob)
+                is Wolf -> tryAddEntityWolf(mob)
+                else -> null
             }
         }
     }

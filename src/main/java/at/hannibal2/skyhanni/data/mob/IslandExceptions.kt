@@ -95,14 +95,29 @@ object IslandExceptions {
     private fun privateIsland(
         armorStand: ArmorStand?,
         baseEntity: LivingEntity,
-    ) = when {
-        armorStand?.isDefaultValue() != false ->
-            if (baseEntity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) < 15.0) {
+    ): MobData.MobResult? {
+        val dummyArmorStand = armorStand ?: MobUtils.getClosestArmorStand(baseEntity, 4.0)
+        if (dummyArmorStand != null && MobFilter.dummyMobNamePattern.matches(dummyArmorStand.cleanName)) {
+            return MobData.MobResult.found(
+                Mob(
+                    baseEntity = baseEntity,
+                    category = MobCategory.SPECIAL,
+                    armorStand = dummyArmorStand,
+                    name = "Dummy",
+                ),
+            )
+        }
+
+        if (armorStand?.isDefaultValue() != false) {
+            return if (baseEntity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) < 15.0) {
                 // TODO fix to always include Valid Mobs on Private Island
                 MobData.MobResult.found(MobFactories.minionMob(baseEntity))
-            } else MobData.MobResult.notYetFound
+            } else {
+                MobData.MobResult.notYetFound
+            }
+        }
 
-        else -> null
+        return null
     }
 
     private fun theRift(
