@@ -92,7 +92,7 @@ object MobHighlight {
             heldBlock == Blocks.ENDER_CHEST ->
                 Triple(LorenzColor.GREEN, 127, config::chestZealotHighlighter)
 
-            event.maxHealth.isZealotOrBruiser() ->
+            event.maxHealth.isZealotOrBruiserMaxHealth() ->
                 Triple(LorenzColor.DARK_AQUA, 127, config::zealotBruiserHighlighter)
 
             else -> return
@@ -120,6 +120,6 @@ object MobHighlight {
         )
     }
 
-    private fun Int.isZealotOrBruiser() = this == 13_000 || this == 65_000 ||
+    private fun Int.isZealotOrBruiserMaxHealth() = this == 13_000 || this == 65_000 ||
         this == 13_000 * 4 || this == 65_000 * 4 // runic
 }
