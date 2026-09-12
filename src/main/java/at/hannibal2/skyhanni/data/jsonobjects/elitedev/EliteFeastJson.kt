@@ -54,7 +54,10 @@ data class EliteFeastData(
     val next: Map<String, SimpleTimeMark?> = _next.mapValues { it.value?.let(SimpleTimeMark::fromUnixSeconds) }
 
     private val monthEndTime: SimpleTimeMark
-        get() = SkyBlockTime(year, month + 1, 1).toTimeMark()
+        get() {
+            val now = SkyBlockTime.now()
+            return SkyBlockTime(now.year, now.month + 1, 1).toTimeMark()
+        }
 
     fun getBody(): String = ApiUtils.serializeNullsGson.toJson(this)
 
