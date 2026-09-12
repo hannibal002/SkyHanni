@@ -3,10 +3,19 @@ package at.hannibal2.skyhanni.events.entity
 import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
 
+/**
+ * Event that is called when an entity's equipment changes.
+ * This refers to armor and held item, not SkyBlock equipment.
+ *
+ * @param T The type of the entity.
+ * @property entity The entity whose equipment changed.
+ * @property equipmentSlot The slot of the equipment that changed.
+ * @property newItemStack The new item stack that was equipped, or null if the slot was cleared.
+ */
 @PrimaryFunction("onEntityEquipmentChange")
-data class EntityEquipmentChangeEvent<T : Entity>(
+data class EntityEquipmentChangeEvent<T : LivingEntity>(
     val entity: T,
     val equipmentSlot: Int,
     val newItemStack: SafeItemStack?,
