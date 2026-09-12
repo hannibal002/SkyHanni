@@ -397,6 +397,11 @@ class MiscConfig {
     val customTodos: CustomTodosConfig = CustomTodosConfig()
 
     @Expose
+    @ConfigOption(name = "Abiphone Directory Helper", desc = "")
+    @Accordion
+    val abiphoneDirectoryHelper: AbiphoneDirectoryHelperConfig = AbiphoneDirectoryHelperConfig()
+
+    @Expose
     @ConfigOption(
         name = "Boost Warning Volume",
         desc = "Always play SkyHanni warning sounds at 100% volume (unless the game is muted).\n" +
