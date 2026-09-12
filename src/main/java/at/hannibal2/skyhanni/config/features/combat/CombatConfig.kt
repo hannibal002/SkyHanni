@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.combat.broodmother.BroodmotherConfi
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
 import at.hannibal2.skyhanni.config.features.combat.end.EndIslandConfig
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostProfitTrackerConfig
+import at.hannibal2.skyhanni.config.features.combat.mobsconfig.MobsConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category

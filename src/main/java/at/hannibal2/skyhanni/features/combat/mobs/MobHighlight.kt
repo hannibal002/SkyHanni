@@ -24,6 +24,8 @@ import net.minecraft.world.level.block.Blocks
 object MobHighlight {
 
     private val config get() = SkyHanniMod.feature.combat.mobs
+    private val arachneBossConfig get() = config.arachneSettings.boss
+    private val arachneKeeperConfig get() = config.arachneSettings.keeper
     private var arachne: Mob? = null
 
     @HandleEvent
@@ -36,14 +38,14 @@ object MobHighlight {
                 LorenzColor.DARK_PURPLE to config::corleoneHighlighter
 
             name == "Arachne's Keeper" ->
-                LorenzColor.DARK_BLUE to config::arachneKeeperHighlight
+                LorenzColor.DARK_BLUE to arachneKeeperConfig::arachneKeeperHighlight
 
             name == "Arachne's Brood" ->
-                LorenzColor.GOLD to config::arachneBossHighlighter
+                LorenzColor.GOLD to arachneBossConfig::broodHighlight
 
             name == "Arachne" -> {
                 arachne = mob
-                LorenzColor.RED to config::arachneBossHighlighter
+                LorenzColor.RED to arachneBossConfig::bossHighlight
             }
 
             mob.isRunic ->
@@ -108,7 +110,8 @@ object MobHighlight {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!config.lineToArachne) return
+        val arachneLineConfig = arachneBossConfig.line
+        if (!arachneLineConfig.showLine) return
 
         val arachne = arachne ?: return
 
@@ -116,8 +119,8 @@ object MobHighlight {
 
         event.drawLineToCrosshair(
             arachne.centerCords,
-            LorenzColor.RED.toChromaColor(),
-            config.lineToArachneWidth,
+            arachneLineConfig.color,
+            arachneLineConfig.lineWidth,
             true,
         )
     }

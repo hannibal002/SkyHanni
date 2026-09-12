@@ -248,15 +248,15 @@ object VampireSlayerFeatures {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
-        if (config.drawLine) {
+        if (config.line.showLine) {
             for (it in EntityUtils.getEntities<RemotePlayer>()) {
                 if (!it.isHighlighted()) continue
                 if (!it.canBeSeen(15)) continue
                 val vec = event.exactLocation(it)
                 event.drawLineToCrosshair(
                     vec.up(SNEAKING_EYE_HEIGHT),
-                    config.lineColor,
-                    config.lineWidth,
+                    config.line.color,
+                    config.line.lineWidth,
                     true,
                 )
             }

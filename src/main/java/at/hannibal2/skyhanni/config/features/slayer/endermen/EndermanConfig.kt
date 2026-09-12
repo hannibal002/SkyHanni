@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.config.features.slayer.endermen
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.generic.lineconfigs.EndermanSlayerLineConfigs
+import at.hannibal2.skyhanni.config.generic.lineconfigs.SlayerLineConfigs
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class EndermanConfig {
     @Expose
@@ -21,10 +24,14 @@ class EndermanConfig {
     var highlightNukekebi: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Line to Nukekubi Skulls", desc = "Draw a line to the Enderman Slayer Nukekubi Skulls.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var drawLineToNukekebi: Boolean = false
+    @ConfigOption(name = "Line To Nukekubi Skulls", desc = "")
+    @Accordion
+    val lineToNukekebi: EndermanSlayerLineConfigs.LineToNukekebi = EndermanSlayerLineConfigs.LineToNukekebi()
+
+    @Expose
+    @ConfigOption(name = "Line To Boss", desc = "")
+    @Accordion
+    val lineToBoss: SlayerLineConfigs.SlayerLineDefaultOff = SlayerLineConfigs.SlayerLineDefaultOff()
 
     @Expose
     @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer.")
@@ -37,18 +44,15 @@ class EndermanConfig {
     @FeatureToggle
     var hideParticles: Boolean = false
 
-    @Expose
-    @ConfigOption(name = "Line to Voidgloom Boss", desc = "Draws a line to your Voidgloom Seraph Boss.")
-    @SearchTag("enderman")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var lineToBoss: Boolean = false
+    @SkyHanniModule
+    companion object {
 
-    @Expose
-    @ConfigOption(
-        name = "Line to Voidgloom Width",
-        desc = "The width of the line pointing to your Voidgloom Seraph.",
-    )
-    @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 10f)
-    var slayerLineWidth: Int = 3
+        @HandleEvent
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(3, "slayer.endermanHighlightNukekebi", "slayer.endermen.highlightNukekebi")
+            event.move(146, "slayer.endermen.drawLineToNukekebi", "slayer.endermen.lineToNukekebi.showLine")
+            event.move(146, "slayer.endermen.lineToBoss", "slayer.endermen.lineToBoss.showLine")
+            event.move(146, "slayer.endermen.slayerLineWidth", "slayer.endermen.lineToBoss.lineWidth")
+        }
+    }
 }

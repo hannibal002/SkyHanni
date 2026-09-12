@@ -1,16 +1,25 @@
 package at.hannibal2.skyhanni.config.features.slayer.spider
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.generic.lineconfigs.SlayerLineConfigs
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class SpiderConfig {
+
+    @Expose
+    @ConfigOption(name = "Line To Tarantula Boss", desc = "")
+    @Accordion
+    val lineToTaraBoss: SlayerLineConfigs.SlayerLineDefaultOff = SlayerLineConfigs.SlayerLineDefaultOff()
 
     @Expose
     @ConfigOption(name = "Mark When Invincible", desc = "Highlight the Tarantula Slayer tier 5 when the hatchlings are alive.")
@@ -30,22 +39,6 @@ class SpiderConfig {
     var phaseDisplay: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Line to Tarantula Boss", desc = "Adds a line to your Tarantula Broodfather Boss.")
-    @SearchTag("Spider")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var lineToBoss: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Line to Tarantula Width",
-        desc = "The width of the line pointing to your Tarantula Broodfather.",
-    )
-    @SearchTag("Spider")
-    @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 10f)
-    var slayerLineWidth: Int = 3
-
-    @Expose
     @ConfigOption(
         name = "Highlight Egg Sacs",
         desc = "Highlight the Egg Sacs spawned by the Tarantula Broodfather.",
@@ -63,4 +56,14 @@ class SpiderConfig {
     @SearchTag("Spider")
     @ConfigEditorColour
     var eggSacHighlightColor: ChromaColour = ChromaColour.fromStaticRGB(255, 255, 0, 120)
+
+    @SkyHanniModule
+    companion object {
+        @HandleEvent
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(146, "slayer.spider.lineToBoss", "slayer.spider.lineToTaraBoss.showLine")
+            event.move(146, "slayer.spider.slayerLineWidth", "slayer.spider.lineToTaraBoss.lineWidth")
+        }
+    }
+
 }
