@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhite
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class TestLegacyColorFormat {
-
     private val testText1 = Component.literal("")
         .append(Component.literal("[").withColor(ChatFormatting.DARK_GRAY))
         .append(Component.literal("302").withColor(ChatFormatting.BLUE))
@@ -48,13 +46,6 @@ class TestLegacyColorFormat {
 
     @Test
     @Suppress("DEPRECATION")
-    fun `test formatted text compat leading white`() {
-        Assertions.assertEquals("§8[§r§9302§r§8] §r§6♫ §r§b[MVP§r§d+§r§b] lrg89§r§f: test", testText1.formattedTextCompatLeadingWhite())
-        Assertions.assertEquals("§fTest §r§lExtra §rResets §r§r§r§kDone", testText2.formattedTextCompatLeadingWhite())
-    }
-
-    @Test
-    @Suppress("DEPRECATION")
     fun `test formatted text compat leading white less resets`() {
         Assertions.assertEquals("§8[§9302§8] §6♫ §b[MVP§d+§b] lrg89§f: test", testText1.formattedTextCompatLeadingWhiteLessResets())
         Assertions.assertEquals("§fTest §lExtra Resets §r§kDone", testText2.formattedTextCompatLeadingWhiteLessResets())
@@ -66,5 +57,4 @@ class TestLegacyColorFormat {
         Assertions.assertEquals("[302] ♫ [MVP+] lrg89: test", testText1.unformattedTextCompat())
         Assertions.assertEquals("Test Extra Resets §rDone", testText2.unformattedTextCompat())
     }
-
 }
