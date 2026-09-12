@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.KeyboardManager.isUnknown
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -97,7 +98,7 @@ class GuiPositionEditor(
 
         // When the mouse isn't currently hovering over a gui element
         val text = if (displayPos == -1) {
-            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == InputCode.UNKNOWN
+            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen.isUnknown()
 
             buildList {
                 add("§cSkyHanni Position Editor")
@@ -182,7 +183,7 @@ class GuiPositionEditor(
 
                 when (mouseButton) {
                     1 -> position.jumpToConfigOptions()
-                    2 -> if (config.keyBindReset == InputCode.MIDDLE_MOUSE) position.resetPositionAndScale()
+                    2 -> if (config.keyBindReset.value == InputCode.MIDDLE_MOUSE.value) position.resetPositionAndScale()
                     0 -> if (!position.clicked) {
                         clickedPos = i
                         position.clicked = true
@@ -198,7 +199,7 @@ class GuiPositionEditor(
     }
 
     override fun onKeyTyped(typedChar: Char?, keyCode: InputCode) {
-        if (keyCode == config.keyBindReset) {
+        if (keyCode.value == config.keyBindReset.value) {
             positions.firstOrNull { it.isHoveredWithMetrics() }?.resetPositionAndScale()
             return
         }

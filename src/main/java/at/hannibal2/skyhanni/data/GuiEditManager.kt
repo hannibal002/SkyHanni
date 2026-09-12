@@ -38,8 +38,8 @@ object GuiEditManager {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
-        if (event.keyCode == InputCode.KEY_RETURN) {
+        if (!event.isPressed(SkyHanniMod.feature.gui.keyBindOpen)) return
+        if (event.isPressed(InputCode.KEY_RETURN)) {
             ChatUtils.chat("You can't use Enter as a keybind to open the gui editor!")
             return
         }

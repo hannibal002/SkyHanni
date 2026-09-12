@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
+import at.hannibal2.skyhanni.config.ConfigKeybind
 import at.hannibal2.skyhanni.config.core.elements.GuiOptionEditorKeyMapping
 import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
@@ -30,8 +31,8 @@ object KeyboardManager {
     @HandleEvent
     private fun onGuiOpen(event: GuiScreenOpenEvent) {
         if (event.gui != null) return
-        if (InputCode.KEY_RETURN.isKeyHeld()) lockedKeys.add(InputCode.KEY_RETURN)
-        if (InputCode.KEY_NUMPADENTER.isKeyHeld()) lockedKeys.add(InputCode.KEY_NUMPADENTER)
+        if (InputCode.KEY_RETURN.isKeyHeld()) lockedKeys.add(InputCode.KEY_RETURN.value)
+        if (InputCode.KEY_NUMPADENTER.isKeyHeld()) lockedKeys.add(InputCode.KEY_NUMPADENTER.value)
     }
 
     /**
@@ -123,7 +124,7 @@ object KeyboardManager {
     // and in renderable calls have time to react first, and lock this key press event properly.
     fun KeyMapping.isActive(): Boolean {
         try {
-            if (InputCode.fromValue(key.value).isKeyHeld()) return true
+            if (this.isKeyHeld()) return true
         } catch (e: IndexOutOfBoundsException) {
             ErrorManager.logErrorWithData(
                 e,
@@ -135,29 +136,43 @@ object KeyboardManager {
         return isDown || consumeClick()
     }
 
-    fun InputCode.isKeyHeld(): Boolean = when {
-        this == InputCode.UNKNOWN -> false
-        MouseCompat.isMouseButton(this.value) -> MouseCompat.isButtonDown(this.value)
-        else -> InputCode.isKeyDown(this)
+    fun InputCode.isKeyHeld(): Boolean = value.isKeyHeld()
+
+    fun Int.isKeyHeld(): Boolean = when {
+        this < InputCode.UNKNOWN.value -> ErrorManager.skyHanniError(
+            "Invalid keycode",
+            "keyCode" to this,
+        )
+        this == InputCode.UNKNOWN.value -> false
+        MouseCompat.isMouseButton(this) -> MouseCompat.isButtonDown(this)
+        else -> InputConstants.isKeyDown(Minecraft.getInstance().window, this)
     }
 
-    private val lockedKeys = mutableSetOf<InputCode>()
+    private val lockedKeys = mutableSetOf<Int>()
 
     /**
      * Can only be used once per click, since the function locks itself until the key is no longer
      * held. Do not use in [KeyPressEvent], since it won't be unlocked again – use [KeyDownEvent]
      * instead.
      */
-    fun InputCode.isKeyClicked(): Boolean = if (isKeyHeld()) {
+    fun Int.isKeyClicked(): Boolean = if (isKeyHeld()) {
         lockedKeys.add(this)
     } else {
         lockedKeys.remove(this)
         false
     }
+    fun InputCode.isKeyClicked(): Boolean = value.isKeyClicked()
 
-    fun KeyMapping.isKeyClicked(): Boolean = InputCode.fromValue(key.value).isKeyClicked()
+    fun KeyMapping.isKeyClicked(): Boolean = key.value.isKeyClicked()
+    fun KeyMapping.isKeyHeld(): Boolean = key.value.isKeyHeld()
 
-    fun getKeyName(keyCode: InputCode): String = IMinecraft.INSTANCE.getKeyName(keyCode.value).text
+    fun ConfigKeybind.isKeyHeld(): Boolean = value.isKeyHeld()
+    fun ConfigKeybind.isKeyClicked(): Boolean = value.isKeyClicked()
+    fun ConfigKeybind.isUnknown(): Boolean = value == InputCode.UNKNOWN.value
+
+    fun getKeyName(keyCode: Int): String = IMinecraft.INSTANCE.getKeyName(keyCode.value).text
+    fun getKeyName(keyCode: InputCode): String = getKeyName(keyCode.value)
+    fun getKeyName(keyCode: ConfigKeybind): String = getKeyName(keyCode.value)
 
     private val SKYHANNI_CONFIG_CATEGORY = KeyMapping.Category.register(
         SkyHanniMod.id("keys")

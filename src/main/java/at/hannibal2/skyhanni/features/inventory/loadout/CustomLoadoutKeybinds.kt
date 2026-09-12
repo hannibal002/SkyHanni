@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -58,8 +57,8 @@ object CustomLoadoutKeybinds {
         return false
     }
 
-    fun allowMouseClick() = isEnabled() && keybinds.filter { it != InputCode.UNKNOWN }.any { it.isKeyHeld() }
-    fun allowKeyboardClick() = isEnabled() && keybinds.filter { it != InputCode.UNKNOWN }.any { it.isKeyHeld() }
+    fun allowMouseClick() = isEnabled() && keybinds.any { it.isKeyHeld() }
+    fun allowKeyboardClick() = isEnabled() && keybinds.any { it.isKeyHeld() }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && LoadoutApi.inLoadouts() && config.slotKeybindsToggle
 }

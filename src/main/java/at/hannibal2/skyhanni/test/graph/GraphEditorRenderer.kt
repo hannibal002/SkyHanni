@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigKeybind
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -215,7 +216,7 @@ object GraphEditorRenderer {
         else -> nodeColor
     }
 
-    private fun InputCode.name() = KeyboardManager.getKeyName(this)
+    private fun ConfigKeybind.name() = KeyboardManager.getKeyName(this)
 
     private fun KeyMapping.name() = KeyboardManager.getKeyName(InputCode.fromValue(key.value))
 

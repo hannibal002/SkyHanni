@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.InputCode.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.InputCode.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
@@ -485,8 +484,11 @@ object TunnelsMaps {
         if (!isEnabled()) return
         if (MinecraftCompat.screen != null) return
         val keyCode = event.keyCode
-        campfireKey(keyCode)
-        nextSpotKey(keyCode)
+        when {
+            event.isPressed(config.nextSpotHotkey) -> nextSpot()
+            event.isPressed(config.campfireKey) -> campfireKey()
+            else -> return
+        }
     }
 
     @HandleEvent
@@ -497,8 +499,7 @@ object TunnelsMaps {
         nextSpot()
     }
 
-    private fun campfireKey(keyCode: InputCode) {
-        if (keyCode != config.campfireKey) return
+    private fun campfireKey() {
         if (lastBaseCampWarp.passedSince() < 2.seconds) return
         lastBaseCampWarp = SimpleTimeMark.now()
         if (config.travelScroll) HypixelCommands.warp("basecamp") else campfireOverride()
@@ -520,12 +521,6 @@ object TunnelsMaps {
     }
 
     private var nextSpotDelay = SimpleTimeMark.farPast()
-
-    private fun nextSpotKey(keyCode: InputCode) {
-        if (keyCode == config.nextSpotHotkey) {
-            nextSpot()
-        }
-    }
 
     private fun nextSpot() {
         if (!nextSpotDelay.isInPast()) return

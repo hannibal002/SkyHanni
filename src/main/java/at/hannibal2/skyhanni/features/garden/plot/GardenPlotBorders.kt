@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi.renderPlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.KeyboardManager.isUnknown
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -21,7 +21,7 @@ object GardenPlotBorders {
     fun onKeyDown(event: KeyDownEvent) {
         if (!isEnabled()) return
         if (MinecraftCompat.screen != null) return
-        if (event.keyCode == config.plotBorderKey) {
+        if (event.isPressed(config.plotBorderKey)) {
             showBorders = !showBorders
         }
     }
@@ -41,5 +41,5 @@ object GardenPlotBorders {
     private fun getClosestPlot(): GardenPlot? =
         GardenPlotApi.plots.minByOrNull { it.middle.distanceSqToPlayer() }
 
-    private fun isEnabled() = GardenApi.inGarden() && config.plotBorderKey != InputCode.UNKNOWN
+    private fun isEnabled() = GardenApi.inGarden() && !config.plotBorderKey.isUnknown()
 }

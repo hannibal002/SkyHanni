@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import com.mojang.blaze3d.platform.InputConstants
-import net.minecraft.client.Minecraft
 
 @Suppress("unused")
 enum class InputCode(
@@ -144,12 +143,9 @@ enum class InputCode(
 
     override fun toString(): String = value.toString()
 
+    operator fun compareTo(other: Int): Int = value.compareTo(other)
+
     companion object {
-        fun isValidKey(input: InputCode): Boolean = input.value >= UNKNOWN.value
-
-        fun isKeyDown(input: InputCode): Boolean =
-            InputConstants.isKeyDown(Minecraft.getInstance().window, input.value)
-
         @JvmStatic
         fun fromValue(value: Int): InputCode =
             entries.firstOrNull { it.value == value } ?: UNKNOWN

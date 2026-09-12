@@ -42,7 +42,7 @@ object PlayerChatModifier {
             findHoverTexts(sibling, hoverEvents)
         }
         val hoverEvent = chatComponent.style.hoverEvent ?: return
-        if (hoverEvents.any { it.value() == hoverEvent.value() }) return
+        if (hoverEvents.any { it.value == hoverEvent.value }) return
         hoverEvents.add(hoverEvent)
     }
 

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.KeyboardManager.isUnknown
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
 
@@ -50,14 +51,14 @@ object FusionKeybinds {
         val confirmFusionKeybind = config.confirmFusionKeybind.get()
 
         config.repeatFusionKeybind.afterChange {
-            if (this != InputCode.UNKNOWN && this == confirmFusionKeybind) {
+            if (!this.isUnknown() && this == confirmFusionKeybind) {
                 config.repeatFusionKeybind.set(InputCode.UNKNOWN)
                 warnDuplicateKeybinds()
             }
         }
 
         config.confirmFusionKeybind.afterChange {
-            if (this != InputCode.UNKNOWN && this == repeatFusionKeybind) {
+            if (!this.isUnknown() && this == repeatFusionKeybind) {
                 config.confirmFusionKeybind.set(InputCode.UNKNOWN)
                 warnDuplicateKeybinds()
             }

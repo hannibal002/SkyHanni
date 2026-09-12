@@ -74,7 +74,7 @@ object FocusMode {
     fun onKeyDown(event: KeyDownEvent) {
         if (!isEnabled()) return
         if (config.alwaysEnabled) return
-        if (event.keyCode != config.toggleKey) return
+        if (!event.isPressed(config.toggleKey)) return
         active = !active
     }
 

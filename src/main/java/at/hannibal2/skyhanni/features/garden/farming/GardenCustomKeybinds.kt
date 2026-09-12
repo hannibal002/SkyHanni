@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigKeybind
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -88,8 +89,8 @@ object GardenCustomKeybinds {
         with(config) {
             with(mcSettings) {
                 map = buildMap {
-                    fun add(keyBinding: KeyMapping, property: Property<InputCode>) {
-                        put(keyBinding, property.get())
+                    fun add(keyBinding: KeyMapping, property: Property<ConfigKeybind>) {
+                        put(keyBinding, InputCode.fromValue(property.get().value))
                     }
                     add(keyAttack, attack)
                     add(keyUse, useItem)
@@ -180,28 +181,28 @@ object GardenCustomKeybinds {
     @JvmStatic
     fun disableAll() {
         with(config) {
-            attack.set(InputCode.UNKNOWN)
-            useItem.set(InputCode.UNKNOWN)
-            left.set(InputCode.UNKNOWN)
-            right.set(InputCode.UNKNOWN)
-            forward.set(InputCode.UNKNOWN)
-            back.set(InputCode.UNKNOWN)
-            jump.set(InputCode.UNKNOWN)
-            sneak.set(InputCode.UNKNOWN)
+            attack.set(ConfigKeybind(InputCode.UNKNOWN))
+            useItem.set(ConfigKeybind(InputCode.UNKNOWN))
+            left.set(ConfigKeybind(InputCode.UNKNOWN))
+            right.set(ConfigKeybind(InputCode.UNKNOWN))
+            forward.set(ConfigKeybind(InputCode.UNKNOWN))
+            back.set(ConfigKeybind(InputCode.UNKNOWN))
+            jump.set(ConfigKeybind(InputCode.UNKNOWN))
+            sneak.set(ConfigKeybind(InputCode.UNKNOWN))
         }
     }
 
     @JvmStatic
     fun defaultAll() {
         with(config) {
-            attack.set(InputCode.LEFT_MOUSE)
-            useItem.set(InputCode.RIGHT_MOUSE)
-            left.set(InputCode.KEY_A)
-            right.set(InputCode.KEY_D)
-            forward.set(InputCode.KEY_W)
-            back.set(InputCode.KEY_S)
-            jump.set(InputCode.KEY_SPACE)
-            sneak.set(InputCode.KEY_LSHIFT)
+            attack.set(ConfigKeybind(InputCode.LEFT_MOUSE))
+            useItem.set(ConfigKeybind(InputCode.RIGHT_MOUSE))
+            left.set(ConfigKeybind(InputCode.KEY_A))
+            right.set(ConfigKeybind(InputCode.KEY_D))
+            forward.set(ConfigKeybind(InputCode.KEY_W))
+            back.set(ConfigKeybind(InputCode.KEY_S))
+            jump.set(ConfigKeybind(InputCode.KEY_SPACE))
+            sneak.set(ConfigKeybind(InputCode.KEY_LSHIFT))
         }
     }
 

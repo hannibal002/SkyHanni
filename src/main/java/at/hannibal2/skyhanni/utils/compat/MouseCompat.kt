@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InputCode
 import net.minecraft.client.Minecraft
 import net.minecraft.client.input.MouseButtonInfo
 import kotlin.math.sign
@@ -89,11 +88,11 @@ object MouseCompat {
         val button: Int = input.button()
         if (action == 1) {
             setButtonState(button, true)
-            val key = InputCode.fromValue(button)
+            val key = button
             KeyDownEvent(key).post()
             KeyPressEvent(key).post()
         } else {
-            val key = InputCode.fromValue(button)
+            val key = button
             KeyPressEvent(key).post()
             DelayedRun.runNextTickEnd {
                 setButtonState(button, false)
