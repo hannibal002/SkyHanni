@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object BitsPerCookieVisual {
-
     private val config get() = SkyHanniMod.feature.misc.bits
 
     private val boosterCookie = "BOOSTER_COOKIE".toInternalName()
@@ -50,7 +49,7 @@ object BitsPerCookieVisual {
     )
 
     @HandleEvent
-    fun onToolTip(event: ToolTipTextEvent) {
+    private fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (event.itemStack.getInternalNameOrNull() != boosterCookie) return
         if (wrongCookiePattern.matches(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
@@ -71,21 +70,22 @@ object BitsPerCookieVisual {
         val newAvailable = BitsApi.bitsAvailable + gain
         val duration = 4 * cookieAmount
 
-        var index = positionIndex
+        val lines = buildList {
+            if (timeReplaced) {
+                if (config.bulkBuyCookieTime) add("§7§b$duration §7days")
+                add("")
+            } else {
+                add("")
+                if (config.bulkBuyCookieTime) add("§8‣ §7Cookie Buff for §b$duration §7days")
+            }
 
-        if (timeReplaced) {
-            if (config.bulkBuyCookieTime) toolTip.add(index++, "§7§b$duration §7days")
-            toolTip.add(index++, "")
-        } else {
-            toolTip.add(index++, "")
-            if (config.bulkBuyCookieTime) toolTip.add(index++, "§8‣ §7Cookie Buff for §b$duration §7days")
+            if (config.showBitsOnCookie) add("§8‣ §7Gain §b${gain.addSeparators()} Bits")
+            if (config.showBitsChangeOnCookie) add(
+                "§8‣ §7Available Bits: §3${BitsApi.bitsAvailable.addSeparators()} §6→ §3${newAvailable.addSeparators()}",
+            )
         }
 
-        if (config.showBitsOnCookie) toolTip.add(index++, "§8‣ §7Gain §b${gain.addSeparators()} Bits")
-        if (config.showBitsChangeOnCookie) toolTip.add(
-            index++,
-            "§8‣ §7Available Bits: §3${BitsApi.bitsAvailable.addSeparators()} §6→ §3${newAvailable.addSeparators()}",
-        )
+        toolTip.addAll(positionIndex - 1, lines)
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock &&

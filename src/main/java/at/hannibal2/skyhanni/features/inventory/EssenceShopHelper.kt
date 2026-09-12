@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -37,7 +36,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object EssenceShopHelper {
-
     // Where the informational item stack will be placed in the GUI
     private const val CUSTOM_STACK_LOCATION = 8
     private inline val GOLD_NUGGET_ITEM get() = Items.GOLD_NUGGET
@@ -129,14 +127,14 @@ object EssenceShopHelper {
     }
 
     @HandleEvent
-    fun replaceItem(event: ReplaceItemEvent) {
+    private fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled() || essenceShops.isEmpty() || currentProgress == null || event.slot != CUSTOM_STACK_LOCATION) return
         if (!essenceShopPattern.matches(InventoryUtils.openInventoryName())) return
         infoItemStack?.let { event.replace(it) }
     }
 
     @HandleEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (currentProgress == null || event.slotId != CUSTOM_STACK_LOCATION) return
         val currentEssenceItem = currentEssenceItem ?: return
         event.cancel()
@@ -147,7 +145,7 @@ object EssenceShopHelper {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val repoEssenceShops = event.getConstant<Map<String, Map<String, NeuEssenceShopJson>>>("essenceshops")
         essenceShops = repoEssenceShops.map { (key, value) ->
             EssenceShop(key, value.values.toMutableList())
@@ -155,7 +153,7 @@ object EssenceShopHelper {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose(event: InventoryCloseEvent) {
         currentProgress = null
         currentEssenceType = ""
         currentEssenceItem = null
@@ -164,12 +162,12 @@ object EssenceShopHelper {
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         processInventoryEvent(event)
     }
 
     @HandleEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         processInventoryEvent(event)
     }
 
@@ -199,11 +197,11 @@ object EssenceShopHelper {
                     add("§7Additional Essence Needed: §8${essenceNeeded.addSeparators()}")
                     val essenceItem = "ESSENCE_${currentEssenceType.uppercase()}".toInternalName()
 
-                    val bzInstantPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY)
+                    val bzInstantPrice = essenceItem.getPrice(BAZAAR_INSTANT_BUY)
                     val totalInstantPrice = bzInstantPrice * essenceNeeded
                     add("  §7BZ Instant Buy: §6${totalInstantPrice.addSeparators()}")
 
-                    val bzOrderPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL)
+                    val bzOrderPrice = essenceItem.getPrice(BAZAAR_INSTANT_SELL)
                     val totalOrderPrice = bzOrderPrice * essenceNeeded
                     add("  §7BZ Buy Order: §6${totalOrderPrice.addSeparators()}")
 
@@ -246,7 +244,7 @@ object EssenceShopHelper {
                 "Could not read current Essence Count from inventory",
                 extraData = listOf(
                     "inventoryName" to event.inventoryName,
-                    "essenceHeaderStack" to essenceHeaderStack?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty(),
+                    "essenceHeaderStack" to essenceHeaderStack?.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "populatedInventorySize" to event.inventoryItems.filter {
                         it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty()
                     }.size,
