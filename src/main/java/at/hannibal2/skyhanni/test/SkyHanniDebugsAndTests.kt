@@ -276,28 +276,16 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun reloadListeners() {
-        // TODO: use repo for this and implement it correctly
-        val blockedFeatures = try {
-            SkyHanniMod.configDir.resolve("blocked-features.txt").readLines().toList()
-        } catch (_: Exception) {
-            emptyList()
-        }
-
         val modules = SkyHanniMod.modules
         for (original in modules.toMutableList()) {
             val javaClass = original.javaClass
             val simpleName = javaClass.simpleName
             SkyHanniEvents.unregister(original)
             println("Unregistered listener $simpleName")
-
-            if (simpleName !in blockedFeatures) {
-                modules.remove(original)
-                modules.add(original)
-                SkyHanniEvents.register(original)
-                println("Registered listener $simpleName")
-            } else {
-                println("Skipped registering listener $simpleName")
-            }
+            modules.remove(original)
+            modules.add(original)
+            SkyHanniEvents.register(original)
+            println("Registered listener $simpleName")
         }
         ChatUtils.chat("Reloaded ${modules.size} listener classes.")
     }
