@@ -257,6 +257,14 @@ class DebugConfig {
     var remainingKillsDebug: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "Ghost Mode",
+        desc = "Makes literally every mob/player invisible for 'performance' §4(THIS WILL BE UNPLAYABLE)"
+    )
+    @ConfigEditorBoolean
+    var unRenderLiterallyEveryEntity: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Track Sound", desc = "")
     @Accordion
     val trackSound: TrackCommandConfig = TrackCommandConfig()
