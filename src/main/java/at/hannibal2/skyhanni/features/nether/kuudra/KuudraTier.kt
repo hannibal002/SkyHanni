@@ -50,20 +50,16 @@ enum class KuudraTier(val displayName: String) {
             questName: String,
             state: QuestState,
         ): KuudraQuest? = kuudraQuestPattern.matchMatcher(questName) {
-            val tierName = getTierByNameOrNull(group("tier")) ?: return@matchMatcher null
+            val tierName = getByDisplayName(group("tier")) ?: return@matchMatcher null
             KuudraQuest(tierName, state)
         }
 
-        private fun getTierByNameOrNull(name: String) = entries.firstOrNull {
-            it.displayName.equals(name, ignoreCase = true) || it.name.equals(name, ignoreCase = true)
-        }
+        fun getByDisplayName(displayName: String): KuudraTier? =
+            entries.firstOrNull { it.displayName.equals(displayName, ignoreCase = true) }
 
-        fun addRepoData(
-            displayName: String,
-            displayItem: NeuInternalName,
-            location: LorenzVec?,
-            tier: Int,
-        ) {
+        fun getByTierNumber(tierNumber: Int): KuudraTier? = entries.firstOrNull { it.tierNumber == tierNumber }
+
+        fun addRepoData(displayName: String, displayItem: NeuInternalName, location: LorenzVec?, tier: Int) {
             val target = entries.firstOrNull { it.displayName == displayName } ?: return
             target.setLocation(location)
             target.setDisplayItem(displayItem)

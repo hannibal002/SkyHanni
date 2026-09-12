@@ -46,8 +46,7 @@ object DailyKuudraBossHelper {
 
     @HandleEvent
     fun onKuudraDone(event: KuudraCompleteEvent) {
-        val tier = event.kuudraTier
-        val kuudraTier = getByTier(tier) ?: return
+        val kuudraTier = event.kuudraTier
         ChatUtils.debug("Detected kuudra tier done: ${kuudraTier.getTieredDisplayName()}")
         DailyQuestHelper.finishKuudra(kuudraTier)
         kuudraTier.doneToday = true
@@ -57,9 +56,10 @@ object DailyKuudraBossHelper {
 
     fun MutableList<Renderable>.addKuudraBoss() {
         val done = kuudraTiers.count { it.doneToday }
+        val total = kuudraTiers.size
         addString("")
-        addString("§7Daily Kuudra (§e$done§8/§e5 killed§7)")
-        if (done < 5) {
+        addString("§7Daily Kuudra (§e$done§8/§e$total killed§7)")
+        if (done < total) {
             for (tier in kuudraTiers) {
                 if (config.hideComplete.get() && tier.doneToday) continue
                 val result = if (tier.doneToday) "§aDone" else "§bTodo"
@@ -106,7 +106,7 @@ object DailyKuudraBossHelper {
     fun loadData(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         if (kuudraTiers.isEmpty()) return
         for (name in storage.kuudraTiersDone) {
-            getByDisplayName(name)?.doneToday = true
+            getByName(name)?.doneToday = true
         }
         updateAllKuudraDone()
     }
@@ -115,7 +115,7 @@ object DailyKuudraBossHelper {
         allKuudraDone = !kuudraTiers.any { !it.doneToday }
     }
 
-    private fun getByDisplayName(name: String) = kuudraTiers.firstOrNull { it.name == name }
+    private fun getByName(name: String) = kuudraTiers.firstOrNull { it.name == name }
 
     private fun getByTier(number: Int) = kuudraTiers.firstOrNull { it.tierNumber == number }
 }

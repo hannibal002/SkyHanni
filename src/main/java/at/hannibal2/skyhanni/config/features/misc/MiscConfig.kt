@@ -209,10 +209,6 @@ class MiscConfig {
     val collectionCounterPos: Position = Position(10, 10)
 
     @Expose
-    @NoConfigLink
-    val carryPosition: Position = Position(10, 10)
-
-    @Expose
     @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the item names directly inside the Brewing Stand.")
     @ConfigEditorBoolean
     @FeatureToggle
