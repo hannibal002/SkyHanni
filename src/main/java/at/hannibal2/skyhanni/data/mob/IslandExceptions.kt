@@ -95,7 +95,7 @@ object IslandExceptions {
     private fun privateIsland(
         armorStand: ArmorStand?,
         baseEntity: LivingEntity,
-    ): MobData.MobResult? = when {
+    ) = when {
 
         baseEntity.baseMaxHealth >= 2_000_000_000 -> MobData.MobResult.found(
             Mob(
@@ -109,9 +109,7 @@ object IslandExceptions {
             if (baseEntity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) < 15.0) {
                 // TODO fix to always include Valid Mobs on Private Island
                 MobData.MobResult.found(MobFactories.minionMob(baseEntity))
-            } else {
-                MobData.MobResult.notYetFound
-            }
+            } else MobData.MobResult.notYetFound
 
         else -> null
     }
