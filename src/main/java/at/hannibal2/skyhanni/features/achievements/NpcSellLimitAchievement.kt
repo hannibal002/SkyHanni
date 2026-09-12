@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 @SkyHanniModule
 object NpcSellLimitAchievement {
 
-    private val sellLimitPattern by AchievementManager.group.pattern(
+    private val sellLimitPattern by AchievementManager.patternGroup.pattern(
         "npc-sell-limit",
         "You've reached the daily limit of coins you may earn from NPC shops\\.",
     )

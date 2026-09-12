@@ -17,7 +17,7 @@ object BestiaryAchievement {
      * REGEX-TEST: Bestiary Milestone CCCXX
      * REGEX-TEST: Bestiary Milestone 320
      */
-    private val bestiaryPattern by AchievementManager.group.pattern(
+    private val bestiaryPattern by AchievementManager.patternGroup.pattern(
         "bestiary",
         "Bestiary Milestone (?<milestone>.*)",
     )

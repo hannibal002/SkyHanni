@@ -15,7 +15,7 @@ object StarCultAchievement {
      * REGEX-TEST: [NPC] Dalir: You’ve now attended 8 meetings of the Cult of the Fallen Star! As a reward, here's some Starfall!
      * REGEX-TEST: [NPC] Dalir: You’ve now attended 4 meetings of the Cult of the Fallen Star! As a reward, here's some Starfall!
      */
-    private val starCultPattern by AchievementManager.group.pattern(
+    private val starCultPattern by AchievementManager.patternGroup.pattern(
         "starcult",
         "\\[NPC] Dalir: You’ve now attended (?<amount>\\d+) meetings of the Cult of the Fallen Star!" +
             " As a reward, here's some Starfall!"

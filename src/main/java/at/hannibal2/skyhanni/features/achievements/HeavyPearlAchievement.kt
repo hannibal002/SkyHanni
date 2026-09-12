@@ -10,12 +10,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 @SkyHanniModule
 object HeavyPearlAchievement {
 
-    private val allCollectedPattern by AchievementManager.group.pattern(
+    private val allCollectedPattern by AchievementManager.patternGroup.pattern(
         "pearls.allcollected",
         "Find a way to reach the top of the stomach!",
     )
 
-    private val bonusPattern by AchievementManager.group.pattern(
+    private val bonusPattern by AchievementManager.patternGroup.pattern(
         "pearls.bonus",
         "Your Matriarch Cubs attribute has granted you 1 additional Heavy Pearl!",
     )

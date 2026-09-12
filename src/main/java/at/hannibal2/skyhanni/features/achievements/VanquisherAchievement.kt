@@ -17,7 +17,7 @@ object VanquisherAchievement {
     /**
      * REGEX-TEST: A Vanquisher is spawning nearby!
      */
-    private val vanquisherSpawnPattern by AchievementManager.group.pattern(
+    private val vanquisherSpawnPattern by AchievementManager.patternGroup.pattern(
         "vanquisher",
         "A Vanquisher is spawning nearby!",
     )
