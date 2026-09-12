@@ -355,7 +355,8 @@ class MobFinder {
             EntityResult(bossType = BossType.GAIA_CONSTRUCT)
         }
         // TODO use Lord Jawbus Name
-        mob.baseEntity.hasMaxHealth(100_000_000) -> {
+        IslandType.CRIMSON_ISLE.isInIsland() &&
+            mob.baseEntity.hasMaxHealth(100_000_000) -> {
             EntityResult(bossType = BossType.LORD_JAWBUS)
         }
 

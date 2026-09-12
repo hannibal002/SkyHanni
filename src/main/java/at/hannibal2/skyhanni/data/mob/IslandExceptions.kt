@@ -95,40 +95,25 @@ object IslandExceptions {
     private fun privateIsland(
         armorStand: ArmorStand?,
         baseEntity: LivingEntity,
-    ): MobData.MobResult? {
+    ): MobData.MobResult? = when {
 
-        // Dummy can either have 2m or Int.MAX_VALUE
-        if (baseEntity.baseMaxHealth >= 2_000_000) {
-            val dummyMob = sequenceOf(armorStand)
-                .plus(MobUtils.getArmorStandByRangeAll(baseEntity, 4.0))
-                .filterNotNull()
-                .firstNotNullOfOrNull { stand ->
-                    MobFilter.dummyMobNamePattern.matchMatcher(stand.cleanName) {
-                        Mob(
-                            baseEntity = baseEntity,
-                            category = MobCategory.SPECIAL,
-                            armorStand = stand,
-                            name = "Dummy",
-                            hypixelTypes = group("mobTypes"),
-                        )
-                    }
-                }
+        baseEntity.baseMaxHealth >= 2_000_000_000 -> MobData.MobResult.found(
+            Mob(
+                baseEntity = baseEntity,
+                category = MobCategory.SPECIAL,
+                name = "Dummy",
+            )
+        )
 
-            if (dummyMob != null) {
-                return MobData.MobResult.found(dummyMob)
-            }
-        }
-
-        if (armorStand?.isDefaultValue() != false) {
-            return if (baseEntity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) < 15.0) {
+        armorStand?.isDefaultValue() != false ->
+            if (baseEntity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) < 15.0) {
                 // TODO fix to always include Valid Mobs on Private Island
                 MobData.MobResult.found(MobFactories.minionMob(baseEntity))
             } else {
                 MobData.MobResult.notYetFound
             }
-        }
 
-        return null
+        else -> null
     }
 
     private fun theRift(

@@ -158,16 +158,6 @@ object MobFilter {
         "^§8\\[§7Lv\\d+§8] §.(?<name>Horse|Armadillo|Skeleton Horse|Pig|Rat)$",
     )
 
-    /**
-     * REGEX-TEST:  Dummy 2B❤
-     * REGEX-TEST:  Dummy 2B❤
-     * REGEX-TEST:  Dummy 2B❤
-     */
-    val dummyMobNamePattern by patternGroup.pattern(
-        "pattern.privateisland.dummy",
-        "(?<mobTypes>.*) Dummy 2B❤",
-    )
-
     internal val RAT_SKULL_TEXTURE by SkullTextureHolder.texture("MOB_RAT")
     private val HELLWISP_TENTACLE_SKULL_TEXTURE by SkullTextureHolder.texture("HELLWISP_TENTACLE")
     private val RIFT_EYE_SKULL1_TEXTURE by SkullTextureHolder.texture("RIFT_EYE_1")
