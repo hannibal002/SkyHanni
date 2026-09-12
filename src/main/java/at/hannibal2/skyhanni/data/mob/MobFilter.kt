@@ -161,10 +161,11 @@ object MobFilter {
     /**
      * REGEX-TEST:  Dummy 2B❤
      * REGEX-TEST:  Dummy 2B❤
+     * REGEX-TEST:  Dummy 2B❤
      */
     val dummyMobNamePattern by patternGroup.pattern(
         "pattern.privateisland.dummy",
-        ".*Dummy.*",
+        "(?<types>.*) Dummy 2B❤",
     )
 
     internal val RAT_SKULL_TEXTURE by SkullTextureHolder.texture("MOB_RAT")
