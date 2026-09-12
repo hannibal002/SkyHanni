@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHelmet
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.core.particles.ParticleTypes
@@ -28,13 +28,9 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object DungeonHideItems {
-
     private val config get() = SkyHanniMod.feature.dungeon.objectHider
 
-    private val hideParticles = mutableMapOf<ArmorStand, SimpleTimeMark>()
-    private val movingSkeletonSkulls = mutableMapOf<ArmorStand, SimpleTimeMark>()
-
-    private val SOUL_WEAVER_HIDER by SkullTextureHolder.texture("DUNGEONS_SOUL_WEAVER")
+    private val SOUL_WEAVER_TEXTURE by SkullTextureHolder.texture("DUNGEONS_SOUL_WEAVER")
     private val BLESSING_TEXTURE by SkullTextureHolder.texture("DUNGEONS_BLESSING")
     private val REVIVE_STONE_TEXTURE by SkullTextureHolder.texture("DUNGEONS_REVIVE_STONE")
     private val PREMIUM_FLESH_TEXTURE by SkullTextureHolder.texture("DUNGEONS_PREMIUM_FLESH")
@@ -43,9 +39,12 @@ object DungeonHideItems {
     private val DAMAGE_ORB_TEXTURE by SkullTextureHolder.texture("DUNGEONS_DAMAGE_ORB")
     private val HEALER_FAIRY_TEXTURE by SkullTextureHolder.texture("DUNGEONS_HEALER_FAIRY")
 
+    private val hideParticles = mutableMapOf<ArmorStand, SimpleTimeMark>()
+    private val movingSkeletonSkulls = mutableMapOf<ArmorStand, SimpleTimeMark>()
+
     private fun String?.matchesTexture(texture: String?) = texture != null && this == texture
 
-    private fun isSkeletonSkull(entity: ArmorStand): Boolean = entity.getStandHelmet()?.cleanName == "Skeleton Skull"
+    private fun isSkeletonSkull(entity: ArmorStand): Boolean = entity.getHelmet()?.cleanName == "Skeleton Skull"
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
@@ -64,7 +63,7 @@ object DungeonHideItems {
 
         if (entity !is ArmorStand) return
 
-        val head = entity.getStandHelmet()
+        val head = entity.getHelmet()
         val skullTexture = head?.getSkullTexture()
         if (config.hideSuperboomTNT) {
             if (entity.name.formattedTextCompatLessResets().startsWith("§9Superboom TNT")) {
@@ -144,7 +143,7 @@ object DungeonHideItems {
         }
 
         if (config.hideSoulweaverSkulls) {
-            if (skullTexture.matchesTexture(SOUL_WEAVER_HIDER)) {
+            if (skullTexture.matchesTexture(SOUL_WEAVER_TEXTURE)) {
                 event.cancel()
                 return
             }

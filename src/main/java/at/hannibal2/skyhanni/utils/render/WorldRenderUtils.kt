@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.position
 import at.hannibal2.skyhanni.utils.compat.rotation
 import at.hannibal2.skyhanni.utils.expand
@@ -971,7 +970,7 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {
-        if (entity.deceased) return entity.boundingBox
+        if (entity.isRemoved) return entity.boundingBox
         val offset = exactLocation(entity) - entity.getLorenzVec()
         return entity.boundingBox.move(offset.x, offset.y, offset.z)
     }

@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -50,7 +49,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -66,7 +64,6 @@ import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
 object MinionFeatures {
-
     const val MINION_FUEL_SLOT = 19
     const val MINION_PICKUP_SLOT = 53
 
@@ -442,7 +439,7 @@ object MinionFeatures {
 
         val entity = event.entity.takeIf {
             val nameMatch = it.customName?.string?.contains("❤") ?: false
-            it.hasCustomName() && !it.deceased && nameMatch
+            it.hasCustomName() && !it.isRemoved && nameMatch
         } ?: return
         val minions = minions ?: return
 
@@ -453,7 +450,7 @@ object MinionFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender() {
         if (!minionInventoryOpen || !config.hopperProfitDisplay) return
 
         val display = display ?: return

@@ -10,12 +10,13 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.TreeMap
+import java.util.concurrent.ConcurrentHashMap
 
 @SkyHanniModule
 object MobData {
-
-    class MobSet : HashSet<Mob>() {
-        val entityList get() = this.flatMap { listOf(it.baseEntity) + (it.extraEntities) }
+    class MobSet : MutableSet<Mob> by ConcurrentHashMap.newKeySet() {
+        val entityList: List<LivingEntity>
+            get() = flatMap { listOf(it.baseEntity) + (it.extraEntities) }
     }
 
     val players = MobSet()

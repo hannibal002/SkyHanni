@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev
 
+import at.hannibal2.skyhanni.config.OnlyDevEnv
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -7,9 +8,16 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class DebugMobConfig {
+    @Expose
+    @ConfigOption(
+        name = "Mob Name & Category",
+        desc = "Shows mob names and categories in the world.",
+    )
+    @ConfigEditorBoolean
+    var mobDisplay: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Mob Detection", desc = "Debug feature to check the Mob Detection.")
+    @ConfigOption(name = "Mob Detection", desc = "Debug feature to test Mob Detection.")
     @Accordion
     val mobDetection: MobDetection = MobDetection()
 
@@ -17,7 +25,8 @@ class DebugMobConfig {
         OFF("Off"),
         ONLY_NAME("Only Name"),
         ONLY_HIGHLIGHT("Only Highlight"),
-        NAME_AND_HIGHLIGHT("Both");
+        NAME_AND_HIGHLIGHT("Both"),
+        ;
 
         override fun toString() = displayName
     }
@@ -81,6 +90,7 @@ class DebugMobConfig {
             desc = "Shows invisible mobs (due to invisibility effect) if looked at directly.",
         )
         @ConfigEditorBoolean
+        @OnlyDevEnv
         var showInvisible: Boolean = false
     }
 }

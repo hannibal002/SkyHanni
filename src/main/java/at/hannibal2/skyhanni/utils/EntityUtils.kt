@@ -8,15 +8,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.getAllEquipment
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEntityLevel
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEquipmentSlots
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHandItem
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHelmet
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.realHealth
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -44,11 +41,11 @@ annotation class AllEntitiesGetter
 
 @SkyHanniModule
 object EntityUtils {
-
     inline val ALWAYS get(): (Entity) -> Boolean = { true }
 
     // TODO remove this relatively heavy call everywhere
-    @Deprecated("Use Mob Detection Instead")
+    @Deprecated("Use Mob Detection instead")
+    @Suppress("DEPRECATION")
     fun LivingEntity.hasNameTagWith(
         y: Int,
         contains: String,
@@ -57,25 +54,22 @@ object EntityUtils {
         debugWrongEntity: Boolean = false,
     ): Boolean = getNameTagWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity) != null
 
-    fun getPlayerEntities(): MutableList<RemotePlayer> {
-        val list = mutableListOf<RemotePlayer>()
-        for (entity in MinecraftCompat.localWorldOrNull?.players().orEmpty()) {
-            if (!entity.isNpc() && entity is RemotePlayer) {
-                list.add(entity)
-            }
-        }
-        return list
-    }
+    fun getPlayerEntities(): List<RemotePlayer> =
+        MinecraftCompat.localWorldOrNull
+            ?.players()
+            ?.filterIsInstance<RemotePlayer>()
+            ?.filterNot { it.isNpc() }
+            .orEmpty()
 
-    @Deprecated("Use Mob Detection Instead")
+    @Deprecated("Use Mob Detection instead")
     fun LivingEntity.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
-    ): List<ArmorStand> = getArmorStandsInRadius(getLorenzVec().up(3), radius).filter {
-        it.name.string.contains(contains)
-    }
+    ): List<ArmorStand> =
+        getArmorStandsInRadius(getLorenzVec().up(3), radius).filter { contains in it.cleanName }
 
-    @Deprecated("Use Mob Detection Instead")
+    @Deprecated("Use Mob Detection instead")
+    @Suppress("DEPRECATION")
     fun LivingEntity.getNameTagWith(
         y: Int,
         contains: String,
@@ -84,7 +78,7 @@ object EntityUtils {
         debugWrongEntity: Boolean = false,
     ): ArmorStand? = getAllNameTagsWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity).firstOrNull()
 
-    @Deprecated("Use Mob Detection Instead")
+    @Deprecated("Use Mob Detection instead")
     fun LivingEntity.getAllNameTagsWith(
         y: Int,
         contains: String,
@@ -94,14 +88,15 @@ object EntityUtils {
     ): List<ArmorStand> {
         val center = getLorenzVec().up(y)
         return getArmorStandsInRadius(center, inaccuracy).filter {
-            val result = it.name.formattedTextCompatLessResets().contains(contains)
+            val name = it.name.formattedTextCompatLessResets()
+            val result = contains in name
             if (debugWrongEntity && !result) {
-                ChatUtils.consoleLog("wrong entity in aabb: '" + it.name.formattedTextCompatLessResets() + "'")
+                ChatUtils.consoleLog("wrong entity in aabb: '$name'")
             }
             if (debugRightEntity && result) {
-                ChatUtils.consoleLog("mob: " + center.printWithAccuracy(2))
-                ChatUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                ChatUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
+                ChatUtils.consoleLog("mob: ${center.printWithAccuracy(2)}")
+                ChatUtils.consoleLog("nametag: ${it.getLorenzVec().printWithAccuracy(2)}")
+                ChatUtils.consoleLog("accuracy: ${(it.getLorenzVec() - center).printWithAccuracy(3)}")
             }
             result
         }
@@ -114,10 +109,11 @@ object EntityUtils {
         return getEntitiesInBoundingBox<ArmorStand>(alignedBB)
     }
 
-    @Deprecated("Old. Instead use entity detection feature instead.")
+    @Deprecated("Use entity detection feature instead")
+    @Suppress("DEPRECATION")
     fun LivingEntity.hasBossHealth(health: Int): Boolean = this.hasMaxHealth(health, true)
 
-    @Deprecated("Old. Instead use entity detection feature instead.")
+    @Deprecated("Use entity detection feature instead")
     fun LivingEntity.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
         val derpyMultiplier = if (ElectionApi.isDerpy) 2.0 else if (ElectionApi.isAura) 1.1 else 1.0
         if (maxHealth == (health * derpyMultiplier).toInt()) return true
@@ -134,40 +130,30 @@ object EntityUtils {
         return false
     }
 
-    internal fun Player.getSkinTexture(): String? = gameProfile.properties.entries()
-        .filter { it.key == "textures" }
-        .map { it.value }
-        .firstOrNull { it.name == "textures" }?.value
+    fun Player.getSkinTexture(): String? = gameProfile.properties.get("textures").firstOrNull()?.value
 
-    inline fun <reified T : Entity> getEntitiesNearby(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
-        LocationUtils.playerLocation().getEntitiesNearby<T>(radius, predicate)
+    inline fun <reified T : Entity> getEntitiesNearby(
+        radius: Double,
+        noinline predicate: (T) -> Boolean = ALWAYS,
+    ): List<T> = LocationUtils.playerLocation().getEntitiesNearby<T>(radius, predicate)
 
     // First filters for a bounding box because it's faster, and then filters based on distance
     inline fun <reified T : Entity> LorenzVec.getEntitiesNearby(
         radius: Double,
         noinline predicate: (T) -> Boolean = ALWAYS,
-    ): List<T> {
-        return getEntitiesInBox<T>(this, radius) { it.distanceTo(this) < radius && predicate(it) }
-    }
+    ): List<T> = getEntitiesInBox<T>(this, radius) { it.distanceTo(this) < radius && predicate(it) }
 
-    @AllEntitiesGetter
-    inline fun <reified T : Entity> getEntitiesNearbyIgnoreY(location: LorenzVec, radius: Double): Sequence<T> =
-        getEntities<T>().filter { it.distanceToIgnoreY(location) < radius }
-
-    fun LivingEntity.isAtFullHealth() = baseMaxHealth == findHealthReal().toInt()
+    fun LivingEntity.isAtFullHealth() = baseMaxHealth == realHealth.toInt()
 
     @Deprecated("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
-    fun ArmorStand.hasSkullTexture(skin: String?): Boolean {
-        skin ?: return false
-        val inventory = this.getAllEquipment()
-        return inventory.any { it != null && it.getSkullTexture() == skin }
-    }
+    fun LivingEntity.hasSkullTexture(skin: String?): Boolean =
+        skin != null && getEquipmentSlots().values.any { it?.getSkullTexture() == skin }
 
-    fun ArmorStand.getWornSkullTexture(): String? = getStandHelmet()?.getSkullTexture()
-    fun ArmorStand.wearingSkullTexture(skin: String?) = skin != null && getWornSkullTexture() == skin
-    fun ArmorStand.holdingSkullTexture(skin: String?) = skin != null && getHandItem()?.getSkullTexture() == skin
+    fun LivingEntity.getWornSkullTexture(): String? = getHelmet()?.getSkullTexture()
+    fun LivingEntity.wearingSkullTexture(skin: String?) = skin != null && getWornSkullTexture() == skin
+    fun LivingEntity.holdingSkullTexture(skin: String?) = skin != null && getHandItem()?.getSkullTexture() == skin
 
-    internal fun Player.isNpc() = !isRealPlayer()
+    fun Player.isNpc() = !isRealPlayer()
 
     fun LivingEntity.getArmorInventory(): Array<SafeItemStack?>? {
         if (this !is Player) return null
@@ -181,25 +167,32 @@ object EntityUtils {
 
     fun EnderMan.getBlockInHand(): BlockState? = carriedBlock
 
-    @AllEntitiesGetter
+    @OptIn(AllEntitiesGetter::class)
     inline fun <reified R : Entity> getEntities(): Sequence<R> = getAllEntities().filterIsInstance<R>()
 
-    inline fun <reified E : Entity> getEntitiesInBox(pos: LorenzVec, radius: Double, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
-        return getEntitiesInBoundingBox(pos.boundingCenter(radius), predicate)
-    }
+    inline fun <reified E : Entity> getEntitiesInBox(
+        pos: LorenzVec,
+        radius: Double,
+        noinline predicate: (E) -> Boolean = ALWAYS,
+    ): List<E> = getEntitiesInBoundingBox(pos.boundingCenter(radius), predicate)
 
-    // More efficient than filtering by type, and then for distance, as Minecraft already first filters the chunks that contain the aabb,
-    // and then filters both for entity type and with the predicate for entities inside those chunks.
-    inline fun <reified E : Entity> getEntitiesInBoundingBox(aabb: AABB, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
-        val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
-        return world.getEntitiesOfClass(E::class.java, aabb, predicate)
-    }
+    /**
+     * More efficient than filtering by type, and then for distance, as Minecraft already first
+     * filters the chunks that contain the [aabb], and then filters both for entity type and with
+     * the predicate for entities inside those chunks.
+     */
+    inline fun <reified E : Entity> getEntitiesInBoundingBox(
+        aabb: AABB,
+        noinline predicate: (E) -> Boolean = ALWAYS,
+    ): List<E> = MinecraftCompat.localWorldOrNull?.getEntitiesOfClass(
+        E::class.java, aabb, predicate,
+    ).orEmpty()
 
-    @AllEntitiesGetter
+    @OptIn(AllEntitiesGetter::class)
     fun getAllEntities(): Sequence<Entity> = MinecraftCompat.localWorldOrNull?.entitiesForRendering()?.let {
         if (Minecraft.getInstance().isSameThread) it
-        // TODO: while I am here, I want to point out that copying the entity list does not constitute proper synchronization,
-        //  but *does* make crashes because of it rarer.
+        // TODO: while I am here, I want to point out that copying the entity list does not
+        //  constitute proper synchronization, but *does* make crashes because of it rarer.
         else it.toMutableList()
     }?.asSequence().orEmpty()
 
@@ -217,24 +210,22 @@ object EntityUtils {
     }
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5, ignoreFrustum: Boolean = false): Boolean {
-        if (deceased) return false
+        if (isRemoved) return false
         // TODO add cache that only updates e.g. 10 times a second
         if (!ignoreFrustum && !FrustumUtils.isVisible(boundingBox)) return false
         return getLorenzVec().up(vecYOffset).canBeSeen(viewDistance)
     }
 
-    fun getEntityByID(entityId: Int): Entity? = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntity(entityId)
+    fun getEntityByID(entityId: Int): Entity? = MinecraftCompat.localWorldOrNull?.getEntity(entityId)
 
-    fun LivingEntity.isCorrupted() = baseMaxHealth == findHealthReal().toInt().derpy() * 3 || isRunicAndCorrupt()
-    fun LivingEntity.isRunic() = baseMaxHealth == findHealthReal().toInt().derpy() * 4 || isRunicAndCorrupt()
-    fun LivingEntity.isRunicAndCorrupt() = baseMaxHealth == findHealthReal().toInt().derpy() * 3 * 4
+    fun LivingEntity.isCorrupted() = baseMaxHealth == realHealth.toInt().derpy() * 3 || isRunicAndCorrupt()
+    fun LivingEntity.isRunic() = baseMaxHealth == realHealth.toInt().derpy() * 4 || isRunicAndCorrupt()
+    fun LivingEntity.isRunicAndCorrupt() = baseMaxHealth == realHealth.toInt().derpy() * 3 * 4
 
-    val Entity.cleanName
-        get() = this.name.string.removeColor()
+    val Entity.cleanName: String get() = name.string.removeColor()
 
     // TODO use derpy() on every use case
-    val LivingEntity.baseMaxHealth: Int
-        get() = this.getAttributeBaseValue(Attributes.MAX_HEALTH).toInt()
+    val LivingEntity.baseMaxHealth: Int get() = getAttributeBaseValue(Attributes.MAX_HEALTH).toInt()
 
     inline val Entity.spawnTime: ServerTimeMark get() = ServerTimeMark.now() - tickCount.ticks
 

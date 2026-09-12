@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.realHealth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import java.awt.Color
@@ -54,7 +54,7 @@ object SeaCreatureFeatures {
         entityIds.addIfAbsent(entity.id)
         if (seaCreature.isOwn) return
 
-        if (mob.name == "Water Hydra" && entity.findHealthReal() == (entity.baseMaxHealth.toFloat() / 2)) return
+        if (mob.name == "Water Hydra" && entity.realHealth == (entity.baseMaxHealth.toFloat() / 2)) return
         if (config.alertOtherCatches && shouldNotify && SeaCreatureSettings.getConfig(mob)?.shouldNotifyForNonOwn == true) {
             val text = if (config.creatureName) "${seaCreature.displayName} NEARBY!"
             else "${seaCreature.rarity.chatColorCode}RARE SEA CREATURE!"

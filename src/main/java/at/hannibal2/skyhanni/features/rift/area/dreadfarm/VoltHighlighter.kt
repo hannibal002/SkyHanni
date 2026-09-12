@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.getStandHelmet
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHelmet
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
@@ -31,15 +31,14 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object VoltHighlighter {
-
-    private val config get() = RiftApi.config.area.dreadfarm.voltCrux
-
+    private const val LIGHTNING_DISTANCE = 7F
+    private val CHARGE_TIME = 12.seconds
     private val VOLT_DOING_LIGHTNING by SkullTextureHolder.texture("VOLT_DOING_LIGHTNING")
     private val VOLT_FRIENDLY by SkullTextureHolder.texture("VOLT_FRIENDLY")
     private val VOLT_HOSTILE by SkullTextureHolder.texture("VOLT_HOSTILE")
 
-    private const val LIGHTNING_DISTANCE = 7F
-    private val CHARGE_TIME = 12.seconds
+    private val config get() = RiftApi.config.area.dreadfarm.voltCrux
+
     private var chargingSince = mapOf<Entity, SimpleTimeMark>()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
@@ -107,7 +106,7 @@ object VoltHighlighter {
 
     private fun getVoltState(entity: Entity): VoltState {
         if (entity !is ArmorStand) return VoltState.NO_VOLT
-        val helmet = entity.getStandHelmet() ?: return VoltState.NO_VOLT
+        val helmet = entity.getHelmet() ?: return VoltState.NO_VOLT
         return getVoltState(helmet)
     }
 

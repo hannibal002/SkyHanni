@@ -10,14 +10,12 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import net.minecraft.world.entity.Entity
 
 @SkyHanniModule
 object SlayerMiniBossFeatures {
-
     private val config get() = SlayerApi.config
     private var miniBosses = mutableSetOf<Mob>()
     private var cocoons = mutableSetOf<Entity>()
@@ -48,8 +46,8 @@ object SlayerMiniBossFeatures {
 
     @HandleEvent
     fun onSecondPassed() {
-        cocoons.removeIf { it.deceased }
-        miniBosses.removeIf { it.baseEntity.deceased }
+        cocoons.removeIf { it.isRemoved }
+        miniBosses.removeIf { it.baseEntity.isRemoved }
     }
 
     @HandleEvent

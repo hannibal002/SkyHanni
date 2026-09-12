@@ -47,6 +47,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -55,8 +56,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.realHealth
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -82,8 +82,8 @@ typealias EntityData = DamageIndicatorEntityData
 @SkyHanniModule
 @Suppress("LargeClass")
 object DamageIndicatorManager {
-
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
+    private val mobDebugConfig get() = SkyHanniMod.feature.dev.mobDebug
 
     // TODO use repoPattern
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
@@ -95,13 +95,22 @@ object DamageIndicatorManager {
     // EntityData is owned by the field 'data', so we can use weak keys
     private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds, useWeakKeys = true)
 
+    private val thirdPerson get() = PlayerUtils.isThirdPersonView()
+
+    private val sizeHealth by RecalculatingValue(1.ticks) { if (thirdPerson) 2.8 else 1.9 }
+    private val sizeNameAbove by RecalculatingValue(1.ticks) { if (thirdPerson) 2.2 else 1.8 }
+    private val sizeBossName by RecalculatingValue(1.ticks) { if (thirdPerson) 2.4 else 2.1 }
+    private val sizeFinalResults by RecalculatingValue(1.ticks) { if (thirdPerson) 1.8 else 1.4 }
+
+    private val smallestViewDistance by RecalculatingValue(1.ticks) { if (thirdPerson) 10.0 else 6.0 }
+
     private var tarantulaFoundTime = SimpleTimeMark.farPast()
     private val tarantulaErrored = mutableSetOf<UUID>()
 
     fun isDamageSplash(entity: ArmorStand): Boolean {
         if (entity.tickCount > 300) return false
         if (!entity.hasCustomName()) return false
-        if (entity.deceased) return false
+        if (entity.isRemoved) return false
         val name = entity.cleanName.replace(",", "")
 
         return damagePattern.matcher(name).matches()
@@ -129,14 +138,14 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onServerTick() {
+    private fun onServerTick() {
         data.forEach {
             it.value.serverTicksAlive++
         }
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         mobFinder = MobFinder()
         data.clear()
 
@@ -145,40 +154,24 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         mobFinder?.handleChat(event.cleanMessage)
     }
 
+    // TODO split up this function
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
-        if (SkyBlockUtils.debug) {
-            list.removeIf { it.decayAt.isInPast() }
-            for (highlight in list) {
-                event.drawDynamicText(highlight.location, highlight.text, 1.5, seeThroughBlocks = false)
-            }
-        }
+        if (mobDebugConfig.mobDisplay) {
+            highlights.removeIf { it.decayAt.isInPast() }
 
-        val sizeHealth: Double
-        val sizeNameAbove: Double
-        val sizeBossName: Double
-        val sizeFinalResults: Double
-        val smallestViewDistance: Double
-        if (PlayerUtils.isThirdPersonView()) {
-            sizeHealth = 2.8
-            sizeNameAbove = 2.2
-            sizeBossName = 2.4
-            sizeFinalResults = 1.8
-
-            smallestViewDistance = 10.0
-        } else {
-            sizeHealth = 1.9
-            sizeNameAbove = 1.8
-            sizeBossName = 2.1
-            sizeFinalResults = 1.4
-
-            smallestViewDistance = 6.0
+            highlights
+                .filter { !it.mob.isFullyInvisible() && it.mob.canBeSeen() }
+                .forEach {
+                    event.drawDynamicText(it.location, it.text, 1.5, seeThroughBlocks = false)
+                }
         }
 
         for (data in data.values) {
@@ -189,7 +182,9 @@ object DamageIndicatorManager {
                 else -> 1.0
             }
 
-            if (!data.ignoreBlocks && !data.entity.canBeSeen(70.0, vecYOffset = vecYOffset)) continue
+            if (!data.ignoreBlocks &&
+                !data.entity.canBeSeen(70.0, vecYOffset = vecYOffset)
+            ) continue
             val showNameAndHealth = data.shouldShowNameAndHealth()
 
             val entity = data.entity
@@ -273,47 +268,47 @@ object DamageIndicatorManager {
                 diff += 22f
             } else diff += 4f
 
-            if (showNameAndHealth && config.showDamageOverTime) {
-                val currentDamage = data.damageCounter.currentDamage
-                val currentHealing = data.damageCounter.currentHealing
-                if (currentDamage != 0L || currentHealing != 0L) {
-                    val formatDamage = "§c${currentDamage.shortFormat()}"
-                    val formatHealing = "§a+${currentHealing.shortFormat()}"
-                    val finalResult = if (currentHealing == 0L) {
-                        formatDamage
-                    } else if (currentDamage == 0L) {
-                        formatHealing
-                    } else {
-                        "$formatDamage §7/ $formatHealing"
-                    }
-                    event.drawDynamicText(
-                        location,
-                        finalResult,
-                        sizeFinalResults,
-                        diff,
-                        smallestViewDistance = smallestViewDistance,
-                    )
-                    diff += 9f
+            if (!showNameAndHealth || !config.showDamageOverTime) continue
+
+            val currentDamage = data.damageCounter.currentDamage
+            val currentHealing = data.damageCounter.currentHealing
+            if (currentDamage != 0L || currentHealing != 0L) {
+                val formatDamage = "§c${currentDamage.shortFormat()}"
+                val formatHealing = "§a+${currentHealing.shortFormat()}"
+                val finalResult = if (currentHealing == 0L) {
+                    formatDamage
+                } else if (currentDamage == 0L) {
+                    formatHealing
+                } else {
+                    "$formatDamage §7/ $formatHealing"
                 }
-                for (damage in data.damageCounter.oldDamages) {
-                    val formatDamage = "§c${damage.damage.shortFormat()}/s"
-                    val formatHealing = "§a+${damage.healing.shortFormat()}/s"
-                    val finalResult = if (damage.healing == 0L) {
-                        formatDamage
-                    } else if (damage.damage == 0L) {
-                        formatHealing
-                    } else {
-                        "$formatDamage §7/ $formatHealing"
-                    }
-                    event.drawDynamicText(
-                        location,
-                        finalResult,
-                        sizeFinalResults,
-                        diff,
-                        smallestViewDistance = smallestViewDistance,
-                    )
-                    diff += 9f
+                event.drawDynamicText(
+                    location,
+                    finalResult,
+                    sizeFinalResults,
+                    diff,
+                    smallestViewDistance = smallestViewDistance,
+                )
+                diff += 9f
+            }
+            for (damage in data.damageCounter.oldDamages) {
+                val formatDamage = "§c${damage.damage.shortFormat()}/s"
+                val formatHealing = "§a+${damage.healing.shortFormat()}/s"
+                val finalResult = if (damage.healing == 0L) {
+                    formatDamage
+                } else if (damage.damage == 0L) {
+                    formatHealing
+                } else {
+                    "$formatDamage §7/ $formatHealing"
                 }
+                event.drawDynamicText(
+                    location,
+                    finalResult,
+                    sizeFinalResults,
+                    diff,
+                    smallestViewDistance = smallestViewDistance,
+                )
+                diff += 9f
             }
         }
     }
@@ -369,16 +364,24 @@ object DamageIndicatorManager {
         return color.getChatColor() + format
     }
 
-    val list = mutableListOf<Highlight>()
+    private val highlights = mutableSetOf<Highlight>()
 
-    class Highlight(val location: LorenzVec, val text: String, val decayAt: SimpleTimeMark)
+    private data class Highlight(
+        val mob: ShMob,
+        val decayAt: SimpleTimeMark,
+    ) {
+        val location = mob.baseEntity.getLorenzVec()
+        val text = "${mob.name} - ${mob.category}"
+    }
 
+    // Suppressed warning is a false positive
     @HandleEvent
-    fun onMobSpawn(event: MobEvent.Spawn) {
+    @Suppress("MismatchedPrimaryFunctionName")
+    private fun onMobSpawn(event: MobEvent.Spawn) {
         val mob = event.mob
 
-        if (SkyBlockUtils.debug) {
-            list.add(Highlight(mob.baseEntity.getLorenzVec(), "${mob.name} - ${mob.category}", 5.seconds.fromNow()))
+        if (mobDebugConfig.mobDisplay) {
+            highlights.add(Highlight(mob, 5.seconds.fromNow()))
         }
         if (!isEnabled()) return
         try {
@@ -396,7 +399,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (!isEnabled()) return
         data.values.forEach(::update)
         // TODO config to define between 100ms and 5 sec
@@ -414,7 +417,7 @@ object DamageIndicatorManager {
             if (DungeonApi.inDungeon()) {
                 checkFinalBoss(entityData.finalDungeonBoss, entity.id)
             }
-            val health = entity.findHealthReal().toLong()
+            val health = entity.realHealth.toLong()
             val maxHealth: Long
             val biggestHealth = getMaxHealthFor(entity)
             if (biggestHealth == 0L) {
@@ -470,7 +473,6 @@ object DamageIndicatorManager {
         entity: LivingEntity,
         maxHealth: Long,
     ): String? {
-
         when (entityData.bossType) {
             BossType.DUNGEON_F4_THORN -> {
                 val thorn = checkThorn(health, maxHealth)
@@ -564,9 +566,7 @@ object DamageIndicatorManager {
 
             BossType.BACTE -> return checkBacte(entityData)
 
-
             BossType.END_ENDER_DRAGON -> return checkEnderDragon(entityData)
-
 
             else -> return ""
         }
@@ -982,14 +982,14 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onEntityJoin(event: EntityEnterWorldEvent<*>) {
+    private fun onEntityJoin(event: EntityEnterWorldEvent<*>) {
         mobFinder?.handleNewEntity(event.entity)
     }
 
     private val dummyDamageCache = mutableListOf<UUID>()
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
+    private fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
 
@@ -1029,7 +1029,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
+    private fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         val uuid = event.entity.uuid
         val data = data[uuid] ?: return
 
@@ -1078,7 +1078,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "damageIndicator", "combat.damageIndicator")
         event.move(3, "slayer.endermanPhaseDisplay", "slayer.endermen.phaseDisplay")
         event.move(3, "slayer.blazePhaseDisplay", "slayer.blazes.phaseDisplay")
@@ -1095,7 +1095,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Damage Indicator")
         if (!DevApi.mainToggles.damageIndicator) {
             event.addData("Damage Indicator is manually disabled!")

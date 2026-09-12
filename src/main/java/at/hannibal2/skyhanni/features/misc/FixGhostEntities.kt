@@ -7,8 +7,7 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.getAllEquipment
+import at.hannibal2.skyhanni.utils.MobUtils.isCompletelyDefault
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -17,12 +16,11 @@ import net.minecraft.world.entity.player.Player
 import java.util.function.IntConsumer
 
 /**
- * This feature fixes ghost entities sent by hypixel that are not properly deleted in the correct order.
- * This included Diana, Dungeon and Crimson Isle mobs and nametags.
+ * This feature fixes ghost entities sent by Hypixel that are not properly deleted in the correct
+ * order. This includes Diana, Dungeon, and Crimson Isle mobs and nametags.
  */
 @SkyHanniModule
 object FixGhostEntities {
-
     private val config get() = SkyHanniMod.feature.misc
 
     private var recentlyRemovedEntities = ArrayDeque<Int>()
@@ -30,21 +28,25 @@ object FixGhostEntities {
     private val hiddenEntityIds = mutableListOf<Int>()
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         recentlyRemovedEntities = ArrayDeque()
         recentlySpawnedEntities = ArrayDeque()
         hiddenEntityIds.clear()
     }
 
+    @Suppress("KotlinUnreachableCode")
     @HandleEvent(onlyOnSkyblock = true)
-    fun onPacketReceive(event: PacketReceivedEvent) {
-        if (!config.fixGhostEntities) return
-        // Disable in Kuudra for now - causes players to randomly disappear in supply phase
-        // TODO: Remove once fixed
-
-        // Disabled on modern versions as the detection is not fully correct leading to incorrect hiding of entities
+    private fun onPacketReceive(event: PacketReceivedEvent) {
+        // Disabled as the detection is not fully correct on modern versions, leading to incorrect
+        // hiding of entities
         // TODO fix this
-        if (KuudraApi.inKuudra || true) return
+        return
+
+        if (!config.fixGhostEntities) return
+
+        // Disable in Kuudra for now - causes players to randomly disappear in supply phase
+        // TODO remove once fixed
+        if (KuudraApi.inKuudra) return
 
         when (val packet = event.packet) {
             is ClientboundAddEntityPacket -> {
@@ -67,10 +69,10 @@ object FixGhostEntities {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    private fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (config.hideTemporaryArmorStands) {
             (event.entity as? ArmorStand)?.let { stand ->
-                if (stand.tickCount < 10 && stand.isDefaultValue() && stand.getAllEquipment().all { it == null }) event.cancel()
+                if (stand.tickCount < 10 && stand.isCompletelyDefault()) event.cancel()
             }
         }
         if (config.fixGhostEntities && (event.entity is Monster || event.entity is Player)) {
@@ -79,7 +81,7 @@ object FixGhostEntities {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(95, "misc.hideTemporaryArmorstands", "misc.hideTemporaryArmorStands")
     }
 }

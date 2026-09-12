@@ -3,14 +3,15 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEquipmentSlots
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -18,8 +19,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChumBucketHider {
-
     private val config get() = SkyHanniMod.feature.fishing.chumBucketHider
+
     private val titleEntity = TimeLimitedSet<Entity>(5.seconds, useWeakKeys = true)
     private val hiddenEntities = TimeLimitedCache<Entity, Boolean>(5.seconds, useWeakKeys = true)
 
@@ -65,9 +66,10 @@ object ChumBucketHider {
         }
 
         // Chum Bucket
+        // TODO check specific equipment slot + use RepoPattern
         if (config.hideBucket.get() &&
-            entity.getAllEquipment().any {
-                it != null && (it.hoverName.string == "Empty Chum Bucket" || it.hoverName.string == "Empty Chumcap Bucket")
+            entity.getEquipmentSlots().values.any {
+                it?.cleanName.equalsOneOf("Empty Chum Bucket", "Empty Chumcap Bucket")
             }
         ) {
             val entityLocation = entity.getLorenzVec()
@@ -83,7 +85,7 @@ object ChumBucketHider {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.enabled, config.hideBucket, config.hideOwn) { reset() }
     }
 

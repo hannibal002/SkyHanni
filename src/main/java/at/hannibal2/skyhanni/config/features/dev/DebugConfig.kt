@@ -15,7 +15,7 @@ import org.lwjgl.glfw.GLFW
 
 class DebugConfig {
     @Expose
-    @ConfigOption(name = "Enable Debug", desc = "Enable Test logic")
+    @ConfigOption(name = "Enable Debug", desc = "Enable test logic")
     @ConfigEditorBoolean
     var enabled: Boolean = false
 

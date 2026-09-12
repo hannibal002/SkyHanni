@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.realHealth
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
@@ -44,7 +44,6 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class MobFinder {
-
     // F1
     private var floor1bonzo1 = false
     private var floor1bonzo1SpawnTime = SimpleTimeMark.farPast()
@@ -91,7 +90,7 @@ class MobFinder {
             if (mob.name == "Dummy") {
                 EntityResult(bossType = BossType.DUMMY)
             } else {
-                when (val entity = mob.baseEntity) {
+                when (mob.baseEntity) {
                     /*
                      * Note that the order does matter here.
                      * For example, if you put EntityZombie before EntityPigZombie,
@@ -107,7 +106,7 @@ class MobFinder {
                     is Guardian -> tryAddEntityGuardian(mob)
                     is Zombie -> tryAddEntityZombie(mob)
                     is WitherBoss -> tryAddEntityWither(mob)
-                    is EnderDragon -> tryAddEntityDragon(mob)
+                    is EnderDragon -> tryAddEntityDragon()
                     is Spider -> tryAddEntitySpider(mob)
                     is Horse -> tryAddEntityHorse(mob)
                     is Blaze -> tryAddEntityBlaze(mob)
@@ -159,7 +158,7 @@ class MobFinder {
         val entity = mob.baseEntity
         if (entity.name.string == "Summon " && entity is RemotePlayer) {
             if (floor2summons1 && !floor2summonsDiedOnce.contains(entity)) {
-                if (entity.findHealthReal().toInt() != 0) {
+                if (entity.realHealth.toInt() != 0) {
                     return EntityResult(floor2summons1SpawnTime, bossType = BossType.DUNGEON_F2_SUMMON)
                 }
                 floor2summonsDiedOnce.add(entity)
@@ -343,8 +342,7 @@ class MobFinder {
     }
 
     // TODO testing and use sidebar data
-    @Suppress("UnusedParameter")
-    private fun tryAddEntityDragon(mob: Mob) = when {
+    private fun tryAddEntityDragon() = when {
         IslandType.THE_END.isInIsland() -> EntityResult(bossType = BossType.END_ENDER_DRAGON)
         IslandType.WINTER.isInIsland() -> EntityResult(bossType = BossType.WINTER_REINDRAKE)
 
@@ -621,7 +619,7 @@ class MobFinder {
     private fun calcGuardiansTotalHealth() {
         var totalHealth = 0
         for (guardian in guardians) {
-            totalHealth += guardian.findHealthReal().toInt()
+            totalHealth += guardian.realHealth.toInt()
         }
         if (totalHealth == 0) {
             floor3GuardianShield = false

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.rift.area.wyldwoods
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -21,16 +20,16 @@ import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object RiftLarva {
-
-    private val config get() = RiftApi.config.area.wyldWoods.larvas
-    private var hasHookInHand = false
-
     private val LARVA_SKULL_TEXTURE by SkullTextureHolder.texture("RIFT_LARVA")
 
     private val LARVA_HOOK = "LARVA_HOOK".toInternalName()
 
+    private val config get() = RiftApi.config.area.wyldWoods.larvas
+
+    private var hasHookInHand = false
+
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (!isEnabled()) return
 
         checkHand()

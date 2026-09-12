@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.compat.getAllEquipment
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEquipmentSlots
 import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object AshfangHider {
-
     private val config get() = AshfangManager.config.hide
 
     @HandleEvent(priority = HandleEvent.HIGH)
@@ -34,7 +34,10 @@ object AshfangHider {
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!AshfangManager.active || !config.particles) return
-        if (event.entity.getAllEquipment().any { it?.hoverName?.string == "Glowstone" }) event.cancel()
+        // TODO check for specific equipment slot
+        if (event.entity.getEquipmentSlots().values.any { it?.cleanName == "Glowstone" }) {
+            event.cancel()
+        }
     }
 
     @HandleEvent

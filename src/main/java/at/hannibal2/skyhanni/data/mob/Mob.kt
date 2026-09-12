@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
+import at.hannibal2.skyhanni.utils.EntityUtils.hasVisibleEquipment
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.getBoxCenter
@@ -18,8 +19,7 @@ import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.getAllEquipment
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.realHealth
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -85,7 +85,6 @@ class Mob(
     val levelOrTier: Int = -1,
     val hypixelTypes: String = "",
 ) {
-
     private val uniqueId: UUID = UUID.randomUUID()
     val id = baseEntity.id
 
@@ -94,7 +93,6 @@ class Mob(
     val ownerNameOrEmpty: String get() = owner?.ownerName.orEmpty()
 
     companion object {
-
         fun Entity?.belongsToPlayer(): Boolean = this?.mob.belongsToPlayer()
         fun Mob?.belongsToPlayer(): Boolean = this?.owner?.equals(PlayerUtils.getName()) ?: false
     }
@@ -127,9 +125,9 @@ class Mob(
 
     fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
-    fun isInvisible() = baseEntity !is Zombie &&
-        baseEntity.isInvisible &&
-        baseEntity.getAllEquipment().isEmpty()
+    // TODO remove hardcoded Zombie check and use it only in specific features that need it
+    fun isFullyInvisible(): Boolean =
+        baseEntity !is Zombie && baseEntity.isInvisible && !baseEntity.hasVisibleEquipment()
 
     private var highlightColor: Color? = null
     private var condition: () -> Boolean = { true }
@@ -166,9 +164,13 @@ class Mob(
 
     private fun internalHighlight() {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColor(baseEntity, color) { !isInvisible() && condition() }
+            RenderLivingEntityHelper.setEntityColor(baseEntity, color) {
+                !isFullyInvisible() && condition()
+            }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColor(it, color) { !isInvisible() && condition() }
+                RenderLivingEntityHelper.setEntityColor(it, color) {
+                    !isFullyInvisible() && condition()
+                }
             }
         }
     }
@@ -188,7 +190,7 @@ class Mob(
             baseEntity.position().z,
         ) ?: baseEntity.boundingBox
 
-    val health: Float get() = baseEntity.findHealthReal()
+    val health: Float get() = baseEntity.realHealth
     val maxHealth: Int get() = baseEntity.baseMaxHealth
 
     init {
@@ -215,10 +217,9 @@ class Mob(
         relativeBoundingBox = if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null
     }
 
-    private fun makeRelativeBoundingBox() = baseEntity.boundingBox.union(
-        extraEntities.filter { it !is ArmorStand }
-            .mapNotNull { it.boundingBox },
-    )?.move(-baseEntity.position().x, -baseEntity.position().y, -baseEntity.position().z)
+    private fun makeRelativeBoundingBox() = baseEntity.boundingBox
+        .union(extraEntities.filter { it !is ArmorStand }.map { it.boundingBox })
+        ?.move(-baseEntity.position().x, -baseEntity.position().y, -baseEntity.position().z)
 
     fun fullEntityList() =
         baseEntity.toSingletonListOrEmpty() +
