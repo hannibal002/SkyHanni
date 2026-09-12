@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -82,7 +83,9 @@ object AuctionHouseCopyUnderbidPrice {
     }
 
     private fun copyPrice(price: Long) {
-        val underbidPrice = price - 1
+        val amount = config.underbidAmount.formatLongOrNull() ?: 1L
+        // Underbid by the configured amount, falling back to 1 coin if that's negative or would zero out the price.
+        val underbidPrice = if (amount < 0 || amount >= price) price - 1 else price - amount
         OSUtils.copyToClipboard("$underbidPrice")
         ChatUtils.chat(
             "Copied ${underbidPrice.addSeparators()} to clipboard. (Copy Underbid Price)",

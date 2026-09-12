@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
@@ -54,7 +55,7 @@ class AuctionHouseConfig {
     @ConfigOption(
         name = "Auto Copy Underbid",
         desc = "Automatically copies the price of an item in the \"Create BIN Auction\"" +
-            " minus 1 coin into the clipboard for faster under-bidding."
+            " minus the §eUnderbid Amount §7into the clipboard for faster under-bidding."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -63,10 +64,20 @@ class AuctionHouseConfig {
     @Expose
     @ConfigOption(
         name = "Copy Underbid Keybind",
-        desc = "Copy the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding."
+        desc = "Copy the price of the hovered item in Auction House minus the §eUnderbid Amount " +
+            "§7into the clipboard for easier under-bidding."
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var copyUnderbidKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(
+        name = "Underbid Amount",
+        desc = "How many coins to subtract from the price when copying an underbid. " +
+            "Supports shorthand like §e1k§7. Default §e1§7."
+    )
+    @ConfigEditorText
+    var underbidAmount: String = "1"
 
     @Expose
     @ConfigOption(
