@@ -258,7 +258,7 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(
-        name = "Ghost Mode",
+        name = "Hide all Entities",
         desc = "Makes literally every mob/player invisible for 'performance' §4(THIS WILL BE UNPLAYABLE)"
     )
     @ConfigEditorBoolean
