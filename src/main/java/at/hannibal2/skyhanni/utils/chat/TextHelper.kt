@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils.chat
 
 import at.hannibal2.skyhanni.utils.ColorUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -10,10 +9,12 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.toChatFormatting
 import at.hannibal2.skyhanni.utils.compat.withColor
 import com.mojang.authlib.GameProfile
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.components.ComponentRenderUtils
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
@@ -66,7 +67,16 @@ object TextHelper {
     fun Component.suffix(suffix: String): Component = join(this, suffix)
     fun Component.wrap(prefix: String, suffix: String) = this.prefix(prefix).suffix(suffix)
 
+    fun String.applyFormattingFrom(original: Component): Component =
+        asComponent { style = original.style }
+
+    fun Component.contains(other: String): Boolean = string.contains(other)
+
+    fun Component.startsWith(other: String): Boolean = string.startsWith(other)
+
     fun Component.width(): Int = Minecraft.getInstance().font.width(this.string)
+
+    fun String.width(): Int = Minecraft.getInstance().font.width(this)
 
     fun Component.fitToChat(): Component {
         val width = this.width()
@@ -85,6 +95,59 @@ object TextHelper {
         val spaceWidth = SPACE.width().coerceAtLeast(1)
         val padding = (width - textWidth).coerceAtLeast(0) / 2
         return join(" ".repeat(padding / spaceWidth), this)
+    }
+
+    fun String.capAtMinecraftLength(limit: Int) = capAtLength(limit) {
+        Minecraft.getInstance().font.width(it.toString())
+    }
+
+    private fun String.capAtLength(limit: Int, lengthJudger: (Char) -> Int): String {
+        var i = 0
+        return takeWhile {
+            i += lengthJudger(it)
+            i < limit
+        }
+    }
+
+    fun String.splitLines(width: Int): String = splitText(
+        this,
+        width,
+    ).joinToString("\n") { it.removePrefix("§r") }
+
+    private fun splitText(text: String, width: Int): List<String> {
+        val lines = ComponentRenderUtils.wrapComponents(text.asComponent(), width, Minecraft.getInstance().font)
+        val strings: MutableList<String> = ArrayList(lines.size)
+        for (line in lines) {
+            var newLine = ""
+            var lastColor: TextColor? = null
+            var lastFormatting = ""
+            line.accept { _, style, codePoint ->
+                val color = style.color
+                if (color != lastColor) {
+                    lastColor = color
+                    lastFormatting = ""
+                    if (color != null) {
+                        newLine += color.toChatFormatting()
+                    }
+                }
+                var newFormatting = ""
+                newFormatting = if (style.isBold) "§l"
+                else if (style.isItalic) "§o"
+                else if (style.isUnderlined) "§n"
+                else if (style.isStrikethrough) "§m"
+                else if (style.isObfuscated) "§k"
+                else ""
+
+                if (newFormatting != lastFormatting) {
+                    lastFormatting = newFormatting
+                    newLine += newFormatting
+                }
+                newLine += codePoint.toChar()
+                true
+            }
+            strings.add(newLine)
+        }
+        return strings
     }
 
     fun Component.send(id: Int = 0, bypassSelfMessages: Boolean = false) =
@@ -113,23 +176,25 @@ object TextHelper {
         this.hover = tips.joinToString("\n").asComponent()
     }
 
-    fun createDivider(dividerColor: ChatFormatting = ChatFormatting.BLUE) = HYPHEN.fitToChat().style {
-        withStrikethrough(true)
-        withColor(dividerColor)
-    }
+    // TODO remove this deprecated alias in November 2026
+    @Deprecated(
+        "Moved to PaginatedList",
+        ReplaceWith(
+            "PaginatedList.createDivider(dividerColor)",
+            "at.hannibal2.skyhanni.utils.chat.PaginatedList",
+        ),
+    )
+    fun createDivider(dividerColor: ChatFormatting = ChatFormatting.BLUE) =
+        PaginatedList.createDivider(dividerColor)
 
-    /**
-     * Displays a paginated list of entries in the chat.
-     *
-     * @param title The title of the paginated list.
-     * @param list The list of entries to paginate and display.
-     * @param chatLineId The ID of the chat line for message updates.
-     * @param emptyMessage The message to display if the list is empty.
-     * @param currentPage The current page to display.
-     * @param maxPerPage The number of entries to display per page.
-     * @param dividerColor The color of the divider lines.
-     * @param formatter A function to format each entry into an IChatComponent.
-     */
+    // TODO remove this deprecated alias in November 2026
+    @Deprecated(
+        "Moved to PaginatedList",
+        ReplaceWith(
+            "PaginatedList.displayPaginatedList(title, list, chatLineId, emptyMessage, currentPage, maxPerPage, dividerColor, formatter)",
+            "at.hannibal2.skyhanni.utils.chat.PaginatedList",
+        ),
+    )
     fun <T> displayPaginatedList(
         title: String,
         list: List<T>,
@@ -139,54 +204,9 @@ object TextHelper {
         maxPerPage: Int = 15,
         dividerColor: ChatFormatting = ChatFormatting.BLUE,
         formatter: (T) -> Component,
-    ): Unit = DelayedRun.runOrNextTick("paginated list: $title") {
-        val text = mutableListOf<Component>()
-
-        val totalPages = (list.size + maxPerPage - 1) / maxPerPage
-        val page = if (totalPages == 0) 0 else currentPage
-
-        text.add(createDivider(dividerColor))
-        text.add("§6$title".asComponent().center())
-
-        if (totalPages > 1) {
-            text.add(
-                join(
-                    if (page > 1) "§6§l<<".asComponent {
-                        hover = "§eClick to view page ${page - 1}".asComponent()
-                        onClick {
-                            displayPaginatedList(title, list, chatLineId, emptyMessage, page - 1, maxPerPage, dividerColor, formatter)
-                        }
-                    } else null,
-                    " ",
-                    "§6(Page $page of $totalPages)",
-                    " ",
-                    if (page < totalPages) "§6§l>>".asComponent {
-                        hover = "§eClick to view page ${page + 1}".asComponent()
-                        onClick {
-                            displayPaginatedList(title, list, chatLineId, emptyMessage, page + 1, maxPerPage, dividerColor, formatter)
-                        }
-                    } else null,
-                ).center(),
-            )
-        }
-
-        text.add(createDivider(dividerColor))
-
-        if (list.isNotEmpty()) {
-            val start = (page - 1) * maxPerPage
-            val end = (page * maxPerPage).coerceAtMost(list.size)
-            for (i in start until end) {
-                text.add(formatter(list[i]))
-            }
-        } else {
-            text.add(EMPTY)
-            text.add("§c$emptyMessage".asComponent().center())
-            text.add(EMPTY)
-        }
-
-        text.add(createDivider(dividerColor))
-        multiline(text).send(chatLineId)
-    }
+    ): Unit = PaginatedList.displayPaginatedList(
+        title, list, chatLineId, emptyMessage, currentPage, maxPerPage, dividerColor, formatter,
+    )
 
     fun createGradientText(start: LorenzColor, end: LorenzColor, string: String): Component {
         return createGradientText(start.toColor(), end.toColor(), string)
