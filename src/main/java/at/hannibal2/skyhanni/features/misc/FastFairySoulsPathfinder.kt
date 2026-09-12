@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
@@ -20,15 +21,12 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -42,7 +40,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object FastFairySoulsPathfinder {
-    val config get() = SkyHanniMod.feature.misc
+    val config get() = SkyHanniMod.feature.misc.fairySouls
 
     // TODO this does not work with glacite tunnels, should prob use strings and add the same workaround we have for graph area
     // TODO also once this is fixed, add a chat message when finding the last soul in dwarven mines and have not yet found the souls in glacite tunnels
@@ -53,7 +51,7 @@ object FastFairySoulsPathfinder {
     private var data: Data? = null
 
     private val pathfindCoroutine = CoroutineSettings("fairy souls pathfind")
-    private val patternGroup = RepoPattern.group("misc.fairy-souls")
+    private val patternGroup = RepoPattern.group("misc.fairy-soul-chat-detection")
 
     /**
      * REGEX-TEST: You have already found that Fairy Soul!
@@ -69,14 +67,6 @@ object FastFairySoulsPathfinder {
     private val newPattern by patternGroup.pattern(
         "chat.new.colorless",
         "^SOUL! You found a Fairy Soul!$",
-    )
-
-    /**
-     * REGEX-TEST: Fairy Souls: 11/11
-     */
-    private val loreSoulPattern by patternGroup.pattern(
-        "new.colorless",
-        "Fairy Souls: (?<found>.*)\\/(?<total>.*)",
     )
 
     private class Data(
@@ -213,20 +203,19 @@ object FastFairySoulsPathfinder {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Fairy Souls Guide") return
 
-        for (stack in event.inventoryItems.values) {
-            val island = IslandType.getByNameOrNull(stack.cleanName) ?: continue
-            // The group is named "found" rather than "have", because "having" a fairy soul means trading it to Tia the Fairy for XP,
-            // which is distinct from finding it on an island.
-            val found = stack.getLoreComponent().firstOrNull()?.let {
-                loreSoulPattern.matchMatcher(it.string) {
-                    group("found").toIntOrNull()
-                }
-            } ?: continue
+        val islandSoulInfo = FairySoulApi.getIslandSoulInfo(event.inventoryItems)
 
-            if (island.isInIsland()) {
+        for (islandSlot in islandSoulInfo.keys) {
+            val islandType = islandSoulInfo[islandSlot]?.islandType ?: continue
+            val found = islandSoulInfo[islandSlot]?.soulsFound ?: continue
+
+            if (islandType.isInIsland()) {
                 data?.checkHaveAll()
             }
-            totalFound[island] = found
+
+            if (islandType != IslandType.NONE) {
+                totalFound[islandType] = found
+            }
         }
     }
 
@@ -382,7 +371,7 @@ object FastFairySoulsPathfinder {
         ChatUtils.clickableChat(
             "§cFairy Souls are disabled. Click to enable!",
             onClick = {
-                config.fastFairySouls = true
+                config.pathfinder = true
             },
         )
         return true
@@ -402,5 +391,14 @@ object FastFairySoulsPathfinder {
 
     private fun getTargetNodes(nodes: List<GraphNode>): List<GraphNode> = nodes.filter { it.hasTag(GraphNodeTag.FAIRY_SOUL) }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.fastFairySouls
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.pathfinder
+
+    @HandleEvent
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(
+            147,
+            "misc.fastFairySouls",
+            "misc.fairySouls.fastFairySouls",
+        )
+    }
 }
