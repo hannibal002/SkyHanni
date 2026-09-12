@@ -42,7 +42,7 @@ object DianaApi {
     fun isDoingDiana(): Boolean =
         IslandType.HUB.isInIsland() && isRitualActive() && hasSpadeInHotbar()
 
-    val SafeItemStack.isDianaSpade get() = getInternalName() in spades
+    val SafeItemStack.isDianaSpade get() = getInternalName().isDianaSpade
 
     val NeuInternalName.isDianaSpade get() = this in spades
 
@@ -96,7 +96,7 @@ object DianaApi {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.HIGHEST)
+    @HandleEvent(onlyOnIsland = HUB, priority = HandleEvent.HIGHEST)
     private fun onItemClick(event: ItemClickEvent) {
         if (!hasSpadeInHand()) return
         if (event.clickType != RIGHT_CLICK) return
