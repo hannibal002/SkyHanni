@@ -10,11 +10,9 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import kotlin.concurrent.fixedRateTimer
 
 @SkyHanniModule
 object GardenCropSpeed {
-
     private val config get() = GardenApi.config
     private val cropsPerSecond: MutableMap<CropType, Int>? get() = GardenApi.storage?.cropsPerSecond
     private val latestBlocksPerSecond: MutableMap<CropType, Double>? get() = GardenApi.storage?.latestBlocksPerSecond
@@ -28,22 +26,20 @@ object GardenCropSpeed {
     private var blocksBroken = 0
     private var secondsStopped = 0
 
-    init {
-        // TODO use SecondPassedEvent + passedSince
-        fixedRateTimer(name = "skyhanni-crop-milestone-speed", daemon = true, period = 1000L) {
-            if (isEnabled()) {
-                checkSpeed()
-            }
+    @HandleEvent
+    private fun onSecondPassed() {
+        if (isEnabled()) {
+            checkSpeed()
         }
     }
 
     @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    private fun onProfileJoin(event: ProfileJoinEvent) {
         lastBrokenCrop = null
     }
 
     @HandleEvent
-    fun onGardenToolChange(event: GardenToolChangeEvent) {
+    private fun onGardenToolChange(event: GardenToolChangeEvent) {
         if (isEnabled()) {
             resetSpeed()
             update()
@@ -55,7 +51,7 @@ object GardenCropSpeed {
     }
 
     @HandleEvent
-    fun onCropClick(event: CropClickEvent) {
+    private fun onCropClick(event: CropClickEvent) {
         lastBrokenCrop = event.crop
         lastBrokenTime = SimpleTimeMark.now()
         blocksBroken++
@@ -126,7 +122,7 @@ object GardenCropSpeed {
     fun isSpeedDataEmpty() = cropsPerSecond?.values?.sum()?.let { it == 0 } ?: true
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.blocksBrokenResetTime", "garden.cropMilestones.blocksBrokenResetTime")
     }
 }
