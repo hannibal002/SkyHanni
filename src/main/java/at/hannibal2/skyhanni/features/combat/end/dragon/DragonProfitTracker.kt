@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.combat.end
+package at.hannibal2.skyhanni.features.combat.end.dragon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -7,9 +7,11 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DragonProfitTrackerItemDataJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DragonProfitTrackerItemsJson
+import at.hannibal2.skyhanni.events.EndBoss
+import at.hannibal2.skyhanni.events.EndBossFightEndEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker.drawDisplay
+import at.hannibal2.skyhanni.features.combat.end.dragon.DragonProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
@@ -114,6 +116,25 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
 
     init {
         initRenderer({ config.position }) { config.enabled && DragonFightAPI.inNestArea() }
+    }
+
+    /**
+     * Books the finished dragon once [DragonFightAPI] has read the fight summary. Lives here
+     * rather than in the fight state, so the tracker owns everything it needs to record.
+     */
+    @HandleEvent
+    private fun onEndBossFightEnd(event: EndBossFightEndEvent) {
+        if (event.boss != EndBoss.DRAGON) return
+        val eyes = DragonFightState.eyesPlaced
+        val type = DragonFightState.dragonType ?: DragonType.UNKNOWN
+
+        if (event.yourDamage > 0 && (eyes != 0 || config.countLeechedDragons)) {
+            addDragonKill(type)
+            addDragonLoot(type, "ESSENCE_DRAGON".toInternalName(), if (type == DragonType.SUPERIOR) 10 else 5)
+        }
+
+        lastDragonPlacement = event.place
+        DragonLootDetection.finishedLoot = false
     }
 
     fun addEyes(amount: Int) {
