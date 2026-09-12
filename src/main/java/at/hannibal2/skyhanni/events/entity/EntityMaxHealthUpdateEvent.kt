@@ -6,6 +6,7 @@ import net.minecraft.world.entity.LivingEntity
 
 /**
  * Event that is called when an entity's max health is updated.
+ * [maxHealth] accounts for global health modifiers, such as Derpy mayor.
  *
  * @property entity The entity whose max health was updated.
  * @property maxHealth The new max health of the entity.
@@ -13,5 +14,5 @@ import net.minecraft.world.entity.LivingEntity
 @PrimaryFunction("onEntityMaxHealthUpdate")
 data class EntityMaxHealthUpdateEvent<T : LivingEntity>(
     val entity: T,
-    val maxHealth: Int
+    val maxHealth: Int,
 ) : GenericSkyHanniEvent<T>(entity.javaClass)
