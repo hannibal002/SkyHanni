@@ -2,54 +2,54 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ElectionApi.derpy
+import at.hannibal2.skyhanni.events.AttributeWatcherUpdateEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.AllEntitiesGetter
-import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.client.player.RemotePlayer
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.decoration.ItemFrame
+import net.minecraft.world.entity.item.ItemEntity
 import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object EntityData {
 
-    private val maxHealthMap = mutableMapOf<Int, Int>()
     private val nametagCache = TimeLimitedCache<UUID, Component>(50.milliseconds)
     private val healthDisplayCache = TimeLimitedCache<Component, Component>(50.milliseconds)
     private val lastVisibilityCheck = TimeLimitedCache<Int, Boolean>(200.milliseconds)
 
-    // TODO replace with packet detection
-    @OptIn(AllEntitiesGetter::class)
+    val ignoredEntities = setOf(
+        ArmorStand::class.java,
+        ExperienceOrb::class.java,
+        ItemEntity::class.java,
+        ItemFrame::class.java,
+        RemotePlayer::class.java,
+        LocalPlayer::class.java,
+    )
+
     @HandleEvent
-    fun onTick() {
-        for (entity in EntityUtils.getEntities<LivingEntity>()) { // this completely ignores the ignored entities list?
+    private fun onAttributeWatcherUpdate(event: AttributeWatcherUpdateEvent<LivingEntity>) {
+        val entity = event.entity
+        if (entity.javaClass in ignoredEntities) return
+        val attribute = event.attribute
+        if (attribute.`is`(Attributes.MAX_HEALTH)) {
             val maxHealth = entity.baseMaxHealth
-            val id = entity.id
-            val oldMaxHealth = maxHealthMap.getOrDefault(id, -1)
-            if (oldMaxHealth != maxHealth) {
-                maxHealthMap[id] = maxHealth
-                EntityMaxHealthUpdateEvent(entity, maxHealth.derpy()).post()
-            }
+            EntityMaxHealthUpdateEvent(entity, maxHealth.derpy()).post()
         }
-    }
-
-    @HandleEvent
-    fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<LivingEntity>) {
-        maxHealthMap -= event.entity.id
-    }
-
-    @HandleEvent
-    fun onWorldChange() {
-        maxHealthMap.clear()
     }
 
     @JvmStatic

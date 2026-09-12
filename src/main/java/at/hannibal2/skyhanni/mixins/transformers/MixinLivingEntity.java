@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.events.AttributeWatcherUpdateEvent;
 import at.hannibal2.skyhanni.events.entity.EntityDeathEvent;
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent;
+import net.minecraft.core.Holder;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,6 +24,11 @@ public abstract class MixinLivingEntity {
 
     @Inject(method = "setItemSlot", at = @At("TAIL"))
     public void setItemStack(EquipmentSlot equipment, ItemStack itemStack, CallbackInfo ci) {
-        new EntityEquipmentChangeEvent<>((Entity) (Object) this, equipment.getId(), itemStack).post();
+        new EntityEquipmentChangeEvent<>((LivingEntity) (Object) this, equipment.getId(), itemStack).post();
+    }
+
+    @Inject(method = "onAttributeUpdated", at = @At("TAIL"))
+    public void onAttributeUpdated(Holder<Attribute> attribute, CallbackInfo ci) {
+        new AttributeWatcherUpdateEvent<>((LivingEntity) (Object) this, attribute).post();
     }
 }
