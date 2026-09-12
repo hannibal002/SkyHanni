@@ -586,9 +586,6 @@
     <ID>PrivateEventListener:ComposterOverlay.kt:ComposterOverlay$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onToolTip</ID>
     <ID>PrivateEventListener:ComposterOverlay.kt:ComposterOverlay$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onWidgetUpdate</ID>
     <ID>PrivateEventListener:ComposterUpgradesData.kt:ComposterUpgradesData$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:ComputerEnvDebug.kt:ComputerEnvDebug$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:ComputerEnvDebug.kt:ComputerEnvDebug$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:ComputerEnvDebug.kt:ComputerEnvDebug$@HandleEvent fun onRepoReload</ID>
     <ID>PrivateEventListener:ComputerTimeOffset.kt:ComputerTimeOffset$@HandleEvent fun onDebugDataCollect</ID>
     <ID>PrivateEventListener:ComputerTimeOffset.kt:ComputerTimeOffset$@HandleEvent(ProfileJoinEvent::class) fun onProfileJoin</ID>
     <ID>PrivateEventListener:ConfigGuiManager.kt:ConfigGuiManager$@HandleEvent(ConfigLoadEvent::class) fun onConfigLoad</ID>
@@ -885,12 +882,6 @@
     <ID>PrivateEventListener:DraconicSacrificeTracker.kt:DraconicSacrificeTracker$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:DragNDrop.kt:DragNDrop$@HandleEvent fun onGuiContainerAfterDraw</ID>
     <ID>PrivateEventListener:DragNDrop.kt:DragNDrop$@HandleEvent fun onGuiContainerBeforeDraw</ID>
-    <ID>PrivateEventListener:DragonFeatures.kt:DragonFeatures$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:DragonFeatures.kt:DragonFeatures$@HandleEvent fun onIslandChange</ID>
-    <ID>PrivateEventListener:DragonFeatures.kt:DragonFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_END) fun onChat</ID>
-    <ID>PrivateEventListener:DragonFeatures.kt:DragonFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_END) fun onRender</ID>
-    <ID>PrivateEventListener:DragonFeatures.kt:DragonFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_END) fun onScoreBoard</ID>
-    <ID>PrivateEventListener:DragonFeatures.kt:DragonFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_END) fun onTabList</ID>
     <ID>PrivateEventListener:DragonFightAPI.kt:DragonFightAPI$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:DragonFightAPI.kt:DragonFightAPI$@HandleEvent fun onScoreboardChange</ID>
     <ID>PrivateEventListener:DragonFightAPI.kt:DragonFightAPI$@HandleEvent fun onWorldChange</ID>
@@ -1015,11 +1006,6 @@
     <ID>PrivateEventListener:ElectionApi.kt:ElectionApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:ElectionApi.kt:ElectionApi$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:EliteDevApi.kt:EliteDevApi$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:EliteFarmersLeaderboard.kt:EliteFarmersLeaderboard$@HandleEvent fun onAchievementRegistration</ID>
-    <ID>PrivateEventListener:EliteFarmersLeaderboard.kt:EliteFarmersLeaderboard$@HandleEvent fun onCropCollectionAdd</ID>
-    <ID>PrivateEventListener:EliteFarmersLeaderboard.kt:EliteFarmersLeaderboard$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:EliteFarmersLeaderboard.kt:EliteFarmersLeaderboard$@HandleEvent fun onPestKill</ID>
-    <ID>PrivateEventListener:EliteFarmersLeaderboard.kt:EliteFarmersLeaderboard$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onSecondPassed</ID>
     <ID>PrivateEventListener:EliteLeaderboards.kt:EliteLeaderboards.EliteLeaderboardDisplayManager$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:EliteLeaderboards.kt:EliteLeaderboards.EliteLeaderboardDisplayManager$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:EliteLeaderboards.kt:EliteLeaderboards.EliteLeaderboardDisplayManager$@HandleEvent fun onGuiRenderTop</ID>
@@ -1950,9 +1936,6 @@
     <ID>PrivateEventListener:KuudraApi.kt:KuudraApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:KuudraApi.kt:KuudraApi$@HandleEvent(onlyOnSkyblock = true) fun onScoreboardChange</ID>
     <ID>PrivateEventListener:KuudraProfileViewerBlocker.kt:KuudraProfileViewerBlocker$@HandleEvent(onlyOnIsland = IslandType.KUUDRA_ARENA) fun onClickEntity</ID>
-    <ID>PrivateEventListener:LassoDisplay.kt:LassoDisplay$@HandleEvent fun onConfigFixEvent</ID>
-    <ID>PrivateEventListener:LassoDisplay.kt:LassoDisplay$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:LassoDisplay.kt:LassoDisplay$@OptIn(AllEntitiesGetter::class) @HandleEvent(SkyHanniTickEvent::class, onlyOnSkyblock = true) fun onTick</ID>
     <ID>PrivateEventListener:LastServers.kt:LastServers$@HandleEvent fun onSecondPassed</ID>
     <ID>PrivateEventListener:LavaReplacement.kt:LavaReplacement$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:LavaReplacement.kt:LavaReplacement$@HandleEvent fun onConfigLoad</ID>
@@ -2296,9 +2279,6 @@
     <ID>PrivateEventListener:OwnInventoryData.kt:OwnInventoryData$@HandleEvent(onlyOnSkyblock = true) fun onTick</ID>
     <ID>PrivateEventListener:OwnInventoryData.kt:OwnInventoryData$@HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true, onlyOnSkyblock = true) fun onItemPickupReceivePacket</ID>
     <ID>PrivateEventListener:PabloHelper.kt:PabloHelper$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:PacketTest.kt:PacketTest$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:PacketTest.kt:PacketTest$@HandleEvent fun onSendPacket</ID>
-    <ID>PrivateEventListener:PacketTest.kt:PacketTest$@HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true) fun onPacketReceive</ID>
     <ID>PrivateEventListener:PageScrolling.kt:PageScrolling$@HandleEvent fun onInventoryOpen</ID>
     <ID>PrivateEventListener:PageScrolling.kt:PageScrolling$@HandleEvent fun onTick</ID>
     <ID>PrivateEventListener:ParkourWaypointSaver.kt:ParkourWaypointSaver$@HandleEvent fun onKeyPress</ID>
@@ -2414,8 +2394,6 @@
     <ID>PrivateEventListener:PigFeaturesApi.kt:PigFeaturesApi$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:PigFeaturesApi.kt:PigFeaturesApi$@HandleEvent(onlyOnIsland = IslandType.HUB) fun onChat</ID>
     <ID>PrivateEventListener:PigFeaturesApi.kt:PigFeaturesApi$@HandleEvent(onlyOnIsland = IslandType.HUB) fun onEntityClick</ID>
-    <ID>PrivateEventListener:PlatformUtils.kt:PlatformUtils$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:PlatformUtils.kt:PlatformUtils$@HandleEvent fun onDebugDataCollect</ID>
     <ID>PrivateEventListener:PlayerChatFilter.kt:PlayerChatFilter$@HandleEvent fun onRepoReload</ID>
     <ID>PrivateEventListener:PlayerChatManager.kt:PlayerChatManager$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:PlayerChatModifier.kt:PlayerChatModifier$@HandleEvent fun onChat</ID>
@@ -2991,7 +2969,6 @@
     <ID>PrivateEventListener:TabWidgetSettings.kt:TabWidgetSettings$@HandleEvent fun onBackgroundDrawn</ID>
     <ID>PrivateEventListener:TabWidgetSettings.kt:TabWidgetSettings$@HandleEvent fun onInventoryClose</ID>
     <ID>PrivateEventListener:TabWidgetSettings.kt:TabWidgetSettings$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:TeleportPadCompactName.kt:TeleportPadCompactName$@HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onRenderLiving</ID>
     <ID>PrivateEventListener:TeleportPadInventoryNumber.kt:TeleportPadInventoryNumber$@HandleEvent fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:TeleportPadInventoryNumber.kt:TeleportPadInventoryNumber$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onRenderItemTip</ID>
     <ID>PrivateEventListener:TentacleWaypoint.kt:TentacleWaypoint$@HandleEvent fun onWorldSwitch</ID>
@@ -3023,8 +3000,6 @@
     <ID>PrivateEventListener:TestExportTools.kt:TestExportTools$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:TestExportTools.kt:TestExportTools$@HandleEvent fun onGuiKeyPress</ID>
     <ID>PrivateEventListener:TestShowSlotNumber.kt:TestShowSlotNumber$@HandleEvent fun onRenderItemTip</ID>
-    <ID>PrivateEventListener:TextInput.kt:TextInput.Companion$@HandleEvent fun onChar</ID>
-    <ID>PrivateEventListener:TextInput.kt:TextInput.Companion$@HandleEvent fun onInventoryClose</ID>
     <ID>PrivateEventListener:TheGreatSpook.kt:TheGreatSpook$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:TheGreatSpook.kt:TheGreatSpook$@HandleEvent fun onDebugDataCollect</ID>
     <ID>PrivateEventListener:TheGreatSpook.kt:TheGreatSpook$@HandleEvent fun onIslandChange</ID>

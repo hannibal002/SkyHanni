@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.MarkdownBuilder
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.VersionConstants
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.SharedConstants
 import kotlin.system.exitProcess
 
 /**
@@ -18,8 +19,7 @@ import kotlin.system.exitProcess
  */
 @SkyHanniModule
 object PlatformUtils {
-
-    val MC_VERSION: String = net.minecraft.SharedConstants.getCurrentVersion().name()
+    val MC_VERSION: String = SharedConstants.getCurrentVersion().name()
 
     @JvmStatic
     @get:JvmName("isDevEnvironment")
@@ -33,7 +33,7 @@ object PlatformUtils {
     )
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shmodlist") {
             description = "Get a Discord-formatted list of all loaded mods"
             category = CommandCategory.USERS_ACTIVE
@@ -52,7 +52,7 @@ object PlatformUtils {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Loaded Mods")
         event.addIrrelevant {
             getLoadedMods().forEach { (_, name, version, origin) ->

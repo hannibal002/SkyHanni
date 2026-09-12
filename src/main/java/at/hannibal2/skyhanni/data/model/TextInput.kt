@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.minecraft.CharEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -17,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlinx.coroutines.runBlocking
 
 open class TextInput {
-
     var textBox: String = ""
     private var carriage: Int? = null
 
@@ -77,7 +77,7 @@ open class TextInput {
         }
 
         @HandleEvent
-        fun onInventoryClose(event: InventoryCloseEvent) {
+        private fun onInventoryClose(event: InventoryCloseEvent) {
             disable()
         }
 
@@ -120,7 +120,7 @@ open class TextInput {
         }
 
         @HandleEvent
-        fun onChar(event: at.hannibal2.skyhanni.events.minecraft.CharEvent) {
+        private fun onChar(event: CharEvent) {
             handleTextInput(event.keyCode.toChar())
         }
 

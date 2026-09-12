@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.features.misc.teleportpad
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
@@ -30,8 +30,8 @@ object TeleportPadCompactName {
         "§.✦ §cNo Destination",
     )
 
-    @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStand>) {
+    @HandleEvent(onlyOnIsland = PRIVATE_ISLAND, priority = HandleEvent.HIGH)
+    private fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStand>) {
         if (!SkyHanniMod.feature.misc.teleportPad.compactName) return
         val entity = event.entity
 
@@ -42,7 +42,7 @@ object TeleportPadCompactName {
         }
 
         namePattern.matchMatcher(name) {
-            entity.customName = net.minecraft.network.chat.Component.literal(group("name"))
+            entity.customName = Component.literal(group("name"))
         }
     }
 }

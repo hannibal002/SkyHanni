@@ -32,7 +32,6 @@ annotation class KSerializable
 annotation class ExtraData
 
 class KotlinTypeAdapterFactory : TypeAdapterFactory {
-
     internal data class ParameterInfo(
         val param: KParameter,
         val adapter: TypeAdapter<Any?>,
@@ -57,7 +56,7 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
             }
         val parameterInfos = params.mapNotNull { param ->
             val field = kotlinClass.memberProperties.single { it.name == param.name } as KProperty1<Any, Any?>
-            kotlin.runCatching {
+            runCatching {
                 field.isAccessible = true
             }.getOrNull() ?: return@mapNotNull null
             val kType = field.returnType
