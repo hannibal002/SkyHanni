@@ -76,6 +76,13 @@ object SafariShardChecklist {
                 add(Renderable.horizontal(row, spacing = 2))
             }
         }
+        if (checklistConfig.runShardChecklistDisplay == SafariChecklistConfig.ChecklistDisplay.ONLY_CURRENT) {
+            SafariBiome.entries.filter { it !in biomes }.forEach { biome ->
+                val collected = biome.shards.count { shardCounts.getValue(it) > 0 }
+                val status = if (isBiomeDone(biome)) "§aDone" else "§7$collected/${biome.shards.size}"
+                add(Renderable.text("${biome.formattedName} §7- $status"))
+            }
+        }
     }
 
     internal fun isBiomeDone(biome: SafariBiome): Boolean = biome.shards.all { shardCounts.getValue(it) > 0 }

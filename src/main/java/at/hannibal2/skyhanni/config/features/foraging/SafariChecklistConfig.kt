@@ -25,7 +25,7 @@ class SafariChecklistConfig {
         desc = "Select which Critter Safari shard checklist biomes to show.",
     )
     @ConfigEditorDropdown
-    var runShardChecklistDisplay: ChecklistDisplay = ChecklistDisplay.ALL
+    var runShardChecklistDisplay: ChecklistDisplay = ChecklistDisplay.ONLY_CURRENT
 
     @Expose
     @ConfigOption(
@@ -33,7 +33,7 @@ class SafariChecklistConfig {
         desc = "Hide shards already collected during the current Critter Safari run.",
     )
     @ConfigEditorBoolean
-    var hideCollectedRunShards: Boolean = false
+    var hideCollectedRunShards: Boolean = true
 
     @Expose
     @ConfigLink(owner = SafariChecklistConfig::class, field = "runShardChecklist")
