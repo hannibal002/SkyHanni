@@ -483,10 +483,10 @@ object TunnelsMaps {
     private fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (MinecraftCompat.screen != null) return
-        val keyCode = event.keyCode
-        when {
-            event.isPressed(config.campfireKey) -> campfireKey()
-            event.isPressed(config.nextSpotHotkey) -> nextSpot()
+        when (event.key) {
+            config.campfireKey -> campfireKey()
+            config.nextSpotHotkey -> nextSpot()
+            else -> return
         }
     }
 

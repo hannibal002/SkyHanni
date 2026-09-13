@@ -28,7 +28,7 @@ object ShulkerFinder {
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     private fun onKeyPress(event: KeyPressEvent) {
         if (MinecraftCompat.screen != null || navigating) return
-        if (!event.isPressed(config.nextShulkerKeybind)) return
+        if (event.key != config.nextShulkerKeybind) return
         if (!config.shulkerFinder) return
 
         val shulkerType = ShulkerType.entries.firstOrNull { it.island.isInIsland() } ?: return

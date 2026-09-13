@@ -30,7 +30,7 @@ object NotificationManager {
     fun onKeyPress(event: KeyPressEvent) {
         currentNotification ?: return
         if (lastNotificationClosed.passedSince() < 200.milliseconds) return
-        if (event.isPressed(InputCode.KEY_X)) return
+        if (event.key == InputCode.KEY_X) return
         currentNotification = null
         lastNotificationClosed = SimpleTimeMark.now()
     }

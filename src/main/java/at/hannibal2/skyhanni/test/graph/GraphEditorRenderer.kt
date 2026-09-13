@@ -217,7 +217,7 @@ object GraphEditorRenderer {
 
     private fun InputCode.name() = KeyboardManager.getKeyName(this)
 
-    private fun KeyMapping.name() = KeyboardManager.getKeyName(key.value)
+    private fun KeyMapping.name() = KeyboardManager.getKeyName(key)
 
     private fun isEnabled() = GraphEditor.isEnabled()
 }

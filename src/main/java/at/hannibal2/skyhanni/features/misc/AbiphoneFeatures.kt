@@ -51,7 +51,7 @@ object AbiphoneFeatures {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (InventoryUtils.inInventory()) return
-        if (config.abiphoneAcceptKey.isUnknown() || !event.isPressed(config.abiphoneAcceptKey)) return
+        if (config.abiphoneAcceptKey.isUnknown() || event.key != config.abiphoneAcceptKey) return
         val acceptUUID = acceptUUID ?: return
         HypixelCommands.callback(acceptUUID)
         AbiphoneFeatures.acceptUUID = null

@@ -74,7 +74,7 @@ object BurrowWarpHelper {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (!event.isPressed(config.keyBindWarp)) return
+        if (event.key != config.keyBindWarp) return
         if (warpQueued) return
 
         if (cannotWarpUntil.isInFuture()) {

@@ -98,7 +98,7 @@ object MineshaftWaypoints {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (MinecraftCompat.screen != null) return
-        if (!event.isPressed(config.shareWaypointLocation)) return
+        if (event.key != config.shareWaypointLocation) return
         if (timeLastShared.passedSince() < 500.milliseconds) return
 
         val closestWaypoint = waypoints.filter { it.location.distanceToPlayer() <= 5 }

@@ -211,7 +211,7 @@ object RareMobWaypointShare {
     private fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (MinecraftCompat.screen != null) return
-        if (event.isPressed(config.keyBindShare)) sendRareMob()
+        if (event.key == config.keyBindShare) sendRareMob()
     }
 
     private fun sendDeath() {

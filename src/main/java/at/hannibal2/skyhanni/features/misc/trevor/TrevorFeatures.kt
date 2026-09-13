@@ -336,7 +336,7 @@ object TrevorFeatures {
     private fun onKeyPress(event: KeyPressEvent) {
         if (MinecraftCompat.screen != null) return
 
-        if (!event.isPressed(config.keyBind)) return
+        if (event.key != config.keyBind) return
 
         if (config.acceptQuest) {
             val timeSince = lastChatPromptTime.passedSince()

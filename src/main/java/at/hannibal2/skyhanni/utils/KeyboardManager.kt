@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.config.core.elements.GuiOptionEditorKeyMapping
+import at.hannibal2.skyhanni.config.core.elements.GuiOptionEditorInputCode
 import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -12,10 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import com.mojang.blaze3d.platform.InputConstants
-import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
-import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.input.InputQuirks
@@ -166,72 +162,19 @@ object KeyboardManager {
     fun KeyMapping.isKeyClicked(): Boolean = key.value.isKeyClicked()
     fun InputCode.isKeyClicked(): Boolean = value.isKeyClicked()
 
-    fun getKeyName(keyCode: Int): String = IMinecraft.INSTANCE.getKeyName(keyCode).text
-    fun getKeyName(keyCode: InputCode): String = getKeyName(keyCode.value)
+    fun getKeyName(key: InputConstants.Key): String =
+        if (key == InputConstants.UNKNOWN) {
+            "NONE"
+        } else {
+            key.displayName.string
+        }
 
-    private val SKYHANNI_CONFIG_CATEGORY = KeyMapping.Category.register(
-        SkyHanniMod.id("keys")
-    )
+    fun getKeyName(keyCode: InputCode): String = getKeyName(keyCode.key)
 
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
         processor.registerConfigEditor(ConfigEditorKeyMapping::class.java) { option, annotation ->
-            val mapping = getOrCreateKeyMapping(
-                option,
-                annotation.defaultKey.value,
-            )
-            GuiOptionEditorKeyMapping(option, mapping)
+            GuiOptionEditorInputCode(option, annotation.defaultKey)
         }
-    }
-
-    private val keyMappingMap = mutableMapOf<String, KeyMapping>()
-
-    private fun getOrCreateKeyMapping(option: ProcessedOption, defaultKey: Int): KeyMapping =
-        keyMappingMap.computeIfAbsent(option.path) {
-            createKeyMapping(option, defaultKey)
-        }
-
-    fun createKeyMapping(option: ProcessedOption, defaultKey: Int): KeyMapping {
-        val keyValue = option.get() as Int
-        val type = if (keyValue in 0 until MouseCompat.NUMBER_OF_MOUSE_BUTTONS) InputConstants.Type.MOUSE else InputConstants.Type.KEYSYM
-        val displayName = getDisplayNameForKeyMapping(option)
-
-        val keyMapping = KeyMapping(
-            // HACK: This is meant to be a translation key
-            displayName,
-            type,
-            defaultKey,
-            SKYHANNI_CONFIG_CATEGORY,
-        )
-
-        val key = type.getOrCreate(keyValue)
-        keyMapping.setKey(key)
-        KeyMappingHelper.registerKeyMapping(keyMapping)
-        return keyMapping
-    }
-
-    private fun getDisplayNameForKeyMapping(option: ProcessedOption): String {
-        val parts = option.path.split(".")
-        // wardrobe.keybinds.open -> wardrobe.open
-        // dev.chat.peekKey -> chat.peekKey
-        val name = if (
-            parts.size >= 3 &&
-            parts[parts.lastIndex - 1].startsWith("keybind", true)
-        ) {
-            listOf(parts[parts.lastIndex - 2], parts.last())
-        } else {
-            parts.takeLast(2)
-        }
-
-        return name
-            .joinToString(" ")
-            .replace(Regex("(?i)keybindConfig"), "")
-            .replace(Regex("(?i)keybind(?=Option)"), "")
-            .replace(Regex("([a-z])([A-Z])"), "$1 $2")
-            .replace(Regex("([A-Za-z])([0-9])"), "$1 $2")
-            .replace(Regex("\\s+"), " ")
-            .trim()
-            .split(" ")
-            .joinToString(" ") { it.replaceFirstChar(Char::uppercase) }
     }
 
     object WasdInputMatrix : Iterable<KeyMapping> {

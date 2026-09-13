@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
@@ -140,7 +141,7 @@ object DungeonSpiritLeapOverlay {
     private fun onKeyPress(event: KeyDownEvent) {
         if (!isEnabled() || !config.spiritLeapKeybindConfig.enableKeybind) return
         if (!inventory.isInside()) return
-        val index = getKeybindIndex(event.keyCode)
+        val index = getKeybindIndex(event.key.key)
         if (index !in 0..<playerList.count()) return
         leapToPlayer(playerList[index])
     }
@@ -151,9 +152,9 @@ object DungeonSpiritLeapOverlay {
             config.spiritLeapKeybindConfig.keybindOption2,
             config.spiritLeapKeybindConfig.keybindOption3,
             config.spiritLeapKeybindConfig.keybindOption4,
-        ).map { it.value }
+        ).map { it.key }
 
-    private fun getKeybindIndex(keyCode: Int): Int = spiritLeapKeybinds.indexOf(keyCode)
+    private fun getKeybindIndex(key: InputConstants.Key): Int = spiritLeapKeybinds.indexOf(key)
 
     private fun createOverlayTable(layout: List<List<Renderable>>): Renderable {
         return if (layout.isNotEmpty()) Renderable.table(

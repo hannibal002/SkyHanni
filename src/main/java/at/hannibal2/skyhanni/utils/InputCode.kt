@@ -1,15 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
 import com.mojang.blaze3d.platform.InputConstants
+import net.minecraft.client.input.KeyEvent
 
 @Suppress("unused")
 enum class InputCode(
-    @JvmField
-    val value: Int,
-    private val type: InputConstants.Type = InputConstants.Type.KEYSYM
+    val key: InputConstants.Key
 ) {
-    //~ if < 26.3 '0' -> '-1'
-    UNKNOWN(-1),
+    UNKNOWN(InputConstants.UNKNOWN),
+
     KEY_0(InputConstants.KEY_0),
     KEY_1(InputConstants.KEY_1),
     KEY_2(InputConstants.KEY_2),
@@ -142,16 +141,34 @@ enum class InputCode(
     MOD_NUM_LOCK(InputConstants.MOD_NUM_LOCK),
     ;
 
-    override fun toString(): String = value.toString()
+    constructor(value: Int, type: InputConstants.Type = InputConstants.Type.KEYSYM) : this(type.getOrCreate(value))
+
+    constructor(name: String) : this(InputConstants.getKey(name))
+
+    val value: Int
+        get() = key.value
+
+    override fun toString(): String = key.value.toString()
 
     fun isUnknown(): Boolean = this == UNKNOWN
 
-    fun toKeyIdentifier(): String = type.getOrCreate(value).name
+    fun toKeyIdentifier(): String = key.name
 
     companion object {
-        fun fromKeyIdentifier(identifier: String): InputCode {
-            val key = InputConstants.getKey(identifier)
-            return entries.firstOrNull { it.value == key.value && it.type == key.type } ?: UNKNOWN
-        }
+        fun fromKeyIdentifier(identifier: String): InputCode =
+            fromKey(InputConstants.getKey(identifier))
+
+        fun fromKeyCode(keyCode: Int): InputCode =
+            fromKey(InputConstants.Type.KEYSYM.getOrCreate(keyCode))
+
+        @JvmStatic
+        fun fromKeyEvent(keyEvent: KeyEvent): InputCode =
+            fromKey(InputConstants.getKey(keyEvent))
+
+        fun fromMouseButton(mouseButton: Int): InputCode =
+            fromKey(InputConstants.Type.MOUSE.getOrCreate(mouseButton))
+
+        fun fromKey(key: InputConstants.Key): InputCode =
+            entries.firstOrNull { it.key == key } ?: UNKNOWN
     }
 }

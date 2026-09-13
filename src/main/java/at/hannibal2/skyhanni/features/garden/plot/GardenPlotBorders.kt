@@ -21,7 +21,7 @@ object GardenPlotBorders {
     fun onKeyDown(event: KeyDownEvent) {
         if (!isEnabled()) return
         if (MinecraftCompat.screen != null) return
-        if (event.isPressed(config.plotBorderKey)) {
+        if (event.key == config.plotBorderKey) {
             showBorders = !showBorders
         }
     }

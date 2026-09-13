@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent;
 import at.hannibal2.skyhanni.utils.InputCode;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.CharacterEvent;
@@ -20,9 +21,9 @@ public abstract class MixinKeyboardHandler {
 
     @Inject(method = "keyPress", at = @At("HEAD"))
     private void onKey(long window, int action, KeyEvent input, CallbackInfo ci) {
-        int key = input.key();
         if (Minecraft.getInstance().player == null) return;
-        if (key == InputCode.UNKNOWN.value) return;
+        var key = InputCode.fromKeyEvent(input);
+        if (key == InputCode.UNKNOWN) return;
         //System.out.println("Key: " + key + " Scancode: " + scancode + " Action: " + action + " Modifiers: " + modifiers);
 
         // Don't send key events if REI search bar is selected

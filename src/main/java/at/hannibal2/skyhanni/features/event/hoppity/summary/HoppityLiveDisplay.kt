@@ -129,7 +129,7 @@ object HoppityLiveDisplay {
     fun onKeyPress(event: KeyPressEvent) {
         reCheckInventoryState()
         if (!config.enabled) return
-        if (config.toggleKeybind.isUnknown() || !event.isPressed(config.toggleKeybind)) return
+        if (config.toggleKeybind.isUnknown() || event.key != config.toggleKeybind) return
         // Only toggle from inventory if the user is in the Chocolate Factory
         if (MinecraftCompat.screen != null && !CFApi.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return
