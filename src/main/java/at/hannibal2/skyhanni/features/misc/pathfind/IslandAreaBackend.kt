@@ -67,12 +67,16 @@ object IslandAreaBackend {
     }
 
     private var hasMoved = false
+    private var lastDrawnTarget: GraphNode? = null
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled() || !event.isMod(2) || !hasMoved) return
-        update()
+        if (!isEnabled() || !event.isMod(2)) return
+        val target = IslandGraphs.currentTargetNode
+        if (!hasMoved && target == lastDrawnTarget) return
+        lastDrawnTarget = target
         hasMoved = false
+        update()
     }
 
     @HandleEvent(onlyOnSkyblock = true)

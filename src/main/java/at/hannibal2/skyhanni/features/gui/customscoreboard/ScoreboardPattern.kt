@@ -257,7 +257,7 @@ object ScoreboardPattern {
      */
     val tokensPattern by kuudraSB.pattern(
         "tokens",
-        "(?:§.)*Tokens: §.[\\w,]+",
+        "(?:§.)*Tokens: §.(?<tokens>[\\w,]+)",
     )
 
     /**
@@ -313,7 +313,7 @@ object ScoreboardPattern {
      */
     val peltsPattern by farmingSB.pattern(
         "pelts",
-        "(?:§.)*Pelts: (?:§.)*[\\d,]+.*",
+        "(?:§.)*Pelts: (?:§.)*(?<pelts>[\\d,]+).*",
     )
 
     /**

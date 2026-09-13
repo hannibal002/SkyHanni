@@ -89,7 +89,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
         with(SkyHanniMod) { asyncUnScopedCoroutine(block) }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         val screenToOpen = screenToOpen ?: return
         screenTicks++
         if (screenTicks != 5) return
@@ -105,12 +105,8 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     }
 
     @HandleEvent
-    fun onClientShutdown() {
+    private fun onClientShutdown() {
         configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
-    }
-
-    @HandleEvent
-    fun onRenderShutdown() {
         SkyHanniItemRenderCoordinator.closeAtlas()
     }
 
@@ -119,7 +115,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
 
     fun id(path: String): Identifier = Identifier.fromNamespaceAndPath(MODID, path)
 
-    val modVersion: ModVersion = ModVersion.fromString(VERSION)
+    val modVersion: ModVersion = ModVersion.installed
 
     val isBetaVersion: Boolean
         get() = modVersion.isBeta
@@ -155,7 +151,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("sh") {
             aliases = listOf("skyhanni")
             description = "Opens the main SkyHanni config"

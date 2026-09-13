@@ -83,6 +83,8 @@ object SkyBlockItemModifierUtils {
 
     fun SafeItemStack.getStarCount() = getAttributeInt("upgrade_level")
 
+    fun SafeItemStack.getDungeonItemQuality() = getAttributeInt("baseStatBoostPercentage")
+
     private fun SafeItemStack.isDungeonItem() = getLore().any { it.contains("DUNGEON ") }
 
     @KSerializable

@@ -12,19 +12,22 @@ import java.awt.Color
 
 @SkyHanniModule
 object GlowingDroppedItems {
-
     private val config get() = SkyHanniMod.feature.misc
 
     @HandleEvent
-    fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
+    private fun onRenderEntityOutline(event: RenderEntityOutlineEvent) {
         if (!isEnabled()) return
-        if (event.type != RenderEntityOutlineEvent.Type.NO_XRAY) return
 
         event.queueEntitiesToOutline(::getGlowColor)
     }
 
     private fun getGlowColor(entity: Entity): Color? {
+        // The config option explicitly says it glows items Hypixel doesn't.
+        // While Hypixel and SkyHanni will probably agree on the glow color
+        // the majority of the time, we don't want to inadvertently override
+        // Hypixel's glow color if it happens to be different.
         if (entity.isCurrentlyGlowing) return null
+
         val itemEntity = entity as? ItemEntity ?: return null
         val stack = itemEntity.item
         val rarity = stack.getItemRarityOrCommon()

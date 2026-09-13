@@ -202,6 +202,7 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
                 BOSS_FIGHT -> "Slaying $article ${SlayerApi.activeType?.displayName}"
                 SLAIN -> "Finished slaying $article ${SlayerApi.activeType?.displayName}"
                 FAILED -> "Lost to $article ${SlayerApi.activeType?.displayName}"
+                COCOONED -> "Waiting for $article ${SlayerApi.activeType?.displayName} cocoon to hatch"
                 else -> AutoStatus.SLAYER.placeholderText
             }
         },

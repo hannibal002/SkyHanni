@@ -12,12 +12,12 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.system.ModVersion
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import java.lang.reflect.Method
 import java.util.concurrent.atomic.AtomicInteger
 
 @SkyHanniModule
 object SkyHanniEvents {
-
     private val listeners: MutableMap<Class<out SkyHanniEvent>, EventListeners> = mutableMapOf()
     private val handlers: MutableMap<Class<out SkyHanniEvent>, EventHandler<out SkyHanniEvent>> = mutableMapOf()
     private var disabledHandlers = emptySet<String>()
@@ -138,16 +138,16 @@ object SkyHanniEvents {
 
     fun markEventCacheDirty(type: DirtyReason) {
         when (type) {
-            DirtyReason.REPO_RELOAD,
-            DirtyReason.OUTSIDE_SB_FEATURE_CHANGED,
+            REPO_RELOAD,
+            OUTSIDE_SB_FEATURE_CHANGED,
             -> listenerCacheGeneration.incrementAndGet()
 
-            DirtyReason.LOCATION_CHANGED -> {
+            LOCATION_CHANGED -> {
                 listenerCacheGeneration.incrementAndGet()
                 currentStateIndex.set(ListenerCollection.getCurrentStateIndex())
             }
 
-            DirtyReason.SERVER_DISCONNECTED -> {
+            SERVER_DISCONNECTED -> {
                 listenerCacheGeneration.incrementAndGet()
                 currentStateIndex.set(ListenerCollection.OUTSIDE)
             }
@@ -164,22 +164,28 @@ object SkyHanniEvents {
         REPO_RELOAD,
     }
 
-    // This is marked highest priority to let it
-    // disable other RepositoryReloadEvent listeners before they happen
+    // This is marked highest priority to let it disable other RepositoryReloadEvent listeners
+    // before they happen. All other listeners of this event must use HIGH or lower priority.
     @HandleEvent(priority = HandleEvent.HIGHEST)
     private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         val version = SkyHanniMod.modVersion
 
-        disabledHandlers = data.disabledHandlers + data.disabledHandlersVersioned.activeNames(version)
-        disabledHandlerInvokers = data.disabledInvokers + data.disabledInvokersVersioned.activeNames(version)
-        markEventCacheDirty(DirtyReason.REPO_RELOAD)
+        val mcVersion = PlatformUtils.MC_VERSION
+        disabledHandlers = data.disabledHandlers + data.disabledHandlersVersioned.activeNames(version, mcVersion)
+        disabledHandlerInvokers = data.disabledInvokers + data.disabledInvokersVersioned.activeNames(version, mcVersion)
+        markEventCacheDirty(REPO_RELOAD)
     }
 
-
-    private fun Set<DisabledEventVersionedJson>.activeNames(version: ModVersion): Set<String> =
-        filter { (it.minVersion == null || version >= it.minVersion) && (it.maxVersion == null || version <= it.maxVersion) }
-            .map { it.name }.toSet()
+    private fun Set<DisabledEventVersionedJson>.activeNames(
+        version: ModVersion,
+        mcVersion: String,
+    ): Set<String> =
+        filter {
+            (it.minVersion == null || version >= it.minVersion) &&
+                (it.maxVersion == null || version <= it.maxVersion) &&
+                (it.mcVersions == null || mcVersion in it.mcVersions)
+        }.map { it.name }.toSet()
 
     val seconds = listOf(10, 60, 60 * 5)
 
@@ -190,7 +196,6 @@ object SkyHanniEvents {
 
             for (second in seconds) {
                 if (event.repeatSeconds(second)) {
-
                     for (handler in list) {
                         val log = handler.invokeLog
                         val current = log.invokeCount
@@ -213,7 +218,6 @@ object SkyHanniEvents {
     class EventInvokeData(var oldValue: Long, var diff: Long)
 
     class EventInvokeLog {
-
         var invokeCount: Long = 0L
 
         var overTimeLog = mutableMapOf<Int, EventInvokeData>()
@@ -244,7 +248,6 @@ object SkyHanniEvents {
 
                             append(" ")
                             append("${(log.invokeCount / (ClientEvents.totalTicks / 20)).addSeparators()}/s")
-
                         },
                     )
                 }

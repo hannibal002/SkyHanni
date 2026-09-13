@@ -25,19 +25,19 @@ import net.minecraft.world.entity.animal.golem.IronGolem
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon
 import net.minecraft.world.entity.boss.wither.WitherBoss
 import net.minecraft.world.entity.monster.Ghast
-import net.minecraft.world.entity.monster.MagmaCube
+import net.minecraft.world.entity.monster.cubemob.MagmaCube
 
 @SkyHanniModule
 object HideFarEntities {
     private val config get() = SkyHanniMod.feature.misc.hideFarEntities
 
-    private var ignored = emptySet<Int>()
+    private var hidden = emptySet<Int>()
     private var neverHide = emptySet<Int>()
 
     // TODO: use entity events
     @OptIn(AllEntitiesGetter::class)
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (GlobalRender.renderDisabled) return
         if (!isEnabled()) return
         if (event.isMod(20)) {
@@ -47,7 +47,7 @@ object HideFarEntities {
         val maxAmount = config.maxAmount.coerceAtLeast(1)
         val minDistance = config.minDistance.coerceAtLeast(3)
 
-        ignored = EntityUtils.getAllEntities()
+        hidden = EntityUtils.getAllEntities()
             .map { it.id to it.distanceToPlayer() }
             .filter { it.second > minDistance && it.first !in neverHide }
             .sortedBy { it.second }.drop(maxAmount)
@@ -106,10 +106,10 @@ object HideFarEntities {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
+    private fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!isEnabled()) return
         val entity = event.entity
-        if (entity.id in ignored) {
+        if (entity.id in hidden) {
             event.cancel()
         }
     }

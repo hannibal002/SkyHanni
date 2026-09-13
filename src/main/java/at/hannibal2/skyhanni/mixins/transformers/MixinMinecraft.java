@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent;
 import at.hannibal2.skyhanni.mixins.hooks.MinecraftInputHook;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
@@ -37,11 +35,6 @@ public abstract class MixinMinecraft {
         if (this.gameMode.isDestroying()) return;
 
         if (MinecraftInputHook.shouldCancelMouseRightClick(this.hitResult)) ci.cancel();
-    }
-
-    @Inject(method = "setScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;"))
-    private void onSetScreen(Screen screen, CallbackInfo ci) {
-        new GuiScreenOpenEvent(screen).post();
     }
 
     @Inject(

@@ -984,10 +984,11 @@ fun buildGenericFailureBody(conclusion: String): String = buildString {
 
 fun runBuildMode(prNumber: String) {
     val log1 = readBuildLog(System.getenv("ARTIFACT_DIR_1"))
+    val log2 = readBuildLog(System.getenv("ARTIFACT_DIR_2"))
 
     buildComment.staleExisting(prNumber)
 
-    if (log1.isNullOrBlank()) {
+    if (log1.isNullOrBlank() && log2.isNullOrBlank()) {
         // A missing artifact is not proof of a green build: a step failing before its upload leaves it missing
         // while the run is red. Only the conclusion tells those two apart.
         val conclusion = System.getenv("WORKFLOW_CONCLUSION")?.takeIf { it.isNotEmpty() }
@@ -1005,7 +1006,7 @@ fun runBuildMode(prNumber: String) {
         exitProcess(0)
     }
 
-    val versions = filterStonecutterDuplicates(listOf("26.1" to log1))
+    val versions = filterStonecutterDuplicates(listOf("26.1" to log1, "26.2" to log2))
     buildComment.post(prNumber, buildBuildFailureBody(versions)) {
         "Error: could not post build failure comment (HTTP $it)"
     }
