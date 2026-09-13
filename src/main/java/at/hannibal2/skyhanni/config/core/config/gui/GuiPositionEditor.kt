@@ -172,7 +172,7 @@ class GuiPositionEditor(
     private fun getEditorScaledHeight() = Minecraft.getInstance().window.guiScaledHeight
     private fun getEditorScaledWidth() = Minecraft.getInstance().window.guiScaledWidth
 
-    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
+    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: InputCode) {
         for (i in positions.indices.reversed()) {
             val position = positions[i]
             val handled = position.withPositionMetrics {
@@ -181,14 +181,15 @@ class GuiPositionEditor(
                 val (mouseX, mouseY) = GuiScreenUtils.mousePos
 
                 when (mouseButton) {
-                    1 -> position.jumpToConfigOptions()
-                    2 -> if (config.keyBindReset == InputCode.MIDDLE_MOUSE) position.resetPositionAndScale()
-                    0 -> if (!position.clicked) {
+                    RIGHT_MOUSE -> position.jumpToConfigOptions()
+                    MIDDLE_MOUSE -> if (config.keyBindReset == InputCode.MIDDLE_MOUSE) position.resetPositionAndScale()
+                    LEFT_MOUSE -> if (!position.clicked) {
                         clickedPos = i
                         position.clicked = true
                         grabbedX = mouseX
                         grabbedY = mouseY
                     }
+                    else -> {}
                 }
 
                 true
@@ -197,8 +198,8 @@ class GuiPositionEditor(
         }
     }
 
-    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
-        if (keyCode == config.keyBindReset.value) {
+    override fun onKeyTyped(typedChar: Char?, key: InputCode) {
+        if (key == config.keyBindReset) {
             positions.firstOrNull { it.isHoveredWithMetrics() }?.resetPositionAndScale()
             return
         }
@@ -210,13 +211,13 @@ class GuiPositionEditor(
             val dist = if (KeyboardManager.isShiftKeyDown()) 10 else 1
             val elementWidth = position.getDummySize(true).x
             val elementHeight = position.getDummySize(true).y
-            when (keyCode) {
-                InputCode.KEY_DOWN.value -> position.moveY(dist, elementHeight)
-                InputCode.KEY_UP.value -> position.moveY(-dist, elementHeight)
-                InputCode.KEY_LEFT.value -> position.moveX(-dist, elementWidth)
-                InputCode.KEY_RIGHT.value -> position.moveX(dist, elementWidth)
-                InputCode.KEY_MINUS.value, InputCode.KEY_SUBTRACT.value -> position.scale -= .1F
-                InputCode.KEY_EQUALS.value, InputCode.KEY_ADD.value -> position.scale += .1F
+            when (key) {
+                KEY_DOWN -> position.moveY(dist, elementHeight)
+                KEY_UP -> position.moveY(-dist, elementHeight)
+                KEY_LEFT -> position.moveX(-dist, elementWidth)
+                KEY_RIGHT -> position.moveX(dist, elementWidth)
+                KEY_MINUS, KEY_SUBTRACT -> position.scale -= .1F
+                KEY_EQUALS, KEY_ADD -> position.scale += .1F
                 else -> return@withPositionMetrics
             }
         }

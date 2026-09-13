@@ -68,14 +68,14 @@ class GuiOptionEditorInputCode(option: ProcessedOption, defaultInputCode: InputC
 
                 override fun mouseEvent(mouseEvent: MouseEvent, context: GuiImmediateContext): Boolean {
                     if (mouseEvent !is Click) return false
-                    if (mouseEvent.mouseState && mouseEvent.mouseButton != -1 && editingKeycode) {
+                    if (mouseEvent.mouseState && mouseEvent.mouseButton != InputCode.UNKNOWN.value && editingKeycode) {
                         editingKeycode = false
                         val mouseButton = mouseEvent.mouseButton
                         option.set(InputCode.fromMouseButton(mouseButton))
                         return true
                     }
 
-                    if (mouseEvent.mouseState && mouseEvent.mouseButton == 0) {
+                    if (mouseEvent.mouseState && mouseEvent.mouseButton == InputCode.LEFT_MOUSE.value) {
                         val height = getHeight()
                         val width = getHeight()
                         val mouseX = context.mouseX
