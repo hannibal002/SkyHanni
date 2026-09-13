@@ -72,7 +72,7 @@ object CFApi {
         /**
          * REGEX-TEST: Chocolate Factory
          */
-        val hoppityChocolateFactoryShortcutNamePattern by patternGroup.pattern(
+        val chocolateFactoryShortcutNamePattern by patternGroup.pattern(
             "item.name.chocolatefactory",
             "Chocolate Factory",
         )
@@ -165,14 +165,13 @@ object CFApi {
             if (namePatterns.chocolateFactoryInventoryNamePattern.matches(it)) return@InventoryDetector true
 
             if (namePatterns.hoppityInventoryNamePattern.matches(it)) {
-                if (namePatterns.hoppityChocolateFactoryShortcutNamePattern.matches(
-                        InventoryUtils.getItemAtSlotIndex(CHOCOLATE_FACTORY_SHORTCUT_SLOT)?.cleanName
-                )) {
+                val slotName = InventoryUtils.getItemAtSlotIndex(CHOCOLATE_FACTORY_SHORTCUT_SLOT)?.cleanName
+                if (namePatterns.chocolateFactoryShortcutNamePattern.matches(slotName)) {
                     return@InventoryDetector true
                 }
             }
 
-            return@InventoryDetector false
+            false
         },
     )
 
