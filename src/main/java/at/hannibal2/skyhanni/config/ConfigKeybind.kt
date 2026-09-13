@@ -23,7 +23,12 @@ class ConfigKeybind {
     fun bind(path: String) {
         keyMappingPath = path
         startingKey?.let { startKey ->
-            keyMapping.setKey(getInputConstantKey(startKey))
+            val key = if (MouseCompat.isButtonDown(startKey)) {
+                InputConstants.Type.MOUSE.getOrCreate(startKey)
+            } else {
+                InputConstants.Type.KEYSYM.getOrCreate(startKey)
+            }
+            keyMapping.setKey(key)
         }
     }
 
@@ -34,18 +39,11 @@ class ConfigKeybind {
     /** Returns the integer keycode currently represented by this config keybind.
      *  If not yet bound, returns the configured starting key (if present) or UNKNOWN.
      */
-    var value: Int
-        get() = try {
-            keyMapping.key.value
-        } catch (e: Exception) {
-            startingKey ?: InputCode.UNKNOWN.value
-        }
-        set(newValue) {
-            startingKey = newValue
-            keyMapping.setKey(getInputConstantKey(newValue))
-            KeyMapping.resetMapping()
-        }
-
+    val value: Int get() = try {
+        keyMapping.key.value
+    } catch (e: Exception) {
+        startingKey ?: InputCode.UNKNOWN.value
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -71,12 +69,5 @@ class ConfigKeybind {
 
             override fun read(reader: JsonReader): ConfigKeybind = ConfigKeybind(reader.nextInt())
         }
-
-        private fun getInputConstantKey(key: Int) =
-            if (MouseCompat.isButtonDown(key)) {
-                InputConstants.Type.MOUSE.getOrCreate(key)
-            } else {
-                InputConstants.Type.KEYSYM.getOrCreate(key)
-            }
     }
 }
