@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.Screen
 
 object GuiScreenUtils {
 
@@ -12,6 +13,19 @@ object GuiScreenUtils {
         val scaledWindowHeight: Int,
         val scaleFactor: Int,
     )
+
+    /**
+     * The screen that is currently open, or null if none is.
+     *
+     * This delegates to [MinecraftCompat.screen], which feature classes are not supposed
+     * to touch directly. It exists so the version differences stay in one place instead
+     * of every caller handling them, not to grant feature classes new access.
+     */
+    var currentScreen: Screen?
+        get() = MinecraftCompat.screen
+        set(value) {
+            MinecraftCompat.screen = value
+        }
 
     val scaledWindowHeight: Int
         get() = screenMetricsOverride?.scaledWindowHeight ?: mc.window.guiScaledHeight
