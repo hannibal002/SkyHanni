@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import net.minecraft.client.gui.screens.ChatScreen
 import kotlin.time.Duration.Companion.seconds
@@ -53,7 +53,7 @@ object InputSequenceTracker {
         // Counts single character keys pressed while a chat is open. The input field alone
         // cannot tell us who opened that chat, since the player can edit it with the mouse
         // without ever reaching this handler
-        lettersInChat = if (GuiScreenUtils.currentScreen is ChatScreen) lettersInChat + 1 else 0
+        lettersInChat = if (MinecraftCompat.screen is ChatScreen) lettersInChat + 1 else 0
 
         // takeLast caps the buffer at the sequence length, so it can never grow
         buffer = (buffer + typed).takeLast(SEQUENCE.length)
@@ -74,20 +74,20 @@ object InputSequenceTracker {
             return
         }
         ChatUtils.chat("April Fools! Here is your tank... almost.", prefix = false)
-        GuiScreenUtils.currentScreen = SequenceOverlay()
+        MinecraftCompat.screen = SequenceOverlay()
     }
 
     /**
-     * Only closes a chat that the sequence itself opened, recognized by exactly
-     * [CHAT_LEFTOVER] having been typed since it appeared. The one gap is a chat key bound
-     * to a mouse button, which never reaches the handler that feeds the counter.
+     * Only closes a chat that the sequence itself opened, recognized by the letter count
+     * plus the input matching [CHAT_LEFTOVER] exactly. This assumes the default chat key,
+     * since only then does the "t" of the sequence open a chat at all.
      *
      * Blanking the input before closing is required, since [ChatScreen.removed] stores
      * anything non-blank as a draft.
      */
     private fun closeUntouchedChat() {
         if (lettersInChat != CHAT_LEFTOVER.length) return
-        val screen = GuiScreenUtils.currentScreen as? ChatScreen ?: return
+        val screen = MinecraftCompat.screen as? ChatScreen ?: return
         if (screen.input.value != CHAT_LEFTOVER) return
         screen.input.value = ""
         screen.onClose()
