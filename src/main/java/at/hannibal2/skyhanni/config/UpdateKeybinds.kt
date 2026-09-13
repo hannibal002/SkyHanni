@@ -11,6 +11,9 @@ import com.mojang.blaze3d.platform.InputConstants
 object UpdateKeybinds {
     @HandleEvent
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        if (event.oldVersion >= 147) {
+            return
+        }
         for (keybindPath in SkyHanniConfigSearchResetCommand.allKeybinds) {
             event.transform(147, keybindPath) { element ->
                 val oldCode = element.asInt
