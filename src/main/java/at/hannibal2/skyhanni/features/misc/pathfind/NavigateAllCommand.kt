@@ -78,7 +78,7 @@ object NavigateAllCommand {
                 NavigateAllApi.handleSkip()
             }
             literalCallback("stop") {
-                NavigateAllApi.handleStop(manual = true)
+                IslandGraphs.manualCancel()
             }
             literalCallback("undo") {
                 NavigateAllApi.handleUndo()

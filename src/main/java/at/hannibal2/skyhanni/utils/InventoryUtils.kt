@@ -2,7 +2,10 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
+import at.hannibal2.skyhanni.events.MouseClickType
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
+import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
+import at.hannibal2.skyhanni.utils.InventoryUtils.mouseClickSlot
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
@@ -13,6 +16,7 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
@@ -30,6 +34,18 @@ import kotlin.time.Duration.Companion.seconds
 @Suppress("MemberVisibilityCanBePrivate", "TooManyFunctions", "Unused")
 object InventoryUtils {
     var itemInHandId = NeuInternalName.NONE
+
+    /**
+     * The slot indexes of the inner inventory of a 6 row chest.
+     * This is used to filter out the border slots of the chest.
+     */
+    val innerInventorySlots: Set<Int> = listOf(
+        10..16,
+        19..25,
+        28..34,
+        37..43,
+    ).flatten().toSet()
+
     fun NeuInternalName.recentlyHeld(): Boolean = this in recentItemsInHand
 
     val recentItemsInHand = TimeLimitedSet<NeuInternalName>(30.seconds)
@@ -194,10 +210,34 @@ object InventoryUtils {
     fun clickSlot(
         slotId: Int,
         windowId: Int = InventoryCompat.getWindowId(),
-        mouseButton: Int = 0,
+        button: MouseClickType = LEFT_CLICK,
+        mode: ContainerInput = button.defaultMode,
+    ) {
+        clickSlotRaw(slotId, windowId, button.buttonId, mode)
+    }
+
+    /**
+     * Same as [clickSlot], but takes the window id from this screen.
+     */
+    fun ContainerScreen.clickSlot(
+        slotId: Int,
+        button: MouseClickType = LEFT_CLICK,
+        mode: ContainerInput = button.defaultMode,
+    ) {
+        clickSlot(slotId, container.containerId, button, mode)
+    }
+
+    /**
+     * Only for forwarding an existing click. What [button] means depends on [mode],
+     * see [MouseClickType]. Prefer [clickSlot] everywhere else.
+     */
+    fun clickSlotRaw(
+        slotId: Int,
+        windowId: Int = InventoryCompat.getWindowId(),
+        button: Int = 0,
         mode: ContainerInput = PICKUP,
     ) {
-        InventoryCompat.clickInventorySlot(windowId, slotId, mouseButton, mode)
+        InventoryCompat.clickInventorySlot(windowId, slotId, button, mode)
     }
 
     /**
@@ -207,13 +247,27 @@ object InventoryUtils {
      */
     fun mouseClickSlot(
         slotId: Int,
-        mouseButton: Int = 0,
+        button: MouseClickType = LEFT_CLICK,
+        mode: ContainerInput = button.defaultMode,
+    ) {
+        mouseClickSlotRaw(slotId, button.buttonId, mode)
+    }
+
+    /**
+     * Only for forwarding an existing click. What [button] means depends on [mode],
+     * see [MouseClickType]. Prefer [mouseClickSlot] everywhere else.
+     */
+    fun mouseClickSlotRaw(
+        slotId: Int,
+        button: Int = 0,
         mode: ContainerInput = PICKUP,
     ) {
-        InventoryCompat.mouseClickInventorySlot(slotId, mouseButton, mode)
+        InventoryCompat.mouseClickInventorySlot(slotId, button, mode)
     }
 
     fun SkyHanniGuiContainer.slots(): List<Slot> {
         return InventoryCompat.containerSlots(this)
     }
+
+    fun <T> Map<Int, T>.filterInnerSlots(): Map<Int, T> = filter { it.key in innerInventorySlots }
 }

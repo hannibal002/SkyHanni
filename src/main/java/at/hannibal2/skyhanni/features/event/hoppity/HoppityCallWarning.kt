@@ -25,14 +25,10 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityCallWarning {
-
     // <editor-fold desc="Patterns">
     /**
-     * Test messages (and the real ones from Hypixel) have a space at the end of
-     * them that the IDE kills. So it's "§r§e ✆ "
-     *
-     * REGEX-TEST: §e✆ §r§bHoppity§r§e ✆
-     * REGEX-TEST: §e✆ §r§aHoppity§r§e ✆
+     * WRAPPED-REGEX-TEST: "§e✆ §r§bHoppity§r§e ✆ "
+     * WRAPPED-REGEX-TEST: "§e✆ §r§aHoppity§r§e ✆ "
      */
     private val initHoppityCallPattern by CFApi.patternGroup.pattern(
         "hoppity.call.init",
@@ -49,7 +45,7 @@ object HoppityCallWarning {
     // </editor-fold>
 
     private val config get() = HoppityEggsManager.config.hoppityCallWarning
-    private var warningSound = SoundUtils.createSound("block.note_block.pling", 1f)
+    private var warningSound = SoundUtils.createSound("block.note_block.pling", 1f, isWarning = true)
     private var activeWarning = false
     private var nextWarningTime: Instant? = null
     private var finalWarningTime: Instant? = null
@@ -57,24 +53,24 @@ object HoppityCallWarning {
     private var commandSentTimer = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad(event: ConfigLoadEvent) {
         val soundProperty = config.hoppityCallSound
         ConditionalUtils.onToggle(soundProperty) {
-            warningSound = SoundUtils.createSound(soundProperty.get(), 1f)
+            warningSound = SoundUtils.createSound(soundProperty.get(), 1f, isWarning = true)
         }
         nextWarningTime = null
         finalWarningTime = null
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (initHoppityCallPattern.matches(event.message)) startWarningUser()
         if (pickupHoppityCallPattern.matches(event.message)) stopWarningUser()
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!activeWarning) return
         if (nextWarningTime == null || finalWarningTime == null) return
@@ -87,7 +83,7 @@ object HoppityCallWarning {
     }
 
     @HandleEvent
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    private fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !activeWarning) return
         // Calculate a fluctuating alpha value based on the sine of time, for a smooth oscillation
         val randomizationAlphaDouble = ((2 + sin(Instant.now().toEpochMilli().toDouble() / 1000)) * 255 / 4)
@@ -106,7 +102,7 @@ object HoppityCallWarning {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onCommandSend(event: MessageSendToServerEvent) {
+    private fun onCommandSend(event: MessageSendToServerEvent) {
         if (!HoppityApi.pickupOutgoingCommandPattern.matches(event.message)) return
         if (!config.ensureCoins || commandSentTimer.passedSince() < 5.seconds) return
         if (PurseApi.getPurse() >= config.coinThreshold) return
@@ -123,7 +119,7 @@ object HoppityCallWarning {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         stopWarningUser()
     }
 
