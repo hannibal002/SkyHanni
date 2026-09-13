@@ -159,10 +159,6 @@ object KeyboardManager {
     fun getKeyName(keyCode: Int): String = IMinecraft.INSTANCE.getKeyName(keyCode).text
 
     object WasdInputMatrix : Iterable<KeyMapping> {
-        operator fun contains(keyBinding: KeyMapping) = when (keyBinding) {
-            w, a, s, d, up, down -> true
-            else -> false
-        }
 
         val w get() = Minecraft.getInstance().options.keyUp
         val a get() = Minecraft.getInstance().options.keyLeft
@@ -172,34 +168,10 @@ object KeyboardManager {
         val up get() = Minecraft.getInstance().options.keyJump
         val down get() = Minecraft.getInstance().options.keyShift
 
-        override fun iterator(): Iterator<KeyMapping> =
-            object : Iterator<KeyMapping> {
+        private val all get() = listOf(w, a, s, d, up, down)
 
-                var current = w
-                var finished = false
+        operator fun contains(keyBinding: KeyMapping) = keyBinding in all
 
-                override fun hasNext(): Boolean =
-                    !finished
-
-                override fun next(): KeyMapping {
-                    if (!hasNext()) throw NoSuchElementException()
-
-                    return current.also {
-                        current = when (it) {
-                            w -> a
-                            a -> s
-                            s -> d
-                            d -> up
-                            up -> down
-                            else -> {
-                                finished = true
-                                throw NoSuchElementException()
-                            }
-                        }
-                    }
-                }
-
-            }
-
+        override fun iterator(): Iterator<KeyMapping> = all.iterator()
     }
 }
