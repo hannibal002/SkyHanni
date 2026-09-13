@@ -134,8 +134,6 @@ object KeyboardManager {
 
     fun KeyMapping.isKeyHeld(): Boolean = key.isKeyHeld()
 
-    fun InputCode.isKeyHeld(): Boolean = key.isKeyHeld()
-
     fun InputConstants.Key.isKeyHeld(): Boolean {
         val value = this.value
         return when {

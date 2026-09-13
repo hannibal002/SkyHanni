@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.input.KeyEvent
 
@@ -151,11 +152,13 @@ enum class InputCode(
     val displayName: String
         get() = KeyboardManager.getKeyName(key)
 
-    override fun toString(): String = key.value.toString()
+    fun isKeyHeld(): Boolean = key.isKeyHeld()
 
     fun isUnknown(): Boolean = this == UNKNOWN
 
     fun toKeyIdentifier(): String = key.name
+
+    override fun toString(): String = key.value.toString()
 
     companion object {
         fun fromKeyIdentifier(identifier: String): InputCode =
