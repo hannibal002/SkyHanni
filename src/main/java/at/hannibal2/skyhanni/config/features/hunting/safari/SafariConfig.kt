@@ -26,4 +26,9 @@ class SafariConfig {
     @FeatureToggle
     var hideyhoFinder: Boolean = true
 
+    @Expose
+    @ConfigOption(name = "Critter Capsules", desc = "")
+    @Accordion
+    val critterCapsules: CritterCapsuleConfig = CritterCapsuleConfig()
+
 }
