@@ -239,8 +239,9 @@ Make sure such pull requests have a good explanation in the **What** section.
   released feature. It never blocks a pull request here, and no pull request here is closed because another mod happens
   to be working on something similar. This works both ways: if another mod releases something that is sitting in an open
   pull request here, that is equally fine and no reason to complain.
-- Independently of that, never take code, coordinates, item lists or other collected data from another mod, released or
-  not. That is copying, whatever the status of the feature is.
+- Code from another mod, released or not, is off limits.
+  - Collected data such as coordinates or item lists is different. It describes the game, not the mod that wrote it down.
+    Use it where the feature is your own, and credit the source in the commit or pull request.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
       Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.
