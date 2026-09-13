@@ -235,7 +235,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
                 }
                 loot.clear()
             }
-            if (config.compactGiftChats) blockedReason = "TREE_GIFT"
+            if (config.displayTreeGifts != ForagingTrackerConfig.TreeGiftDisplayMode.FULL_GIFT) blockedReason = "TREE_GIFT"
         }
         if (!openLootLoop) return
 
@@ -300,7 +300,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     }
 
     private fun SkyHanniChatEvent.Allow.tryBlock() {
-        if (!config.compactGiftChats || !openLootLoop) return
+        if (config.displayTreeGifts == ForagingTrackerConfig.TreeGiftDisplayMode.FULL_GIFT || !openLootLoop) return
         blockedReason = "TREE_GIFT"
     }
 
@@ -344,7 +344,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
 
     private fun sendTreeGiftStats() {
         val lastTreeType = treeType ?: return
-        if (config.compactGiftChats) {
+        if (config.displayTreeGifts == ForagingTrackerConfig.TreeGiftDisplayMode.COMPACT_GIFT) {
             val message = "§9$lastTreeType Tree Gift. §7You helped cut $lastPercentString §7and gained §e$lastRewardCount rewards§a!"
             val component = message.asComponent()
             component.hover = lastHover
