@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.hunting
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.foraging.SafariConfig
@@ -71,7 +71,7 @@ class HuntingConfig {
     @Expose
     @ConfigOption(name = "Show next Shulker", desc = "Press this key to show the route to the next Shulker.")
     @SearchTag("hideonleaf hideonsun")
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var nextShulkerKeybind = InputCode.UNKNOWN
 
     @Expose

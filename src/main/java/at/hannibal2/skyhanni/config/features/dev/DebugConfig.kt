@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.features.misc.update.SkyHanniUpdateSource
@@ -71,7 +71,7 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var copyInternalName = InputCode.UNKNOWN
 
     @Expose
@@ -79,7 +79,7 @@ class DebugConfig {
         name = "Copy Cosmetics Skull Data",
         desc = "Copies the cosmetic data for skins with different variants but no animations."
     )
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var copyCosmeticsSkullData = InputCode.UNKNOWN
 
     @Expose
@@ -114,12 +114,12 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(name = "Copy Item Data", desc = "Copies item NBT data on key press in a GUI to clipboard.")
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var copyItemData = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Copy Compressed Item Data", desc = "Copies compressed item NBT data on key press in a GUI to clipboard.")
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var copyItemDataCompressed = InputCode.UNKNOWN
 
     @Expose
@@ -189,7 +189,7 @@ class DebugConfig {
         name = "Bypass Advanced Tab List",
         desc = "The Advanced Player Tab list is disabled while pressing this hotkey.",
     )
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var bypassAdvancedPlayerTabList = InputCode.UNKNOWN
 
     @Expose

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.combat
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.InputCode
@@ -53,7 +53,7 @@ class InstanceChestProfitConfig {
         desc = "Press while Hovering an item to add/remove it from favorites which will Star chests containing this item in Croesus" +
             " and highlight the Item in Instance Chests."
     )
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var keybind = InputCode.UNKNOWN
 
     @Expose

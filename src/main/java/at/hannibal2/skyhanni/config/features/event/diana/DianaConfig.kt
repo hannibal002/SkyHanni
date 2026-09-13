@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.event.diana
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -135,7 +135,7 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(name = "Warp Key", desc = "Press this key to warp to the nearest burrow waypoint.")
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var keyBindWarp = InputCode.UNKNOWN
 
     @Expose

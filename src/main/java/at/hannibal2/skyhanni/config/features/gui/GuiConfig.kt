@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.gui
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -52,12 +52,12 @@ class GuiConfig {
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var keyBindOpen = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Reset Hotkey", desc = "Key to press hovering a gui element to reset it's position and scale in the GUI Editor.")
-    @ConfigEditorKeymapping(defaultKey = KEY_R)
+    @ConfigEditorKeyMapping(defaultKey = KEY_R)
     var keyBindReset = InputCode.KEY_R
 
     @Expose

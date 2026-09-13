@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.hunting
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.hunting.ShardTrackerDisplay
@@ -25,7 +25,7 @@ class ShardTrackerConfig {
 
     @Expose
     @ConfigOption(name = "Select Shard Key", desc = "Press this key in your hunting box to track the hovered shard.")
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var selectShardKeybind = InputCode.UNKNOWN
 
     @ConfigOption(

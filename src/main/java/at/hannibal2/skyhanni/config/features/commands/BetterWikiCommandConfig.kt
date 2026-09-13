@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.commands
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
@@ -47,6 +47,6 @@ class BetterWikiCommandConfig {
         desc = "Search for an item's wiki page with this keybind.\n" +
             "§cFor an optimal experience, do §lNOT §cbind this to a mouse button.",
     )
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var wikiKeybind = InputCode.UNKNOWN
 }

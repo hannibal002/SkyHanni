@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.crimsonisle
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.InputCode
@@ -31,7 +31,7 @@ class ReputationHelperConfig {
 
     @Expose
     @ConfigOption(name = "Hotkey", desc = "Press this hotkey to show the Reputation Helper.")
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var hotkey = InputCode.UNKNOWN
 
     @Expose

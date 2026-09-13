@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.fishing.trophyfishing
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.InputCode
@@ -37,7 +37,7 @@ class TrophyFishDisplayConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "")
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var keybind = InputCode.UNKNOWN
 
     @Expose

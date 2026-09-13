@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
@@ -34,7 +34,7 @@ class RewardWarningConfig {
 
     @Expose
     @ConfigOption(name = "Bypass Key", desc = "Hold this key to bypass the Prevent Refusing feature.")
-    @ConfigEditorKeymapping(defaultKey = KEY_LCONTROL)
+    @ConfigEditorKeyMapping(defaultKey = KEY_LCONTROL)
     var bypassKey = InputCode.KEY_LCONTROL
 
     @Expose

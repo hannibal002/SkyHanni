@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
@@ -28,7 +28,7 @@ class JacobFarmingContestConfig {
         name = "Open On Elite",
         desc = "Open the contest on §eeliteskyblock.com§7 when pressing this key in Jacob's menu or the calendar."
     )
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var openOnElite = InputCode.UNKNOWN
 
     @Expose

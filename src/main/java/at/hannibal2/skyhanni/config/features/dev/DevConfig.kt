@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -65,7 +65,7 @@ class DevConfig {
 
     @Expose
     @ConfigOption(name = "Slot Number", desc = "Show slot number in inventory while pressing this key.")
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var showSlotNumberKey = InputCode.UNKNOWN
 
     @Expose

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.garden.MouseSensitivityReducer.AutoEnableMode
 import at.hannibal2.skyhanni.utils.InputCode
@@ -33,7 +33,7 @@ class MouseSensitivityReducerConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "When selected above, press this key to reduce the mouse sensitivity.")
-    @ConfigEditorKeymapping(defaultKey = KEY_N)
+    @ConfigEditorKeyMapping(defaultKey = KEY_N)
     var keybind = InputCode.KEY_N
 
     @Expose

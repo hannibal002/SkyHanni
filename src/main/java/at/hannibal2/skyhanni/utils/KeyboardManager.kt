@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.core.elements.GuiOptionEditorKeyMapping
 import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
@@ -164,7 +164,7 @@ object KeyboardManager {
     )
 
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
-        processor.registerConfigEditor(ConfigEditorKeymapping::class.java) { option, annotation ->
+        processor.registerConfigEditor(ConfigEditorKeyMapping::class.java) { option, annotation ->
             val mapping = getOrCreateKeyMapping(
                 option,
                 annotation.defaultKey.value,

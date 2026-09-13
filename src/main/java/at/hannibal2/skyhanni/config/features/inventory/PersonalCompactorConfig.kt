@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
@@ -31,7 +31,7 @@ class PersonalCompactorConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "The keybind to hold to show the overlay.")
-    @ConfigEditorKeymapping(defaultKey = KEY_LSHIFT)
+    @ConfigEditorKeyMapping(defaultKey = KEY_LSHIFT)
     var keybind = InputCode.KEY_LSHIFT
 
     @Expose

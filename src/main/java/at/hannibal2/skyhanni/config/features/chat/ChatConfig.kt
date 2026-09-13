@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.chat
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.InputCode
@@ -16,7 +16,7 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 class ChatConfig {
     @Expose
     @ConfigOption(name = "Peek Chat", desc = "Hold this key to keep the chat open.")
-    @ConfigEditorKeymapping(defaultKey = KEY_Z)
+    @ConfigEditorKeyMapping(defaultKey = KEY_Z)
     var peekChat = InputCode.UNKNOWN
 
     // TODO move into own sub category

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -230,7 +230,7 @@ class GardenConfig {
         desc = "Show Garden plot borders when pressing this key " +
             "(similar to how F3 + G shows chunk borders).",
     )
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var plotBorderKey = InputCode.UNKNOWN
 
     @Expose

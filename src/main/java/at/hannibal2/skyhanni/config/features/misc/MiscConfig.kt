@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.misc
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -498,7 +498,7 @@ class MiscConfig {
 
     @Expose
     @ConfigOption(name = "Abiphone Hotkey", desc = "Answer incoming abiphone calls with a hotkey.")
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var abiphoneAcceptKey = InputCode.UNKNOWN
 
     @Expose

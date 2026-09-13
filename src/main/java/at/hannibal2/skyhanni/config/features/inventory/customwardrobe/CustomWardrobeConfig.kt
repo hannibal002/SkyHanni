@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory.customwardrobe
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
@@ -56,7 +56,7 @@ class CustomWardrobeConfig {
 
     @Expose
     @ConfigOption(name = "Tooltip Keybind", desc = "Press this key to show the item tooltip.")
-    @ConfigEditorKeymapping(defaultKey = KEY_LSHIFT)
+    @ConfigEditorKeyMapping(defaultKey = KEY_LSHIFT)
     var tooltipKeybind = InputCode.KEY_LSHIFT
 
     @Expose

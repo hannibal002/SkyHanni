@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.crimsonisle
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
@@ -21,7 +21,7 @@ class VanquisherWaypointShareConfig {
 
     @Expose
     @ConfigOption(name = "Keybind Share", desc = "Manually share your Vanquisher spawns with a keybind.")
-    @ConfigEditorKeymapping(defaultKey = KEY_Y)
+    @ConfigEditorKeyMapping(defaultKey = KEY_Y)
     var keybindSharing = InputCode.KEY_Y
 
     @Expose

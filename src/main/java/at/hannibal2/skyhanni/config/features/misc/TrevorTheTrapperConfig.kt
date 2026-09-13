@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.misc
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.InputCode
@@ -117,7 +117,7 @@ class TrevorTheTrapperConfig {
         desc = "Press this key to warp to Trevor's Den or to accept the quest. " +
             "§eRequires the relevant above settings to be toggled"
     )
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var keyBind = InputCode.UNKNOWN
 
     @Expose

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
@@ -102,7 +102,7 @@ class VisitorConfig {
             "§eUseful for getting Ephemeral Gratitudes during the Great Spook event."
     )
     @SearchTag("halloween")
-    @ConfigEditorKeymapping
+    @ConfigEditorKeyMapping
     var acceptHotkey = InputCode.UNKNOWN
 
     @Expose
