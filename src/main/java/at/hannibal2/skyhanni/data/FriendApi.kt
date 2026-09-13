@@ -85,7 +85,7 @@ object FriendApi {
      */
     private val friendRequestExpiredPattern by patternGroup.pattern(
         "friend-request-expired",
-        "(The|Your) friend request to (?<name>.*) has expired.",
+        "(?:The|Your) friend request to (?<name>.*) has expired.",
     )
 
     /**
