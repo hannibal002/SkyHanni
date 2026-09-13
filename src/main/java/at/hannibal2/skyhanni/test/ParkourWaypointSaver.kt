@@ -37,8 +37,8 @@ object ParkourWaypointSaver {
         if (GraphEditor.isEnabled()) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 
-        when (event.keyCode) {
-            config.deleteKey -> {
+        when {
+            event.isPressed(config.deleteKey) -> {
                 if (locations.isEmpty()) {
                     loadClipboard()
                 } else {
@@ -51,7 +51,7 @@ object ParkourWaypointSaver {
                 }
             }
 
-            config.saveKey -> {
+            event.isPressed(config.saveKey) -> {
                 val newLocation = LocationUtils.getBlockBelowPlayer()
                 if (locations.isNotEmpty() && newLocation == locations.last()) return
                 locations.add(newLocation)

@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
 import com.mojang.blaze3d.platform.InputConstants
-import net.minecraft.client.Minecraft
 
 @Suppress("unused")
 enum class InputCode(
     @JvmField
-    val value: Int
+    val value: Int,
+    private val type: InputConstants.Type = InputConstants.Type.KEYSYM
 ) {
     //~ if < 26.3 '0' -> '-1'
     UNKNOWN(-1),
@@ -126,14 +126,14 @@ enum class InputCode(
     KEY_PAUSE(InputConstants.KEY_PAUSE),
     KEY_SCROLLLOCK(InputConstants.KEY_SCROLLLOCK),
     KEY_PRINTSCREEN(InputConstants.KEY_PRINTSCREEN),
-    LEFT_MOUSE(InputConstants.MOUSE_BUTTON_LEFT),
-    RIGHT_MOUSE(InputConstants.MOUSE_BUTTON_RIGHT),
-    MIDDLE_MOUSE(InputConstants.MOUSE_BUTTON_MIDDLE),
-    MOUSE_BUTTON_4(InputConstants.MOUSE_BUTTON_4),
-    MOUSE_BUTTON_5(InputConstants.MOUSE_BUTTON_5),
-    MOUSE_BUTTON_6(InputConstants.MOUSE_BUTTON_6),
-    MOUSE_BUTTON_7(InputConstants.MOUSE_BUTTON_7),
-    MOUSE_BUTTON_8(InputConstants.MOUSE_BUTTON_8),
+    LEFT_MOUSE(InputConstants.MOUSE_BUTTON_LEFT, MOUSE),
+    RIGHT_MOUSE(InputConstants.MOUSE_BUTTON_RIGHT, MOUSE),
+    MIDDLE_MOUSE(InputConstants.MOUSE_BUTTON_MIDDLE, MOUSE),
+    MOUSE_BUTTON_4(InputConstants.MOUSE_BUTTON_4, MOUSE),
+    MOUSE_BUTTON_5(InputConstants.MOUSE_BUTTON_5, MOUSE),
+    MOUSE_BUTTON_6(InputConstants.MOUSE_BUTTON_6, MOUSE),
+    MOUSE_BUTTON_7(InputConstants.MOUSE_BUTTON_7, MOUSE),
+    MOUSE_BUTTON_8(InputConstants.MOUSE_BUTTON_8, MOUSE),
     MOD_SHIFT(InputConstants.MOD_SHIFT),
     MOD_CONTROL(InputConstants.MOD_CONTROL),
     MOD_ALT(InputConstants.MOD_ALT),
@@ -144,14 +144,14 @@ enum class InputCode(
 
     override fun toString(): String = value.toString()
 
+    fun isUnknown(): Boolean = this == UNKNOWN
+
+    fun toKeyIdentifier(): String = type.getOrCreate(value).name
+
     companion object {
-        fun isValidKey(input: InputCode): Boolean = input.value >= UNKNOWN.value
-
-        fun isKeyDown(input: InputCode): Boolean =
-            InputConstants.isKeyDown(Minecraft.getInstance().window, input.value)
-
-        @JvmStatic
-        fun fromValue(value: Int): InputCode =
-            entries.firstOrNull { it.value == value } ?: UNKNOWN
+        fun fromKeyIdentifier(identifier: String): InputCode {
+            val key = InputConstants.getKey(identifier)
+            return entries.firstOrNull { it.value == key.value && it.type == key.type } ?: UNKNOWN
+        }
     }
 }

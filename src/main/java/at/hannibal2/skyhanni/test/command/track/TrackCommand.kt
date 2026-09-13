@@ -138,7 +138,7 @@ abstract class TrackCommand<T : SkyHanniEvent, K>(
     }
 
     open fun onKeyPress(event: KeyPressEvent) {
-        if (event.keyCode != config.toggleKeybind) return
+        if (!event.isPressed(config.toggleKeybind)) return
         if (lastKeyToggle.passedSince() < 1.seconds) return
 
         if (isRecording) endRecording()

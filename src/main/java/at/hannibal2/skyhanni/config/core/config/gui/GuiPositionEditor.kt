@@ -197,8 +197,8 @@ class GuiPositionEditor(
         }
     }
 
-    override fun onKeyTyped(typedChar: Char?, keyCode: InputCode) {
-        if (keyCode == config.keyBindReset) {
+    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
+        if (keyCode == config.keyBindReset.value) {
             positions.firstOrNull { it.isHoveredWithMetrics() }?.resetPositionAndScale()
             return
         }
@@ -211,12 +211,12 @@ class GuiPositionEditor(
             val elementWidth = position.getDummySize(true).x
             val elementHeight = position.getDummySize(true).y
             when (keyCode) {
-                InputCode.KEY_DOWN -> position.moveY(dist, elementHeight)
-                InputCode.KEY_UP -> position.moveY(-dist, elementHeight)
-                InputCode.KEY_LEFT -> position.moveX(-dist, elementWidth)
-                InputCode.KEY_RIGHT -> position.moveX(dist, elementWidth)
-                InputCode.KEY_MINUS, InputCode.KEY_SUBTRACT -> position.scale -= .1F
-                InputCode.KEY_EQUALS, InputCode.KEY_ADD -> position.scale += .1F
+                InputCode.KEY_DOWN.value -> position.moveY(dist, elementHeight)
+                InputCode.KEY_UP.value -> position.moveY(-dist, elementHeight)
+                InputCode.KEY_LEFT.value -> position.moveX(-dist, elementWidth)
+                InputCode.KEY_RIGHT.value -> position.moveX(dist, elementWidth)
+                InputCode.KEY_MINUS.value, InputCode.KEY_SUBTRACT.value -> position.scale -= .1F
+                InputCode.KEY_EQUALS.value, InputCode.KEY_ADD.value -> position.scale += .1F
                 else -> return@withPositionMetrics
             }
         }

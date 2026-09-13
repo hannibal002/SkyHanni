@@ -54,10 +54,10 @@ object GardenWarpCommands {
     fun onKeyDown(event: KeyDownEvent) {
         if (MinecraftCompat.screen != null) return
 
-        when (event.keyCode) {
-            config.homeHotkey -> HypixelCommands.warp("garden")
-            config.sethomeHotkey -> HypixelCommands.setSpawn()
-            config.barnHotkey -> HypixelCommands.teleportToPlot("barn")
+        when {
+            event.isPressed(config.homeHotkey) -> HypixelCommands.warp("garden")
+            event.isPressed(config.sethomeHotkey) -> HypixelCommands.setSpawn()
+            event.isPressed(config.barnHotkey) -> HypixelCommands.teleportToPlot("barn")
             else -> return
         }
     }
