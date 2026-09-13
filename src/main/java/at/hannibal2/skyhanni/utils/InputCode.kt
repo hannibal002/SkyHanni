@@ -5,7 +5,7 @@ import net.minecraft.client.input.KeyEvent
 
 @Suppress("unused")
 enum class InputCode(
-    val key: InputConstants.Key
+    val key: InputConstants.Key,
 ) {
     UNKNOWN(InputConstants.UNKNOWN),
 

@@ -168,7 +168,8 @@ object KeyboardManager {
         if (key == InputConstants.UNKNOWN) {
             "NONE"
         } else {
-            key.displayName.string
+            val displayName = key.displayName
+            displayName.tryCollapseToString() ?: displayName.string
         }
 
     fun getKeyName(keyCode: InputCode): String = getKeyName(keyCode.key)
