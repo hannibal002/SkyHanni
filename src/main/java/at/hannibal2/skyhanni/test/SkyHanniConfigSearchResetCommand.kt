@@ -370,15 +370,14 @@ object SkyHanniConfigSearchResetCommand {
         else -> toString()
     }
 
-    internal fun findKeybinds(action: (Set<String>) -> Unit) = CoroutineSettings("findKeybinds").launch {
-        val set = buildSet {
+    val allKeybinds: Set<String> by lazy {
+        buildSet {
             ConfigUtils.traverseConfig(SkyHanniMod.feature) { _, field, path ->
                 if (field.getAnnotation(ConfigEditorKeybind::class.java) != null) {
                     add(path)
                 }
             }
         }
-        action(set)
     }
 
     @HandleEvent
@@ -398,8 +397,8 @@ object SkyHanniConfigSearchResetCommand {
             description = "Resets all of your SkyHanni keybinds"
             aliases = listOf("shkeybindreset")
             simpleCallback {
-                findKeybinds { keybinds ->
-                    for (keybind in keybinds) {
+                CoroutineSettings("findKeybinds").launch {
+                    for (keybind in allKeybinds) {
                         // TODO: Have some bulk reset command
                         resetCommand(
                             arrayOf("reset", "config.$keybind"),
