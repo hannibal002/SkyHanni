@@ -1,7 +1,8 @@
-package at.hannibal2.skyhanni.config.features.foraging
+package at.hannibal2.skyhanni.config.features.hunting.safari
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
