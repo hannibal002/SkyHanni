@@ -57,13 +57,13 @@ class VisualWordScreen : SkyHanniBaseScreen() {
 
     override fun onKeyTyped(typedChar: Char?, keyCode: InputCode) =
         when {
-            keyCode.value == InputCode.KEY_ESCAPE.value || KeyboardManager.checkIsInventoryClosure(keyCode) ->
+            keyCode == InputCode.KEY_ESCAPE || KeyboardManager.checkIsInventoryClosure(keyCode) ->
                 if (currentlyEditing) exitEditMode() else onClose()
 
-            keyCode.value == InputCode.KEY_TAB.value && currentlyEditing ->
+            keyCode == InputCode.KEY_TAB && currentlyEditing ->
                 activeInput = if (activeInput === phraseInput) replacementInput else phraseInput
 
-            (keyCode.value == InputCode.KEY_RETURN.value || keyCode.value == InputCode.KEY_NUMPADENTER.value) && currentlyEditing ->
+            (keyCode == InputCode.KEY_RETURN || keyCode == InputCode.KEY_NUMPADENTER) && currentlyEditing ->
                 exitEditMode()
 
             else -> {}

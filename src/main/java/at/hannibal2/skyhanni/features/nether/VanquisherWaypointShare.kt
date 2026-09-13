@@ -30,6 +30,9 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.renderBeaconBeam
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.component3
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -146,7 +149,7 @@ object VanquisherWaypointShare {
     fun onKeyPressEvent(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (MinecraftCompat.screen != null) return
-        if (event.isPressed(config.keybindSharing)) sendSpawn()
+        if (event.keyCode == config.keybindSharing) sendSpawn()
     }
 
     @HandleEvent

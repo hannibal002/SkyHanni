@@ -27,6 +27,7 @@ public abstract class MixinKeyboardHandler {
 
         // Don't send key events if REI search bar is selected
         if (ReiCompat.searchHasFocus()) return;
+        var inputKey = InputCode.fromValue(key);
 
         /*
          * action = 0: Key released
@@ -44,13 +45,13 @@ public abstract class MixinKeyboardHandler {
         // there is also an onChar method we could mixin to and use for typing fields and replace TextInput.isActive() with that somehow
         // the extension functions such as isActive() and isKeyHeld() still work from keyboard manager
         // this only replaces the posting of events
-        if (action == 0) new KeyUpEvent(key).post();
+        if (action == 0) new KeyUpEvent(inputKey).post();
         if (action == 1) {
-            new KeyDownEvent(key).post();
+            new KeyDownEvent(inputKey).post();
             // on 1.21 it takes like 1 full second before the key press event will get posted so im doing it here
-            new KeyPressEvent(key).post();
+            new KeyPressEvent(inputKey).post();
         }
-        if (action == 2) new KeyPressEvent(key).post();
+        if (action == 2) new KeyPressEvent(inputKey).post();
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"))
