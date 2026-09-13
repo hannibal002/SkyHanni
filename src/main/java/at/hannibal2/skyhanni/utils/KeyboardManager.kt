@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import com.mojang.blaze3d.platform.InputConstants
+import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
@@ -164,15 +165,8 @@ object KeyboardManager {
     fun KeyMapping.isKeyClicked(): Boolean = key.isKeyClicked()
     fun InputCode.isKeyClicked(): Boolean = key.isKeyClicked()
 
-    fun getKeyName(key: InputConstants.Key): String =
-        if (key == InputConstants.UNKNOWN) {
-            "NONE"
-        } else {
-            val displayName = key.displayName
-            displayName.tryCollapseToString() ?: displayName.string
-        }
-
-    fun getKeyName(keyCode: InputCode): String = getKeyName(keyCode.key)
+    // TODO: Use The type of the key to determine if it is a mouse button or keyboard key, and use the appropriate method to get the name.
+    fun getKeyName(key: InputConstants.Key): String = IMinecraft.getInstance().getKeyName(key.value).text
 
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
         processor.registerConfigEditor(ConfigEditorKeyMapping::class.java) { option, annotation ->
