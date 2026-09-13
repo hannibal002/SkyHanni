@@ -53,7 +53,7 @@ data class EliteFeastData(
 ) {
     val next: Map<String, SimpleTimeMark?> = _next.mapValues { it.value?.let(SimpleTimeMark::fromUnixSeconds) }
 
-    private val monthEndTime: SimpleTimeMark
+    private val currentMonthEndTime: SimpleTimeMark
         get() {
             val now = SkyBlockTime.now()
             return SkyBlockTime(now.year, now.month + 1, 1).toTimeMark()
@@ -71,12 +71,12 @@ data class EliteFeastData(
     }
 
     fun getActiveDuration(): Duration {
-        if (next.values.all { it == null }) return monthEndTime.timeUntil()
+        if (next.values.all { it == null }) return currentMonthEndTime.timeUntil()
 
         return getDurations()
             .filter(Duration::isPositive)
             .minByOrNull { it.inWholeMilliseconds }
-            ?: monthEndTime.timeUntil()
+            ?: currentMonthEndTime.timeUntil()
     }
 
     fun getCurrentCrops(): List<CropType> {
