@@ -156,7 +156,7 @@ stonecutter parameters {
                 )
             renderpearlApis.forEach { name ->
                 replace("com.mojang.renderpearl.api.$name", "com.mojang.blaze3d.$name")
-                replace("com/mojang/renderpearl/api/${name.slashed}", "com/mojang/blaze3d/${name.slashed}")
+                replace("com/mojang/renderpearl/api/${name.descriptor}", "com/mojang/blaze3d/${name.descriptor}")
             }
 
             val renderpearlRenamedApis = mapOf(
@@ -169,7 +169,7 @@ stonecutter parameters {
             )
             renderpearlRenamedApis.forEach { (old, new) ->
                 replace("com.mojang.renderpearl.api.$old", "com.mojang.blaze3d.$new")
-                replace("com/mojang/renderpearl/api/${old.slashed}", "com/mojang/blaze3d/${new.slashed}")
+                replace("com/mojang/renderpearl/api/${old.descriptor}", "com/mojang/blaze3d/${new.descriptor}")
             }
         }
 
@@ -208,4 +208,4 @@ stonecutter parameters {
     filters.include("**/*.fsh", "**/*.vsh")
 }
 
-private val String.slashed get() = replace(".", "/")
+private val String.descriptor get() = replace(".", "/")
