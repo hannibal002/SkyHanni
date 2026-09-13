@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat

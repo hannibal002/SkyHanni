@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.input.KeyEvent
@@ -153,6 +154,7 @@ enum class InputCode(
         get() = KeyboardManager.getKeyName(key)
 
     fun isKeyHeld(): Boolean = key.isKeyHeld()
+    fun isKeyClicked(): Boolean = key.isKeyClicked()
 
     fun isUnknown(): Boolean = this == UNKNOWN
 

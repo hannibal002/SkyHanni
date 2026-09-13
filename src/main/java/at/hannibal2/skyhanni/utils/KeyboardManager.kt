@@ -161,7 +161,6 @@ object KeyboardManager {
     }
 
     fun KeyMapping.isKeyClicked(): Boolean = key.isKeyClicked()
-    fun InputCode.isKeyClicked(): Boolean = key.isKeyClicked()
 
     // TODO: Use The type of the key to determine if it is a mouse button or keyboard key, and use the appropriate method to get the name.
     fun getKeyName(key: InputConstants.Key): String = IMinecraft.INSTANCE.getKeyName(key.value).text
