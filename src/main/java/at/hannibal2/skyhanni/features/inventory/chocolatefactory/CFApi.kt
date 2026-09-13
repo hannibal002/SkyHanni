@@ -92,7 +92,7 @@ object CFApi {
      */
     private val upgradeLorePattern by patternGroup.pattern(
         "item.lore.upgrade",
-        "§a§l(?:UPGRADE|PROMOTE) §8➜ (?:§7\\\\[(?<nextlevel>\\\\d+)§7] )?(?<upgradename>.*?) ?(?<nextlevelalt>[IVXLCDM]*)\\\$",
+        "§a§l(?:UPGRADE|PROMOTE) §8➜ (?:§7\\[(?<nextlevel>\\d+)§7] )?(?<upgradename>.*?) ?(?<nextlevelalt>[IVXLCDM]*)\$",
     )
 
     /**
