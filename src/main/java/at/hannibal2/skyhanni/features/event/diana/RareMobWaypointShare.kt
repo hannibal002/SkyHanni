@@ -183,7 +183,8 @@ object RareMobWaypointShare {
             // add repo kill switch
             sendRareMob()
         } else {
-            val message = "§l§bYou found a Rare Diana Mob! Click §l§chere §l§bor press §c${config.keyBindShare.displayName} to share the location!"
+            val message = "§l§bYou found a Rare Diana Mob! Click §l§chere §l§bor press " +
+                "§c${config.keyBindShare.displayName} to share the location!"
             ChatUtils.clickableChat(
                 message,
                 onClick = ::sendRareMob,
