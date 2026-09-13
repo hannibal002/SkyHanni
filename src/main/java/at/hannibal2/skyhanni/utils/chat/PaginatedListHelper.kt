@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.utils.compat.hover
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 
-object PaginatedList {
+object PaginatedListHelper {
 
-    fun createDivider(dividerColor: ChatFormatting = ChatFormatting.BLUE) = TextHelper.HYPHEN.fitToChat().style {
+    fun createDivider(dividerColor: ChatFormatting = BLUE) = TextHelper.HYPHEN.fitToChat().style {
         withStrikethrough(true)
         withColor(dividerColor)
     }
@@ -30,7 +30,7 @@ object PaginatedList {
      * @param dividerColor The color of the divider lines.
      * @param formatter A function to format each entry into a Component.
      */
-    fun <T> displayPaginatedList(
+    fun <T> display(
         title: String,
         list: List<T>,
         chatLineId: Int,
@@ -54,7 +54,7 @@ object PaginatedList {
                     if (page > 1) "§6§l<<".asComponent {
                         hover = "§eClick to view page ${page - 1}".asComponent()
                         onClick {
-                            displayPaginatedList(title, list, chatLineId, emptyMessage, page - 1, maxPerPage, dividerColor, formatter)
+                            display(title, list, chatLineId, emptyMessage, page - 1, maxPerPage, dividerColor, formatter)
                         }
                     } else null,
                     " ",
@@ -63,7 +63,7 @@ object PaginatedList {
                     if (page < totalPages) "§6§l>>".asComponent {
                         hover = "§eClick to view page ${page + 1}".asComponent()
                         onClick {
-                            displayPaginatedList(title, list, chatLineId, emptyMessage, page + 1, maxPerPage, dividerColor, formatter)
+                            display(title, list, chatLineId, emptyMessage, page + 1, maxPerPage, dividerColor, formatter)
                         }
                     } else null,
                 ).center(),

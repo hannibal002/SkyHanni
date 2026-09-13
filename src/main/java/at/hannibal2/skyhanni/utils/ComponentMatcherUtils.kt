@@ -67,9 +67,6 @@ object ComponentMatcherUtils {
      */
     inline fun <T> Pattern.findStyledMatcher(span: ComponentSpan, consumer: ComponentMatcher.() -> T) =
         styledMatcher(span).let { if (it.find()) consumer(it) else null }
-
-    fun String.applyFormattingFrom(original: ComponentSpan): Component =
-        asComponent { style = original.sampleStyleAtStart() }
 }
 
 /**

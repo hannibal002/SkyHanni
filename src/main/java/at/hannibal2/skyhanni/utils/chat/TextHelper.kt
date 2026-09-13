@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.chat
 
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -66,6 +67,9 @@ object TextHelper {
     fun Component.prefix(prefix: String): Component = join(prefix, this)
     fun Component.suffix(suffix: String): Component = join(this, suffix)
     fun Component.wrap(prefix: String, suffix: String) = this.prefix(prefix).suffix(suffix)
+
+    fun String.applyFormattingFrom(original: ComponentSpan): Component =
+        asComponent { style = original.sampleStyleAtStart() }
 
     fun String.applyFormattingFrom(original: Component): Component =
         asComponent { style = original.style }
@@ -178,21 +182,21 @@ object TextHelper {
 
     // TODO remove this deprecated alias in November 2026
     @Deprecated(
-        "Moved to PaginatedList",
+        "Moved to PaginatedListHelper",
         ReplaceWith(
-            "PaginatedList.createDivider(dividerColor)",
-            "at.hannibal2.skyhanni.utils.chat.PaginatedList",
+            "PaginatedListHelper.createDivider(dividerColor)",
+            "at.hannibal2.skyhanni.utils.chat.PaginatedListHelper",
         ),
     )
-    fun createDivider(dividerColor: ChatFormatting = ChatFormatting.BLUE) =
-        PaginatedList.createDivider(dividerColor)
+    fun createDivider(dividerColor: ChatFormatting = BLUE) =
+        PaginatedListHelper.createDivider(dividerColor)
 
     // TODO remove this deprecated alias in November 2026
     @Deprecated(
-        "Moved to PaginatedList",
+        "Moved to PaginatedListHelper",
         ReplaceWith(
-            "PaginatedList.displayPaginatedList(title, list, chatLineId, emptyMessage, currentPage, maxPerPage, dividerColor, formatter)",
-            "at.hannibal2.skyhanni.utils.chat.PaginatedList",
+            "PaginatedListHelper.display(title, list, chatLineId, emptyMessage, currentPage, maxPerPage, dividerColor, formatter)",
+            "at.hannibal2.skyhanni.utils.chat.PaginatedListHelper",
         ),
     )
     fun <T> displayPaginatedList(
@@ -202,9 +206,9 @@ object TextHelper {
         emptyMessage: String,
         currentPage: Int = 1,
         maxPerPage: Int = 15,
-        dividerColor: ChatFormatting = ChatFormatting.BLUE,
+        dividerColor: ChatFormatting = BLUE,
         formatter: (T) -> Component,
-    ): Unit = PaginatedList.displayPaginatedList(
+    ): Unit = PaginatedListHelper.display(
         title, list, chatLineId, emptyMessage, currentPage, maxPerPage, dividerColor, formatter,
     )
 

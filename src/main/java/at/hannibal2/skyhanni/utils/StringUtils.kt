@@ -311,7 +311,7 @@ object StringUtils {
     fun replaceIfNeeded(original: Component, newText: String): Component? =
         ChatComponentUtils.replaceIfNeeded(original, newText)
 
-    // TODO remove in November 2026
+    // TODO remove this deprecated alias in November 2026
     @Deprecated(
         "Moved to ChatComponentUtils",
         ReplaceWith(
@@ -324,7 +324,7 @@ object StringUtils {
         newText: T,
     ): T? = ChatComponentUtils.replaceIfNeeded(original, newText)
 
-    // TODO remove in November 2026
+    // TODO remove this deprecated alias in November 2026
     @Deprecated(
         "Moved to ChatComponentUtils",
         ReplaceWith(
@@ -365,14 +365,14 @@ object StringUtils {
 
     // TODO remove this deprecated alias in November 2026
     @Deprecated(
-        "Moved to ComponentMatcherUtils",
+        "Moved to TextHelper",
         ReplaceWith(
             "this.applyFormattingFrom(original)",
-            "at.hannibal2.skyhanni.utils.ComponentMatcherUtils.applyFormattingFrom",
+            "at.hannibal2.skyhanni.utils.chat.TextHelper.applyFormattingFrom",
         ),
     )
     fun String.applyFormattingFrom(original: ComponentSpan): Component =
-        with(ComponentMatcherUtils) { applyFormattingFrom(original) }
+        with(TextHelper) { applyFormattingFrom(original) }
 
     // TODO remove this deprecated alias in November 2026
     @Deprecated(
