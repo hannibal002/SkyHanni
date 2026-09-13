@@ -47,6 +47,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
+private const val CHOCOLATE_FACTORY_SHORTCUT_SLOT = 50
+
 @SkyHanniModule
 object CFApi {
     private val chromaEnabled get() = ChromaManager.config.enabled.get()
@@ -165,7 +167,7 @@ object CFApi {
 
             if (namePatterns.hoppityInventoryNamePattern.matches(it)) {
                 if (namePatterns.hoppityChocolateFactoryShortcutNamePattern.matches(
-                        InventoryUtils.getItemAtSlotIndex(50)?.cleanName)) {
+                        InventoryUtils.getItemAtSlotIndex(CHOCOLATE_FACTORY_SHORTCUT_SLOT)?.cleanName)) {
                     return@InventoryDetector true
                 }
             }
