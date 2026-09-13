@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
-import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -130,7 +129,7 @@ object VisitorRewardWarning {
         val loss = visitor.totalPrice!! - visitor.totalReward!!
         val formattedLoss = loss.absoluteValue.shortFormat()
         blockedToolTip.add(blockDescription(blockReason, pricePerCopper, loss, formattedLoss))
-        blockedToolTip.add("  §7(Bypass by holding ${KeyboardManager.getKeyName(config.bypassKey)})")
+        blockedToolTip.add("  §7(Bypass by holding ${config.bypassKey.displayName})")
 
         visitor.blockedLore = blockedToolTip
     }

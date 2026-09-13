@@ -148,6 +148,9 @@ enum class InputCode(
     val value: Int
         get() = key.value
 
+    val displayName: String
+        get() = KeyboardManager.getKeyName(key)
+
     override fun toString(): String = key.value.toString()
 
     fun isUnknown(): Boolean = this == UNKNOWN

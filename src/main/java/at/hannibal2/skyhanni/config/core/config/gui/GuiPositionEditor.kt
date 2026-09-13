@@ -123,7 +123,7 @@ class GuiPositionEditor(
             "",
             "§eRight-Click to open associated config options!",
             "§eUse Scroll-Wheel to resize!",
-            "§e${KeyboardManager.getKeyName(config.keyBindReset)} to reset to default position!",
+            "§e${config.keyBindReset.displayName} to reset to default position!",
         )
     }
 

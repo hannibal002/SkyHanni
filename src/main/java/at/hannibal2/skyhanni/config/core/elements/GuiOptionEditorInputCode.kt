@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.core.elements
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.InputCode
-import at.hannibal2.skyhanni.utils.KeyboardManager
 import io.github.notenoughupdates.moulconfig.GuiTextures
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import io.github.notenoughupdates.moulconfig.common.KeyboardConstants.escape
@@ -44,7 +43,7 @@ class GuiOptionEditorInputCode(option: ProcessedOption, defaultInputCode: InputC
 
                     renderContext.drawTexturedRect(GuiTextures.BUTTON, (width / 6 - 24).toFloat(), (height - 7 - 14).toFloat(), 48f, 16f)
 
-                    val keyName = KeyboardManager.getKeyName(option.get() as InputCode).asStructuredText()
+                    val keyName = (option.get() as InputCode).displayName.asStructuredText()
                     val text = if (editingKeycode) StructuredText.of("> ").append(keyName).append(" <") else keyName
                     renderContext.drawStringCenteredScaledMaxWidth(
                         text,

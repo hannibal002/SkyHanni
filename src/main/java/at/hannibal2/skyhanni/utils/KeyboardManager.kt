@@ -166,8 +166,7 @@ object KeyboardManager {
     fun InputCode.isKeyClicked(): Boolean = key.isKeyClicked()
 
     // TODO: Use The type of the key to determine if it is a mouse button or keyboard key, and use the appropriate method to get the name.
-    fun getKeyName(key: InputConstants.Key): String = IMinecraft.getInstance().getKeyName(key.value).text
-    fun getKeyName(key: InputCode): String = getKeyName(key.key)
+    fun getKeyName(key: InputConstants.Key): String = IMinecraft.INSTANCE.getKeyName(key.value).text
 
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
         processor.registerConfigEditor(ConfigEditorKeyMapping::class.java) { option, annotation ->
