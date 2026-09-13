@@ -166,8 +166,8 @@ object CFApi {
 
             if (namePatterns.hoppityInventoryNamePattern.matches(it)) {
                 if (namePatterns.hoppityChocolateFactoryShortcutNamePattern.matches(
-                        InventoryUtils.getItemAtSlotIndex(CHOCOLATE_FACTORY_SHORTCUT_SLOT)?.cleanName)
-                    ) {
+                        InventoryUtils.getItemAtSlotIndex(CHOCOLATE_FACTORY_SHORTCUT_SLOT)?.cleanName
+                )) {
                     return@InventoryDetector true
                 }
             }
