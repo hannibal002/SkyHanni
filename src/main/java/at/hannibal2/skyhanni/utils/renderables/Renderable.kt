@@ -751,7 +751,6 @@ interface Renderable {
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),
             velocity: Double = 2.0,
-            button: Int? = null,
             bypassChecks: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
@@ -775,7 +774,6 @@ interface Renderable {
                 0,
                 virtualHeight - height + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
                 velocity,
-                button,
             )
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
@@ -845,7 +843,6 @@ interface Renderable {
                 0,
                 virtualHeight - height + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
                 velocity,
-                button,
             )
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {

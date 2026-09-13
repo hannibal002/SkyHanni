@@ -14,7 +14,7 @@ import kotlin.math.sign
  */
 object MouseCompat {
 
-    const val NUMBER_OF_MOUSE_BUTTONS = 6
+    const val NUMBER_OF_MOUSE_BUTTONS = 8
 
     @JvmStatic
     var deltaMouseX = 0.0
@@ -40,16 +40,12 @@ object MouseCompat {
 
     private val mouse by lazy { Minecraft.getInstance().mouseHandler }
 
-    fun isMouseButton(button: Int) = button in 0 until NUMBER_OF_MOUSE_BUTTONS
-
     fun isButtonDown(button: Int): Boolean {
-        return isMouseButton(button) && buttonStates[button]
+        return buttonStates[button]
     }
 
-    fun setButtonState(button: Int, down: Boolean) {
-        if (isMouseButton(button)) {
-            buttonStates[button] = down
-        }
+    private fun setButtonState(button: Int, down: Boolean) {
+        buttonStates[button] = down
     }
 
     fun getScrollDelta(): Int {

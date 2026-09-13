@@ -134,7 +134,7 @@ object UpdateKeybinds {
         for (keybind in keybinds) {
             event.transform(147, keybind) { element ->
                 val oldCode = element.asInt
-                val type = if (MouseCompat.isMouseButton(oldCode)) InputConstants.Type.MOUSE else InputConstants.Type.KEYSYM
+                val type = if (oldCode in 0 until MouseCompat.NUMBER_OF_MOUSE_BUTTONS) InputConstants.Type.MOUSE else InputConstants.Type.KEYSYM
                 val newStringName = type.getOrCreate(oldCode).name
                 JsonPrimitive(newStringName)
             }

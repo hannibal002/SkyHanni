@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -49,7 +51,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
             DrawContextUtils.translate(l + 0.0, t + 0.0)
             DrawContextUtils.translate(5.0, 5.0 - scroll)
             val offsetMouseX = mouseX - l
-            val isMouseButtonDown = offsetMouseX in 0..w && mouseY in t..(t + h) && MouseCompat.isButtonDown(0)
+            val isMouseButtonDown = offsetMouseX in 0..w && mouseY in t..(t + h) && InputCode.LEFT_MOUSE.isKeyHeld()
             var offsetMouseY = mouseY - (t - scroll).toInt() - 5
 
             for (msg in history) {

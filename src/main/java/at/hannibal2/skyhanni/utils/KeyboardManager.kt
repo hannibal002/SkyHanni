@@ -26,8 +26,8 @@ object KeyboardManager {
     @HandleEvent
     private fun onGuiOpen(event: GuiScreenOpenEvent) {
         if (event.gui != null) return
-        if (InputCode.KEY_RETURN.isKeyHeld()) lockedKeys.add(InputCode.KEY_RETURN.value)
-        if (InputCode.KEY_NUMPADENTER.isKeyHeld()) lockedKeys.add(InputCode.KEY_NUMPADENTER.value)
+        if (InputCode.KEY_RETURN.isKeyHeld()) lockedKeys.add(InputCode.KEY_RETURN.key)
+        if (InputCode.KEY_NUMPADENTER.isKeyHeld()) lockedKeys.add(InputCode.KEY_NUMPADENTER.key)
     }
 
     /**
@@ -119,7 +119,7 @@ object KeyboardManager {
     // and in renderable calls have time to react first, and lock this key press event properly.
     fun KeyMapping.isActive(): Boolean {
         try {
-            if (key.value.isKeyHeld()) return true
+            if (key.isKeyHeld()) return true
         } catch (e: IndexOutOfBoundsException) {
             ErrorManager.logErrorWithData(
                 e,
@@ -131,36 +131,38 @@ object KeyboardManager {
         return isDown || consumeClick()
     }
 
-    fun KeyMapping.isKeyHeld(): Boolean = key.value.isKeyHeld()
+    fun KeyMapping.isKeyHeld(): Boolean = key.isKeyHeld()
 
-    fun InputCode.isKeyHeld(): Boolean = value.isKeyHeld()
+    fun InputCode.isKeyHeld(): Boolean = key.isKeyHeld()
 
-    fun Int.isKeyHeld(): Boolean = when {
-        this < InputCode.UNKNOWN.value -> ErrorManager.skyHanniError(
-            "Error while checking if a key is pressed. Key code is invalid: $this",
-        )
-
-        this == InputCode.UNKNOWN.value -> false
-        MouseCompat.isMouseButton(this) -> MouseCompat.isButtonDown(this)
-        else -> InputConstants.isKeyDown(Minecraft.getInstance().window, this)
+    fun InputConstants.Key.isKeyHeld(): Boolean {
+        val value = this.value
+        return when {
+            value < InputCode.UNKNOWN.value -> ErrorManager.skyHanniError(
+                "Error while checking if a key is pressed. Key code is invalid: $this",
+            )
+            value == InputCode.UNKNOWN.value -> false
+            type == MOUSE -> MouseCompat.isButtonDown(value)
+            else -> InputConstants.isKeyDown(Minecraft.getInstance().window, value)
+        }
     }
 
-    private val lockedKeys = mutableSetOf<Int>()
+    private val lockedKeys = mutableSetOf<InputConstants.Key>()
 
     /**
      * Can only be used once per click, since the function locks itself until the key is no longer
      * held. Do not use in [KeyPressEvent], since it won't be unlocked again – use [KeyDownEvent]
      * instead.
      */
-    fun Int.isKeyClicked(): Boolean = if (isKeyHeld()) {
+    fun InputConstants.Key.isKeyClicked(): Boolean = if (isKeyHeld()) {
         lockedKeys.add(this)
     } else {
         lockedKeys.remove(this)
         false
     }
 
-    fun KeyMapping.isKeyClicked(): Boolean = key.value.isKeyClicked()
-    fun InputCode.isKeyClicked(): Boolean = value.isKeyClicked()
+    fun KeyMapping.isKeyClicked(): Boolean = key.isKeyClicked()
+    fun InputCode.isKeyClicked(): Boolean = key.isKeyClicked()
 
     fun getKeyName(key: InputConstants.Key): String =
         if (key == InputConstants.UNKNOWN) {
