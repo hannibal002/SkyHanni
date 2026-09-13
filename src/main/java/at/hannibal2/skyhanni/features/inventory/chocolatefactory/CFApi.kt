@@ -19,6 +19,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -137,6 +139,8 @@ object CFApi {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         DelayedRun.runNextTick {
+            if (event.inventoryName == "Hoppity" && InventoryUtils.getItemAtSlotIndex(50)?.cleanName != "Chocolate Factory") return@runNextTick
+
             if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
                 if (config.enabled) {
                     chocolateFactoryPaused = true
