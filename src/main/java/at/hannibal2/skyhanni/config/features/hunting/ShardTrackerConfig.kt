@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.config.features.hunting
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.config.ConfigKeybind
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.hunting.ShardTrackerDisplay
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.OSUtils.openBrowser
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -25,8 +25,8 @@ class ShardTrackerConfig {
 
     @Expose
     @ConfigOption(name = "Select Shard Key", desc = "Press this key in your hunting box to track the hovered shard.")
-    @ConfigEditorKeyMapping
-    var selectShardKeybind = ConfigKeybind()
+    @ConfigEditorKeymapping
+    var selectShardKeybind = InputCode.UNKNOWN
 
     @ConfigOption(
         name = "SkyShards",

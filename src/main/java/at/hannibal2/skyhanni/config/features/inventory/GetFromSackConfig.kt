@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.config.ConfigKeybind
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -49,8 +49,8 @@ class GetFromSackConfig {
         name = "GfS Keybind",
         desc = "Fills your inventory with the item you are hovering over."
     )
-    @ConfigEditorKeyMapping
-    var keybind = ConfigKeybind()
+    @ConfigEditorKeymapping
+    var keybind = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(
@@ -58,6 +58,6 @@ class GetFromSackConfig {
         desc = "While held, marks every item in your inventory that can reach its next craft step. " +
             "Click one to grab the missing amount from your sacks."
     )
-    @ConfigEditorKeyMapping
-    var compactorKeybind = ConfigKeybind()
+    @ConfigEditorKeymapping
+    var compactorKeybind = InputCode.UNKNOWN
 }

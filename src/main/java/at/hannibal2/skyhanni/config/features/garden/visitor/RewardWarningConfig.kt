@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.config.ConfigKeybind
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -34,8 +34,8 @@ class RewardWarningConfig {
 
     @Expose
     @ConfigOption(name = "Bypass Key", desc = "Hold this key to bypass the Prevent Refusing feature.")
-    @ConfigEditorKeyMapping(defaultKey = KEY_LCONTROL)
-    var bypassKey = ConfigKeybind(KEY_LCONTROL)
+    @ConfigEditorKeymapping(defaultKey = KEY_LCONTROL)
+    var bypassKey = InputCode.KEY_LCONTROL
 
     @Expose
     @ConfigOption(name = "Items", desc = "Warn for these reward item visitor drops.")

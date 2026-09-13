@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.config.ConfigKeybind
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.features.misc.update.SkyHanniUpdateSource
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -71,16 +71,16 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
-    @ConfigEditorKeyMapping
-    var copyInternalName = ConfigKeybind()
+    @ConfigEditorKeymapping
+    var copyInternalName = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(
         name = "Copy Cosmetics Skull Data",
         desc = "Copies the cosmetic data for skins with different variants but no animations."
     )
-    @ConfigEditorKeyMapping
-    var copyCosmeticsSkullData = ConfigKeybind()
+    @ConfigEditorKeymapping
+    var copyCosmeticsSkullData = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Show NPC Price", desc = "Show NPC price in item lore.")
@@ -114,13 +114,13 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(name = "Copy Item Data", desc = "Copies item NBT data on key press in a GUI to clipboard.")
-    @ConfigEditorKeyMapping
-    var copyItemData = ConfigKeybind()
+    @ConfigEditorKeymapping
+    var copyItemData = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Copy Compressed Item Data", desc = "Copies compressed item NBT data on key press in a GUI to clipboard.")
-    @ConfigEditorKeyMapping
-    var copyItemDataCompressed = ConfigKeybind()
+    @ConfigEditorKeymapping
+    var copyItemDataCompressed = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(
@@ -189,8 +189,8 @@ class DebugConfig {
         name = "Bypass Advanced Tab List",
         desc = "The Advanced Player Tab list is disabled while pressing this hotkey.",
     )
-    @ConfigEditorKeyMapping
-    var bypassAdvancedPlayerTabList = ConfigKeybind()
+    @ConfigEditorKeymapping
+    var bypassAdvancedPlayerTabList = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Ore Event Messages", desc = "Shows debug messages every time the Ore Event happens.")

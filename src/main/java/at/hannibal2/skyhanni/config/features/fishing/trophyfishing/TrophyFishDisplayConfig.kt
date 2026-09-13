@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.config.features.fishing.trophyfishing
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.config.ConfigKeybind
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -37,8 +37,8 @@ class TrophyFishDisplayConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "")
-    @ConfigEditorKeyMapping
-    var keybind = ConfigKeybind()
+    @ConfigEditorKeymapping
+    var keybind = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.config.ConfigKeybind
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -16,6 +15,7 @@ import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedCon
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.features.garden.farming.NoBreak.NoBreakItem
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -230,8 +230,8 @@ class GardenConfig {
         desc = "Show Garden plot borders when pressing this key " +
             "(similar to how F3 + G shows chunk borders).",
     )
-    @ConfigEditorKeyMapping
-    var plotBorderKey = ConfigKeybind()
+    @ConfigEditorKeymapping
+    var plotBorderKey = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(

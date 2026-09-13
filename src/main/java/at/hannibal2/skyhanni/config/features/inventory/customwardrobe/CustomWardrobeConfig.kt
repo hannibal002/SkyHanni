@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.inventory.customwardrobe
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.config.ConfigKeybind
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -56,8 +56,8 @@ class CustomWardrobeConfig {
 
     @Expose
     @ConfigOption(name = "Tooltip Keybind", desc = "Press this key to show the item tooltip.")
-    @ConfigEditorKeyMapping(defaultKey = KEY_LSHIFT)
-    var tooltipKeybind = ConfigKeybind(KEY_LSHIFT)
+    @ConfigEditorKeymapping(defaultKey = KEY_LSHIFT)
+    var tooltipKeybind = InputCode.KEY_LSHIFT
 
     @Expose
     @ConfigOption(name = "Show REI Items", desc = "Enables showing the REI item list from Firmament while in the custom wardrobe.")

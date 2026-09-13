@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.config.features.misc
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.config.ConfigKeybind
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -28,8 +28,8 @@ class EstimatedItemValueConfig {
 
     @Expose
     @ConfigOption(name = "Hotkey", desc = "Press this key to show the Estimated Item Value.")
-    @ConfigEditorKeyMapping
-    var hotkey = ConfigKeybind()
+    @ConfigEditorKeymapping
+    var hotkey = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Show Always", desc = "Ignore the hotkey and always display the item value.")

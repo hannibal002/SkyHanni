@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.config.ConfigKeybind
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -25,6 +25,6 @@ class TrackCommandConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "Press this keybind to start/stop tracking.")
-    @ConfigEditorKeyMapping
-    var toggleKeybind = ConfigKeybind()
+    @ConfigEditorKeymapping
+    var toggleKeybind = InputCode.UNKNOWN
 }

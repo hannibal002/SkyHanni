@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.json
 
-import at.hannibal2.skyhanni.config.ConfigKeybind
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
@@ -217,7 +216,6 @@ enum class SkyHanniTypeAdapters(
         },
     ),
     SESSION_UPTIME(SessionUptime::class.java, SessionUptimeTypeAdapter()),
-    CONFIG_KEYBIND(ConfigKeybind::class.java, ConfigKeybind.typeAdapter),
     COMPONENT(
         Component::class.java,
         object : TypeAdapter<Component>() {

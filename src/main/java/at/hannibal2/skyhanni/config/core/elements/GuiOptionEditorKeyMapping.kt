@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.core.elements
 
-import at.hannibal2.skyhanni.config.ConfigKeybind
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.GuiTextures
@@ -23,10 +22,6 @@ import org.lwjgl.glfw.GLFW
 // Refrence: https://github.com/AzureAaron/Dandelion/blob/master/src/main/java/net/azureaaron/dandelion/impl/moulconfig/editor/DandelionKeyMappingEditor.java
 class GuiOptionEditorKeyMapping(option: ProcessedOption, keyMapping: KeyMapping) : ComponentEditor(option) {
     private val component: GuiComponent = this.wrapComponent(KeyMappingComponent(keyMapping))
-
-    init {
-        (option.get() as ConfigKeybind).bind(option.path)
-    }
 
     override fun getDelegate(): GuiComponent {
         return this.component

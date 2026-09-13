@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
+import at.hannibal2.skyhanni.config.ConfigEditorKeymapping
 import at.hannibal2.skyhanni.config.core.elements.GuiOptionEditorKeyMapping
 import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
@@ -164,7 +164,7 @@ object KeyboardManager {
     )
 
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
-        processor.registerConfigEditor(ConfigEditorKeyMapping::class.java) { option, annotation ->
+        processor.registerConfigEditor(ConfigEditorKeymapping::class.java) { option, annotation ->
             val mapping = getOrCreateKeyMapping(
                 option,
                 annotation.defaultKey.value,
@@ -180,7 +180,7 @@ object KeyboardManager {
             createKeyMapping(option, defaultKey)
         }
 
-    private fun createKeyMapping(option: ProcessedOption, defaultKey: Int): KeyMapping {
+    fun createKeyMapping(option: ProcessedOption, defaultKey: Int): KeyMapping {
         val keyValue = option.get() as Int
         val type = if (keyValue in 0 until MouseCompat.NUMBER_OF_MOUSE_BUTTONS) InputConstants.Type.MOUSE else InputConstants.Type.KEYSYM
         val displayName = getDisplayNameForKeyMapping(option)
@@ -223,8 +223,6 @@ object KeyboardManager {
             .split(" ")
             .joinToString(" ") { it.replaceFirstChar(Char::uppercase) }
     }
-
-    fun getKeyMapping(keyMappingPath: String) = keyMappingMap[keyMappingPath]
 
     object WasdInputMatrix : Iterable<KeyMapping> {
         operator fun contains(keyBinding: KeyMapping) = when (keyBinding) {
