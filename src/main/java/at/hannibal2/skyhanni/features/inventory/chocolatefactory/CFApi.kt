@@ -64,13 +64,18 @@ object CFApi {
         "Hoppity|Chocolate Factory Milestones",
     )
 
+    private val hoppityInventorySecondaryCheck by patternGroup.pattern(
+        "item.name.chocolatefactoory",
+        "Hoppity|Chocolate Factory Milestones",
+    )
+
     /**
      * REGEX-TEST: §a§lPROMOTE §8➜ §7[208§7] §dExecutive
      * REGEX-TEST: §a§lUPGRADE §8➜ §aRabbit Barn CCXXI
      */
     private val upgradeLorePattern by patternGroup.pattern(
         "item.lore.upgrade",
-        "§a§l(?:UPGRADE|PROMOTE) §8➜ (?:§7\\[(?<nextlevel>\\d+)§7] )?(?<upgradename>.*?) ?(?<nextlevelalt>[IVXLCDM]*)\$",
+        "Chocolate Factory",
     )
 
     /**
@@ -139,7 +144,8 @@ object CFApi {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         DelayedRun.runNextTick {
-            if (event.inventoryName == "Hoppity" && InventoryUtils.getItemAtSlotIndex(50)?.cleanName != "Chocolate Factory") return@runNextTick
+            if (event.inventoryName == "Hoppity" &&
+                InventoryUtils.getItemAtSlotIndex(50)?.cleanName != "Chocolate Factory") return@runNextTick
 
             if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
                 if (config.enabled) {
