@@ -53,14 +53,14 @@ object FusionKeybinds {
 
         config.repeatFusionKeybind.afterChange {
             if (!this.isUnknown() && this == confirmFusionKeybind) {
-                config.repeatFusionKeybind.get().value = InputCode.UNKNOWN.value
+                config.repeatFusionKeybind.get().value = InputCode.UNKNOWN
                 warnDuplicateKeybinds()
             }
         }
 
         config.confirmFusionKeybind.afterChange {
             if (!this.isUnknown() && this == repeatFusionKeybind) {
-                config.confirmFusionKeybind.get().value = InputCode.UNKNOWN.value
+                config.confirmFusionKeybind.get().value = InputCode.UNKNOWN
                 warnDuplicateKeybinds()
             }
         }
