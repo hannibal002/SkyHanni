@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import net.minecraft.resources.Identifier
 
 @SkyHanniModule
 object EggAchievement {
-
     private val eggPatternPattern by AchievementManager.group.pattern(
         "laid-egg",
         "You laid an egg!",
@@ -20,10 +20,10 @@ object EggAchievement {
     private const val EGG_ACHIEVEMENT = "egg layer"
 
     @HandleEvent
-    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+    private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             name = "Lay 25 Eggs".asComponent(),
-            description = TextHelper.createAtlasSprite("item/egg", "items", "minecraft"),
+            description = TextHelper.createAtlasSprite("items", Identifier.withDefaultNamespace("item/egg")),
             userLuckAmount = 1f,
             secret = true,
             tiers = listOf(25),
@@ -32,7 +32,7 @@ object EggAchievement {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (eggPatternPattern.matches(event.cleanMessage)) {
             val achievement = AchievementManager.getAchievement(EGG_ACHIEVEMENT)
             AchievementManager.updateTieredAchievement(EGG_ACHIEVEMENT, achievement.data.progress + 1)

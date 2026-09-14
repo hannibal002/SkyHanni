@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.achievements
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
@@ -10,12 +11,11 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 
 @SkyHanniModule
 object PleadAchievement {
-
-    private val pleadComponent = TextHelper.createAtlasSprite("plead")
+    private val pleadComponent = TextHelper.createAtlasSprite("gui", SkyHanniMod.id("plead"))
     private const val PLEAD_ACHIEVEMENT = "Plead"
 
     @HandleEvent
-    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+    private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             name = pleadComponent,
             description = pleadComponent,
@@ -26,10 +26,9 @@ object PleadAchievement {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: PlayerAllChatEvent.Allow) {
+    private fun onChat(event: PlayerAllChatEvent.Allow) {
         if (!event.author.contains(PlayerUtils.getName())) return
         if (!event.cleanMessage.contains("plead")) return
         AchievementManager.completeAchievement(PLEAD_ACHIEVEMENT)
-
     }
 }

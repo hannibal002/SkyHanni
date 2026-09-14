@@ -27,7 +27,6 @@ import java.util.Optional
 
 @Suppress("TooManyFunctions")
 object TextHelper {
-
     val NEWLINE = "\n".asComponent()
     val HYPHEN = "-".asComponent()
     val SPACE = " ".asComponent()
@@ -266,9 +265,8 @@ object TextHelper {
         return newComponents.takeIf { it.isNotEmpty() }
     }
 
-    fun createAtlasSprite(sprite: String, atlas: String = "gui", namespace: String = "skyhanni"): Component {
+    fun createAtlasSprite(atlas: String, texture: Identifier): Component {
         val atlasId = Identifier.withDefaultNamespace(atlas)
-        val texture = Identifier.fromNamespaceAndPath(namespace, sprite)
         return Component.`object`(AtlasSprite(atlasId, texture)).withColor(ChatFormatting.WHITE)
     }
 
