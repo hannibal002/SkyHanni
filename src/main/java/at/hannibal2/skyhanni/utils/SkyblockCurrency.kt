@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -36,6 +35,13 @@ enum class SkyblockCurrency(
     val color: LorenzColor,
     val coinValue: Double? = null,
     private val loreNames: Set<String>,
+    /** Set when [displayName] is the plural, as with "Bits". */
+    private val singularName: String? = null,
+    /**
+     * Set when [displayName] is the singular and its plural is not an s away, as with "Chocolate".
+     * Never set together with [singularName], [displayName] always covers the other form.
+     */
+    private val pluralName: String? = null,
     /** Set when the lore name alone is ambiguous and only unique on one island. */
     private val island: IslandType? = null,
     /** True when the amount belongs to the account instead of the current profile. */
@@ -53,12 +59,14 @@ enum class SkyblockCurrency(
         GOLD,
         coinValue = 1.0,
         loreNames = setOf("coin", "coins", "skyblock coin", "skyblock coins", "skyblock_coin", "skyblock_coins"),
+        singularName = "Coin",
         ownedAmount = { PurseApi.currentPurse.toLong() },
     ),
 
     // Bits Shop from Elisabeth
     BITS(
         "BITS".toInternalName(), "Bits", AQUA, loreNames = setOf("bit", "bits"),
+        singularName = "Bit",
         accountWide = true,
         ownedAmount = { BitsApi.bits.toLong() },
     ),
@@ -66,6 +74,7 @@ enum class SkyblockCurrency(
     // Pesthunter's Wares in Garden
     PESTS(
         "PESTS".toInternalName(), "Pests", DARK_GREEN, loreNames = setOf("pest", "pests"),
+        singularName = "Pest",
         ownedAmount = { getFromStorage() },
     ),
 
@@ -75,12 +84,14 @@ enum class SkyblockCurrency(
         "Chocolate",
         GOLD,
         loreNames = setOf("chocolate"),
+        pluralName = "Chocolate",
         ownedAmount = { ChocolateAmount.CURRENT.chocolate() + ChocolateAmount.chocolateSinceUpdate() },
     ),
 
     // SkyMart in Garden
     COPPER(
         NeuInternalName.SKYBLOCK_COPPER, "Copper", RED, loreNames = setOf("copper"),
+        pluralName = "Copper",
         ownedAmount = { getFromStorage() },
     ),
 
@@ -101,12 +112,14 @@ enum class SkyblockCurrency(
     // Tony's Shop in the Farming Islands
     PELTS(
         "PELTS".toInternalName(), "Pelts", DARK_PURPLE, loreNames = setOf("pelt", "pelts"),
+        singularName = "Pelt",
         ownedAmount = { getFromStorage() },
     ),
 
     // Cosmetics in various shops
     GEMS(
         "GEMS".toInternalName(), "Gems", GREEN, loreNames = setOf("gem", "gems"),
+        singularName = "Gem",
         accountWide = true,
         ownedAmount = { getFromStorage() },
     ),
@@ -114,6 +127,7 @@ enum class SkyblockCurrency(
     // no shop sells for sowdust yet, this only tracks the amount
     SOWDUST(
         "SOWDUST".toInternalName(), "Sowdust", DARK_GREEN, loreNames = setOf("sowdust"),
+        pluralName = "Sowdust",
         ownedAmount = { getFromStorage() },
     ),
 
@@ -126,6 +140,7 @@ enum class SkyblockCurrency(
     // the lore only writes "Tokens", the island is what makes it unambiguous
     KUUDRA_TOKEN(
         "KUUDRA_TOKEN".toInternalName(), "Tokens", DARK_PURPLE, loreNames = setOf("token", "tokens"),
+        singularName = "Token",
         island = KUUDRA_ARENA,
         ownedAmount = { getFromStorage() },
     ),
@@ -160,9 +175,17 @@ enum class SkyblockCurrency(
         ownedAmount = { getFromStorage() },
     ),
 
+    // Grand Bakery from Feast Baker Scott in the Hub, earned by donating Seasonings during a Grand Feast
+    KERNEL(
+        NeuInternalName.SKYBLOCK_KERNEL, "Kernel", GOLD, loreNames = setOf("kernel", "kernels"),
+        ownedAmount = { getFromStorage() },
+    ),
+
     // TODO add these currencies, each one needs a real cost line from its shop first
     //  - North Stars, waiting on the winter event
     //  - Bingo Points, waiting on the bingo event
+    // not missing: essence has a bazaar price and its own map in CurrencyApi, and the powders and
+    // whispers only show up in the perk trees, which NpcTradeApi skips entirely
     ;
 
     val coloredName: String = color.getChatColor() + displayName
@@ -179,7 +202,11 @@ enum class SkyblockCurrency(
     private fun isAvailable(): Boolean = island?.isInIsland() ?: true
 
     /** Formats an amount the way it appears in a cost lore, for example "§b5,000 Bits". */
-    fun formatAmount(amount: Long): String = "${color.getChatColor()}${amount.addSeparators()} $displayName"
+    fun formatAmount(amount: Long): String {
+        // displayName is the plural when a singular is stated, otherwise pluralName, and null appends the s
+        val plural = if (singularName == null) pluralName else displayName
+        return color.getChatColor() + StringUtils.pluralize(amount, singularName ?: displayName, plural, withNumber = true)
+    }
 
     @SkyHanniModule
     companion object {
