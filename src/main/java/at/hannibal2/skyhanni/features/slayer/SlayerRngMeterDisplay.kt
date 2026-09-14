@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonObject
 import net.minecraft.ChatFormatting
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
@@ -282,7 +283,13 @@ object SlayerRngMeterDisplay {
 
                 add(StringRenderable("$itemGoal §7in §e${timesMissing.toInt().addSeparators()} §7bosses!"))
 
-                if (config.coinsPerBoss) addNotNull(addCoinsPerBossLine(itemGoal, goalNeeded, gainPerBoss))
+                if (config.coinsPerBoss) {
+                    SlayerRngMeterToolTipFeatures.coinsPerBossLine(itemGoal, gainPerBoss)?.let { profitLine ->
+                        addNotNull(StringRenderable(profitLine))
+                    } ?: {
+                        add(StringRenderable("§cCouldn't calculate profit/boss!"))
+                    }
+                }
             },
         )
     }
@@ -306,28 +313,6 @@ object SlayerRngMeterDisplay {
         return true
     }
 
-    private fun addCoinsPerBossLine(itemGoal: String, goalNeeded: Long, gainPerBoss: Long): StringRenderable? {
-        val internalName = NeuInternalName.fromItemNameOrNull(itemGoal.removeColor()) ?: return null
-        val slayerType = SlayerApi.activeType ?: return null
-        val slayerTier = SlayerApi.tier
-
-        val (minDrop, maxDrop) = SlayerApi.getItemDropAmountForTier(internalName, slayerTier)
-        val itemPriceMin = SlayerApi.getItemNameAndPrice(internalName, minDrop).second
-        val itemPriceMax = maxDrop?.let { SlayerApi.getItemNameAndPrice(internalName, it).second }
-
-        val bossesNeeded = ceil(goalNeeded.toDouble() / gainPerBoss).toInt().takeIf { it > 0 } ?: return null
-        val spawnCost = slayerType.calculateSpawnCost(slayerTier) ?: return null
-
-        val line = SlayerRngMeterToolTipFeatures.formatProfitPerBossLine(
-            bossesNeeded,
-            spawnCost,
-            itemPriceMin,
-            itemPriceMax,
-        )
-
-        return StringRenderable(line)
-    }
-
     private fun logCalculatingError(storage: ProfileSpecificStorage.SlayerStorage.RngMeterStorage, vararg extra: Pair<String, Any?>) {
         ErrorManager.logErrorStateWithData(
             "Error Calculating Slayer RNG Meter",
@@ -348,7 +333,31 @@ object SlayerRngMeterDisplay {
 
     @HandleEvent
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(140, "#profile.slayerRngMeter", "#profile.slayer.rngMeter")
-    }
+        event.transform(146, "#profile.slayerRngMeter") { element ->
+            val result = JsonObject()
+            element.asJsonObject.asMap().forEach { (boss, oldValues) ->
+                val innerResult = JsonObject()
+                oldValues.asJsonObject.asMap().forEach { (key, oldValue) ->
+                    val primitive = oldValue.asJsonPrimitive
 
+                    when {
+                        primitive.isString -> {
+                            val asString = primitive.asString
+                            innerResult.addProperty(key, if (asString == "?") null else asString)
+                        }
+
+                        primitive.isNumber -> {
+                            val asInt = primitive.asInt
+                            innerResult.addProperty(key, if (asInt == -1) null else asInt)
+                        }
+                    }
+                }
+
+                result.add(boss, innerResult)
+            }
+
+            result
+        }
+        event.move(146, "#profile.slayerRngMeter", "#profile.slayer.rngMeter")
+    }
 }

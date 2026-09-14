@@ -67,8 +67,9 @@ enum class SlayerType(
 
             bonusLevel >= SlayerApi.COST_REDUCTION_LEVEL -> {
                 if (bonusLevel > SlayerApi.COST_REDUCTION_LEVEL) {
-                    ErrorManager.skyHanniError(
-                        "Slayer Bonus Rewards Level is above max level ($bonusLevel)",
+                    ErrorManager.logErrorStateWithData(
+                        "Slayer Bonus Rewards Level is above max level ($bonusLevel).",
+                        "Slayer Bonus Rewards level too high, has it changed?",
                         "Bonus Rewards Level" to bonusLevel,
                     )
                 }
@@ -83,11 +84,11 @@ enum class SlayerType(
         return cost
     }
 
-    fun calculateXPGain(tier: Int, @Suppress("unused") includeAatrox: Boolean = true): Double? {
+    fun calculateXPGain(tier: Int, includeAatrox: Boolean = true): Double? {
         val xpBuff = Perk.SLAYER_XP_BUFF.isActive
         val baseGained = SlayerApi.jsonData?.xpGains?.get(this)?.get(tier) ?: return null
 
-        return baseGained * (if (xpBuff) 1.25 else 1.0)
+        return baseGained * (if (xpBuff && includeAatrox) SlayerApi.jsonData?.aatroxSlayerXPBuffMultiplier ?: 1.0 else 1.0)
     }
 
     companion object {

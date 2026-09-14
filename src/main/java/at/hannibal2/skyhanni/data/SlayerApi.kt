@@ -208,7 +208,7 @@ object SlayerApi {
 
     fun getItemDropAmountForTier(internalName: NeuInternalName, tier: Int): Pair<Int, Int?> {
         val dropAmount = jsonData?.dropAmounts?.get(internalName) ?: return 1 to null
-        val dropAmountForTier = dropAmount[tier]?.split("-")
+        val dropAmountForTier = dropAmount[tier]?.split(regex = "-?".toPattern()).takeIf { !it.isNullOrEmpty() }
 
         val min = dropAmountForTier?.get(0)?.toInt() ?: 1
         val max = dropAmountForTier?.get(1)?.toInt() ?: 1
