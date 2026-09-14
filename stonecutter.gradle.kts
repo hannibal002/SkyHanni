@@ -98,6 +98,17 @@ allprojects {
             }
         }
 
+        // SBIL for compat plugin
+        exclusiveContent {
+            forRepositories(
+                repositories.maven("https://maven.operationpotato.com/releases"),
+                repositories.maven("https://maven.operationpotato.com/snapshots"),
+            )
+            filter {
+                includeGroup("com.operationpotato")
+            }
+        }
+
         // REI for compat plugin
         exclusiveContent {
             forRepository {

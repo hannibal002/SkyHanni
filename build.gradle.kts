@@ -176,6 +176,9 @@ dependencies {
     compileOnly(libs.basicMath)
     "minecraftTestClientRuntimeLibraries"(libs.basicMath)
 
+    compileOnly(libs.skyblockitemlist)
+    "minecraftTestClientRuntimeLibraries"(libs.skyblockitemlist)
+
     // getting clock offset
     shadowImpl(libs.commons.net)
     "minecraftTestClientRuntimeLibraries"(libs.commons.net)

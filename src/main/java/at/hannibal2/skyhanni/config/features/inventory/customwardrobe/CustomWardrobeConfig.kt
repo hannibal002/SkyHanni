@@ -59,8 +59,9 @@ class CustomWardrobeConfig {
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_LEFT_SHIFT)
     var tooltipKeybind: Int = GLFW.GLFW_KEY_LEFT_SHIFT
 
+    // TODO: probably rename this option
     @Expose
-    @ConfigOption(name = "Show REI Items", desc = "Enables showing the REI item list from Firmament while in the custom wardrobe.")
+    @ConfigOption(name = "Show Item List Items", desc = "Enables showing the items in Item Lists while in the custom wardrobe.")
     @ConfigEditorBoolean
     var showReiItems: Boolean = true
 
