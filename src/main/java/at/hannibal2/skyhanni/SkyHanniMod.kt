@@ -143,7 +143,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     val logger: Logger = LogManager.getLogger("SkyHanni")
 
     val dataDir: File by lazy {
-        PlatformUtils.dataDir.resolve(MODID).toFile()
+        PlatformUtils.gameDir.resolve(MODID).toFile()
     }
 
     val configDir: File by lazy {
