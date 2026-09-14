@@ -41,7 +41,7 @@ object PlatformUtils {
     }
 
     val logsDir: Path by lazy {
-        dataDir.resolve("logs")
+        gameDir.resolve("logs")
     }
 
     private val allowedFabricReports = setOf(
