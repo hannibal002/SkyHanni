@@ -10,8 +10,11 @@ import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
  * Fired when a key is pressed or a mouse button is clicked while a container screen is open.
  * Despite the name, this covers mouse input as well.
  *
- * The event carries no information about which input triggered it, so listeners have to check the
- * key or mouse button themselves, for example through `KeyboardManager.isKeyHeld()` or
+ * Listen to this class to receive both, or to [GuiKeyboardKeyPressEvent] or
+ * [GuiMouseButtonPressEvent] to receive only one of the two.
+ *
+ * The event carries no information about which key or button triggered it, so listeners have to
+ * check that themselves, for example through `KeyboardManager.isKeyHeld()` or
  * `KeyboardManager.isKeyClicked()`.
  * Cancelling it stops the screen from handling the input.
  *
@@ -44,7 +47,7 @@ sealed class GuiKeyPressEvent(
      *
      * @param guiContainer The container screen that received the mouse input.
      */
-    @PrimaryFunction("onGuiMouseKeyPress")
+    @PrimaryFunction("onGuiMouseButtonPress")
     class GuiMouseButtonPressEvent(
         guiContainer: SkyHanniGuiContainer,
     ) : GuiKeyPressEvent(guiContainer)
