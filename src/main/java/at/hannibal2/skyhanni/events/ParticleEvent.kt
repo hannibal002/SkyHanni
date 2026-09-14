@@ -9,14 +9,15 @@ import net.minecraft.core.registries.BuiltInRegistries
 
 /**
  * Fired when a particle packet is received from the server.
+ * Notably, this fires only once per packet, not once per spawned particle.
  *
- * Unlike vanilla packet cancellation, canceling this event does not stop other
+ * Unlike vanilla packet cancellation, cancelling this event does not stop other
  * mods from seeing the packet. Instead, SkyHanni records the cancellation and
  * suppresses the particle later in the packet handler, after other mixins have
  * had a chance to process it.
  *
  * Runs on the render thread.
- * Will only fire if the player is in the world
+ * Will only fire if the player is in the world.
  *
  * @param type the particle type
  * @param location the particle spawn location
