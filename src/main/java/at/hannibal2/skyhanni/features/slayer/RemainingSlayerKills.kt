@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -40,7 +39,6 @@ import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object RemainingSlayerKills {
-
     private val config get() = SlayerApi.config.slayerRemainingKills
     private val debugToggle get() = SkyHanniMod.feature.dev.debug.remainingKillsDebug
 
@@ -202,7 +200,7 @@ object RemainingSlayerKills {
             }
         }
 
-        if (NonGodPotEffectDisplay.isActive(NonGodPotEffect.SMOLDERING) && SlayerApi.activeType == SlayerType.INFERNO) {
+        if (NonGodPotEffectDisplay.isActive(SMOLDERING) && SlayerApi.activeType == INFERNO) {
             combatWisdom += 10
         }
 
@@ -234,7 +232,6 @@ object RemainingSlayerKills {
      * https://hypixelskyblock.minecraft.wiki/w/Combat_Wisdom#Notes
      */
     private fun getAdditivelyMultiplicativeValues(): Double {
-
         var additiveWithMultMultipliers = 1.0
 
         val championLevel = (InventoryUtils.getItemInHand()?.getHypixelEnchantments().orEmpty()["champion"] ?: 0) - 1
@@ -333,4 +330,3 @@ object RemainingSlayerKills {
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.display
 }
-
