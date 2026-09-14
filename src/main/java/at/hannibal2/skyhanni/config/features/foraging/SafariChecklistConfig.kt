@@ -7,6 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class SafariChecklistConfig {
 
@@ -25,7 +26,7 @@ class SafariChecklistConfig {
         desc = "Select which Critter Safari shard checklist biomes to show.",
     )
     @ConfigEditorDropdown
-    var runShardChecklistDisplay: ChecklistDisplay = ChecklistDisplay.ONLY_CURRENT
+    val runShardChecklistDisplay: Property<ChecklistDisplay> = Property.of(ChecklistDisplay.ONLY_CURRENT)
 
     @Expose
     @ConfigOption(
@@ -33,7 +34,15 @@ class SafariChecklistConfig {
         desc = "Hide shards already collected during the current Critter Safari run.",
     )
     @ConfigEditorBoolean
-    var hideCollectedRunShards: Boolean = true
+    val hideCollectedRunShards: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(
+        name = "Show Shard Icons",
+        desc = "Display an item icon next to each shard in the checklist.",
+    )
+    @ConfigEditorBoolean
+    val showShardIcons: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigLink(owner = SafariChecklistConfig::class, field = "runShardChecklist")
