@@ -1195,6 +1195,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Mute when all Mineshaft Corpses are found. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5929)
     + Mutes the sounds made from the Organ Donor accessory once all Frozen Corpses in the Mineshaft have been found.
     + Requires Corpse Locator to be enabled.
++ Added Fallen Star Cult Timer. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6521)
+    + Shows the time until the next Cult of the Fallen Star meeting in Dwarven Mines.
+    + By default only visible inside the cult room or while wearing the Fallen Star Helmet. Can be changed to always show.
 
 </details>
 <details open><summary>
