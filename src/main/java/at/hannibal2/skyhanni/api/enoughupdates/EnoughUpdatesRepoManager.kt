@@ -15,7 +15,7 @@ object EnoughUpdatesRepoManager : AbstractRepoManager<NeuRepositoryReloadEvent>(
     override val commonName = "NotEnoughUpdates"
     override val commonShortNameCased = "NEU"
     override val config get(): NeuRepositoryConfig = SkyHanniMod.feature.dev.neuRepo
-    override val backupRepoResourcePath: String = "assets/skyhanni/neu-repo.tar.gz"
+    override val backupRepoResourcePath: String = "assets/skyhanni/neurepo.tar.gz"
     override val repoFolderName: String = "neurepo"
     override val legacyConfigDirectory = File("config/notenoughupdates")
 
