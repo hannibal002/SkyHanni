@@ -632,10 +632,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                     legacyFile.copyTo(commitFile, overwrite = false)
                 }.onSuccess {
                     legacyFile.delete()
-                }.onFailure { copyFailure ->
+                }.onFailure {
                     logger.error(
-                        "Failed to move or copy legacy commit file; keeping original: ${legacyFile.absolutePath}",
-                        copyFailure
+                        "Failed to move or copy legacy commit file; keeping original: ${legacyFile.absolutePath}"
                     )
                 }
             }
