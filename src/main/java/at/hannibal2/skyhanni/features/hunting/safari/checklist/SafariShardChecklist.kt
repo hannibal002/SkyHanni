@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.events.item.ShardSource
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -25,6 +25,16 @@ object SafariShardChecklist {
     private val checklistConfig get() = SkyHanniMod.feature.hunting.safari.checklist
 
     private val shardCounts = SafariShard.entries.associateWithTo(mutableMapOf()) { 0 }
+
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    private fun onRepoReload() {
+        DelayedRun.runOrNextTick { SafariShard.entries.forEach { it.resetCache() } }
+    }
+
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    private fun onNeuRepoReload() {
+        DelayedRun.runOrNextTick { SafariShard.entries.forEach { it.resetCache() } }
+    }
 
     @HandleEvent
     private fun onWorldSwap(event: WorldChangeEvent) {
@@ -91,10 +101,10 @@ object SafariShardChecklist {
         "${rarity?.chatColorCode ?: "§f"}$displayName"
 
     internal fun shardNameToRarity(shardName: String): LorenzRarity? =
-        SafariShard.getByName(shardName)?.itemStack?.getItemRarityOrNull()
+        SafariShard.getByName(shardName)?.rarity
 
     internal fun shardInternalNameToRarity(internalName: NeuInternalName): LorenzRarity? =
-        SafariShard.entries.firstOrNull { it.internalName == internalName }?.let { shardNameToRarity(it.displayName) }
+        SafariShard.entries.firstOrNull { it.internalName == internalName }?.rarity
 
     internal fun getCurrentBiome(): SafariBiome? {
         val playerLocation = playerLocation()

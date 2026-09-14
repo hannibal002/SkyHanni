@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.hunting.safari.checklist
 
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.ResettableValue
 import at.hannibal2.skyhanni.utils.SafeItemStack
 
 enum class SafariShard(val displayName: String, val biome: SafariBiome) {
@@ -47,14 +49,21 @@ enum class SafariShard(val displayName: String, val biome: SafariBiome) {
     WUMPA("Wumpa", SafariBiome.ICY),
     ;
 
-    val internalName: NeuInternalName?
-        get() = ItemResolutionQuery.attributeNameToInternalName(displayName)?.toInternalName()
+    private val internalNameCache = ResettableValue { ItemResolutionQuery.attributeNameToInternalName(displayName)?.toInternalName() }
+    private val itemStackCache = ResettableValue { internalName?.getItemStackOrNull() }
+    private val rarityCache = ResettableValue { itemStack?.getItemRarityOrNull() }
 
-    val itemStack: SafeItemStack?
-        get() = internalName?.getItemStackOrNull()
+    val internalName: NeuInternalName? by internalNameCache
 
-    val rarity: LorenzRarity?
-        get() = internalName?.let(SafariShardChecklist::shardInternalNameToRarity)
+    val itemStack: SafeItemStack? by itemStackCache
+
+    val rarity: LorenzRarity? by rarityCache
+
+    internal fun resetCache() {
+        internalNameCache.reset()
+        itemStackCache.reset()
+        rarityCache.reset()
+    }
 
     companion object {
         private val byName = entries.associateBy(SafariShard::displayName)
