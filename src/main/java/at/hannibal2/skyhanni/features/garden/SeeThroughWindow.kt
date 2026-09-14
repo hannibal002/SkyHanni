@@ -41,6 +41,7 @@ object SeeThroughWindow {
     }
 
     private fun setOpacity() {
+        // Once the window system has rejected it, every further attempt fails the same way.
         if (unsupportedPlatform) return
 
         val targetOpacity = if (isActive) {
@@ -55,11 +56,10 @@ object SeeThroughWindow {
             currentOpacity = targetOpacity
         } else {
             unsupportedPlatform = true
-            ChatUtils.userError("Your platform doesn't support See Through Farming Windows!")
+            ChatUtils.userError("Your window system doesn't support See Through Farming!")
         }
     }
 
-    // This function can only fail due to platform limitations
     private fun trySetWindowOpacity(alpha: Float): Boolean {
         val handle = Minecraft.getInstance().window.handle()
         GLFW.glfwGetError(null) // Clear previous error
