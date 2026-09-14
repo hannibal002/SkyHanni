@@ -89,9 +89,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     /**
      * Stores commit metadata for this repo.
-     *
-     * For example:
-     * `.minecraft/data/skyhanni/repo/sh-currentCommit.json`
      */
     private val commitStorage: RepoCommitStorage by lazy {
         RepoCommitStorage(commitFile)
@@ -631,8 +628,16 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             runCatching {
                 Files.move(legacyFile.toPath(), commitFile.toPath())
             }.onFailure {
-                runCatching { legacyFile.copyTo(commitFile, overwrite = false) }
-                legacyFile.delete()
+                runCatching {
+                    legacyFile.copyTo(commitFile, overwrite = false)
+                }.onSuccess {
+                    legacyFile.delete()
+                }.onFailure { copyFailure ->
+                    logger.error(
+                        "Failed to move or copy legacy commit file; keeping original: ${legacyFile.absolutePath}",
+                        copyFailure
+                    )
+                }
             }
         }
     }
