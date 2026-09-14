@@ -167,9 +167,7 @@ object CFApi {
             if (namePatterns.chocolateFactoryInventoryNamePattern.matches(it)) return@InventoryDetector true
 
             if (namePatterns.hoppityInventoryNamePattern.matches(it)) {
-                val slotName = InventoryUtils.getItemAtSlotIndex(50) ?: return@InventoryDetector false
-                ChatUtils.chat(slotName.toString())
-                return@InventoryDetector namePatterns.chocolateFactoryShortcutNamePattern.matches(slotName.toString())
+                return@InventoryDetector namePatterns.chocolateFactoryShortcutNamePattern.matches(shortcutSlotItemName)
             }
 
             false
@@ -178,10 +176,9 @@ object CFApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        shortcutSlotItemName = event.inventoryItems[50]?.cleanName.toString()
-        ChatUtils.chat(shortcutSlotItemName)
+        shortcutSlotItemName = event.inventoryItems[CHOCOLATE_FACTORY_SHORTCUT_SLOT]?.cleanName.toString()
 
-        chocolateFactoryInventory.updateInventoryState(event)
+        chocolateFactoryInventory.forceUpdate(event)
 
         DelayedRun.runNextTick {
             if (chocolateFactoryInventory.isInside()) {

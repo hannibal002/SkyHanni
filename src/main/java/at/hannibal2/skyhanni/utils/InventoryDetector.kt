@@ -61,7 +61,9 @@ class InventoryDetector(
         }
     }
 
-    fun updateInventoryState(event: InventoryFullyOpenedEvent) {
+    fun forceUpdate(event: InventoryFullyOpenedEvent) { updateInventoryState(event) }
+
+    private fun updateInventoryState(event: InventoryFullyOpenedEvent) {
         inInventory = try {
             checkInventoryName(event.inventoryName)
         } catch (e: Exception) {
