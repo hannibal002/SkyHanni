@@ -32,10 +32,6 @@ object PlatformUtils {
         FabricLoader.getInstance().gameDir
     }
 
-    val dataDir: Path by lazy {
-        gameDir.resolve("data")
-    }
-
     val configDir: Path by lazy {
         FabricLoader.getInstance().configDir
     }
