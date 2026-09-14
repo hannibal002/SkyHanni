@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -61,13 +62,18 @@ object BazaarOrderApi {
 
     /**
      * The bazaar omits this line entirely while nothing of the order has been traded yet.
+     * Large numbers are abbreviated and rounded, so only the progress text is exact.
      *
      * REGEX-TEST: Filled: 26/50 (52%)
      * REGEX-TEST: Filled: 59/59 100%!
+     * REGEX-TEST: Filled: 4/1.5k (0.3%)
+     * REGEX-TEST: Filled: 34/1.9k (1.8%)
+     * REGEX-TEST: Filled: 1.2k/1.5k (80%)
+     * REGEX-TEST: Filled: 1.9k/1.9k 100%!
      */
     private val filledPattern by patternGroup.pattern(
         "filled.colorless",
-        "Filled: (?<filled>[\\d,]+)/[\\d,]+ .*",
+        "Filled: (?<filled>[\\d,.k]+)/[\\d,.k]+ (?<progress>\\S+)",
     )
 
     /**
@@ -92,7 +98,7 @@ object BazaarOrderApi {
      * REGEX-TEST: By: [MVP+] hannibal2
      * REGEX-TEST: By: hannibal2
      */
-    private val ownerPattern by patternGroup.pattern(
+    val ownerPattern by patternGroup.pattern(
         "owner.colorless",
         "By: (?:\\[[^]]+] )?(?<name>\\S+)",
     )
@@ -158,7 +164,6 @@ object BazaarOrderApi {
         val lore = stack.getCleanLore()
         // The bazaar omits the filled and claimable lines while nothing has been traded yet,
         // and the owner line whenever the player has no co-op.
-        val filled = filledPattern.firstMatcher(lore) { group("filled").formatInt() } ?: 0
         val claimable = claimablePattern.firstMatcher(lore) { group("amount").formatInt() } ?: 0
         val owner = ownerPattern.firstMatcher(lore) { group("name") }
 
@@ -176,12 +181,18 @@ object BazaarOrderApi {
             return null
         }
 
+        val (parsedFilled, isFull) = filledPattern.firstMatcher(lore) {
+            (group("filled").formatIntOrNull() ?: 0) to (group("progress") == "100%!")
+        } ?: (0 to false)
+
         return BazaarOrder(
             slot = slot,
             type = type,
             internalName = NeuInternalName.fromItemName(itemName),
             amount = amount,
-            filled = filled,
+            // The abbreviated number is rounded, at 100% the order amount is the exact value.
+            filled = if (isFull) amount else parsedFilled,
+            isFull = isFull,
             claimable = claimable,
             pricePerUnit = pricePerUnit,
             // Without a co-op the inventory shows no owner, and every order in it is the player's.

@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
-import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.MouseClickType
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
+import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
+import at.hannibal2.skyhanni.utils.InventoryUtils.mouseClickSlot
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.convertEmptyToNull
@@ -14,6 +16,7 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
@@ -25,14 +28,24 @@ import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
 // TODO refactor
 @Suppress("MemberVisibilityCanBePrivate", "TooManyFunctions", "Unused")
 object InventoryUtils {
-
     var itemInHandId = NeuInternalName.NONE
+
+    /**
+     * The slot indexes of the inner inventory of a 6 row chest.
+     * This is used to filter out the border slots of the chest.
+     */
+    val innerInventorySlots: Set<Int> = listOf(
+        10..16,
+        19..25,
+        28..34,
+        37..43,
+    ).flatten().toSet()
+
     fun NeuInternalName.recentlyHeld(): Boolean = this in recentItemsInHand
 
     val recentItemsInHand = TimeLimitedSet<NeuInternalName>(30.seconds)
@@ -75,7 +88,9 @@ object InventoryUtils {
         return getItemsInOpenChest().mapNotNull { it.item.getInternalNameOrNull() }.toSet()
     }
 
-    // only works while not in an inventory
+    /**
+     * Only works while not in an inventory.
+     */
     fun getSlotsInOwnInventory(): List<Slot> {
         val guiInventory = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return emptyList()
         return guiInventory.slots()
@@ -119,8 +134,7 @@ object InventoryUtils {
             it.contains("Ender Chest") || it.contains("Backpack")
     }
 
-    // mainHandItem can be AIR, since equipment in EntityLiving is an array of item stacks that can be AIR as well.
-    fun getItemInHand(): SafeItemStack? = MinecraftCompat.localPlayerOrNull?.mainHandItem?.takeIf { it.item != Items.AIR }
+    fun getItemInHand(): SafeItemStack? = MinecraftCompat.localPlayerOrNull?.mainHandItem?.takeUnlessEmpty()
 
     fun getArmor(): Array<SafeItemStack?> = MinecraftCompat.localPlayerOrNull?.getArmorInventory() ?: arrayOfNulls(4)
     fun getArmorInternalNames(): Set<NeuInternalName> = getArmor().mapNotNull { it?.getInternalNameOrNull() }.toSet()
@@ -129,14 +143,6 @@ object InventoryUtils {
     fun getChestplate(): SafeItemStack? = getArmor()[2]
     fun getLeggings(): SafeItemStack? = getArmor()[1]
     fun getBoots(): SafeItemStack? = getArmor()[0]
-
-    internal fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
-        if (this.clickedButton == 1 && slot?.item?.getItemCategoryOrNull() == ItemCategory.SACK) return
-        slot?.index?.let { slotNumber ->
-            clickSlot(slotNumber, container.containerId, mouseButton = 0, mode = ContainerInput.QUICK_MOVE)
-            this.cancel()
-        }
-    }
 
     fun isSlotInPlayerInventory(itemStack: SafeItemStack): Boolean {
         val slotUnderMouse = slotUnderCursor() ?: return false
@@ -194,26 +200,74 @@ object InventoryUtils {
         MinecraftCompat.screen = null
     }
 
-    fun isInNormalChest(name: String = openInventoryName()): Boolean = name in normalChestInternalNames.map { I18n.get(it) }
+    fun isInNormalChest(name: String = openInventoryName()): Boolean =
+        name in normalChestInternalNames.map { I18n.get(it) }
 
+    /**
+     * Clicks a slot by calling MultiPlayerGameMode's `handleContainerInput` method.
+     * Less compatible with other mods that intercept clicks than [mouseClickSlot].
+     */
     fun clickSlot(
         slotId: Int,
         windowId: Int = InventoryCompat.getWindowId(),
-        mouseButton: Int = 0,
-        mode: ContainerInput = ContainerInput.PICKUP,
+        button: MouseClickType = LEFT_CLICK,
+        mode: ContainerInput = button.defaultMode,
     ) {
-        InventoryCompat.clickInventorySlot(windowId, slotId, mouseButton, mode)
+        clickSlotRaw(slotId, windowId, button.buttonId, mode)
     }
 
+    /**
+     * Same as [clickSlot], but takes the window id from this screen.
+     */
+    fun ContainerScreen.clickSlot(
+        slotId: Int,
+        button: MouseClickType = LEFT_CLICK,
+        mode: ContainerInput = button.defaultMode,
+    ) {
+        clickSlot(slotId, container.containerId, button, mode)
+    }
+
+    /**
+     * Only for forwarding an existing click. What [button] means depends on [mode],
+     * see [MouseClickType]. Prefer [clickSlot] everywhere else.
+     */
+    fun clickSlotRaw(
+        slotId: Int,
+        windowId: Int = InventoryCompat.getWindowId(),
+        button: Int = 0,
+        mode: ContainerInput = PICKUP,
+    ) {
+        InventoryCompat.clickInventorySlot(windowId, slotId, button, mode)
+    }
+
+    /**
+     * Clicks a slot by calling the AbstractContainerScreen's `slotClicked` method.
+     * Preferred over [clickSlot] for compatibility with other mods, especially when
+     * modifying an existing player click.
+     */
     fun mouseClickSlot(
         slotId: Int,
-        mouseButton: Int = 0,
-        mode: ContainerInput = ContainerInput.PICKUP,
+        button: MouseClickType = LEFT_CLICK,
+        mode: ContainerInput = button.defaultMode,
     ) {
-        InventoryCompat.mouseClickInventorySlot(slotId, mouseButton, mode)
+        mouseClickSlotRaw(slotId, button.buttonId, mode)
+    }
+
+    /**
+     * Only for forwarding an existing click. What [button] means depends on [mode],
+     * see [MouseClickType]. Prefer [mouseClickSlot] everywhere else.
+     */
+    fun mouseClickSlotRaw(
+        slotId: Int,
+        button: Int = 0,
+        mode: ContainerInput = PICKUP,
+    ) {
+        InventoryCompat.mouseClickInventorySlot(slotId, button, mode)
     }
 
     fun SkyHanniGuiContainer.slots(): List<Slot> {
         return InventoryCompat.containerSlots(this)
     }
+
+    fun <T> Map<Int, T>.filterInnerSlots(): Map<Int, T> = filter { it.key in innerInventorySlots }
 }

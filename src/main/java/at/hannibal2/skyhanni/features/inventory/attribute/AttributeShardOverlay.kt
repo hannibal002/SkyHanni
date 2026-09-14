@@ -288,7 +288,11 @@ object AttributeShardOverlay {
         val priceUntilMaxed = individualPrice * actualAmountUntilMaxed
         val shardItemName = internalName.repoItemName
 
-        val coveredString = if (amountInBazaarOrders != 0) "§eOn order" else "§aEnough in Hunting Box"
+        val coveredString = when {
+            amountInBazaarOrders != 0 -> "§eOn order"
+            amountInHuntingBox != 0 -> "§aEnough in Hunting Box"
+            else -> "§aNothing needed"
+        }
         val priceColor = if (amountInBazaarOrders != 0) "§b" else "§6"
         val priceToNextTierString =
             if (actualAmountToNextTier == 0) coveredString else "$priceColor${priceUntilNextTier.shortFormat()}"

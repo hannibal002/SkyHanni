@@ -100,14 +100,6 @@ object UtilsPatterns {
         "(?<name>(?:§.)*(?:[^§] ?)+)(?:§8x(?<amount>[\\d,]+))?",
     )
 
-    /**
-     * REGEX-TEST: §7Cost
-     */
-    val costLinePattern by patternGroup.pattern(
-        "item.cost.line",
-        "(?:§5§o)?§7Cost.*",
-    )
-
     @Suppress("MaxLineLength")
     val timeAmountPattern by patternGroup.pattern(
         "time.amount",

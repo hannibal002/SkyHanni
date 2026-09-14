@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.associateNotNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
@@ -27,17 +26,22 @@ import kotlin.math.sin
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 
+//? if >= 26.2 {
+import net.minecraft.util.LightCoordsUtil
+//?} else {
+/*import net.minecraft.client.renderer.LevelRenderer
+*///?}
+
 /**
  * Utility for creating fake entities without an associated world to avoid contaminating the world state.
  */
 @SkyHanniModule
 object HolographicEntities {
-
     private var debugHologram: HolographicEntity<Zombie>? = null
     private var debugHologramTransparency: Float = 1f
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shdebughologram") {
             description = "Spawns a holographic zombie 5 blocks in front of you for testing"
             category = CommandCategory.DEVELOPER_TEST
@@ -73,7 +77,7 @@ object HolographicEntities {
 
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         val hologram = debugHologram ?: return
         event.renderHolographicEntity(hologram, opacity = debugHologramTransparency)
     }
@@ -127,6 +131,8 @@ object HolographicEntities {
         fun instance(position: LorenzVec, yaw: Float): HolographicEntity<T>? {
             val level = Minecraft.getInstance().level ?: return null
             val entity = entityType.create(level, EntitySpawnReason.COMMAND) ?: return null
+            //? if >= 26.2
+            entity.id = FakeEntityIdProvider.getNextId()
             return HolographicEntity(entity, position, yaw)
         }
     }
@@ -137,7 +143,10 @@ object HolographicEntities {
         BuiltInRegistries.ENTITY_TYPE.associateNotNull type@{ entityType ->
             // Create a throwaway instance only to determine the KClass key.
             val testEntity: LivingEntity = runCatching {
-                entityType.create(level, EntitySpawnReason.COMMAND)
+                entityType.create(level, EntitySpawnReason.COMMAND)?.apply {
+                    //? if >= 26.2
+                    id = FakeEntityIdProvider.getNextId()
+                }
             }.getOrNull() as? LivingEntity ?: return@type null
             @Suppress("UNCHECKED_CAST")
             testEntity::class to HolographicBase(entityType as EntityType<LivingEntity>)
@@ -182,14 +191,15 @@ object HolographicEntities {
         val gameRenderer = client.gameRenderer
         val entityRenderState = holographicEntity.cachedRenderState
             ?: renderer.createRenderState().also { holographicEntity.cachedRenderState = it }
-        val cameraRenderState = gameRenderer.gameRenderState.levelRenderState.cameraRenderState
+        //~ if < 26.2 'gameRenderState()' -> 'gameRenderState'
+        val cameraRenderState = gameRenderer.gameRenderState().levelRenderState.cameraRenderState
         val cameraPos = cameraRenderState.pos
-        val submitNodeCollector = gameRenderer.featureRenderDispatcher.submitNodeStorage
         renderer.extractRenderState(entity, entityRenderState, partialTicks)
         entityRenderState.`skyhanni$setEntity`(entity)
         (entityRenderState as? LivingEntityRenderState)?.isBaby = holographicEntity.isChild
         client.level?.let { level ->
-            entityRenderState.lightCoords = LevelRenderer.getLightCoords(level, mobPosition.toBlockPos())
+            //~ if < 26.2 'LightCoordsUtil' -> 'LevelRenderer'
+            entityRenderState.lightCoords = LightCoordsUtil.getLightCoords(level, mobPosition.toBlockPos())
         }
 
         activeHolographicEntities.add(entity)

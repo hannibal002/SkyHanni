@@ -6,12 +6,17 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.Minecraft
 import net.minecraft.client.User
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket
 import net.minecraft.world.entity.Entity
+
+//? if >= 26.2 {
+import net.minecraft.client.gui.Hud
+//?} else {
+/*import net.minecraft.client.gui.Gui
+*///?}
 
 /**
  * This is a compatibility layer that helps with multiple Minecraft versions and mixins.
@@ -103,19 +108,24 @@ object MinecraftCompat {
     // <editor-fold desc="Miscellaneous">
     @JvmStatic
     var screen: Screen?
-        get() = mc.screen
+        //~ if < 26.2 'gui.screen()' -> 'screen'
+        get() = mc.gui.screen()
         set(value) {
-            mc.setScreen(value)
+            //~ if < 26.2 'gui.setScreen' -> 'setScreen'
+            mc.gui.setScreen(value)
         }
 
-    val hud get(): Gui = mc.gui
+    //~ if < 26.2 'Hud = mc.gui.hud' -> 'Gui = mc.gui'
+    val hud get(): Hud = mc.gui.hud
 
-    val hideGui get(): Boolean = mc.options.hideGui
+    //~ if < 26.2 'hud.isHidden()' -> 'mc.options.hideGui'
+    val hideGui get(): Boolean = hud.isHidden()
 
     val showDebugHud get(): Boolean = mc.debugEntries.isOverlayVisible
 
     fun reloadChunks() = DelayedRun.runOrNextTick {
-        mc.levelRenderer.allChanged()
+        //~ if < 26.2 'levelExtractor' -> 'levelRenderer'
+        mc.levelExtractor.allChanged()
     }
     // </editor-fold>
 }

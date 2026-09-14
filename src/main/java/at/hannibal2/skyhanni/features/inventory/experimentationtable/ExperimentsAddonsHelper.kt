@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
@@ -35,7 +34,6 @@ import com.google.gson.JsonPrimitive
 
 @SkyHanniModule
 object ExperimentsAddonsHelper {
-
     private enum class HelperPhase {
         READ,
         REPLICATE
@@ -95,8 +93,8 @@ object ExperimentsAddonsHelper {
     )
     // </editor-fold>
 
-    @HandleEvent(InventoryCloseEvent::class, onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun resetAddonsData() {
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    private fun onInventoryClose() {
         hypixelChronomatronData.clear()
         userChronomatronProgress.clear()
         hypixelUltrasequencerData.clear()
@@ -116,16 +114,12 @@ object ExperimentsAddonsHelper {
         "Cyan" -> LorenzColor.DARK_AQUA
         "Orange" -> LorenzColor.GOLD
         "Purple" -> LorenzColor.DARK_PURPLE
-        else -> try {
-            LorenzColor.valueOf(cleanName.uppercase())
-        } catch (exception: IllegalArgumentException) {
-            null
-        }
+        else -> runCatching { LorenzColor.valueOf(cleanName.uppercase()) }.getOrNull()
     }
 
     // <editor-fold desc="Next click highlighting">
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    private fun onBackgroundDrawn() {
         if (!config.enabled) return
         if (!config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
 
@@ -165,7 +159,7 @@ object ExperimentsAddonsHelper {
 
     // <editor-fold desc="Slot click stuff">
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.enabled) return
         if (event.slot == null || event.item == null || !ExperimentationTableApi.inAddon) return
         if (currentAddonPhase != HelperPhase.REPLICATE) return
@@ -189,7 +183,7 @@ object ExperimentsAddonsHelper {
     private fun GuiContainerEvent.SlotClickEvent.handleUltrasequencerClick() {
         if (!ExperimentationTableApi.inUltrasequencer || slot == null) return
         if (userUltrasequencerProgress.size == hypixelUltrasequencerData.size) return
-        val clickedSlot = slot.index.takeIf {
+        val clickedSlot = slotId.takeIf {
             val expectedSlot = hypixelUltrasequencerData[userUltrasequencerProgress.size]
             it == expectedSlot
         } ?: run {
@@ -229,7 +223,7 @@ object ExperimentsAddonsHelper {
 
     // <editor-fold desc="Inventory Update reading logic">
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onPlaySound(event: PlaySoundEvent) {
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (!ExperimentationTableApi.inChronomatron) return
         // This sound indicates when the player has finished a round in chronomatron
         if (event.soundName != "entity.player.levelup" || event.pitch != 1.7619047f || event.volume != 0.7f) return
@@ -237,7 +231,7 @@ object ExperimentsAddonsHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!ExperimentationTableApi.inAddon) return
 
         val oldAddonPhase = currentAddonPhase
@@ -367,7 +361,7 @@ object ExperimentsAddonsHelper {
     // </editor-fold>
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val basePath = "inventory.experimentationTable.addons"
         event.move(94, "$basePath.highlightNextClick", "$basePath.enabled")
         event.transform(94, "$basePath.highlightNextClick") {

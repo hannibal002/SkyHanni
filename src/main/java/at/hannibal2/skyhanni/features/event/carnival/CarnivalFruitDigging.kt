@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -375,7 +374,7 @@ object CarnivalFruitDigging {
 
         // Armor stand appears when a fruit is dug or exposed by watermelon
         val entity = event.entity
-        val name = event.newName?.removeColor() ?: return
+        val name = event.cleanName ?: return
         if (name.isBlank()) return
 
         val pos = entity.blockPosition().toLorenzVec()

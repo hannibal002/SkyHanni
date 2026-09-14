@@ -36,7 +36,7 @@ object CommunityFix {
     /**
      * REGEX-TEST: §2§l§m       §f§l§m             §r §e676,985§6/§e2M
      */
-    private val amountPattern by RepoPattern.pattern(
+    private val progressPattern by RepoPattern.pattern(
         "data.garden.milestonefix.amount",
         ".*§e(?<having>.*)§6/§e(?<max>.*)",
     )
@@ -45,7 +45,7 @@ object CommunityFix {
     private var showWhenAllCorrect = false
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         val map = data.cropMilestoneCommunityHelp
         for ((key, value) in map) {
@@ -97,7 +97,7 @@ object CommunityFix {
         val next = lore.nextAfter({ totalPattern.matches(it) }, 3) ?: return
 
         val guessNextMax = nextMax(realTier, crop)
-        val nextMax = amountPattern.matchMatcher(next) {
+        val nextMax = progressPattern.matchMatcher(next) {
             group("max").formatLong()
         } ?: return
 
@@ -126,7 +126,6 @@ object CommunityFix {
     private var totalFixedValues = 0
 
     private fun handleInput(input: String) {
-        println(" ")
         var fixed = 0
         var alreadyCorrect = 0
         for (line in input.lines()) {
@@ -167,7 +166,7 @@ object CommunityFix {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shreadcropmilestonefromclipboard") {
             description = "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
             category = CommandCategory.DEVELOPER_TEST
