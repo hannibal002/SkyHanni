@@ -14,7 +14,7 @@ object SkyHanniRepoManager : AbstractRepoManager<RepositoryReloadEvent>() {
     override val commonName = "SkyHanni"
     override val commonShortNameCased = "SH"
     override val config get() = SkyHanniMod.feature.dev.repo
-    override val backupRepoResourcePath: String = "assets/skyhanni/repo.tar.gz"
+    override val backupRepoResourcePath: String = "assets/skyhanni/shrepo.tar.gz"
     override val repoFolderName: String = "shrepo"
     // Intentionally hardcoded: the legacy path must not follow changes to the config directory.
     override val legacyConfigDirectory = File("config/skyhanni")
