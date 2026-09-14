@@ -235,6 +235,13 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
     - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
     - If you can improve the existing feature in a meaningful way.
+- The rule above applies to features another mod has already released. An open pull request in another mod is not a
+  released feature. It never blocks a pull request here, and no pull request here is closed because another mod happens
+  to be working on something similar. This works both ways: if another mod releases something that is sitting in an open
+  pull request here, that is equally fine and no reason to complain.
+- Code from another mod, released or not, is off limits.
+  - Collected data such as coordinates or item lists is different. It describes the game, not the mod that wrote it down.
+    Use it where the feature is your own, and credit the source in the commit or pull request.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
       Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.

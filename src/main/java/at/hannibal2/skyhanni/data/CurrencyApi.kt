@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.inventory.NpcTradeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -20,11 +21,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import java.util.regex.Pattern
 
 /**
  * Remembers how much of a currency the player owns, for currencies that Hypixel only shows on
@@ -106,6 +109,34 @@ object CurrencyApi {
     )
 
     /**
+     * The Grand Bakery item states how many kernels the player owns.
+     *
+     * REGEX-TEST: Grand Bakery
+     */
+    private val kernelItemPattern by patternGroup.pattern(
+        "kernel.item",
+        "Grand Bakery",
+    )
+
+    /**
+     * REGEX-TEST: Your Kernels: 12
+     */
+    private val kernelAmountPattern by patternGroup.pattern(
+        "kernel.amount",
+        "Your Kernels: (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * Only Ted is confirmed, the npc name is left open so another feast chef still matches.
+     *
+     * REGEX-TEST: [NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.
+     */
+    private val kernelGainPattern by patternGroup.pattern(
+        "kernel.gain",
+        "\\[NPC] [\\w ]+: Thanks for the donation! I've added a Kernel to your purse\\.",
+    )
+
+    /**
      * The type is read as written, so a new kind of essence needs no code change.
      *
      * REGEX-TEST: Your Undead Essence: 28,439
@@ -136,6 +167,12 @@ object CurrencyApi {
 
     private fun SkyblockCurrency.setAmount(amount: Long) {
         storage?.put(this, amount)
+    }
+
+    // an unknown amount stays unknown, counting up from a guessed zero would show a wrong total
+    private fun SkyblockCurrency.addAmount(amount: Long) {
+        val owned = getFromStorage() ?: return
+        setAmount(owned + amount)
     }
 
     fun SkyblockCurrency.getFromStorage(): Long? = storage?.get(this)
@@ -223,15 +260,34 @@ object CurrencyApi {
         }
     }
 
-    // unlocking an upgrade sends no chat message, the new amount only shows in the updated item
+    // unlocking a carnival upgrade sends no chat message, the new amount only shows in the updated
+    // item. this event also fires once right after the menu opened, so it covers the initial read too.
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        val item = event.inventoryItems.values.firstOrNull { carnivalTokenItemPattern.matches(it.cleanName) } ?: return
-        for (line in item.getCleanLore()) {
-            carnivalTokenAmountPattern.matchMatcher(line) {
-                SkyblockCurrency.CARNIVAL_TOKEN.setAmount(group("amount").formatLong())
+        for (item in event.inventoryItems.values) {
+            val name = item.cleanName
+            when {
+                carnivalTokenItemPattern.matches(name) ->
+                    item.readOwnedAmount(carnivalTokenAmountPattern, SkyblockCurrency.CARNIVAL_TOKEN)
+
+                kernelItemPattern.matches(name) -> item.readOwnedAmount(kernelAmountPattern, SkyblockCurrency.KERNEL)
             }
         }
+    }
+
+    private fun SafeItemStack.readOwnedAmount(pattern: Pattern, currency: SkyblockCurrency) {
+        for (line in getCleanLore()) {
+            pattern.matchMatcher(line) {
+                currency.setAmount(group("amount").formatLong())
+            }
+        }
+    }
+
+    // one kernel per donated Seasoning, this keeps the amount current between two menu visits
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
+        if (!kernelGainPattern.matches(event.cleanMessage)) return
+        SkyblockCurrency.KERNEL.addAmount(1)
     }
 
     @HandleEvent
