@@ -259,9 +259,12 @@ object StringUtils {
 
     fun String.pluralize(number: Int) = pluralize(number, this)
 
-    fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
+    fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String =
+        pluralize(number.toLong(), singular, plural, withNumber)
+
+    fun pluralize(number: Long, singular: String, plural: String? = null, withNumber: Boolean = false): String {
         val pluralForm = plural ?: "${singular}s"
-        var str = if (number == 1 || number == -1) singular else pluralForm
+        var str = if (number == 1L || number == -1L) singular else pluralForm
         if (withNumber) str = "${number.addSeparators()} $str"
         return str
     }
