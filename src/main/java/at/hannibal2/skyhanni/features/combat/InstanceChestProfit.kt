@@ -6,9 +6,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent
@@ -30,7 +27,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -42,7 +38,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhite
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -111,7 +106,6 @@ object InstanceChestProfit {
         "§aReroll Shard",
     )
 
-
     /**
      * REGEX-TEST: §61,000,000 Coins
      * REGEX-TEST: §aFREE
@@ -159,12 +153,12 @@ object InstanceChestProfit {
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.enabled && !config.croesusAllChestsOverlay && !config.croesusHighlight) return
 
         if (isInCroesusMenu() && (config.croesusAllChestsOverlay || config.croesusHighlight)) {
             event.inventoryItems.forEach { (slot, item) ->
-                val chestType = CroesusChestType.getByStackName(item.hoverName.formattedTextCompatLeadingWhite())
+                val chestType = CroesusChestType.getByStackName(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
                 if (chestType != null) {
                     if (!alreadyProcessedChests.contains(chestType)) {
                         alreadyProcessedChests.add(chestType)
@@ -179,7 +173,7 @@ object InstanceChestProfit {
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST, onlyOnSkyblock = true)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         val slot = slotToHighlight?.first
         if (isInCroesusMenu() && slot != null && config.croesusHighlight) {
             event.container.slots[slot].highlight(LorenzColor.GREEN)
@@ -187,11 +181,11 @@ object InstanceChestProfit {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderItemTip(event: RenderItemTipEvent) {
+    private fun onRenderItemTip(event: RenderItemTipEvent) {
         val slots = slotsWithFavorites
         if (isInCroesusMenu()) {
             slots.forEach {
-                if (it == event.stack.hoverName.formattedTextCompatLeadingWhite()) event.stackTip = "§6✯"
+                if (it == event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) event.stackTip = "§6✯"
             }
         }
         if (isInstanceChestGUI()) {
@@ -199,8 +193,8 @@ object InstanceChestProfit {
         }
     }
 
-    @HandleEvent(GuiKeyPressEvent::class)
-    fun onGuiKeyPress() {
+    @HandleEvent
+    private fun onGuiKeyPress() {
         if (!config.keybind.isKeyHeld()) return
         val favoriteItems = profileStorage?.instanceChestFavoriteItems ?: mutableListOf()
         stackUnderCursor()?.getInternalNameOrNull()?.let {
@@ -215,8 +209,8 @@ object InstanceChestProfit {
         profileStorage?.instanceChestFavoriteItems = favoriteItems
     }
 
-    @HandleEvent(InventoryCloseEvent::class)
-    fun onInventoryClose() {
+    @HandleEvent
+    private fun onInventoryClose() {
         alreadyProcessedChests.clear()
         croesusDisplayList.clear()
         slotsWithFavorites.clear()
@@ -425,14 +419,14 @@ object InstanceChestProfit {
             ?.maxByOrNull { it.rarity.id }
             ?.let {
                 when (it.rarity) {
-                    LorenzRarity.RARE -> 0.15 / 100 * it.level
-                    LorenzRarity.EPIC, LorenzRarity.LEGENDARY -> 0.2 / 100 * it.level
+                    RARE -> 0.15 / 100 * it.level
+                    EPIC, LEGENDARY -> 0.2 / 100 * it.level
                     else -> 0.0
                 }
             } ?: 0.0
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    fun onChestGuiRender() {
+    @HandleEvent
+    private fun onChestGuiRender() {
         if (config.enabled && InventoryUtils.inInventory())
             if (isInstanceChestGUI()) {
                 chestDisplay?.let {
@@ -448,12 +442,12 @@ object InstanceChestProfit {
     }
 
     @HandleEvent(DungeonEnterEvent::class)
-    fun onDungeonEnter() {
+    private fun onDungeonEnter() {
         chestProfits.clear()
     }
 
     @HandleEvent(KuudraEnterEvent::class)
-    fun onKuudraEnter() {
+    private fun onKuudraEnter() {
         chestProfits.clear()
     }
 }
