@@ -29,7 +29,6 @@ import java.util.Optional
 
 @Suppress("TooManyFunctions")
 object TextHelper {
-
     val NEWLINE = "\n".asComponent()
     val HYPHEN = "-".asComponent()
     val SPACE = " ".asComponent()
@@ -41,7 +40,7 @@ object TextHelper {
         Component.literal(this).also(init)
 
     fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
-    fun join(vararg components: Any?, separator: Component? = null): Component {
+    fun join(vararg components: Any?, separator: Component? = null): MutableComponent {
         val result = "".asComponent()
         components.forEachIndexed { index, component ->
             when (component) {
@@ -167,16 +166,16 @@ object TextHelper {
         parent.send(id, bypassSelfMessages)
     }
 
-    fun Component.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), oneTime: Boolean = true, onClick: () -> Any) {
+    fun MutableComponent.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), oneTime: Boolean = true, onClick: () -> Any) {
         val token = ChatClickActionManager.createAction(onClick, expiresAt, oneTime)
         this.command = "/shaction $token"
     }
 
-    fun Component.onHover(tip: String) {
+    fun MutableComponent.onHover(tip: String) {
         this.hover = tip.asComponent()
     }
 
-    fun Component.onHover(tips: List<String>) {
+    fun MutableComponent.onHover(tips: List<String>) {
         this.hover = tips.joinToString("\n").asComponent()
     }
 
