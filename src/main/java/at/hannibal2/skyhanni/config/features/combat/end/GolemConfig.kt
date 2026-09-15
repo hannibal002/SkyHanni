@@ -60,6 +60,30 @@ class GolemConfig {
     var showSpawnTimer: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Show Damage", desc = "Show the damage you dealt to the protector so far.")
+    @ConfigEditorBoolean
+    var showDamage: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Show Zealots",
+        desc = "Show how many zealots and zealot bruisers you killed on this server. " +
+            "Resets when you switch servers."
+    )
+    @ConfigEditorBoolean
+    var showZealots: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Late Stage Title",
+        desc = "Shows the stage in the middle of the screen when you join a server where the " +
+            "protector is already awakening or summoned."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var joinStageTitle: Boolean = false
+
+    @Expose
     @ConfigOption(
         name = "Highlight Spawn Points",
         desc = "Marks all six fixed spawn points in the world with a beam on the head structure " +

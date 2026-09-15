@@ -29,6 +29,21 @@ class EndIslandConfig {
     val rareDropTracker: RareDropTrackerConfig = RareDropTrackerConfig()
 
     @Expose
+    @ConfigOption(name = "DPS Tracker", desc = "")
+    @Accordion
+    val dps: DpsConfig = DpsConfig()
+
+    @Expose
+    @ConfigOption(name = "Special Drop Sound", desc = "")
+    @Accordion
+    val dropSound: DropSoundConfig = DropSoundConfig()
+
+    @Expose
+    @ConfigOption(name = "Dragons Summoned", desc = "")
+    @Accordion
+    val summonCounter: SummonCounterConfig = SummonCounterConfig()
+
+    @Expose
     @ConfigOption(name = "Ender Node Tracker", desc = "")
     @Accordion
     val enderNodeTracker: EnderNodeConfig = EnderNodeConfig()

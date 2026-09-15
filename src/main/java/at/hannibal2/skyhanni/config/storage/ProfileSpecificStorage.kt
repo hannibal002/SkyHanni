@@ -187,6 +187,14 @@ class ProfileSpecificStorage(
     @Expose
     var endRareDrops: EndRareDropTracker.Data = EndRareDropTracker.Data()
 
+    /** Dragons the player placed at least one summoning eye for. */
+    @Expose
+    var summonedDragons: Int = 0
+
+    /** Whether [summonedDragons] has been taken from the dragon guide at least once. */
+    @Expose
+    var summonedDragonsSynced: Boolean = false
+
     // - event
     // -- carnival
     @Expose
