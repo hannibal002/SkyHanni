@@ -91,7 +91,7 @@ object UserLuckBreakdown {
     private var skillOverflowLuck = mapOf<SkillType, Int>()
 
     @HandleEvent
-    fun replaceItem(event: ReplaceItemEvent) {
+    private fun replaceItem(event: ReplaceItemEvent) {
         if (!config.userLuck) return
         if (event.inventory !is SimpleContainer) return
         if (!inMiscStats) return
@@ -135,7 +135,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!statsBreakdownInventory.isInside()) {
             inMiscStats = false
             return
@@ -157,7 +157,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         inMiscStats = false
         inCustomBreakdown = false
     }
@@ -173,7 +173,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltip(event: ToolTipTextEvent) {
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!config.userLuck) return
         event.slot ?: return
         if (!event.slot.isTopInventory()) return
@@ -235,7 +235,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.userLuck) return
         if (!inMiscStats) return
         val luckEvent = getOrPostLuckEvent()
@@ -344,7 +344,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(95, "misc.userluckEnabled", "misc.userLuck")
     }
 
@@ -372,52 +372,60 @@ object UserLuckBreakdown {
         return userLuckEvent
     }
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun skillLuck(event: UserLuckCalculateEvent) {
+    private fun UserLuckCalculateEvent.addSkillLuck() {
         val lore = createItemLore("skills")
         val luck = skillOverflowLuck.values.sum().toFloat()
-        event.addLuck(luck)
+        addLuck(luck)
         val stack = ItemUtils.createItemStack(
             Items.DIAMOND_SWORD,
             "§a✴ Category: Skills",
             lore,
         )
-        event.addItem(stack)
+        addItem(stack)
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
-    fun limboLuck(event: UserLuckCalculateEvent) {
+    private fun UserLuckCalculateEvent.addLimboLuck() {
         val luck = storage?.limbo?.userLuck ?: 0f
-        event.addLuck(luck)
+        addLuck(luck)
         val stack = ItemUtils.createItemStack(
             Items.ENDER_PEARL,
             "§a✴ Limbo Personal Best",
             createItemLore("limbo", luck),
         )
-        event.addItem(stack)
+        addItem(stack)
     }
 
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun jerryLuck(event: UserLuckCalculateEvent) {
+    private fun UserLuckCalculateEvent.addJerryLuck() {
         if (!Perk.STATSPOCALYPSE.isActive) return
-        val jerryLuck = event.getTotalLuck() * .1f
-        event.addLuck(jerryLuck)
+        val jerryLuck = getTotalLuck() * .1f
+        addLuck(jerryLuck)
         val stack = ItemUtils.createItemStack(
             Items.PAPER,
             "§a✴ Statspocalypse",
             createItemLore("jerry", jerryLuck),
         )
-        event.addItem(stack)
+        addItem(stack)
     }
 
-    @HandleEvent(priority = 100)
-    fun totalLuck(event: UserLuckCalculateEvent) {
-        val totalLuck = event.getTotalLuck()
-        event.mainLuckStack = ItemUtils.createItemStack(
+    private fun UserLuckCalculateEvent.addTotalLuck() {
+        val totalLuck = getTotalLuck()
+        mainLuckStack = ItemUtils.createItemStack(
             mainLuckID,
             "$MAIN_LUCK_NAME §f${tryTruncateFloat(totalLuck)}",
             createItemLore("mainMenu", totalLuck),
         )
+    }
+
+    @HandleEvent(priorityLevel = HIGHEST)
+    private fun onUserLuckStart(event: UserLuckCalculateEvent) {
+        event.addSkillLuck()
+        event.addLimboLuck()
+    }
+
+    @HandleEvent(priorityLevel = LOWEST)
+    private fun onUserLuckEnd(event: UserLuckCalculateEvent) {
+        event.addJerryLuck()
+        event.addTotalLuck()
     }
 
     fun getTotalUserLuck(): Float {

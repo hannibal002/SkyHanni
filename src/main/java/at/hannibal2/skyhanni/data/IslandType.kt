@@ -114,7 +114,7 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
         fun getByIdOrNull(id: String): IslandType? = entries.find { it.apiName == id }
         fun getByIdOrUnknown(id: String): IslandType = getByIdOrNull(id) ?: UNKNOWN
 
-        @HandleEvent(priority = HandleEvent.HIGH)
+        @HandleEvent(priorityLevel = HIGH)
         private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
             val data = event.getConstantAsync<IslandTypeJson>("misc/IslandType")
 

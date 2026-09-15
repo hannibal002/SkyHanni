@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
@@ -33,8 +32,8 @@ object CarrolynHelper {
         "§7Bring §63,000 §7of these to §5Carrolyn §7in",
     )
 
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onTooltip(event: ToolTipTextEvent) {
+    @HandleEvent(priorityLevel = LOW)
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
 
         if (!event.itemStack.isCarrolynItem()) return
@@ -46,7 +45,7 @@ object CarrolynHelper {
     private fun SafeItemStack?.isCarrolynItem() = this?.getLore()?.any { lorePattern.matches(it) } ?: false
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onItemClick(event: ItemClickEvent) {
+    private fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
 
         if (!event.itemInHand.isCarrolynItem()) return
@@ -58,7 +57,7 @@ object CarrolynHelper {
                 "Carrolyn is on the Crimson Isle. Click here to warp there!",
                 onClick = {
                     HypixelCommands.warp("crimson")
-                    EntityMovementData.onNextTeleport(IslandType.CRIMSON_ISLE) {
+                    EntityMovementData.onNextTeleport(CRIMSON_ISLE) {
                         startPathfind()
                     }
                 },
@@ -68,9 +67,8 @@ object CarrolynHelper {
     }
 
     private fun startPathfind() {
-        IslandGraphs.node("Carrolyn", GraphNodeTag.NPC).pathFind("§5Carrolyn") { isEnabled() }
+        IslandGraphs.node("Carrolyn", NPC).pathFind("§5Carrolyn") { isEnabled() }
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.helpCarrolyn
-
 }

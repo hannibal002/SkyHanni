@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.SafeItemStack
 
-// gets fired when we want to calculate what the current player user luck values are
+/**
+ * Gets fired when we want to calculate what the current player user luck values are.
+ */
+@PrimaryFunction("onUserLuck")
 class UserLuckCalculateEvent : SkyHanniEvent() {
-
     private var totalLuck = 0f
     lateinit var mainLuckStack: SafeItemStack
     private val stacks = mutableMapOf<Int, SafeItemStack>()
@@ -28,10 +30,8 @@ class UserLuckCalculateEvent : SkyHanniEvent() {
                 break
             }
         }
-        if (slot == -1) {
-            ErrorManager.skyHanniError(
-                "Looks like we ran out of space in the user luck menu! This means *someone* has to add pages to it :)"
-            )
+        check(slot != -1) {
+            "Looks like we ran out of space in the user luck menu! This means *someone* has to add pages to it :)"
         }
         stacks[slot] = stack
     }
