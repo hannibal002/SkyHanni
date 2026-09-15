@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.AbstractSkyHanniEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -77,7 +76,7 @@ object HoppityRabbitTheFishChecker {
         }?.key
     }
 
-    @HandleEvent(priority = HIGHEST)
+    @HandleEvent(priorityLevel = HIGHEST)
     private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || rabbitTheFishIndex == null) return
 
@@ -91,22 +90,22 @@ object HoppityRabbitTheFishChecker {
     }
 
     @HandleEvent
-    fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
+    private fun onAttemptedInventoryClose(event: AttemptedInventoryCloseEvent) {
         if (!isEnabled() || rabbitTheFishIndex == null) return
         event.sendPreventClosureTitle()
     }
 
     @HandleEvent
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         rabbitTheFishIndex = null
     }
 
-    private fun SkyHanniEvent.Cancellable.sendPreventClosureTitle() {
+    private fun AbstractSkyHanniEvent.Cancellable.sendPreventClosureTitle() {
         TitleManager.sendTitle(
             "§cRabbit the Fish Prevented Close",
             subtitleText = "§7Hold §eShift §7to bypass",
             duration = 5.seconds,
-            location = TitleManager.TitleLocation.INVENTORY,
+            location = INVENTORY,
         )
         SoundUtils.playErrorSound()
         cancel()

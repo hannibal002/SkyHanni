@@ -27,6 +27,7 @@ import java.lang.reflect.ParameterizedType
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import kotlin.time.Duration.Companion.minutes
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
@@ -186,13 +187,15 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         directory: String,
         fileName: String,
         gson: Gson = ConfigManager.gson,
-    ): T = runCatching {
+    ): T = try {
         val path = resolvePath(directory, fileName)
         val json = readJsonElement(path) ?: logger.throwError("Repo file '$fileName' not found.")
         withContext(Dispatchers.Default) {
             gson.fromJson<T>(json)
         }
-    }.getOrElse { e ->
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Throwable) {
         logger.throwErrorWithCause("Repo parsing error while trying to read constant '$fileName'", e)
     }
 

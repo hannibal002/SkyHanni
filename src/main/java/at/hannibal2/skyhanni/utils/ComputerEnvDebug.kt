@@ -20,7 +20,6 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ComputerEnvDebug {
-
     private var launchers: List<LauncherEntry> = listOf()
     private var genericStacks: List<String> = listOf()
 
@@ -34,7 +33,7 @@ object ComputerEnvDebug {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val repoJson = event.getConstant<LaunchersJson>("Launchers")
         launchers = repoJson.launchers
         genericStacks = repoJson.genericStacks

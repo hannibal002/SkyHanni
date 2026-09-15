@@ -2,30 +2,20 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT_ABIPHONE
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.HITMAN
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.VISITOR
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFBarnManager
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
@@ -38,9 +28,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.toSingleLineLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
-import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
-import at.hannibal2.skyhanni.utils.LorenzRarity.RARE
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -48,9 +35,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyblockSeason
-import at.hannibal2.skyhanni.utils.SkyblockSeasonModifier
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -58,10 +43,8 @@ import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object HoppityApi {
-
     // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: §f1st Chocolate Milestone
@@ -185,10 +168,10 @@ object HoppityApi {
     fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) getEventEndMark(SkyBlockTime.now().year) else null
 
     fun getEventEndMark(year: Int) =
-        SkyBlockTime.fromSeason(year, SkyblockSeason.SUMMER, SkyblockSeasonModifier.EARLY).toTimeMark()
+        SkyBlockTime.fromSeason(year, SUMMER, EARLY).toTimeMark()
 
     fun getEventStartMark(year: Int) =
-        SkyBlockTime.fromSeason(year, SkyblockSeason.SPRING, SkyblockSeasonModifier.EARLY).toTimeMark()
+        SkyBlockTime.fromSeason(year, SPRING, EARLY).toTimeMark()
 
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
         it.chatColorCode == rabbit.substring(0, 2)
@@ -234,25 +217,30 @@ object HoppityApi {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         allowedHoppityIslands = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations").apiEggLocations.keys.toSet()
     }
 
-    @HandleEvent(IslandChangeEvent::class)
-    fun onIslandChange() {
-        onHoppityIsland = SkyBlockUtils.inSkyBlock && allowedHoppityIslands.any { it.isInIsland() }
+    @HandleEvent
+    private fun onWorldChange() {
+        onHoppityIsland = false
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onIslandJoin(event: IslandJoinEvent) {
+        onHoppityIsland = event.island in allowedHoppityIslands
+    }
+
+    @HandleEvent
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!checkNextInvOpen) return
         checkNextInvOpen = false
         if (!hoppityDetector.isInside()) return
         lastHoppityCallAccept = SimpleTimeMark.now()
     }
 
-    @HandleEvent(InventoryCloseEvent::class)
-    fun onInventoryClose() {
+    @HandleEvent
+    private fun onInventoryClose() {
         processedStraySlots.clear()
         if (lastHoppityCallAccept == null) return
         DelayedRun.runDelayed(1.seconds) {
@@ -261,13 +249,13 @@ object HoppityApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onCommandSend(event: MessageSendToServerEvent) {
+    private fun onCommandSend(event: MessageSendToServerEvent) {
         if (!pickupOutgoingCommandPattern.matches(event.message)) return
         checkNextInvOpen = true
     }
 
     @HandleEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         // Remove any processed stray slots that are no longer in the inventory.
         processedStraySlots.entries.removeIf {
             !event.inventoryItems.containsKey(it.key) ||
@@ -309,8 +297,8 @@ object HoppityApi {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    @HandleEvent(priorityLevel = HIGH)
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!miscProcessInvPattern.matches(InventoryUtils.openInventoryName())) return
         val slot = event.slot?.takeIf { it.isMiscProcessable() } ?: return
         val hoverName = slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets()
@@ -327,8 +315,8 @@ object HoppityApi {
         }
     }
 
-    @HandleEvent(priority = HIGHEST)
-    fun onEggFound(event: EggFoundEvent) {
+    @HandleEvent(priorityLevel = HIGHEST)
+    private fun onEggFound(event: EggFoundEvent) {
         hoppityDataSet.lastMeal = event.type
 
         when (event.type) {
@@ -353,8 +341,8 @@ object HoppityApi {
         attemptFireRabbitFound(event.chatEvent)
     }
 
-    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    @HandleEvent(onlyOnSkyblock = true, priorityLevel = HIGH)
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
             hoppityDataSet.reset()
             val type = getEggType(event)

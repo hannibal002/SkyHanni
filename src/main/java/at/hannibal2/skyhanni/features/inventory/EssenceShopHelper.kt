@@ -37,7 +37,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object EssenceShopHelper {
-
     // Where the informational item stack will be placed in the GUI
     private const val CUSTOM_STACK_LOCATION = 8
     private inline val GOLD_NUGGET_ITEM get() = Items.GOLD_NUGGET
@@ -147,7 +146,7 @@ object EssenceShopHelper {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val repoEssenceShops = event.getConstant<Map<String, Map<String, NeuEssenceShopJson>>>("essenceshops")
         essenceShops = repoEssenceShops.map { (key, value) ->
             EssenceShop(key, value.values.toMutableList())

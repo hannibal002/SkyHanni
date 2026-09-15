@@ -21,7 +21,6 @@ import kotlin.time.Duration
  */
 @SkyHanniModule
 object CompactorCraftApi {
-
     /** Null until the first repo reload build finished. Replaced as a whole, never field by field. */
     @Volatile
     private var lookup: CraftLookup? = null
@@ -38,7 +37,6 @@ object CompactorCraftApi {
 
         /** The first build has not finished yet, so nothing is known about any item. */
         data object NotLoaded : CraftState
-
 
         /** The item has no single step craft. */
         data object NoCraft : CraftState
@@ -64,7 +62,7 @@ object CompactorCraftApi {
     }
 
     @HandleEvent
-    private fun onNeuRepoReload() {
+    private suspend fun onNeuRepoReload() {
         // The sack item list is only rebuilt after this event, so the build has to wait for it.
         DelayedRun.runNextTickEnd("compactor gfs single step crafts") {
             repoReloadCoroutine.launch {

@@ -27,7 +27,6 @@ import net.minecraft.world.phys.AABB
 
 @SkyHanniModule
 object DanceRoomHelper {
-
     private val config get() = RiftApi.config.area.mirrorverse.danceRoomHelper
     private val danceRoom = AABB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
 
@@ -165,7 +164,7 @@ object DanceRoomHelper {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         instructions = event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions").instructions
     }
 

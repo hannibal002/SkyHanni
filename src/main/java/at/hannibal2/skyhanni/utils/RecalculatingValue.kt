@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -12,7 +10,6 @@ import kotlin.reflect.KProperty
 import kotlin.time.Duration
 
 class RecalculatingValue<T>(private val expireTime: Duration, private val calculation: () -> T) : ReadOnlyProperty<Any?, T> {
-
     private var currentValue: Any? = UNINITIALIZED_VALUE
     private var lastAccessTime = SimpleTimeMark.farPast()
 
@@ -31,7 +28,6 @@ class RecalculatingValue<T>(private val expireTime: Duration, private val calcul
 }
 
 class ResettableValue<T>(private val calculation: () -> T) : ReadOnlyProperty<Any?, T> {
-
     private var currentValue: Any? = UNINITIALIZED_VALUE
     private var dirty = true
 
@@ -57,7 +53,6 @@ class StableOrTransientValue<T>(
     private val transientExpireTime: Duration,
     private val calculation: () -> Result<T>,
 ) : ReadOnlyProperty<Any?, T> {
-
     private var currentValue: Any? = UNINITIALIZED_VALUE
     private var lastCalculationTime = SimpleTimeMark.farPast()
     private var stable = false
@@ -93,7 +88,6 @@ class StableOrTransientValue<T>(
 }
 
 class AutoUpdatingItemStack(internalName: NeuInternalName) : ReadOnlyProperty<Any?, SafeItemStack> {
-
     private val value: ResettableValue<SafeItemStack> = ResettableValue {
         internalName.getItemStack()
     }.also { list.add(it) }
@@ -109,13 +103,13 @@ class AutoUpdatingItemStack(internalName: NeuInternalName) : ReadOnlyProperty<An
 
         val list = mutableListOf<ResettableValue<SafeItemStack>>()
 
-        @HandleEvent(RepositoryReloadEvent::class)
-        fun onRepoReload() {
+        @HandleEvent
+        private suspend fun onRepoReload() {
             list.forEach { it.reset() }
         }
 
-        @HandleEvent(NeuRepositoryReloadEvent::class)
-        fun onNeuRepoReload() {
+        @HandleEvent
+        private suspend fun onNeuRepoReload() {
             list.forEach { it.reset() }
         }
     }

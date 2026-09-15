@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.api.event.AbstractSkyHanniEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.utils.LorenzVec
 
@@ -19,4 +20,4 @@ abstract class WorldEvent : SkyHanniEvent() {
 /**
  * Base class for cancellable world events.
  */
-abstract class CancellableWorldEvent : WorldEvent(), SkyHanniEvent.Cancellable
+abstract class CancellableWorldEvent : WorldEvent(), AbstractSkyHanniEvent.Cancellable
