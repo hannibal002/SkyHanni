@@ -1,5 +1,8 @@
 #version 150
 
+//? if >= 26.3
+#extension GL_ARB_separate_shader_objects : require
+
 in vec3 Position;
 in vec4 RoundedParams0;
 in vec4 RoundedParams1;
@@ -7,8 +10,8 @@ in vec4 GradientParams0;
 in vec4 GradientParams1;
 in vec4 GradientParams2;
 
-#moj_import <minecraft:dynamictransforms.glsl>
-#moj_import <minecraft:projection.glsl>
+#include <minecraft:dynamictransforms.glsl>
+#include <minecraft:projection.glsl>
 
 out vec4 roundedParams0;
 out vec4 roundedParams1;

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 import at.hannibal2.skyhanni.utils.AbstractCustomMenuScreen
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
@@ -45,11 +46,11 @@ class CustomWardrobeScreen(
         }
     }
 
-    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
+    override fun onKeyTyped(typedChar: Char?, key: InputCode) {
         CustomWardrobeKeybinds.handlePress()
     }
 
-    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
+    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: InputCode) {
         CustomWardrobeKeybinds.handlePress()
     }
 }

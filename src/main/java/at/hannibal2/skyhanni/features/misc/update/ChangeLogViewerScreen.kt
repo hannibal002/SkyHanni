@@ -155,7 +155,6 @@ class ChangeLogViewerScreen : SkyHanniBaseScreen() {
         velocity = 12.0,
         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         scrollValue = changelogScroll,
-        button = 0,
     )
 
     private fun makeChangeLogToRenderable(
