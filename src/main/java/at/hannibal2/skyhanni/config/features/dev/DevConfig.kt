@@ -106,7 +106,8 @@ class DevConfig {
     @Expose
     @ConfigOption(
         name = "Discover Contributor Message",
-        desc = "Sends a message to your chat when you see a unique contributor.",
+        desc = "Sends a message to your chat when you see a unique contributor.\n" +
+            "Your first-ever contributor discovery is always shown if you have achievements enabled.",
     )
     @ConfigEditorBoolean
     var discoverContributorMessage: Boolean = false
