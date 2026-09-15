@@ -8,6 +8,9 @@ import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.mining.CorpseFoundEvent
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypoint
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypoint.Type
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypointManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -43,6 +46,7 @@ object CorpseFinder {
 
     // Map with the corpse entity as the key and the consecutive ticks count of passing canBeSeen checks as value
     private val corpseEntities = mutableMapOf<ArmorStand, Int>()
+    private val potentialWaypoints = mutableMapOf<MineshaftWaypoint, Int>()
     private var totalCorpseCount = 0
 
     private fun areAllCorpsesFound(): Boolean {
@@ -52,7 +56,7 @@ object CorpseFinder {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
-    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
+    private fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (!event.isHead || event.newItemStack == null) return
         if (!CorpseType.isValidHelmet(event.newItemStack.getInternalName())) return
         if (corpseEntities.any { it.key.uuid == event.entity.uuid }) return
@@ -61,7 +65,7 @@ object CorpseFinder {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
-    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
+    private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         for ((entity, canBeSeenTicks) in corpseEntities) {
             if (canBeSeenTicks >= MARK_AS_FOUND_TICKS_THRESHOLD) continue
 
@@ -81,10 +85,24 @@ object CorpseFinder {
                 CorpseFoundEvent(corpseType, entity.getLorenzVec().up(), areAllCorpsesFound()).post()
             }
         }
+
+        MineshaftWaypointManager.waypoints.removeIf { waypoint ->
+            if (waypoint.type != Type.POTENTIAL_CORPSE) return@removeIf false
+            if (areAllCorpsesFound()) return@removeIf true
+
+            if (!waypoint.location.canBeSeen(-1..3)) {
+                potentialWaypoints[waypoint] = 0
+                return@removeIf false
+            }
+
+            if (potentialWaypoints.addOrPut(waypoint, 1) < MARK_AS_FOUND_TICKS_THRESHOLD) return@removeIf false
+
+            corpseEntities.none { it.key.getLorenzVec().distance(waypoint.location) <= 3 }
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
-    fun onEntityClick(event: EntityClickEvent) {
+    private fun onEntityClick(event: EntityClickEvent) {
         val clickedEntityUuid = event.clickedEntity.uuid
         val (entity, canBeSeenTicks) = corpseEntities.entries.firstOrNull { it.key.uuid == clickedEntityUuid } ?: return
 
@@ -102,13 +120,13 @@ object CorpseFinder {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (event.widget != TabWidget.FROZEN_CORPSES) return
         totalCorpseCount = event.lines.count { tabWidgetCorpsePattern.matches(it) }
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         corpseEntities.clear()
         totalCorpseCount = 0
     }

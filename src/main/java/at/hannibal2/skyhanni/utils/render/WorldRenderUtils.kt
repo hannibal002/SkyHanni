@@ -229,6 +229,7 @@ object WorldRenderUtils {
         extraSizeTopY: Double = extraSize,
         extraSizeBottomY: Double = extraSize,
         minimumAlpha: Float = 0.2f,
+        maximumAlpha: Float = 1.0f,
         inverseAlphaScale: Boolean = false,
     ) {
         val (viewerX, viewerY, viewerZ) = getViewerPos()
@@ -237,14 +238,17 @@ object WorldRenderUtils {
         val z = location.z - viewerZ
         val distSq = x * x + y * y + z * z
 
+        val minAlpha = minimumAlpha.coerceIn(0f..1f)
+        val maxAlpha = maximumAlpha.coerceIn(minAlpha..1f)
+
         drawFilledBoundingBox(
             AABB(
                 x - extraSize, y - extraSizeBottomY, z - extraSize,
                 x + 1 + extraSize, y + 1 + extraSizeTopY, z + 1 + extraSize,
             ).expandBlock(),
             color,
-            if (inverseAlphaScale) (1f - 0.005f * distSq.toFloat()).coerceIn(minimumAlpha..1f)
-            else (0.1f + 0.005f * distSq.toFloat()).coerceIn(minimumAlpha..1f),
+            if (inverseAlphaScale) (1f - 0.005f * distSq.toFloat()).coerceIn(minAlpha..maxAlpha)
+            else (0.1f + 0.005f * distSq.toFloat()).coerceIn(minAlpha..maxAlpha),
             renderRelativeToCamera = true,
             seeThroughBlocks = seeThroughBlocks,
         )
