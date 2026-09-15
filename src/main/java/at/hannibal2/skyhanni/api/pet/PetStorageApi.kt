@@ -529,11 +529,7 @@ object PetStorageApi {
         val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
         when (event.mouseType) {
             RIGHT_CLICK -> {
-                clickedPetUuid ?: return
-                petStorage?.pets?.removeIf { it.uuid == clickedPetUuid }
-                if (currentPetUuid == clickedPetUuid) {
-                    CurrentPetApi.clearCurrentPet()
-                }
+                if (remove(clickedPetUuid, currentPetUuid)) return
             }
 
             LEFT_CLICK -> { // if not a shift click, summon/un-summon pet
