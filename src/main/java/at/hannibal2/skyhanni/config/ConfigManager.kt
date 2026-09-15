@@ -73,7 +73,6 @@ class ConfigManager {
         }
         configDirectory.mkdirs()
 
-
         for (fileType in ConfigFileType.entries) {
             val clazzInstance = fileType.clazz.getDeclaredConstructor().newInstance()
             setConfigHolder(fileType, firstLoadFile(fileType.file, fileType, clazzInstance))
@@ -244,6 +243,7 @@ class ConfigManager {
      */
     fun recreateConfig() {
         ConfigGuiManager.editor = null
+        IndividualTrackerConfigGuiManager.invalidate()
         PetDisplayConfigGuiManager.invalidate()
         ConfigUtils.clearEditorCache()
         val features = SkyHanniMod.feature
