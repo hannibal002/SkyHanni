@@ -27,6 +27,8 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessaryOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -100,6 +102,14 @@ object SlayerApi {
     private val cocoonPattern by patternGroup.pattern(
         "cocooned.colorless",
         "\\s+YOU COCOONED YOUR SLAYER BOSS",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: 1-2
+     */
+    private val repoDropAmountPattern by patternGroup.pattern(
+        "repo.drops.amounts",
+        "-?"
     )
     // </editor-fold>
 
@@ -208,12 +218,11 @@ object SlayerApi {
 
     fun getItemDropAmountForTier(internalName: NeuInternalName, tier: Int): Pair<Int, Int?> {
         val dropAmount = jsonData?.dropAmounts?.get(internalName) ?: return 1 to null
-        val dropAmountForTier = dropAmount[tier]?.split(regex = "-?".toPattern()).takeIf { !it.isNullOrEmpty() }
-
-        val min = dropAmountForTier?.get(0)?.toInt() ?: 1
-        val max = dropAmountForTier?.get(1)?.toInt() ?: 1
-
-        return min to max
+        val dropString = dropAmount[tier] ?: return 1 to null
+        return repoDropAmountPattern.matchMatcher(dropString) {
+            val min = group("min")?.toInt() ?: return 1 to null
+            min to groupOrNull("max")?.toInt()
+        } ?: (1 to null)
     }
 
     @HandleEvent

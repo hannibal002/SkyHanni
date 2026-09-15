@@ -207,8 +207,8 @@ object SlayerRngMeterDisplay {
     private fun setNewGoal(internalName: NeuInternalName?) {
         val storage = getStorage() ?: return
         if (internalName == null) {
-            storage.itemGoal = ""
-            storage.goalNeeded = -1
+            storage.itemGoal = null
+            storage.goalNeeded = null
         } else {
             storage.itemGoal = internalName.repoItemName
             val currentSlayer = getCurrentSlayer()
@@ -220,7 +220,7 @@ object SlayerRngMeterDisplay {
                     "currentSlayer" to currentSlayer,
                     "rngScore" to rngScore,
                 )
-                -1
+                null
             }
         }
         update()
@@ -250,49 +250,50 @@ object SlayerRngMeterDisplay {
             return Renderable.empty()
         }
 
-        return Renderable.vertical(
-            buildList {
-                val storage = storage
-                val itemGoal = storage.itemGoal
-                val goalNeeded = storage.goalNeeded
-                val currentMeter = storage.currentMeter
-                val gainPerBoss = storage.gainPerBoss
-
-                if (itemGoal == null) {
-                    add(StringRenderable("§cOpen RNG Meter Inventory!"))
-                    return@buildList
-                }
-                if (itemGoal.isBlank()) {
-                    val msg = if (!lastItemDroppedTime.isFarPast()) "§a§lRNG Item dropped!" else "§eNo RNG Item selected!"
-                    add(StringRenderable(msg))
-                    return@buildList
-                }
-                if (currentMeter == null || gainPerBoss == null) {
-                    add(StringRenderable("§cKill the slayer boss 2 times!"))
-                    return@buildList
-                }
-                if (goalNeeded == null) {
-                    logCalculatingError(storage)
-                    return@buildList
-                }
-
-                val missing = goalNeeded - currentMeter + gainPerBoss
-                var timesMissing = missing.toDouble() / gainPerBoss
-                if (timesMissing < 1) timesMissing = 1.0
-                timesMissing = ceil(timesMissing)
-
-                add(StringRenderable("$itemGoal §7in §e${timesMissing.toInt().addSeparators()} §7bosses!"))
-
-                if (config.coinsPerBoss) {
-                    SlayerRngMeterToolTipFeatures.coinsPerBossLine(itemGoal, gainPerBoss)?.let { profitLine ->
-                        addNotNull(StringRenderable(profitLine))
-                    } ?: {
-                        add(StringRenderable("§cCouldn't calculate profit/boss!"))
-                    }
-                }
-            },
-        )
+        return Renderable.vertical(buildDisplay(storage))
     }
+
+    private fun buildDisplay(storage: ProfileSpecificStorage.SlayerStorage.RngMeterStorage): List<StringRenderable> =
+        buildList {
+            val itemGoal = storage.itemGoal
+            val goalNeeded = storage.goalNeeded
+            val currentMeter = storage.currentMeter
+            val gainPerBoss = storage.gainPerBoss
+
+            if (itemGoal == null) {
+                add(StringRenderable("§cOpen RNG Meter Inventory!"))
+                return@buildList
+            }
+            if (itemGoal.isBlank()) {
+                val msg = if (!lastItemDroppedTime.isFarPast()) "§a§lRNG Item dropped!" else "§eNo RNG Item selected!"
+                add(StringRenderable(msg))
+                return@buildList
+            }
+            if (currentMeter == null || gainPerBoss == null) {
+                add(StringRenderable("§cKill the slayer boss 2 times!"))
+                return@buildList
+            }
+            if (goalNeeded == null) {
+                logCalculatingError(storage)
+                return@buildList
+            }
+
+            val missing = goalNeeded - currentMeter + gainPerBoss
+            var timesMissing = missing.toDouble() / gainPerBoss
+            if (timesMissing < 1) timesMissing = 1.0
+            timesMissing = ceil(timesMissing)
+
+            add(StringRenderable("$itemGoal §7in §e${timesMissing.toInt().addSeparators()} §7bosses!"))
+
+            if (config.coinsPerBoss) {
+                SlayerRngMeterToolTipFeatures.coinsPerBossLine(itemGoal, goalNeeded)?.let { profitLine ->
+                    addNotNull(StringRenderable(profitLine))
+                } ?: {
+                    add(StringRenderable("§cCouldn't calculate profit/boss!"))
+                }
+            }
+        }
+
 
     init {
         RenderDisplayHelper(
@@ -333,7 +334,7 @@ object SlayerRngMeterDisplay {
 
     @HandleEvent
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(146, "#profile.slayerRngMeter") { element ->
+        event.move(147, "#profile.slayerRngMeter", "#profile.slayer.rngMeter") { element ->
             val result = JsonObject()
             element.asJsonObject.asMap().forEach { (boss, oldValues) ->
                 val innerResult = JsonObject()
@@ -358,6 +359,5 @@ object SlayerRngMeterDisplay {
 
             result
         }
-        event.move(146, "#profile.slayerRngMeter", "#profile.slayer.rngMeter")
     }
 }

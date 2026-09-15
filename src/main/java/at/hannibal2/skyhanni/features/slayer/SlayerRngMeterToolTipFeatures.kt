@@ -80,10 +80,10 @@ object SlayerRngMeterToolTipFeatures {
         val slayerName = SlayerApi.rngMeterSlayerTypePattern.matchMatcher(
             InventoryUtils.openInventoryName(),
         ) { group("type") } ?: return
-        val slayerType = SlayerType.getByName(slayerName)
+        val slayerType = SlayerType.getByName(slayerName) ?: return
 
         val goalNeeded = TestCopyRngMeterValues.rngScorePattern.firstComponentMatcher(event.toolTip) {
-            group("required").formatLongOrNull()
+            group("xp").formatLongOrNull()
         } ?: return
 
         val internalName = event.itemStack.getInternalNameOrNull()
@@ -92,7 +92,8 @@ object SlayerRngMeterToolTipFeatures {
         if (convertToFractions) event.toolTip.replaceOddsWithFractions(oddsInfo)
 
         if (coinsPerBoss && internalName != null) {
-            val profitLine = coinsPerBossLine(internalName, goalNeeded, slayerType = slayerType) ?: return
+            val maxSlayerTier = SlayerApi.jsonData?.spawnCosts?.get(slayerType)?.keys?.maxOrNull()
+            val profitLine = coinsPerBossLine(internalName, goalNeeded, slayerType = slayerType, slayerTier = maxSlayerTier) ?: return
             event.toolTip.addOrInsert(oddsInfo.toolTipIndex + 1, Component.literal(profitLine))
         }
     }
@@ -161,18 +162,23 @@ object SlayerRngMeterToolTipFeatures {
         return coinsPerBossLine(internalName, goalNeeded, slayerType)
     }
 
-    fun coinsPerBossLine(internalName: NeuInternalName, goalNeeded: Long, slayerType: SlayerType? = null): String? {
+    fun coinsPerBossLine(
+        internalName: NeuInternalName,
+        goalNeeded: Long,
+        slayerType: SlayerType? = null,
+        slayerTier: Int? = null,
+    ): String? {
         val activeType = slayerType ?: SlayerApi.activeType ?: return null
-        val slayerTier = SlayerApi.tier
+        val activeTier = slayerTier ?: SlayerApi.tier
 
-        val (minDrop, maxDrop) = SlayerApi.getItemDropAmountForTier(internalName, slayerTier)
+        val (minDrop, maxDrop) = SlayerApi.getItemDropAmountForTier(internalName, activeTier)
         val itemPriceMin = SlayerApi.getItemNameAndPrice(internalName, minDrop).second
         val itemPriceMax = maxDrop?.let { SlayerApi.getItemNameAndPrice(internalName, it).second }
 
-        val gainPerBoss = SlayerApi.jsonData?.xpGains?.get(activeType)?.get(slayerTier) ?: return null
+        val gainPerBoss = activeType.calculateXPGain(activeTier) ?: return null
 
         val bossesNeeded = ceil(goalNeeded.toDouble() / gainPerBoss).toInt().takeIf { it > 0 } ?: return null
-        val spawnCost = activeType.calculateSpawnCost(slayerTier) ?: return null
+        val spawnCost = activeType.calculateSpawnCost(activeTier) ?: return null
 
         return formatProfitPerBossLine(
             bossesNeeded,
