@@ -10,12 +10,14 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import com.mojang.serialization.JsonOps
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.MessageSignature
 import net.minecraft.network.chat.MutableComponent
@@ -314,7 +316,6 @@ fun ClickEvent.value(): String {
         // todo use error manager here probably, not doing it now because it doesn't compile on 1.21
         else -> ""
     }
-
 }
 
 fun HoverEvent.value(): Component = when (action()) {
@@ -344,8 +345,8 @@ fun Component.changeColor(color: LorenzColor): Component {
 }
 
 fun Component.convertToJsonString(): String {
-    return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(
-        com.mojang.serialization.JsonOps.INSTANCE,
+    return ComponentSerialization.CODEC.encodeStart(
+        JsonOps.INSTANCE,
         this,
     ).orThrow.toString()
 }

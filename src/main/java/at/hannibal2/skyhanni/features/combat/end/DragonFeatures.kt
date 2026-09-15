@@ -3,12 +3,9 @@ package at.hannibal2.skyhanni.features.combat.end
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -31,11 +28,11 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.properties.Delegates
+import kotlin.properties.ReadWriteProperty
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object DragonFeatures {
-
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragon
     private val trackerConfig get() = SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker
     private val configProtector get() = SkyHanniMod.feature.combat.endIsland.endstoneProtectorChat
@@ -169,7 +166,7 @@ object DragonFeatures {
 
     private var dirty = false
 
-    private fun <T> dirtyTracking(initial: T): kotlin.properties.ReadWriteProperty<Any?, T> =
+    private fun <T> dirtyTracking(initial: T): ReadWriteProperty<Any?, T> =
         Delegates.observable(initial) { _, old, new ->
             if (old != new) dirty = true
         }
@@ -231,8 +228,8 @@ object DragonFeatures {
 
     private fun displayIsEnabled() = config.display && dragonSpawned
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    @HandleEvent(onlyOnIsland = THE_END)
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message
 
         if (!config.chat && !config.display && !config.superiorNotify && !configProtector) return
@@ -386,8 +383,8 @@ object DragonFeatures {
         )
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onScoreBoard(event: ScoreboardUpdateEvent) {
+    @HandleEvent(onlyOnIsland = THE_END)
+    private fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         val index = event.new.indexOfFirstOrNull { scoreDragonPattern.matches(it) } ?: return
         if (eggSpawned) {
             dragonSpawned = true
@@ -397,8 +394,8 @@ object DragonFeatures {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onTabList(event: WidgetUpdateEvent) {
+    @HandleEvent(onlyOnIsland = THE_END)
+    private fun onTabList(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.DRAGON)) return
         if (!displayIsEnabled()) return
         widgetActive = true
@@ -418,8 +415,8 @@ object DragonFeatures {
 
     private var display = listOf<Renderable>()
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onRender(event: GuiRenderEvent) {
+    @HandleEvent(onlyOnIsland = THE_END)
+    private fun onGuiRender() {
         if (!displayIsEnabled()) return
         if (dirty) {
             display = if (widgetActive) display() else widgetErrorMessage
@@ -442,13 +439,13 @@ object DragonFeatures {
     )
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    private fun onWorldChange() {
         reset()
         eggSpawned = true
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(78, "combat.dragon", "combat.endIsland.dragon")
         event.move(78, "combat.endstoneProtectorChat", "combat.endIsland.endstoneProtectorChat")
     }

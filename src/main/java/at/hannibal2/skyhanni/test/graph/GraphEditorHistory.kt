@@ -10,9 +10,10 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import org.lwjgl.glfw.GLFW
+import java.awt.Color
+import java.util.Stack
 
 object GraphEditorHistory {
-
     private val undoRedoMessageId = ChatUtils.getUniqueMessageId()
 
     private data class HistoryEntry(
@@ -21,8 +22,8 @@ object GraphEditorHistory {
         val playerPos: LorenzVec,
     )
 
-    private val undoStack = java.util.Stack<HistoryEntry>()
-    private val redoStack = java.util.Stack<HistoryEntry>()
+    private val undoStack = Stack<HistoryEntry>()
+    private val redoStack = Stack<HistoryEntry>()
 
     fun save(label: String) {
         val currentPos = GraphUtils.playerPosition
@@ -90,7 +91,7 @@ object GraphEditorHistory {
         IslandGraphs.pathFind(
             entry.playerPos,
             "$type: ${entry.label}",
-            java.awt.Color.ORANGE,
+            Color.ORANGE,
             condition = { isEnabled() },
         )
     }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.associateNotNull
+import java.io.File
 import java.nio.file.Files
 import kotlin.io.path.Path
 
@@ -15,7 +16,6 @@ import kotlin.io.path.Path
  * and surfaces an actionable message and the [DiscordIPCException.isSandboxIssue] flag.
  */
 object DiscordIPCPipeManager {
-
     private val isWindows = System.getProperty("os.name").lowercase().contains("win")
 
     /**
@@ -102,7 +102,7 @@ object DiscordIPCPipeManager {
                 isSandboxIssue = true,
             )
         }
-        if (baseDirs.none { java.io.File(it).canRead() }) return Diagnosis(
+        if (baseDirs.none { File(it).canRead() }) return Diagnosis(
             message = "No candidate runtime directories are accessible from this process. Is Discord running?",
             isSandboxIssue = false,
         )
@@ -116,7 +116,7 @@ object DiscordIPCPipeManager {
      * Returns null when not running inside a Flatpak sandbox.
      */
     private fun readFlatpakInfo(): Map<String, String>? {
-        val file = java.io.File("/.flatpak-info")
+        val file = File("/.flatpak-info")
         if (!file.exists()) return null
         return file.readLines()
             .filter { '=' in it && !it.startsWith('[') }
@@ -127,15 +127,15 @@ object DiscordIPCPipeManager {
 
     private fun resolveUid(): String? =
         System.getenv("XDG_RUNTIME_DIR")?.substringAfterLast('/')?.takeIf { it.isNotEmpty() && it.all(Char::isDigit) }
-            ?: runCatching { java.io.File("/proc/self/loginuid").readText().trim() }.getOrNull()
+            ?: runCatching { File("/proc/self/loginuid").readText().trim() }.getOrNull()
             ?: runCatching {
-                java.io.File("/proc/self/status").useLines { lines ->
+                File("/proc/self/status").useLines { lines ->
                     lines.firstOrNull { it.startsWith("Uid:") }?.split("\t")?.getOrNull(1)
                 }
             }.getOrNull()
 
     private fun readProcEnviron(): Map<String, String> = runCatching {
-        java.io.File("/proc/self/environ").readBytes()
+        File("/proc/self/environ").readBytes()
             .toString(Charsets.UTF_8)
             .split('\u0000')
             .associateNotNull { entry ->
