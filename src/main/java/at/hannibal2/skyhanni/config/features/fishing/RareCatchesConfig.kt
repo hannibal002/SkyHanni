@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.config.features.fishing
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
@@ -54,4 +57,11 @@ class RareCatchesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var highlight: Boolean = false
+
+    @ConfigOption(
+        name = "Invincibility Timer",
+        desc = "Click to open the Invincibility Timer settings."
+    )
+    @ConfigEditorButton(buttonText = "OPEN")
+    val invincibilityTracker: Runnable = Runnable { SkyHanniMod.feature.combat.mobs.invincibilityTimer::enabled.jumpToEditor() }
 }
