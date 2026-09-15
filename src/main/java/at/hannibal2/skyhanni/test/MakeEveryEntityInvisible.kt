@@ -3,15 +3,16 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 @SkyHanniModule
 object MakeEveryEntityInvisible {
-    private val config get() = DevApi.config.debug.unRenderLiterallyEveryEntity
+    private val config get() = DevApi.config.debug
 
     @HandleEvent
     private fun onEntityRenderEvent(event: CheckRenderEntityEvent<*>) {
         if (isEnabled()) event.cancel()
     }
 
-    private fun isEnabled() = config
+    private fun isEnabled() = config.hideAllEntities && SkyBlockUtils.inSkyBlock
 }
