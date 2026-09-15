@@ -38,7 +38,6 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
@@ -50,9 +49,6 @@ object BazaarApi {
 
     private val storage get() = ProfileStorageData.playerSpecific?.bazaar
 
-    private var loadedNpcPriceData = false
-
-    val holder = HypixelItemApi()
     var inBazaarInventory = false
     private var currentSearchedItem = ""
 
@@ -233,15 +229,6 @@ object BazaarApi {
         if (sellInstantly.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§6Sell Instantly") return
         taxPattern.firstMatcher(sellInstantly.getLore()) {
             taxRate = group("tax").formatDouble()
-        }
-    }
-
-    @HandleEvent
-    private fun onTick() {
-        if (ApiUtils.isHypixelItemsDisabled()) return
-        if (!loadedNpcPriceData) {
-            loadedNpcPriceData = true
-            holder.start()
         }
     }
 
