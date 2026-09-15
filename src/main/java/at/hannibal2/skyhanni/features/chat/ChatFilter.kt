@@ -474,7 +474,7 @@ object ChatFilter {
         "§4This Teleport Pad does not have a destination set!",
     )
 
-    // §e[NPC] Feast Chef Ted§r§f: §rThanks for the donation! I've added a §eKernel §fto your purse..
+    // §e[NPC] Feast Chef Ted§r§f: §rThanks for the donation! I've added a §eKernel §fto your purse.
     private val masterChefPatterns = listOf(
         "§e\\[NPC] Feast Chef Ted§r§f: §rThanks for the donation! I've added a §eKernel §fto your purse.".toPattern(),
     )
