@@ -18,7 +18,7 @@ class SafariChecklistConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var runShardChecklist: Boolean = true
+    var enabled: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -54,7 +54,7 @@ class SafariChecklistConfig {
     val showIcons: Property<Boolean> = Property.of(true)
 
     @Expose
-    @ConfigLink(owner = SafariChecklistConfig::class, field = "runShardChecklist")
+    @ConfigLink(owner = SafariChecklistConfig::class, field = "enabled")
     val position: Position = Position(80, 100)
 
 }

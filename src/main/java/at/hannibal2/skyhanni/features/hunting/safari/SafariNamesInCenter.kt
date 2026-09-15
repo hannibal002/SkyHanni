@@ -32,10 +32,8 @@ object SafariNamesInCenter {
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.namesInCenter || !showWaypoints) return
         for ((location, biome) in areaLocations) {
-            val name = "${biome.formattedName} Biome"
-
             if (location.distanceSqToPlayer() > 50) {
-                event.drawDynamicText(location, name, 2.5)
+                event.drawDynamicText(location, biome.waypointName, 2.5)
             }
         }
     }

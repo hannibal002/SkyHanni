@@ -1,7 +1,6 @@
-package at.hannibal2.skyhanni.features.hunting.safari.checklist
+package at.hannibal2.skyhanni.features.hunting.safari
 
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
-import at.hannibal2.skyhanni.features.hunting.safari.SafariBiome
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -12,7 +11,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 
 enum class SafariShard(val displayName: String, val biome: SafariBiome) {
 
-    //Cavern
+    // Cavern
     CAVERNFISH("Cavernfish", SafariBiome.CAVERN),
     FLITTER("Flitter", SafariBiome.CAVERN),
     SHYWORM("Shyworm", SafariBiome.CAVERN),
@@ -23,7 +22,7 @@ enum class SafariShard(val displayName: String, val biome: SafariBiome) {
     SNOOZLE("Snoozle", SafariBiome.CAVERN),
     GEMZIE("Gemzie", SafariBiome.CAVERN),
 
-    //Forest
+    // Forest
     FOXTROT("Foxtrot", SafariBiome.FOREST),
     HONEYBUG("Honeybug", SafariBiome.FOREST),
     HIDEONFLOOR("Hideonfloor", SafariBiome.FOREST),
@@ -34,7 +33,7 @@ enum class SafariShard(val displayName: String, val biome: SafariBiome) {
     PARAKEET("Parakeet", SafariBiome.FOREST),
     MACAW("Macaw", SafariBiome.FOREST),
 
-    //Haunted
+    // Haunted
     SOLSNATCHER("Solsnatcher", SafariBiome.HAUNTED),
     BLOODBAT("Bloodbat", SafariBiome.HAUNTED),
     LITTERBUG("Litterbug", SafariBiome.HAUNTED),
@@ -46,7 +45,7 @@ enum class SafariShard(val displayName: String, val biome: SafariBiome) {
     HIDEYHO("Hideyho", SafariBiome.HAUNTED),
     DOOMSPIRAL("Doomspiral", SafariBiome.HAUNTED),
 
-    //Icy
+    // Icy
     STRONGARM("Strongarm", SafariBiome.ICY),
     POLARIS("Polaris", SafariBiome.ICY),
     BILLYGOAT("Billygoat", SafariBiome.ICY),
@@ -67,6 +66,8 @@ enum class SafariShard(val displayName: String, val biome: SafariBiome) {
     val itemStack: SafeItemStack? by itemStackCache
 
     val rarity: LorenzRarity? by rarityCache
+
+    val formattedName: String get() = "${rarity?.chatColorCode ?: "§f"}$displayName"
 
     internal fun resetCache() {
         internalNameCache.reset()

@@ -1,16 +1,13 @@
-package at.hannibal2.skyhanni.features.hunting.safari.checklist
+package at.hannibal2.skyhanni.features.hunting.safari
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.foraging.SafariChecklistConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
-import at.hannibal2.skyhanni.events.item.ShardSource
-import at.hannibal2.skyhanni.features.hunting.safari.SafariBiome
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
@@ -50,7 +47,10 @@ object SafariShardChecklist {
 
     @HandleEvent(onlyOnIsland = IslandType.SAFARI)
     private fun onShardGain(event: ShardGainEvent) {
-        if (event.source != ShardSource.HUNT && event.source != ShardSource.CAPTURED) return
+        when (event.source) {
+            HUNT, CAPTURED, FLOOR_DROP, GIVEN -> Unit
+            else -> return
+        }
         val shard = SafariShard.entries.firstOrNull { it.internalName == event.shardInternalName } ?: return
         addShard(shard.displayName, event.amount)
         updateDisplay()
@@ -82,7 +82,7 @@ object SafariShardChecklist {
 
     @HandleEvent(onlyOnIsland = IslandType.SAFARI)
     private fun onGuiRenderTop() {
-        if (!config.runShardChecklist) return
+        if (!config.enabled) return
         config.position.renderRenderables(display, posLabel = "Safari Shard Checklist")
     }
 
@@ -102,10 +102,7 @@ object SafariShardChecklist {
         val currentArea = SafariBiome.currentArea()
         val detailedBiomes = when (config.runDisplay.get()) {
             SafariChecklistConfig.ChecklistDisplay.ALL -> SafariBiome.entries
-            SafariChecklistConfig.ChecklistDisplay.CURRENT_ON_TOP -> currentArea.let { currentBiome ->
-                SafariBiome.entries.sortedByDescending { it == currentBiome }
-            }
-
+            SafariChecklistConfig.ChecklistDisplay.CURRENT_ON_TOP -> SafariBiome.entries.sortedByDescending { it == currentArea }
             SafariChecklistConfig.ChecklistDisplay.ONLY_CURRENT -> currentArea?.let { listOf(it) }.orEmpty()
         }
 
@@ -113,16 +110,20 @@ object SafariShardChecklist {
 
         if (config.runDisplay.get() == SafariChecklistConfig.ChecklistDisplay.ONLY_CURRENT) {
             SafariBiome.entries.filter { it !in detailedBiomes }.forEach { biome ->
-                val collected = biome.shards.count { shardCounts.getValue(it) > 0 }
-                val status = if (isBiomeDone(biome)) "§aDone" else "§7$collected/${biome.shards.size}"
-                add(Renderable.text("${biome.formattedName} §7- $status"))
+                addBiomeHeader(biome)
             }
         }
     }
 
-    private fun MutableList<Renderable>.addBiomeDetails(biome: SafariBiome) {
-        val status = if (isBiomeDone(biome)) "§aDone" else "§cUndone"
+    private fun MutableList<Renderable>.addBiomeHeader(biome: SafariBiome) {
+        val collected = biome.shards.count { shardCounts.getValue(it) > 0 }
+        val color = if (collected == biome.shards.size) "§a" else "§c"
+        val status = "$color$collected/${biome.shards.size}"
         add(Renderable.text("${biome.formattedName} §7- $status"))
+    }
+
+    private fun MutableList<Renderable>.addBiomeDetails(biome: SafariBiome) {
+        addBiomeHeader(biome)
         biome.shards.filter { !config.hideCollected.get() || shardCounts.getValue(it) == 0 }.forEach { shard ->
             val marker = if (shardCounts.getValue(shard) > 0) "§a✔" else "§c✖"
             val row = buildList {
@@ -130,7 +131,7 @@ object SafariShardChecklist {
                 if (config.showIcons.get()) {
                     shard.itemStack?.let { add(Renderable.item(it)) }
                 }
-                add(Renderable.text(formatShardName(shard.displayName, shard.rarity)))
+                add(Renderable.text(shard.formattedName))
             }
             add(Renderable.horizontal(row, spacing = 2))
         }
@@ -143,10 +144,4 @@ object SafariShardChecklist {
         }
         display = createDisplay()
     }
-
-    private fun isBiomeDone(biome: SafariBiome): Boolean = biome.shards.all { shardCounts.getValue(it) > 0 }
-
-    private fun formatShardName(displayName: String, rarity: LorenzRarity?): String =
-        "${rarity?.chatColorCode ?: "§f"}$displayName"
-
 }
