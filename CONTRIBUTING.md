@@ -91,15 +91,6 @@ configuration. If not, you can restart IntelliJ and reload the Gradle project ag
 
 </details>
 
-Select an appropriate Java 25 JDK (preferably [Adoptium](https://adoptium.net/), but any Java 25 JDK will do).
-
-<details>
-<summary>🖼️Show run configuration image</summary>
-
-![Run configuration settings](docs/run-configuration-settings.avif)
-
-</details>
-
 Now that we are done with that, you should be able to launch your game from your IDE with that run configuration.
 
 ## Pull Requests
@@ -244,6 +235,13 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
     - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
     - If you can improve the existing feature in a meaningful way.
+- The rule above applies to features another mod has already released. An open pull request in another mod is not a
+  released feature. It never blocks a pull request here, and no pull request here is closed because another mod happens
+  to be working on something similar. This works both ways: if another mod releases something that is sitting in an open
+  pull request here, that is equally fine and no reason to complain.
+- Code from another mod, released or not, is off limits.
+  - Collected data such as coordinates or item lists is different. It describes the game, not the mod that wrote it down.
+    Use it where the feature is your own, and credit the source in the commit or pull request.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
       Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.
@@ -260,6 +258,10 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
+- When renaming or replacing a symbol other code already uses, keep a deprecated alias under the old
+  name instead of deleting it right away. Open pull requests that still use the old name then keep
+  compiling and their authors get time to react. Remove the alias in a separate pull request one or
+  two months later, and note that date in a TODO comment above it.
 - Future JSON data objects should be made in kotlin.
 - Config files should be made in **Kotlin**.
     - There may be legacy config files left as Java files, however they will all be ported eventually.

@@ -10,11 +10,13 @@
 [![Discord](https://img.shields.io/discord/997079228510117908?label=discord&color=9089DA&logo=discord&style=for-the-badge)](https://discord.gg/skyhanni-997079228510117908)
 [![Made with Kotlin](https://img.shields.io/badge/Made%20With-Kotlin-orange?style=for-the-badge&logo=kotlin&logocolor=white)](https://kotlinlang.org/)
 [![Downloads](https://img.shields.io/github/downloads/hannibal002/SkyHanni/total?label=downloads&color=208a19&logo=github&style=for-the-badge)](https://github.com/hannibal002/SkyHanni/releases)
+[![Modrinth](https://img.shields.io/modrinth/dt/skyhanni?style=for-the-badge&logo=modrinth&label=Downloads&color=208a19
+)](https://modrinth.com/mod/skyhanni)
 </div>
 
 ## What it does
 
-SkyHanni is a Fabric Minecraft mod that adds many useful features to [Hypixel SkyBlock](https://wiki.hypixel.net/Main_Page). With SkyHanni you have access to:
+SkyHanni is a Fabric Minecraft mod that adds many useful features to [Hypixel SkyBlock](https://hypixel.net/categories/skyblock/). With SkyHanni you have access to:
 
 * **Helpful GUIs:** View important information at a glance.
 * **Extra Chat Messages:** Receive reminders and tips at the right moment.

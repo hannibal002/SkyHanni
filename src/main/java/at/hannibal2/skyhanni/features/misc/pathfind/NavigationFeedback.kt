@@ -42,20 +42,25 @@ object NavigationFeedback {
         navActive = false
     }
 
-    fun sendPathFindMessage(message: String) = sendPathFindMessage(message.asComponent())
-    fun sendPathFindMessage(component: Component): Boolean {
+    fun sendPathFindMessage(message: String, force: Boolean = false) = sendPathFindMessage(message.asComponent(), force)
+
+    /**
+     * @param force Skips the chat update interval. Set for messages that report the end of a navigation,
+     *  since those are shown once and would otherwise be dropped right after a progress update.
+     */
+    fun sendPathFindMessage(component: Component, force: Boolean = false): Boolean {
         navActive = true
         navLastActive = SimpleTimeMark.now()
         return when (config.feedbackMode.get()) {
             PathfindConfig.FeedbackMode.NONE -> false
-            PathfindConfig.FeedbackMode.CHAT -> sendChatFeedback(component)
+            PathfindConfig.FeedbackMode.CHAT -> sendChatFeedback(component, force)
             PathfindConfig.FeedbackMode.GUI -> sendGuiFeedback(component)
             else -> false
         }
     }
 
-    private fun sendChatFeedback(component: Component): Boolean {
-        if (lastChatMessageSent.passedSince() < config.chatUpdateInterval.duration) return false
+    private fun sendChatFeedback(component: Component, force: Boolean): Boolean {
+        if (!force && lastChatMessageSent.passedSince() < config.chatUpdateInterval.duration) return false
         component.send(pathFindMessageId)
         lastChatMessageSent = SimpleTimeMark.now()
         return true
@@ -65,7 +70,7 @@ object NavigationFeedback {
         val guiFormattedText = component.formattedTextCompat().replace("§e[SkyHanni] ", "§e")
         guiRenderable = Renderable.clickable(
             Renderable.text(guiFormattedText),
-            onLeftClick = IslandGraphs::cancelClick,
+            onLeftClick = IslandGraphs::manualCancel,
             tips = listOf("§eClick to stop navigating!"),
         )
         return true

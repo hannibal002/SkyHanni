@@ -75,7 +75,7 @@ object PetStorageApi {
         checkInventoryName = {
             if (!PetStoragePatterns.mainPetMenuNamePattern.matches(it)) return@InventoryDetector false
             return@InventoryDetector extraPetMenuCheck()
-        }
+        },
     )
 
     // Forge pets menu is also called "Pets", but doesn't have this item
@@ -91,9 +91,11 @@ object PetStorageApi {
         !TabWidget.PET.isActive && SkyBlockUtils.lastWorldSwitch.passedSince() >= WIDGET_LOAD_GRACE -> {
             "§cInaccurate! Enable /tab → Pet Widget"
         }
+
         showMissingOverflowXpWarning && petWidgetState == PetWidgetState.MAXED_WITHOUT_OVERFLOW_XP -> {
             "§cInaccurate! Enable /tab → Pet Widget → Show Overflow Pet XP"
         }
+
         else -> null
     }
 
@@ -525,12 +527,16 @@ object PetStorageApi {
         val clickedPetData = clickedItem.toClickedPetDataOrNull() ?: return
         val clickedPetUuid = clickedPetData.uuid
         val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
-        when (event.clickedButton) {
-            1 -> { // Right click - remove pet from menu
-                if (remove(clickedPetUuid, currentPetUuid)) return
+        when (event.mouseType) {
+            RIGHT_CLICK -> {
+                clickedPetUuid ?: return
+                petStorage?.pets?.removeIf { it.uuid == clickedPetUuid }
+                if (currentPetUuid == clickedPetUuid) {
+                    CurrentPetApi.clearCurrentPet()
+                }
             }
 
-            0 -> { // Left click - if not a shift click, summon/un-summon pet
+            LEFT_CLICK -> { // if not a shift click, summon/un-summon pet
                 if (toggleSummon(clickedItem, currentPetUuid, clickedPetUuid, clickedPetData)) return
             }
 
