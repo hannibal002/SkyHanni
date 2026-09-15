@@ -137,6 +137,7 @@ stonecutter parameters {
 
     replacements {
         string(current.parsed < "26.3") {
+            replace("#include", "#moj_import")
             replace("import net.minecraft.world.entity.monster.Enderman;", "import net.minecraft.world.entity.monster.EnderMan;")
             replace("import net.minecraft.world.entity.monster.Enderman", "import net.minecraft.world.entity.monster.EnderMan as Enderman")
 

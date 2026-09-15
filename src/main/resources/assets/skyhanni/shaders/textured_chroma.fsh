@@ -1,5 +1,8 @@
 #version 150
 
+//? if >= 26.3
+#extension GL_ARB_separate_shader_objects : require
+
 in vec4 vertexColor;
 in vec2 texCoord0;
 

@@ -1,5 +1,8 @@
 #version 120
 
+//? if >= 26.3
+#extension GL_ARB_separate_shader_objects : require
+
 // Fragment Shader
 uniform sampler2D texture;
 uniform float darknessLevel;
