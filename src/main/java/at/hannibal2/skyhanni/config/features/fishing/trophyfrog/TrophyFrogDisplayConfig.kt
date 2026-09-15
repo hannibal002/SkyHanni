@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.fishing.trophyfishing
+package at.hannibal2.skyhanni.config.features.fishing.trophyfrog
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -18,15 +18,15 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.glfw.GLFW
 
-class TrophyFishDisplayConfig : TrophyCollectionDisplayConfig {
+class TrophyFrogDisplayConfig : TrophyCollectionDisplayConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show a display of all trophy fishes ever caught.")
+    @ConfigOption(name = "Enabled", desc = "Show a display of all trophy frogs ever caught.")
     @ConfigEditorBoolean
     @FeatureToggle
     override val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigOption(name = "When Show", desc = "Change when the trophy fish display should be visible in Crimson Isle.")
+    @ConfigOption(name = "When Show", desc = "Change when the trophy frog display should be visible on Lotus Atoll.")
     @ConfigEditorDropdown
     override val whenToShow: Property<WhenToShow> = Property.of(WhenToShow.ALWAYS)
 
@@ -37,12 +37,11 @@ class TrophyFishDisplayConfig : TrophyCollectionDisplayConfig {
 
     @Expose
     @ConfigOption(
-        name = "Trophy Fishing Gear",
-        desc = "Only show when: wearing 2+ Hunter Armor pieces, full Ember Armor, trophy line on your rod, using hot bait, " +
-            "or you're too low level to fish for sea creatures."
+        name = "Require Trophy Armor",
+        desc = "Only show when wearing 2+ trophy Hunter armor pieces (any tier).",
     )
     @ConfigEditorBoolean
-    override val requireArmor: Property<Boolean> = Property.of(false)
+    override val requireArmor: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Highlight New", desc = "Highlight new trophies green for couple seconds.")
@@ -55,7 +54,7 @@ class TrophyFishDisplayConfig : TrophyCollectionDisplayConfig {
     override val extraSpace: Property<Int> = Property.of(1)
 
     @Expose
-    @ConfigOption(name = "Sorted By", desc = "Sorting type of trophy fish in the display.")
+    @ConfigOption(name = "Sorted By", desc = "Sorting type of frogs in the display.")
     @ConfigEditorDropdown
     override val sortingType: Property<TrophySorting> = Property.of(TrophySorting.ITEM_RARITY)
 
@@ -90,19 +89,19 @@ class TrophyFishDisplayConfig : TrophyCollectionDisplayConfig {
     override val showCheckmark: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigOption(name = "Only Show Missing", desc = "Only show Trophy Fish that are still missing at this rarity.")
+    @ConfigOption(name = "Only Show Missing", desc = "Only show Trophy Frogs that are still missing at this rarity.")
     @ConfigEditorDropdown
     override val onlyShowMissing: Property<HideCaught> = Property.of(HideCaught.NONE)
 
     @Expose
     @ConfigOption(
         name = "Show If Caught Higher Tier",
-        desc = "Show Trophy Fish missing at the chosen tier even if a higher tier has already been caught.",
+        desc = "Show Trophy Frogs missing at the chosen tier even if a higher tier has already been caught.",
     )
     @ConfigEditorBoolean
     override val showCaughtHigher: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigLink(owner = TrophyFishDisplayConfig::class, field = "enabled")
-    override val position: Position = Position(144, 139)
+    @ConfigLink(owner = TrophyFrogDisplayConfig::class, field = "enabled")
+    override val position: Position = Position(200, 139)
 }
