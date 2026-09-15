@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.config.features.combat.end
 
-import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class EndIslandConfig {
@@ -18,10 +16,14 @@ class EndIslandConfig {
     val dragon: DragonConfig = DragonConfig()
 
     @Expose
-    @ConfigOption(name = "Weight Endstone Protector", desc = "Shows your Endstone Protector weight in chat after it died.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var endstoneProtectorChat: Boolean = true
+    @ConfigOption(name = "Golem Features", desc = "End Stone Protector features.")
+    @Accordion
+    val golem: GolemConfig = GolemConfig()
+
+    @Expose
+    @ConfigOption(name = "Rare Drop Tracker", desc = "")
+    @Accordion
+    val rareDropTracker: RareDropTrackerConfig = RareDropTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Ender Node Tracker", desc = "")
