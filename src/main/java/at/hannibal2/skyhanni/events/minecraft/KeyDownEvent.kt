@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.InputCode
  *
  * Not fired while no player exists, for an unknown key code, or while the REI search bar has focus.
  *
- * @param keyCode the GLFW key code of the pressed key
+ * @param key the input code the user pressed
  */
 @PrimaryFunction("onKeyDown")
 class KeyDownEvent(val key: InputCode) : SkyHanniEvent() {
