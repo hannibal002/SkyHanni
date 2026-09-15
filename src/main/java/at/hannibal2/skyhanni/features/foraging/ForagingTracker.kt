@@ -235,7 +235,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
                 }
                 loot.clear()
             }
-            if (config.displayTreeGifts != ForagingTrackerConfig.TreeGiftDisplayMode.FULL_GIFT) blockedReason = "TREE_GIFT"
+            if (config.displayTreeGifts != FULL_GIFT) blockedReason = "TREE_GIFT"
         }
         if (!openLootLoop) return
 
