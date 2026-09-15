@@ -26,5 +26,4 @@ enum class SafariBiome(val displayName: String, private val colorCode: String) {
             }
         }
     }
-
 }
