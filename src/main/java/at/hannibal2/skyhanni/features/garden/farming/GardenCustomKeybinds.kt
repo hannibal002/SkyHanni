@@ -12,12 +12,12 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.ToggleKeyMapping
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
-import org.lwjgl.glfw.GLFW
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -177,14 +177,14 @@ object GardenCustomKeybinds {
     @JvmStatic
     fun disableAll() {
         with(config) {
-            attack.set(GLFW.GLFW_KEY_UNKNOWN)
-            useItem.set(GLFW.GLFW_KEY_UNKNOWN)
-            left.set(GLFW.GLFW_KEY_UNKNOWN)
-            right.set(GLFW.GLFW_KEY_UNKNOWN)
-            forward.set(GLFW.GLFW_KEY_UNKNOWN)
-            back.set(GLFW.GLFW_KEY_UNKNOWN)
-            jump.set(GLFW.GLFW_KEY_UNKNOWN)
-            sneak.set(GLFW.GLFW_KEY_UNKNOWN)
+            attack.set(KeyboardManager.KEY_UNKNOWN)
+            useItem.set(KeyboardManager.KEY_UNKNOWN)
+            left.set(KeyboardManager.KEY_UNKNOWN)
+            right.set(KeyboardManager.KEY_UNKNOWN)
+            forward.set(KeyboardManager.KEY_UNKNOWN)
+            back.set(KeyboardManager.KEY_UNKNOWN)
+            jump.set(KeyboardManager.KEY_UNKNOWN)
+            sneak.set(KeyboardManager.KEY_UNKNOWN)
         }
     }
 
@@ -193,12 +193,12 @@ object GardenCustomKeybinds {
         with(config) {
             attack.set(KeyboardManager.LEFT_MOUSE)
             useItem.set(KeyboardManager.RIGHT_MOUSE)
-            left.set(GLFW.GLFW_KEY_A)
-            right.set(GLFW.GLFW_KEY_D)
-            forward.set(GLFW.GLFW_KEY_W)
-            back.set(GLFW.GLFW_KEY_S)
-            jump.set(GLFW.GLFW_KEY_SPACE)
-            sneak.set(GLFW.GLFW_KEY_LEFT_SHIFT)
+            left.set(InputConstants.KEY_A)
+            right.set(InputConstants.KEY_D)
+            forward.set(InputConstants.KEY_W)
+            back.set(InputConstants.KEY_S)
+            jump.set(InputConstants.KEY_SPACE)
+            sneak.set(InputConstants.KEY_LSHIFT)
         }
     }
 

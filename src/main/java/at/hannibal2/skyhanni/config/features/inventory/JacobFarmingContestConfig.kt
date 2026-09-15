@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.glfw.GLFW
 
 class JacobFarmingContestConfig {
     @Expose
@@ -28,8 +28,8 @@ class JacobFarmingContestConfig {
         name = "Open On Elite",
         desc = "Open the contest on §eeliteskyblock.com§7 when pressing this key in Jacob's menu or the calendar."
     )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var openOnElite: Int = GLFW.GLFW_KEY_UNKNOWN
+    @ConfigEditorKeybind(defaultKey = KeyboardManager.KEY_UNKNOWN)
+    var openOnElite: Int = KeyboardManager.KEY_UNKNOWN
 
     @Expose
     @ConfigOption(

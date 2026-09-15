@@ -16,12 +16,12 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import org.joml.Vector2i
-import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -39,7 +39,7 @@ object GuiEditManager {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
-        if (event.keyCode == GLFW.GLFW_KEY_ENTER) {
+        if (event.keyCode == InputConstants.KEY_RETURN) {
             ChatUtils.chat("You can't use Enter as a keybind to open the gui editor!")
             return
         }

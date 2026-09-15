@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.Minecraft
-import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -30,7 +30,7 @@ object NotificationManager {
     fun onKeyPress(event: KeyPressEvent) {
         currentNotification ?: return
         if (lastNotificationClosed.passedSince() < 200.milliseconds) return
-        if (event.keyCode != GLFW.GLFW_KEY_X) return
+        if (event.keyCode != InputConstants.KEY_X) return
         currentNotification = null
         lastNotificationClosed = SimpleTimeMark.now()
     }

@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
-import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule
 object GuiData {
@@ -50,7 +50,7 @@ object GuiData {
             )
         }
         if (allowedKeys.any { it.isActive() }) return
-        if (GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) return
+        if (InputConstants.KEY_ESCAPE.isKeyHeld()) return
 
         if (CustomLoadoutKeybinds.allowKeyboardClick()) return
 

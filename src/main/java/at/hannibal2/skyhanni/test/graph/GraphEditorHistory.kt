@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import org.lwjgl.glfw.GLFW
+import com.mojang.blaze3d.platform.InputConstants
 
 object GraphEditorHistory {
 
@@ -71,13 +71,13 @@ object GraphEditorHistory {
         if (undoStack.isNotEmpty()) {
             val peek = undoStack.peek().label
             strings.add(" ")
-            strings.add("§eUndo: §6Ctrl + ${KeyboardManager.getKeyName(GLFW.GLFW_KEY_Y)}")
+            strings.add("§eUndo: §6Ctrl + ${KeyboardManager.getKeyName(InputConstants.KEY_Y)}")
             strings.add("§7(next undo: $peek)")
         }
         if (redoStack.isNotEmpty()) {
             val peek = redoStack.peek().label
             strings.add(" ")
-            strings.add("§eRedo: §6Ctrl + ${KeyboardManager.getKeyName(GLFW.GLFW_KEY_Z)}")
+            strings.add("§eRedo: §6Ctrl + ${KeyboardManager.getKeyName(InputConstants.KEY_Z)}")
             strings.add("§7(next redo: $peek)")
         }
     }
