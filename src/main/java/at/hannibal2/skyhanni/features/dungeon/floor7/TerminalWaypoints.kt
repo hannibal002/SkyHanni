@@ -2,58 +2,75 @@ package at.hannibal2.skyhanni.features.dungeon.floor7
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonBossApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import net.minecraft.server.level.ServerPlayer
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
 object TerminalWaypoints {
 
-    private val config get() = SkyHanniMod.feature.dungeon
+    private val config get() = SkyHanniMod.feature.dungeon.terminalWaypoints
+    private val players: MutableList<Player> = mutableListOf()
 
-    @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         for (term in TerminalInfo.entries) {
-            if (!term.highlight || !term.phase.isCurrent()) continue
-            event.drawWaypointFilled(term.location, LorenzColor.GREEN.toColor(), seeThroughBlocks = true)
-            event.drawDynamicText(term.location, term.text, 1.0)
+            if (!term.phase.isCurrent() && !term.shouldShowActiveWaypoint()) continue
+            if (term.unsolved) {
+                event.drawWaypointFilled(term.location, config.inactiveColor.toColor(), seeThroughBlocks = true)
+                event.drawDynamicText(term.location, term.text, 1.0)
+            }
+            else if (!config.removeActive)
+                event.drawWaypointFilled(term.location, config.activeColor.toColor(), seeThroughBlocks = true)
+
         }
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         TerminalInfo.resetTerminals()
+        players.clear()
     }
 
-    // Only calls getEntities when terminals get completed, so the performance impact is minimal
-    @OptIn(AllEntitiesGetter::class)
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    private fun onEntityEnterWorld(event: EntityEnterWorldEvent<LocalPlayer>) = players.add(event.entity)
+
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) = players.add(event.entity)
+
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!inBoss()) return
 
-        val playerName = DungeonBossApi.goldorTerminalPattern.matchMatcher(event.message) {
+        val playerName = DungeonBossApi.goldorTerminalPattern.matchMatcher(event.cleanMessage) {
             group("playerName")
         } ?: return
 
-        val playerEntity = EntityUtils.getEntities<ServerPlayer>().find { it.name.formattedTextCompatLessResets() == playerName } ?: return
+        val playerEntity = players.find { it.name.string == playerName } ?: return
         val terminal = TerminalInfo.getClosestTerminal(playerEntity.getLorenzVec())
-        terminal?.highlight = false
+        terminal?.unsolved = false
     }
+
+    private fun TerminalInfo.shouldShowActiveWaypoint() = config.removeActive && !this.unsolved
 
     private fun inBoss() = DungeonApi.inBossRoom && DungeonApi.isOneOf("F7", "M7")
 
-    private fun isEnabled() = inBoss() && config.terminalWaypoints
+    private fun isEnabled() = inBoss() && config.enabled
 }
