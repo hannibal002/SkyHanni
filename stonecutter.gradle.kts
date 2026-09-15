@@ -57,16 +57,6 @@ allprojects {
             }
         }
 
-        // libautoupdate
-        exclusiveContent {
-            forRepository {
-                maven("https://repo.nea.moe/releases")
-            }
-            filter {
-                includeGroup("moe.nea")
-            }
-        }
-
         // MoulConfig and a few Detekt rules
         exclusiveContent {
             forRepositories(
