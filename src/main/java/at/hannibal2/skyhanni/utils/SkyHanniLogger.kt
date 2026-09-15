@@ -21,11 +21,12 @@ open class SkyHanniLogger(private val filePath: String) {
             .resolve("$filePath.log")
     }
 
+    private val format = SimpleDateFormat("HH:mm:ss")
+
     companion object {
         private var deletedExpired = false
 
         private val startTimeFormatted = SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()
-        private val format = SimpleDateFormat("HH:mm:ss")
     }
 
     @Suppress("PrintStackTrace")
