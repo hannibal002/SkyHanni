@@ -77,6 +77,7 @@ import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.chunk.LevelChunk
+import org.lwjgl.glfw.GLFW
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AnnotationNode
@@ -383,15 +384,15 @@ object SkyHanniDebugsAndTests {
     private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (debugConfig.copyCosmeticsSkullData.isKeyHeld()) {
             val stack = event.stackUnderCursor ?: return
-            onKeyPressCopyCosmeticsData(stack)
+            copyCosmeticsData(stack)
         }
         if (debugConfig.copyInternalName.isKeyHeld()) {
             val stack = event.stackUnderCursor ?: return
-            onKeybind(stack)
+            copyInternalName(stack)
         }
     }
 
-    private fun onKeybind(stack: SafeItemStack) {
+    private fun copyInternalName(stack: SafeItemStack) {
         val internalName = stack.getInternalNameOrNull() ?: return
         val rawInternalName = internalName.asString()
         OSUtils.copyToClipboard(rawInternalName)
@@ -511,6 +512,7 @@ object SkyHanniDebugsAndTests {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onGuiRender() {
+        if (debugConfig.copyCosmeticsSkullData == GLFW.GLFW_KEY_UNKNOWN) return
         val stack = InventoryCompat.stackUnderCursor() ?: return
         if (!stack.getCleanLore().any { it.contains("Right-click to preview!") }) return
 
@@ -519,7 +521,7 @@ object SkyHanniDebugsAndTests {
         skinIdTime = SimpleTimeMark.now()
     }
 
-    fun onKeyPressCopyCosmeticsData(stack: SafeItemStack) {
+    private fun copyCosmeticsData(stack: SafeItemStack) {
         if (!stack.`is`(Items.PLAYER_HEAD)) return
         val skinId = skinId ?: return
         if (skinIdTime.passedSince() > 2.minutes) return

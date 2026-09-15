@@ -8,35 +8,26 @@ import org.lwjgl.system.MemoryUtil
 import com.mojang.blaze3d.GpuFormat
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 //?} else {
-/*import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import com.mojang.blaze3d.vertex.VertexFormatElement
+/*import com.mojang.blaze3d.vertex.VertexFormatElement
 *///?}
 
-//? if < 26.2
-//private typealias VFEType = VertexFormatElement.Type
-
 object SkyHanniVertexFormats {
-
     //? if < 26.2 {
-    /*// Different versions of MC use differing counts, so load the last registered ID dynamically.
-    val lastRegisteredId by lazy {
-        (0 until VertexFormatElement.MAX_COUNT).filter { VertexFormatElement.byId(it) != null }.max()
-    }
+    /*// Vanilla registers IDs 0-6.
+    private var startingId = 7
     *///?}
 
-    @Suppress("EmptyDefaultConstructor", "UnusedPrivateProperty")
+    @Suppress("EmptyDefaultConstructor")
     internal enum class VertexElement(
         //? if < 26.2 {
         /*private val index: Int = 0,
-        private val type: VFEType = VFEType.FLOAT,
+        private val type: VertexFormatElement.Type = FLOAT,
         private val normalized: Boolean = false,
         private val count: Int = 4,
         *///?}
     ) {
         // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
         ROUNDED_PARAMS_0,
-
         // {adjustedCenterPosX, adjustedCenterPosY, borderBlur/angle1/0, angle2/0}
         ROUNDED_PARAMS_1,
         // {angle, progress, phaseOffset, reverse(float)}
@@ -51,41 +42,37 @@ object SkyHanniVertexFormats {
             name.lowercase().split("_").joinToString("") { it.replaceFirstChar(Char::uppercaseChar) }
 
         //? if < 26.2 {
-        /*// The ID we use to register the format element with Minecraft.
-        // see safeRegister() for details on how this is used and determined at runtime.
-        private val registrationId: Int by lazy { lastRegisteredId + (ordinal + 1) }
-        val element by lazy {
-            safeRegister(registrationId, index, type, false, count)
+        /*val element by lazy {
+            safeRegister(index, type, normalized, count)
         }
         *///?}
     }
 
     //? if < 26.2 {
     /*/**
-     * Registers a VertexFormatElement with the given parameters, automatically finding an available ID if the desired one is taken.
-     * Logs an error if the desired ID was already taken, but still registers the element with a valid ID.
-     * @param desiredId The preferred ID for the VertexFormatElement.
+     * Registers a VertexFormatElement with the given parameters,
+     * automatically finding an available ID.
+     *
      * @param index The index of the element in the vertex format (default is 0).
      * @param type The data type of the element (default is FLOAT).
-     * @param usage The intended usage of the element (default is GENERIC).
+     * @param normalized Whether integer data types should be mapped to the range [-1.0, 1.0]
+     *     (for signed values) or [0.0, 1.0] (for unsigned values) before converting to float.
      * @param count The number of components in the element (default is 4).
      * @return The registered VertexFormatElement, guaranteed to have a unique ID.
      */
-    @Suppress("UnusedParameter")
     private fun safeRegister(
-        desiredId: Int,
         index: Int = 0,
-        type: VFEType = VFEType.FLOAT,
+        type: VertexFormatElement.Type = FLOAT,
         normalized: Boolean = false,
         count: Int = 4,
     ): VertexFormatElement {
-        // Todo, it is exceptionally unlikely that a user will have enough mods to register 27 more vertex format elements,
-        //  but, technically possible, and something we should account for eventually.
-        val id = (desiredId until VertexFormatElement.MAX_COUNT).first { VertexFormatElement.byId(it) == null }
-        if (id != desiredId && PlatformUtils.isDevEnvironment) ErrorManager.logErrorStateWithData(
-            "VertexFormatElement ID $desiredId was already taken, using $id instead",
-            "SkyHanni vertex format element ID conflict. Desired ID $desiredId was already registered",
-        )
+        // It is technically possible, but exceptionally unlikely, that a user will have enough
+        // mods to register 27 more vertex format elements. We deliberately let the game crash
+        // here rather than attempting to recover, because a failed registration would leave a
+        // lot of mod features broken, and forcibly extending the array would be potentially
+        // unsafe and require mixins into mods such as Sodium that hardcode the size as 32.
+        val id = (startingId++ until VertexFormatElement.MAX_COUNT).firstOrNull { VertexFormatElement.byId(it) == null }
+            ?: error("Too many mods trying to register VertexFormatElements")
         return VertexFormatElement.register(id, index, type, normalized, count)
     }
     *///?}

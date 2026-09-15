@@ -5,41 +5,50 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
-import net.minecraft.client.input.KeyEvent
-import net.minecraft.client.input.MouseButtonEvent
 
 /**
- * Event that is fired when a key is pressed while a SkyHanniGuiContainer is open.
- * This event is cancellable, and if canceled, the key press will not be processed by the GUI.
- * Users of this function should use [at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld]
- * Or [at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked]
- * if they want to see which key was pressed.
+ * Fired when a key is pressed or a mouse button is clicked while a container screen is open.
+ * Despite the name, this covers mouse input as well.
+ *
+ * Listen to this class to receive both, or to [GuiKeyboardKeyPressEvent] or
+ * [GuiMouseButtonPressEvent] to receive only one of the two.
+ *
+ * The event carries no information about which key or button triggered it, so listeners have to
+ * check that themselves, for example through `KeyboardManager.isKeyHeld()` or
+ * `KeyboardManager.isKeyClicked()`.
+ * Cancelling it stops the screen from handling the input.
+ *
+ * @param guiContainer The container screen that received the input.
  */
 @PrimaryFunction("onGuiKeyPress")
 sealed class GuiKeyPressEvent(
     val guiContainer: SkyHanniGuiContainer,
 ) : CancellableSkyHanniEvent() {
-    abstract val stackUnderCursor: SafeItemStack?
+    val stackUnderCursor: SafeItemStack? by lazy {
+        InventoryCompat.stackUnderCursor()
+    }
 
+    /**
+     * Fired when a keyboard key is pressed while a container screen is open.
+     *
+     * Cancelling this event stops the screen from handling the keyboard input.
+     *
+     * @param guiContainer The container screen that received the keyboard input.
+     */
     @PrimaryFunction("onGuiKeyboardKeyPress")
     class GuiKeyboardKeyPressEvent(
         guiContainer: SkyHanniGuiContainer,
-        private val keyEvent: KeyEvent,
-    ) : GuiKeyPressEvent(guiContainer) {
+    ) : GuiKeyPressEvent(guiContainer)
 
-        override val stackUnderCursor by lazy(LazyThreadSafetyMode.NONE) {
-            InventoryCompat.stackUnderCursor(keyEvent)
-        }
-    }
-
-    @PrimaryFunction("onGuiMouseKeyPress")
-    class GuiMouseKeyPressEvent(
+    /**
+     * Fired when a mouse button is pressed or clicked while a container screen is open.
+     *
+     * Cancelling this event stops the screen from handling the mouse input.
+     *
+     * @param guiContainer The container screen that received the mouse input.
+     */
+    @PrimaryFunction("onGuiMouseButtonPress")
+    class GuiMouseButtonPressEvent(
         guiContainer: SkyHanniGuiContainer,
-        private val mouseEvent: MouseButtonEvent,
-    ) : GuiKeyPressEvent(guiContainer) {
-
-        override val stackUnderCursor by lazy(LazyThreadSafetyMode.NONE) {
-            InventoryCompat.stackUnderCursor(mouseEvent)
-        }
-    }
+    ) : GuiKeyPressEvent(guiContainer)
 }

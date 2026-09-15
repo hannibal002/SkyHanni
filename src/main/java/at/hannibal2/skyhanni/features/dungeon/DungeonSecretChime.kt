@@ -2,13 +2,12 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickedBlockType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBlockClickEvent
-import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
+import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -22,28 +21,29 @@ object DungeonSecretChime {
     private var dungeonSecretItems = setOf<NeuInternalName>()
 
     @HandleEvent
-    fun onDungeonClickedBlock(event: DungeonBlockClickEvent) {
+    private fun onDungeonClickedBlock(event: DungeonBlockClickEvent) {
         if (!isEnabled()) return
-        if (DungeonApi.inWaterRoom && event.blockType == ClickedBlockType.LEVER) return
+        if (DungeonApi.inWaterRoom && event.blockType == LEVER) return
 
         when (event.blockType) {
-            ClickedBlockType.CHEST,
-            ClickedBlockType.TRAPPED_CHEST,
-            ClickedBlockType.LEVER,
-            ClickedBlockType.WITHER_ESSENCE,
+            CHEST,
+            TRAPPED_CHEST,
+            LEVER,
+            WITHER_ESSENCE,
             -> playSound()
         }
     }
 
     @HandleEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    private fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (isEnabled() && event.mob.name == "Dungeon Secret Bat") {
             playSound()
         }
     }
 
+    // An item entity leaving the world means the player picked it up
     @HandleEvent
-    fun onItemPickup(event: EntityRemovedEvent<ItemEntity>) {
+    private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ItemEntity>) {
         if (!isEnabled()) return
         val itemName = event.entity.item.hoverName.formattedTextCompatLeadingWhiteLessResets()
         if (NeuInternalName.fromItemName(itemName) in dungeonSecretItems) {
@@ -52,7 +52,7 @@ object DungeonSecretChime {
     }
 
     @HandleEvent
-    fun onPlaySound(event: PlaySoundEvent) {
+    private fun onPlaySound(event: PlaySoundEvent) {
         with(config.muteSecretSound) {
             if (!muteChestSound && !muteLeverSound) return
             if (muteChestSound && event.isChestSound()) event.cancel()
@@ -79,7 +79,7 @@ object DungeonSecretChime {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         dungeonSecretItems = data.dungeonSecretItems
     }
@@ -89,7 +89,7 @@ object DungeonSecretChime {
     @JvmStatic
     fun playSound() {
         with(config) {
-            SoundUtils.createSound(soundName, soundPitch, 100f).playSound()
+            SoundUtils.createSound(soundName, soundPitch, 100f, isWarning = true).playSound()
         }
     }
 }
