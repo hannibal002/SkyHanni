@@ -259,9 +259,12 @@ object StringUtils {
 
     fun String.pluralize(number: Int) = pluralize(number, this)
 
-    fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
+    fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String =
+        pluralize(number.toLong(), singular, plural, withNumber)
+
+    fun pluralize(number: Long, singular: String, plural: String? = null, withNumber: Boolean = false): String {
         val pluralForm = plural ?: "${singular}s"
-        var str = if (number == 1 || number == -1) singular else pluralForm
+        var str = if (number == 1L || number == -1L) singular else pluralForm
         if (withNumber) str = "${number.addSeparators()} $str"
         return str
     }
@@ -421,16 +424,6 @@ object StringUtils {
         return newText
     }
 
-    private fun addComponent(foundCommands: MutableList<Component>, message: Component) {
-        val clickEvent = message.command
-        if (clickEvent != null) {
-            if (foundCommands.size == 1 && foundCommands[0].command == clickEvent) {
-                return
-            }
-            foundCommands.add(message)
-        }
-    }
-
     /**
      * Applies a transformation on the message of a SystemMessageEvent if possible.
      */
@@ -525,9 +518,10 @@ object StringUtils {
 
     fun String.isValidUuid(): Boolean = runCatching(UUID::fromString).isSuccess
 
-    fun optionalAn(string: String): String {
-        if (string.isEmpty()) return ""
-        return if (string[0] in "aeiou") "an" else "a"
+    fun optionalAn(string: String): String = when {
+        string.isEmpty() -> ""
+        string.first().isVowel() -> "an"
+        else -> "a"
     }
 
     fun String.hasWhitespace(): Boolean = any { it.isWhitespace() }

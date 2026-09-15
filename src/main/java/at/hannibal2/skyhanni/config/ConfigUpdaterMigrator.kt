@@ -32,7 +32,6 @@ object ConfigUpdaterMigrator {
         var movesPerformed: Int,
         val dynamicPrefix: Map<String, List<String>>,
     ) : SkyHanniEvent() {
-
         init {
             dynamicPrefix.entries
                 .filter { it.value.isEmpty() }
