@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.foraging.SafariChecklistConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
+import at.hannibal2.skyhanni.events.item.ShardSource
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -47,10 +48,7 @@ object SafariShardChecklist {
 
     @HandleEvent(onlyOnIsland = IslandType.SAFARI)
     private fun onShardGain(event: ShardGainEvent) {
-        when (event.source) {
-            HUNT, CAPTURED, FLOOR_DROP, GIVEN -> Unit
-            else -> return
-        }
+        if (event.source != ShardSource.HUNT && event.source != ShardSource.CAPTURED) return
         val shard = SafariShard.entries.firstOrNull { it.internalName == event.shardInternalName } ?: return
         addShard(shard.displayName, event.amount)
         updateDisplay()

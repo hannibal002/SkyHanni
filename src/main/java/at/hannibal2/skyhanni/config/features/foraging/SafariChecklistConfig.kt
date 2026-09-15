@@ -14,7 +14,7 @@ class SafariChecklistConfig {
     @Expose
     @ConfigOption(
         name = "Shard Checklist",
-        desc = "Displays the Critter Safari shards collected during the current run.",
+        desc = "Displays the Critter Safari unique shards caught during the current run.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
