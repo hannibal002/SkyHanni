@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class BazaarConfig {
     @Expose
@@ -110,6 +112,14 @@ class BazaarConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var craftMaterialsFromBazaar: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Custom Craft Multiplier",
+        desc = "Add a custom multiplying option."
+    )
+    @ConfigEditorSlider(minValue = 2f, maxValue = 2048f, minStep = 1f)
+    var customCraftMaterialsMultiplier: Property<Float> = Property.of(1f)
 
     @Expose
     @ConfigLink(owner = BazaarConfig::class, field = "craftMaterialsFromBazaar")
