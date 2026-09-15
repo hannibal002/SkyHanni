@@ -2,12 +2,13 @@ package at.hannibal2.skyhanni.features.combat.end.golem
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EndBoss
 import at.hannibal2.skyhanni.events.EndBossFightEndEvent
 import at.hannibal2.skyhanni.events.GolemWeightEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -101,7 +102,16 @@ object GolemWeight {
     }
 
     @HandleEvent
-    private fun onIslandChange(event: IslandChangeEvent) {
+    private fun onWorldChange(event: WorldChangeEvent) {
         pendingResult = null
+    }
+
+    /**
+     * The message used to be a single option directly on the End island config. It is moved rather
+     * than dropped, because it was on by default and a reset would silently switch it off.
+     */
+    @HandleEvent
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(147, "combat.endIsland.endstoneProtectorChat", "combat.endIsland.golem.weightChat")
     }
 }

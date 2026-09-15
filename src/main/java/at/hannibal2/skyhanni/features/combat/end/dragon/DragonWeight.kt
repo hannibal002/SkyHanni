@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EndBoss
 import at.hannibal2.skyhanni.events.EndBossFightEndEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -26,6 +27,12 @@ object DragonWeight {
     /** Weight of the last finished fight, read by [DragonLootDetection]. */
     var weight = 0.0
         private set
+
+    /** The inputs of the live weight. The overlay is only rebuilt when one of them changes. */
+    private data class State(val eyes: Int, val ownDamage: Double, val topDamage: Double, val place: Int?)
+
+    private var state: State? = null
+    private var display: List<Renderable> = emptyList()
 
     private fun placementWeight(place: Int) = when (place) {
         -1 -> 10
@@ -58,25 +65,37 @@ object DragonWeight {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    private fun onRender(event: GuiRenderEvent) {
-        if (!config.display || !DragonFightState.dragonSpawned) return
-        config.displayPosition.renderRenderables(buildDisplay(), posLabel = "Dragon Weight")
+    private fun onTick(event: SkyHanniTickEvent) {
+        if (!config.display) return
+        val newState = State(
+            eyes = DragonFightState.eyesPlaced,
+            ownDamage = DragonFightState.yourDamage,
+            topDamage = DragonFightAPI.topDamage,
+            place = DragonFightAPI.ownPlace,
+        )
+        if (newState == state) return
+        state = newState
+        display = buildDisplay(newState)
     }
 
-    private fun buildDisplay(): List<Renderable> {
-        val eyes = DragonFightState.eyesPlaced
-        val ownDamage = DragonFightState.yourDamage
-        val topDamage = DragonFightAPI.topDamage
-        val place = DragonFightAPI.ownPlace
-        val live = calculateWeight(eyes, place ?: 6, topDamage, ownDamage)
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
+    private fun onRender(event: GuiRenderEvent) {
+        if (!config.display || !DragonFightState.dragonSpawned) return
+        config.displayPosition.renderRenderables(display, posLabel = "Dragon Weight")
+    }
+
+    private fun buildDisplay(state: State): List<Renderable> {
+        val live = calculateWeight(state.eyes, state.place ?: 6, state.topDamage, state.ownDamage)
+        val ratio = state.ownDamage / (state.topDamage.takeIf { it != 0.0 } ?: 1.0)
+        val place = state.place?.toString() ?: if (state.ownDamage != 0.0) "unknown, assuming 6th" else "not damaged yet"
 
         return listOf(
             Renderable.hoverTips(
                 "§6Current Weight: §f${live.roundTo(1).addSeparators()}",
                 listOf(
-                    "Eyes: $eyes",
-                    "Place: ${place ?: if (ownDamage != 0.0) "unknown, assuming 6th" else "not damaged yet"}",
-                    "Damage Ratio: ${(ownDamage / (topDamage.takeIf { it != 0.0 } ?: 1.0)).formatPercentage()}",
+                    "Eyes: ${state.eyes}",
+                    "Place: $place",
+                    "Damage Ratio: ${ratio.formatPercentage()}",
                 ),
             ),
         )

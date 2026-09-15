@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 object DragonDamageDisplay {
 
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragon
+
     /** Breathing room between the entries. */
     private const val LINE_SPACING = 3
 
@@ -30,16 +32,25 @@ object DragonDamageDisplay {
 
     private val waitingMessage = listOf(Renderable.text("§7Waiting for fight data..."))
 
+    /** Entries the overlay was last built from - it is only rebuilt once they change. */
+    private var shownEntries: List<DragonFightAPI.DamageEntry>? = null
+    private var display: Renderable? = null
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
+    private fun onTick(event: SkyHanniTickEvent) {
+        if (!config.damageList) return
+        val entries = DragonFightAPI.damageEntries
+        if (entries == shownEntries) return
+        shownEntries = entries
+        display = Renderable.vertical(buildLines(entries), spacing = LINE_SPACING).withTitledFrame(buildTitle())
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     private fun onRender(event: GuiRenderEvent) {
         if (!config.damageList) return
-        // Only while a dragon is actually up: outside a fight the list has nothing to say, and
-        // the tab list still carries the previous fight's numbers for a while.
         // Always visible on the End island, so the HUD can be placed outside of a fight.
-        config.damageListPosition.renderRenderable(
-            Renderable.vertical(buildLines(), spacing = LINE_SPACING).withTitledFrame(buildTitle()),
-            posLabel = "Dragon Damage List",
-        )
+        val renderable = display ?: return
+        config.damageListPosition.renderRenderable(renderable, posLabel = "Dragon Damage List")
     }
 
     private fun buildTitle() = Renderable.text(
@@ -48,8 +59,7 @@ object DragonDamageDisplay {
         },
     )
 
-    private fun buildLines(): List<Renderable> {
-        val entries = DragonFightAPI.damageEntries
+    private fun buildLines(entries: List<DragonFightAPI.DamageEntry>): List<Renderable> {
         if (entries.isEmpty()) return waitingMessage
 
         val ownName = PlayerUtils.getName()

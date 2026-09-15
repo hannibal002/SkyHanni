@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -31,12 +32,10 @@ object GolemDisplay {
 
     private val config get() = SkyHanniMod.feature.combat.endIsland.golem
 
-
     private const val LINE_SPACING = 3
 
     private const val LABEL_COLOR = 0xAAAAAA
     private const val UNKNOWN_COLOR = 0xFFFFFF
-
 
     private const val TITLE_COLOR = 0xE3D5A0
 
@@ -44,17 +43,55 @@ object GolemDisplay {
 
     private val PROTECTOR_HEAD = "ENDSTONE_PROTECTOR_BOSS".toInternalName()
 
+    /**
+     * Everything the overlay shows. It is only rebuilt when this changes, instead of building new
+     * renderables every frame for numbers that mostly stay the same.
+     */
+    private data class State(
+        val showStage: Boolean,
+        val showLocation: Boolean,
+        val showSpawnTimer: Boolean,
+        val stage: GolemStage.Stage?,
+        val stageName: String?,
+        val awakeningSeconds: Long?,
+        val location: String?,
+        val countdownTenths: Long,
+    )
+
+    private var state: State? = null
+    private var display: Renderable? = null
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
+    private fun onTick(event: SkyHanniTickEvent) {
+        if (!config.display) return
+        val newState = currentState()
+        if (newState == state) return
+        state = newState
+        val lines = buildLines(newState)
+        display = if (lines.isEmpty()) null else Renderable.vertical(lines, spacing = LINE_SPACING).withTitledFrame(buildTitle())
+    }
+
+    /**
+     * Shown on the whole island, even while nothing is known: for a lobby hopper "Stage: 0" and
+     * "not revealed" are exactly the answer that there is nothing to wait for on this server.
+     */
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     private fun onRender(event: GuiRenderEvent) {
         if (!config.display) return
-        val lines = buildLines()
-        if (lines.isEmpty()) return
-        config.displayPosition.renderRenderable(
-            Renderable.vertical(lines, spacing = LINE_SPACING).withTitledFrame(buildTitle()),
-            posLabel = "End Stone Protector",
-        )
+        val renderable = display ?: return
+        config.displayPosition.renderRenderable(renderable, posLabel = "End Stone Protector")
     }
 
+    private fun currentState() = State(
+        showStage = config.showStage,
+        showLocation = config.showLocation,
+        showSpawnTimer = config.showSpawnTimer,
+        stage = GolemStage.current,
+        stageName = GolemStage.stageName,
+        awakeningSeconds = GolemStage.timeInAwakening()?.inWholeSeconds,
+        location = GolemLocation.currentLocationText(),
+        countdownTenths = GolemSpawnTimer.timeUntilSpawn().inWholeMilliseconds / 100,
+    )
 
     private fun buildTitle(): Renderable {
         val text = Renderable.text(
@@ -66,35 +103,34 @@ object GolemDisplay {
         return Renderable.horizontal(listOf(icon, text), spacing = TITLE_ICON_SPACING)
     }
 
-    private fun buildLines(): List<Renderable> = buildList {
-        if (config.showStage) {
+    private fun buildLines(state: State): List<Renderable> = buildList {
+        if (state.showStage) {
             // Built as a component because the stage colours are plain RGB - the 16 legacy
             // colour codes have no real orange. Unknown wordings fall back to Hypixel's text.
-            val stage = GolemStage.current
+            val stage = state.stage
             // How long the awakening stage has been running, shown only during that stage.
-            val elapsed = GolemStage.timeInAwakening()
+            val elapsed = state.awakeningSeconds?.seconds
                 ?.format(biggestUnit = TimeUnit.MINUTE, showMilliSeconds = false)
             add(
                 Renderable.text(
                     componentBuilder {
                         appendWithColor("Stage: ", LABEL_COLOR)
-                        appendWithColor(stage?.display ?: GolemStage.stageName ?: "?", stage?.rgb ?: UNKNOWN_COLOR)
+                        appendWithColor(stage?.display ?: state.stageName ?: "?", stage?.rgb ?: UNKNOWN_COLOR)
                         if (elapsed != null) appendWithColor(" ($elapsed)", LABEL_COLOR)
                     },
                 ),
             )
         }
-        if (config.showLocation) {
+        if (state.showLocation) {
             // Before the protector starts rising there is no head block to read the spot from.
-            val location = GolemLocation.currentLocationText()?.let { "§f$it" } ?: "§8not revealed"
+            val location = state.location?.let { "§f$it" } ?: "§8not revealed"
             add(Renderable.text("§7Location: $location"))
         }
-        if (config.showSpawnTimer) {
-            val remaining = GolemSpawnTimer.timeUntilSpawn()
+        if (state.showSpawnTimer) {
             // The line keeps its place while the protector is still awakening, so it does not
             // pop into existence only for the last 20 seconds.
-            val countdown = if (remaining > 0.seconds) {
-                "§a${(remaining.inWholeMilliseconds / 1000.0).roundTo(1)}s"
+            val countdown = if (state.countdownTenths > 0) {
+                "§a${(state.countdownTenths / 10.0).roundTo(1)}s"
             } else "§8incoming"
             add(Renderable.text("§7Spawns in: $countdown"))
         }

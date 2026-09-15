@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.EndBoss
 import at.hannibal2.skyhanni.events.EndBossDeathEvent
 import at.hannibal2.skyhanni.events.EndBossFightEndEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -34,6 +34,8 @@ object DragonFightAPI {
         .filter { it != DragonType.UNKNOWN }
         .joinToString("|") { it.name.firstLetterUppercase() }
 
+    // Keys that beta already uses for the older coloured patterns carry a .colorless suffix. Their
+    // regex changed, and an older client picking up the new one under the old key would break.
     private val group = RepoPattern.group("combat.end-dragon-fight")
     private val chatGroup = group.group("chat")
     private val endGroup = group.group("chat.end")
@@ -46,7 +48,7 @@ object DragonFightAPI {
      * REGEX-TEST: ☬ The Young Dragon has spawned!
      */
     private val dragonSpawnPattern by chatGroup.pattern(
-        "spawn",
+        "spawn.colorless",
         "☬ The (?<dragon>$dragonNames) Dragon has spawned!",
     )
 
@@ -122,19 +124,21 @@ object DragonFightAPI {
     )
 
     /**
+     * The protector fight shows the same lines, so [onScoreboard] tells the two apart by the boss.
+     *
      * REGEX-TEST: Dragon HP: 14,659,354 ❤
      * REGEX-TEST: Protector HP: 2,317,156 ❤
      */
     private val scoreboardHpPattern by scoreboardGroup.pattern(
-        "hp",
-        "(?:Protector|Dragon) HP: (?<hp>[\\d,.]+) .*",
+        "hp.colorless",
+        "(?<boss>Protector|Dragon) HP: (?<hp>[\\d,.]+) .*",
     )
 
     /**
      * REGEX-TEST: Your Damage: 2,003.2
      */
     private val scoreboardDamagePattern by scoreboardGroup.pattern(
-        "your-damage",
+        "your-damage.colorless",
         "Your Damage: (?<damage>[\\w,.]+)",
     )
 
@@ -241,17 +245,22 @@ object DragonFightAPI {
         val index = lines.indexOfFirst { scoreboardHpPattern.matches(it) }
         if (index == -1) return
 
-        if (DragonFightState.eggSpawned) DragonFightState.dragonSpawned = true
         scoreboardHpPattern.matchMatcher(lines[index]) {
-            currentHp = group("hp").formatIntOrNull()
+            // Only the dragon's line may mark a dragon as spawned - the protector's would otherwise
+            // bring up the dragon weight during a protector fight.
+            val isDragon = group("boss") == "Dragon"
+            if (isDragon && DragonFightState.eggSpawned) DragonFightState.dragonSpawned = true
+            // The damage indicator shows this health next to the dragon, so the protector's stays out.
+            if (isDragon) currentHp = group("hp").formatIntOrNull()
         }
-        scoreboardDamagePattern.matchMatcher(lines[index + 1]) {
+        val damageLine = lines.getOrNull(index + 1) ?: return
+        scoreboardDamagePattern.matchMatcher(damageLine) {
             DragonFightState.yourDamage = group("damage").formatDouble()
         }
     }
 
     @HandleEvent
-    private fun onIslandChange(event: IslandChangeEvent) {
+    private fun onWorldChange(event: WorldChangeEvent) {
         damageEntries = emptyList()
         endingBoss = null
         endTopDamage = 0.0

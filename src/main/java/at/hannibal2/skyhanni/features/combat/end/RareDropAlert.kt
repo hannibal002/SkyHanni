@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.features.combat.end
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.EndBossDeathEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
@@ -23,20 +21,6 @@ object RareDropAlert {
 
     private val VOWELS = setOf('A', 'E', 'I', 'O', 'U')
 
-    /**
-     * One announcement per item and fight. The same physical drop can be seen twice - once from
-     * the stand carrying it and once from the one holding its label - while genuinely different
-     * drops must all be reported.
-     */
-    private val announced = mutableSetOf<NeuInternalName>()
-
-    /** Cleared when the loot window opens, which is the boss death - not the summary after it. */
-    @HandleEvent
-    private fun onEndBossDeath(event: EndBossDeathEvent) {
-        announced.clear()
-    }
-
-
     /** SkyBlock rarity colours. */
     const val RARE = "§9"
     const val EPIC = "§5"
@@ -55,7 +39,6 @@ object RareDropAlert {
     data class Drop(val color: String, val label: String, val withTitle: Boolean = true)
 
     fun show(internalName: NeuInternalName, drop: Drop, amount: Int) {
-        if (!announced.add(internalName)) return
         val suffix = if (amount > 1) " §7x$amount" else ""
         val value = valueText(internalName, amount)
 

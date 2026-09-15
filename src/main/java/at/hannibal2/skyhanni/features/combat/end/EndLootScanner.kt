@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EndBoss
 import at.hannibal2.skyhanni.events.EndBossDeathEvent
 import at.hannibal2.skyhanni.events.EndLootFoundEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -71,6 +71,15 @@ object EndLootScanner {
     private val seenDrops = mutableSetOf<UUID>()
 
     /**
+     * Items already reported, for each boss whose loot window is still open. One drop is made of
+     * several stands and is collected later on top of that, so the same item can turn up three
+     * times. A boss's list starts over with its next kill, so a new kill always counts - even when
+     * it drops the same item again. Only the Pearlescent Dye drops from both bosses; one from each
+     * within overlapping windows would be reported once.
+     */
+    private val reported = mutableMapOf<EndBoss, MutableSet<NeuInternalName>>()
+
+    /**
      * Opened on the death message rather than on the fight summary: the loot is already lying
      * around while the summary prints, and fast pickups would be missed otherwise.
      *
@@ -80,6 +89,7 @@ object EndLootScanner {
     @HandleEvent
     private fun onEndBossDeath(event: EndBossDeathEvent) {
         activeWindows[event.boss] = SimpleTimeMark.now() + SCAN_WINDOW
+        reported[event.boss] = mutableSetOf()
     }
 
     /**
@@ -89,7 +99,10 @@ object EndLootScanner {
      */
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     private fun onTick(event: SkyHanniTickEvent) {
-        activeWindows.values.removeIf { it.isInPast() }
+        for (expired in activeWindows.filterValues { it.isInPast() }.keys) {
+            activeWindows.remove(expired)
+            reported.remove(expired)
+        }
         val boss = mostRecentBoss() ?: return
 
         scanNameplates(boss)
@@ -128,21 +141,27 @@ object EndLootScanner {
             val amount = carried?.count?.takeIf { it > 1 }
                 ?: label?.split("§8x")?.last()?.toIntOrNull()
                 ?: 1
-            EndLootFoundEvent(boss, internalName, amount).post()
+            report(boss, internalName, amount)
         }
     }
 
     /**
      * Second, slower path: drops that were too far away to ever be rendered still end up in the
-     * inventory when they are collected automatically. Reporting them late beats not at all.
-     *
-     * Drops already announced from their label are filtered out downstream, so a nearby drop is
-     * not reported twice.
+     * inventory when they are collected automatically. Reporting them late beats not at all, and a
+     * drop already reported from its stand is filtered out by [report].
      */
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     private fun onItemAdd(event: ItemAddEvent) {
         val boss = mostRecentBoss() ?: return
-        EndLootFoundEvent(boss, event.internalName, event.amount).post()
+        report(boss, event.internalName, event.amount)
+    }
+
+    private fun report(boss: EndBoss, internalName: NeuInternalName, amount: Int) {
+        // Checked across all open windows: a drop collected after the other boss died is still the
+        // same drop, even though it is now attributed to that other boss.
+        if (reported.values.any { internalName in it }) return
+        reported.getOrPut(boss) { mutableSetOf() }.add(internalName)
+        EndLootFoundEvent(boss, internalName, amount).post()
     }
 
     /** First item the stand carries in any of its slots, ignoring empty ones. */
@@ -163,8 +182,9 @@ object EndLootScanner {
     private fun mostRecentBoss(): EndBoss? = activeWindows.maxByOrNull { it.value }?.key
 
     @HandleEvent
-    private fun onIslandChange(event: IslandChangeEvent) {
+    private fun onWorldChange(event: WorldChangeEvent) {
         activeWindows.clear()
         seenDrops.clear()
+        reported.clear()
     }
 }

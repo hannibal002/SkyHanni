@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.combat.end.golem
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MinecraftData
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -66,7 +66,7 @@ object GolemSpawnTimer {
     }
 
     @HandleEvent
-    private fun onIslandChange(event: IslandChangeEvent) {
+    private fun onWorldChange(event: WorldChangeEvent) {
         spawnTick = null
     }
 }
