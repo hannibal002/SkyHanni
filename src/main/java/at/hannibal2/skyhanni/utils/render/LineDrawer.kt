@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.submitCustomGeometry
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.world.phys.AABB
+import org.joml.Vector3f
 import java.awt.Color
 
 class LineDrawer @PublishedApi internal constructor(
@@ -14,13 +16,17 @@ class LineDrawer @PublishedApi internal constructor(
     val depth: Boolean,
 ) {
     private val queuedLines = mutableListOf<QueuedLine>()
+    private val cameraPos = event.camera.pos.toLorenzVec()
+    private val cameraLook = Vector3f(0f, 0f, -1f).rotate(event.camera.orientation).let {
+        LorenzVec(it.x.toDouble(), it.y.toDouble(), it.z.toDouble())
+    }
 
     @PublishedApi
     internal fun drawQueuedLines() {
         if (queuedLines.isEmpty()) return
 
         val layer = SkyHanniRenderLayers.getLines(!depth)
-        val lines = queuedLines.toList()
+        val lines = queuedLines.mapNotNull { it.clipToCamera() }
         event.submitCustomGeometry(layer) { pose, buf ->
             fun QueuedLine.addVertexForPoint(point: LorenzVec) {
                 buf.addVertex(pose.pose(), point.x.toFloat(), point.y.toFloat(), point.z.toFloat())
@@ -36,6 +42,18 @@ class LineDrawer @PublishedApi internal constructor(
         }
 
         queuedLines.clear()
+    }
+
+    // The line shader expands each vertex into a quad edge that folds over itself once the vertex is behind the
+    // camera, and which of the two folded shapes gets rasterized depends on gl_VertexID parity. Since 26.2 all
+    // world geometry shares one vertex buffer with a per-frame base vertex, so that parity flickers between frames.
+    private fun QueuedLine.clipToCamera(): QueuedLine? {
+        val depth1 = (p1 - cameraPos).dotProduct(cameraLook)
+        val depth2 = (p2 - cameraPos).dotProduct(cameraLook)
+        if (depth1 >= MIN_CAMERA_DEPTH && depth2 >= MIN_CAMERA_DEPTH) return this
+        if (depth1 < MIN_CAMERA_DEPTH && depth2 < MIN_CAMERA_DEPTH) return null
+        val cut = p1 + (p2 - p1) * ((MIN_CAMERA_DEPTH - depth1) / (depth2 - depth1))
+        return if (depth1 < MIN_CAMERA_DEPTH) copy(p1 = cut) else copy(p2 = cut)
     }
 
     private fun addQueuedLine(p1: LorenzVec, p2: LorenzVec, color: Color) {
@@ -125,6 +143,9 @@ class LineDrawer @PublishedApi internal constructor(
     }
 
     companion object {
+        // Slightly in front of the near plane (0.05) so no vertex ends up at w = 0
+        private const val MIN_CAMERA_DEPTH = 0.1
+
         inline fun draw3D(
             event: SkyHanniRenderWorldEvent,
             lineWidth: Int,
