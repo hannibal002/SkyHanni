@@ -2,8 +2,11 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
+import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EnumUtils.next
@@ -45,6 +48,8 @@ object ComputerTimeOffset {
     private var lastSystemTime = System.currentTimeMillis()
     private var timeoutWarned = SimpleTimeMark.farPast()
     private var checkJob: Job? = null
+
+    private const val CLOCK_FIX_ACHIEVEMENT = "PC Clock Fixed"
 
     enum class State(val duration: Duration) {
         NORMAL(1.seconds),
@@ -138,7 +143,10 @@ object ComputerTimeOffset {
         val offsetDuration = offsetDuration?.absoluteValue?.takeIf {
             it >= 5.seconds
         } ?: run {
-            if (wasOffsetBefore) ChatUtils.chat("Congratulations! Your computer's clock is now accurate.")
+            if (wasOffsetBefore) {
+                AchievementManager.completeAchievement(CLOCK_FIX_ACHIEVEMENT)
+                ChatUtils.chat("Congratulations! Your computer's clock is now accurate.")
+            }
             return
         }
 
@@ -181,5 +189,15 @@ object ComputerTimeOffset {
         } else {
             event.addIrrelevant(offset.toString())
         }
+    }
+
+    @HandleEvent
+    private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+        val achievement = Achievement(
+            name = "Right On Time",
+            description = "Fix your computer's clock to be accurate.",
+            userLuckAmount = 10f,
+        )
+        event.register(achievement, CLOCK_FIX_ACHIEVEMENT)
     }
 }
