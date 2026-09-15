@@ -26,27 +26,7 @@ class SafariChecklistConfig {
         desc = "Select which Critter Safari shard checklist biomes to show.",
     )
     @ConfigEditorDropdown
-    val runShardChecklistDisplay: Property<ChecklistDisplay> = Property.of(ChecklistDisplay.ONLY_CURRENT)
-
-    @Expose
-    @ConfigOption(
-        name = "Hide Collected Shards",
-        desc = "Hide shards already collected during the current Critter Safari run.",
-    )
-    @ConfigEditorBoolean
-    val hideCollectedRunShards: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @ConfigOption(
-        name = "Show Shard Icons",
-        desc = "Display an item icon next to each shard in the checklist.",
-    )
-    @ConfigEditorBoolean
-    val showShardIcons: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @ConfigLink(owner = SafariChecklistConfig::class, field = "runShardChecklist")
-    val runShardChecklistPosition: Position = Position(80, 100)
+    val runDisplay: Property<ChecklistDisplay> = Property.of(ChecklistDisplay.ONLY_CURRENT)
 
     enum class ChecklistDisplay(private val displayName: String) {
         ALL("All"),
@@ -56,4 +36,25 @@ class SafariChecklistConfig {
 
         override fun toString() = displayName
     }
+
+    @Expose
+    @ConfigOption(
+        name = "Hide Collected Shards",
+        desc = "Hide shards already collected during the current Critter Safari run.",
+    )
+    @ConfigEditorBoolean
+    val hideCollected: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(
+        name = "Show Shard Icons",
+        desc = "Display an item icon next to each shard in the checklist.",
+    )
+    @ConfigEditorBoolean
+    val showIcons: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigLink(owner = SafariChecklistConfig::class, field = "runShardChecklist")
+    val position: Position = Position(80, 100)
+
 }

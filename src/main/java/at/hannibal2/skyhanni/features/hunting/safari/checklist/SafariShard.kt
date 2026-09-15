@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.hunting.safari.checklist
 
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
+import at.hannibal2.skyhanni.features.hunting.safari.SafariBiome
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -10,6 +11,8 @@ import at.hannibal2.skyhanni.utils.ResettableValue
 import at.hannibal2.skyhanni.utils.SafeItemStack
 
 enum class SafariShard(val displayName: String, val biome: SafariBiome) {
+
+    //Cavern
     CAVERNFISH("Cavernfish", SafariBiome.CAVERN),
     FLITTER("Flitter", SafariBiome.CAVERN),
     SHYWORM("Shyworm", SafariBiome.CAVERN),
@@ -19,6 +22,8 @@ enum class SafariShard(val displayName: String, val biome: SafariBiome) {
     SCRAPPY("Scrappy", SafariBiome.CAVERN),
     SNOOZLE("Snoozle", SafariBiome.CAVERN),
     GEMZIE("Gemzie", SafariBiome.CAVERN),
+
+    //Forest
     FOXTROT("Foxtrot", SafariBiome.FOREST),
     HONEYBUG("Honeybug", SafariBiome.FOREST),
     HIDEONFLOOR("Hideonfloor", SafariBiome.FOREST),
@@ -28,6 +33,8 @@ enum class SafariShard(val displayName: String, val biome: SafariBiome) {
     BLUEBIRD("Bluebird", SafariBiome.FOREST),
     PARAKEET("Parakeet", SafariBiome.FOREST),
     MACAW("Macaw", SafariBiome.FOREST),
+
+    //Haunted
     SOLSNATCHER("Solsnatcher", SafariBiome.HAUNTED),
     BLOODBAT("Bloodbat", SafariBiome.HAUNTED),
     LITTERBUG("Litterbug", SafariBiome.HAUNTED),
@@ -38,6 +45,8 @@ enum class SafariShard(val displayName: String, val biome: SafariBiome) {
     GIMMIEGOLD("Gimmiegold", SafariBiome.HAUNTED),
     HIDEYHO("Hideyho", SafariBiome.HAUNTED),
     DOOMSPIRAL("Doomspiral", SafariBiome.HAUNTED),
+
+    //Icy
     STRONGARM("Strongarm", SafariBiome.ICY),
     POLARIS("Polaris", SafariBiome.ICY),
     BILLYGOAT("Billygoat", SafariBiome.ICY),
