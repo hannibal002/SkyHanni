@@ -58,7 +58,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PetStorageApi {
-
     private val config get() = SkyHanniMod.feature.misc.pets
     private val petStorage get() = ProfileStorageData.petProfiles
     private const val PET_MENU_CURRENT_PET_SLOT = 4
@@ -68,7 +67,7 @@ object PetStorageApi {
     private var jsonNeedsSave: Boolean = false
     private var lastSaved: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastExactPetMenuClick: SimpleTimeMark = SimpleTimeMark.farPast()
-    private var petWidgetState: PetWidgetState = PetWidgetState.NOT_READY
+    private var petWidgetState = PetWidgetState.NOT_READY
 
     private val mainMenuInventory = InventoryDetector(
         checkInventoryName = {
@@ -87,7 +86,7 @@ object PetStorageApi {
             "§cInaccurate! Enable /tab → Pet Widget"
         }
 
-        showMissingOverflowXpWarning && petWidgetState == PetWidgetState.MAXED_WITHOUT_OVERFLOW_XP -> {
+        showMissingOverflowXpWarning && petWidgetState == MAXED_WITHOUT_OVERFLOW_XP -> {
             "§cInaccurate! Enable /tab → Pet Widget → Show Overflow Pet XP"
         }
 
@@ -121,26 +120,26 @@ object PetStorageApi {
         getPetSkinColorTagOrNull()?.replace(" ", "")
 
     private fun ComponentMatcher.getPetSkinColorTagOrNull(): String? =
-        component("skin")?.formattedTextForItemLookup()
-            ?: component("altskin")?.formattedTextForItemLookup()
+        componentOrNull("skin")?.formattedTextForItemLookup()
+            ?: componentOrNull("altskin")?.formattedTextForItemLookup()
 
     private fun ComponentMatcher.petNameAndRarityOrNull(): Pair<String, LorenzRarity>? {
-        val petSpan = groupOrThrow("pet")
+        val petSpan = group("pet")
         val petName = petSpan.getText().trim()
         val rarity = petSpan.sampleStyleAtStart().toLorenzRarityOrNull() ?: return null
         return petName to rarity
     }
 
     private fun Style.toLorenzRarityOrNull(): LorenzRarity? = when (color?.name) {
-        "dark_red" -> LorenzRarity.ULTIMATE
-        "red" -> LorenzRarity.SPECIAL
-        "aqua" -> LorenzRarity.DIVINE
-        "light_purple" -> LorenzRarity.MYTHIC
-        "gold" -> LorenzRarity.LEGENDARY
-        "dark_purple" -> LorenzRarity.EPIC
-        "blue" -> LorenzRarity.RARE
-        "green" -> LorenzRarity.UNCOMMON
-        "white" -> LorenzRarity.COMMON
+        "dark_red" -> ULTIMATE
+        "red" -> SPECIAL
+        "aqua" -> DIVINE
+        "light_purple" -> MYTHIC
+        "gold" -> LEGENDARY
+        "dark_purple" -> EPIC
+        "blue" -> RARE
+        "green" -> UNCOMMON
+        "white" -> COMMON
         else -> null
     }
 
@@ -216,7 +215,7 @@ object PetStorageApi {
         PetStoragePatterns.petMenuPetStackNamePattern.matchStyledMatcher(hoverName) {
             val petInfo = getPetInfo()
             val level = matcher.group("level").formatInt()
-            val petSpan = groupOrThrow("pet")
+            val petSpan = group("pet")
             val petName = petSpan.getText().trim()
             val itemInternalName = getInternalNameOrNull()?.takeIf { PetUtils.getPetRarity(it) != null }
             val petInternalName = itemInternalName ?: run {
@@ -254,7 +253,7 @@ object PetStorageApi {
     private fun SafeItemStack.isCurrentPetStack() = getLore().any { it.contains("Click to despawn") }
 
     @HandleEvent
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!jsonNeedsSave || lastSaved.passedSince() < 30.seconds) return
         SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
         jsonNeedsSave = false
@@ -262,11 +261,11 @@ object PetStorageApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.PET)) return
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(PET)) return
         if (event.isClear()) {
             if (SkyBlockUtils.lastWorldSwitch.passedSince() < WIDGET_LOAD_GRACE) return
-            petWidgetState = PetWidgetState.NOT_READY
+            petWidgetState = NOT_READY
             return
         }
         var foundUsableWidgetPet = false
@@ -275,7 +274,7 @@ object PetStorageApi {
             foundUsableWidgetPet = foundUsableWidgetPet || lineWasUsable
         }
         if (!foundUsableWidgetPet) {
-            petWidgetState = PetWidgetState.NOT_READY
+            petWidgetState = NOT_READY
         }
     }
 
@@ -324,7 +323,7 @@ object PetStorageApi {
             previousExp = previousExp,
             appliedExp = exactPetExp,
         )
-        CurrentPetApi.assertFoundCurrentData(currentPetData, CurrentPetApi.PetDataAssertionSource.TAB)
+        CurrentPetApi.assertFoundCurrentData(currentPetData, source = TAB)
         updatePetWidgetState(maxedWithoutOverflowXp, exactPetExp)
         jsonNeedsSave = true
         return maxedWithoutOverflowXp || exactPetExp != null
@@ -394,9 +393,9 @@ object PetStorageApi {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         PetStoragePatterns.petItemHeldMessagePattern.matchStyledMatcher(event.chatComponent) {
-            val petHeldItemName = componentOrThrow("item").formattedTextForItemLookup()
+            val petHeldItemName = component("item").formattedTextForItemLookup()
             val petHeldItem = resolveAppliedPetItemOrNull(petHeldItemName) ?: return
             updateCurrentPetHeldItem(petHeldItem)
         }
@@ -418,7 +417,7 @@ object PetStorageApi {
             val hoverInfoComponents = event.chatComponent.hoverTextComponents()
             val hoverInfo = hoverInfoComponents.toColorlessText()
             val petHeldItemName = hoverInfoComponents.firstStyledMatcher(PetStoragePatterns.autoPetHoverHeldItemPattern) {
-                componentOrThrow("item").formattedTextForItemLookup()
+                component("item").formattedTextForItemLookup()
             }?.trim()
             val petHeldItem = petHeldItemName?.let(PetUtils::resolvePetItemOrNull)
 
@@ -444,7 +443,7 @@ object PetStorageApi {
             }
 
             val previousPet = CurrentPetApi.currentPet
-            CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.AUTOPET)
+            CurrentPetApi.assertFoundCurrentData(resolvedPet, source = AUTOPET)
             PetXpEstimateApi.recordAutopetSwap(resolvedPet, previousPet, hoverInfo.autopetTriggerOrNull())
             jsonNeedsSave = true
         }
@@ -465,7 +464,7 @@ object PetStorageApi {
         if (currentPet.heldItemInternalName == heldItem) return
         currentPet.heldItemInternalName = heldItem
         if (currentPet.uuid != null) petStorage?.pets?.addOrReplace(currentPet)
-        CurrentPetApi.assertFoundCurrentData(currentPet, CurrentPetApi.PetDataAssertionSource.CHAT)
+        CurrentPetApi.assertFoundCurrentData(currentPet, source = CHAT)
         markDirty()
     }
 
@@ -507,7 +506,7 @@ object PetStorageApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inMainPetMenuName()) return
         if (!event.slotId.isPetStackLocation()) return
         val clickedItem = event.slot?.item.orNull() ?: event.item.orNull() ?: return
@@ -530,7 +529,7 @@ object PetStorageApi {
                     CurrentPetApi.clearCurrentPet()
                 } else {
                     if (clickedPetUuid != null) petStorage?.pets?.addOrReplace(clickedPetData)
-                    CurrentPetApi.assertFoundCurrentData(clickedPetData, CurrentPetApi.PetDataAssertionSource.MENU)
+                    CurrentPetApi.assertFoundCurrentData(clickedPetData, source = MENU)
                 }
             }
 
@@ -540,7 +539,7 @@ object PetStorageApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         event.readSelectedPetData()
         event.readEquipmentPetData()
         PetStorageExpShare.readInventory(event.inventoryName, event.inventoryItems)
@@ -583,7 +582,7 @@ object PetStorageApi {
 
         petStorage.pets.addOrReplace(data)
 
-        CurrentPetApi.assertFoundCurrentData(data, CurrentPetApi.PetDataAssertionSource.MENU)
+        CurrentPetApi.assertFoundCurrentData(data, source = MENU)
         jsonNeedsSave = true
     }
 
@@ -631,7 +630,7 @@ object PetStorageApi {
             previousExp = previousExp,
             appliedExp = exactPetExp,
         )
-        CurrentPetApi.assertFoundCurrentData(currentPetData, CurrentPetApi.PetDataAssertionSource.MENU)
+        CurrentPetApi.assertFoundCurrentData(currentPetData, source = MENU)
         jsonNeedsSave = true
         return true
     }
@@ -700,7 +699,7 @@ object PetStorageApi {
             previousExp = previousExp,
             appliedExp = currentPetData.exp,
         )
-        CurrentPetApi.assertFoundCurrentData(currentPetData, CurrentPetApi.PetDataAssertionSource.MENU)
+        CurrentPetApi.assertFoundCurrentData(currentPetData, source = MENU)
         jsonNeedsSave = true
         return true
     }
