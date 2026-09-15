@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.hunting.safari
 
 import at.hannibal2.skyhanni.features.hunting.safari.checklist.SafariShard
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 enum class SafariBiome(val displayName: String, private val colorCode: String) {
     CAVERN("Cavern", "§6"),
@@ -16,15 +16,13 @@ enum class SafariBiome(val displayName: String, private val colorCode: String) {
 
 
     companion object {
-        fun currentArea(playerLocation: LorenzVec): SafariBiome? {
-            val centerX = -49.5
-            val centerZ = 0.5
-            return when {
-                playerLocation.x < centerX && playerLocation.z < centerZ -> ICY
-                playerLocation.x < centerX && playerLocation.z >= centerZ -> CAVERN
-                playerLocation.x >= centerX && playerLocation.z >= centerZ -> FOREST
-                playerLocation.x >= centerX && playerLocation.z < centerZ -> HAUNTED
-                else -> throw IllegalStateException("Player is not in any known safari biome.")
+        fun currentArea(): SafariBiome? {
+            return when (SkyBlockUtils.graphArea) {
+                "Cavern Biome" -> CAVERN
+                "Icy Biome" -> ICY
+                "Haunted Biome" -> HAUNTED
+                "Forest Biome" -> FOREST
+                else -> null
             }
         }
     }

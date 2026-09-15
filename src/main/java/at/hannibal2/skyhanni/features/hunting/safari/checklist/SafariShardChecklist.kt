@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.hunting.safari.SafariBiome
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -70,9 +69,14 @@ object SafariShardChecklist {
 
     @HandleEvent(onlyOnIsland = IslandType.SAFARI)
     private fun onTick() {
-        val biome = SafariBiome.currentArea(LocationUtils.playerLocation())
+        val biome = SafariBiome.currentArea()
         if (biome == lastBiome) return
         lastBiome = biome
+        updateDisplay()
+    }
+
+    @HandleEvent
+    private fun onIslandJoin() {
         updateDisplay()
     }
 
@@ -95,7 +99,7 @@ object SafariShardChecklist {
     }
 
     private fun createDisplay(): List<Renderable> = buildList {
-        val currentArea = SafariBiome.currentArea(LocationUtils.playerLocation())
+        val currentArea = SafariBiome.currentArea()
         val detailedBiomes = when (config.runDisplay.get()) {
             SafariChecklistConfig.ChecklistDisplay.ALL -> SafariBiome.entries
             SafariChecklistConfig.ChecklistDisplay.CURRENT_ON_TOP -> currentArea.let { currentBiome ->
