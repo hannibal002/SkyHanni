@@ -125,14 +125,18 @@ object MobFilter {
         "^\\[\\w+ (?<level>\\d+)\\] (?<name>.*)",
     )
 
-    // TODO fix pattern
+    // TODO check if pattern is correct
+    /**
+     * REGEX-TEST: Woke Golem
+     * REGEX-TEST: Sleeping Golem
+     */
     val wokeSleepingGolemPattern by patternGroup.pattern(
-        "pattern.dungeon.woke.golem",
-        "(?:§c§lWoke|§5§lSleeping) Golem§r",
+        "pattern.dungeon.woke.golem.colorless",
+        "(?:Woke|Sleeping) Golem",
     )
     val jerryMagmaCubePattern by patternGroup.pattern(
-        "pattern.jerry.magma.cube",
-        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c${SkyblockStat.HEALTH.hypixelIcon}",
+        "pattern.jerry.magma.cube.colorless",
+        """(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? \d+/\d+${SkyblockStat.HEALTH.hypixelIcon}""",
     )
     val summonOwnerPattern by patternGroup.pattern(
         "pattern.summon.owner",
@@ -179,7 +183,6 @@ object MobFilter {
         ;
 
         companion object {
-
             val toRegexLine = DungeonAttribute.entries.joinToString("|") { it.name }
         }
     }
@@ -362,7 +365,7 @@ object MobFilter {
         if (DungeonApi.inDungeon()) {
             when {
                 (baseEntity is EnderMan || baseEntity is Giant) &&
-                    extraEntityList.lastOrNull()?.name.formattedTextCompatLessResets() == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿" -> MobResult.illegal // Livid Start Animation
+                    extraEntityList.lastOrNull()?.cleanName == "﴾ Livid 7M❤ ﴿" -> MobResult.illegal // Livid Start Animation
                 else -> null
             }
         } else when (SkyBlockUtils.currentIsland) {
