@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
-import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
@@ -22,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -30,7 +28,6 @@ import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object StarlynSisterCouponProfit {
-
     private val config get() = SkyHanniMod.feature.foraging.starlynContest
 
     private var display = emptyList<Renderable>()
@@ -119,12 +116,12 @@ object StarlynSisterCouponProfit {
 
     // TODO merge logic into core item utils logic, I think
     private fun workOutInternalNameOrNull(item: SafeItemStack): Pair<NeuInternalName, Component>? {
-        val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
+        val isEnchantedBook = item.getItemCategoryOrNull() == ENCHANTED_BOOK
         return if (isEnchantedBook) {
             val internalName = item.getInternalNameOrNull() ?: return null
             internalName to item.repoItemName.asComponent()
         } else {
-            val internalName = NeuInternalName.fromItemNameOrNull(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) ?: return null
+            val internalName = NeuInternalName.fromItemNameOrNull(item.hoverName) ?: return null
             internalName to item.hoverName
         }
     }
