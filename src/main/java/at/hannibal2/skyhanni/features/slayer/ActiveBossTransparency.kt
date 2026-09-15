@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityTransparencyActiveEvent
 import at.hannibal2.skyhanni.events.entity.EntityTransparencyTickEvent
-import at.hannibal2.skyhanni.features.misc.CarryTracker
+import at.hannibal2.skyhanni.features.combat.carrytracker.CarryTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
