@@ -80,9 +80,16 @@ abstract class GuiContainerEvent(
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
         var slotId: Int,
-        var clickedButton: Int,
+        private var clickedButtonRaw: Int,
         var clickType: ContainerInput,
     ) : GuiContainerEvent(gui, container), Cancellable {
+
+        val mouseType: MouseClickType get() = MouseClickType.of(clickedButtonRaw, clickType)
+        fun rawButton(): Int = clickedButtonRaw
+
+        // TODO remove in october 2026
+        @Deprecated("use mouseType, or rawButton() when the raw value is needed")
+        val clickedButton get() = clickedButtonRaw
 
         val slot: Slot?
             get() = slotId.takeIf { it > -1 }?.let(container::getSlot)
@@ -91,18 +98,18 @@ abstract class GuiContainerEvent(
             get() = slot?.item
 
         fun makePickblock() {
-            if (clickedButton == 2 && clickType == CLONE) return
+            if (clickType == CLONE) return
             if (slot == null) return
 
-            clickedButton = 2
+            clickedButtonRaw = 2
             clickType = CLONE
         }
 
         fun makeShiftClick() {
-            if (clickedButton == 1 && slot?.item?.getItemCategoryOrNull() == SACK) return
+            if (mouseType.isRightClick() && slot?.item?.getItemCategoryOrNull() == SACK) return
             if (slot == null) return
 
-            clickedButton = 0
+            clickedButtonRaw = 0
             clickType = QUICK_MOVE
         }
 
@@ -131,6 +138,48 @@ abstract class GuiContainerEvent(
                     posting.remove()
                 }
             }
+        }
+    }
+}
+
+/**
+ * The mouse button of a slot click, where it can be determined.
+ *
+ * Only PICKUP, QUICK_MOVE and CLONE carry a mouse button. For SWAP the raw value is the hotbar slot
+ * index, for THROW it separates Q from Ctrl+Q, for QUICK_CRAFT it is a drag bitmask. Those are [OTHER].
+ */
+enum class MouseClickType {
+    LEFT_CLICK,
+    RIGHT_CLICK,
+    MIDDLE_CLICK,
+    OTHER,
+    ;
+
+    fun isLeftClick(): Boolean = this == LEFT_CLICK
+    fun isRightClick(): Boolean = this == RIGHT_CLICK
+    fun isMiddleClick(): Boolean = this == MIDDLE_CLICK
+
+    /** The container input vanilla sends together with this button. */
+    val defaultMode: ContainerInput get() = if (this == MIDDLE_CLICK) CLONE else PICKUP
+
+    /** The raw button value to send. [OTHER] is sent as a left click. */
+    val buttonId: Int
+        get() = when (this) {
+            LEFT_CLICK, OTHER -> 0
+            RIGHT_CLICK -> 1
+            MIDDLE_CLICK -> 2
+        }
+
+    companion object {
+        fun of(button: Int, clickType: ContainerInput): MouseClickType = when (clickType) {
+            PICKUP, QUICK_MOVE -> when (button) {
+                0 -> LEFT_CLICK
+                1 -> RIGHT_CLICK
+                else -> OTHER
+            }
+
+            CLONE -> MIDDLE_CLICK
+            else -> OTHER
         }
     }
 }
