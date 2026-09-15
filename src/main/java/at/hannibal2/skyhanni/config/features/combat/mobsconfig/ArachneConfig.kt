@@ -84,18 +84,18 @@ class ArachneConfig {
             val oldArachnePath = "combat.mobs"
             val newArachneBossPath = "$oldArachnePath.arachneSettings.boss"
             val newArachneKeeperPath = "$oldArachnePath.arachneSettings.keeper"
-            event.move(146, "$oldArachnePath.lineToArachne", "$newArachneBossPath.line.showLine")
-            event.move(146, "$oldArachnePath.lineToArachneWidth", "$newArachneBossPath.line.lineWidth")
-            event.move(146, "$oldArachnePath.showArachneSpawnTimer", "$newArachneBossPath.showSpawnTimer")
-            event.move(146, "$oldArachnePath.arachneKillTimer", "$newArachneBossPath.killTimer")
-            event.move(146, "$oldArachnePath.hideNameTagArachneMinis", "$newArachneBossPath.hideNameTagOfBroods")
-            event.move(146, "$oldArachnePath.arachneKeeperHighlight", "$newArachneKeeperPath.arachneKeeperHighlight")
-            event.transform(146, "$oldArachnePath.arachneBossHighlighter") { element ->
+            event.move(147, "$oldArachnePath.lineToArachne", "$newArachneBossPath.line.showLine")
+            event.move(147, "$oldArachnePath.lineToArachneWidth", "$newArachneBossPath.line.lineWidth")
+            event.move(147, "$oldArachnePath.showArachneSpawnTimer", "$newArachneBossPath.showSpawnTimer")
+            event.move(147, "$oldArachnePath.arachneKillTimer", "$newArachneBossPath.killTimer")
+            event.move(147, "$oldArachnePath.hideNameTagArachneMinis", "$newArachneBossPath.hideNameTagOfBroods")
+            event.move(147, "$oldArachnePath.arachneKeeperHighlight", "$newArachneKeeperPath.arachneKeeperHighlight")
+            event.transform(147, "$oldArachnePath.arachneBossHighlighter") { element ->
                 val enabled = JsonPrimitive(element.asBoolean)
-                event.add(146, "$newArachneBossPath.bossHighlight") {
+                event.add(147, "$newArachneBossPath.bossHighlight") {
                     enabled
                 }
-                event.add(146, "$newArachneBossPath.broodHighlight") {
+                event.add(147, "$newArachneBossPath.broodHighlight") {
                     enabled
                 }
                 element

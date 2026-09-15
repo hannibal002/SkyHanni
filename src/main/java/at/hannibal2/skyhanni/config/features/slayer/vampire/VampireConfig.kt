@@ -70,9 +70,9 @@ class VampireConfig {
         @HandleEvent
         private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             val path = "slayer.vampire"
-            event.move(146, "$path.drawLine", "$path.line.showLine")
-            event.move(146, "$path.lineColor", "$path.line.color")
-            event.move(146, "$path.lineWidth", "$path.line.lineWidth")
+            event.move(147, "$path.drawLine", "$path.line.showLine")
+            event.move(147, "$path.lineColor", "$path.line.color")
+            event.move(147, "$path.lineWidth", "$path.line.lineWidth")
         }
     }
 }

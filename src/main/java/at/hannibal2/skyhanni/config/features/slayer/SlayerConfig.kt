@@ -188,32 +188,32 @@ class SlayerConfig {
             event.move(138, "${oldPath}remainingKillsLevel", "${remainingKillsPath}includeMobLevel")
             event.move(138, "${oldPath}remainingKillsHealth", "${remainingKillsPath}includeMobHealth")
             event.move(138, "${oldPath}remainingKillsPosition", "${remainingKillsPath}remainingKillsPosition")
-            event.transform(146, "${oldPath}slayerMinibossHighlight") { element ->
+            event.transform(147, "${oldPath}slayerMinibossHighlight") { element ->
                 val enabled = JsonPrimitive(element.asBoolean)
-                event.add(146, "${oldPath}miniboss.slayerMinibossHighlight") {
+                event.add(147, "${oldPath}miniboss.slayerMinibossHighlight") {
                     enabled
                 }
-                event.add(146, "${oldPath}miniboss.cocoonHighlight") {
+                event.add(147, "${oldPath}miniboss.cocoonHighlight") {
                     enabled
                 }
                 element
             }
-            event.transform(146, "${oldPath}slayerMinibossLine") { element ->
+            event.transform(147, "${oldPath}slayerMinibossLine") { element ->
                 val enabled = JsonPrimitive(element.asBoolean)
-                event.add(146, "${oldPath}miniboss.minibossLine.showLine") {
+                event.add(147, "${oldPath}miniboss.minibossLine.showLine") {
                     enabled
                 }
-                event.add(146, "${oldPath}miniboss.cocoonLine.showLine") {
+                event.add(147, "${oldPath}miniboss.cocoonLine.showLine") {
                     enabled
                 }
                 element
             }
-            event.transform(146, "${oldPath}slayerMinibossLineWidth") { element ->
+            event.transform(147, "${oldPath}slayerMinibossLineWidth") { element ->
                 val width = JsonPrimitive(element.asInt)
-                event.add(146, "${oldPath}miniboss.minibossLine.lineWidth") {
+                event.add(147, "${oldPath}miniboss.minibossLine.lineWidth") {
                     width
                 }
-                event.add(146, "${oldPath}miniboss.cocoonLine.lineWidth") {
+                event.add(147, "${oldPath}miniboss.cocoonLine.lineWidth") {
                     width
                 }
                 element
