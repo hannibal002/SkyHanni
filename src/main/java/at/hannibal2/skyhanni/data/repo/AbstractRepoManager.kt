@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.repo.filesystem.DiskRepoFileSystem
 import at.hannibal2.skyhanni.data.repo.filesystem.MemoryRepoFileSystem
 import at.hannibal2.skyhanni.data.repo.filesystem.RepoFileSystem
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.OSUtils.deleteRecursivelySafe
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -33,7 +34,6 @@ import kotlinx.coroutines.withContext
 
 @Suppress("TooManyFunctions")
 abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
-
     /**
      * Should be user-friendly, e.g. "SkyHanni" or "NotEnoughUpdates".
      * Gets used in error messages and logging.
@@ -52,15 +52,52 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      */
     open val backupRepoResourcePath: String? = null
 
+    abstract val repoFolderName: String
+
+    open val legacyConfigDirectory: File? = null
+
     abstract val config: AbstractRepoConfig
-    abstract val configDirectory: File
+
+    /**
+     * The root directory for this specific repo.
+     *
+     * For example:
+     * `.minecraft/skyhanni/shrepo` or `.minecraft/skyhanni/neurepo`
+     */
+    val repoDirectory: File by lazy {
+        SkyHanniMod.dataDir.resolve(repoFolderName)
+    }
+
+    /**
+     * Stores the currently checked-out commit for this repo.
+     *
+     * For example:
+     * `.minecraft/skyhanni/shrepo.meta.json`
+     */
+    val commitFile: File by lazy {
+        SkyHanniMod.dataDir.resolve("$repoFolderName.meta.json")
+    }
+
+    /**
+     * Local archive of the repo's default branch.
+     *
+     * For example:
+     * `.minecraft/skyhanni/shrepo.tar.gz`
+     */
+    private val repoTgzFile: File by lazy {
+        SkyHanniMod.dataDir.resolve("$repoFolderName.tar.gz")
+    }
+
+    /**
+     * Stores commit metadata for this repo.
+     */
+    private val commitStorage: RepoCommitStorage by lazy {
+        RepoCommitStorage(commitFile)
+    }
 
     @PublishedApi
     internal val logger by lazy { RepoLogger(this) }
-    val repoDirectory by lazy {
-        // ~/.minecraft/config/[...]/repo
-        File(configDirectory, "repo")
-    }
+
     @Suppress("UNCHECKED_CAST")
     private val eventClass: Class<E> by lazy {
         (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<E>
@@ -69,18 +106,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private val eventCtor by lazy {
         eventClass.getConstructor(AbstractRepoManager::class.java)
     }
-    private val repoTgzFile by lazy {
-        // ~/.minecraft/config/[...]/repo/[name]-repo-[def_branch].tar.gz
-        // e.g., 'sh-repo-main' or 'neu-repo-master'
-        File(repoDirectory, "$commonShortName-repo-${config.location.defaultBranch}.tar.gz")
-    }
-    private val legacyRepoZipFile by lazy {
-        File(repoDirectory, "$commonShortName-repo-${config.location.defaultBranch}.zip")
-    }
-    private val commitStorage: RepoCommitStorage by lazy {
-        // ~/.minecraft/config/[...]/currentCommit.json
-        RepoCommitStorage(File(configDirectory, "currentCommit.json"))
-    }
+
     private val commonShortName by lazy { commonShortNameCased.lowercase() }
     private val successfulConstants = mutableSetOf<String>()
     private val unsuccessfulConstants = mutableSetOf<String>()
@@ -245,6 +271,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun initRepo() = progressCategory.startBlock("auto loading on init") { progress ->
         shouldManuallyReload = true
         repoInitCoroutineConfig.launch {
+            // TODO: Remove in 10.0.0
+            updateLegacyFiles()
             if (config.repoAutoUpdate) {
                 if (!fetchAndUnpackRepo(progress, command = false).canContinue) {
                     progress.end("Failed to fetch & unpack repo - aborting.")
@@ -493,7 +521,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private fun prepCleanRepoFileSystem(progress: ChatProgressUpdates) {
         progress.update("deleteRecursively")
-        repoDirectory.listFiles()?.forEach { if (it != logger.logsDir) it.deleteRecursively() }
+        repoDirectory.listFiles()?.forEach { it.deleteRecursively() }
 
         progress.update("createAndClean")
         repoFileSystem = repoDirectory.let { root ->
@@ -561,7 +589,57 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private fun deleteArchiveFiles() {
         repoTgzFile.delete()
-        legacyRepoZipFile.delete()
+    }
+
+    private fun updateLegacyFiles() {
+        val configDirectory = legacyConfigDirectory ?: return
+
+        val legacyRepoDirectory = configDirectory.resolve("repo").takeIf { it.exists() }
+        legacyRepoDirectory?.let { legacyDirectory ->
+            logger.warn("Migrating legacy repo directory to: ${repoDirectory.absolutePath}")
+            repoDirectory.mkdirs()
+
+            val copied = legacyDirectory.copyRecursively(
+                target = repoDirectory,
+                overwrite = false,
+                onError = { _, exception ->
+                    if (exception is FileAlreadyExistsException) {
+                        OnErrorAction.SKIP
+                    } else {
+                        OnErrorAction.TERMINATE
+                    }
+                }
+            )
+
+            if (copied) {
+                legacyDirectory.deleteRecursivelySafe()
+            } else {
+                logger.error("Failed to copy legacy repo directory from ${legacyDirectory.absolutePath}")
+            }
+        }
+
+        val legacyCommitFile = configDirectory.resolve("currentCommit.json").takeIf { it.exists() }
+        legacyCommitFile?.let { legacyFile ->
+            if (commitFile.exists()) {
+                legacyFile.delete()
+                return@let
+            }
+            logger.warn("Moving legacy commit file to: ${commitFile.absolutePath}")
+            commitFile.parentFile?.mkdirs()
+            runCatching {
+                Files.move(legacyFile.toPath(), commitFile.toPath())
+            }.onFailure {
+                runCatching {
+                    legacyFile.copyTo(commitFile, overwrite = false)
+                }.onSuccess {
+                    legacyFile.delete()
+                }.onFailure {
+                    logger.error(
+                        "Failed to move or copy legacy commit file; keeping original: ${legacyFile.absolutePath}"
+                    )
+                }
+            }
+        }
     }
 
     internal fun dumpDiagnosticsToLog(vararg extraData: Pair<String, Any?>) = with(logger) {
