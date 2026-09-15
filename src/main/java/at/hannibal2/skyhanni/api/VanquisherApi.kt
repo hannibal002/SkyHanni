@@ -73,7 +73,7 @@ object VanquisherApi {
     private val vanquisherLongTimeout = 5.seconds
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (spawnPattern.matches(event.cleanMessage)) {
             lastOwnTime = SimpleTimeMark.now()
             VanquisherOwnMessageEvent.post()
@@ -82,7 +82,7 @@ object VanquisherApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onPlaySound(event: PlaySoundEvent) {
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (event.soundName != "entity.wither.spawn" || event.pitch != 1f || event.volume != 2f) return
         lastSoundPos = event.location
         lastSoundTime = SimpleTimeMark.now()
@@ -90,8 +90,8 @@ object VanquisherApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
-        val entity = event.entity as? ArmorStand ?: return
+    private fun onEntityMaxHealthUpdate(event: EntityMaxHealthUpdateEvent<ArmorStand>) {
+        val entity = event.entity
         val helmet = entity.getStandHelmet() ?: return
         if (!helmet.`is`(Items.WITHER_SKELETON_SKULL)) return
         lastSpawnEntityPos = entity.getLorenzVec()
