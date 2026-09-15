@@ -106,7 +106,8 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
 
     @HandleEvent
     private fun onClientShutdown() {
-        configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
+        configManager.queueSave(ConfigFileType.FEATURES, "shutdown-hook")
+        configManager.flushQueuedSaves()
         SkyHanniItemRenderCoordinator.closeAtlas()
     }
 
