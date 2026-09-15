@@ -15,10 +15,10 @@ object SafariNamesInCenter {
 
     private val config get() = SkyHanniMod.feature.hunting.safari
     private val areaLocations = mapOf(
-        LorenzVec(-27.1, 66.0, 22.8) to "§2Forest Biome",
-        LorenzVec(-25.5, 66.0, -23.2) to "§5Haunted Biome",
-        LorenzVec(-73.3, 65.0, -23.4) to "§9Icy Biome",
-        LorenzVec(-72.6, 65.5, 23.9) to "§6Cavern Biome",
+        LorenzVec(-27.1, 66.0, 22.8) to SafariBiome.FOREST,
+        LorenzVec(-25.5, 66.0, -23.2) to SafariBiome.HAUNTED,
+        LorenzVec(-73.3, 65.0, -23.4) to SafariBiome.ICY,
+        LorenzVec(-72.6, 65.5, 23.9) to SafariBiome.CAVERN,
     )
 
     private var showWaypoints = false
@@ -31,7 +31,9 @@ object SafariNamesInCenter {
     @HandleEvent(onlyOnIsland = SAFARI)
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.namesInCenter || !showWaypoints) return
-        for ((location, name) in areaLocations) {
+        for ((location, biome) in areaLocations) {
+            val name = "${biome.formattedName} Biome"
+
             if (location.distanceSqToPlayer() > 50) {
                 event.drawDynamicText(location, name, 2.5)
             }
