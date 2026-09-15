@@ -12,7 +12,8 @@ class CritterCapsuleConfig {
     @Expose
     @ConfigOption(
         name = "Hide Flying Capsules",
-        desc = "Hide thrown Critter Capsules while they are in the air.",
+        desc = "Hide thrown Critter Capsules while they are in the air. " +
+            "Masterful Critter Capsules are only hidden while they are close to you.",
     )
     @ConfigEditorDropdown
     var flyingMode: FlyingMode = FlyingMode.NEVER
@@ -38,7 +39,7 @@ class CritterCapsuleConfig {
     @ConfigOption(
         name = "Hide Capsules on Ground",
         desc = "Hide Critter Capsules lying on the ground. Capsules you do not pick up return to your inventory " +
-            "on their own after a few seconds.",
+            "on their own after a few seconds. Masterful Critter Capsules are never hidden.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
