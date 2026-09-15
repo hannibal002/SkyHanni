@@ -263,7 +263,7 @@ object RiftWiltedBerberisHelper {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled() || !config.respawnSequence) return
-        if (event.old != "dead_bush" || event.new != "air") return
+        if (event.old != Blocks.DEAD_BUSH || event.new != Blocks.AIR) return
 
         for (seq in fieldSequences.values) {
             if (!seq.isRendering || seq.isAway) continue
