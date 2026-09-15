@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -173,7 +173,7 @@ object DungeonFinderFeatures {
         "View and select a dungeon class\\.",
     )
 
-    //  Variables used
+    // Variables used
     private var selectedClass: DungeonClass? = null
     private var floorStackSize = mapOf<Int, String>()
     private var highlightParty = mapOf<Int, LorenzColor>()
@@ -385,7 +385,7 @@ object DungeonFinderFeatures {
                 event.toolTip.add(line)
                 continue
             }
-            if (oldToolTip[index].string.removeColor() != line.string.removeColor()) {
+            if (oldToolTip[index].stripped != line.stripped) {
                 event.toolTip[index + 1] = line
             }
         }

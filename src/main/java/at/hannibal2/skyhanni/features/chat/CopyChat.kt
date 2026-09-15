@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ActiveTextCollector
@@ -49,9 +50,9 @@ object CopyChat {
                     .removeColor()
                 ) to "modified message"
 
-            KeyboardManager.isControlKeyDown() -> chatLine.content.string.removeColor() to "line"
+            KeyboardManager.isControlKeyDown() -> chatLine.content.stripped to "line"
 
-            else -> chatLine.content.string.removeColor() to "message"
+            else -> chatLine.content.stripped to "message"
         }
 
         ClipboardUtils.copyToClipboard(clipboard)
