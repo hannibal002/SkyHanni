@@ -1,17 +1,17 @@
 package at.hannibal2.skyhanni.config.features.hunting
 
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.foraging.SafariConfig
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
-import org.lwjgl.glfw.GLFW
 
 class HuntingConfig {
 
@@ -71,8 +71,8 @@ class HuntingConfig {
     @Expose
     @ConfigOption(name = "Show next Shulker", desc = "Press this key to show the route to the next Shulker.")
     @SearchTag("hideonleaf hideonsun")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var nextShulkerKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
+    @ConfigEditorKeyMapping
+    var nextShulkerKeybind = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Fusion Display", desc = "Displays the shard you are fusing and how many you have.")

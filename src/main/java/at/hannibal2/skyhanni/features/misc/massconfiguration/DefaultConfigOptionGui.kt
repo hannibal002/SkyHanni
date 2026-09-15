@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.massconfiguration
 
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -49,7 +50,7 @@ class DefaultConfigOptionGui(
         GuiRenderUtils.drawFloatingRectDark((width - xSize) / 2, (height - ySize) / 2, xSize, ySize)
         var hoveringTextToDraw: List<String>? = null
         val x = mouseX - ((width - xSize) / 2) - padding
-        val isMouseDown = MouseCompat.isButtonDown(0)
+        val isMouseDown = InputCode.LEFT_MOUSE.isKeyHeld()
         val shouldClick = isMouseDown && !wasMouseDown
         wasMouseDown = isMouseDown
         val isMouseInScrollArea =

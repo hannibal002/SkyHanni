@@ -27,7 +27,7 @@ object SeeThroughWindow {
 
     @HandleEvent
     private fun onKeyDown(event: KeyDownEvent) {
-        if (event.keyCode != config.keybind) return
+        if (event.key != config.keybind) return
         if (MinecraftCompat.screen != null) return
 
         isActive = !isActive

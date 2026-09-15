@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import io.github.notenoughupdates.moulconfig.common.RenderContext
@@ -88,7 +89,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         mouseEvent: MouseEvent,
     ): Boolean {
         val event = mouseEvent as? MouseEvent.Click ?: return false
-        if (event.mouseButton != 0) return false
+        if (event.mouseButton != InputCode.LEFT_MOUSE.value) return false
 
         fun isInside(width: Int, height: Int, def: GuiElementButton): Boolean {
             val inX = (mouseX - width - x) in (0..def.width)
