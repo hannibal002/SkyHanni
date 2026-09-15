@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -50,7 +49,7 @@ object AuctionHouseCopyUnderbidPrice {
     private var lastCopiedItem: NeuInternalName? = null
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!config.autoCopyUnderbidPrice) return
         if (!event.fullyOpenedOnce) return
         if (event.inventoryName != "Create BIN Auction") return
@@ -70,10 +69,10 @@ object AuctionHouseCopyUnderbidPrice {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onKeybind(event: GuiKeyPressEvent) {
+    private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.copyUnderbidKeybind.isKeyHeld()) return
         if (!allowedInventoriesPattern.matches(InventoryUtils.openInventoryName())) return
-        val stack = stackUnderCursor() ?: return
+        val stack = event.stackUnderCursor ?: return
 
         auctionPricePattern.firstMatcher(stack.getLore()) {
             copyPrice(group("coins").formatLong())
@@ -89,7 +88,7 @@ object AuctionHouseCopyUnderbidPrice {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(25, "inventory.copyUnderbidPrice", "inventory.auctions.autoCopyUnderbidPrice")
     }
 }

@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -64,7 +63,7 @@ object ShardTrackerDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
+    private fun onTick() {
         if (!isEnabled()) return
         if (trackedShards.isEmpty()) {
             renderables = null
@@ -129,7 +128,7 @@ object ShardTrackerDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRender(event: GuiRenderEvent.GuiOnTopRenderEvent) {
+    private fun onGuiRenderTop(event: GuiRenderEvent.GuiOnTopRenderEvent) {
         if (!isEnabled()) return
         renderables?.let {
             config.position.renderRenderables(it, posLabel = "Shard Tracker")
@@ -143,18 +142,18 @@ object ShardTrackerDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiKeyPress(event: GuiKeyPressEvent) {
+    private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!isEnabled()) return
         if (!config.selectShardKeybind.isKeyHeld()) return
         if (!isInsideShardsMenu()) return
-        val stack = stackUnderCursor() ?: return
+        val stack = event.stackUnderCursor ?: return
         val internalName = stack.getInternalName()
         if (internalName == NeuInternalName.NONE) return
         toggleShard(internalName)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltip(event: ToolTipTextEvent) {
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (!isInsideShardsMenu()) return
         if (config.selectShardKeybind == InputCode.UNKNOWN) return
@@ -163,7 +162,7 @@ object ShardTrackerDisplay {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shimportskyshards") {
             description = "Imports SkyShards material export"
             category = CommandCategory.USERS_ACTIVE
