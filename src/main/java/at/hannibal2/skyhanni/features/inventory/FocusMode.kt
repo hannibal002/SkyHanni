@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -36,9 +35,8 @@ object FocusMode {
             if (inBazaar) return
         }
 
-        val keyName = KeyboardManager.getKeyName(config.toggleKey)
-
-        val hint = !config.disableHint && !config.alwaysEnabled && keyName != "NONE"
+        val keyName = config.toggleKey.displayName
+        val hint = !config.disableHint && !config.alwaysEnabled && !config.toggleKey.isUnknown()
         if (active || config.alwaysEnabled) {
             val newTooltip = buildList {
                 add(event.toolTip.first())
@@ -74,7 +72,7 @@ object FocusMode {
     fun onKeyDown(event: KeyDownEvent) {
         if (!isEnabled()) return
         if (config.alwaysEnabled) return
-        if (event.keyCode != config.toggleKey) return
+        if (event.key != config.toggleKey) return
         active = !active
     }
 
