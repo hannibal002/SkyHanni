@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.events.ParticleChangeEvent
 import at.hannibal2.skyhanni.events.ParticleEvent
-import at.hannibal2.skyhanni.mixins.hooks.ParticleSuppressionMarker.Companion.shouldSuppress
+import at.hannibal2.skyhanni.mixins.hooks.ParticleSuppressionStore.Companion.shouldSuppress
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation
 import net.minecraft.client.multiplayer.ClientLevel
