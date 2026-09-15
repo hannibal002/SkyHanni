@@ -17,11 +17,12 @@ object HighlightCurrentPet {
     private val config get() = SkyHanniMod.feature.misc.pets.highlightInMenu
     private var highlightSlot: Int? = null
     private var correctPetPage: Int? = null
+    private var openPageNumber: Int? = null
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!config.enabled) return
-        val currentPage = PetStorageApi.petMenuPageNumber(InventoryUtils.openInventoryName()) ?: return
+        val currentPage = openPageNumber ?: return
         if (currentPage != correctPetPage) return
         val highlightSlot = highlightSlot ?: return
         event.container.slots[highlightSlot].highlight(config.color)
@@ -30,7 +31,7 @@ object HighlightCurrentPet {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.enabled) return
-        val currentPage = PetStorageApi.petMenuPageNumber(event.inventoryName) ?: return
+        openPageNumber = PetStorageApi.petMenuPageNumber(event.inventoryName) ?: return
         val currentPet = CurrentPetApi.currentPet
         if (currentPet == null) {
             highlightSlot = null
@@ -42,7 +43,7 @@ object HighlightCurrentPet {
             highlightSlot = null
             return
         }
-        correctPetPage = currentPage
+        correctPetPage = openPageNumber
         highlightSlot = petSlot
     }
 }

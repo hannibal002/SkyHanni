@@ -215,16 +215,12 @@ object PetStorageApi {
 
     fun inMainPetMenuName(): Boolean = mainMenuInventory.isInside()
 
+
     fun petMenuPageNumber(inventoryName: String): Int? {
         if (!extraPetMenuCheck()) return null
-        PetStoragePatterns.mainPetMenuNamePattern.matchMatcher(inventoryName) {
-            var petPage = groupOrNull("currentpage")
-            if (petPage == null) {
-                petPage = groupOrNull("currentalternatepage") ?: return 1
-            }
-            return petPage.formatInt()
+        return PetStoragePatterns.mainPetMenuNamePattern.matchMatcher(inventoryName) {
+            (groupOrNull("currentPage") ?: groupOrNull("alternatePage"))?.formatInt() ?: 1
         }
-        return null
     }
 
     private fun SafeItemStack.toVisiblePetDataOrNull(): PetData? =
@@ -543,6 +539,10 @@ object PetStorageApi {
         jsonNeedsSave = true
     }
 
+    /**
+     * returns true when pet did not change (Shift Key held down)
+     * returns false when pet has been changed.
+     */
     private fun toggleSummon(
         clickedItem: SafeItemStack,
         currentPetUuid: UUID?,
@@ -560,6 +560,10 @@ object PetStorageApi {
         return false
     }
 
+    /**
+     * returns true when pet could not be removed
+     * returns false when pet could be removed.
+     */
     private fun remove(clickedPetUuid: UUID?, currentPetUuid: UUID?): Boolean {
         clickedPetUuid ?: return true
         petStorage?.pets?.removeIf { it.uuid == clickedPetUuid }
