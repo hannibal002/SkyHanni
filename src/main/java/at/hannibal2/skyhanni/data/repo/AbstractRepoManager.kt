@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.repo.filesystem.DiskRepoFileSystem
 import at.hannibal2.skyhanni.data.repo.filesystem.MemoryRepoFileSystem
 import at.hannibal2.skyhanni.data.repo.filesystem.RepoFileSystem
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.OSUtils.deleteRecursivelySafe
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -611,7 +612,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             )
 
             if (copied) {
-                legacyDirectory.deleteRecursively()
+                legacyDirectory.deleteRecursivelySafe()
             } else {
                 logger.error("Failed to copy legacy repo directory from ${legacyDirectory.absolutePath}")
             }

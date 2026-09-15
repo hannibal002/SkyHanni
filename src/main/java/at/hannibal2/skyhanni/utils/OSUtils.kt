@@ -7,10 +7,10 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
+import kotlin.io.path.deleteRecursively
 import kotlin.time.Duration
 
 object OSUtils {
-
     enum class OperatingSystem {
         LINUX,
         SOLARIS,
@@ -143,5 +143,14 @@ object OSUtils {
                 "path" to this.absolutePath,
             )
         }
+    }
+
+    /**
+     * Deletes the target directory recursively. Unlike [File.deleteRecursively], this does not
+     * follow symbolic links, so it will only delete the link, and not the contents of the target
+     * directory.
+     */
+    fun File.deleteRecursivelySafe() {
+        this.toPath().deleteRecursively()
     }
 }

@@ -334,6 +334,7 @@ tasks.withType<KotlinCompile> {
         allWarningsAsErrors = true
         optIn.addAll(
             "kotlin.concurrent.atomics.ExperimentalAtomicApi",
+            "kotlin.io.path.ExperimentalPathApi",
             "kotlin.time.ExperimentalTime"
         )
         freeCompilerArgs.addAll(
