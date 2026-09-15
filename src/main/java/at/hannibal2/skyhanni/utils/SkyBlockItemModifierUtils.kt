@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.features.event.carnival.fruitdigging.DowsingMode
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.FishingApi.getFishingRodPart
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -36,6 +37,9 @@ import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions")
 object SkyBlockItemModifierUtils {
+    private val CARNIVAL_SHOVEL = "CARNIVAL_SHOVEL".toInternalName()
+    private val PROMISING_SPADE = "PROMISING_SPADE".toInternalName()
+    private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
 
     fun SafeItemStack.getCoinsOfAvarice() = getAttributeLong("collected_coins")
 
@@ -66,9 +70,9 @@ object SkyBlockItemModifierUtils {
     fun SafeItemStack.getMithrilInfusion(): Boolean = getAttributeByte("mithril_infusion") == 1.toByte()
     fun SafeItemStack.getFreeWill(): Boolean = getAttributeByte("free_will") == 1.toByte()
 
-    private fun SafeItemStack.getBaseSilexCount() = when (getInternalName().asString()) {
-        "STONK_PICKAXE" -> 1
-        "PROMISING_SPADE" -> 5
+    private fun SafeItemStack.getBaseSilexCount() = when (getInternalName()) {
+        STONK_PICKAXE -> 1
+        PROMISING_SPADE -> 5
 
         else -> 0
     }
@@ -292,6 +296,14 @@ object SkyBlockItemModifierUtils {
 
     fun SafeItemStack.getRecipientName() = getAttributeString("recipient_name")
 
+    fun SafeItemStack.getDowsingMode(): DowsingMode? {
+        if (getInternalName() != CARNIVAL_SHOVEL) return null
+        // The initial state of the Carnival Shovel is always Mines, but it does not have the tag yet
+        val modeStr = getAttributeString("dowsing_mode") ?: "mines"
+        return DowsingMode.entries.firstOrNull { it.name.equals(modeStr, ignoreCase = true) }
+            ?: error("unknown dowsing mode: $modeStr")
+    }
+
     fun SafeItemStack.getItemUuid() = getAttributeString("uuid")
 
     fun SafeItemStack.getItemId() = getAttributeString("id")
@@ -378,42 +390,40 @@ object SkyBlockItemModifierUtils {
     }
 
     enum class GemstoneQuality(private val displayName: String, private val color: LorenzColor) {
-        ROUGH("Rough", LorenzColor.WHITE),
-        FLAWED("Flawed", LorenzColor.GREEN),
-        FINE("Fine", LorenzColor.BLUE),
-        FLAWLESS("Flawless", LorenzColor.DARK_PURPLE),
-        PERFECT("Perfect", LorenzColor.GOLD),
+        ROUGH("Rough", WHITE),
+        FLAWED("Flawed", GREEN),
+        FINE("Fine", BLUE),
+        FLAWLESS("Flawless", DARK_PURPLE),
+        PERFECT("Perfect", GOLD),
         ;
 
         override fun toString() = displayName
         fun toDisplayString() = "${color.getChatColor()}$displayName"
 
         companion object {
-
             fun getByNameOrNull(name: String) = entries.firstOrNull { it.name.equals(name, ignoreCase = true) }
         }
     }
 
     enum class GemstoneType(val displayName: String, private val color: LorenzColor) {
-        JADE("Jade", LorenzColor.GREEN),
-        AMBER("Amber", LorenzColor.GOLD),
-        TOPAZ("Topaz", LorenzColor.YELLOW),
-        SAPPHIRE("Sapphire", LorenzColor.BLUE),
-        AMETHYST("Amethyst", LorenzColor.DARK_PURPLE),
-        JASPER("Jasper", LorenzColor.LIGHT_PURPLE),
-        RUBY("Ruby", LorenzColor.RED),
-        OPAL("Opal", LorenzColor.WHITE),
-        ONYX("Onyx", LorenzColor.DARK_GRAY),
-        AQUAMARINE("Aquamarine", LorenzColor.AQUA),
-        CITRINE("Citrine", LorenzColor.DARK_RED),
-        PERIDOT("Peridot", LorenzColor.DARK_GREEN),
+        JADE("Jade", GREEN),
+        AMBER("Amber", GOLD),
+        TOPAZ("Topaz", YELLOW),
+        SAPPHIRE("Sapphire", BLUE),
+        AMETHYST("Amethyst", DARK_PURPLE),
+        JASPER("Jasper", LIGHT_PURPLE),
+        RUBY("Ruby", RED),
+        OPAL("Opal", WHITE),
+        ONYX("Onyx", DARK_GRAY),
+        AQUAMARINE("Aquamarine", AQUA),
+        CITRINE("Citrine", DARK_RED),
+        PERIDOT("Peridot", DARK_GREEN),
         ;
 
         override fun toString() = displayName
         fun toDisplayString() = "${color.getChatColor()}$displayName"
 
         companion object {
-
             fun getByNameOrNull(name: String) = entries.firstOrNull { it.name == name || it.displayName == name }
         }
     }
@@ -438,7 +448,6 @@ object SkyBlockItemModifierUtils {
         ;
 
         companion object {
-
             fun getByName(name: String): GemstoneSlotType =
                 entries.firstOrNull { name.uppercase(Locale.ENGLISH).contains(it.name) }
                     ?: error("Unknown GemstoneSlotType: '$name'")

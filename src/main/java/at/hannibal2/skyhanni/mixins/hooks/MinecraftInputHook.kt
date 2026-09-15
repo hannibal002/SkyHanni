@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.ContinuedBlockBreakEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -37,7 +38,13 @@ object MinecraftInputHook {
 
         val position = (hitResult as BlockHitResult).blockPos
 
-        if (currentBlockPos == position) return false
+        if (currentBlockPos == position) {
+            // This event is intentionally listen-only and not cancellable as allowing arbitrary
+            // selective cancellation would be dangerous.
+            ContinuedBlockBreakEvent(position.toLorenzVec(), InventoryUtils.getItemInHand()).post()
+
+            return false
+        }
 
         val clickCancelled =
             ItemClickEvent(InventoryUtils.getItemInHand(), InteractClickType.LEFT_CLICK).post().isCancelled
