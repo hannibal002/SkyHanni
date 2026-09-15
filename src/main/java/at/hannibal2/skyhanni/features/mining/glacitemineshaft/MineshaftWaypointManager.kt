@@ -28,26 +28,25 @@ import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO rename to something else to reduce confusion
 @SkyHanniModule
-object MineshaftWaypoints {
-    private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft
+object MineshaftWaypointManager {
+    private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.waypointsConfig
 
-    private const val BLOCKS_FORWARD = 7
-    private const val BLOCKS_DOWN = -15
+    private const val LADDER_BLOCKS_FORWARD = 7
+    private const val LADDER_BLOCKS_DOWN = -15
 
     val waypoints = mutableListOf<MineshaftWaypoint>()
     private var timeLastShared = SimpleTimeMark.farPast()
     private var isWorldLoaded = false
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         waypoints.clear()
         isWorldLoaded = false
     }
 
     @HandleEvent
-    fun onIslandJoin(event: IslandJoinEvent) {
+    private fun onIslandJoin(event: IslandJoinEvent) {
         if (event.island != IslandType.MINESHAFT) return
 
         val spawnLocation = LocationUtils.getBlockBelowPlayer()
@@ -57,7 +56,7 @@ object MineshaftWaypoints {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
-    fun onPacketReceived(event: PacketReceivedEvent) {
+    private fun onPacketReceived(event: PacketReceivedEvent) {
         if (isWorldLoaded) return
 
         when (event.packet) {
@@ -74,31 +73,28 @@ object MineshaftWaypoints {
     }
 
     @HandleEvent
-    fun onCorpseFound(event: CorpseFoundEvent) {
-        if (!config.mineshaftWaypoints.enabled || !config.corpseLocator.enabled) return
+    private fun onCorpseFound(event: CorpseFoundEvent) {
+        waypoints.add(MineshaftWaypoint(MineshaftWaypoint.Type.FOUND_CORPSE, event.location, event.corpseType))
 
-        val corpseType = event.corpseType
-        val article = if (corpseType == CorpseType.UMBER) "an" else "a"
-        ChatUtils.chat("Found $article $corpseType Corpse§e and marked its location with a waypoint.")
-
-        val waypoint = MineshaftWaypoint(corpseType.waypointType, event.location, isCorpse = true)
-        waypoints.add(waypoint)
+        // Only display a message when Found Corpse waypoints are enabled.
+        if (config.types.foundCorpse) {
+            val article = if (event.corpseType == CorpseType.UMBER) "an" else "a"
+            ChatUtils.chat("Found $article ${event.corpseType} Corpse§e at ${event.location.toLocalFormat()}.")
+        }
     }
 
     @HandleEvent
-    fun onCorpseLooted(event: CorpseLootedEvent) {
-        if (waypoints.isEmpty()) return
-
+    private fun onCorpseLooted(event: CorpseLootedEvent) {
         val closestWaypoint = waypoints.filter { it.isCorpse && it.location.distanceToPlayer() <= 5 }
             .minByOrNull { it.location.distanceToPlayer() } ?: return
 
-        closestWaypoint.isLootedCorpse = true
+        closestWaypoint.type = MineshaftWaypoint.Type.LOOTED_CORPSE
     }
 
     @HandleEvent
-    fun onKeyPress(event: KeyPressEvent) {
+    private fun onKeyPress(event: KeyPressEvent) {
         if (MinecraftCompat.screen != null) return
-        if (event.keyCode != config.shareWaypointLocation) return
+        if (event.keyCode != config.shareCorpseKeybind) return
         if (timeLastShared.passedSince() < 500.milliseconds) return
 
         val closestWaypoint = waypoints.filter { it.location.distanceToPlayer() <= 5 }
@@ -106,7 +102,7 @@ object MineshaftWaypoints {
 
         timeLastShared = SimpleTimeMark.now()
         val location = closestWaypoint.location.toChatFormat()
-        val type = closestWaypoint.waypointType.display
+        val type = closestWaypoint.type.label
         val message = "$location | ($type)"
 
         if (PartyApi.partyMembers.isNotEmpty()) {
@@ -117,36 +113,27 @@ object MineshaftWaypoints {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (waypoints.isEmpty()) return
-
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         waypoints
-            .filter {
-                (it.isCorpse && config.corpseLocator.enabled) || (!it.isCorpse && config.mineshaftWaypoints.enabled)
-            }
+            .filter { it.shouldRender }
             .forEach {
-                event.drawWaypointFilled(it.location, it.waypointType.color.toColor(), seeThroughBlocks = true)
-                event.drawDynamicText(it.location, "§${if (it.isLootedCorpse) "a" else "e"}${it.waypointType.display}", 1.0)
+                event.drawWaypointFilled(it.location, it.fillColor.toColor(), seeThroughBlocks = true)
+                event.drawDynamicText(it.location, it.textDisplay, it.labelScale)
             }
     }
 
-    private fun addEntranceWaypoints(spawnLocation: LorenzVec, direction: Vec3i) {
-        if (config.mineshaftWaypoints.entranceLocation) {
-            waypoints.removeIf { it.waypointType == MineshaftWaypointType.ENTRANCE }
-            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.ENTRANCE, location = spawnLocation))
-        }
+    private fun addEntranceWaypoints(entranceLocation: LorenzVec, direction: Vec3i) {
+        waypoints.removeIf { it.type in listOf(MineshaftWaypoint.Type.ENTRANCE, MineshaftWaypoint.Type.LADDER) }
 
-        if (config.mineshaftWaypoints.ladderLocation) {
-            val ladderLocation = spawnLocation
-                // Move 7 blocks in front of the player to be in the ladder shaft
-                .add(x = direction.x * BLOCKS_FORWARD, z = direction.z * BLOCKS_FORWARD)
-                // Adjust 2 blocks to the right to be in the center of the ladder shaft
-                .add(x = direction.z * -2, z = direction.x * 2)
-                // Move 15 blocks down to be at the bottom of the ladder shaft
-                .add(y = BLOCKS_DOWN)
+        val ladderLocation = entranceLocation
+            // Move 7 blocks in front of the player to be in the ladder shaft
+            .add(x = direction.x * LADDER_BLOCKS_FORWARD, z = direction.z * LADDER_BLOCKS_FORWARD)
+            // Adjust 2 blocks to the right to be in the center of the ladder shaft
+            .add(x = direction.z * -2, z = direction.x * 2)
+            // Move 15 blocks down to be at the bottom of the ladder shaft
+            .add(y = LADDER_BLOCKS_DOWN)
 
-            waypoints.removeIf { it.waypointType == MineshaftWaypointType.LADDER }
-            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.LADDER, location = ladderLocation))
-        }
+        waypoints.add(MineshaftWaypoint(type = MineshaftWaypoint.Type.ENTRANCE, location = entranceLocation))
+        waypoints.add(MineshaftWaypoint(type = MineshaftWaypoint.Type.LADDER, location = ladderLocation))
     }
 }
