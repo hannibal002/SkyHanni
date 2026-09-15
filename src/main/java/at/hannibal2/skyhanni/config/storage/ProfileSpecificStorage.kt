@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
+import at.hannibal2.skyhanni.features.foraging.ForagingTracker
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
@@ -71,7 +71,6 @@ import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
@@ -140,7 +139,7 @@ class ProfileSpecificStorage(
 
     class LastStorage {
         @Expose
-        var type: OpenLastStorage.StorageType = OpenLastStorage.StorageType.ENDER_CHEST
+        var type: OpenLastStorage.StorageType = ENDER_CHEST
 
         @Expose
         var page: Int? = null
@@ -163,7 +162,7 @@ class ProfileSpecificStorage(
             constructor(floor: String?, runTime: SimpleTimeMark?) {
                 this.floor = floor
                 this.runTime = runTime
-                this.openState = OpenedState.UNOPENED
+                this.openState = UNOPENED
             }
 
             @Expose
@@ -373,7 +372,7 @@ class ProfileSpecificStorage(
         @Expose var strayChocolateGained: Long = 0,
         @Expose var rabbitTheFishFinds: Int = 0,
 
-        @Expose var millisInCf: Duration = Duration.ZERO,
+        @Expose var millisInCf: Duration = ZERO,
         @Expose var initialLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
         @Expose var finalLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
         @Expose var lastLbUpdate: SimpleTimeMark = farPast(),
@@ -492,7 +491,7 @@ class ProfileSpecificStorage(
         var personalBestFF: MutableMap<CropType, Double> = enumMapOf()
 
         @Expose
-        var savedCropAccessory: CropAccessory? = CropAccessory.NONE
+        var savedCropAccessory: CropAccessory? = NONE
 
         @Expose
         var informedAboutLowMatter: SimpleTimeMark = farPast()
@@ -516,10 +515,10 @@ class ProfileSpecificStorage(
         var toolWithBountiful: MutableMap<CropType, Boolean> = enumMapOf()
 
         @Expose
-        var composterCurrentOrganicMatterItem: NeuInternalName? = NONE
+        var composterCurrentOrganicMatterItem: NeuInternalName? = NeuInternalName.NONE
 
         @Expose
-        var composterCurrentFuelItem: NeuInternalName? = NONE
+        var composterCurrentFuelItem: NeuInternalName? = NeuInternalName.NONE
 
         @Expose
         var uniqueVisitors: Int = 0
@@ -654,7 +653,6 @@ class ProfileSpecificStorage(
 
             @Expose
             var minAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
-
         }
 
         @Expose
@@ -796,9 +794,8 @@ class ProfileSpecificStorage(
         @Expose
         var whispers: PowderStorage = PowderStorage()
 
-        // todo when we're fully 1.21, change ForagingTrackerLegacy to ForagingTracker
         @Expose
-        var trackerData: ForagingTrackerLegacy.BucketData = ForagingTrackerLegacy.BucketData()
+        var trackerData: ForagingTracker.BucketData = ForagingTracker.BucketData()
 
         @Expose
         var honeyhiveRemindTime: SimpleTimeMark = farPast()
