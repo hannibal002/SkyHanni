@@ -317,7 +317,6 @@
     <ID>PrivateEventListener:BitsApi.kt:BitsApi$@HandleEvent fun onDebugDataCollect</ID>
     <ID>PrivateEventListener:BitsApi.kt:BitsApi$@HandleEvent fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:BitsApi.kt:BitsApi$@HandleEvent fun onScoreboardChange</ID>
-    <ID>PrivateEventListener:BitsPerCookieVisual.kt:BitsPerCookieVisual$@HandleEvent fun onToolTip</ID>
     <ID>PrivateEventListener:BlazeSlayerClearView.kt:BlazeSlayerClearView$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:BlazeSlayerClearView.kt:BlazeSlayerClearView$@HandleEvent(onlyOnSkyblock = true) fun onCheckRender</ID>
     <ID>PrivateEventListener:BlazeSlayerClearView.kt:BlazeSlayerClearView$@HandleEvent(onlyOnSkyblock = true) fun onParticle</ID>
@@ -651,11 +650,6 @@
     <ID>PrivateEventListener:CrimsonIsleReputationHelper.kt:CrimsonIsleReputationHelper$@HandleEvent fun onSackChange</ID>
     <ID>PrivateEventListener:CrimsonIsleReputationHelper.kt:CrimsonIsleReputationHelper$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onTick</ID>
     <ID>PrivateEventListener:CrimsonIsleReputationHelper.kt:CrimsonIsleReputationHelper$@HandleEvent(priority = HandleEvent.LOWEST, onlyOnIsland = IslandType.CRIMSON_ISLE) fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:CrimsonMinibossRespawnTimer.kt:CrimsonMinibossRespawnTimer$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:CrimsonMinibossRespawnTimer.kt:CrimsonMinibossRespawnTimer$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:CrimsonMinibossRespawnTimer.kt:CrimsonMinibossRespawnTimer$@HandleEvent fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:CrimsonMinibossRespawnTimer.kt:CrimsonMinibossRespawnTimer$@HandleEvent fun onSecondPassed</ID>
-    <ID>PrivateEventListener:CrimsonMinibossRespawnTimer.kt:CrimsonMinibossRespawnTimer$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:CroesusChestTracker.kt:CroesusChestTracker$@HandleEvent fun onDungeonComplete</ID>
     <ID>PrivateEventListener:CroesusChestTracker.kt:CroesusChestTracker$@HandleEvent fun onKuudraComplete</ID>
     <ID>PrivateEventListener:CroesusChestTracker.kt:CroesusChestTracker$@HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, priority = HandleEvent.LOW, onlyOnSkyblock = true) fun onBackgroundDrawn</ID>
@@ -1081,21 +1075,7 @@
     <ID>PrivateEventListener:ErrorManager.kt:ErrorManager$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:ErrorManager.kt:ErrorManager$@HandleEvent fun onConnect</ID>
     <ID>PrivateEventListener:ErrorManager.kt:ErrorManager$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:EssenceShopHelper.kt:EssenceShopHelper$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:EssenceShopHelper.kt:EssenceShopHelper$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:EssenceShopHelper.kt:EssenceShopHelper$@HandleEvent fun onInventoryUpdated</ID>
-    <ID>PrivateEventListener:EssenceShopHelper.kt:EssenceShopHelper$@HandleEvent fun onNeuRepoReload</ID>
-    <ID>PrivateEventListener:EssenceShopHelper.kt:EssenceShopHelper$@HandleEvent fun onSlotClick</ID>
-    <ID>PrivateEventListener:EssenceShopHelper.kt:EssenceShopHelper$@HandleEvent fun replaceItem</ID>
     <ID>PrivateEventListener:EssenceUtils.kt:EssenceUtils$@HandleEvent fun onNeuRepoReload</ID>
-    <ID>PrivateEventListener:EstimatedItemValue.kt:EstimatedItemValue$@HandleEvent fun onChestGuiRender</ID>
-    <ID>PrivateEventListener:EstimatedItemValue.kt:EstimatedItemValue$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:EstimatedItemValue.kt:EstimatedItemValue$@HandleEvent fun onConfigLoad</ID>
-    <ID>PrivateEventListener:EstimatedItemValue.kt:EstimatedItemValue$@HandleEvent fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:EstimatedItemValue.kt:EstimatedItemValue$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:EstimatedItemValue.kt:EstimatedItemValue$@HandleEvent fun onNeuRepoReload</ID>
-    <ID>PrivateEventListener:EstimatedItemValue.kt:EstimatedItemValue$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:EstimatedItemValue.kt:EstimatedItemValue$@HandleEvent(onlyOnSkyblock = true) fun onRenderItemTooltip</ID>
     <ID>PrivateEventListener:EstimatedItemValueTooltip.kt:EstimatedItemValueTooltip$@HandleEvent(onlyOnSkyblock = true) fun onTooltip</ID>
     <ID>PrivateEventListener:EstimatedWardrobePrice.kt:EstimatedWardrobePrice$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:EstimatedWardrobePrice.kt:EstimatedWardrobePrice$@HandleEvent(onlyOnSkyblock = true) fun onToolTip</ID>
@@ -2017,8 +1997,6 @@
     <ID>PrivateEventListener:LowHealthAlert.kt:LowHealthAlert$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onScoreboardChange</ID>
     <ID>PrivateEventListener:MagicalPowerAchievement.kt:MagicalPowerAchievement$@HandleEvent fun onAchievementRegistration</ID>
     <ID>PrivateEventListener:MagicalPowerAchievement.kt:MagicalPowerAchievement$@HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOW) fun onAccessoryBagUpdate</ID>
-    <ID>PrivateEventListener:MagicalPowerDisplay.kt:MagicalPowerDisplay$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:MagicalPowerDisplay.kt:MagicalPowerDisplay$@HandleEvent fun onRenderItemTip</ID>
     <ID>PrivateEventListener:MantidKillDisplay.kt:MantidKillDisplay$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:MantidKillDisplay.kt:MantidKillDisplay$@HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:MantidKillDisplay.kt:MantidKillDisplay$@HandleEvent(PestKillEvent::class) fun onPestKill</ID>
@@ -2506,12 +2484,6 @@
     <ID>PrivateEventListener:QuickModMenuSwitch.kt:QuickModMenuSwitch$@HandleEvent fun onRepoReload</ID>
     <ID>PrivateEventListener:QuickModMenuSwitch.kt:QuickModMenuSwitch$@HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.QUICK_MOD_MENU_SWITCH]) fun onScreenDrawn</ID>
     <ID>PrivateEventListener:QuickModMenuSwitch.kt:QuickModMenuSwitch$@HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.QUICK_MOD_MENU_SWITCH]) fun onTick</ID>
-    <ID>PrivateEventListener:QuiverApi.kt:QuiverApi$@HandleEvent fun onAchievementRegistration</ID>
-    <ID>PrivateEventListener:QuiverApi.kt:QuiverApi$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:QuiverApi.kt:QuiverApi$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:QuiverApi.kt:QuiverApi$@HandleEvent fun onOwnInventoryMenuUpdate</ID>
-    <ID>PrivateEventListener:QuiverApi.kt:QuiverApi$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:QuiverApi.kt:QuiverApi$@HandleEvent fun onSecondPassed</ID>
     <ID>PrivateEventListener:QuiverDisplay.kt:QuiverDisplay$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:QuiverDisplay.kt:QuiverDisplay$@HandleEvent fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:QuiverDisplay.kt:QuiverDisplay$@HandleEvent fun onProfileJoin</ID>
@@ -2562,7 +2534,6 @@
     <ID>PrivateEventListener:RenderDisplayHelper.kt:RenderDisplayHelper.Companion$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:RenderDisplayHelper.kt:RenderDisplayHelper.Companion$@HandleEvent fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:RenderDisplayHelper.kt:RenderDisplayHelper.Companion$@HandleEvent fun onTick</ID>
-    <ID>PrivateEventListener:RenderEvents.kt:RenderEvents$@HandleEvent fun onResourcePackReload</ID>
     <ID>PrivateEventListener:RenderLivingEntityHelper.kt:RenderLivingEntityHelper$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:RenderLivingEntityHelper.kt:RenderLivingEntityHelper$@HandleEvent(SkyHanniTickEvent::class) fun onTick</ID>
     <ID>PrivateEventListener:RenderableTestSuite.kt:RenderableTestSuite$@HandleEvent fun onCommandRegistration</ID>
@@ -2658,9 +2629,6 @@
     <ID>PrivateEventListener:SackApi.kt:SackApi$@HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH) fun onProfileJoin</ID>
     <ID>PrivateEventListener:SackDisplay.kt:SackDisplay$@HandleEvent fun onBackgroundDrawn</ID>
     <ID>PrivateEventListener:SackDisplay.kt:SackDisplay$@HandleEvent fun onSackOpen</ID>
-    <ID>PrivateEventListener:ScoreboardData.kt:ScoreboardData$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:ScoreboardData.kt:ScoreboardData$@HandleEvent(priority = HandleEvent.HIGHEST) fun onTick</ID>
-    <ID>PrivateEventListener:ScoreboardData.kt:ScoreboardData$@HandleEvent(receiveCancelled = true) fun onPacketReceive</ID>
     <ID>PrivateEventListener:ScoreboardPattern.kt:ScoreboardPattern$@HandleEvent(RepositoryReloadEvent::class) fun onRepoReload</ID>
     <ID>PrivateEventListener:ScrapGFS.kt:ScrapGFS$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:ScrapGFS.kt:ScrapGFS$@HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES) fun onChestGuiRender</ID>
@@ -3646,12 +3614,10 @@
     <ID>UnusedParameter:MobUtils.kt:MobUtils$partialTicks: Float</ID>
     <ID>UnusedParameter:ModernIslandExceptions.kt:ModernIslandExceptions$armorStand: ArmorStand?</ID>
     <ID>UnusedParameter:ModernIslandExceptions.kt:ModernIslandExceptions$nextEntity: LivingEntity?</ID>
-    <ID>UnusedParameter:RenderEvents.kt:RenderEvents$tick: DeltaTracker</ID>
     <ID>UnusedPrivateProperty:BetterContainers.kt:BetterContainers$private val x: Identifier = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54")</ID>
     <ID>UnusedVariable:MobFinder.kt:MobFinder$val entity = mob.baseEntity</ID>
     <ID>UselessCallOnNotNull:EssenceShopHelper.kt:EssenceShopHelper$essenceHeaderStack?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty()</ID>
     <ID>UselessCallOnNotNull:IslandExceptions.kt:IslandExceptions$armorStand?.name.formattedTextCompatLessResets().orEmpty()</ID>
-    <ID>UselessCallOnNotNull:ScoreboardData.kt:ScoreboardData$MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.formattedTextCompat().orEmpty()</ID>
     <ID>VarCouldBeVal:CommandBuilder.kt:ComplexCommandBuilder$private var realDescription: String = ""</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt:RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo>())</ID>
     <ID>VarCouldBeVal:RepoPatternManager.kt:RepoPatternManager$/** * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for * checking duplicate registrations. */ private var usedKeys: NavigableMap&lt;String, CommonPatternInfo&lt;*, *>> = TreeMap()</ID>

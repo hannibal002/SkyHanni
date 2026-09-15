@@ -180,7 +180,6 @@ object StringUtils {
                 // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
-
         } else {
             internalCleanPlayerName()
         }
@@ -222,13 +221,14 @@ object StringUtils {
                         newLine += color.toChatFormatting()
                     }
                 }
-                var newFormatting = ""
-                newFormatting = if (style.isBold) "§l"
-                else if (style.isItalic) "§o"
-                else if (style.isUnderlined) "§n"
-                else if (style.isStrikethrough) "§m"
-                else if (style.isObfuscated) "§k"
-                else ""
+                val newFormatting = when {
+                    style.isBold -> "§l"
+                    style.isItalic -> "§o"
+                    style.isUnderlined -> "§n"
+                    style.isStrikethrough -> "§m"
+                    style.isObfuscated -> "§k"
+                    else -> ""
+                }
 
                 if (newFormatting != lastFormatting) {
                     lastFormatting = newFormatting
