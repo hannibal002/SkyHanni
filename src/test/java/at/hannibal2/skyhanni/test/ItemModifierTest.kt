@@ -10,9 +10,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
-@ExtendWith(BootstrapExtension::class)
 class ItemModifierTest {
-
     @Test
     fun testUpgradeLevelMasterStars() {
         val itemStack = TestExportTools.getTestData(TestExportTools.Item, "10starnecronhead")
