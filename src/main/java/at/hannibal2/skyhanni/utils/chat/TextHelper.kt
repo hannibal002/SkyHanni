@@ -19,7 +19,6 @@ import net.minecraft.client.gui.components.ComponentRenderUtils
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
-import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.objects.AtlasSprite
 import net.minecraft.network.chat.contents.objects.PlayerSprite
 import net.minecraft.resources.Identifier
@@ -29,12 +28,10 @@ import java.util.Optional
 
 @Suppress("TooManyFunctions")
 object TextHelper {
-
     val NEWLINE = "\n".asComponent()
     val HYPHEN = "-".asComponent()
     val SPACE = " ".asComponent()
     val EMPTY = "".asComponent()
-    val chromaStyle by lazy { TextColor(0xFFFFFE, "chroma") }
 
     fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
     fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent =
