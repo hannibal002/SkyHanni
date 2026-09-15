@@ -189,7 +189,7 @@ class SlayerConfig {
             event.move(138, "${oldPath}remainingKillsHealth", "${remainingKillsPath}includeMobHealth")
             event.move(138, "${oldPath}remainingKillsPosition", "${remainingKillsPath}remainingKillsPosition")
             event.transform(146, "${oldPath}slayerMinibossHighlight") { element ->
-                val enabled = JsonPrimitive(element.asString != "OFF")
+                val enabled = JsonPrimitive(element.asBoolean)
                 event.add(146, "${oldPath}miniboss.slayerMinibossHighlight") {
                     enabled
                 }
@@ -199,7 +199,7 @@ class SlayerConfig {
                 element
             }
             event.transform(146, "${oldPath}slayerMinibossLine") { element ->
-                val enabled = JsonPrimitive(element.asString != "OFF")
+                val enabled = JsonPrimitive(element.asBoolean)
                 event.add(146, "${oldPath}miniboss.minibossLine.showLine") {
                     enabled
                 }

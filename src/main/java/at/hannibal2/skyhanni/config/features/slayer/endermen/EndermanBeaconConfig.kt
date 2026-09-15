@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.slayer.endermen
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.generic.lineconfigs.EndermanSlayerLineConfigs
+import at.hannibal2.skyhanni.config.generic.lineconfigs.slayer.LineToBeacon
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -17,7 +17,7 @@ class EndermanBeaconConfig {
     @Expose
     @ConfigOption(name = "Show a Line to Crosshair From Beacon", desc = "")
     @Accordion
-    val line: EndermanSlayerLineConfigs.LineToBeacon = EndermanSlayerLineConfigs.LineToBeacon()
+    val line: LineToBeacon = LineToBeacon()
 
     @Expose
     @ConfigOption(

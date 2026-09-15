@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.config.features.slayer.endermen
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.generic.lineconfigs.EndermanSlayerLineConfigs
-import at.hannibal2.skyhanni.config.generic.lineconfigs.SlayerLineConfigs
+import at.hannibal2.skyhanni.config.generic.lineconfigs.slayer.LineToNukekebi
+import at.hannibal2.skyhanni.config.generic.lineconfigs.slayer.LineToSlayer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -26,12 +26,12 @@ class EndermanConfig {
     @Expose
     @ConfigOption(name = "Line To Nukekubi Skulls", desc = "")
     @Accordion
-    val lineToNukekebi: EndermanSlayerLineConfigs.LineToNukekebi = EndermanSlayerLineConfigs.LineToNukekebi()
+    val lineToNukekebi: LineToNukekebi = LineToNukekebi()
 
     @Expose
     @ConfigOption(name = "Line To Boss", desc = "")
     @Accordion
-    val lineToBoss: SlayerLineConfigs.SlayerLineDefaultOff = SlayerLineConfigs.SlayerLineDefaultOff()
+    val lineToBoss: LineToSlayer = LineToSlayer()
 
     @Expose
     @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer.")

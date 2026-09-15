@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.slayer
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.generic.lineconfigs.SlayerLineConfigs
+import at.hannibal2.skyhanni.config.generic.lineconfigs.slayer.LineToSlayer
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -18,7 +18,7 @@ class MinibossConfig {
     @Expose
     @ConfigOption(name = "Line to Miniboss Mob", desc = "")
     @Accordion
-    val minibossLine: SlayerLineConfigs.SlayerLineDefaultOff = SlayerLineConfigs.SlayerLineDefaultOff()
+    val minibossLine: LineToSlayer = LineToSlayer()
 
     @Expose
     @ConfigOption(name = "Disable when Boss", desc = "Disables Line to Miniboss Mobs when your own Slayer Boss is active.")
@@ -34,7 +34,7 @@ class MinibossConfig {
     @Expose
     @ConfigOption(name = "Line To Cocoon with Miniboss", desc = "")
     @Accordion
-    val cocoonLine: SlayerLineConfigs.SlayerLineDefaultOn = SlayerLineConfigs.SlayerLineDefaultOn()
+    val cocoonLine: LineToSlayer = LineToSlayer()
 
     @Expose
     @ConfigOption(name = "Disable when Boss", desc = "Disables Line to Miniboss Cocoon when your own Slayer Boss is active.")

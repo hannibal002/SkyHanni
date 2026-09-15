@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.slayer.vampire
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.generic.lineconfigs.SlayerLineConfigs
+import at.hannibal2.skyhanni.config.generic.lineconfigs.slayer.LineToVampireBoss
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -32,7 +32,7 @@ class VampireConfig {
     @Expose
     @ConfigOption(name = "Line from Crosshair To Boss Head.", desc = "")
     @Accordion
-    val line: SlayerLineConfigs.SlayerLineDefaultOff = SlayerLineConfigs.SlayerLineDefaultOff()
+    val line: LineToVampireBoss = LineToVampireBoss()
 
     @Expose
     @ConfigOption(name = "Transparency", desc = "Choose the transparency of the color.")
