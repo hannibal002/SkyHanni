@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.SkyHanniConfig
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -20,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import com.google.gson.JsonElement
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.observer.Property
 import java.io.File
 import java.lang.reflect.Field
@@ -373,7 +373,7 @@ object SkyHanniConfigSearchResetCommand {
     val allKeybinds: Set<String> by lazy {
         buildSet {
             ConfigUtils.traverseConfig(SkyHanniMod.feature) { _, field, path ->
-                if (field.getAnnotation(ConfigEditorKeybind::class.java) != null) {
+                if (field.getAnnotation(ConfigEditorKeyMapping::class.java) != null) {
                     add(path)
                 }
             }
