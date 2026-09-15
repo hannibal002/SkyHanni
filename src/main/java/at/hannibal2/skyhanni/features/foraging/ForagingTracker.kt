@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.features.foraging
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig
+import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig.TreeGiftDisplayMode
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TreeGiftBonusDropsJson
@@ -17,6 +19,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.foraging.ForagingTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -235,7 +238,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
                 }
                 loot.clear()
             }
-            if (config.compactGiftChats) blockedReason = "TREE_GIFT"
+            if (config.displayTreeGifts != FULL_GIFT) blockedReason = "TREE_GIFT"
         }
         if (!openLootLoop) return
 
@@ -300,7 +303,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     }
 
     private fun SkyHanniChatEvent.Allow.tryBlock() {
-        if (!config.compactGiftChats || !openLootLoop) return
+        if (config.displayTreeGifts == FULL_GIFT || !openLootLoop) return
         blockedReason = "TREE_GIFT"
     }
 
@@ -344,7 +347,8 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
 
     private fun sendTreeGiftStats() {
         val lastTreeType = treeType ?: return
-        if (config.compactGiftChats) {
+        if (config.displayTreeGifts == COMPACT_GIFT) {
+            @Suppress("MaxLineLength")
             val message = "§9$lastTreeType Tree Gift. §7You helped cut $lastPercentString §7and gained §e$lastRewardCount rewards§a!"
             val component = message.asComponent()
             component.hover = lastHover
@@ -383,6 +387,13 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
                 lastAxeHeldTime = SimpleTimeMark.now()
             }
             hasHeldAxe = isAxe
+        }
+    }
+
+    @HandleEvent
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(since = 147, "foraging.tracker.compactGiftChats", "foraging.tracker.displayTreeGifts") { element ->
+            ConfigUtils.migrateBooleanToEnum(element, TreeGiftDisplayMode.COMPACT_GIFT, TreeGiftDisplayMode.FULL_GIFT)
         }
     }
 }
