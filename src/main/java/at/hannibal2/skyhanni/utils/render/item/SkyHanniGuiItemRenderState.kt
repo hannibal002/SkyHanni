@@ -18,6 +18,14 @@ import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
 
+//? if >= 26.3 {
+import com.mojang.blaze3d.systems.RenderSystem
+import org.joml.Vector4fc
+import java.util.Optional
+import java.util.OptionalDouble
+import java.util.function.Supplier
+//?}
+
 //? if >= 26.2 {
 import net.minecraft.client.renderer.SubmitNodeStorage
 //?} else {
@@ -119,9 +127,25 @@ data class SkyHanniGuiItemRenderState(
 
         //~ if < 26.2 'submitNodeStorage' -> 'featureRenderDispatcher.submitNodeStorage'
         trackingState.submit(ps, submitNodeStorage, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
-        //? if >= 26.2 {
-        featureRenderDispatcher.renderAllFeatures(submitNodeStorage)
-        //?} else {
+        //? if >= 26.3 {
+        featureRenderDispatcher.prepareFrame(submitNodeStorage).use { frame ->
+            RenderSystem.getDevice()
+                .createCommandEncoder()
+                .createRenderPass(
+                    Supplier { "SkyHanni Item to GUI item atlas" },
+                    TODO("colorTexture"),
+                    Optional.empty<Vector4fc>(),
+                    TODO("depthTexture"),
+                    OptionalDouble.empty(),
+                )
+                .use { renderPass ->
+                    RenderSystem.bindDefaultUniforms(renderPass)
+                    FeatureRenderDispatcher.renderAllFeatures(renderPass, frame)
+                }
+        }
+        //?} elif >= 26.2 {
+        /*featureRenderDispatcher.renderAllFeatures(submitNodeStorage)
+        *///?} else {
         /*featureRenderDispatcher.renderAllFeatures()
         bufferSource.endBatch()
         *///?}

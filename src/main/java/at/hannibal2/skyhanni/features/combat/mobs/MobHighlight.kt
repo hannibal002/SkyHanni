@@ -15,12 +15,11 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
-import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster.Enderman
 import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
 object MobHighlight {
-
     private val config get() = SkyHanniMod.feature.combat.mobs
     private var arachne: Mob? = null
 
@@ -79,7 +78,7 @@ object MobHighlight {
     // Mob detection isn't used here to allow for highlighting Zealots from further away.
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
-        if (event.entity !is EnderMan) return
+        if (event.entity !is Enderman) return
 
         val entity = event.entity
 

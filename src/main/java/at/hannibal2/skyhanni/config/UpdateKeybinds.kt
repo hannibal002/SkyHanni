@@ -17,8 +17,12 @@ object UpdateKeybinds {
         for (keybindPath in SkyHanniConfigSearchResetCommand.allKeybinds) {
             event.transform(147, keybindPath) { element ->
                 val oldCode = element.asInt
-                val type =
-                    if (oldCode in 0 until MouseCompat.NUMBER_OF_MOUSE_BUTTONS) InputConstants.Type.MOUSE else InputConstants.Type.KEYSYM
+                val type = if (oldCode in 0 until MouseCompat.NUMBER_OF_MOUSE_BUTTONS) {
+                    InputConstants.Type.MOUSE
+                } else {
+                    //~ if < 26.3 'KEYBOARD' -> 'KEYSYM'
+                    InputConstants.Type.KEYBOARD
+                }
                 val newStringName = type.getOrCreate(oldCode).name
                 JsonPrimitive(newStringName)
             }

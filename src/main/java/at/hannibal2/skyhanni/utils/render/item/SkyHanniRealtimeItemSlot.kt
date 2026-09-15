@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils.render.item
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.textures.FilterMode
-import com.mojang.blaze3d.textures.GpuTexture
+import com.mojang.renderpearl.api.textures.FilterMode
+import com.mojang.renderpearl.api.textures.GpuTexture
 import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.renderer.Projection
@@ -33,36 +33,47 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         guiRenderState: GuiRenderState,
         projectionBuffer: ProjectionMatrixBuffer,
     ) {
-        val texture = texture ?: return
-        val textureView = textureView ?: return
+        val colorTexture = texture ?: return
+        // TODO 26.3
+        @Suppress("UnusedVariable")
+        val colorTextureView = textureView ?: return
         val depthTexture = depthTexture ?: return
+        // TODO 26.3
+        @Suppress("UnusedVariable")
         val depthTextureView = depthTextureView ?: return
 
         // Clear before rendering
         RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(
-            texture,
+            colorTexture,
             GuiRenderer.CLEAR_COLOR,
             depthTexture,
             RenderCompat.CLEAR_DEPTH,
         )
 
         val size = slotSize.toFloat()
-        val bufferSlice = projectionBuffer.getBuffer(Projection().apply { this.setupOrtho(-1000f, 1000f, size, size, true) })
+        val bufferSlice = projectionBuffer.getBuffer(Projection().apply { setupOrtho(-1000f, 1000f, size, size, true) })
 
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
-        RenderSystem.outputColorTextureOverride = textureView
+        // TODO 26.3
+        //? if < 26.3 {
+        /*RenderSystem.outputColorTextureOverride = colorTextureView
         RenderSystem.outputDepthTextureOverride = depthTextureView
+        *///?}
 
         state.renderItemToTexture(
             //~ if < 26.2 'submitNodeStorage' -> 'bufferSource'
-            context.submitNodeStorage, context.featureRenderDispatcher,
+            context.submitNodeStorage,
+            context.featureRenderDispatcher,
             centerX = slotSize / 2.0f,
             centerY = slotSize / 2.0f,
             pixelSize = slotSize,
         )
 
-        RenderSystem.outputColorTextureOverride = null
+        // TODO 26.3
+        //? if < 26.3 {
+        /*RenderSystem.outputColorTextureOverride = null
         RenderSystem.outputDepthTextureOverride = null
+        *///?}
 
         // Blit is submitted AFTER the texture override is cleared
         submitBlit(state, guiRenderState)
@@ -72,14 +83,17 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         state: SkyHanniGuiItemRenderState,
         guiRenderState: GuiRenderState,
     ) {
-        val textureView = textureView ?: return
+        val colorTextureView = textureView ?: return
         // u/v: full slot occupies [0,1] x [0,1] in the per-item texture
         guiRenderState.addBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,
-                TextureSetup.singleTexture(textureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
+                TextureSetup.singleTexture(colorTextureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
                 state.pose(),
-                state.x0(), state.y0(), state.x1(), state.y1(),
+                state.x0(),
+                state.y0(),
+                state.x1(),
+                state.y1(),
                 0f,
                 1f,
                 1f,

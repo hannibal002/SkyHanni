@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.resources.Identifier
 
 internal class SkyHanniItemAtlas : SkyHanniAbstractAtlas<SkyHanniAtlasKey, SkyHanniItemAtlasEntry>() {
-
     override val identifier: Identifier by lazy {
         Identifier.fromNamespaceAndPath("skyhanni", "item_atlas")
     }
@@ -21,7 +20,9 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractAtlas<SkyHanniAtlasKey, SkyHa
 
     override fun onAllocated() {
         @Suppress("UnsafeCallOnNullableType")
-        renderer = SkyHanniItemAtlasRenderer(sizePixels, textureView!!, depthTextureView!!, texture!!, depthTexture!!)
+        renderer = SkyHanniItemAtlasRenderer(
+            sizePixels, textureView!!, depthTextureView!!, texture!!, depthTexture!!,
+        )
     }
 
     private fun pruneFrames(currentFrame: Int, olderThanLastRenderedFrames: Int = 2) {
