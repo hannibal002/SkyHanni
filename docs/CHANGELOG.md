@@ -209,6 +209,7 @@
 + Added an option to keep your mouse locked when teleporting to a plot. - Luna (https://github.com/hannibal002/SkyHanni/pull/5822)
   + You can choose to still unlock it when teleporting to the barn plot.
 + Added Melon Juice Mixin to Non-God-Potion Effects. - Alex (https://github.com/hannibal002/SkyHanni/pull/5824)
++ Added a chat message when your window system does not support See Through Farming. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6323)
 
 #### Mining
 
@@ -380,6 +381,8 @@
 + Made Hotbar, XP Bar, Action Bar, and Held Item Tooltip customization options searchable by typing moveable. - Luna (https://github.com/hannibal002/SkyHanni/pull/6498)
 + Renamed the Bouncy Ball config options to Beach Ball. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6501)
 + Changed Pest Timer's Repeat Warning option to also stop when opening Loadouts, not just the Wardrobe. - Luna (https://github.com/hannibal002/SkyHanni/pull/6490)
++ Changed the message shown when discovering your first SkyHanni contributor. - Luna (https://github.com/hannibal002/SkyHanni/pull/6545)
+    + The name is now behind a hover, the same as with every later discovery.
 
 ### Fixes
 
@@ -579,6 +582,8 @@
 + Fixed Bouncy Ball Line pointing to wrong landing spots. - 3d3n-pyc (https://github.com/hannibal002/SkyHanni/pull/6470)
 + Fixed Mythological Ritual not being detected sometimes. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6452)
 + Fixed Zealot Mob Highlighting not working during Derpy. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6533)
++ Fixed the Harvest Feast in-season timer sometimes incorrectly displaying 'soon'. - VK3DNS (https://github.com/hannibal002/SkyHanni/pull/6531)
+    + Occurred after a month change until Feast Chef Ted's 'All Crops' menu was opened.
 
 #### Fishing
 
@@ -662,6 +667,8 @@
 + Fixed rare error while using the Rift Berberis Helper. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6166)
 + Fixed Enigma Soul Helper not detecting the menu. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6187)
 + Fixed extreme lag spikes in the Mirrorverse Crafting Room in the Rift on Minecraft 26.2. - Luna (https://github.com/hannibal002/SkyHanni/pull/6426)
++ Fixed Highlight Motes Orbs and Hide Particles not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/6536)
+    + Also possibly fixed some other particle-related features working less reliably.
 
 #### Inventory
 
@@ -954,6 +961,10 @@
 + Fixed pet drops from chat messages (e.g. Baby Yeti, Flying Fish, Slug) not being added to Profit Trackers. - Luna (https://github.com/hannibal002/SkyHanni/pull/6514)
 + Fixed the A SkyHanni currency uses a wrong id error sometimes appearing when joining Hypixel. - Luna (https://github.com/hannibal002/SkyHanni/pull/6515)
 + Fixed other players not being able to join your worlds hosted by world-hosting mods unless they also have SkyHanni installed. - Luna (https://github.com/hannibal002/SkyHanni/pull/6522)
++ Fixed an expired friend request granting the Rejected achievement instead of Notice Me Senpai. - jani (https://github.com/hannibal002/SkyHanni/pull/6541)
++ Fixed Shard captures not being detected for certain creatures (Hideyho). - jani (https://github.com/hannibal002/SkyHanni/pull/6540)
++ Fixed some other mods such as Skyblocker not being able to detect particles hidden by SkyHanni. - Luna (https://github.com/hannibal002/SkyHanni/pull/6536)
++ Fixed the game sometimes hanging when certain SkyHanni features that hide particles are enabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/6536)
 
 ### Technical Details
 
@@ -1384,6 +1395,14 @@
 + Fixed an off-by-one loop bound when reading item boosters in Estimated Item Value. - 3d3n-pyc (https://github.com/hannibal002/SkyHanni/pull/6469)
 + Lowered the priority of IslandType.onRepoReload, PowderMiningChatFilter.onRepoReload, and RemainingSlayerKills.onRepoReload from HIGHEST to HIGH to ensure SkyHanniEvents can disable them. - Luna (https://github.com/hannibal002/SkyHanni/pull/6503)
 + Updated the Hypixel SkyBlock link in the README to the Hypixel forum category. - legentpc (https://github.com/hannibal002/SkyHanni/pull/6523)
++ Added stackUnderCursor to GuiKeyPressEvent. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6305)
++ Separated GuiKeyPressEvent into keyboard and mouse events. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6305)
++ Simplified WasdInputMatrix in KeyboardManager. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6537)
++ Split up StringUtils and TextHelper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6525)
+    + Moved chat component helpers into the new ChatComponentUtils.
+    + Moved the paginated chat list from TextHelper into the new PaginatedListHelper.
+    + Moved font-dependent text helpers from StringUtils into TextHelper.
+    + Kept the old names as deprecated aliases until November 2026.
 
 ### Removed Features
 
