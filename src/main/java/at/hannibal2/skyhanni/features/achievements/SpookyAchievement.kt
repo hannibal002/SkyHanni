@@ -17,7 +17,7 @@ object SpookyAchievement {
     /**
      * WRAPPED-REGEX-TEST: "                   Your Candy: 4,036 (Position #342)"
      */
-    private val candyPattern by AchievementManager.group.pattern(
+    private val candyPattern by AchievementManager.patternGroup.pattern(
         "spooky-candy",
         " +Your Candy: (?<candy>[\\d,]+) \\(Position #[\\d,]+\\)"
     )
