@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -40,9 +41,12 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import java.util.TreeSet
+import java.util.regex.Pattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
+
+private const val CHOCOLATE_FACTORY_SHORTCUT_SLOT = 50
 
 @SkyHanniModule
 object CFApi {
@@ -53,14 +57,33 @@ object CFApi {
 
     // <editor-fold desc="Patterns">
 
-    /**
-     * REGEX-TEST: Hoppity
-     * REGEX-TEST: Chocolate Factory Milestones
-     */
-    private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
-        "inventory.name",
-        "Hoppity|Chocolate Factory Milestones",
-    )
+    private class chocolateFactoryNamePatterns : Iterable<Pattern> {
+        override fun iterator(): Iterator<Pattern> = listOf(hoppityInventoryNamePattern, chocolateFactoryInventoryNamePattern).iterator()
+
+        /**
+         * REGEX-TEST: Hoppity
+         */
+        val hoppityInventoryNamePattern by patternGroup.pattern(
+            "inventory.name.hoppity",
+            "Hoppity",
+        )
+
+        /**
+         * REGEX-TEST: Chocolate Factory
+         */
+        val chocolateFactoryShortcutNamePattern by patternGroup.pattern(
+            "item.name.chocolatefactory",
+            "Chocolate Factory",
+        )
+
+        /**
+         * REGEX-TEST: Chocolate Factory Milestones
+         */
+        val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
+            "inventory.name.chocolatefactory",
+            "Chocolate Factory Milestones",
+        )
+    }
 
     /**
      * REGEX-TEST: §a§lPROMOTE §8➜ §7[208§7] §dExecutive
@@ -134,10 +157,30 @@ object CFApi {
 
     val CHOCOLATE_ITEM = SkyblockCurrency.CHOCOLATE.internalName
 
+    private var shortcutSlotItemName: String = ""
+
+    private val chocolateFactoryInventory = InventoryDetector(
+        checkInventoryName = {
+            val namePatterns = chocolateFactoryNamePatterns()
+
+            if (namePatterns.chocolateFactoryInventoryNamePattern.matches(it)) return@InventoryDetector true
+
+            if (namePatterns.hoppityInventoryNamePattern.matches(it)) {
+                return@InventoryDetector namePatterns.chocolateFactoryShortcutNamePattern.matches(shortcutSlotItemName)
+            }
+
+            false
+        },
+    )
+
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        shortcutSlotItemName = event.inventoryItems[CHOCOLATE_FACTORY_SHORTCUT_SLOT]?.cleanName.toString()
+
+        chocolateFactoryInventory.forceUpdate(event)
+
         DelayedRun.runNextTick {
-            if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
+            if (chocolateFactoryInventory.isInside()) {
                 if (config.enabled) {
                     chocolateFactoryPaused = true
                     CFStats.updateDisplay()
