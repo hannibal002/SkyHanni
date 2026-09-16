@@ -68,7 +68,9 @@ class GolemConfig {
     @ConfigOption(
         name = "Show Zealots",
         desc = "Show how many zealots and zealot bruisers you killed on this server. " +
-            "Resets when you switch servers."
+            "Resets when you switch servers. " +
+            "§eEnable the Bestiary widget in your tab list for an exact count. Without it, or once your " +
+            "Zealot bestiary is maxed, only zealots you hit or aim at are counted."
     )
     @ConfigEditorBoolean
     var showZealots: Boolean = true
