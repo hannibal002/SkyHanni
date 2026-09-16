@@ -193,10 +193,81 @@ class FilterTypesConfig {
     @FeatureToggle
     var masterChef: Boolean = false
 
-    // TODO remove
     @Expose
-    @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
+    @ConfigOption(
+        name = "Bazaar/Auction House/Bank Setup",
+        desc = "Hide the progress messages while using the Bazaar, Auction House, or Bank (e.g. 'Putting item in escrow...').",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
-    var others: Boolean = false
+    var bzAhMinis: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Slayer", desc = "Hide Slayer Quest start and complete announcements.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var slayer: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Slayer Drop", desc = "Hide Slayer rare and very rare drop announcements.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var slayerDrop: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Useless Drop",
+        desc = "Hide rare drop announcements for useless items, e.g. Carrot, Potato, Enchanted Ender Pearl.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var uselessDrop: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Useless Notification",
+        desc = "Hide useless notifications, e.g. tipped players, Mining Speed Boost, bank interest.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var uselessNotification: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Party Separator", desc = "Hide the party message separator line.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var party: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Bazaar/Auction House Orders",
+        desc = "Hide Bazaar order setup/cancellation messages and the Auction House collection reminder.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var auctionBazaarSetup: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Winter Island", desc = "Hide Winter Island Snow Cannon mount messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var winterIsland: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Useless Warning",
+        desc = "Hide useless warning messages, e.g. rate limit warnings, combat restrictions.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var uselessWarning: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Annoying Spam",
+        desc = "Hide miscellaneous spammy messages, e.g. ability damage numbers, fishing catches, dev warnings.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var annoyingSpam: Boolean = false
 }

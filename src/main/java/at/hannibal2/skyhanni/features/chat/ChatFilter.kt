@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonPrimitive
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -646,7 +647,16 @@ object ChatFilter {
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 
-        config.others && isOthers(message) -> othersMsg
+        config.bzAhMinis && message.isPresent("bz_ah_minis") -> "bz_ah_minis"
+        config.slayer && message.isPresent("slayer") -> "slayer"
+        config.slayerDrop && message.isPresent("slayer_drop") -> "slayer_drop"
+        config.uselessDrop && message.isPresent("useless_drop") -> "useless_drop"
+        config.uselessNotification && message.isPresent("useless_notification") -> "useless_notification"
+        config.party && message.isPresent("party") -> "party"
+        config.auctionBazaarSetup && message.isPresent("money") -> "money"
+        config.winterIsland && message.isPresent("winter_island") -> "winter_island"
+        config.uselessWarning && message.isPresent("useless_warning") -> "useless_warning"
+        config.annoyingSpam && message.isPresent("annoying_spam") -> "annoying_spam"
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
 
@@ -735,34 +745,6 @@ object ChatFilter {
         }
     }
 
-    private var othersMsg: String? = null
-
-    /**
-     * Checks if the message is an "other" message.
-     * Will also set the variable othersMsg to the reason why the message was blocked,
-     * so that it can be used in the block function.
-     * @param message The message to check
-     * @return True if the message is part of "other"
-     * @see othersMsg
-     * @see block
-     */
-    private fun isOthers(message: String): Boolean {
-        othersMsg = when {
-            message.isPresent("bz_ah_minis") -> "bz_ah_minis"
-            message.isPresent("slayer") -> "slayer"
-            message.isPresent("slayer_drop") -> "slayer_drop"
-            message.isPresent("useless_drop") -> "useless_drop"
-            message.isPresent("useless_notification") -> "useless_notification"
-            message.isPresent("party") -> "party"
-            message.isPresent("money") -> "money"
-            message.isPresent("winter_island") -> "winter_island"
-            message.isPresent("useless_warning") -> "useless_warning"
-            message.isPresent("annoying_spam") -> "annoying_spam"
-            else -> null
-        }
-        return othersMsg != null
-    }
-
     /**
      * Checks if the message is present in the list of messages or patterns
      * Checks against four maps that compare in different ways.
@@ -804,5 +786,18 @@ object ChatFilter {
         event.move(61, "chat.filterType.powderMiningFilter", "chat.filterType.powderMining")
         event.move(61, "chat.filterType.gemstoneFilterConfig", "chat.filterType.powderMining.gemstone")
         event.move(107, "chat.filterType.guildExp", "chat.filterType.guildEventExp")
+        event.move(147, "chat.filterType.others", "chat.filterType.bzAhMinis") { element ->
+            val enabled = element.asBoolean
+            event.add(147, "chat.filterType.slayer") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.slayerDrop") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.uselessDrop") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.uselessNotification") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.party") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.auctionBazaarSetup") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.winterIsland") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.uselessWarning") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.annoyingSpam") { JsonPrimitive(enabled) }
+            JsonPrimitive(enabled)
+        }
     }
 }
