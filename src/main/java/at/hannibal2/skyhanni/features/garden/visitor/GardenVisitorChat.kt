@@ -46,10 +46,11 @@ object GardenVisitorChat {
     /**
      * REGEX-TEST: §e[NPC] §6Madame Eleanor Q. Goldsworth III§f: §r§fI'm here to put a value on your farm.
      * REGEX-TEST: §e[NPC] §aRhys§f: §r§fI found an unexplored cave while mining for titanium.
+     * REGEX-TEST: §e[NPC] §r§9Queen Mismyla§r§f: §r§fOh, you refuse to work as well? I should have known.
      */
     private val visitorChatMessagePattern by patternGroup.pattern(
         "visitorchat",
-        "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r.*",
+        "§e\\[NPC] (?:§r)?(?<color>§.)?(?<name>.*)§f: §r.*",
     )
 
     /**
