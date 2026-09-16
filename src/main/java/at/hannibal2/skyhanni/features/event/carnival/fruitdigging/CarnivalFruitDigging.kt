@@ -46,7 +46,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CarnivalFruitDigging {
-
     private const val GRID_LENGTH = 7
     const val MAX_DIGS = 15
 

@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.event.carnival.fruitdigging
 import at.hannibal2.skyhanni.features.event.carnival.fruitdigging.CarnivalFruitDigging.Fruit
 
 /**
- *
  * Steps:
  *  1. Read the board. Sort every cell into: known content, a still-diggable unknown,
  *    a fruit destroyed by a bomb and gather the dowsing clues we collected
@@ -12,7 +11,6 @@ import at.hannibal2.skyhanni.features.event.carnival.fruitdigging.CarnivalFruitD
  *  3. Score and pick
  */
 class FruitDiggingSolver(private val size: Int = 7) {
-
     data class CellInput(
         val content: Fruit?,
         val diggable: Boolean,
@@ -67,7 +65,6 @@ class FruitDiggingSolver(private val size: Int = 7) {
         private val nextMultiplier: Double,
         private val coconutProtection: Boolean,
     ) {
-
         private val knownContent = arrayOfNulls<Fruit>(size * size)
 
         private val diggable = BooleanArray(size * size)
@@ -162,7 +159,6 @@ class FruitDiggingSolver(private val size: Int = 7) {
                 else -> error("dowsing mode $mode is not implemented")
             }
         }
-
 
         private fun pointValue(content: Fruit): Double = when (content) {
             Fruit.APPLE -> 100.0 * (applesCollected + 1)

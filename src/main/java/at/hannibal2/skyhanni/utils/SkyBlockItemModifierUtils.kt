@@ -37,7 +37,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions")
 object SkyBlockItemModifierUtils {
-
     private val CARNIVAL_SHOVEL = "CARNIVAL_SHOVEL".toInternalName()
     private val PROMISING_SPADE = "PROMISING_SPADE".toInternalName()
     private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
@@ -402,7 +401,6 @@ object SkyBlockItemModifierUtils {
         fun toDisplayString() = "${color.getChatColor()}$displayName"
 
         companion object {
-
             fun getByNameOrNull(name: String) = entries.firstOrNull { it.name.equals(name, ignoreCase = true) }
         }
     }
@@ -426,7 +424,6 @@ object SkyBlockItemModifierUtils {
         fun toDisplayString() = "${color.getChatColor()}$displayName"
 
         companion object {
-
             fun getByNameOrNull(name: String) = entries.firstOrNull { it.name == name || it.displayName == name }
         }
     }
@@ -451,7 +448,6 @@ object SkyBlockItemModifierUtils {
         ;
 
         companion object {
-
             fun getByName(name: String): GemstoneSlotType =
                 entries.firstOrNull { name.uppercase(Locale.ENGLISH).contains(it.name) }
                     ?: error("Unknown GemstoneSlotType: '$name'")
