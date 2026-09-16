@@ -40,7 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object EndLootScanner {
 
-    private val repoGroup = RepoPattern.group("combat.end-loot")
+    private val patternGroup = RepoPattern.group("combat.end-loot")
 
     /**
      * Pet labels carry no rarity word - epic and legendary read exactly the same and differ only
@@ -51,7 +51,7 @@ object EndLootScanner {
      * REGEX-TEST: §7[Lvl 1] §5Ender Dragon
      * REGEX-TEST: §7[Lvl 100] §6Ender Dragon
      */
-    private val petPattern by repoGroup.pattern(
+    private val petPattern by patternGroup.pattern(
         "pet",
         "§7\\[Lvl \\d+] §(?<rarity>[56])(?<name>.+)",
     )
@@ -62,7 +62,7 @@ object EndLootScanner {
      * REGEX-TEST: §5Dragon Claw §8x3
      * REGEX-TEST: §aEnchanted Ender Pearl §8x16
      */
-    private val amountPattern by repoGroup.pattern(
+    private val amountPattern by patternGroup.pattern(
         "amount",
         ".*§8x(?<amount>[\\d,]+)",
     )

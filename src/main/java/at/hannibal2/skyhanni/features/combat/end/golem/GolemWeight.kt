@@ -27,12 +27,12 @@ object GolemWeight {
 
     private val config get() = SkyHanniMod.feature.combat.endIsland.golem
 
-    private val repoGroup = RepoPattern.group("combat.boss.protector.2.weight")
+    private val patternGroup = RepoPattern.group("combat.boss.protector.2.weight")
 
     /**
      * WRAPPED-REGEX-TEST: "                       Zealots Contributed: 27/100"
      */
-    private val zealotsPattern by repoGroup.pattern(
+    private val zealotsPattern by patternGroup.pattern(
         "chat.end.zealot",
         "\\s+Zealots Contributed: (?<amount>\\d+)/100",
     )

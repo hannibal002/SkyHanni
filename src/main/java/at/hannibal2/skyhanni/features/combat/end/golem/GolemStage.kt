@@ -17,13 +17,13 @@ import kotlin.time.Duration
 @SkyHanniModule
 object GolemStage {
 
-    private val repoGroup = RepoPattern.group("combat.boss.protector.2.stage")
+    private val patternGroup = RepoPattern.group("combat.boss.protector.2.stage")
 
     /**
      * WRAPPED-REGEX-TEST: " Protector: Resting"
      * WRAPPED-REGEX-TEST: " Protector: Disturbed"
      */
-    private val stagePattern by repoGroup.pattern(
+    private val stagePattern by patternGroup.pattern(
         "tablist",
         "\\s*Protector: (?<stage>.*)",
     )

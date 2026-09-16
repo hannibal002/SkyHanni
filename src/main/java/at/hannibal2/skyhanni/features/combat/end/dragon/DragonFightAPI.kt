@@ -34,10 +34,10 @@ object DragonFightAPI {
 
     // Keys that beta already uses for the older coloured patterns carry a .colorless suffix. Their
     // regex changed, and an older client picking up the new one under the old key would break.
-    private val group = RepoPattern.group("combat.end-dragon-fight")
-    private val chatGroup = group.group("chat")
-    private val endGroup = group.group("chat.end")
-    private val scoreboardGroup = group.group("scoreboard")
+    private val patternGroup = RepoPattern.group("combat.end-dragon-fight")
+    private val chatGroup = patternGroup.group("chat")
+    private val endGroup = patternGroup.group("chat.end")
+    private val scoreboardGroup = patternGroup.group("scoreboard")
 
     /**
      * REGEX-TEST: ☬ The Protector Dragon has spawned!
@@ -111,7 +111,7 @@ object DragonFightAPI {
      * WRAPPED-REGEX-TEST: " Andromeda126785: 816.9k❤"
      * WRAPPED-REGEX-TEST: " Paulinkaxcv: 17k❤"
      */
-    private val tabDamagePattern by group.pattern(
+    private val tabDamagePattern by patternGroup.pattern(
         "tablist.player",
         "\\s(?<name>.+): (?<damage>[\\d.]+[kMB]?)[❤\\uE010].*",
     )
@@ -135,7 +135,7 @@ object DragonFightAPI {
         "Your Damage: (?<damage>[\\w,.]+)",
     )
 
-    private val nestAreaPattern by group.pattern("area.nest", "Dragon's Nest")
+    private val nestAreaPattern by patternGroup.pattern("area.nest", "Dragon's Nest")
 
     fun inNestArea() = IslandType.THE_END.isInIsland() && nestAreaPattern.matches(SkyBlockUtils.graphArea)
 

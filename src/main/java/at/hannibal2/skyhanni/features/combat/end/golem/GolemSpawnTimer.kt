@@ -23,7 +23,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GolemSpawnTimer {
 
-    private val repoGroup = RepoPattern.group("combat.boss.protector.2.spawn")
+    private val patternGroup = RepoPattern.group("combat.boss.protector.2.spawn")
 
     /** 21 seconds of server time. */
     private const val SPAWN_DELAY_TICKS = 420
@@ -38,7 +38,7 @@ object GolemSpawnTimer {
      *
      * REGEX-TEST: The ground begins to shake as an End Stone Protector rises from below!
      */
-    private val risingPattern by repoGroup.pattern(
+    private val risingPattern by patternGroup.pattern(
         "chat.rising",
         "The ground begins to shake as an End Stone Protector rises from below!",
     )

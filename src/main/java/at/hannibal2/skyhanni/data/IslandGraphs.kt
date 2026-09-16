@@ -136,7 +136,10 @@ object IslandGraphs {
     private var lastCacheUpdate = SimpleTimeMark.farPast()
 
     private var currentTarget: LorenzVec? = null
-    private var currentTargetNode: GraphNode? = null
+
+    var currentTargetNode: GraphNode? = null
+        private set
+
     private var navigationLabel = ""
     private var lastDisplayedDistance = 0.0
     private var totalDistance = 0.0
@@ -189,7 +192,9 @@ object IslandGraphs {
     @HandleEvent
     private fun onWorldChange() {
         currentIslandGraph = null
-        if (currentTarget != null) NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped because of world switch!")
+        if (currentTarget != null) {
+            NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped because of world switch!", force = true)
+        }
         resetNavigation()
     }
 
@@ -346,11 +351,13 @@ object IslandGraphs {
         GraphUtils.updatePlayerPosition()
         currentTarget?.let {
             if (distanceSqToPlayer(it) < TARGET_REACHED_DISTANCE_SQ) {
-                NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation reached §r$navigationLabel§e!")
+                NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation reached §r$navigationLabel§e!", force = true)
                 resetNavigation()
                 onFound()
+                return@let
             }
             if (!activeCondition()) {
+                NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!", force = true)
                 resetNavigation()
             }
         }
@@ -454,11 +461,12 @@ object IslandGraphs {
         }
     }
 
+    /**
+     * Resets the navigation state silently. Aborting an active navigation and telling the player about it
+     * is up to the caller.
+     */
     fun stopNavigation() {
-        if (currentTarget != null) {
-            NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
-            currentTarget = null
-        }
+        currentTarget = null
         goal = null
         pathRenderer = null
         currentTargetNode = null
@@ -469,14 +477,17 @@ object IslandGraphs {
     }
 
     fun manualCancel() {
-        if (currentTarget == null) {
+        val hadOwnTarget = currentTarget != null
+        if (!hadOwnTarget && !NavigateAllApi.currentlyNavigating) {
             ChatUtils.userError("No navigation is currently active.")
             return
         }
 
+        // sent before stopNavigation(), which marks the feedback as inactive
+        NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!", force = true)
         stopNavigation()
-        NavigateAllApi.handleStop(errorMessage = false)
-        onManualCancel()
+        NavigateAllApi.handleStop()
+        if (hadOwnTarget) onManualCancel()
     }
 
     /**

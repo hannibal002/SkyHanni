@@ -17,19 +17,19 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object SkyBlockXPApi {
 
-    private val group = RepoPattern.group("skyblockxpapi.inventory")
+    private val patternGroup = RepoPattern.group("skyblockxpapi.inventory")
 
-    private val itemNamePattern by group.pattern("itemname", "§aSkyBlock Leveling")
+    private val itemNamePattern by patternGroup.pattern("itemname", "§aSkyBlock Leveling")
 
     /**
      * REGEX-TEST: §7Your SkyBlock Level: §8[§9287§8]
      */
-    private val levelPattern by group.pattern("level", "§7Your SkyBlock Level: §8\\[§.(?<level>\\d+)§8\\]")
+    private val levelPattern by patternGroup.pattern("level", "§7Your SkyBlock Level: §8\\[§.(?<level>\\d+)§8\\]")
 
     /**
      * REGEX-TEST: §3§l§m      §f§l§m                   §r §b24§3/§b100 §bXP
      */
-    private val xpPattern by group.pattern("xp", "[§\\w\\s]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
+    private val xpPattern by patternGroup.pattern("xp", "[§\\w\\s]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
 
     val levelXPPair get() = storage?.toLevelXPPair()
 

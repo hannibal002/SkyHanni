@@ -31,7 +31,8 @@ import kotlin.time.Duration.Companion.seconds
  * Drives a navigation over a list of nodes, one after the other.
  *
  * Holds the state of the single navigation that can run at a time. Features start one via `navigateAll` and
- * add their own command entry points that delegate to `handleSkip`, `handleStop` and `handleUndo`.
+ * add their own command entry points that delegate to `handleSkip`, `handleUndo` and, for stopping,
+ * `IslandGraphs.manualCancel`.
  *
  * The route stays untouched once it is calculated, the position inside it is tracked by an index. Skipping and
  * going back therefore only move that index, and a skipped node can be returned to.
@@ -48,7 +49,7 @@ object NavigateAllApi {
 
     private val defaultTargetLocation: (GraphNode) -> LorenzVec = { it.position }
 
-    private val currentlyNavigating get() = currentTargetName != null
+    val currentlyNavigating get() = currentTargetName != null
     private val currentTarget get() = route.getOrNull(currentIndex)
 
     private var navigationId = 0
@@ -178,20 +179,10 @@ object NavigateAllApi {
         navigateToCurrent()
     }
 
-    fun handleStop(manual: Boolean = false, errorMessage: Boolean = true) {
-        if (!currentlyNavigating) {
-            if (errorMessage) {
-                ChatUtils.userError("No current navigation to stop. §eUse /shnavigateall to start navigation")
-            }
-            return
-        }
-
-        if (manual) {
-            ChatUtils.userError("Manually stopped navigation")
-        }
+    fun handleStop() {
+        if (!currentlyNavigating) return
 
         resetState()
-
         IslandGraphs.stopNavigation()
     }
 
