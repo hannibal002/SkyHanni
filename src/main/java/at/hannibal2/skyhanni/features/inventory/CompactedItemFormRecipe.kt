@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule
@@ -27,7 +27,7 @@ object CompactedItemFormRecipe {
     private var recipes = mapOf<NeuInternalName, CompactedItemFormRecipeEntry>()
 
     @HandleEvent
-    fun onGuiKeyPress() {
+    private fun onGuiKeyPress() {
         if (!config.keybind.isKeyHeld()) return
         val stack = stackUnderCursor() ?: return
         val item = stack.getInternalNameOrNull() ?: return
@@ -80,7 +80,7 @@ object CompactedItemFormRecipe {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         recipes = event.getConstant<CompactedItemFormRecipesJson>("CompactedItemFormRecipes").recipes
     }
 }
