@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.enums.NoTradeModeSetting
+import at.hannibal2.skyhanni.config.enums.ProfitCalcSettings
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -139,7 +139,7 @@ object CrystalNucleusTracker {
             val jungleKeyCost: Double = tracker.getPricePer(JUNGLE_KEY_ITEM) * runsCompleted
 
             val profitType = config.profileProfitSetting.get()
-            if (profitType == NoTradeModeSetting.NONE || (profitType == NoTradeModeSetting.NO_TRADE && !SkyBlockUtils.noTradeMode)) {
+            if (profitType == ProfitCalcSettings.NONE || (profitType == ProfitCalcSettings.NO_TRADE && !SkyBlockUtils.noTradeMode)) {
                 profit -= jungleKeyCost
                 val jungleKeyCostFormat = jungleKeyCost.shortFormat()
                 add(
@@ -165,7 +165,7 @@ object CrystalNucleusTracker {
             else rawConfigString
             val usageTotal = if (usesApparatus) runsCompleted else runsCompleted * 6
 
-            if (profitType == NoTradeModeSetting.NONE || (profitType == NoTradeModeSetting.NO_TRADE && !SkyBlockUtils.noTradeMode)) {
+            if (profitType == ProfitCalcSettings.NONE || (profitType == ProfitCalcSettings.NO_TRADE && !SkyBlockUtils.noTradeMode)) {
                 profit -= totalSapphireCost
                 val totalSapphireCostFormat = totalSapphireCost.shortFormat()
                 add(

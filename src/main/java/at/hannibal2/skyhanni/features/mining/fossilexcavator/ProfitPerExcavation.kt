@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.enums.NoTradeModeSetting
+import at.hannibal2.skyhanni.config.enums.ProfitCalcSettings
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -42,7 +42,7 @@ object ProfitPerExcavation {
         val scrapPrice = scrapItem.getPrice()
 
         val profitType = config.profileProfitSetting.get();
-        if (profitType == NoTradeModeSetting.NONE || (profitType == NoTradeModeSetting.NO_TRADE && !SkyBlockUtils.noTradeMode)) {
+        if (profitType == ProfitCalcSettings.NONE || (profitType == ProfitCalcSettings.NO_TRADE && !SkyBlockUtils.noTradeMode)) {
             totalProfit -= scrapPrice
             map["${scrapItem.repoItemName}: §c-${scrapPrice.shortFormat()}"] = -scrapPrice
         }

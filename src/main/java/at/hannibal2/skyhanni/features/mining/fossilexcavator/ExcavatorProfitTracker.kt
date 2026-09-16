@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.enums.NoTradeModeSetting
+import at.hannibal2.skyhanni.config.enums.ProfitCalcSettings
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -74,7 +74,7 @@ object ExcavatorProfitTracker {
         )
 
         val profitType = config.profileProfitSetting.get()
-        if (profitType == NoTradeModeSetting.ALL_PROFILES || (profitType == NoTradeModeSetting.NO_TRADE && SkyBlockUtils.noTradeMode)) {
+        if (profitType == ProfitCalcSettings.ALL_PROFILES || (profitType == ProfitCalcSettings.NO_TRADE && SkyBlockUtils.noTradeMode)) {
             profit = addScrap(timesExcavated, profit)
         }
 

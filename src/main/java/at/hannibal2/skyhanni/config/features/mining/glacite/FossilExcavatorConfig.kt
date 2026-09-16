@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.mining.glacite
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.enums.NoTradeModeSetting
+import at.hannibal2.skyhanni.config.enums.ProfitCalcSettings
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -42,7 +42,7 @@ class FossilExcavatorConfig {
     @Expose
     @ConfigOption(name = "Ignore Material Costs", desc = "Removes the cost of Experience Bottles from the Profit.")
     @ConfigEditorDropdown
-    val profileProfitSetting: Property<NoTradeModeSetting> = Property.of(NoTradeModeSetting.NO_TRADE);
+    val profileProfitSetting: Property<ProfitCalcSettings> = Property.of(ProfitCalcSettings.NO_TRADE);
 
     @Expose
     @ConfigOption(name = "Glacite Powder Stack", desc = "Show Glacite Powder as stack size in the Fossil Excavator.")

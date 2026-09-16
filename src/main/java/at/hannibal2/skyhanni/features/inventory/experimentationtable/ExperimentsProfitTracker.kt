@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.api.ExperimentationTableApi.experimentRenewPattern
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.enums.NoTradeModeSetting
+import at.hannibal2.skyhanni.config.enums.ProfitCalcSettings
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils.isIronmanProfile
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -198,10 +199,21 @@ object ExperimentsProfitTracker {
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lExperiments Profit Tracker")
-        val startCost = when (SkyHanniMod.feature.misc.tracker.priceSource) {
-            ItemPriceSource.NPC_SELL -> 0
+
+        val profileType = config.profileProfitSetting.get()
+        val isZeroCostProfile = (profileType == ProfitCalcSettings.ALL_PROFILES ||
+            (profileType == ProfitCalcSettings.NO_TRADE && SkyBlockUtils.noTradeMode))
+
+        val startCost = when {
+            isZeroCostProfile || SkyHanniMod.feature.misc.tracker.priceSource == ItemPriceSource.NPC_SELL -> 0
             else -> data.startCost
         }
+
+//         val startCost = when (SkyHanniMod.feature.misc.tracker.priceSource) {
+//             ItemPriceSource.NPC_SELL -> 0
+//             else -> data.startCost
+//         }
+
         val profit = tracker.drawItems(data, { true }, this) + startCost
         addSearchString("§eExperiments Done: §a${data.experimentsDone.addSeparators()}")
 
@@ -213,11 +225,10 @@ object ExperimentsProfitTracker {
         val startCostFormat = startCost.absoluteValue
         val bitCostFormat = data.bitCost;
 
-        val profileType = config.profileProfitSetting.get()
-        if (profileType == NoTradeModeSetting.ALL_PROFILES || (profileType == NoTradeModeSetting.NO_TRADE && isIronmanProfile)) {
+        if (profileType == ProfitCalcSettings.ALL_PROFILES || (profileType == ProfitCalcSettings.NO_TRADE && SkyBlockUtils.noTradeMode)) {
             add(
                 Renderable.hoverTips(
-                    "§eTotal Cost: §b${bitCostFormat.shortFormat()}",
+                    "§eTotal Cost: §b${bitCostFormat.shortFormat()} bits",
                     listOf(
                         "§7You paid §b${bitCostFormat.addSeparators()} §7bits",
                         "§7for starting experiments.",
@@ -227,7 +238,7 @@ object ExperimentsProfitTracker {
         } else {
             add(
                 Renderable.hoverTips(
-                    "§eTotal Cost: §c${startCostFormat.shortFormat()}§e/§b${bitCostFormat.shortFormat()}",
+                    "§eTotal Cost: §c-${startCostFormat.shortFormat()}§e/§b${bitCostFormat.shortFormat()}",
                     listOf(
                         "§7You paid §c${startCostFormat.addSeparators()} §7coins and",
                         "§b${bitCostFormat.addSeparators()} §7bits for starting",

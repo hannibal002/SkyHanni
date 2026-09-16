@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.enums
 
-enum class NoTradeModeSetting(private val displayName: String) {
+enum class ProfitCalcSettings(private val displayName: String) {
 
     NONE("§cNone"),
     NO_TRADE("§7No Trade Profiles"),
