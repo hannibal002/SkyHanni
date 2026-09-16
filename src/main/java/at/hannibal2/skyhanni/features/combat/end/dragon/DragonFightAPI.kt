@@ -9,12 +9,10 @@ import at.hannibal2.skyhanni.events.EndBossFightEndEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
-import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -41,8 +39,6 @@ object DragonFightAPI {
     private val endGroup = group.group("chat.end")
     private val scoreboardGroup = group.group("scoreboard")
 
-
-
     /**
      * REGEX-TEST: ☬ The Protector Dragon has spawned!
      * REGEX-TEST: ☬ The Young Dragon has spawned!
@@ -56,7 +52,6 @@ object DragonFightAPI {
      * REGEX-TEST: ☬ You placed a Summoning Eye! (2/8)
      * REGEX-TEST: ☬ You placed a Summoning Eye! Brace yourselves! (8/8)
      */
-    @Suppress("MaxLineLength")
     private val eyePlacedPattern by chatGroup.pattern(
         "eye.placed.you",
         "☬ You placed a Summoning Eye!(?: Brace yourselves!)? \\(\\d/8\\)",
@@ -94,7 +89,6 @@ object DragonFightAPI {
      * WRAPPED-REGEX-TEST: "          2nd Damager - Andromeda126785 - 3,372,454"
      * WRAPPED-REGEX-TEST: "             3rd Damager - [MVP+] AvitasG - 1,975,795"
      */
-    @Suppress("MaxLineLength")
     private val leaderboardPattern by endGroup.pattern(
         "place",
         "\\s+(?<position>\\d+).. Damager - (?:\\[[^ ]+\\] )?(?<name>.*) - (?<damage>[\\d.,]+)",
@@ -104,7 +98,6 @@ object DragonFightAPI {
      * WRAPPED-REGEX-TEST: "                      Your Damage: 0 (Position #24)"
      * WRAPPED-REGEX-TEST: "                 Your Damage: 5,057,018 (Position #1)"
      */
-    @Suppress("MaxLineLength")
     private val yourDamagePattern by endGroup.pattern(
         "position",
         "\\s+Your Damage: (?<damage>[\\d.,]+) (?:\\(NEW RECORD!\\) )?\\(Position #(?<position>\\d+)\\)",
@@ -143,7 +136,6 @@ object DragonFightAPI {
     )
 
     private val nestAreaPattern by group.pattern("area.nest", "Dragon's Nest")
-    // </editor-fold>
 
     fun inNestArea() = IslandType.THE_END.isInIsland() && nestAreaPattern.matches(SkyBlockUtils.graphArea)
 
@@ -155,10 +147,6 @@ object DragonFightAPI {
 
     /** Damage of the current first place, 0.0 while unknown. */
     val topDamage: Double get() = damageEntries.firstOrNull()?.damage ?: 0.0
-
-    /** Own placement (1-based) among the listed entries, null while not listed. */
-    val ownPlace: Int?
-        get() = damageEntries.indexOfFirst { it.name == PlayerUtils.getName() }.takeIf { it >= 0 }?.plus(1)
 
     // Consumed by the damage indicator, which shows the boss name and its health.
     var currentType: String? = null
@@ -226,7 +214,7 @@ object DragonFightAPI {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    private fun onTabList(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.DRAGON)) return
         // The first line is the widget header, damage entries follow once players deal damage.
         damageEntries = if (event.isClear()) emptyList() else event.cleanLines.drop(1).mapNotNull { line ->
@@ -246,12 +234,12 @@ object DragonFightAPI {
         if (index == -1) return
 
         scoreboardHpPattern.matchMatcher(lines[index]) {
-            // Only the dragon's line may mark a dragon as spawned - the protector's would otherwise
-            // bring up the dragon weight during a protector fight.
-            val isDragon = group("boss") == "Dragon"
-            if (isDragon && DragonFightState.eggSpawned) DragonFightState.dragonSpawned = true
+            // The protector shares the wording of this line, and its fight says nothing about a dragon.
+            if (group("boss") != "Dragon") return@matchMatcher
+            // A dragon is up, so the egg is gone - which is what the loot detection waits for.
+            DragonFightState.eggSpawned = false
             // The damage indicator shows this health next to the dragon, so the protector's stays out.
-            if (isDragon) currentHp = group("hp").formatIntOrNull()
+            currentHp = group("hp").formatIntOrNull()
         }
         val damageLine = lines.getOrNull(index + 1) ?: return
         scoreboardDamagePattern.matchMatcher(damageLine) {
@@ -260,7 +248,7 @@ object DragonFightAPI {
     }
 
     @HandleEvent
-    private fun onWorldChange(event: WorldChangeEvent) {
+    private fun onWorldChange() {
         damageEntries = emptyList()
         endingBoss = null
         endTopDamage = 0.0

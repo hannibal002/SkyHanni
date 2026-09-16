@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -33,11 +32,15 @@ object GolemSpawnTimer {
     private const val MILLIS_PER_TICK = 50.0
 
     /**
-     * REGEX-TEST: ☬ The ground begins to shake as an End Stone Protector rises from below!
+     * Unlike most lines of the fight, this one carries no symbol in front of it. Matching it
+     * exactly also keeps a player quoting the message in chat from starting the countdown - their
+     * line arrives with the rank and name in front.
+     *
+     * REGEX-TEST: The ground begins to shake as an End Stone Protector rises from below!
      */
     private val risingPattern by repoGroup.pattern(
         "chat.rising",
-        ".*The ground begins to shake as an End Stone Protector rises from below!.*",
+        "The ground begins to shake as an End Stone Protector rises from below!",
     )
 
     private var spawnTick: Int? = null
@@ -58,15 +61,12 @@ object GolemSpawnTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        val message = event.cleanMessage
-        if (risingPattern.matches(message)) {
-            spawnTick = MinecraftData.totalServerTicks + SPAWN_DELAY_TICKS
-            return
-        }
+        if (!risingPattern.matches(event.cleanMessage)) return
+        spawnTick = MinecraftData.totalServerTicks + SPAWN_DELAY_TICKS
     }
 
     @HandleEvent
-    private fun onWorldChange(event: WorldChangeEvent) {
+    private fun onWorldChange() {
         spawnTick = null
     }
 }

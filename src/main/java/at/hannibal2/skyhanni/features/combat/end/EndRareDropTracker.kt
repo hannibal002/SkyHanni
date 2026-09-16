@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.EndBoss
-import at.hannibal2.skyhanni.events.EndBossDeathEvent
 import at.hannibal2.skyhanni.events.EndBossFightEndEvent
 import at.hannibal2.skyhanni.events.EndLootFoundEvent
 import at.hannibal2.skyhanni.events.GolemWeightEvent
@@ -82,6 +81,26 @@ object EndRareDropTracker {
     private val storage: Data? get() = ProfileStorageData.profileSpecific?.endRareDrops
 
     /**
+     * Everything the overlay shows. It is only rebuilt when this changes, instead of building new
+     * renderables every frame for counters that move a few times per hour.
+     */
+    private data class State(
+        val showDragon: Boolean,
+        val showGolem: Boolean,
+        val showDryStreak: Boolean,
+        val legendaryPets: Int,
+        val epicPets: Int,
+        val tierBoostCores: Int,
+        val dryDragons: Int,
+        val dryGolems: Int,
+        val dryDragonChance: Double,
+        val dryGolemChance: Double,
+    )
+
+    private var state: State? = null
+    private var display: Renderable? = null
+
+    /**
      * Magic Find and Pet Luck as they were when the boss died. Read at that moment because both
      * can change right afterwards - potions run out, a pet is swapped - while the roll that
      * decided the drop used the values from the kill.
@@ -93,15 +112,23 @@ object EndRareDropTracker {
     private var petLuck = 0.0
 
     @HandleEvent
-    private fun onEndBossDeath(event: EndBossDeathEvent) {
+    private fun onEndBossDeath() {
         magicFind = SkyblockStat.MAGIC_FIND.lastKnownValue ?: 0.0
         petLuck = SkyblockStat.PET_LUCK.lastKnownValue ?: 0.0
     }
 
-    private fun withPetBonus(baseChance: Double) = baseChance * (1 + (magicFind + petLuck) / 100)
+    /**
+     * Chance that the dragon just killed drops a pet at all, epic or legendary. It scales with the
+     * eyes the player placed, since each eye is one roll of the drop table.
+     */
+    private fun dragonPetChance(): Double {
+        val chancePerEye = LEGENDARY_PET_CHANCE_PER_EYE + EPIC_PET_CHANCE_PER_EYE
+        val baseChance = DragonFightState.eyesPlaced * chancePerEye
+        return baseChance * (1 + (magicFind + petLuck) / 100)
+    }
 
-    /** Pet Luck only applies to pets, and the Tier Boost Core is a pet item rather than a pet. */
-    private fun withMagicFindBonus(baseChance: Double) = baseChance * (1 + magicFind / 100)
+    /** Pet Luck is left out here: the Tier Boost Core is a pet item rather than a pet. */
+    private fun tierBoostCoreChance(): Double = TIER_BOOST_CHANCE * (1 + magicFind / 100)
 
     @HandleEvent
     private fun onEndLootFound(event: EndLootFoundEvent) {
@@ -133,26 +160,19 @@ object EndRareDropTracker {
      */
     @HandleEvent
     private fun onEndBossFightEnd(event: EndBossFightEndEvent) {
+        // The protector is counted in onGolemWeight instead: its weight needs the zealot count,
+        // which only arrives after this event.
+        if (event.boss != EndBoss.DRAGON) return
         val data = storage ?: return
-        when (event.boss) {
-            EndBoss.DRAGON -> {
-                val weight = DragonWeight.calculateWeight(
-                    DragonFightState.eyesPlaced,
-                    event.place,
-                    event.topDamage,
-                    event.yourDamage,
-                )
-                if (weight < DRAGON_WEIGHT_REQUIREMENT) return
-                data.dryDragons++
-                data.dryDragonChance += withPetBonus(
-                    DragonFightState.eyesPlaced * (LEGENDARY_PET_CHANCE_PER_EYE + EPIC_PET_CHANCE_PER_EYE),
-                )
-            }
-
-            // The protector is counted in onGolemWeight instead: its weight needs the zealot
-            // count, which only arrives after this event.
-            EndBoss.END_STONE_PROTECTOR -> return
-        }
+        val weight = DragonWeight.calculateWeight(
+            DragonFightState.eyesPlaced,
+            event.place,
+            event.topDamage,
+            event.yourDamage,
+        )
+        if (weight < DRAGON_WEIGHT_REQUIREMENT) return
+        data.dryDragons++
+        data.dryDragonChance += dragonPetChance()
     }
 
     @HandleEvent
@@ -160,21 +180,40 @@ object EndRareDropTracker {
         val data = storage ?: return
         if (event.weight < GOLEM_WEIGHT_REQUIREMENT) return
         data.dryGolems++
-        data.dryGolemChance += withMagicFindBonus(TIER_BOOST_CHANCE)
+        data.dryGolemChance += tierBoostCoreChance()
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
+    private fun onTick() {
+        if (!config.enabled) return
+        val newState = storage?.let { currentState(it) }
+        if (newState == state) return
+        state = newState
+        val lines = newState?.let { buildLines(it) }.orEmpty()
+        display = if (lines.isEmpty()) null else {
+            Renderable.vertical(lines, spacing = LINE_SPACING).withTitledFrame(Renderable.text("§f§lRare Drops"))
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     private fun onRender(event: GuiRenderEvent) {
         if (!config.enabled) return
-        val data = storage ?: return
-        val lines = buildLines(data)
-        if (lines.isEmpty()) return
-        config.position.renderRenderable(
-            Renderable.vertical(lines, spacing = LINE_SPACING)
-                .withTitledFrame(Renderable.text("§f§lRare Drops")),
-            posLabel = "End Rare Drops",
-        )
+        val renderable = display ?: return
+        config.position.renderRenderable(renderable, posLabel = "End Rare Drops")
     }
+
+    private fun currentState(data: Data) = State(
+        showDragon = config.showDragon,
+        showGolem = config.showGolem,
+        showDryStreak = config.showDryStreak,
+        legendaryPets = data.legendaryPets,
+        epicPets = data.epicPets,
+        tierBoostCores = data.tierBoostCores,
+        dryDragons = data.dryDragons,
+        dryGolems = data.dryGolems,
+        dryDragonChance = data.dryDragonChance,
+        dryGolemChance = data.dryGolemChance,
+    )
 
     @HandleEvent
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -201,18 +240,18 @@ object EndRareDropTracker {
     }
 
     /** Each boss forms its own block, so switching one off simply shrinks the overlay. */
-    private fun buildLines(data: Data): List<Renderable> = buildList {
-        if (config.showDragon) {
-            add(countLine(LEGENDARY_PET, "§6Legendary Ender Dragon", data.legendaryPets))
-            add(countLine(EPIC_PET, "§5Epic Ender Dragon", data.epicPets))
-            if (config.showDryStreak) {
-                add(dryLine("Since Pet", data.dryDragons, data.dryDragonChance))
+    private fun buildLines(state: State): List<Renderable> = buildList {
+        if (state.showDragon) {
+            add(countLine(LEGENDARY_PET, "§6Legendary Ender Dragon", state.legendaryPets))
+            add(countLine(EPIC_PET, "§5Epic Ender Dragon", state.epicPets))
+            if (state.showDryStreak) {
+                add(dryLine("Since Pet", state.dryDragons, state.dryDragonChance))
             }
         }
-        if (config.showGolem) {
-            add(countLine(TIER_BOOST_CORE, "§6Tier Boost Core", data.tierBoostCores))
-            if (config.showDryStreak) {
-                add(dryLine("Since Core", data.dryGolems, data.dryGolemChance))
+        if (state.showGolem) {
+            add(countLine(TIER_BOOST_CORE, "§6Tier Boost Core", state.tierBoostCores))
+            if (state.showDryStreak) {
+                add(dryLine("Since Core", state.dryGolems, state.dryGolemChance))
             }
         }
     }

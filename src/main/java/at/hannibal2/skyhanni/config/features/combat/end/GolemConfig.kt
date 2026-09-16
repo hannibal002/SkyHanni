@@ -54,7 +54,7 @@ class GolemConfig {
     @Expose
     @ConfigOption(
         name = "Show Spawn Countdown",
-        desc = "Count down the 20 seconds until the protector can be attacked."
+        desc = "Count down the 21 seconds until the protector can be attacked."
     )
     @ConfigEditorBoolean
     var showSpawnTimer: Boolean = true

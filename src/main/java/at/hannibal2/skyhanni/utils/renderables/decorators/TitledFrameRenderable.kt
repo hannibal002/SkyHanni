@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 /**
  * Draws a rounded, translucent card around [root] with [title] as a heading, separated from the
@@ -84,12 +83,5 @@ class TitledFrameRenderable(
             backgroundColor: Int = DEFAULT_BACKGROUND,
             padding: Int = DEFAULT_PADDING,
         ) = TitledFrameRenderable(this, title, accentColor, backgroundColor, padding)
-
-        fun Renderable.withTitledFrame(
-            title: String,
-            accentColor: Int = DEFAULT_ACCENT,
-            backgroundColor: Int = DEFAULT_BACKGROUND,
-            padding: Int = DEFAULT_PADDING,
-        ) = withTitledFrame(Renderable.text(title), accentColor, backgroundColor, padding)
     }
 }

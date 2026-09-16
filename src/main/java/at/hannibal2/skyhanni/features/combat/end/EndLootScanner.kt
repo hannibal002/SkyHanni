@@ -2,18 +2,18 @@ package at.hannibal2.skyhanni.features.combat.end
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.EndBoss
 import at.hannibal2.skyhanni.events.EndBossDeathEvent
 import at.hannibal2.skyhanni.events.EndLootFoundEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.AllEntitiesGetter
-import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -28,6 +28,10 @@ import kotlin.time.Duration.Companion.seconds
  * Reads the drops of a finished End boss fight from their floating item labels and publishes
  * them as [EndLootFoundEvent]. Dragons and the protector drop loot the same way, so one scanner
  * covers both.
+ *
+ * Driven by the drops themselves: a stand reports its own item and its own label the moment the
+ * server sends either, and anything arriving outside the window after a kill is dropped right
+ * away. Nothing is searched for on a timer.
  *
  * Deliberately independent of the profit tracker's own scan, which keeps its whitelist and its
  * weight based estimation - a feature reacting to drops should not depend on whether that
@@ -50,6 +54,17 @@ object EndLootScanner {
     private val petPattern by repoGroup.pattern(
         "pet",
         "§7\\[Lvl \\d+] §(?<rarity>[56])(?<name>.+)",
+    )
+
+    /**
+     * Stacked drops carry their amount in the label, behind the item name.
+     *
+     * REGEX-TEST: §5Dragon Claw §8x3
+     * REGEX-TEST: §aEnchanted Ender Pearl §8x16
+     */
+    private val amountPattern by repoGroup.pattern(
+        "amount",
+        ".*§8x(?<amount>[\\d,]+)",
     )
 
     /**
@@ -93,56 +108,51 @@ object EndLootScanner {
     }
 
     /**
-     * Scanned every tick rather than every second: drops are collected quickly, and one that
-     * comes and goes between two scans would never be seen. Deliberately without a radius -
-     * whatever the server has not sent is out of reach anyway.
+     * A drop is made of several stands: one wears the item, another carries the label. The two
+     * arrive as separate packets and either one can name the item, so both are listened to.
      */
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    private fun onTick(event: SkyHanniTickEvent) {
-        for (expired in activeWindows.filterValues { it.isInPast() }.keys) {
-            activeWindows.remove(expired)
-            reported.remove(expired)
-        }
-        val boss = mostRecentBoss() ?: return
+    private fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
+        inspect(event.entity)
+    }
 
-        scanNameplates(boss)
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
+    private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+        inspect(event.entity)
     }
 
     /**
-     * Boss loot exists only as an armor stand with a floating label - measured in game, it has
-     * no item entity behind it. Scanning item entities was tried and only ever turned up
-     * unrelated ground loot from other players, so the label is the one reliable source.
+     * Boss loot exists only as an armor stand with a floating label - measured in game, it has no
+     * item entity behind it. Scanning item entities was tried and only ever turned up unrelated
+     * ground loot from other players, so the stand is the one reliable source.
      *
-     * The stand's equipment is still preferred when present, because a stack names its item
-     * exactly, including a pet's rarity, without any text parsing.
+     * Its equipment is preferred over the label, because a stack names its item exactly, including
+     * a pet's rarity, without any text parsing. The label still matters: at a distance the item may
+     * never arrive, and stacked drops carry their amount there.
      */
-    @OptIn(AllEntitiesGetter::class)
-    private fun scanNameplates(boss: EndBoss) {
-        for (entity in EntityUtils.getEntities<ArmorStand>()) {
-            if (entity.uuid in seenDrops) continue
+    private fun inspect(stand: ArmorStand) {
+        // Every stand in the End reports here, so anything outside a loot window leaves at once.
+        val boss = mostRecentBoss() ?: return
+        if (stand.uuid in seenDrops) return
 
-            // A drop is made of several stands: one wears the item, another carries the label.
-            // The item bearing one is read too, because its name may not have arrived yet - or
-            // may never arrive at this distance.
-            //
-            // Every slot is checked, not just head and hand: an armor piece sits in the slot it
-            // belongs to, which is why armor was previously only ever found through its label.
-            val carried = entity.carriedLoot()
-            val fromStack = carried?.getInternalNameOrNull()?.takeIf { it != NeuInternalName.NONE }
-            val label = if (entity.hasCustomName()) entity.name.formattedTextCompatLessResets() else null
+        // Every slot is checked, not just head and hand: an armor piece sits in the slot it belongs
+        // to, which is why armor was previously only ever found through its label.
+        val carried = stand.carriedLoot()
+        val fromStack = carried?.getInternalNameOrNull()?.takeIf { it != NeuInternalName.NONE }
+        val label = if (stand.hasCustomName()) stand.name.formattedTextCompatLessResets() else null
 
-            if (fromStack == null && label == null) continue
-            seenDrops.add(entity.uuid)
+        val internalName = fromStack
+            ?: label?.let { resolvePet(it) ?: NeuInternalName.fromItemNameOrNull(it) }
+            ?: return
 
-            val internalName = fromStack
-                ?: label?.let { resolvePet(it) ?: NeuInternalName.fromItemNameOrNull(it) }
-            if (internalName == null) continue
+        // Noted only once something could be read from it: item and label arrive one after the
+        // other, so a stand that says nothing yet may well be readable at its next packet.
+        seenDrops.add(stand.uuid)
 
-            val amount = carried?.count?.takeIf { it > 1 }
-                ?: label?.split("§8x")?.last()?.toIntOrNull()
-                ?: 1
-            report(boss, internalName, amount)
-        }
+        val amount = carried?.count?.takeIf { it > 1 }
+            ?: label?.let { amountPattern.matchMatcher(it) { group("amount").formatIntOrNull() } }
+            ?: 1
+        report(boss, internalName, amount)
     }
 
     /**
@@ -152,6 +162,9 @@ object EndLootScanner {
      */
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     private fun onItemAdd(event: ItemAddEvent) {
+        // Only what was really picked up off the ground: sacks, the hunting box and the test
+        // command post the same event without a drop having been collected.
+        if (event.source != ItemAddManager.Source.ITEM_ADD) return
         val boss = mostRecentBoss() ?: return
         report(boss, event.internalName, event.amount)
     }
@@ -176,13 +189,22 @@ object EndLootScanner {
     }
 
     /**
-     * The label alone does not say which boss a drop came from, so the most recent kill is
-     * assumed. This only matters while both windows overlap, and the drop tables barely do.
+     * The boss whose loot window is open, expired ones cleared on the way - which is the only place
+     * that still needs to happen now that nothing runs on a timer.
+     *
+     * The label alone does not say which boss a drop came from, so the most recent kill is assumed.
+     * This only matters while both windows overlap, and the drop tables barely do.
      */
-    private fun mostRecentBoss(): EndBoss? = activeWindows.maxByOrNull { it.value }?.key
+    private fun mostRecentBoss(): EndBoss? {
+        for (expired in activeWindows.filterValues { it.isInPast() }.keys) {
+            activeWindows.remove(expired)
+            reported.remove(expired)
+        }
+        return activeWindows.maxByOrNull { it.value }?.key
+    }
 
     @HandleEvent
-    private fun onWorldChange(event: WorldChangeEvent) {
+    private fun onWorldChange() {
         activeWindows.clear()
         seenDrops.clear()
         reported.clear()

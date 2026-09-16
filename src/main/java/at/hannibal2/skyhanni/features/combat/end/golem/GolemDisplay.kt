@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -62,7 +61,7 @@ object GolemDisplay {
     private var display: Renderable? = null
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    private fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick() {
         if (!config.display) return
         val newState = currentState()
         if (newState == state) return

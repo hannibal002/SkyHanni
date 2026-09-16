@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -37,7 +36,7 @@ object DragonDamageDisplay {
     private var display: Renderable? = null
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    private fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick() {
         if (!config.damageList) return
         val entries = DragonFightAPI.damageEntries
         if (entries == shownEntries) return

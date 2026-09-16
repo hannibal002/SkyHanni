@@ -4,9 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
@@ -72,14 +70,14 @@ object GolemLocation {
      * spawn point can be named immediately instead of only once the entity exists.
      */
     private fun detectFromHeadBlock(): SpawnPoint? = spawnPoints.firstOrNull { point ->
-        (0..HEAD_SCAN_HEIGHT).any { dy ->
-            val position = point.head.up(dy.toDouble())
+        (0..HEAD_SCAN_HEIGHT).any { heightOffset ->
+            val position = point.head.up(heightOffset)
             position.isInLoadedChunk() && position.getBlockAt() in HEAD_BLOCKS
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    private fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed() {
         // Only ever set, never cleared here: the head block disappears once the golem rises,
         // but the location stays relevant for the whole fight.
         detectFromHeadBlock()?.let { activePoint = it }
@@ -125,7 +123,7 @@ object GolemLocation {
     }
 
     @HandleEvent
-    private fun onWorldChange(event: WorldChangeEvent) {
+    private fun onWorldChange() {
         activePoint = null
     }
 }

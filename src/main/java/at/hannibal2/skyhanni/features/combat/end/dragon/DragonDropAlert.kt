@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.combat.end.dragon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.EndLootFoundEvent
-import at.hannibal2.skyhanni.features.combat.end.RareDropAlert
-import at.hannibal2.skyhanni.features.combat.end.RareDropAlert.Drop
+import at.hannibal2.skyhanni.features.combat.end.EndDropAlert
+import at.hannibal2.skyhanni.features.combat.end.EndDropAlert.Drop
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -24,23 +24,21 @@ object DragonDropAlert {
 
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragon
 
-
     private val specialDrops = mapOf(
         // NEU rarity suffixes: 3 is epic, 4 is legendary.
-        "ENDER_DRAGON;4".toInternalName() to Drop(RareDropAlert.LEGENDARY, "LEGENDARY ENDER DRAGON PET"),
-        "ENDER_DRAGON;3".toInternalName() to Drop(RareDropAlert.EPIC, "EPIC ENDER DRAGON PET"),
-        "DRAGON_HORN".toInternalName() to Drop(RareDropAlert.EPIC, "DRAGON HORN"),
-        "DYE_PEARLESCENT".toInternalName() to Drop(RareDropAlert.DYE, "PEARLESCENT DYE"),
+        "ENDER_DRAGON;4".toInternalName() to Drop(EndDropAlert.LEGENDARY, "LEGENDARY ENDER DRAGON PET"),
+        "ENDER_DRAGON;3".toInternalName() to Drop(EndDropAlert.EPIC, "EPIC ENDER DRAGON PET"),
+        "DRAGON_HORN".toInternalName() to Drop(EndDropAlert.EPIC, "DRAGON HORN"),
     )
 
     /** Rare drops: worth reporting in chat, but not worth a title. */
     private val rareDrops = mapOf(
         "ASPECT_OF_THE_DRAGON".toInternalName() to
-            Drop(RareDropAlert.LEGENDARY, "Aspect of the Dragons", withTitle = false),
-        "DRAGON_CLAW".toInternalName() to Drop(RareDropAlert.RARE, "Dragon Claw", withTitle = false),
-        "DRAGON_SCALE".toInternalName() to Drop(RareDropAlert.RARE, "Dragon Scale", withTitle = false),
+            Drop(EndDropAlert.LEGENDARY, "Aspect of the Dragons", withTitle = false),
+        "DRAGON_CLAW".toInternalName() to Drop(EndDropAlert.RARE, "Dragon Claw", withTitle = false),
+        "DRAGON_SCALE".toInternalName() to Drop(EndDropAlert.RARE, "Dragon Scale", withTitle = false),
         "DRAGON_NEST_TRAVEL_SCROLL".toInternalName() to
-            Drop(RareDropAlert.EPIC, "Travel Scroll to Dragon's Nest", withTitle = false),
+            Drop(EndDropAlert.EPIC, "Travel Scroll to Dragon's Nest", withTitle = false),
     )
 
     /** Every dragon drops the same four pieces. */
@@ -63,12 +61,12 @@ object DragonDropAlert {
         // long after the kill cannot be attributed to a boss reliably anyway.
         if (!config.dropAlert) return
         val drop = watchedDrops[event.internalName] ?: armorDrop(event.internalName) ?: return
-        RareDropAlert.show(event.internalName, drop, event.amount)
+        EndDropAlert.show(event.internalName, drop, event.amount)
     }
 
     /** Resolved on the drop rather than up front, so the repo is guaranteed to be loaded. */
     private fun armorDrop(internalName: NeuInternalName): Drop? {
         if (internalName !in dragonArmor) return null
-        return Drop(RareDropAlert.LEGENDARY, internalName.repoItemName.removeColor(), withTitle = false)
+        return Drop(EndDropAlert.LEGENDARY, internalName.repoItemName.removeColor(), withTitle = false)
     }
 }

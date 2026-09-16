@@ -16,20 +16,6 @@ class DragonConfig {
 
     @Expose
     @ConfigOption(
-        name = "Weight HUD",
-        desc = "Shows your current dragon weight on the HUD and if hovered shows the breakdown." +
-            " The dragon widget needs to be enabled for this to work."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var display: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = DragonConfig::class, field = "display")
-    val displayPosition: Position = Position(120, 40)
-
-    @Expose
-    @ConfigOption(
         name = "Damage List HUD",
         desc = "Shows a list of all damage sources and their damage during the dragon fight." +
             " The dragon widget needs to be enabled for this to work."
