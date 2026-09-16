@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ParticleChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.core.particles.ColorParticleOption
 import net.minecraft.util.ARGB
 
@@ -22,11 +21,11 @@ object ColorParticleFix {
     private val config get() = SkyHanniMod.feature.misc
     private const val RANDOMIZATION_OFFSET = 0.10000000149011612
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     private fun onParticleChange(event: ParticleChangeEvent) {
-        val particleOptions = event.particleOptions
-        if (!isEnabled()) return
+        if (!config.fixColorParticles) return
         if (event.anyOffsetHasRandomization()) return
+        val particleOptions = event.particleOptions
         if (particleOptions is ColorParticleOption) {
             particleOptions.color = ARGB.colorFromFloat(
                 particleOptions.alpha,
@@ -47,6 +46,4 @@ object ColorParticleFix {
             else -> false
         }
     }
-
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.fixColorParticles
 }
