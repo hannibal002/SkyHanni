@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils.isIronmanProfile
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 
 @SkyHanniModule
@@ -40,11 +41,11 @@ object ProfitPerExcavation {
         val scrapItem = FossilExcavatorApi.scrapItem
 
         val scrapPrice = scrapItem.getPrice()
-        map["${scrapItem.repoItemName}: §c-${scrapPrice.shortFormat()}"] = -scrapPrice
 
-        if (config.ironmanProfitType.get() == IronmanProfitType.NONE ||
-            (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
+        val profitType = config.ironmanProfitType.get()
+        if (profitType == IronmanProfitType.NONE || (profitType == IronmanProfitType.ONLY_IRONMAN && !isIronmanProfile)) {
             totalProfit -= scrapPrice
+            map["${scrapItem.repoItemName}: §c-${scrapPrice.shortFormat()}"] = -scrapPrice
         }
 
         val hover = map.sortedDesc().keys.toMutableList()

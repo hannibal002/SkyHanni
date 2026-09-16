@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils.isIronmanProfile
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -72,10 +74,12 @@ object ExcavatorProfitTracker {
                 listOf("§7You excavated §e${timesExcavated.addSeparators()} §7times."),
             ).toSearchable(),
         )
-        if (config.ironmanProfitType.get() == IronmanProfitType.NONE ||
-            (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
+
+        val profitType = config.ironmanProfitType.get()
+        if (profitType == IronmanProfitType.ALL_PROFILES || (profitType == IronmanProfitType.ONLY_IRONMAN && isIronmanProfile)) {
             profit = addScrap(timesExcavated, profit)
         }
+
         if (config.showFossilDust) {
             profit = addFossilDust(data.fossilDustGained, profit)
         }

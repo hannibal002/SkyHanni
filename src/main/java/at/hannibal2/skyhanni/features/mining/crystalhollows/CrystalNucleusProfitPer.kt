@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils.isIronmanProfile
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 
@@ -47,16 +48,16 @@ object CrystalNucleusProfitPer {
 
         val jungleKeyCost = JUNGLE_KEY_ITEM.getPrice()
         val partsCost = CrystalNucleusApi.getPrecursorRunPrice { it.getPrice() }
-        if (config.ironmanProfitType.get() == IronmanProfitType.NONE ||
-                (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
+
+        val profitType = config.ironmanProfitType.get()
+        if (profitType == IronmanProfitType.ALL_PROFILES || (profitType == IronmanProfitType.ONLY_IRONMAN && isIronmanProfile)) {
             totalProfit -= (jungleKeyCost + partsCost)
         }
 
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"
         val totalMessage = "Profit for Crystal Nucleus Run§e: $profitPrefix${totalProfit.shortFormat()}"
 
-        if (config.ironmanProfitType.get() == IronmanProfitType.NONE ||
-                (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
+        if (profitType == IronmanProfitType.ALL_PROFILES || (profitType == IronmanProfitType.ONLY_IRONMAN && isIronmanProfile)) {
             hover.add("")
             hover.add("§cUsed §5Jungle Key§7: §c-${jungleKeyCost.shortFormat()}")
             hover.add("§cUsed §9Robot Parts§7: §c-${partsCost.shortFormat()}")

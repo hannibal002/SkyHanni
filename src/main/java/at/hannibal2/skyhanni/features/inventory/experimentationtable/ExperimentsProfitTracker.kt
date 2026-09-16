@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils.isIronmanProfile
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -211,8 +212,10 @@ object ExperimentsProfitTracker {
         }
 
         val startCostFormat = startCost.absoluteValue
-        val bitCostFormat = data.bitCost
-        if (config.ironmanProfitType.get() == IronmanProfitType.NONE || (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
+        val bitCostFormat = data.bitCost;
+
+        val profileType = config.ironmanProfitType.get();
+        if (profileType == IronmanProfitType.ALL_PROFILES || (profileType == IronmanProfitType.ONLY_IRONMAN && isIronmanProfile)) {
             add(
                 Renderable.hoverTips(
                     "§eTotal Cost: §b${bitCostFormat.shortFormat()}",

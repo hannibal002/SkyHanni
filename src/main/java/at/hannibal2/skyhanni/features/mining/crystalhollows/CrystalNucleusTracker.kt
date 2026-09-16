@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils.isIronmanProfile
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -140,9 +141,9 @@ object CrystalNucleusTracker {
         if (runsCompleted > 0) {
             var profit = tracker.drawItems(data, { true }, this)
             val jungleKeyCost: Double = tracker.getPricePer(JUNGLE_KEY_ITEM) * runsCompleted
-            if (config.ironmanProfitType.get() == IronmanProfitType.NONE ||
-                (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
 
+            val profitType = config.ironmanProfitType.get()
+            if (profitType == IronmanProfitType.NONE || (profitType == IronmanProfitType.ONLY_IRONMAN && !isIronmanProfile)) {
                 profit -= jungleKeyCost
                 val jungleKeyCostFormat = jungleKeyCost.shortFormat()
                 add(
@@ -168,8 +169,7 @@ object CrystalNucleusTracker {
             else rawConfigString
             val usageTotal = if (usesApparatus) runsCompleted else runsCompleted * 6
 
-            if (config.ironmanProfitType.get() == IronmanProfitType.NONE ||
-                (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
+            if (profitType == IronmanProfitType.NONE || (profitType == IronmanProfitType.ONLY_IRONMAN && !isIronmanProfile)) {
                 profit -= totalSapphireCost
                 val totalSapphireCostFormat = totalSapphireCost.shortFormat()
                 add(
