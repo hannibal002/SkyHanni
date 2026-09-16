@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.mining.glacite.FossilExcavatorConfig.IronmanProfitType
+import at.hannibal2.skyhanni.config.enums.NoTradeModeSetting
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -11,8 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SkyBlockUtils.isIronmanProfile
+import at.hannibal2.skyhanni.utils.SkyBlockUtils.noTradeMode
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 
 @SkyHanniModule
@@ -42,8 +41,8 @@ object ProfitPerExcavation {
 
         val scrapPrice = scrapItem.getPrice()
 
-        val profitType = config.ironmanProfitType.get()
-        if (profitType == IronmanProfitType.NONE || (profitType == IronmanProfitType.ONLY_IRONMAN && !isIronmanProfile)) {
+        val profitType = config.profileProfitSetting.get();
+        if (profitType == NoTradeModeSetting.NONE || (profitType == NoTradeModeSetting.NO_TRADE && !SkyBlockUtils.noTradeMode)) {
             totalProfit -= scrapPrice
             map["${scrapItem.repoItemName}: §c-${scrapPrice.shortFormat()}"] = -scrapPrice
         }

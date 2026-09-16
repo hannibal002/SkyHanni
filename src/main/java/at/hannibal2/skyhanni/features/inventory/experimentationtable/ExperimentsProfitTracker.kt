@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.api.ExperimentationTableApi.experimentRenewPattern
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentsProfitTrackerConfig.IronmanProfitType
+import at.hannibal2.skyhanni.config.enums.NoTradeModeSetting
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils.isIronmanProfile
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -194,7 +193,7 @@ object ExperimentsProfitTracker {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        config.ironmanProfitType.onToggle(tracker::update)
+        config.profileProfitSetting.onToggle(tracker::update)
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -214,8 +213,8 @@ object ExperimentsProfitTracker {
         val startCostFormat = startCost.absoluteValue
         val bitCostFormat = data.bitCost;
 
-        val profileType = config.ironmanProfitType.get();
-        if (profileType == IronmanProfitType.ALL_PROFILES || (profileType == IronmanProfitType.ONLY_IRONMAN && isIronmanProfile)) {
+        val profileType = config.profileProfitSetting.get()
+        if (profileType == NoTradeModeSetting.ALL_PROFILES || (profileType == NoTradeModeSetting.NO_TRADE && isIronmanProfile)) {
             add(
                 Renderable.hoverTips(
                     "§eTotal Cost: §b${bitCostFormat.shortFormat()}",

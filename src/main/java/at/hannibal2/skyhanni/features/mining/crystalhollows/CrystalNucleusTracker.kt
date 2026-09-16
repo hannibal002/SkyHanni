@@ -5,8 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
-import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig.IronmanProfitType
+import at.hannibal2.skyhanni.config.enums.NoTradeModeSetting
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -20,7 +19,6 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.EP
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.JUNGLE_KEY_ITEM
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.LEGENDARY_BAL_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -29,7 +27,6 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SkyBlockUtils.isIronmanProfile
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -41,7 +38,6 @@ import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
-import kotlin.toString
 
 @SkyHanniModule
 object CrystalNucleusTracker {
@@ -131,7 +127,7 @@ object CrystalNucleusTracker {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.professorUsage.onToggle(tracker::update)
-        config.ironmanProfitType.onToggle(tracker::update)
+        config.profileProfitSetting.onToggle(tracker::update)
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -142,8 +138,8 @@ object CrystalNucleusTracker {
             var profit = tracker.drawItems(data, { true }, this)
             val jungleKeyCost: Double = tracker.getPricePer(JUNGLE_KEY_ITEM) * runsCompleted
 
-            val profitType = config.ironmanProfitType.get()
-            if (profitType == IronmanProfitType.NONE || (profitType == IronmanProfitType.ONLY_IRONMAN && !isIronmanProfile)) {
+            val profitType = config.profileProfitSetting.get()
+            if (profitType == NoTradeModeSetting.NONE || (profitType == NoTradeModeSetting.NO_TRADE && !SkyBlockUtils.noTradeMode)) {
                 profit -= jungleKeyCost
                 val jungleKeyCostFormat = jungleKeyCost.shortFormat()
                 add(
@@ -169,7 +165,7 @@ object CrystalNucleusTracker {
             else rawConfigString
             val usageTotal = if (usesApparatus) runsCompleted else runsCompleted * 6
 
-            if (profitType == IronmanProfitType.NONE || (profitType == IronmanProfitType.ONLY_IRONMAN && !isIronmanProfile)) {
+            if (profitType == NoTradeModeSetting.NONE || (profitType == NoTradeModeSetting.NO_TRADE && !SkyBlockUtils.noTradeMode)) {
                 profit -= totalSapphireCost
                 val totalSapphireCostFormat = totalSapphireCost.shortFormat()
                 add(

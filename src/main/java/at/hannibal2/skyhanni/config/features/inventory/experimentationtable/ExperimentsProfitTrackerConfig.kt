@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.enums.NoTradeModeSetting
 import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -26,16 +27,9 @@ class ExperimentsProfitTrackerConfig {
     val hideMessages: MutableList<ExperimentationTableApi.ExperimentationMessages> = mutableListOf()
 
     @Expose
-    @ConfigOption(name = "Ironman Profits", desc = "Select which profiles should use the Ironman price calculation option. §eRemoves the cost of Experience Bottles from the Profit.")
+    @ConfigOption(name = "Ignore Material Costs", desc = "Removes the cost of Experience Bottles from the Profit.")
     @ConfigEditorDropdown
-    val ironmanProfitType: Property<IronmanProfitType> = Property.of(IronmanProfitType.ONLY_IRONMAN)
-
-    enum class IronmanProfitType(private val displayName: String) {
-        NONE("§cNone"),
-        ONLY_IRONMAN("§7Only Ironman"),
-        ALL_PROFILES("§2All Profiles");
-        override fun toString(): String = displayName
-    }
+    val profileProfitSetting: Property<NoTradeModeSetting> = Property.of(NoTradeModeSetting.NO_TRADE)
 
     @Expose
     @ConfigOption(name = "Track Time Spent", desc = "Track time spent doing addons and experiments.")

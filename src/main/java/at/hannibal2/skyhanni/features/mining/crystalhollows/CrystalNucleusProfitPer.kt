@@ -3,8 +3,7 @@ package at.hannibal2.skyhanni.features.mining.crystalhollows
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
-import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
-import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig.IronmanProfitType
+import at.hannibal2.skyhanni.config.enums.NoTradeModeSetting
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.JUNGLE_KEY_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -13,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SkyBlockUtils.isIronmanProfile
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 
@@ -49,15 +47,15 @@ object CrystalNucleusProfitPer {
         val jungleKeyCost = JUNGLE_KEY_ITEM.getPrice()
         val partsCost = CrystalNucleusApi.getPrecursorRunPrice { it.getPrice() }
 
-        val profitType = config.ironmanProfitType.get()
-        if (profitType == IronmanProfitType.ALL_PROFILES || (profitType == IronmanProfitType.ONLY_IRONMAN && isIronmanProfile)) {
+        val profitType = config.profileProfitSetting.get()
+        if (profitType == NoTradeModeSetting.ALL_PROFILES || (profitType == NoTradeModeSetting.NO_TRADE && SkyBlockUtils.noTradeMode)) {
             totalProfit -= (jungleKeyCost + partsCost)
         }
 
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"
         val totalMessage = "Profit for Crystal Nucleus Run§e: $profitPrefix${totalProfit.shortFormat()}"
 
-        if (profitType == IronmanProfitType.ALL_PROFILES || (profitType == IronmanProfitType.ONLY_IRONMAN && isIronmanProfile)) {
+        if (profitType == NoTradeModeSetting.ALL_PROFILES || (profitType == NoTradeModeSetting.NO_TRADE && SkyBlockUtils.noTradeMode)) {
             hover.add("")
             hover.add("§cUsed §5Jungle Key§7: §c-${jungleKeyCost.shortFormat()}")
             hover.add("§cUsed §9Robot Parts§7: §c-${partsCost.shortFormat()}")

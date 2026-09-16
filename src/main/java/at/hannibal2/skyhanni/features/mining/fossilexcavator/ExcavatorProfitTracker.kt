@@ -4,13 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.mining.glacite.ExcavatorProfitTrackerConfig.IronmanProfitType
+import at.hannibal2.skyhanni.config.enums.NoTradeModeSetting
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
-import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -75,8 +74,8 @@ object ExcavatorProfitTracker {
             ).toSearchable(),
         )
 
-        val profitType = config.ironmanProfitType.get()
-        if (profitType == IronmanProfitType.ALL_PROFILES || (profitType == IronmanProfitType.ONLY_IRONMAN && isIronmanProfile)) {
+        val profitType = config.profileProfitSetting.get()
+        if (profitType == NoTradeModeSetting.ALL_PROFILES || (profitType == NoTradeModeSetting.NO_TRADE && SkyBlockUtils.noTradeMode)) {
             profit = addScrap(timesExcavated, profit)
         }
 
