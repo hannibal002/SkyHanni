@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.config
 
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
+import io.github.notenoughupdates.moulconfig.gui.KeyboardEvent
+import io.github.notenoughupdates.moulconfig.gui.MouseEvent
 
 class GuiOptionEditorHidden(base: GuiOptionEditor) : GuiOptionEditor(base.getOption()) {
 
@@ -9,11 +11,11 @@ class GuiOptionEditorHidden(base: GuiOptionEditor) : GuiOptionEditor(base.getOpt
         // Don't render anything as we want the option to be hidden from the user
     }
 
-    override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
+    override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int, event: MouseEvent): Boolean {
         return false
     }
 
-    override fun keyboardInput(): Boolean {
+    override fun keyboardInput(event: KeyboardEvent): Boolean {
         return false
     }
 

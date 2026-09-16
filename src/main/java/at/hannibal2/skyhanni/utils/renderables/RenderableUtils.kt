@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.putAt
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -29,6 +30,9 @@ import kotlin.reflect.KMutableProperty0
 
 @Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
+
+    fun deferredItemRenderable(stackFactory: () -> SafeItemStack): Renderable =
+        Renderable.item(stackFactory) { xSpacing = 0 }
 
     /** Calculates the relative x position of the columns in a table*/
     fun calculateTableX(content: Collection<List<Renderable?>>, xPadding: Int): List<Int> {
@@ -462,3 +466,9 @@ fun MutableList<Renderable>.addLine(builderAction: MutableList<Renderable>.() ->
 fun MutableList<Renderable>.addLine(tips: List<String>, builderAction: MutableList<Renderable>.() -> Unit) {
     add(hoverTips(Renderable.horizontal(buildList { builderAction() }, 0), tips = tips))
 }
+
+@JvmName("stringListToRenderables")
+fun List<String>.toRenderables(): List<Renderable> = map { Renderable.text(it) }
+
+@JvmName("componentListToRenderables")
+fun List<Component>.toRenderables(): List<Renderable> = map { Renderable.text(it) }

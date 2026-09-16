@@ -30,7 +30,7 @@ open class EliteDisplayGenericConfig {
     val leaderboard: Property<Boolean> = Property.of(true)
 
     @Expose
-    @ConfigOption(name = "Show Outside Garden", desc = "Show this display outside of the garden.")
+    @ConfigOption(name = "Show Outside Garden", desc = "Show this display outside the garden.")
     @ConfigEditorBoolean
     var showOutsideGarden: Boolean = false
 

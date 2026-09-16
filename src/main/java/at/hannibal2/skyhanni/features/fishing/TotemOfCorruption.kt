@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.fishing.TotemOfCorruptionConfig.OutlineType
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -97,7 +97,7 @@ object TotemOfCorruption {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!config.hideParticles) return
 
         for (totem in allTotems) {
@@ -150,7 +150,7 @@ object TotemOfCorruption {
     private fun getTimeRemaining(totem: ArmorStand): Duration? =
         totem.getLorenzVec().getEntitiesNearby<ArmorStand>(2.0)
             .firstNotNullOfOrNull { entity ->
-                timeRemainingPattern.matchMatcher(entity.cleanName()) {
+                timeRemainingPattern.matchMatcher(entity.cleanName) {
                     val minutes = group("min")?.toIntOrNull() ?: 0
                     val seconds = group("sec")?.toInt() ?: 0
                     (minutes * 60 + seconds).seconds
@@ -160,7 +160,7 @@ object TotemOfCorruption {
     private fun getOwner(totem: ArmorStand): String? =
         totem.getLorenzVec().getEntitiesNearby<ArmorStand>(2.0)
             .firstNotNullOfOrNull { entity ->
-                ownerPattern.matchMatcher(entity.cleanName()) {
+                ownerPattern.matchMatcher(entity.cleanName) {
                     group("owner")
                 }
             }
@@ -189,7 +189,7 @@ object TotemOfCorruption {
     }
 
     private fun getAllTotems(): List<Totem> = getEntitiesNearby<ArmorStand>(100.0)
-        .filter { totemNamePattern.matches(it.cleanName()) }.toList()
+        .filter { totemNamePattern.matches(it.cleanName) }.toList()
         .mapNotNull { totem ->
             val timeRemaining = getTimeRemaining(totem) ?: return@mapNotNull null
             val owner = getOwner(totem) ?: return@mapNotNull null

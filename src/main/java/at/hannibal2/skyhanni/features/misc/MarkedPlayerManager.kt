@@ -5,11 +5,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.PlayerSuggestions
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerNameSource
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
@@ -107,7 +108,7 @@ object MarkedPlayerManager {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         config.markOwnName.whenChanged { _, new ->
             val name = PlayerUtils.getName()
             if (new) {
@@ -141,7 +142,7 @@ object MarkedPlayerManager {
     }
 
     @HandleEvent
-    fun onTablistUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
         if (!config.joinLeaveMessage.enabled) return
         if (!event.isWidget(TabWidget.PLAYER_LIST)) return
@@ -184,7 +185,15 @@ object MarkedPlayerManager {
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shmarkplayer") {
             description = "Add a highlight effect to a player for better visibility"
-            argCallback("name", BrigadierArguments.string()) { displayName ->
+            argCallback(
+                "name",
+                BrigadierArguments.string(),
+                PlayerSuggestions.builder {
+                    includeAllSources()
+                    includePlayers(playerNamesToMark)
+                    exclude(PlayerNameSource.SELF)
+                },
+            ) { displayName ->
                 val name = displayName.lowercase()
 
                 if (name == PlayerUtils.getName().lowercase()) {

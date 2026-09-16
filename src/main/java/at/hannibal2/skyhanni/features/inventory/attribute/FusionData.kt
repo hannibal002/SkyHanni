@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.features.inventory.attribute
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 
 @SkyHanniModule
 object FusionData {
@@ -26,9 +26,9 @@ object FusionData {
         currentFusionData = CurrentFusionData(firstShard, secondShard, outputShard)
     }
 
-    private fun processShard(stack: ItemStack?): FusionShard? {
+    private fun processShard(stack: SafeItemStack?): FusionShard? {
         val internalName = stack?.getInternalNameOrNull() ?: return null
-        val amount = AttributeShardsData.requiredToFusePattern.firstMatcher(stack.getLore()) {
+        val amount = AttributeShardsData.requiredToFusePattern.firstMatcher(stack.getCleanLore()) {
             group("amount").toInt()
         } ?: return null
         return FusionShard(internalName, amount)

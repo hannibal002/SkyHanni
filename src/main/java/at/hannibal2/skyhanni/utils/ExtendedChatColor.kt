@@ -91,7 +91,7 @@ class ExtendedChatColor(
                             }
                             val heldItem = InventoryUtils.getItemInHand()
                             if (heldItem != null) {
-                                append(" Look its the item you are holding!") {
+                                append(" Look it's the item you are holding!") {
                                     stackHover = heldItem
                                     withColor("#349EFB")
                                 }
@@ -114,7 +114,7 @@ class ExtendedChatColor(
                                 "0123456789"
                             )
                         )
-                        appendWithColor(" i did it! ", ChatFormatting.RED)
+                        appendWithColor(" I did it! ", ChatFormatting.RED)
                         appendWithColor("watch me count 0123456789 but this one isn't matched :(", ChatFormatting.BLUE)
                     }
                     ChatUtils.chat(component)

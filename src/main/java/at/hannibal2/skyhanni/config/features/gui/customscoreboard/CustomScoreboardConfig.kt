@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigElement
+import at.hannibal2.skyhanni.utils.OSUtils.openBrowser
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -14,6 +15,14 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class CustomScoreboardConfig {
+
+    @ConfigOption(
+        name = "Deprecated Feature",
+        desc = "SkyHanni's CustomScoreboard will not receive Updates in the future. Please switch to the mod for more & unique features.",
+    )
+    @ConfigEditorButton(buttonText = "Download the Mod")
+    val customScoreboardMod: Runnable = Runnable { openBrowser("https://modrinth.com/mod/skyblock-custom-scoreboard") }
+
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show a custom scoreboard instead of the vanilla one.")
     @ConfigEditorBoolean
@@ -49,7 +58,7 @@ class CustomScoreboardConfig {
     @ConfigOption(
         name = "Unknown Lines warning",
         desc = "Give a chat warning when unknown lines are found in the scoreboard.\n" +
-            "§cReporting these in the Discord Server are very important, so we can know what lines are missing."
+            "§cReporting these in the Discord Server is very important, so we can know what lines are missing."
     )
     @ConfigEditorBoolean
     var unknownLinesWarning: Boolean = true

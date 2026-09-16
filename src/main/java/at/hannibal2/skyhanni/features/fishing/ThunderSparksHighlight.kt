@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
-import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
+import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -24,7 +24,7 @@ import net.minecraft.world.entity.decoration.ArmorStand
 object ThunderSparksHighlight {
 
     private val config get() = SkyHanniMod.feature.fishing.thunderSpark
-    private val THUNDER_SPARK_TEXTURE by lazy { SkullTextureHolder.getTexture("THUNDER_SPARK") }
+    private val THUNDER_SPARK_TEXTURE by SkullTextureHolder.texture("THUNDER_SPARK")
     private val sparks = mutableSetOf<ArmorStand>()
 
     @HandleEvent
@@ -35,7 +35,7 @@ object ThunderSparksHighlight {
     }
 
     @HandleEvent
-    fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
+    private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
         sparks.remove(event.entity)
     }
 

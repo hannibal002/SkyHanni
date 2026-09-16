@@ -37,7 +37,7 @@ object GraphEditorIO {
         val compiledNodeMap = filteredNodes.associate { node ->
             node.id to GraphNode(
                 node.id,
-                node.position,
+                node.position.roundTo(0),
                 node.name,
                 node.tags.map { it.internalName },
                 node.extraWeight,
@@ -80,7 +80,7 @@ object GraphEditorIO {
         val compileGraph = compileGraph()
         val json = compileGraph.toJson()
         val copied = OSUtils.copyToClipboardAsync(json) ?: false
-        if (!copied) return@launch ChatUtils.chat("Failed to copy graph to clipboard.")
+        if (!copied) return@launch ChatUtils.chat("§cFailed to copy graph to clipboard.")
 
         ChatUtils.chat("Copied Graph to Clipboard.")
         val networkCount = GraphEditorNetworks.recalculate()
@@ -94,7 +94,7 @@ object GraphEditorIO {
             GraphEditorNetworks.bridgeNetworks(compileGraph)
             DelayedRun.runOrNextTick {
                 IslandGraphs.setNewGraph(compileGraph)
-                GraphEditorBugFinder.runTests()
+                GraphEditorErrorFinder.runTests()
                 if (GraphEditorNodeFinder.active) {
                     GraphEditorNodeFinder.calculateNewAllNodeFind()
                 }

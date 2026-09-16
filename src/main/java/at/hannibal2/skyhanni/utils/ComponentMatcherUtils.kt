@@ -112,7 +112,11 @@ class ComponentMatcher internal constructor(
      * Return a span equivalent to the group with the given name found by [matches] or [find]
      */
     fun group(name: String): ComponentSpan? {
-        val start = matcher.start(name)
+        val start = try {
+            matcher.start(name)
+        } catch (_: IllegalArgumentException) {
+            return null
+        }
         if (start < 0) return null
         return this.span.slice(start, matcher.end(name))
     }

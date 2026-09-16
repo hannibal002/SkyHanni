@@ -139,7 +139,7 @@ object PigFeaturesApi {
         }
     }
 
-    private val ORB_SKULL by lazy { SkullTextureHolder.getTexture("SHINY_PIG_ORB") }
+    private val ORB_SKULL by SkullTextureHolder.texture("SHINY_PIG_ORB")
 
     private fun tryFindOrb(location: LorenzVec): ArmorStand? {
         val nearbyStands = location.getEntitiesNearby<ArmorStand>(5.0).toList()

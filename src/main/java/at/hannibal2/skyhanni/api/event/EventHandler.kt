@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.EventListeners.Listener
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.ErrorManager.maybeSkipError
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -11,28 +12,26 @@ import net.minecraft.ChatFormatting
 
 class EventHandler<T : SkyHanniEvent> private constructor(
     val name: String,
-    private val listeners: List<EventListeners.Listener>,
+    private val listenerCollection: ListenerCollection,
     private val canReceiveCancelled: Boolean,
 ) {
 
     val invokeLog = SkyHanniEvents.EventInvokeLog()
 
-    constructor(event: Class<T>, listeners: List<EventListeners.Listener>) : this(
+    constructor(event: Class<T>, listeners: List<Listener>) : this(
         (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
-        listeners.sortedBy { it.priority }.toList(),
+        ListenerCollection(listeners),
         listeners.any { it.receiveCancelled },
     )
 
-    fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
+    fun post(event: T, onError: ((Throwable) -> Unit)? = null) {
         invokeLog.invokeCount++
-        if (this.listeners.isEmpty()) return false
-
-        if (SkyHanniEvents.isDisabledHandler(name)) return false
+        if (SkyHanniEvents.isDisabledHandler(name)) return
 
         var errors = 0
+        listenerCollection.forEachCurrent { listener ->
+            if (!listener.shouldInvoke(event)) return@forEachCurrent true
 
-        for (listener in listeners) {
-            if (!listener.shouldInvoke(event)) continue
             try {
                 listener.invoker.accept(event)
             } catch (originalThrowable: Throwable) {
@@ -46,7 +45,8 @@ class EventHandler<T : SkyHanniEvent> private constructor(
                 }
                 onError?.invoke(throwable)
             }
-            if (event.isCancelled && !canReceiveCancelled) break
+
+            !event.isCancelled || canReceiveCancelled
         }
 
         if (errors > 3) {
@@ -58,6 +58,5 @@ class EventHandler<T : SkyHanniEvent> private constructor(
                 }
             )
         }
-        return event.isCancelled
     }
 }

@@ -24,9 +24,9 @@ object CakeSoulAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Hmmmmm cake... soul".asComponent(),
-            Component.literal("Find a cake soul").withColor(ChatFormatting.LIGHT_PURPLE),
-            3f,
+            name = "Hmmmmm cake... soul".asComponent(),
+            description = Component.literal("Find a cake soul").withColor(ChatFormatting.LIGHT_PURPLE),
+            userLuckAmount = 3f,
         )
         event.register(achievement, CAKE_SOUL_ACHIEVEMENT)
     }

@@ -17,7 +17,7 @@ class BitsConfig {
     var bulkBuyCookieTime: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Bits on Cookie", desc = "Show the bits you would gain on a cookies.")
+    @ConfigOption(name = "Bits on Cookie", desc = "Show the bits you would gain from the cookies.")
     @ConfigEditorBoolean
     @FeatureToggle
     var showBitsOnCookie: Boolean = true

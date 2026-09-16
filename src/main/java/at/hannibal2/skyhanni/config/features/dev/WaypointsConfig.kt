@@ -10,7 +10,7 @@ class WaypointsConfig {
     @Expose
     @ConfigOption(
         name = "Save Hotkey",
-        desc = "Saves block location to a temporarily parkour and copies everything to your clipboard."
+        desc = "Saves block location to a temporary parkour and copies everything to your clipboard."
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var saveKey: Int = GLFW.GLFW_KEY_UNKNOWN

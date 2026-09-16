@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.WiltedBerberisLocationsJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.level.block.Blocks
 import java.awt.Color
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -43,7 +44,7 @@ object RiftWiltedBerberisHelper {
     private val berberisSounds = setOf("entity.donkey.death", "entity.donkey.hurt")
 
     // NOTE: Do not make this a set, it breaks identity checks
-    private val list = mutableListOf<WiltedBerberis>()
+    private val list = CopyOnWriteArrayList<WiltedBerberis>()
 
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
@@ -159,8 +160,8 @@ object RiftWiltedBerberisHelper {
             .filter { it.distanceIgnoreY(location) < maxDistance }
             .minByOrNull { it.distanceIgnoreY(location) }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT, receiveCancelled = true)
+    fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 
@@ -247,7 +248,7 @@ object RiftWiltedBerberisHelper {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled() || !config.respawnSequence) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
         if (event.blockState.block != Blocks.DEAD_BUSH) return
 
         for (seq in fieldSequences.values) {

@@ -33,9 +33,10 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTr
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker.duplicatePseudoStrayPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
+import at.hannibal2.skyhanni.utils.ItemUtils.toSingleLineLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
 import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
@@ -44,6 +45,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -53,7 +55,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
@@ -125,12 +126,31 @@ object HoppityApi {
     )
 
     /**
+     * REGEX-TEST: Chocolate Factory
+     */
+    val chocolateFactoryInvPattern by CFApi.patternGroup.pattern(
+        "inventory.chocolatefactory",
+        "Chocolate Factory",
+    )
+
+    /**
      * REGEX-TEST: Rabbit Hitman
      */
     val hitmanInventoryPattern by CFApi.patternGroup.pattern(
         "hitman.inventory",
         "(?:§.)*Rabbit Hitman",
     )
+
+    /**
+     * REGEX-TEST: Hoppity
+     */
+    val hoppityInventoryPattern by CFApi.patternGroup.pattern(
+        "hoppity.inventory",
+        "Hoppity",
+    )
+
+    val hoppityDetector = InventoryDetector { hoppityInventoryPattern }
+
     // </editor-fold>
 
     data class HoppityStateDataSet(
@@ -186,23 +206,23 @@ object HoppityApi {
         return (month % 2 == 1) == (day % 2 == 0)
     }
 
-    fun filterMayBeStray(items: Map<Int, ItemStack>) = items.filter { (slotIndex, stack) ->
+    fun filterMayBeStray(items: Map<Int, SafeItemStack>) = items.filter { (slotIndex, stack) ->
         // Strays can only appear in the first 3 rows of the inventory, excluding the middle slot of the middle row.
         slotIndex != 13 && slotIndex in 0..26 &&
-            // Stack must not be null, and must be a skull.
-            stack.item != null && stack.item == Items.PLAYER_HEAD &&
+            // Stack must be a skull.
+            stack.`is`(Items.PLAYER_HEAD) &&
             // All strays have a display name, all the time.
             stack.hoverName.string.isNotEmpty() && stack.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty()
     }
 
-    private fun Map<Int, ItemStack>.filterStrayProcessable() = filterMayBeStray(this).filter {
+    private fun Map<Int, SafeItemStack>.filterStrayProcessable() = filterMayBeStray(this).filter {
         !processedStraySlots.contains(it.key) && // Don't process the same slot twice.
             it.value.getLore().isNotEmpty() // All processable strays have lore.
     }
 
     private fun Slot.isMiscProcessable() =
         // All misc items are skulls or panes, with a display name, and lore.
-        item != null && item.item != null && (item.item == Items.PLAYER_HEAD || item.isStainedGlassPane()) &&
+        (item.`is`(Items.PLAYER_HEAD) || item.isStainedGlassPane()) &&
             item.hoverName.string.isNotEmpty() && item.getLore().isNotEmpty()
 
     private fun postApiEggFoundEvent(type: HoppityEggType, event: SkyHanniChatEvent.Allow, note: String? = null) {
@@ -227,7 +247,7 @@ object HoppityApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!checkNextInvOpen) return
         checkNextInvOpen = false
-        if (event.inventoryName != "Hoppity") return
+        if (!hoppityDetector.isInside()) return
         lastHoppityCallAccept = SimpleTimeMark.now()
     }
 
@@ -250,7 +270,8 @@ object HoppityApi {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         // Remove any processed stray slots that are no longer in the inventory.
         processedStraySlots.entries.removeIf {
-            it.key !in event.inventoryItems || event.inventoryItems[it.key]?.hoverName.formattedTextCompatLeadingWhiteLessResets() != it.value
+            !event.inventoryItems.containsKey(it.key) ||
+                event.inventoryItems[it.key]?.hoverName.formattedTextCompatLeadingWhiteLessResets() != it.value
         }
 
         // Only process if we're in the Chocolate Factory.
@@ -271,7 +292,7 @@ object HoppityApi {
                     else -> return@matchMatcher
                 }
             }
-            CFStrayTracker.strayDoradoPattern.matchMatcher(itemStack.getSingleLineLore()) {
+            CFStrayTracker.strayDoradoPattern.matchMatcher(itemStack.getLore().toSingleLineLore()) {
                 // If the lore contains the escape pattern, we don't want to fire the event.
                 // There are also 3 separate messages that can match, which is why we need to check the time since the last fire.
                 if (CFStrayTracker.doradoEscapeStrayPattern.anyMatches(itemStack.getLore())) return@matchMatcher
@@ -292,10 +313,13 @@ object HoppityApi {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!miscProcessInvPattern.matches(InventoryUtils.openInventoryName())) return
         val slot = event.slot?.takeIf { it.isMiscProcessable() } ?: return
+        val hoverName = slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets()
 
-        if (sideDishNamePattern.matches(slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets())) EggFoundEvent(SIDE_DISH, event.slotId).post()
+        if (sideDishNamePattern.matches(hoverName)) {
+            EggFoundEvent(SIDE_DISH, event.slotId).post()
+        }
 
-        milestoneNamePattern.matchMatcher(slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+        milestoneNamePattern.matchMatcher(hoverName) {
             val lore = slot.item.getLore()
             if (!claimableMilestonePattern.anyMatches(lore)) return
             if (allTimeLorePattern.anyMatches(lore)) EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, event.slotId).post()

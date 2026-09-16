@@ -3,13 +3,12 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -44,14 +43,14 @@ object PestParticleWaypoint {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled() || !PestApi.hasVacuumInHand()) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
         if (PlayerUtils.isSneaking()) return
         reset()
         lastPestTrackerUse = SimpleTimeMark.now()
     }
 
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true, onlyOnIsland = IslandType.GARDEN)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
 
         if (config.hideParticles && event.type == ParticleTypes.FIREWORK) event.cancel()
@@ -68,28 +67,20 @@ object PestParticleWaypoint {
         if (config.hideParticles) event.cancel()
 
         lastParticle = SimpleTimeMark.now()
-        val pos = event.location
 
-        if (bezierFitter.isEmpty()) {
-            if (pos.distance(LocationUtils.playerLocation()) > 5) return
-            bezierFitter.addPoint(pos)
-            return
-        }
-
-        val lastPoint = bezierFitter.getLastPoint() ?: return
-        val dist = lastPoint.distance(pos)
-        if (dist == 0.0 || dist > 3.0) return
-        bezierFitter.addPoint(pos)
+        val emptyCondition: (LorenzVec) -> Boolean = { it.distance(LocationUtils.playerLocation()) > 5 }
+        if (!bezierFitter.tryAdd(event.location, maxDistanceToLast = 3.0, emptyCondition = emptyCondition)) return
 
         val solved = bezierFitter.solve() ?: return
         guessPosition = solved
         isGuessPlotMiddle = GardenPlotApi.getPlot(solved)?.middle?.equalsIgnoreY(solved.ceil()) ?: false
     }
 
-    private fun ReceiveParticleEvent.isEnchantmentTable(): Boolean =
+
+    private fun ParticleEvent.isEnchantmentTable(): Boolean =
         type == ParticleTypes.ENCHANT && count == 10 && speed == -2f && offset.isZero()
 
-    private fun ReceiveParticleEvent.isVillagerAngry(): Boolean =
+    private fun ParticleEvent.isVillagerAngry(): Boolean =
         type == ParticleTypes.ANGRY_VILLAGER && count == 1 && speed == 0f && offset.isZero()
 
     @HandleEvent
@@ -142,7 +133,7 @@ object PestParticleWaypoint {
         reset()
     }
 
-    @HandleEvent(PestUpdateEvent::class)
+    @HandleEvent
     fun onPestUpdate() {
         if (PestApi.scoreboardPests == 0) reset()
     }

@@ -1,3 +1,4 @@
+# Execution context: PR branch code on pull_request, base branch code on push/workflow_dispatch
 name: Check banned imports
 on:
   - pull_request

@@ -17,7 +17,7 @@ object UltimateEnchantStar {
     @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
-        if (event.stack.item != Items.ENCHANTED_BOOK) return
+        if (!event.stack.`is`(Items.ENCHANTED_BOOK)) return
         val enchants = event.stack.getHypixelEnchantments() ?: return
         if (enchants.size != 1 || !enchants.keys.first().startsWith("ultimate_")) return
         event.renderObjects += RenderObject("§d✦", -10, -10)

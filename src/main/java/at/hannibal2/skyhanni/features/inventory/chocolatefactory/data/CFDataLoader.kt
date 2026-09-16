@@ -14,8 +14,10 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFUpgradeWarnin
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -25,16 +27,15 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CFDataLoader {
-
     private val config get() = CFApi.config
     private val profileStorage get() = CFApi.profileStorage
 
@@ -235,24 +236,25 @@ object CFDataLoader {
     // </editor-fold>
 
     @HandleEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!CFApi.inChocolateFactory) return
-
-        updateInventoryItems(event.inventoryItems)
+        DelayedRun.runOrNextTick {
+            updateInventoryItems(event.inventoryItems)
+        }
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         clearData()
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose(event: InventoryCloseEvent) {
         clearData()
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
             47,
             "inventory.chocolateFactory.rabbitWarning",
@@ -261,10 +263,10 @@ object CFDataLoader {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad(event: ConfigLoadEvent) {
         val soundProperty = config.rabbitWarning.specialRabbitSound
         ConditionalUtils.onToggle(soundProperty) {
-            CFApi.warningSound = SoundUtils.createSound(soundProperty.get(), 1f)
+            CFApi.warningSound = SoundUtils.createSound(soundProperty.get(), 1f, isWarning = true)
         }
 
         config.chocolateUpgradeWarnings.upgradeWarningTimeTower.whenChanged { _, _ ->
@@ -287,7 +289,9 @@ object CFDataLoader {
         CFApi.bestPossibleSlot = -1
     }
 
-    fun updateInventoryItems(inventory: Map<Int, ItemStack>) {
+    fun updateInventoryItems(inventory: Map<Int, SafeItemStack>) {
+        if (!CFApi.inChocolateFactory) return
+
         val profileStorage = profileStorage ?: return
 
         val chocolateItem = InventoryUtils.getItemAtSlotIndex(CFApi.infoIndex) ?: return
@@ -320,11 +324,11 @@ object CFDataLoader {
         CFApi.factoryUpgrades = list
     }
 
-    private fun processChocolateItem(item: ItemStack) {
+    private fun processChocolateItem(item: SafeItemStack) {
         val profileStorage = profileStorage ?: return
 
-        CFApi.chocolateAmountPattern.matchMatcher(item.hoverName.string.removeColor()) {
-            profileStorage.currentChocolate = group("amount").formatLong()
+        SkyblockCurrency.CHOCOLATE.readAmountOrNull(item.cleanName)?.let {
+            profileStorage.currentChocolate = it
         }
         for (line in item.getLore()) {
             chocolatePerSecondPattern.matchMatcher(line) {
@@ -336,7 +340,7 @@ object CFDataLoader {
         }
     }
 
-    private fun processPrestigeItem(list: MutableList<CFUpgrade>, item: ItemStack) {
+    private fun processPrestigeItem(list: MutableList<CFUpgrade>, item: SafeItemStack) {
         val profileStorage = profileStorage ?: return
 
         prestigeLevelPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
@@ -364,7 +368,7 @@ object CFDataLoader {
         list.add(prestigeUpgrade)
     }
 
-    private fun processProductionItem(item: ItemStack) {
+    private fun processProductionItem(item: SafeItemStack) {
         val profileStorage = profileStorage ?: return
 
         chocolateMultiplierPattern.firstMatcher(item.getLore()) {
@@ -379,7 +383,7 @@ object CFDataLoader {
         }
     }
 
-    private fun processLeaderboardItem(item: ItemStack) {
+    private fun processLeaderboardItem(item: SafeItemStack) {
         CFApi.leaderboardPosition = null
         CFApi.leaderboardPercentile = null
 
@@ -393,7 +397,7 @@ object CFDataLoader {
         }
     }
 
-    private fun processBarnItem(item: ItemStack) {
+    private fun processBarnItem(item: SafeItemStack) {
         val profileStorage = profileStorage ?: return
 
         barnAmountPattern.firstMatcher(item.getLore()) {
@@ -403,7 +407,7 @@ object CFDataLoader {
         }
     }
 
-    private fun processTimeTowerItem(item: ItemStack) {
+    private fun processTimeTowerItem(item: SafeItemStack) {
         val profileStorage = profileStorage ?: return
 
         for (line in item.getLore()) {
@@ -434,7 +438,7 @@ object CFDataLoader {
         }
     }
 
-    private fun processHitmanItem(item: ItemStack) {
+    private fun processHitmanItem(item: SafeItemStack) {
         val profileStorage = profileStorage ?: return
 
         val newStats = ProfileSpecificStorage.CFStorage.HitmanStatsStorage()
@@ -459,18 +463,18 @@ object CFDataLoader {
         profileStorage.hitmanStats = newStats
     }
 
-    private fun processInventory(list: MutableList<CFUpgrade>, inventory: Map<Int, ItemStack>) {
+    private fun processInventory(list: MutableList<CFUpgrade>, inventory: Map<Int, SafeItemStack>) {
         for ((slotIndex, item) in inventory) {
             processItem(list, item, slotIndex)
         }
     }
 
-    private fun processItem(list: MutableList<CFUpgrade>, item: ItemStack, slotIndex: Int) {
+    private fun processItem(list: MutableList<CFUpgrade>, item: SafeItemStack, slotIndex: Int) {
         if (slotIndex == CFApi.prestigeIndex) return
 
         if (slotIndex !in CFApi.otherUpgradeSlots && slotIndex !in CFApi.rabbitSlots) return
 
-        val itemName = item.hoverName.string.removeColor()
+        val itemName = item.cleanName
         val lore = item.getLore()
         val upgradeCost = CFApi.getChocolateBuyCost(lore)
         val averageChocolate = ChocolateAmount.averageChocPerSecond().roundTo(2)

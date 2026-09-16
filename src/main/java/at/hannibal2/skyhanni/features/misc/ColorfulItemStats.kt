@@ -35,8 +35,7 @@ object ColorfulItemStats {
         for ((index, line) in event.toolTip.withIndex()) {
             genericStat.findMatcher(line.string) {
                 val stat = group("stat")
-                val statId = stat.uppercase().replace(" ", "_")
-                val skyblockStatIcon = SkyblockStat.getIconOrNull(statId) ?: return@findMatcher
+                val skyblockStatIcon = SkyblockStat.getIconByDisplayNameOrNull(stat) ?: return@findMatcher
 
                 val bonusGroup = group("bonus")
                 var bonus = when {

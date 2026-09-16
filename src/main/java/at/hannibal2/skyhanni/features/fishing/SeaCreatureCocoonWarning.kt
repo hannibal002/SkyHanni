@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
+import at.hannibal2.skyhanni.events.combat.HypixelCocoonChatMessageEvent
 import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SeaCreatureSettings
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -17,11 +17,8 @@ object SeaCreatureCocoonWarning {
     private val config get() = SkyHanniMod.feature.fishing.cocoonSettings
 
     @HandleEvent
-    fun onCocoonSpawn(event: CocoonSpawnEvent) {
-        val mob = event.cocoonMob
-        if (mob.seaCreature == null) return
-        if (!mob.seaCreature.isOwn) return
-        val name = mob.seaCreature.name
+    fun onHypixelCocoonMessage(event: HypixelCocoonChatMessageEvent) {
+        val name = event.mobName
         if (config.warnWhenCocooned) {
             if (SeaCreatureSettings.getConfig(name)?.shouldWarnWhenCocooned == true) {
                 val msg = "§c$name Has Been Cocooned"

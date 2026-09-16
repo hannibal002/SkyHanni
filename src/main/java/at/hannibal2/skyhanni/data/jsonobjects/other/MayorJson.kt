@@ -10,7 +10,7 @@ data class MayorJson(
 data class MayorInfo(
     @Expose val key: String,
     @Expose val name: String,
-    @Expose val perks: List<MayorPerk>,
+    @Expose val perks: List<MayorPerk>?,
     // Ministers won't exist,
     // when the current mayor is a special mayor
     @Expose val minister: Minister?,
@@ -25,14 +25,14 @@ data class MayorElection(
 data class MayorCandidate(
     @Expose val key: String,
     @Expose val name: String,
-    @Expose val perks: List<MayorPerk>,
+    @Expose val perks: List<MayorPerk>?,
     @Expose val votes: Int,
 )
 
 data class Minister(
     @Expose val key: String,
     @Expose val name: String,
-    @Expose val perk: MayorPerk,
+    @Expose val perk: MayorPerk?,
 )
 
 data class MayorPerk(

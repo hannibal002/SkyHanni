@@ -34,22 +34,9 @@ object BarnFishingTimer {
 
     private val config get() = SkyHanniMod.feature.fishing.barnTimer
     private const val GLOBAL_CAP = 60
+    private const val PERSONAL_CAP = 10
     private val warningDelay = 5.seconds
     private val hubBarnFishingLocation = LorenzVec(108, 89, -252)
-
-    private enum class FishingCap(val island: IslandType, islandPersonalCap: Int? = null) {
-        CRIMSON_ISLE(IslandType.CRIMSON_ISLE, 5),
-        CRYSTAL_HOLLOWS(IslandType.CRYSTAL_HOLLOWS, 20),
-        OTHERS(IslandType.NONE),
-        ;
-
-        val currentPersonalCap: Int = islandPersonalCap ?: GLOBAL_CAP
-        val hasPersonalCap: Boolean = islandPersonalCap != null
-
-        companion object {
-            fun getForIsland(island: IslandType): FishingCap = entries.find { it.island == island } ?: OTHERS
-        }
-    }
 
     private enum class AlertReason(val title: String, val message: String) {
         TIME(
@@ -77,7 +64,6 @@ object BarnFishingTimer {
     private var otherMobs: Int = 0
     private val totalMobs: Int get() = ownMobs + otherMobs
 
-    private var currentCap = FishingCap.OTHERS
     private var enabledInIsland = false
 
     private var oldestSeaCreature: LivingSeaCreatureData? = null
@@ -153,7 +139,7 @@ object BarnFishingTimer {
         display = Renderable.text(
             buildString {
                 append("$timeColor$formatTime §8(")
-                if (currentCap.hasPersonalCap) append("$personalCapColor$ownMobs§7/")
+                append("$personalCapColor$ownMobs§7/")
                 append("$globalCapColor$totalMobs §bsea creatures§8)")
             },
         )
@@ -165,7 +151,7 @@ object BarnFishingTimer {
             return when {
                 lastWarning.passedSince() < warningDelay -> AlertReason.NO_ALERT
                 timeAlert && timeSince >= alertTime.seconds -> AlertReason.TIME
-                warnPersonalCap && currentCap.hasPersonalCap && ownMobs >= currentCap.currentPersonalCap -> AlertReason.PERSONAL_CAP
+                warnPersonalCap && ownMobs >= PERSONAL_CAP -> AlertReason.PERSONAL_CAP
                 warnGlobalCap && totalMobs >= GLOBAL_CAP -> AlertReason.GLOBAL_CAP
                 else -> AlertReason.NO_ALERT
             }
@@ -187,7 +173,7 @@ object BarnFishingTimer {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Fishing Timer")
         event.addIrrelevant {
             add("ownMobs $ownMobs")
@@ -202,7 +188,6 @@ object BarnFishingTimer {
 
     @HandleEvent
     fun onIslandJoin(event: IslandJoinEvent) {
-        currentCap = FishingCap.getForIsland(event.island)
         enabledInIsland = updateLocation(event.island)
     }
 

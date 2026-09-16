@@ -21,10 +21,10 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.NumberUtil.oneDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -45,7 +44,7 @@ object InfernoMinionProfitTracker {
 
     private val eyedropsItem = "CAPSAICIN_EYEDROPS_NO_CHARGES".toInternalName()
 
-    private val infernoMinionInventory = InventoryDetector(InfernoMinionFeatures.infernoMinionTitlePattern)
+    private val infernoMinionInventory = InventoryDetector { InfernoMinionFeatures.infernoMinionTitlePattern }
     private var fuelDropMap = mapOf<NeuInternalName, Set<NeuInternalName>>()
     private var minionDropMap = mapOf<String, Set<NeuInternalName>>()
 
@@ -176,7 +175,7 @@ object InfernoMinionProfitTracker {
         }
     }
 
-    private fun getFuelFromInventory(inventoryItems: Map<Int, ItemStack>): NeuInternalName? {
+    private fun getFuelFromInventory(inventoryItems: Map<Int, SafeItemStack>): NeuInternalName? {
         val fuelStack = inventoryItems[MINION_FUEL_SLOT] ?: return null
         val name = fuelStack.getInternalNameOrNull() ?: return null
         return if (name in InfernoMinionFeatures.fuelItemIds) name else null

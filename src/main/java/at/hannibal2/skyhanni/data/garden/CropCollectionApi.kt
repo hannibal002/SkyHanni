@@ -131,7 +131,7 @@ object CropCollectionApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("crop collection")
         event.addIrrelevant {
             cropCollectionCounter?.forEach {

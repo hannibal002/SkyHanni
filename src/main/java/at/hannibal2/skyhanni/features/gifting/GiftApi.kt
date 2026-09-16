@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.gifting
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -34,6 +33,6 @@ object GiftApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        holdingGift = giftNamePattern.matches(InventoryUtils.itemInHandId.asString())
+        holdingGift = giftNamePattern.matches(event.newItem.asString())
     }
 }

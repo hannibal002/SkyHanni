@@ -27,10 +27,10 @@ object VanquisherAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Vanquisher Double Trouble".asComponent(),
-            "Spawn two of them within one second".asComponent(),
-            25f,
-            true,
+            name = "Vanquisher Double Trouble".asComponent(),
+            description = "Spawn two of them within one second".asComponent(),
+            userLuckAmount = 25f,
+            secret = true,
         )
         event.register(achievement, VANQUISHER_ACHIEVEMENT)
     }

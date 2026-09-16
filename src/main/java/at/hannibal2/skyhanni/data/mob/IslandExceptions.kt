@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.data.ElectionApi.derpy
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobFilter.makeMobResult
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -16,8 +15,8 @@ import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.LivingEntity
@@ -27,32 +26,32 @@ import net.minecraft.world.entity.animal.pig.Pig
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.Creeper
 import net.minecraft.world.entity.monster.Giant
-import net.minecraft.world.entity.monster.MagmaCube
-import net.minecraft.world.entity.monster.Slime
+import net.minecraft.world.entity.monster.cubemob.MagmaCube
+import net.minecraft.world.entity.monster.cubemob.Slime
 import net.minecraft.world.entity.monster.spider.CaveSpider
 import net.minecraft.world.entity.monster.zombie.Zombie
 import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin
 
 object IslandExceptions {
-
     internal fun islandSpecificExceptions(
         baseEntity: LivingEntity,
         armorStand: ArmorStand?,
         nextEntity: LivingEntity?,
     ): MobData.MobResult? =
         when (SkyBlockUtils.currentIsland) {
-            IslandType.CATACOMBS -> dungeon(baseEntity, armorStand, nextEntity)
-            IslandType.PRIVATE_ISLAND -> privateIsland(armorStand, baseEntity)
-            IslandType.THE_RIFT -> theRift(baseEntity, nextEntity, armorStand)
-            IslandType.CRIMSON_ISLE -> crimsonIsle(baseEntity, armorStand, nextEntity)
-            IslandType.DEEP_CAVERNS -> deepCaverns(baseEntity)
-            IslandType.DWARVEN_MINES -> dwarvenMines(baseEntity)
-            IslandType.CRYSTAL_HOLLOWS -> crystalHollows(baseEntity, armorStand)
-            IslandType.HUB -> hub(baseEntity, armorStand, nextEntity)
-            IslandType.GARDEN -> garden(baseEntity)
-            IslandType.KUUDRA_ARENA -> kuudraArena(baseEntity, nextEntity)
-            IslandType.WINTER -> winterIsland(baseEntity)
-            IslandType.GALATEA -> ModernIslandExceptions.galatea(baseEntity, armorStand, nextEntity)
+            CATACOMBS -> dungeon(baseEntity, armorStand, nextEntity)
+            PRIVATE_ISLAND -> privateIsland(armorStand, baseEntity)
+            THE_RIFT -> theRift(baseEntity, nextEntity, armorStand)
+            CRIMSON_ISLE -> crimsonIsle(baseEntity, armorStand, nextEntity)
+            DEEP_CAVERNS -> deepCaverns(baseEntity)
+            DWARVEN_MINES -> dwarvenMines(baseEntity)
+            CRYSTAL_HOLLOWS -> crystalHollows(baseEntity, armorStand)
+            HUB -> hub(baseEntity, armorStand, nextEntity)
+            GARDEN -> garden(baseEntity)
+            KUUDRA_ARENA -> kuudraArena(baseEntity, nextEntity)
+            WINTER -> winterIsland(baseEntity)
+            GALATEA -> ModernIslandExceptions.moongladeMarsh(baseEntity, armorStand, nextEntity)
+            TORRHUS_CANYON -> ModernIslandExceptions.torrhus(baseEntity, armorStand, nextEntity)
 
             else -> null
         }
@@ -66,7 +65,7 @@ object IslandExceptions {
             armorStand != null &&
             (armorStand.name.formattedTextCompatLessResets() == "§e﴾ §5♃ §c§lThe Watcher§r§r §e﴿" || armorStand.name.formattedTextCompatLessResets() == "§3§lWatchful Eye§r") ->
             MobData.MobResult.found(
-                MobFactories.special(baseEntity, armorStand.cleanName(), armorStand),
+                MobFactories.special(baseEntity, armorStand.cleanName, armorStand),
             )
 
         baseEntity is CaveSpider -> MobUtils.getClosestArmorStand(baseEntity, 2.0).takeNonDefault()
@@ -97,6 +96,13 @@ object IslandExceptions {
         armorStand: ArmorStand?,
         baseEntity: LivingEntity,
     ) = when {
+        // Dummy can have either 2b or Int.MAX_VALUE health
+        // This does not check for the armor stand name because that is sometimes
+        // delayed when switching mobs for the dummy too quickly
+        baseEntity.baseMaxHealth >= 2_000_000_000 -> MobData.MobResult.found(
+            MobFactories.special(baseEntity, "Dummy", armorStand)
+        )
+
         armorStand?.isDefaultValue() != false ->
             if (baseEntity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) < 15.0) {
                 // TODO fix to always include Valid Mobs on Private Island
@@ -114,7 +120,7 @@ object IslandExceptions {
         baseEntity is Slime && nextEntity is Slime ->
             MobData.MobResult.found(Mob(baseEntity, MobCategory.SPECIAL, armorStand, "Bacte Tentacle"))
 
-        baseEntity is Slime && armorStand != null && armorStand.cleanName().startsWith("﴾ [Lv10] B") ->
+        baseEntity is Slime && armorStand != null && armorStand.cleanName.startsWith("﴾ [Lv10] B") ->
             MobData.MobResult.found(Mob(baseEntity, MobCategory.BOSS, armorStand, name = "Bacte"))
 
         baseEntity is RemotePlayer && baseEntity.isNpc() && baseEntity.name.formattedTextCompatLessResets() == "Branchstrutter " ->
@@ -128,9 +134,6 @@ object IslandExceptions {
         armorStand: ArmorStand?,
         nextEntity: LivingEntity?,
     ) = when {
-        baseEntity is Slime && MobFilter.heavyPearlPattern.matches(armorStand?.name.formattedTextCompatLessResets()) ->
-            MobData.MobResult.found(MobFactories.special(baseEntity, "Heavy Pearl"))
-
         baseEntity is Pig && nextEntity is Pig -> MobData.MobResult.illegal // Matriarch Tongue
         baseEntity is RemotePlayer && baseEntity.isNpc() && baseEntity.name.string == "BarbarianGuard " ->
             MobData.MobResult.found(Mob(baseEntity, MobCategory.DISPLAY_NPC, name = "Barbarian Guard"))
@@ -143,6 +146,7 @@ object IslandExceptions {
             MobData.MobResult.found(Mob(baseEntity, MobCategory.BOSS, armorStand, name = "Mage Outlaw"))
 
         baseEntity is ZombifiedPiglin &&
+            MobFilter.NPC_TURD_SKULL != null &&
             baseEntity.getEntityHelmet()?.getSkullTexture() == MobFilter.NPC_TURD_SKULL ->
             MobData.MobResult.found(Mob(baseEntity, MobCategory.DISPLAY_NPC, name = "Turd"))
 
@@ -177,7 +181,7 @@ object IslandExceptions {
     ) = when {
         baseEntity is MagmaCube &&
             armorStand != null &&
-            armorStand.cleanName() == "[Lv100] Bal ???❤" ->
+            armorStand.cleanName == "[Lv100] Bal ???❤" ->
             MobData.MobResult.found(
                 Mob(baseEntity, MobCategory.BOSS, armorStand, "Bal", levelOrTier = 100),
             )
@@ -215,7 +219,7 @@ object IslandExceptions {
 
         baseEntity is Zombie && armorStand != null && !armorStand.isDefaultValue() -> null // Impossible Rat
         baseEntity is Zombie -> ratHandler(baseEntity, nextEntity) // Possible Rat
-        baseEntity is Pig && MobFilter.shinyPig.matches(armorStand?.cleanName()) -> MobData.MobResult.found(
+        baseEntity is Pig && MobFilter.shinyPig.matches(armorStand?.cleanName) -> MobData.MobResult.found(
             Mob(
                 baseEntity,
                 MobCategory.SPECIAL,
@@ -229,7 +233,7 @@ object IslandExceptions {
 
     private fun garden(baseEntity: LivingEntity) = when {
         baseEntity is RemotePlayer && baseEntity.isNpc() ->
-            MobData.MobResult.found(Mob(baseEntity, MobCategory.DISPLAY_NPC, name = baseEntity.cleanName()))
+            MobData.MobResult.found(Mob(baseEntity, MobCategory.DISPLAY_NPC, name = baseEntity.cleanName))
 
         else -> null
     }
@@ -268,13 +272,13 @@ object IslandExceptions {
                     it.distanceTo(baseEntity) < 4.0 &&
                     it.wearingSkullTexture(MobFilter.RAT_SKULL_TEXTURE)
             }?.let {
-                MobData.MobResult.found(Mob(baseEntity, category = MobCategory.BASIC, armorStand = it, name = "Rat"))
+                MobData.MobResult.found(Mob(baseEntity, category = BASIC, armorStand = it, name = "Rat"))
             } ?: if (nextEntity is Zombie) MobData.MobResult.notYetFound else null
 
     private fun petCareHandler(baseEntity: LivingEntity): MobData.MobResult {
         val extraEntityList = listOf(1, 2, 3, 4).mapNotNull { MobUtils.getArmorStand(baseEntity, it) }
         if (extraEntityList.size != 4) return MobData.MobResult.notYetFound
-        return MobFilter.petCareNamePattern.matchMatcher(extraEntityList[1].cleanName()) {
+        return MobFilter.petCareNamePattern.matchMatcher(extraEntityList[1].cleanName) {
             MobData.MobResult.found(
                 Mob(
                     baseEntity,

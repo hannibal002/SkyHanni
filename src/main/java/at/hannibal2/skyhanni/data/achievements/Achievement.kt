@@ -8,15 +8,32 @@ import com.google.gson.annotations.Expose
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 
+/**
+ * An unlockable Achievement for doing something in game
+ *
+ * @param name Name show in Chat and /shachievements
+ * @param description Description shown when hovering over the achievement in chat
+ * @param userLuckAmount The amount of user luck gained when unlocking the achievement
+ * @param secret Secret achievements only show their name once unlocked
+ * @param tiers For achievements that require multiple completions (10, 20) would require 10 for tier 1 and 20 to fully unlock
+ * @param hidden Hidden achievements are completely hidden until unlocked/found
+ */
 data class Achievement(
     private val name: Component? = null,
     private val description: Component = Component.empty(),
-    var userLuckAmount: Float = 0f,
+    val userLuckAmount: Float,
     var secret: Boolean = false,
     var tiers: List<Int> = listOf(),
+    var hidden: Boolean = false,
     @Expose
     var data: AchievementUserData = AchievementUserData(),
 ) {
+    constructor(name: String, description: String, userLuckAmount: Float) : this(
+        name = name.asComponent(),
+        description = description.asComponent(),
+        userLuckAmount = userLuckAmount,
+    )
+
     fun getNameOrNull(): Component? {
         name ?: return null
         val tier = getCurrentTier() ?: return name
@@ -47,7 +64,7 @@ data class Achievement(
                 } else {
                     append(
                         "Current Progress: ${getProgressFormatted()} " +
-                            "(you only needed ${tiers.last().addSeparators()} to fully unlock it)"
+                            "(you only needed ${tiers.last().addSeparators()} to fully unlock it)",
                     )
                 }
                 withColor(ChatFormatting.YELLOW)

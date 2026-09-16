@@ -11,10 +11,12 @@ data class ChangedChatErrorsJson(
 data class RepoErrorData(
     @Expose @SerializedName("message_exact") private val rawMessageExact: List<String>?,
     @Expose @SerializedName("message_starts_with") private val rawMessageStartsWith: List<String>?,
+    @Expose @SerializedName("message_contains") private val rawMessageContains: List<String>?,
     @Expose @SerializedName("replace_message") val replaceMessage: String?,
     @Expose @SerializedName("custom_message") val customMessage: String?,
     @Expose @SerializedName("fixed_in") val fixedIn: ModVersion?,
 ) {
     val messageExact get() = rawMessageExact.orEmpty()
     val messageStartsWith get() = rawMessageStartsWith.orEmpty()
+    val messageContains get() = rawMessageContains.orEmpty()
 }

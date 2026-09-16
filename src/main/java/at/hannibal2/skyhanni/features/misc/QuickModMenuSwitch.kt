@@ -17,11 +17,11 @@ import at.hannibal2.skyhanni.utils.ReflectionUtils.getPublicFieldValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object QuickModMenuSwitch {
@@ -58,7 +58,7 @@ object QuickModMenuSwitch {
     }
 
     private fun update() {
-        var openGui = Minecraft.getInstance().screen?.javaClass?.name ?: "none"
+        var openGui = MinecraftCompat.screen?.javaClass?.name ?: "none"
         openGui = handleAbstractGuis(openGui)
         if (latestGuiPath != openGui) {
             latestGuiPath = openGui
@@ -92,14 +92,14 @@ object QuickModMenuSwitch {
     private fun handleAbstractGuis(openGui: String): String =
         if (openGui == "gg.essential.vigilance.gui.SettingsGui") {
             val clazz = Class.forName("gg.essential.vigilance.gui.SettingsGui")
-            val titleBarDelegate = clazz.getPrivateFieldValue("titleBar\$delegate", Minecraft.getInstance().screen)
+            val titleBarDelegate = clazz.getPrivateFieldValue("titleBar\$delegate", MinecraftCompat.screen)
             val titleBar = titleBarDelegate.getPrivateFieldValue(0)
             val gui = titleBar.getPrivateFieldValue("gui")
             val config = gui.getPrivateFieldValue("config")
 
             config.javaClass.name
         } else if (openGui == "cc.polyfrost.oneconfig.gui.OneConfigGui") {
-            val actualGui = Minecraft.getInstance().screen ?: return openGui
+            val actualGui = MinecraftCompat.screen ?: return openGui
             val currentPage = actualGui.getPrivateFieldValue("currentPage")
             if (currentPage.javaClass.simpleName == "ModConfigPage") {
                 val optionPage = currentPage.getPrivateFieldValue("page")

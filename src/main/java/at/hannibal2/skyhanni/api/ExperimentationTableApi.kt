@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ExperimentsJson
@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -41,7 +42,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.subtract
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -61,7 +61,7 @@ object ExperimentationTableApi {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
-    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
+    private val EXPERIMENTATION_TABLE_SKULL by SkullTextureHolder.texture("EXPERIMENTATION_TABLE")
     private val currentExperimentData = ExperimentationDataSet()
 
     val patternGroup = RepoPattern.group("enchanting.experiments")
@@ -81,10 +81,10 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST:  §r§8+§r§5Metaphysical Serum
-     * REGEX-TEST:  §r§8+§r§3149k Enchanting Exp
+     * WRAPPED-REGEX-TEST: " §r§8+§r§5Metaphysical Serum"
+     * WRAPPED-REGEX-TEST: " §r§8+§r§3149k Enchanting Exp"
      * REGEX-TEST: §8 +§r§3400k Enchanting Exp
-     * REGEX-TEST:  §r§8+§r§327k Enchanting Exp
+     * WRAPPED-REGEX-TEST: " §r§8+§r§327k Enchanting Exp"
      * REGEX-TEST: §r§8+§r§7[Lvl 1] §r§5Guardian
      */
     private val experimentsDropPattern by patternGroup.pattern(
@@ -216,9 +216,17 @@ object ExperimentationTableApi {
         "inventory.experiment-over",
         "Experiment [Oo]ver|Superpairs Rewards",
     )
+
+    /**
+     * REGEX-TEST: Bottles of Enchanting
+     */
+    val bottlesOfEnchantingInventoryPattern by patternGroup.pattern(
+        "inventory.bottles-of-enchanting",
+        "Bottles of Enchanting",
+    )
     // </editor-fold>
 
-    val experimentationTableInventory = InventoryDetector(inventoriesPattern)
+    val experimentationTableInventory = InventoryDetector { inventoriesPattern }
     val inTable get() = experimentationTableInventory.isInside()
     val isActive get() = currentExperimentData.tier != null
     val currentExperimentTier get() = currentExperimentData.tier
@@ -235,6 +243,11 @@ object ExperimentationTableApi {
     private var handleBottlesOnInvClose: Boolean = false
     private var currentBottlesInInventory: Map<NeuInternalName, Int> = mapOf()
     var miscRepoRewards: List<NeuInternalName> = emptyList()
+        private set
+
+    // "Endcap Upgrade" items (Hypixel wiki) — same Ultra Rare RNG cost as T7 books (500k XP) but
+    // no in-game "ULTRA-RARE" lore header at flip time, so detected via internal-name matching instead.
+    var ultraRareMiscItems: List<NeuInternalName> = emptyList()
         private set
 
     enum class ExperimentationMessages(private val displayName: String) {
@@ -326,7 +339,9 @@ object ExperimentationTableApi {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        miscRepoRewards = event.getConstant<ExperimentsJson>("ExperimentationTable").miscRewards
+        val experiments = event.getConstant<ExperimentsJson>("ExperimentationTable")
+        miscRepoRewards = experiments.miscRewards
+        ultraRareMiscItems = experiments.ultraRareRewards.orEmpty()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -419,7 +434,7 @@ object ExperimentationTableApi {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onClick(event: WorldClickEvent) {
         if (!inDistanceToTable(15.0)) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         event.itemInHand?.getInternalNameOrNull()?.takeIf {
             experienceBottlePattern.matches(it.asString())
@@ -433,8 +448,9 @@ object ExperimentationTableApi {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND, priority = HandleEvent.HIGH)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inTable) return
-        event.tryFireRareBookUncovered()
         event.tryUpdateCurrentActivity()
+        event.tryFireRareBookUncovered()
+        event.tryFireRareItemUncovered()
         refreshBottlesInInventory()
     }
 
@@ -486,7 +502,7 @@ object ExperimentationTableApi {
             it != lastExpOverHash && it != currentExpOverHash && it != 0
         } ?: return
 
-        currentExperimentData.type = ExperimentationTaskType.fromStringOrNull(item.hoverName.string.removeColor()) ?: return
+        currentExperimentData.type = ExperimentationTaskType.fromStringOrNull(item.cleanName) ?: return
         currentExperimentData.tier = expOverStakesLorePattern.firstMatcher(lore) {
             ExperimentationTier.byNameOrNull(group("stakes"))
         } ?: return
@@ -537,6 +553,18 @@ object ExperimentationTableApi {
                 currentExperimentData.rareFoundFired = true
                 return
             }
+        }
+    }
+
+    private fun InventoryOpenEvent.tryFireRareItemUncovered() {
+        if (currentExperimentData.rareFoundFired) return
+        if (!inSuperpairs) return
+        for ((_, item) in inventoryItems) {
+            val internalName = item.getInternalNameOrNull() ?: continue
+            if (internalName !in ultraRareMiscItems) continue
+            TableRareUncoverEvent(item.cleanName, isBook = false).post()
+            currentExperimentData.rareFoundFired = true
+            return
         }
     }
 

@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object BlizzardAchievement {
@@ -27,9 +26,9 @@ object BlizzardAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Weather Mastermind".asComponent(),
-            "Spawn a blizzard".asComponent(),
-            1f,
+            name = "Weather Mastermind",
+            description = "Spawn a blizzard",
+            userLuckAmount = 1f,
         )
         event.register(achievement, BLIZZARD_ACHIEVEMENT)
     }

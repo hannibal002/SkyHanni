@@ -14,7 +14,7 @@ class MoneyPerHourConfig {
     @ConfigOption(
         name = "Show Money per Hour",
         desc = "Display the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar.\n" +
-            "Supports Bountiful, Mushroom Cow Perk, Armor Crops. Their toggles are below."
+            "Supports Bountiful, Mushroom Cow Perk, Armor Crops. Their toggles are below.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -29,7 +29,7 @@ class MoneyPerHourConfig {
     @Expose
     @ConfigOption(
         name = "Extend Top List",
-        desc = "Add current crop to the list if its lower ranked than the set limit by extending the list."
+        desc = "Add current crop to the list if its lower ranked than the set limit by extending the list.",
     )
     @ConfigEditorBoolean
     var showCurrent: Boolean = true
@@ -53,7 +53,7 @@ class MoneyPerHourConfig {
     @Expose
     @ConfigOption(
         name = "Use Custom",
-        desc = "Use the custom format below instead of classic ➜ §eSell Offer §7and other profiles ➜ §eNPC Price."
+        desc = "Use the custom format below instead of classic ➜ §eSell Offer §7and other profiles ➜ §eNPC Price.",
     )
     @ConfigEditorBoolean
     var useCustomFormat: Boolean = false
@@ -64,7 +64,7 @@ class MoneyPerHourConfig {
     val customFormat: MutableList<CustomFormatEntry> = mutableListOf(
         CustomFormatEntry.SELL_OFFER,
         CustomFormatEntry.INSTANT_SELL,
-        CustomFormatEntry.NPC_PRICE
+        CustomFormatEntry.NPC_PRICE,
     )
 
     enum class CustomFormatEntry(private val displayName: String) {
@@ -89,13 +89,13 @@ class MoneyPerHourConfig {
     @Expose
     @ConfigOption(
         name = "Include Mooshroom Cow",
-        desc = "Include the coins you get from selling the mushrooms from your Mooshroom Cow pet."
+        desc = "Include the coins you get from selling the mushrooms from your Mooshroom Cow pet.",
     )
     @ConfigEditorBoolean
     var mooshroom: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Include Armor Drops", desc = "Include the average coins/hr from your armor.")
+    @ConfigOption(name = "Include Rare Crops", desc = "Include the average rare crop coins/hr.")
     @ConfigEditorBoolean
     var armor: Boolean = true
 

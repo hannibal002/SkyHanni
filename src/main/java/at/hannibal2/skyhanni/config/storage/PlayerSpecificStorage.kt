@@ -2,13 +2,17 @@ package at.hannibal2.skyhanni.config.storage
 
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.chat.CurrentChatDisplay
+import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
+import at.hannibal2.skyhanni.utils.SkyblockCurrency
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import java.time.LocalDate
+import kotlin.time.Duration
 
 class PlayerSpecificStorage {
     @Expose
@@ -37,6 +41,10 @@ class PlayerSpecificStorage {
 
     @Expose
     var guildMembers: MutableList<String> = mutableListOf()
+
+    /** Written and read by [at.hannibal2.skyhanni.data.CurrencyApi], for currencies shared by all profiles. */
+    @Expose
+    var currencies: MutableMap<SkyblockCurrency, Long> = enumMapOf()
 
     @Expose
     var bazaar: BazaarStorage = BazaarStorage()
@@ -95,4 +103,7 @@ class PlayerSpecificStorage {
         @Expose
         var userLuck: Float = 0f
     }
+
+    @Expose
+    var slayerPersonalBests: MutableMap<BossType, Duration> = mutableMapOf()
 }

@@ -9,13 +9,13 @@ import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuarded
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.PlayerInfo
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
@@ -79,12 +79,12 @@ object TabListData {
     }
 
     @HandleEvent(receiveCancelled = true)
-    fun onPacketReceive(event: PacketReceivedEvent) {
+    private fun onPacketReceive(event: PacketReceivedEvent) {
         if (event.packet is ClientboundPlayerInfoUpdatePacket) dirty = true
     }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (!dirty) return
         dirty = false
 
@@ -99,18 +99,19 @@ object TabListData {
         tablistCache = newTablistCache
         TabListUpdateEvent(newTablistCache).post()
 
-        val tabListOverlay = Minecraft.getInstance().gui.tabList
+        val tabListOverlay = MinecraftCompat.hud.tabList
         header = tabListOverlay.header
         val newFooter = tabListOverlay.footer
         if (newFooter != footer) {
             footer = newFooter
             if (newFooter == null || newFooter.string.isEmpty()) return
-            TablistFooterUpdateEvent(newFooter).post()
+            val footerLines = TextHelper.split(newFooter, "\n") ?: listOf(newFooter)
+            TablistFooterUpdateEvent(footerLines).post()
         }
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shcopytablistcomponent") {
             description = "Copies the tab list data to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG

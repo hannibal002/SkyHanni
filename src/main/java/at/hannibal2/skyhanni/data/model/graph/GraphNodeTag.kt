@@ -130,6 +130,14 @@ enum class GraphNodeTag(
         onlyIslands = IslandTypeTag.FISHING_HOTSPOT,
     ),
 
+    FISHING_WORMHOLE(
+        "fishing_wormhole",
+        LorenzColor.LIGHT_PURPLE,
+        "Fishing Wormhole",
+        "A wormhole where you can fish Reality Hopper.",
+        onlyIslands = IslandTypeTag.WORMHOLE,
+    ),
+
     FAIRY_SOUL(
         "fairy_soul",
         LorenzColor.DARK_PURPLE,
@@ -143,6 +151,70 @@ enum class GraphNodeTag(
         "Hideonleaf",
         "The green Shulkers.",
         onlyIsland = IslandType.GALATEA,
+    ),
+
+    TREE_PROTECTION_ORDER(
+        "tree_protection_order",
+        LorenzColor.RED,
+        "Tree Protection Order",
+        "Tree Protected by the Protection Order.",
+        onlyIslands = IslandTypeTag.FORAGING_CUSTOM_TREES,
+    ),
+
+    HIDEONSUN(
+        "hideonsun",
+        LorenzColor.YELLOW,
+        "Hideonsun",
+        "The yellow Shulkers.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    HONEYHIVE(
+        "honeyhive",
+        LorenzColor.GOLD,
+        "Honeyhive",
+        "Lootable Honeyhive.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    PANGOLIN(
+        "pangolin_area",
+        LorenzColor.BLUE,
+        "Pangolin",
+        "Possible Pangolin Critter spawn point.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    SANGER(
+        "sanger_area",
+        LorenzColor.GREEN,
+        "Sanger",
+        "Possible Sanger NPC spawn point.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
+    SAFARI_BELL(
+        "safari_bell",
+        LorenzColor.GOLD,
+        "Safari Bell",
+        "Bells to be rung in the Safari.",
+        onlyIsland = IslandType.SAFARI,
+    ),
+
+    HIDEYHO_LOCATION(
+        "hideyho",
+        LorenzColor.LIGHT_PURPLE,
+        "Hideyho Location",
+        "A location that Hideyho can be found.",
+        onlyIsland = IslandType.SAFARI,
+    ),
+
+    FLOOR_DROPS(
+        "floor_drops",
+        LorenzColor.GREEN,
+        "Floor Drops",
+        "A location where a Floor Drop can be found.",
+        onlyIsland = IslandType.SAFARI,
     ),
 
     ;

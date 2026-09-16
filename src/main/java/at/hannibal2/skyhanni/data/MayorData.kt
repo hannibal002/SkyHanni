@@ -1,3 +1,5 @@
+@file:Suppress("AnnotationOnSameLine", "AnnotationOnSeparateLine")
+
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.ElectionApi.currentMayor
@@ -10,7 +12,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 enum class ElectionCandidate(
     val mayorName: String,
     val color: String,
-    vararg val perks: Perk,
+    vararg val allPerks: Perk,
 ) {
     AATROX(
         "Aatrox",
@@ -46,7 +48,8 @@ enum class ElectionCandidate(
     FINNEGAN(
         "Finnegan",
         "§c",
-        Perk.PELT_POCALYPSE,
+        Perk.PELT_POCALYPSE, // TODO remove after 9.0.0
+        Perk.GRAND_FEAST,
         Perk.GOATED,
         Perk.BLOOMING_BUSINESS,
         Perk.PEST_ERADICATOR,
@@ -113,12 +116,12 @@ enum class ElectionCandidate(
     DISABLED("§cDisabled", "§7"),
     ;
 
-    val activePerks get() = this.perks.filter { it.isActive }
+    val activePerks get() = this.allPerks.filter { it.isActive }
 
     override fun toString() = mayorName
 
     fun addPerks(perks: List<Perk>) {
-        this.perks.forEach { it.isActive = false }
+        allPerks.forEach { it.isActive = false }
         perks.forEach { it.isActive = true }
     }
 
@@ -127,7 +130,7 @@ enum class ElectionCandidate(
     }
 
     fun addAllPerks(): ElectionCandidate {
-        this.perks.forEach { it.isActive = true }
+        allPerks.forEach { it.isActive = true }
         return this
     }
 
@@ -137,9 +140,9 @@ enum class ElectionCandidate(
 
         fun getMayorFromName(name: String): ElectionCandidate? = entries.firstOrNull { it.mayorName == name || it.name == name }
 
-        fun getMayorFromPerk(perk: Perk): ElectionCandidate? = entries.firstOrNull { it.perks.contains(perk) }
+        fun getMayorFromPerk(perk: Perk): ElectionCandidate? = entries.firstOrNull { it.allPerks.contains(perk) }
 
-        fun setAssumeMayorJson(name: String, perksJson: List<MayorPerk>): ElectionCandidate? {
+        fun setAssumeMayorJson(name: String, perksJson: List<MayorPerk>?): ElectionCandidate? {
             val mayor = getMayorFromName(name) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Unknown mayor found",
@@ -151,7 +154,7 @@ enum class ElectionCandidate(
                 return null
             }
 
-            mayor.addPerks(perksJson.mapNotNull { it.toPerk() })
+            mayor.addPerks(perksJson.orEmpty().mapNotNull { it.toPerk() })
             ElectionApi.repoPerks?.let { mayor.addAdditionalPerks(it) }
             return mayor
         }
@@ -183,7 +186,8 @@ enum class Perk(val perkName: String) {
     LONG_TERM_INVESTMENT("Long Term Investment"),
 
     // Finnegan
-    PELT_POCALYPSE("Pelt-pocalypse"),
+    @Deprecated("Remove after 9.0.0") PELT_POCALYPSE("Pelt-pocalypse"),
+    GRAND_FEAST("Grand Feast"),
     GOATED("GOATed"),
     BLOOMING_BUSINESS("Blooming Business"),
     PEST_ERADICATOR("Pest Eradicator"),

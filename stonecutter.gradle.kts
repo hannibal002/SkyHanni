@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.loom) apply false
     alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.kotlin.powerAssert) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.detekt) apply false
     id("dev.kikugie.stonecutter")
@@ -34,8 +33,7 @@ allprojects {
                 maven("https://maven.fabricmc.net")
             }
             filter {
-                includeGroup("net.fabricmc")
-                includeGroup("net.fabricmc.fabric-api")
+                includeGroupAndSubgroups("net.fabricmc")
             }
         }
 
@@ -59,7 +57,7 @@ allprojects {
             }
         }
 
-        // libautoupdate and shots
+        // libautoupdate
         exclusiveContent {
             forRepository {
                 maven("https://repo.nea.moe/releases")
@@ -69,18 +67,18 @@ allprojects {
             }
         }
 
-        // moulconfig and a few detekt rules
+        // MoulConfig and a few Detekt rules
         exclusiveContent {
-            forRepository {
-                maven("https://maven.notenoughupdates.org/releases")
-            }
+            forRepositories(
+                repositories.mavenLocal(),
+                repositories.maven("https://maven.notenoughupdates.org/releases"),
+            )
             filter {
-                includeGroup("org.notenoughupdates")
-                includeGroup("org.notenoughupdates.moulconfig")
+                includeGroupAndSubgroups("org.notenoughupdates")
             }
         }
 
-        // Hypixel mod api
+        // Hypixel Mod API
         exclusiveContent {
             forRepository {
                 maven("https://repo.hypixel.net/repository/Hypixel")
@@ -100,33 +98,31 @@ allprojects {
             }
         }
 
-        // Rei for compat plugin
+        // REI for compat plugin
         exclusiveContent {
             forRepository {
                 maven("https://maven.shedaniel.me")
             }
             filter {
-                includeGroup("me.shedaniel")
                 includeGroup("dev.architectury")
-                includeGroup("me.shedaniel.cloth")
+                includeGroupAndSubgroups("me.shedaniel")
             }
         }
 
-        maven("https://jitpack.io") {
-            // NotEnoughUpdates (compiled against), Changelog builder, Preprocessor, Discord IPC
-            content {
-                includeGroupByRegex("(com|io)\\.github\\..*")
+        exclusiveContent {
+            forRepositories(
+                repositories.maven("https://maven.azureaaron.net/releases"),
+            )
+            filter {
+                includeGroupAndSubgroups("net.azureaaron")
             }
         }
-        maven("https://maven.gegy.dev/releases/") // mojbackward
     }
 }
 
-stonecutter active "1.21.10"
+stonecutter active "26.2"
 
 stonecutter handlers {
-    inherit("accesswidener", "classtweaker")
-
     configure("fsh", "vsh") {
         commenter = line("//")
     }
@@ -134,8 +130,35 @@ stonecutter handlers {
 
 stonecutter parameters {
     replacements {
-        string(current.parsed >= "1.21.11") {
-            replace("com.google.gson.internal.`\$Gson\$Types`", "com.google.gson.internal.GsonTypes")
+        string(current.parsed < "26.2") {
+            replace("net.minecraft.world.entity.monster.cubemob.MagmaCube", "net.minecraft.world.entity.monster.MagmaCube")
+            replace("net.minecraft.world.entity.monster.cubemob.Slime", "net.minecraft.world.entity.monster.Slime")
+
+            val dyeColors = mapOf(
+                "black" to "BLACK",
+                "blue" to "BLUE",
+                "brown" to "BROWN",
+                "cyan" to "CYAN",
+                "gray" to "GRAY",
+                "green" to "GREEN",
+                "lightBlue" to "LIGHT_BLUE",
+                "lightGray" to "LIGHT_GRAY",
+                "lime" to "LIME",
+                "magenta" to "MAGENTA",
+                "orange" to "ORANGE",
+                "pink" to "PINK",
+                "purple" to "PURPLE",
+                "red" to "RED",
+                "white" to "WHITE",
+                "yellow" to "YELLOW",
+            )
+            dyeColors.forEach { (lower, upper) ->
+                replace("DYE.$lower()", "${upper}_DYE")
+                replace("WOOL.$lower()", "${upper}_WOOL")
+                replace("STAINED_GLASS.$lower()", "${upper}_STAINED_GLASS")
+                replace("STAINED_GLASS_PANE.$lower()", "${upper}_STAINED_GLASS_PANE")
+                replace("DYED_TERRACOTTA.$lower()", "${upper}_TERRACOTTA")
+            }
         }
     }
 

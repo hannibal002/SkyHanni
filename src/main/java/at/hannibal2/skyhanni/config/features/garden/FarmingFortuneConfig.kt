@@ -12,7 +12,7 @@ class FarmingFortuneConfig {
     @Expose
     @ConfigOption(
         name = "FF Display",
-        desc = "Display the true Farming Fortune for the current crop, including all crop-specific and hidden bonuses."
+        desc = "Display the true Farming Fortune for the current crop, including all crop-specific and hidden bonuses.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -31,7 +31,7 @@ class FarmingFortuneConfig {
     @Expose
     @ConfigOption(
         name = "Show Pesthunter Bonus Fortune",
-        desc = "Display the bonus fortune amount and time left from the bonus given by trading in pests at Pesthunter Phillip."
+        desc = "Display the bonus fortune amount and time left from the bonus given by trading in pests at Pesthunter Phillip.",
     )
     @ConfigEditorBoolean
     var showPestBonusFortune: Boolean = false
@@ -39,7 +39,7 @@ class FarmingFortuneConfig {
     @Expose
     @ConfigOption(
         name = "Bonus Fortune Expire Warning",
-        desc = "Warn in chat when the pest fortune buff expires."
+        desc = "Warn in chat when the pest fortune buff expires.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -47,8 +47,16 @@ class FarmingFortuneConfig {
 
     @Expose
     @ConfigOption(
+        name = "Call Phillip",
+        desc = "Click on the chat warning to call Phillip instead of warping to barn",
+    )
+    @ConfigEditorBoolean
+    var callPhillip: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Bonus Fortune Expire Title",
-        desc = "Send a title and sound when the pest fortune buff expires."
+        desc = "Send a title and sound when the pest fortune buff expires.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

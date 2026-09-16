@@ -54,7 +54,7 @@ object GardenBpsTracker {
     }
 
     @HandleEvent
-    fun onGuiRender() {
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         tracker.renderDisplay(config.pos)
     }

@@ -127,6 +127,7 @@ enum class BossType(
     GARDEN_PEST_PRAYING_MANTIS("§cPraying Mantis", Type.GARDEN_PESTS),
     GARDEN_PEST_FIREFLY("§cFirefly", Type.GARDEN_PESTS),
     GARDEN_PEST_DRAGONFLY("§cDragonfly", Type.GARDEN_PESTS),
+    GARDEN_PEST_LUNAR_MOTH("§c§lLunar Moth", Type.GARDEN_PESTS),
 
     // TODO Corleone
     // TODO bal

@@ -15,7 +15,7 @@ object FerocityDisplay {
     private val config get() = SkyHanniMod.feature.combat.ferocityDisplay
 
     @HandleEvent
-    fun onGuiRender() {
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         SkyblockStat.FEROCITY.displayValue?.let {
             config.position.renderRenderable(Renderable.text(it), posLabel = "Ferocity Display")

@@ -6,6 +6,10 @@ import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.LivingEntity
 
+/**
+ * This is a compatibility layer that helps with multiple minecraft versions and mixins.
+ * This class should be used in utils/data/api classes and not in feature classes.
+ */
 enum class EffectsCompat(
     val potion: Holder<MobEffect>,
 ) {

@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributeString
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPersonalCompactorActive
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.container.RenderableInventory.fakeInventory
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object PersonalCompactorOverlay {
@@ -128,7 +128,7 @@ object PersonalCompactorOverlay {
         PersonalCompactorConfig.VisibilityMode.EXCEPT_KEYBIND -> !config.keybind.isKeyHeld()
     }
 
-    private fun getPersonalCompactorEnabled(itemStack: ItemStack): Boolean? {
+    private fun getPersonalCompactorEnabled(itemStack: SafeItemStack): Boolean? {
         val uuid = itemStack.getItemUuid() ?: return null
         return compactorEnabledMap.getOrPut(uuid) { itemStack.getPersonalCompactorActive() }
     }

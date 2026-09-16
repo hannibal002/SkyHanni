@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -122,12 +123,18 @@ object BeaconPower {
             if (config.beaconPowerStat) {
                 append {
                     append(" (")
-                    append(stat ?: Component.literal("§cNo stat"))
+                    append(getStatDisplay())
                     append(")")
                     withColor(ChatFormatting.GRAY)
                 }
             }
         }
+    }
+
+    private fun getStatDisplay(): Component {
+        val stat = stat ?: return Component.literal("§cNo stat")
+        if (!config.beaconPowerCompressStat) return stat
+        return TextHelper.split(stat, " ")?.firstOrNull() ?: stat
     }
 
     @HandleEvent

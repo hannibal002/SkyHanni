@@ -67,7 +67,7 @@ class ChatConfig {
     @ConfigOption(
         name = "Copy Chat",
         desc = "Right click a chat message to copy it. Holding Shift will copy the message with " +
-            "Shwords applied, and holding Ctrl will copy only one line."
+            "Shwords applied, and holding Ctrl will copy only one line.",
     )
     @SearchTag("control")
     @ConfigEditorBoolean
@@ -194,15 +194,20 @@ class ChatConfig {
         name = "Show Actual Powder Gained",
         desc = "Shows both base and actual Gemstone Powder amounts in chat messages, " +
             "accounting for 2x Powder events, Sky Mall perks, and other multipliers.\n" +
-            "§eFormat: §dGemstone Powder §r§8x1,944 §7(x3,888)"
+            "§eFormat: §dGemstone Powder §r§8x1,944 §7(x3,888)",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var showEffectivePowder: Boolean = false
 
+    // TODO rename to hideForagingBuffMessages
     @Expose
-    @ConfigOption(name = "Hide Lottery Messages", desc = "Hide the Lottery messages outside of Foraging Islands.")
+    @ConfigOption(
+        name = "Hide Foraging Buff Messages",
+        desc = "Hide the Lottery and Beekeeper messages outside of Foraging Islands.",
+    )
     @ConfigEditorBoolean
+    @SearchTag("Lottery Beekeeper")
     @FeatureToggle
     var hideLottery: Boolean = true
 

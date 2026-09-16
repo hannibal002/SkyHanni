@@ -16,10 +16,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object TradeValue {
@@ -40,16 +40,24 @@ object TradeValue {
     private var yourDisplay = emptyList<Renderable>()
 
     /**
-     * REGEX-TEST:  §71
-     * REGEX-TEST:  §8(1,000)
+     * WRAPPED-REGEX-TEST: " §71"
+     * WRAPPED-REGEX-TEST: " §8(1,000)"
      */
     private val coinPattern by RepoPattern.pattern(
         "inventory.tradevalue.coins",
         "§(?<type>[87])\\(?(?<number>[^)]*)\\)?",
     )
 
+    /**
+     * REGEX-TEST: You     1
+     */
+    private val tradeMenuPattern by RepoPattern.pattern(
+        "inventory.tradevalue.menu",
+        "You {5}.*",
+    )
+
     // Detects trade menu thx NEU
-    val inventory = InventoryDetector({ onOpen() }) { name -> name.startsWith("You     ") }
+    val inventory = InventoryDetector(onOpenInventory = { onOpen() }) { tradeMenuPattern }
 
     init {
         RenderDisplayHelper(
@@ -73,8 +81,8 @@ object TradeValue {
         if (!inventory.isInside()) return
         if (!event.isMod(2)) return
 
-        val otherMap = mutableMapOf<Int, ItemStack>()
-        val yourMap = mutableMapOf<Int, ItemStack>()
+        val otherMap = mutableMapOf<Int, SafeItemStack>()
+        val yourMap = mutableMapOf<Int, SafeItemStack>()
         // Gets total value of trade
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.containerSlot in otherList) {
@@ -98,7 +106,7 @@ object TradeValue {
         }
     }
 
-    private fun calculatePrice(items: MutableMap<Int, ItemStack>): Pair<Double?, Double> {
+    private fun calculatePrice(items: MutableMap<Int, SafeItemStack>): Pair<Double?, Double> {
         var coin: Double? = null
         var total = 0.0
         for ((slot, stack) in items.toMap()) {
@@ -134,11 +142,11 @@ object TradeValue {
 
         if (indicator == 0) {
             yourDisplay = buildList {
-                addToList(map.values, "§eTrade Value")
+                addToList(map.values, "§eTrade Value Your")
             }
         } else {
             otherDisplay = buildList {
-                addToList(map.values, "§eTrade Value")
+                addToList(map.values, "§eTrade Value Other")
             }
         }
     }

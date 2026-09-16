@@ -32,6 +32,9 @@ class OrbitSystemRenderable private constructor(
     private val orbitSpeed: Int = 10,
     private val orbitDirection: OrbitDirection = OrbitDirection.CLOCKWISE,
     private val subBodies: Collection<Renderable>,
+    initialAngle: Float = 0f,
+    initialLastRenderTime: SimpleTimeMark = SimpleTimeMark.now(),
+    private val onRenderStateChange: ((Float, SimpleTimeMark) -> Unit)? = null,
 ) : TimeDependentRenderable {
 
     private val subBodyW = (subBodies.maxOfOrNull { it.width } ?: 0)
@@ -45,13 +48,14 @@ class OrbitSystemRenderable private constructor(
     override val horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
     override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-    override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
-    private var currentAngle = 0f
+    override var lastRenderTime: SimpleTimeMark = initialLastRenderTime
+    private var currentAngle = initialAngle
 
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
 
         val angleDelta = orbitSpeed * deltaTime.inPartialSeconds * orbitDirection.dirFactor
         currentAngle = (currentAngle + angleDelta).toFloat() % 360f
+        onRenderStateChange?.invoke(currentAngle, lastRenderTime)
         mainBody.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
 
         if (subBodies.isEmpty()) return
@@ -98,6 +102,18 @@ class OrbitSystemRenderable private constructor(
             orbitSpeed: Int = 10,
             orbitDirection: OrbitDirection = OrbitDirection.CLOCKWISE,
             subBodies: Collection<Renderable>,
-        ) = OrbitSystemRenderable(mainBody, subBodySpacing, orbitSpeed, orbitDirection, subBodies)
+            initialAngle: Float = 0f,
+            initialLastRenderTime: SimpleTimeMark = SimpleTimeMark.now(),
+            onRenderStateChange: ((Float, SimpleTimeMark) -> Unit)? = null,
+        ) = OrbitSystemRenderable(
+            mainBody,
+            subBodySpacing,
+            orbitSpeed,
+            orbitDirection,
+            subBodies,
+            initialAngle,
+            initialLastRenderTime,
+            onRenderStateChange,
+        )
     }
 }

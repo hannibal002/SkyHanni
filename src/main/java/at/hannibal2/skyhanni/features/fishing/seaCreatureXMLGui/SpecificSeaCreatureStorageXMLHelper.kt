@@ -4,10 +4,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.xml.Bind
 
-
-class SpecificSeaCreatureStorageXMLHelper(
-    private val from: SpecificSeaCreatureSettings,
-) {
+class SpecificSeaCreatureStorageXMLHelper(from: SpecificSeaCreatureSettings) {
     @field:Bind
     var name: String = from.name
 
@@ -39,9 +36,5 @@ class SpecificSeaCreatureStorageXMLHelper(
     var shouldWarnWhenCocooned: Boolean? = from.shouldWarnWhenCocooned
 
     @Bind
-    fun getName(): StructuredText {
-        return name.asStructuredText()
-    }
-
+    fun getName(): StructuredText = name.asStructuredText()
 }
-

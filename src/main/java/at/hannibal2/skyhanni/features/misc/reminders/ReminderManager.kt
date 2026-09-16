@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -25,7 +27,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ReminderManager {
-
     private const val REMINDERS_PER_PAGE = 10
 
     // Random numbers chosen, this will be used to delete the old list and action messages
@@ -135,6 +136,7 @@ object ReminderManager {
     ) { arguments, reminder ->
         val time = parseDuration(arguments.first()) ?: return@actionReminder "§cInvalid time format!"
         reminder.remindAt = SimpleTimeMark.now().plus(time)
+        reminder.lastReminder = SimpleTimeMark.farPast()
         "§6Reminder moved to ${time.format()}"
     }
 
@@ -151,12 +153,14 @@ object ReminderManager {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed(event: SecondPassedEvent) {
         val remindersToSend = mutableListOf<Component>()
+        val firedReasons = mutableListOf<String>()
 
         for ((id, reminder) in getSortedReminders()) {
             if (!reminder.shouldRemind(config.interval.minutes)) continue
             reminder.lastReminder = SimpleTimeMark.now()
+            firedReasons.add(reminder.reason)
             var actionsComponent: Component? = null
 
             if (!config.autoDeleteReminders) {
@@ -189,13 +193,19 @@ object ReminderManager {
         }
 
         if (remindersToSend.isNotEmpty()) {
+            SoundUtils.repeatSound(150, 3, SoundUtils.createSound("block.note_block.pling", 1.5f, isWarning = true))
+            if (config.showTitle) {
+                val subtitle = if (firedReasons.size == 1) "§e${firedReasons.first()}" else null
+                val titleText = if (firedReasons.size == 1) "§cReminder!" else "§c${firedReasons.size} Reminders!"
+                TitleManager.sendTitle(titleText, subtitleText = subtitle, duration = 3.seconds)
+            }
             val id = if (config.autoDeleteReminders) 0 else REMINDERS_MESSAGE_ID
             TextHelper.join(remindersToSend, separator = TextHelper.NEWLINE).send(id)
         }
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shremind") {
             description = "Set a reminder for yourself"
             literal("list") {

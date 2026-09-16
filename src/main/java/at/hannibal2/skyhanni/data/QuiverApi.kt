@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowTypeJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.OwnInventoryMenuUpdateEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -15,16 +15,18 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -123,11 +125,19 @@ object QuiverApi {
     private val quiverInventoryNamePattern by group.pattern("quivername", "Quiver")
 
     /**
-     * REGEX-TEST: §7Active Arrow: §fFlint Arrow §7(§e2880§7)
+     * REGEX-TEST: Active Arrow: Flint Arrow (2880)
      */
     private val quiverInventoryPattern by group.pattern(
         "quiver.inventory",
-        "§7Active Arrow: §.(?<type>.*) §7\\(§e(?<amount>.*)§7\\)",
+        "Active Arrow: (?<type>.*) \\((?<amount>[\\d,]+)\\)",
+    )
+
+    /**
+     * REGEX-TEST: Arrows Remaining: 1,327
+     */
+    private val quiverPreviewAmountPattern by group.pattern(
+        "quiver.preview.amount",
+        "Arrows Remaining: (?<amount>[\\d,]+)",
     )
 
     @HandleEvent
@@ -241,48 +251,85 @@ object QuiverApi {
         val achievement = Achievement(
             "Arrowslinger".asComponent(),
             "Shoot 100,000 Arrows".asComponent(),
-            50f,
-            false,
-            listOf(100_000)
+            userLuckAmount = 50f,
+            tiers = listOf(100_000),
         )
         event.register(achievement, ARROW_ACHIEVEMENT)
     }
 
     @HandleEvent
-    fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (!isEnabled() || event.slot != 44) return
+    fun onOwnInventoryMenuUpdate(event: OwnInventoryMenuUpdateEvent) {
+        if (!isEnabled()) return
         val stack = event.itemStack
-        if (stack.getExtraAttributes()?.contains("quiver_arrow") == true) {
-            for (line in stack.getLore()) {
-                quiverInventoryPattern.matchMatcher(line) {
-                    val type = group("type")
-                    val amount = group("amount").formatInt()
-                    val currentArrowType = getArrowByNameOrNull(type) ?: run {
-                        if (arrows.isEmpty()) {
-                            ErrorManager.skyHanniError("Quiver arrows list is empty! Type /shupdaterepo to try to fix it.")
-                        }
-                        ErrorManager.logErrorWithData(
-                            UnknownArrowType("Unknown arrow type: $type"),
-                            "Unknown arrow type: $type",
-                            "arrows" to arrows,
-                            "line" to line,
-                        )
-                        return
-                    }
-                    if (currentArrow == currentArrowType && amount != currentAmount) {
-                        val diff = currentAmount - amount
-                        if (diff > 0) {
-                            val achievement = AchievementManager.getAchievement(ARROW_ACHIEVEMENT)
-                            AchievementManager.updateTieredAchievement(ARROW_ACHIEVEMENT, achievement.data.progress + diff)
-                        }
-                    }
-                    if (currentArrowType != currentArrow || amount != currentAmount) {
-                        currentArrow = currentArrowType
-                        currentAmount = amount
-                        postUpdateEvent()
-                    }
+        val lore = stack.getLoreComponent().map { it.string }
+
+        for (line in lore) {
+            quiverInventoryPattern.matchMatcher(line) {
+                val type = group("type")
+                val amount = group("amount").formatInt()
+                val currentArrowType = getArrowByNameOrNull(type) ?: run {
+                    logUnknownArrowType(type, "line" to line)
+                    return
                 }
+                updateCurrentArrow(currentArrowType, amount)
+                return
             }
+        }
+
+        val amount = getQuiverPreviewAmount(lore) ?: return
+        val isQuiverPreview = stack.getExtraAttributes()?.contains("quiver_arrow") == true
+        if (!isQuiverPreview) return
+
+        val currentArrowType = stack.getQuiverPreviewArrowTypeOrNull() ?: run {
+            val type = stack.cleanName
+            logUnknownArrowType(type, "item name" to type, "lore" to lore)
+            return
+        }
+        updateCurrentArrow(currentArrowType, amount)
+    }
+
+    private fun getQuiverPreviewAmount(lore: List<String>): Int? {
+        for (line in lore) {
+            quiverPreviewAmountPattern.matchMatcher(line) {
+                return group("amount").formatInt()
+            }
+        }
+        return null
+    }
+
+    private fun SafeItemStack.getQuiverPreviewArrowTypeOrNull(): ArrowType? {
+        getArrowByNameOrNull(cleanName.trimWhiteSpace())?.let { return it }
+        return getLoreComponent().firstNotNullOfOrNull { line ->
+            getArrowByNameOrNull(line.string.trimWhiteSpace())
+        }
+    }
+
+    private fun logUnknownArrowType(type: String, vararg extraData: Pair<String, Any?>) {
+        if (arrows.isEmpty()) {
+            ErrorManager.skyHanniError("Quiver arrows list is empty! Type /shupdaterepo to try to fix it.")
+        }
+        ErrorManager.logErrorWithData(
+            UnknownArrowType("Unknown arrow type: $type"),
+            "Unknown arrow type: $type",
+            "arrows" to arrows,
+            *extraData,
+        )
+    }
+
+    private fun updateCurrentArrow(currentArrowType: ArrowType, amount: Int) {
+        val previousArrow = currentArrow
+        val previousAmount = currentAmount
+        if (previousArrow == currentArrowType && amount != previousAmount) {
+            val diff = previousAmount - amount
+            if (diff > 0) {
+                val achievement = AchievementManager.getAchievement(ARROW_ACHIEVEMENT)
+                AchievementManager.updateTieredAchievement(ARROW_ACHIEVEMENT, achievement.data.progress + diff)
+            }
+        }
+        if (currentArrowType != previousArrow || amount != previousAmount) {
+            currentArrow = currentArrowType
+            currentAmount = amount
+            postUpdateEvent()
         }
     }
 
@@ -292,7 +339,7 @@ object QuiverApi {
 
     fun isHoldingBow(): Boolean {
         InventoryUtils.getItemInHand()?.let {
-            return it.item is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
+            return it.getItem() is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
         } ?: return false
     }
 
@@ -310,7 +357,7 @@ object QuiverApi {
 
     private fun checkBowInventory() {
         hasBow = InventoryUtils.getItemsInOwnInventory().any {
-            it.item is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
+            it.getItem() is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
         }
     }
 

@@ -93,7 +93,7 @@ abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedI
                 label = sourceLabel,
                 current = data.selectedBucket,
                 onChange = { new ->
-                    modifyEachMode {
+                    modify {
                         it.selectedBucket = new
                     }
                 },
