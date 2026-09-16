@@ -74,7 +74,7 @@ object DianaApi {
     /**
      * REGEX-TEST: The mythological ritual isn't active!
      */
-    private val ritualNotActivePattern by group.pattern(
+    private val ritualNotActivePattern by patternGroup.pattern(
         "ritual-not-active",
         "The mythological ritual isn't active!",
     )
