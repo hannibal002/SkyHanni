@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ParticleChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.core.particles.ColorParticleOption
 import net.minecraft.util.ARGB
 
@@ -21,10 +20,10 @@ import net.minecraft.util.ARGB
 object ColorParticleFix {
     private val config get() = SkyHanniMod.feature.misc
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     private fun onParticleChange(event: ParticleChangeEvent) {
+        if (!config.fixColorParticles) return
         val particleOptions = event.particleOptions
-        if (!isEnabled()) return
         if (particleOptions is ColorParticleOption) {
             particleOptions.color = ARGB.colorFromFloat(
                 particleOptions.alpha,
@@ -35,6 +34,4 @@ object ColorParticleFix {
         }
         event.particleOptions = particleOptions
     }
-
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.fixColorParticles
 }
