@@ -38,6 +38,8 @@ object ChatFilter {
     private val foragingPatternGroup = chatFilterGroup.group("foraging")
     private val miscPatternGroup = chatFilterGroup.group("hypixel-misc")
     private val eventPatternGroup = chatFilterGroup.group("event")
+    private val miningAbilityPatternGroup = chatFilterGroup.group("mining-ability")
+    private val deployablePatternGroup = chatFilterGroup.group("deployable")
 
     // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
@@ -250,13 +252,36 @@ object ChatFilter {
         "(?:§a)?§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
     )
     private val uselessNotificationMessages = listOf(
-        "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!",
-        "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!",
-        "§cYour Mining Speed Boost has expired!",
-        "§a§r§6Mining Speed Boost §r§ais now available!",
         "§aYou have just received §r§60 coins §r§aas interest in your personal bank account!",
         "§aSince you've been away you earned §r§60 coins §r§aas interest in your personal bank account!",
         "§aYou have just received §r§60 coins §r§aas interest in your co-op bank account!",
+    )
+
+    // Mining Abilities
+    /**
+     * REGEX-TEST: §aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!
+     * REGEX-TEST: §aYou used your §r§6Pickobulus §r§aPickaxe Ability!
+     */
+    private val miningAbilityUsedPattern by miningAbilityPatternGroup.pattern(
+        "used",
+        "§aYou used your §r.*§r§aPickaxe Ability!",
+    )
+
+    /**
+     * REGEX-TEST: §cYour Mining Speed Boost has expired!
+     */
+    private val miningAbilityExpiredPattern by miningAbilityPatternGroup.pattern(
+        "expired",
+        "§cYour (?:Mining Speed Boost|Maniac Miner|Tunnel Vision|Gemstone Infusion|Sheer Force) has expired!",
+    )
+
+    // Deployables
+    /**
+     * REGEX-TEST: §eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!
+     */
+    private val deployableRemovedPattern by deployablePatternGroup.pattern(
+        "removed",
+        "§eYour previous §r.*§r§ewas removed!",
     )
 
     // Party
@@ -578,6 +603,8 @@ object ChatFilter {
         "hoppity_appear" to listOf(hoppityAppearPattern),
         "hoppity_begin" to listOf(hoppityBeginPattern),
         "profile_join" to profileJoinPatterns,
+        "mining_abilities" to listOf(miningAbilityUsedPattern, miningAbilityExpiredPattern),
+        "deployable_removed" to listOf(deployableRemovedPattern),
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -647,11 +674,13 @@ object ChatFilter {
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 
-        config.bzAhMinis && message.isPresent("bz_ah_minis") -> "bz_ah_minis"
+        config.transactionSetup && message.isPresent("bz_ah_minis") -> "bz_ah_minis"
         config.slayer && message.isPresent("slayer") -> "slayer"
         config.slayerDrop && message.isPresent("slayer_drop") -> "slayer_drop"
         config.uselessDrop && message.isPresent("useless_drop") -> "useless_drop"
-        config.uselessNotification && message.isPresent("useless_notification") -> "useless_notification"
+        config.uselessNotifications && message.isPresent("useless_notification") -> "useless_notification"
+        config.miningAbilities && message.isPresent("mining_abilities") -> "mining_abilities"
+        config.deployables && message.isPresent("deployable_removed") -> "deployable_removed"
         config.party && message.isPresent("party") -> "party"
         config.auctionBazaarSetup && message.isPresent("money") -> "money"
         config.winterIsland && message.isPresent("winter_island") -> "winter_island"
@@ -786,12 +815,14 @@ object ChatFilter {
         event.move(61, "chat.filterType.powderMiningFilter", "chat.filterType.powderMining")
         event.move(61, "chat.filterType.gemstoneFilterConfig", "chat.filterType.powderMining.gemstone")
         event.move(107, "chat.filterType.guildExp", "chat.filterType.guildEventExp")
-        event.move(147, "chat.filterType.others", "chat.filterType.bzAhMinis") { element ->
+        event.move(147, "chat.filterType.others", "chat.filterType.transactionSetup") { element ->
             val enabled = element.asBoolean
             event.add(147, "chat.filterType.slayer") { JsonPrimitive(enabled) }
             event.add(147, "chat.filterType.slayerDrop") { JsonPrimitive(enabled) }
             event.add(147, "chat.filterType.uselessDrop") { JsonPrimitive(enabled) }
-            event.add(147, "chat.filterType.uselessNotification") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.uselessNotifications") { JsonPrimitive(enabled) }
+            // Mining Abilities and Deployables deliberately default to off and don't inherit "others",
+            // since they can be useful information and were only bundled into "others" incidentally.
             event.add(147, "chat.filterType.party") { JsonPrimitive(enabled) }
             event.add(147, "chat.filterType.auctionBazaarSetup") { JsonPrimitive(enabled) }
             event.add(147, "chat.filterType.winterIsland") { JsonPrimitive(enabled) }

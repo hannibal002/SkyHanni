@@ -195,29 +195,38 @@ class FilterTypesConfig {
 
     @Expose
     @ConfigOption(
-        name = "Bazaar/Auction House/Bank Setup",
+        name = "Transaction Setup",
         desc = "Hide the progress messages while using the Bazaar, Auction House, or Bank (e.g. 'Putting item in escrow...').",
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var bzAhMinis: Boolean = false
+    var transactionSetup: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Slayer", desc = "Hide Slayer Quest start and complete announcements.")
+    @ConfigOption(
+        name = "Transaction Orders",
+        desc = "Hide Bazaar order setup/cancellation messages and the Auction House collection reminder.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var auctionBazaarSetup: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Slayer Quests", desc = "Hide Slayer Quest start and complete announcements.")
     @ConfigEditorBoolean
     @FeatureToggle
     var slayer: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Slayer Drop", desc = "Hide Slayer rare and very rare drop announcements.")
+    @ConfigOption(name = "Slayer Drops", desc = "Hide Slayer rare and very rare drop announcements.")
     @ConfigEditorBoolean
     @FeatureToggle
     var slayerDrop: Boolean = false
 
     @Expose
     @ConfigOption(
-        name = "Useless Drop",
-        desc = "Hide rare drop announcements for useless items, e.g. Carrot, Potato, Enchanted Ender Pearl.",
+        name = "Low Value Drops",
+        desc = "Hide rare drop announcements for low value items, e.g. Carrot, Potato, Enchanted Ender Pearl.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -225,12 +234,38 @@ class FilterTypesConfig {
 
     @Expose
     @ConfigOption(
-        name = "Useless Notification",
-        desc = "Hide useless notifications, e.g. tipped players, Mining Speed Boost, bank interest.",
+        name = "Useless Notifications",
+        desc = "Hide player tipped and bank interest payout messages.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var uselessNotification: Boolean = false
+    var uselessNotifications: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Mining Abilities",
+        desc = "Hide Heart of the Mountain pickaxe ability used/expired messages for Mining Speed Boost, " +
+            "Maniac Miner, Tunnel Vision, Gemstone Infusion, Sheer Force, and Pickobulus.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var miningAbilities: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Deployables",
+        desc = "Hide the message when a previously placed deployable (Power Orb, Lantern, Flare, " +
+            "Black Hole, etc.) gets replaced by a new one.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var deployables: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Snow Cannons", desc = "Hide Jerry's Workshop Snow Cannon mount messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var winterIsland: Boolean = false
 
     @Expose
     @ConfigOption(name = "Party Separator", desc = "Hide the party message separator line.")
@@ -240,23 +275,8 @@ class FilterTypesConfig {
 
     @Expose
     @ConfigOption(
-        name = "Bazaar/Auction House Orders",
-        desc = "Hide Bazaar order setup/cancellation messages and the Auction House collection reminder.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var auctionBazaarSetup: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Winter Island", desc = "Hide Winter Island Snow Cannon mount messages.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var winterIsland: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Useless Warning",
-        desc = "Hide useless warning messages, e.g. rate limit warnings, combat restrictions.",
+        name = "Annoying Warnings",
+        desc = "Hide annoying warning messages, e.g. rate limit warnings, combat restrictions.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
