@@ -149,7 +149,9 @@ object DamageIndicatorManager {
         mobFinder?.handleChat(event.cleanMessage)
     }
 
+    // TODO split up
     @HandleEvent
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
