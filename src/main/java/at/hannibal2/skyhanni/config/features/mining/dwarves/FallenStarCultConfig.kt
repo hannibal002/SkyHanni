@@ -25,11 +25,13 @@ class FallenStarCultConfig {
     )
     @ConfigEditorDraggableList
     val onlyShowWhen: MutableList<ShowCondition> = mutableListOf(
+        ShowCondition.IN_DWARVEN_MINES,
         ShowCondition.IN_CULT_ROOM,
         ShowCondition.WEARING_HELMET,
     )
 
     enum class ShowCondition(private val displayName: String) {
+        IN_DWARVEN_MINES("In Dwarven Mines"),
         IN_CULT_ROOM("In Cult Room"),
         WEARING_HELMET("Wearing Fallen Star Helmet"),
         ;
