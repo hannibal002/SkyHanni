@@ -35,13 +35,13 @@ class ForagingTrackerConfig {
     )
     @ConfigEditorDraggableList
     val compactGiftBonusDropsList: MutableList<TreeGiftBonusDropCategory> = mutableListOf(
-        TreeGiftBonusDropCategory.UNCOMMON_DROPS,
-        TreeGiftBonusDropCategory.ENCHANTED_BOOKS,
-        TreeGiftBonusDropCategory.MOBS,
-        TreeGiftBonusDropCategory.BOOSTERS,
-        TreeGiftBonusDropCategory.SHARDS,
-        TreeGiftBonusDropCategory.RUNES,
-        TreeGiftBonusDropCategory.MISC,
+        UNCOMMON_DROPS,
+        ENCHANTED_BOOKS,
+        MOBS,
+        BOOSTERS,
+        SHARDS,
+        RUNES,
+        MISC,
     )
 
     @Suppress("MaxLineLength")

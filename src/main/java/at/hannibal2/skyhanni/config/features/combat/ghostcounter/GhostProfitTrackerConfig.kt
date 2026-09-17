@@ -23,12 +23,12 @@ class GhostProfitTrackerConfig {
     @ConfigOption(name = "Display Text", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
     val ghostTrackerText: MutableList<GhostTrackerLines> = mutableListOf(
-        GhostTrackerLines.KILLS,
-        GhostTrackerLines.GHOSTS_SINCE_SORROW,
-        GhostTrackerLines.MAX_KILL_COMBO,
-        GhostTrackerLines.COMBAT_XP_GAINED,
-        GhostTrackerLines.AVERAGE_MAGIC_FIND,
-        GhostTrackerLines.BESTIARY_KILLS
+        KILLS,
+        GHOSTS_SINCE_SORROW,
+        MAX_KILL_COMBO,
+        COMBAT_XP_GAINED,
+        AVERAGE_MAGIC_FIND,
+        BESTIARY_KILLS,
     )
 
     @ConfigOption(

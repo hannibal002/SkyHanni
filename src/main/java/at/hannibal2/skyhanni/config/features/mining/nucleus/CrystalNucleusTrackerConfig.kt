@@ -44,7 +44,7 @@ class CrystalNucleusTrackerConfig {
     @Expose
     @ConfigOption(name = "Professor Usage", desc = "Determine how cost for Sapphire Crystal is calculated.")
     @ConfigEditorDropdown
-    val professorUsage: Property<ProfessorUsageType> = Property.of(ProfessorUsageType.ROBOT_PARTS)
+    val professorUsage: Property<ProfessorUsageType> = Property.of(ROBOT_PARTS)
 
     enum class ProfessorUsageType(private val displayName: String) {
         ROBOT_PARTS("§9Robot Parts"),

@@ -159,7 +159,7 @@ class ConfigManager {
                 val lenientGson = BaseGsonBuilder.lenientGson().create()
                 logger.log("load-$fileName-now")
 
-                output = if (fileType == ConfigFileType.FEATURES) {
+                output = if (fileType == FEATURES) {
                     val jsonObject = lenientGson.fromJson(text, com.google.gson.JsonObject::class.java)
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
                     val run = { lenientGson.fromJson(newJsonObject, defaultValue.javaClass) }

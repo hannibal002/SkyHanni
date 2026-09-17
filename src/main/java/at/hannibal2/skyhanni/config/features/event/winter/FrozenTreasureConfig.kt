@@ -25,19 +25,19 @@ class FrozenTreasureConfig {
     @ConfigOption(name = "Text Format", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
     val textFormat: MutableList<FrozenTreasureDisplayEntry> = mutableListOf(
-        FrozenTreasureDisplayEntry.TITLE,
-        FrozenTreasureDisplayEntry.TREASURES_MINED,
-        FrozenTreasureDisplayEntry.TOTAL_ICE,
-        FrozenTreasureDisplayEntry.ICE_PER_HOUR,
-        FrozenTreasureDisplayEntry.COMPACT_PROCS,
-        FrozenTreasureDisplayEntry.SPACER_1,
-        FrozenTreasureDisplayEntry.WHITE_GIFT,
-        FrozenTreasureDisplayEntry.GREEN_GIFT,
-        FrozenTreasureDisplayEntry.RED_GIFT,
-        FrozenTreasureDisplayEntry.ENCHANTED_ICE,
-        FrozenTreasureDisplayEntry.ENCHANTED_PACKED_ICE,
-        FrozenTreasureDisplayEntry.GLACIAL_FRAGMENT,
-        FrozenTreasureDisplayEntry.GLACIAL_TALISMAN
+        TITLE,
+        TREASURES_MINED,
+        TOTAL_ICE,
+        ICE_PER_HOUR,
+        COMPACT_PROCS,
+        SPACER_1,
+        WHITE_GIFT,
+        GREEN_GIFT,
+        RED_GIFT,
+        ENCHANTED_ICE,
+        ENCHANTED_PACKED_ICE,
+        GLACIAL_FRAGMENT,
+        GLACIAL_TALISMAN,
     )
 
     enum class FrozenTreasureDisplayEntry(private val displayName: String) {

@@ -32,9 +32,9 @@ class PestProfitTrackerConfig {
     )
     @ConfigEditorDraggableList
     val onlyWhenHolding: MutableList<HeldItem> = mutableListOf(
-        HeldItem.SPRAYONATOR,
-        HeldItem.VACUUM,
-        HeldItem.TIMEOUT,
+        SPRAYONATOR,
+        VACUUM,
+        TIMEOUT,
     )
 
     enum class HeldItem(val displayName: String) {
