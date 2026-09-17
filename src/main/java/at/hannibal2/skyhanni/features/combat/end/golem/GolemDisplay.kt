@@ -62,6 +62,7 @@ object GolemDisplay {
         val showZealots: Boolean,
         val damage: Double?,
         val zealots: Int,
+        val bestiaryWidgetMissing: Boolean,
     )
 
     private var state: State? = null
@@ -101,6 +102,7 @@ object GolemDisplay {
         showZealots = config.showZealots,
         damage = EndDpsTracker.displayDamage(),
         zealots = GolemZealotCounter.kills,
+        bestiaryWidgetMissing = GolemZealotCounter.bestiaryWidgetMissing,
     )
 
     private fun buildTitle(): Renderable {
@@ -149,7 +151,9 @@ object GolemDisplay {
             state.damage?.let { add(Renderable.text("§7Damage: §a${it.shortFormat()}")) }
         }
         if (state.showZealots) {
-            add(Renderable.text("§7Zealots: §f${state.zealots.addSeparators()}"))
+            // The count still works without the widget, only less exactly - so the hint says how to fix it.
+            val hint = if (state.bestiaryWidgetMissing) " §7(enable Bestiary in /widget)" else ""
+            add(Renderable.text("§7Zealots: §f${state.zealots.addSeparators()}$hint"))
         }
     }
 }
