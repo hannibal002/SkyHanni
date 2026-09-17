@@ -18,6 +18,14 @@ class MineshaftWaypointsConfig {
 
     @Expose
     @ConfigOption(
+        name = "All Corpses Found Alert",
+        desc = "Alert when all corpses in the Mineshaft have been found.",
+    )
+    @ConfigEditorBoolean
+    var allCorpsesFoundAlert: Boolean = true
+
+    @Expose
+    @ConfigOption(
         name = "Auto Share Corpses",
         desc = "Automatically share the location and type of found corpses in party chat.",
     )
