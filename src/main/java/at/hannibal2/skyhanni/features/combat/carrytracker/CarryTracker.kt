@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.width
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
@@ -116,7 +115,7 @@ object CarryTracker {
                 if (types.isNotEmpty()) ChatUtils.chat {
                     append("Click to add carries for:")
 
-                    val chatWidth = Minecraft.getInstance().gui.chat.width
+                    val chatWidth = Minecraft.getInstance().gui.hud.chat.width
                     val prefixWidth = "[SkyHanni] ".width()
                     val spaceWidth = " ".width()
 
