@@ -106,6 +106,8 @@ object CarryTracker {
                 val customer = findCustomer(name)
                 if (customer != null) {
                     customer.coinsPaid += coins
+                    recentTrades.remove(name)
+
                     updateDisplay()
                 }
 
