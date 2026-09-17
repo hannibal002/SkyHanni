@@ -98,19 +98,15 @@ object ConfigUtils {
     private fun MoulConfigEditor<*>.jumpToOption(option: ProcessedOption): Boolean {
         search("")
         if (!goToOption(option)) return false
-        openEditor(this)
+        val current = MinecraftCompat.screen as? MoulConfigScreenComponent
+        if ((current?.guiContext?.root as? MoulConfigEditorComponent)?.editor !== this) {
+            openEditor(this)
+        }
         return true
     }
 
-    fun openEditor(editor: MoulConfigEditor<*>) {
-        SkyHanniMod.screenToOpen = createConfigScreen(editor, findPreviousScreen(editor))
-    }
-
-    // Closing an editor that was linked out from another config screen (e.g. Pet Display) should return to that screen
-    private fun findPreviousScreen(editor: MoulConfigEditor<*>): Screen? {
-        val current = MinecraftCompat.screen as? MoulConfigScreenComponent ?: return null
-        val currentEditor = (current.guiContext.root as? MoulConfigEditorComponent)?.editor
-        return current.takeIf { currentEditor !== editor }
+    fun openEditor(editor: MoulConfigEditor<*>, previousScreen: Screen? = null) {
+        SkyHanniMod.screenToOpen = createConfigScreen(editor, previousScreen)
     }
 
     internal fun createConfigScreen(editor: MoulConfigEditor<*>, previousScreen: Screen? = null): MoulConfigScreenComponent =

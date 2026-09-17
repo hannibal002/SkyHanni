@@ -7,8 +7,10 @@ import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualT
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorAccordion
+import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
@@ -24,7 +26,10 @@ object IndividualTrackerConfigGuiManager {
         mutableMapOf<GenericIndividualTrackerConfig<*>, MoulConfigEditor<IndividualTrackerSettingsConfig>>()
 
     fun open(tracker: GenericIndividualTrackerConfig<*>) {
-        ConfigUtils.openEditor(getEditorInstance(tracker))
+        ConfigUtils.openEditor(
+            getEditorInstance(tracker),
+            previousScreen = MinecraftCompat.screen as? MoulConfigScreenComponent,
+        )
     }
 
     private fun getEditorInstance(tracker: GenericIndividualTrackerConfig<*>) = editors.getOrPut(tracker) {
