@@ -115,6 +115,7 @@ object CarryTracker {
                 if (types.isNotEmpty()) ChatUtils.chat {
                     append("Click to add carries for:")
 
+                    //~ if < 26.2 'gui.hud.chat' -> 'gui.chat'
                     val chatWidth = Minecraft.getInstance().gui.hud.chat.width
                     val prefixWidth = "[SkyHanni] ".width()
                     val spaceWidth = " ".width()
