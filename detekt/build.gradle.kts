@@ -13,8 +13,15 @@ dependencies {
     implementation(libs.autoservice.annotations)
     implementation(libs.detektrules.ktlint)
     testImplementation(libs.detekt.test)
+    testImplementation(libs.junit)
+    testRuntimeOnly(libs.junit.launcher)
     detektPlugins(libs.detektrules.authors)
     detektPlugins(libs.detektrules.ktlint)
+}
+
+tasks.test {
+    useJUnitPlatform()
+    systemProperty("compile-test-snippets", "true")
 }
 
 tasks.withType<Detekt>().configureEach {
