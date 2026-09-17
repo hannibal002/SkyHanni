@@ -609,7 +609,7 @@ object CarryTracker {
 
     @HandleEvent
     fun onOtherPlayersSlayerSpawn(event: OtherPlayersSlayerEvent.Spawn) {
-        val type = findCarryType { it is SlayerCarry && it.slayer == event.slayerType && it.tier == event.tier } ?: return
+        val type = findCarryType { it is SlayerCarry && it.slayer == event.slayer && it.tier == event.tier } ?: return
         val customer = findCustomer(event.owner) ?: return
         val carry = customer.findCarry(type) ?: return
 
@@ -620,7 +620,7 @@ object CarryTracker {
 
     @HandleEvent
     fun onOtherPlayersSlayerDeath(event: OtherPlayersSlayerEvent.Death) {
-        val type = findCarryType { it is SlayerCarry && it.slayer == event.slayerType && it.tier == event.tier } ?: return
+        val type = findCarryType { it is SlayerCarry && it.slayer == event.slayer && it.tier == event.tier } ?: return
         val customer = findCustomer(event.owner) ?: return
         val carry = customer.findCarry(type) ?: return
 
