@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.foraging
+package at.hannibal2.skyhanni.config.features.hunting.safari
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
@@ -30,4 +30,10 @@ class SafariConfig {
     @ConfigOption(name = "Safari Checklist", desc = "Displays the Critter Safari unique shards caught during the current run.")
     @Accordion
     val checklist = SafariChecklistConfig()
+
+    @Expose
+    @ConfigOption(name = "Critter Capsules", desc = "")
+    @Accordion
+    val critterCapsules: CritterCapsuleConfig = CritterCapsuleConfig()
+
 }
