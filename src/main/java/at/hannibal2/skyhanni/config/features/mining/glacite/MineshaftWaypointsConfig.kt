@@ -38,15 +38,15 @@ class MineshaftWaypointsConfig {
         @HandleEvent
         private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             val basePath = "mining.glaciteMineshaft"
-            event.move(140, "$basePath.mineshaftWaypoints.entranceLocation", "$basePath.waypointsConfig.types.entrance")
-            event.move(140, "$basePath.mineshaftWaypoints.ladderLocation", "$basePath.waypointsConfig.types.ladder")
-            event.move(140, "$basePath.corpseLocator.enabled", "$basePath.waypointsConfig.types.foundCorpse") {
-                event.add(140, "$basePath.waypointsConfig.types.lootedCorpse") { it }
+            event.move(147, "$basePath.mineshaftWaypoints.entranceLocation", "$basePath.waypointsConfig.types.entrance")
+            event.move(147, "$basePath.mineshaftWaypoints.ladderLocation", "$basePath.waypointsConfig.types.ladder")
+            event.move(147, "$basePath.corpseLocator.enabled", "$basePath.waypointsConfig.types.foundCorpse") {
+                event.add(147, "$basePath.waypointsConfig.types.lootedCorpse") { it }
                 it
             }
-            event.move(140, "$basePath.corpseLocator.autoSendLocation", "$basePath.waypointsConfig.autoShareFoundCorpses")
-            event.move(140, "$basePath.shareWaypointLocation", "$basePath.waypointsConfig.shareFoundCorpseKeybind")
-            event.remove(140, "$basePath.mineshaftWaypoints.enabled")
+            event.move(147, "$basePath.corpseLocator.autoSendLocation", "$basePath.waypointsConfig.autoShareFoundCorpses")
+            event.move(147, "$basePath.shareWaypointLocation", "$basePath.waypointsConfig.shareFoundCorpseKeybind")
+            event.remove(147, "$basePath.mineshaftWaypoints.enabled")
         }
     }
 }
