@@ -72,7 +72,7 @@ class CarryTrackerConfig {
         @Expose
         @ConfigOption(
             name = "Notification Title",
-            desc = "Show a title for the notification.",
+            desc = "Show a title for the notification. A chat message will always be sent with a title.",
         )
         @ConfigEditorBoolean
         var title: Boolean = true
