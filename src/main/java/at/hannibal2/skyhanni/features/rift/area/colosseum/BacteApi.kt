@@ -15,13 +15,13 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object BacteApi {
 
-    private val group = RepoPattern.group("rift.colosseum.bacte")
+    private val patternGroup = RepoPattern.group("rift.colosseum.bacte")
 
     /**
      * REGEX-TEST: §2﴾ §8[§7Lv10§8] §l§aBa§r §a800§f/§a1,000§c §2﴿
      */
     @Suppress("MaxLineLength")
-    private val namePattern by group.pattern(
+    private val namePattern by patternGroup.pattern(
         "name",
         "§2﴾ §8\\[§7Lv\\d+§8\\] §l§a(?<name>.*)§r §.[\\d.,]+§f\\/§a[\\d.,]+§c${SkyblockStat.HEALTH.hypixelIcon} §2﴿",
     )
@@ -30,7 +30,7 @@ object BacteApi {
      * REGEX-TEST: §aBac §r§eis growing into §r§aBact§r§e!
      * REGEX-TEST: §aB §r§eis growing into §r§aBa§r§e!
      */
-    private val nameChatPattern by group.pattern(
+    private val nameChatPattern by patternGroup.pattern(
         "chat.name",
         "§a(?<previousName>.*) §r§eis growing into §r§a(?<name>.*)§r§e!",
     )

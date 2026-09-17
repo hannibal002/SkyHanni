@@ -182,6 +182,7 @@ enum class InputCode(
         fun fromMouseButton(mouseButton: Int): InputCode =
             fromKey(InputConstants.Type.MOUSE.getOrCreate(mouseButton))
 
+        // TODO: Optimize
         fun fromKey(key: InputConstants.Key): InputCode =
             entries.firstOrNull { it.key == key } ?: UNKNOWN
     }

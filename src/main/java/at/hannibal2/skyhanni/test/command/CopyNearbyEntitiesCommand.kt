@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -184,6 +185,7 @@ object CopyNearbyEntitiesCommand {
         val stackName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val stackDisplayName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val cleanName = stack.cleanName
+        val internalName = stack.getInternalNameOrNull()?.asString() ?: "none"
         val itemEnchanted = stack.isEnchanted
         val stackSize = stack.count
         val maxStackSize = stack.maxStackSize
@@ -191,6 +193,7 @@ object CopyNearbyEntitiesCommand {
         add("-  name: '$stackName'")
         add("-  stackDisplayName: '$stackDisplayName'")
         add("-  cleanName: '$cleanName'")
+        add("-  internalName: '$internalName'")
         add("-  itemEnchanted: '$itemEnchanted'")
         add("-  stackSize: '$stackSize'")
         add("-  maxStackSize: '$maxStackSize'")
@@ -296,9 +299,11 @@ object CopyNearbyEntitiesCommand {
             }
             val cleanName = stack.cleanName
             val stackName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            val internalName = stack.getInternalNameOrNull()?.asString() ?: "none"
             val type = stack.javaClass.name
             add("-     name: '$stackName'")
             add("-     cleanName: '$cleanName'")
+            add("-     internalName: '$internalName'")
             add("-     type: $type")
         }
     }

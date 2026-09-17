@@ -1,7 +1,8 @@
-package at.hannibal2.skyhanni.config.features.foraging
+package at.hannibal2.skyhanni.config.features.hunting.safari
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -24,5 +25,10 @@ class SafariConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideyhoFinder: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Critter Capsules", desc = "")
+    @Accordion
+    val critterCapsules: CritterCapsuleConfig = CritterCapsuleConfig()
 
 }
