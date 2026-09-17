@@ -58,7 +58,7 @@ object SafariShardChecklist {
     private fun onConfigLoad() {
         ConditionalUtils.onToggle(
             config.runDisplay,
-            config.hideCollected,
+            config.hideCaught,
             config.showIcons,
         ) {
             updateDisplay()
@@ -122,7 +122,7 @@ object SafariShardChecklist {
 
     private fun MutableList<Renderable>.addBiomeDetails(biome: SafariBiome) {
         addBiomeHeader(biome)
-        biome.shards.filter { !config.hideCollected.get() || shardCounts.getValue(it) == 0 }.forEach { shard ->
+        biome.shards.filter { !config.hideCaught.get() || shardCounts.getValue(it) == 0 }.forEach { shard ->
             val marker = if (shardCounts.getValue(shard) > 0) "§a✔" else "§c✖"
             val row = buildList {
                 add(Renderable.text("§7- ($marker§7)"))

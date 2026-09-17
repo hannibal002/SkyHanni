@@ -39,11 +39,11 @@ class SafariChecklistConfig {
 
     @Expose
     @ConfigOption(
-        name = "Hide Collected Shards",
-        desc = "Hide shards already collected during the current Critter Safari run.",
+        name = "Hide Caught Shards",
+        desc = "Hide shards already caught during the current Critter Safari run.",
     )
     @ConfigEditorBoolean
-    val hideCollected: Property<Boolean> = Property.of(true)
+    val hideCaught: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
