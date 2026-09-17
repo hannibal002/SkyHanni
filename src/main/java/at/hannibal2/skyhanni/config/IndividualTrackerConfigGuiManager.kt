@@ -38,9 +38,9 @@ object IndividualTrackerConfigGuiManager {
         BuiltinMoulConfigGuis.addProcessors(processor)
         val driver = ConfigProcessorDriver(processor)
         driver.warnForPrivateFields = false
-        val settingsField = checkNotNull(IndividualTrackerSettingsConfig::settings.javaField) {
-            "settings is a constructor property and always has a backing field"
-        }
+        // settings is a constructor property and always has a backing field
+        @Suppress("UnsafeCallOnNullableType")
+        val settingsField = IndividualTrackerSettingsConfig::settings.javaField!!
         processor.beginConfig(IndividualTrackerSettingsConfig::class.java, driver, config)
         processor.beginCategory(config, settingsField, "Tracker Settings", "Settings that only apply to this tracker.")
         processor.pushPath(settingsField.name)
