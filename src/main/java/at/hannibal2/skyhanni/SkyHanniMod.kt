@@ -171,7 +171,8 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
                 ChatUtils.chat("Manually saved the config!")
-                configManager.saveConfig(ConfigFileType.FEATURES, "manual-command")
+                configManager.queueSave(ConfigFileType.FEATURES, "manual-command")
+                configManager.flushQueuedSaves()
             }
         }
     }
