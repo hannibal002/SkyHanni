@@ -408,9 +408,9 @@ object CarryTracker {
                 customer.carries.remove(carry)
                 if (customer.carries.isEmpty()) customers.remove(customer)
 
-                if (config.carryFinishedNotification.chat) ChatUtils.chat("$message §7(automatically removed)")
+                if (config.carryFinishedNotification.chat || config.carryFinishedNotification.title) ChatUtils.chat("$message §7(automatically removed)")
             } else {
-                if (config.carryFinishedNotification.chat) ChatUtils.clickableChat(
+                if (config.carryFinishedNotification.chat || config.carryFinishedNotification.title) ChatUtils.clickableChat(
                     "$message\n§e[CLICK to remove this carry]",
                     onClick = { removeCarry(customer.name, carry.type.id) },
                     hover = "§eClick to remove this carry!",
@@ -614,7 +614,7 @@ object CarryTracker {
         val customer = findCustomer(event.owner) ?: return
         val carry = customer.findCarry(type) ?: return
 
-        if (config.slayerSpawnedNotification.chat) ChatUtils.chat("§d${carry.type.displayName} §espawned for §b${customer.name}")
+        if (config.slayerSpawnedNotification.chat || config.slayerSpawnedNotification.title) ChatUtils.chat("§d${carry.type.displayName} §espawned for §b${customer.name}")
         if (config.slayerSpawnedNotification.title) TitleManager.sendTitle("§eBoss spawned for §b${customer.name}§e!", duration = 3.seconds)
         if (config.slayerSpawnedNotification.sound) SoundUtils.playPlingSound()
     }
