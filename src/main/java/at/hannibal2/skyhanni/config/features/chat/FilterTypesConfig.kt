@@ -284,10 +284,37 @@ class FilterTypesConfig {
 
     @Expose
     @ConfigOption(
-        name = "Annoying Spam",
-        desc = "Hide miscellaneous spammy messages, e.g. ability damage numbers, fishing catches, dev warnings.",
+        name = "Ability Damage",
+        desc = "Hide ability damage notifications for abilities like Wither Impact, Guided Bat, etc.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var annoyingSpam: Boolean = false
+    var abilityDamage: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Blocked Actions",
+        desc = "Hide messages when an action is blocked, e.g. Instant Transmission having blocks in the way, insufficient Breaking Power.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var blockedActions: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "NPC Announcements",
+        desc = "Hide NPC announcement messages, e.g. Jacob's contest starting, Booster cookie required for action.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var npcAnnouncements: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "System/Dev Noise",
+        desc = "Hide internal system and debug messages that sometimes leak into the chat.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var systemNoise: Boolean = false
 }

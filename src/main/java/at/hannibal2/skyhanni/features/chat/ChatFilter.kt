@@ -39,6 +39,7 @@ object ChatFilter {
     private val miscPatternGroup = chatFilterGroup.group("hypixel-misc")
     private val eventPatternGroup = chatFilterGroup.group("event")
     private val miningAbilityPatternGroup = chatFilterGroup.group("mining-ability")
+    private val abilityDamagePatternGroup = chatFilterGroup.group("ability-damage")
     private val deployablePatternGroup = chatFilterGroup.group("deployable")
 
     // <editor-fold desc="Regex Patterns & Messages">
@@ -324,31 +325,36 @@ object ChatFilter {
         "§7Your radio lost signal. There's too many enjoyers on this channel.",
     )
 
-    // Annoying Spam
-    @Suppress("MaxLineLength")
-    private val annoyingSpamPatterns = listOf(
-        "§7Your Implosion hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
-        "§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
-        "§7Your Spirit Sceptre hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
-        "§cYou need a tool with a §r§aBreaking Power §r§cof §r§6(\\d)§r§c to mine (.*)§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!".toPattern(),
-        "§9§n\n§c§lYouTube Premier §eCelebrate Hypixel's 12th Anniversary with a special Minecraft Animation, live now §bhttps://youtu.be/ikT631vQd8A\n".toPattern(),
+    // Ability Damage
+    /**
+     * REGEX-TEST: §7Your Implosion hit Zealot for §r§c1,234 §r§7damage.
+     * REGEX-TEST: §7Your Molten Wave hit Zealot for §r§c1,234 §r§7damage.
+     * REGEX-TEST: §7Your Spirit Sceptre hit Zealot for §r§c1,234 §r§7damage.
+     */
+    private val abilityDamagePattern by abilityDamagePatternGroup.pattern(
+        "hit",
+        "§7Your .* hit (.*) for §r§c(.*) §r§7damage.",
     )
-    private val annoyingSpamMessages = listOf(
+
+    // Blocked Actions
+    @Suppress("MaxLineLength")
+    private val blockedActionsPatterns = listOf(
+        "§cYou need a tool with a §r§aBreaking Power §r§cof §r§6(\\d)§r§c to mine (.*)§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!".toPattern(),
+    )
+    private val blockedActionsMessages = listOf(
         "§cThere are blocks in the way!",
-        "§aYour Blessing enchant got you double drops!",
-        "§cYou can't use the wardrobe in combat!",
-        "§6§lGOOD CATCH! §r§bYou found a §r§fFish Bait§r§b.",
-        "§6§lGOOD CATCH! §r§bYou found a §r§aGrand Experience Bottle§r§b.",
-        "§6§lGOOD CATCH! §r§bYou found a §r§aBlessed Bait§r§b.",
-        "§6§lGOOD CATCH! §r§bYou found a §r§fDark Bait§r§b.",
-        "§6§lGOOD CATCH! §r§bYou found a §r§fLight Bait§r§b.",
-        "§6§lGOOD CATCH! §r§bYou found a §r§aHot Bait§r§b.",
-        "§6§lGOOD CATCH! §r§bYou found a §r§fSpooky Bait§r§b.",
+    )
+
+    // NPC Announcements
+    private val npcAnnouncementsMessages = listOf(
         "§e[NPC] Jacob§f: §rMy contest has started!",
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
+    )
+
+    // System/Dev Noise
+    private val systemNoiseMessages = listOf(
         "Unknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
         "§3[SBE] §a§cUnable to download bin data. This may result in certain features not working!",
-        "§e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.",
     )
 
     private val skymallMessages = listOf(
@@ -579,7 +585,7 @@ object ChatFilter {
         "useless_notification" to uselessNotificationPatterns,
         "money" to bazaarPatterns,
         "winter_island" to winterIslandPatterns,
-        "annoying_spam" to annoyingSpamPatterns,
+        "blocked_actions" to blockedActionsPatterns,
         "winter_gift" to winterGiftPatterns,
         "fire_sale" to fireSalePatterns,
         "event" to eventPatterns,
@@ -605,6 +611,7 @@ object ChatFilter {
         "profile_join" to profileJoinPatterns,
         "mining_abilities" to listOf(miningAbilityUsedPattern, miningAbilityExpiredPattern),
         "deployable_removed" to listOf(deployableRemovedPattern),
+        "ability_damage" to listOf(abilityDamagePattern),
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -619,7 +626,9 @@ object ChatFilter {
         "party" to partyMessages,
         "money" to auctionHouseMessages,
         "useless_warning" to uselessWarningMessages,
-        "annoying_spam" to annoyingSpamMessages,
+        "blocked_actions" to blockedActionsMessages,
+        "npc_announcements" to npcAnnouncementsMessages,
+        "system_noise" to systemNoiseMessages,
         "powder_mining" to powderMiningMessages,
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
@@ -685,7 +694,10 @@ object ChatFilter {
         config.auctionBazaarSetup && message.isPresent("money") -> "money"
         config.winterIsland && message.isPresent("winter_island") -> "winter_island"
         config.uselessWarning && message.isPresent("useless_warning") -> "useless_warning"
-        config.annoyingSpam && message.isPresent("annoying_spam") -> "annoying_spam"
+        config.abilityDamage && message.isPresent("ability_damage") -> "ability_damage"
+        config.blockedActions && message.isPresent("blocked_actions") -> "blocked_actions"
+        config.npcAnnouncements && message.isPresent("npc_announcements") -> "npc_announcements"
+        config.systemNoise && message.isPresent("system_noise") -> "system_noise"
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
 
@@ -827,7 +839,10 @@ object ChatFilter {
             event.add(147, "chat.filterType.auctionBazaarSetup") { JsonPrimitive(enabled) }
             event.add(147, "chat.filterType.winterIsland") { JsonPrimitive(enabled) }
             event.add(147, "chat.filterType.uselessWarning") { JsonPrimitive(enabled) }
-            event.add(147, "chat.filterType.annoyingSpam") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.abilityDamage") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.blockedActions") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.npcAnnouncements") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.systemNoise") { JsonPrimitive(enabled) }
             JsonPrimitive(enabled)
         }
     }
