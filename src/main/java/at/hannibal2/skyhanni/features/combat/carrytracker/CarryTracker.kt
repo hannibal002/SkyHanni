@@ -557,59 +557,59 @@ object CarryTracker {
             }
     }
 
-    private data class SlayerCarryType(
+    private data class SlayerCarry(
         override val id: String,
         override val shortName: String,
-        val slayerType: SlayerType,
-        val slayerTier: Int,
-        override val displayName: String = "${slayerType.displayName} $slayerTier",
+        val slayer: SlayerType,
+        val tier: Int,
+        override val displayName: String = "${slayer.displayName} $tier",
     ) : CarryType()
 
-    private data class DungeonCarryType(
+    private data class DungeonCarry(
         override val id: String,
         override val displayName: String,
-        val dungeonFloor: String,
-        override val shortName: String = dungeonFloor,
+        val floor: String,
+        override val shortName: String = floor,
     ) : CarryType()
 
-    private data class KuudraCarryType(
+    private data class KuudraCarry(
         override val id: String,
-        val kuudraTier: KuudraTier,
-        override val displayName: String = "${kuudraTier.displayName} Kuudra",
+        val tier: KuudraTier,
+        override val displayName: String = "${tier.displayName} Kuudra",
         override val shortName: String = displayName,
     ) : CarryType()
 
-    private data class CrimsonMinibossCarryType(
+    private data class CrimsonMinibossCarry(
         override val id: String,
-        val crimsonMiniBoss: CrimsonMiniBoss,
-        override val displayName: String = crimsonMiniBoss.displayName,
+        val boss: CrimsonMiniBoss,
+        override val displayName: String = boss.displayName,
         override val shortName: String = displayName,
     ) : CarryType()
 
     private val carryTypes = buildList {
-        for (i in 1..5) add(SlayerCarryType("rev$i", "Rev $i", SlayerType.REVENANT, i))
-        for (i in 1..5) add(SlayerCarryType("tara$i", "Tara $i", SlayerType.TARANTULA, i))
-        for (i in 1..4) add(SlayerCarryType("sven$i", "Sven $i", SlayerType.SVEN, i))
-        for (i in 1..4) add(SlayerCarryType("eman$i", "Eman $i", SlayerType.VOID, i))
-        for (i in 1..4) add(SlayerCarryType("blaze$i", "Blaze $i", SlayerType.INFERNO, i))
-        for (i in 1..5) add(SlayerCarryType("vamp$i", "Vamp $i", SlayerType.VAMPIRE, i))
+        for (i in 1..5) add(SlayerCarry("rev$i", "Rev $i", SlayerType.REVENANT, i))
+        for (i in 1..5) add(SlayerCarry("tara$i", "Tara $i", SlayerType.TARANTULA, i))
+        for (i in 1..4) add(SlayerCarry("sven$i", "Sven $i", SlayerType.SVEN, i))
+        for (i in 1..4) add(SlayerCarry("eman$i", "Eman $i", SlayerType.VOID, i))
+        for (i in 1..4) add(SlayerCarry("blaze$i", "Blaze $i", SlayerType.INFERNO, i))
+        for (i in 1..5) add(SlayerCarry("vamp$i", "Vamp $i", SlayerType.VAMPIRE, i))
 
-        add(DungeonCarryType("f0", "Entrance Floor", "E", shortName = "F0"))
-        for (i in 1..7) add(DungeonCarryType("f$i", "Floor $i", "F$i"))
-        for (i in 1..7) add(DungeonCarryType("m$i", "Master Mode $i", "M$i"))
+        add(DungeonCarry("f0", "Entrance Floor", "E", shortName = "F0"))
+        for (i in 1..7) add(DungeonCarry("f$i", "Floor $i", "F$i"))
+        for (i in 1..7) add(DungeonCarry("m$i", "Master Mode $i", "M$i"))
 
-        for (kuudraTier in KuudraTier.entries) add(KuudraCarryType("k${kuudraTier.tierNumber}", kuudraTier))
+        for (kuudraTier in KuudraTier.entries) add(KuudraCarry("k${kuudraTier.tierNumber}", kuudraTier))
 
-        add(CrimsonMinibossCarryType("bladesoul", CrimsonMiniBoss.BLADESOUL))
-        add(CrimsonMinibossCarryType("mage_outlaw", CrimsonMiniBoss.MAGE_OUTLAW))
-        add(CrimsonMinibossCarryType("barb_duke", CrimsonMiniBoss.BARBARIAN_DUKE_X, shortName = "Barb Duke"))
-        add(CrimsonMinibossCarryType("ashfang", CrimsonMiniBoss.ASHFANG))
-        add(CrimsonMinibossCarryType("magma_boss", CrimsonMiniBoss.MAGMA_CUBE))
+        add(CrimsonMinibossCarry("bladesoul", CrimsonMiniBoss.BLADESOUL))
+        add(CrimsonMinibossCarry("mage_outlaw", CrimsonMiniBoss.MAGE_OUTLAW))
+        add(CrimsonMinibossCarry("barb_duke", CrimsonMiniBoss.BARBARIAN_DUKE_X, shortName = "Barb Duke"))
+        add(CrimsonMinibossCarry("ashfang", CrimsonMiniBoss.ASHFANG))
+        add(CrimsonMinibossCarry("magma_boss", CrimsonMiniBoss.MAGMA_CUBE))
     }
 
     @HandleEvent
     fun onOtherPlayersSlayerSpawn(event: OtherPlayersSlayerEvent.Spawn) {
-        val type = findCarryType { it is SlayerCarryType && it.slayerType == event.slayerType && it.slayerTier == event.tier } ?: return
+        val type = findCarryType { it is SlayerCarry && it.slayer == event.slayerType && it.tier == event.tier } ?: return
         val customer = findCustomer(event.owner) ?: return
         val carry = customer.findCarry(type) ?: return
 
@@ -620,7 +620,7 @@ object CarryTracker {
 
     @HandleEvent
     fun onOtherPlayersSlayerDeath(event: OtherPlayersSlayerEvent.Death) {
-        val type = findCarryType { it is SlayerCarryType && it.slayerType == event.slayerType && it.slayerTier == event.tier } ?: return
+        val type = findCarryType { it is SlayerCarry && it.slayer == event.slayerType && it.tier == event.tier } ?: return
         val customer = findCustomer(event.owner) ?: return
         val carry = customer.findCarry(type) ?: return
 
@@ -629,7 +629,7 @@ object CarryTracker {
 
     @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
-        val type = findCarryType { it is DungeonCarryType && it.dungeonFloor == event.floor } ?: return
+        val type = findCarryType { it is DungeonCarry && it.floor == event.floor } ?: return
 
         for (name in DungeonApi.getPlayerNames()) {
             val customer = findCustomer(name) ?: continue
@@ -642,7 +642,7 @@ object CarryTracker {
 
     @HandleEvent
     fun onKuudraComplete(event: KuudraCompleteEvent) {
-        val type = findCarryType { it is KuudraCarryType && it.kuudraTier == event.kuudraTier } ?: return
+        val type = findCarryType { it is KuudraCarry && it.tier == event.kuudraTier } ?: return
 
         for (name in EntityUtils.getPlayerEntities().map { it.name.string }) {
             val customer = findCustomer(name) ?: continue
@@ -655,7 +655,7 @@ object CarryTracker {
 
     @HandleEvent
     fun onCrimsonMinibossDeath(event: CrimsonMiniBossEvent.Death) {
-        val type = findCarryType { it is CrimsonMinibossCarryType && it.crimsonMiniBoss == event.miniBoss } ?: return
+        val type = findCarryType { it is CrimsonMinibossCarry && it.boss == event.miniBoss } ?: return
 
         for (name in EntityUtils.getPlayerEntities().map { it.name.string }) {
             val customer = findCustomer(name) ?: continue
