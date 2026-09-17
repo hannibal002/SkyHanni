@@ -87,7 +87,6 @@ class ConfigManager {
         }
 
         lastFeatureAutoSave = SimpleTimeMark.now()
-        // TODO use SecondPassedEvent
         fixedRateTimer(
             name = "skyhanni-config-auto-save",
             daemon = true,
