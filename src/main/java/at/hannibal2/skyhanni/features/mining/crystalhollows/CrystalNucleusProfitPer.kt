@@ -47,15 +47,18 @@ object CrystalNucleusProfitPer {
         val jungleKeyCost = JUNGLE_KEY_ITEM.getPrice()
         val partsCost = CrystalNucleusApi.getPrecursorRunPrice { it.getPrice() }
 
-        val profitType = config.profileProfitSetting.get()
-        if (profitType == ProfitCalcSettings.ALL_PROFILES || (profitType == ProfitCalcSettings.NO_TRADE && SkyBlockUtils.noTradeMode)) {
+        val profileType = config.profileProfitSetting.get()
+        val isZeroCostProfile = (profileType == ProfitCalcSettings.ALL_PROFILES ||
+            (profileType == ProfitCalcSettings.NO_TRADE && SkyBlockUtils.noTradeMode))
+
+        if (isZeroCostProfile) {
             totalProfit -= (jungleKeyCost + partsCost)
         }
 
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"
         val totalMessage = "Profit for Crystal Nucleus Run§e: $profitPrefix${totalProfit.shortFormat()}"
 
-        if (profitType == ProfitCalcSettings.ALL_PROFILES || (profitType == ProfitCalcSettings.NO_TRADE && SkyBlockUtils.noTradeMode)) {
+        if (isZeroCostProfile) {
             hover.add("")
             hover.add("§cUsed §5Jungle Key§7: §c-${jungleKeyCost.shortFormat()}")
             hover.add("§cUsed §9Robot Parts§7: §c-${partsCost.shortFormat()}")

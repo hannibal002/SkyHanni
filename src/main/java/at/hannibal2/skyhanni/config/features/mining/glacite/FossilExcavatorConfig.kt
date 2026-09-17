@@ -40,9 +40,9 @@ class FossilExcavatorConfig {
     var profitPerExcavation: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Ignore Material Costs", desc = "Removes the cost of Experience Bottles from the Profit.")
+    @ConfigOption(name = "Ignore Material Costs", desc = "Removes the cost of Scrap from the Profit.")
     @ConfigEditorDropdown
-    val profileProfitSetting: Property<ProfitCalcSettings> = Property.of(ProfitCalcSettings.NO_TRADE);
+    val profileProfitSetting: Property<ProfitCalcSettings> = Property.of(ProfitCalcSettings.NO_TRADE)
 
     @Expose
     @ConfigOption(name = "Glacite Powder Stack", desc = "Show Glacite Powder as stack size in the Fossil Excavator.")

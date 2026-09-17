@@ -138,8 +138,11 @@ object CrystalNucleusTracker {
             var profit = tracker.drawItems(data, { true }, this)
             val jungleKeyCost: Double = tracker.getPricePer(JUNGLE_KEY_ITEM) * runsCompleted
 
-            val profitType = config.profileProfitSetting.get()
-            if (profitType == ProfitCalcSettings.NONE || (profitType == ProfitCalcSettings.NO_TRADE && !SkyBlockUtils.noTradeMode)) {
+            val profileType = config.profileProfitSetting.get()
+            val isZeroCostProfile = (profileType == ProfitCalcSettings.ALL_PROFILES ||
+                (profileType == ProfitCalcSettings.NO_TRADE && SkyBlockUtils.noTradeMode))
+
+            if (!isZeroCostProfile) {
                 profit -= jungleKeyCost
                 val jungleKeyCostFormat = jungleKeyCost.shortFormat()
                 add(
@@ -165,7 +168,7 @@ object CrystalNucleusTracker {
             else rawConfigString
             val usageTotal = if (usesApparatus) runsCompleted else runsCompleted * 6
 
-            if (profitType == ProfitCalcSettings.NONE || (profitType == ProfitCalcSettings.NO_TRADE && !SkyBlockUtils.noTradeMode)) {
+            if (!isZeroCostProfile) {
                 profit -= totalSapphireCost
                 val totalSapphireCostFormat = totalSapphireCost.shortFormat()
                 add(

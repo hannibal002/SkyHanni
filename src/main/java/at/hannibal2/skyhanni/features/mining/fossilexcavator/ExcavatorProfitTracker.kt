@@ -73,8 +73,11 @@ object ExcavatorProfitTracker {
             ).toSearchable(),
         )
 
-        val profitType = config.profileProfitSetting.get()
-        if (profitType == ProfitCalcSettings.ALL_PROFILES || (profitType == ProfitCalcSettings.NO_TRADE && SkyBlockUtils.noTradeMode)) {
+        val profileType = config.profileProfitSetting.get()
+        val isZeroCostProfile = (profileType == ProfitCalcSettings.ALL_PROFILES ||
+            (profileType == ProfitCalcSettings.NO_TRADE && SkyBlockUtils.noTradeMode))
+
+        if (!isZeroCostProfile) {
             profit = addScrap(timesExcavated, profit)
         }
 

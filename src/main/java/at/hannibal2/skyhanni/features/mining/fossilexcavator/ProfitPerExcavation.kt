@@ -41,8 +41,11 @@ object ProfitPerExcavation {
 
         val scrapPrice = scrapItem.getPrice()
 
-        val profitType = config.profileProfitSetting.get();
-        if (profitType == ProfitCalcSettings.NONE || (profitType == ProfitCalcSettings.NO_TRADE && !SkyBlockUtils.noTradeMode)) {
+        val profileType = config.profileProfitSetting.get()
+        val isZeroCostProfile = (profileType == ProfitCalcSettings.ALL_PROFILES ||
+            (profileType == ProfitCalcSettings.NO_TRADE && SkyBlockUtils.noTradeMode))
+
+        if (!isZeroCostProfile) {
             totalProfit -= scrapPrice
             map["${scrapItem.repoItemName}: §c-${scrapPrice.shortFormat()}"] = -scrapPrice
         }

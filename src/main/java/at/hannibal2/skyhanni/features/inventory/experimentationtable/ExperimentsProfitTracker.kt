@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SkyBlockUtils.isIronmanProfile
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -209,11 +208,6 @@ object ExperimentsProfitTracker {
             else -> data.startCost
         }
 
-//         val startCost = when (SkyHanniMod.feature.misc.tracker.priceSource) {
-//             ItemPriceSource.NPC_SELL -> 0
-//             else -> data.startCost
-//         }
-
         val profit = tracker.drawItems(data, { true }, this) + startCost
         addSearchString("§eExperiments Done: §a${data.experimentsDone.addSeparators()}")
 
@@ -223,9 +217,9 @@ object ExperimentsProfitTracker {
         }
 
         val startCostFormat = startCost.absoluteValue
-        val bitCostFormat = data.bitCost;
+        val bitCostFormat = data.bitCost
 
-        if (profileType == ProfitCalcSettings.ALL_PROFILES || (profileType == ProfitCalcSettings.NO_TRADE && SkyBlockUtils.noTradeMode)) {
+        if (isZeroCostProfile) {
             add(
                 Renderable.hoverTips(
                     "§eTotal Cost: §b${bitCostFormat.shortFormat()} bits",
@@ -238,7 +232,7 @@ object ExperimentsProfitTracker {
         } else {
             add(
                 Renderable.hoverTips(
-                    "§eTotal Cost: §c-${startCostFormat.shortFormat()}§e/§b${bitCostFormat.shortFormat()}",
+                    "§eTotal Cost: §c-${startCostFormat.shortFormat()}§e/§b-${bitCostFormat.shortFormat()}",
                     listOf(
                         "§7You paid §c${startCostFormat.addSeparators()} §7coins and",
                         "§b${bitCostFormat.addSeparators()} §7bits for starting",
