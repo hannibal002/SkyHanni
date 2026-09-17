@@ -3,13 +3,11 @@ package at.hannibal2.skyhanni
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
-import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.SkyHanniConfig
 import at.hannibal2.skyhanni.config.StorageData
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.storage.AchievementStorage
@@ -106,7 +104,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
 
     @HandleEvent
     private fun onClientShutdown() {
-        configManager.queueSave(ConfigFileType.FEATURES, "shutdown-hook")
+        configManager.queueSave(FEATURES, "shutdown-hook")
         configManager.flushQueuedSaves()
         SkyHanniItemRenderCoordinator.closeAtlas()
     }
@@ -168,10 +166,10 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
         }
         event.registerBrigadier("shconfigsave") {
             description = "Manually saving the config"
-            category = CommandCategory.DEVELOPER_TEST
+            category = DEVELOPER_TEST
             simpleCallback {
                 ChatUtils.chat("Manually saved the config!")
-                configManager.queueSave(ConfigFileType.FEATURES, "manual-command")
+                configManager.queueSave(FEATURES, "manual-command")
                 configManager.flushQueuedSaves()
             }
         }

@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.achievements
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
@@ -55,7 +53,7 @@ object AchievementManager {
             config[id] = achievement
         }
 
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievements loaded")
+        SkyHanniMod.configManager.saveConfig(ACHIEVEMENTS, "achievements loaded")
     }
 
     fun getAchievement(id: String): Achievement {
@@ -69,7 +67,7 @@ object AchievementManager {
     fun setAchievement(id: String, achievement: Achievement) {
         if (HypixelData.hypixelAlpha) return
         config[id] = achievement
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievement set")
+        SkyHanniMod.configManager.saveConfig(ACHIEVEMENTS, "achievement set")
     }
 
     fun updateTieredAchievement(id: String, newProgress: Int) {
@@ -89,7 +87,7 @@ object AchievementManager {
         }
 
         config[id] = achievement
-        SkyHanniMod.configManager.queueSave(ConfigFileType.ACHIEVEMENTS, "achievement progress update")
+        SkyHanniMod.configManager.queueSave(ACHIEVEMENTS, "achievement progress update")
     }
 
     // This function returns true if the achievement was completed, false if it was already completed or if you're in Hypixel Alpha
@@ -101,7 +99,7 @@ object AchievementManager {
         config[id] = achievement
         displayMessage(achievement)
 
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievement completed")
+        SkyHanniMod.configManager.saveConfig(ACHIEVEMENTS, "achievement completed")
         return true
     }
 
@@ -155,7 +153,7 @@ object AchievementManager {
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestachievement") {
             description = "Tests achievement granting and revoking"
-            category = CommandCategory.DEVELOPER_TEST
+            category = DEVELOPER_TEST
             literalCallback("unlockall") {
                 ChatUtils.chat("you didn't think this would really work? did you...")
             }
@@ -195,7 +193,7 @@ object AchievementManager {
         }
         event.registerBrigadier("shachievements") {
             description = "Shows your current achievement progress"
-            category = CommandCategory.USERS_ACTIVE
+            category = USERS_ACTIVE
             simpleCallback {
                 val achievementList = config
                     .map { it.value }

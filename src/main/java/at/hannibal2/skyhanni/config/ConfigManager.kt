@@ -96,7 +96,7 @@ class ConfigManager {
             try {
                 if (lastFeatureAutoSave.passedSince() >= FEATURE_AUTO_SAVE_INTERVAL) {
                     lastFeatureAutoSave = SimpleTimeMark.now()
-                    queueSave(ConfigFileType.FEATURES, "auto-save-60s")
+                    queueSave(FEATURES, "auto-save-60s")
                 }
                 flushQueuedSaves()
             } catch (e: Throwable) {
