@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -25,22 +26,30 @@ class YearOfTheSealConfig {
     @ConfigLink(owner = YearOfTheSealConfig::class, field = "fishyTreatProfit")
     val fishyTreatProfitPosition: Position = Position(170, 150)
 
+    // TODO rename to beachBallLine
     @Expose
-    @ConfigOption(name = "Bouncy Ball Line", desc = "Shows a line for your bouncy balls thrown (Only works on normal ones, not giant).")
+    @ConfigOption(name = "Beach Ball Line", desc = "Shows a line for your Beach Balls thrown (Only works on normal ones, not giant).")
     @ConfigEditorBoolean
-    @SearchTag("beach")
+    @SearchTag("bouncy")
     @FeatureToggle
     val bouncyBallLine: Property<Boolean> = Property.of(true)
 
+    // TODO rename to beachBallLineColor
     @Expose
-    @ConfigOption(name = "Bouncy Ball Line Color", desc = "Color of the Bouncy Ball Line.")
+    @ConfigOption(name = "Beach Ball Line Color", desc = "Color of the Beach Ball Line.")
     @ConfigEditorColour
-    @SearchTag("beach")
+    @SearchTag("bouncy")
     var bouncyBallLineColor: ChromaColour = ChromaColour.fromStaticRGB(255, 0, 196, 245)
 
+    // TODO rename to beachBallLandingSpot
     @Expose
-    @ConfigOption(name = "Bouncy Ball Landing Spot", desc = "Show the spot where the Bouncy Ball will land, and add a counter.")
+    @ConfigOption(name = "Beach Ball Landing Spot", desc = "Show the spot where the Beach Ball will land, and add a counter.")
     @ConfigEditorBoolean
-    @SearchTag("beach")
+    @SearchTag("bouncy")
     val bouncyBallLandingSpot: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @Accordion
+    @ConfigOption(name = "Beach Ball Tracker", desc = "")
+    val beachBallTracker = BeachBallTrackerConfig()
 }
