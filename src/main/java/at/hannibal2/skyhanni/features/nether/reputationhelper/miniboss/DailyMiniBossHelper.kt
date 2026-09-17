@@ -33,7 +33,7 @@ object DailyMiniBossHelper {
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     @HandleEvent
-    fun onCrimsonMiniBossDeath(event: CrimsonMiniBossEvent.Death) {
+    private fun onCrimsonMiniBossDeath(event: CrimsonMiniBossEvent.Death) {
         val miniBoss = event.miniBoss
         ChatUtils.debug("Detected crimson miniboss done: ${miniBoss.displayName}")
         DailyQuestHelper.finishMiniBoss(miniBoss)
@@ -42,7 +42,7 @@ object DailyMiniBossHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.enabled.get()) return
         if (!CrimsonIsleReputationHelper.showLocations()) return
 

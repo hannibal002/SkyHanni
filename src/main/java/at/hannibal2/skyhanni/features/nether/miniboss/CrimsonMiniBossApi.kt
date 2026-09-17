@@ -33,7 +33,7 @@ object CrimsonMiniBossApi {
     private fun getRegexUppercaseNames(): String = CrimsonMiniBoss.entries.joinToString("|") { it.displayName.uppercase() }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         spawnPattern.matchMatcher(event.cleanMessage) {
             val name = group("name")
             val miniBoss = CrimsonMiniBoss.getByDisplayName(name) ?: return

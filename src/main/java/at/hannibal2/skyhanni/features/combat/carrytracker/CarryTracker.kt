@@ -90,7 +90,7 @@ object CarryTracker {
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         tradeCompletedPattern.matchMatcher(event.cleanMessage) {
             val name = group("name").cleanPlayerName()
 
@@ -159,17 +159,17 @@ object CarryTracker {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         CarryTrackerCommand.registerCarryCommand(event)
     }
 
     @HandleEvent
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         updateDisplay()
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Carry Tracker")
         event.addIrrelevant {
             add("customers: $customers")
@@ -609,7 +609,7 @@ object CarryTracker {
     }
 
     @HandleEvent
-    fun onOtherPlayersSlayerSpawn(event: OtherPlayersSlayerEvent.Spawn) {
+    private fun onOtherPlayersSlayerSpawn(event: OtherPlayersSlayerEvent.Spawn) {
         val type = findCarryType { it is SlayerCarry && it.slayer == event.slayer && it.tier == event.tier } ?: return
         val customer = findCustomer(event.owner) ?: return
         val carry = customer.findCarry(type) ?: return
@@ -620,7 +620,7 @@ object CarryTracker {
     }
 
     @HandleEvent
-    fun onOtherPlayersSlayerDeath(event: OtherPlayersSlayerEvent.Death) {
+    private fun onOtherPlayersSlayerDeath(event: OtherPlayersSlayerEvent.Death) {
         val type = findCarryType { it is SlayerCarry && it.slayer == event.slayer && it.tier == event.tier } ?: return
         val customer = findCustomer(event.owner) ?: return
         val carry = customer.findCarry(type) ?: return
@@ -629,7 +629,7 @@ object CarryTracker {
     }
 
     @HandleEvent
-    fun onDungeonComplete(event: DungeonCompleteEvent) {
+    private fun onDungeonComplete(event: DungeonCompleteEvent) {
         val type = findCarryType { it is DungeonCarry && it.floor == event.floor } ?: return
 
         for (name in DungeonApi.getPlayerNames()) {
@@ -642,7 +642,7 @@ object CarryTracker {
     }
 
     @HandleEvent
-    fun onKuudraComplete(event: KuudraCompleteEvent) {
+    private fun onKuudraComplete(event: KuudraCompleteEvent) {
         val type = findCarryType { it is KuudraCarry && it.tier == event.kuudraTier } ?: return
 
         for (name in EntityUtils.getPlayerEntities().map { it.name.string }) {
@@ -655,7 +655,7 @@ object CarryTracker {
     }
 
     @HandleEvent
-    fun onCrimsonMinibossDeath(event: CrimsonMiniBossEvent.Death) {
+    private fun onCrimsonMinibossDeath(event: CrimsonMiniBossEvent.Death) {
         val type = findCarryType { it is CrimsonMinibossCarry && it.boss == event.miniBoss } ?: return
 
         for (name in EntityUtils.getPlayerEntities().map { it.name.string }) {
@@ -676,7 +676,7 @@ object CarryTracker {
     fun getCarryTypeIds(): List<String> = carryTypes.map { it.id }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(139, "misc.carryPosition", "combat.carryTracker.position")
     }
 }

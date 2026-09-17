@@ -100,7 +100,7 @@ object KuudraApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.KUUDRA_ARENA)
-    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+    private fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (kuudraTier != null) return
         tierPattern.firstMatcher(event.added) {
             val tierNumber = group("tier").toInt()
@@ -111,12 +111,12 @@ object KuudraApi {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         kuudraTier = null
     }
 
     @HandleEvent(onlyOnIsland = IslandType.KUUDRA_ARENA)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         completePattern.matchMatcher(event.cleanMessage) {
             val tier = kuudraTier ?: return
             KuudraCompleteEvent(tier).post()

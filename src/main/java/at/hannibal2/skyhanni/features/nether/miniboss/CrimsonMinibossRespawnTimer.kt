@@ -30,7 +30,7 @@ object CrimsonMinibossRespawnTimer {
     private var display: Renderable? = null
 
     @HandleEvent
-    fun onCrimsonMiniBossDeath(event: CrimsonMiniBossEvent.Death) {
+    private fun onCrimsonMiniBossDeath(event: CrimsonMiniBossEvent.Death) {
         val miniBoss = event.miniBoss
         miniBoss.nextSpawnTime = ServerTimeMark.now() + 2.minutes
         miniBoss.spawned = false
@@ -40,7 +40,7 @@ object CrimsonMinibossRespawnTimer {
     }
 
     @HandleEvent
-    fun onCrimsonMiniBossSpawning(event: CrimsonMiniBossEvent.Spawning) {
+    private fun onCrimsonMiniBossSpawning(event: CrimsonMiniBossEvent.Spawning) {
         val miniBoss = event.miniBoss
         miniBoss.spawned = true
         miniBoss.possibleSpawnTime = null
@@ -49,14 +49,14 @@ object CrimsonMinibossRespawnTimer {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!config.minibossRespawnTimer) return
         val renderable = display ?: drawDisplay()
         config.minibossTimerPosition.renderRenderable(renderable, posLabel = "Miniboss Timer")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!config.minibossRespawnTimer) return
         updateArea()
         update()
@@ -143,7 +143,7 @@ object CrimsonMinibossRespawnTimer {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         CrimsonMiniBoss.entries.forEach {
             it.nextSpawnTime = null
             it.possibleSpawnTime = null
@@ -155,7 +155,7 @@ object CrimsonMinibossRespawnTimer {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Crimson Isle Miniboss")
         event.addIrrelevant {
             if (!IslandType.CRIMSON_ISLE.isInIsland()) {

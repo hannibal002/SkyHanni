@@ -15,12 +15,12 @@ object OtherPlayersSlayerApi {
     private val spawnedMobs = mutableSetOf<Int>()
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         spawnedMobs.clear()
     }
 
     @HandleEvent
-    fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+    private fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (spawnedMobs.contains(event.mob.id)) return
 
         detectAndPost(event.mob, OtherPlayersSlayerEvent::Spawn)
@@ -28,7 +28,7 @@ object OtherPlayersSlayerApi {
     }
 
     @HandleEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    private fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob.health == 0f) {
             detectAndPost(event.mob, OtherPlayersSlayerEvent::Death)
             spawnedMobs.remove(event.mob.id)
