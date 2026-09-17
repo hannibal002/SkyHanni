@@ -69,8 +69,8 @@ object QuiverApi {
     var NONE_ARROW_TYPE: ArrowType? = null
     private var FLINT_ARROW_TYPE: ArrowType? = null
 
-    private val group = RepoPattern.group("data.quiver")
-    private val chatGroup = group.group("chat")
+    private val patternGroup = RepoPattern.group("data.quiver")
+    private val chatGroup = patternGroup.group("chat")
 
     /**
      * REGEX-TEST: §aYou set your selected arrow type to §r§fFlint Arrow§r§a!
@@ -121,13 +121,13 @@ object QuiverApi {
      * REGEX-TEST: BOSS_SPIRIT_BOW
      * REGEX-TEST: CRYPT_BOW
      */
-    private val fakeBowsPattern by group.pattern("fakebows", "BOSS_SPIRIT_BOW|CRYPT_BOW")
-    private val quiverInventoryNamePattern by group.pattern("quivername", "Quiver")
+    private val fakeBowsPattern by patternGroup.pattern("fakebows", "BOSS_SPIRIT_BOW|CRYPT_BOW")
+    private val quiverInventoryNamePattern by patternGroup.pattern("quivername", "Quiver")
 
     /**
      * REGEX-TEST: Active Arrow: Flint Arrow (2880)
      */
-    private val quiverInventoryPattern by group.pattern(
+    private val quiverInventoryPattern by patternGroup.pattern(
         "quiver.inventory",
         "Active Arrow: (?<type>.*) \\((?<amount>[\\d,]+)\\)",
     )
@@ -135,7 +135,7 @@ object QuiverApi {
     /**
      * REGEX-TEST: Arrows Remaining: 1,327
      */
-    private val quiverPreviewAmountPattern by group.pattern(
+    private val quiverPreviewAmountPattern by patternGroup.pattern(
         "quiver.preview.amount",
         "Arrows Remaining: (?<amount>[\\d,]+)",
     )
