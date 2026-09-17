@@ -69,7 +69,7 @@ object GolemStage {
     fun timeInAwakening(): Duration? = awakeningSince?.passedSince()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    private fun onTabList(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PROTECTOR)) return
         if (event.isClear()) {
             reset()

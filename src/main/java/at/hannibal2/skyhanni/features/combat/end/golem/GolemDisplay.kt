@@ -127,7 +127,7 @@ object GolemDisplay {
         }
         if (state.showSpawnTimer) {
             // The line keeps its place while the protector is still awakening, so it does not
-            // pop into existence only for the last 20 seconds.
+            // pop into existence only for the last 21 seconds.
             val countdown = if (state.countdownTenths > 0) {
                 "§a${(state.countdownTenths / 10.0).roundTo(1)}s"
             } else "§8incoming"
