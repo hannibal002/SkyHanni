@@ -105,11 +105,11 @@ object SlayerApi {
     )
 
     /**
-     * WRAPPED-REGEX-TEST: 1-2
+     * WRAPPED-REGEX-TEST: "1-2"
      */
     private val repoDropAmountPattern by patternGroup.pattern(
         "repo.drops.amounts",
-        "-?"
+        "(?<min>\\d+)-?(?<max>\\d+)?"
     )
     // </editor-fold>
 

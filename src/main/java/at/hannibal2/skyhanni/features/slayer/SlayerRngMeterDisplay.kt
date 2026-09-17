@@ -289,7 +289,7 @@ object SlayerRngMeterDisplay {
             if (config.coinsPerBoss) {
                 SlayerRngMeterToolTipFeatures.coinsPerBossLine(itemGoal, goalNeeded)?.let { profitLine ->
                     addNotNull(StringRenderable(profitLine))
-                } ?: {
+                } ?: run {
                     add(StringRenderable("§cCouldn't calculate profit/boss!"))
                 }
             }

@@ -169,7 +169,7 @@ object SlayerRngMeterToolTipFeatures {
         slayerTier: Int? = null,
     ): String? {
         val activeType = slayerType ?: SlayerApi.activeType ?: return null
-        val activeTier = slayerTier ?: SlayerApi.tier
+        val activeTier = SlayerApi.tier.takeIf { it != 0 } ?: slayerTier ?: return null
 
         val (minDrop, maxDrop) = SlayerApi.getItemDropAmountForTier(internalName, activeTier)
         val itemPriceMin = SlayerApi.getItemNameAndPrice(internalName, minDrop).second
