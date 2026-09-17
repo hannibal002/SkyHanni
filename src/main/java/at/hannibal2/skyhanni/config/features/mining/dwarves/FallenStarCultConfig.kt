@@ -25,7 +25,6 @@ class FallenStarCultConfig {
     )
     @ConfigEditorDraggableList
     val onlyShowWhen: MutableList<ShowCondition> = mutableListOf(
-        ShowCondition.IN_DWARVEN_MINES,
         ShowCondition.IN_CULT_ROOM,
         ShowCondition.WEARING_HELMET,
     )
