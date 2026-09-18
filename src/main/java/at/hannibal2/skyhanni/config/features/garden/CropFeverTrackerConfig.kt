@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.garden.GardenIndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -37,13 +37,13 @@ class CropFeverTrackerConfig {
     @ConfigEditorDraggableList
     val text: Property<MutableList<CropFeverTrackerTextEntry>> = Property.of(
         mutableListOf(
-            CropFeverTrackerTextEntry.TITLE,
-            CropFeverTrackerTextEntry.RNG_DROPS,
-            CropFeverTrackerTextEntry.SPACER_2,
-            CropFeverTrackerTextEntry.ITEM_DROPS,
-            CropFeverTrackerTextEntry.FEVER_AMOUNT,
-            CropFeverTrackerTextEntry.TOTAL_BLOCKS,
-            CropFeverTrackerTextEntry.TOTAL_PROFIT
+            TITLE,
+            RNG_DROPS,
+            SPACER_2,
+            ITEM_DROPS,
+            FEVER_AMOUNT,
+            TOTAL_BLOCKS,
+            TOTAL_PROFIT,
         )
     )
 
@@ -65,9 +65,9 @@ class CropFeverTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "Click to open the settings that only apply to this tracker."
     )
-    @Accordion
+    @ConfigEditorButton(buttonText = "OPEN")
     val perTrackerConfig: GardenIndividualItemTrackerConfig = GardenIndividualItemTrackerConfig()
 
     @Expose

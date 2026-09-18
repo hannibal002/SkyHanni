@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStats.CFStat
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -33,23 +34,23 @@ class CFConfig {
     )
     @ConfigEditorDraggableList
     val statsDisplayList: MutableList<CFStat> = mutableListOf(
-        CFStat.HEADER,
-        CFStat.CURRENT,
-        CFStat.THIS_PRESTIGE,
-        CFStat.ALL_TIME,
-        CFStat.TIME_TO_PRESTIGE,
-        CFStat.EMPTY,
-        CFStat.PER_SECOND,
-        CFStat.PER_MINUTE,
-        CFStat.PER_HOUR,
-        CFStat.PER_DAY,
-        CFStat.EMPTY_2,
-        CFStat.MULTIPLIER,
-        CFStat.BARN,
-        CFStat.TIME_TOWER,
-        CFStat.TIME_TOWER_FULL,
-        CFStat.LEADERBOARD_POS,
-        CFStat.TIME_TO_BEST_UPGRADE,
+        HEADER,
+        CURRENT,
+        THIS_PRESTIGE,
+        ALL_TIME,
+        TIME_TO_PRESTIGE,
+        EMPTY,
+        PER_SECOND,
+        PER_MINUTE,
+        PER_HOUR,
+        PER_DAY,
+        EMPTY_2,
+        MULTIPLIER,
+        BARN,
+        TIME_TOWER,
+        TIME_TOWER_FULL,
+        LEADERBOARD_POS,
+        TIME_TO_BEST_UPGRADE,
     )
 
     @Expose
@@ -245,9 +246,9 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "Stray Tracker Settings",
-        desc = ""
+        desc = "Click to open the settings that only apply to this tracker."
     )
-    @Accordion
+    @ConfigEditorButton(buttonText = "OPEN")
     val strayTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
 
     @Expose

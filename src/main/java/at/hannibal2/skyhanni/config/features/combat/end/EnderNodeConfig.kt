@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNode
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -36,22 +36,22 @@ class EnderNodeConfig {
     @ConfigEditorDraggableList
     val textFormat: Property<MutableList<EnderNodeDisplayEntry>> = Property.of(
         mutableListOf(
-            EnderNodeDisplayEntry.TITLE,
-            EnderNodeDisplayEntry.NODES_MINED,
-            EnderNodeDisplayEntry.COINS_MADE,
-            EnderNodeDisplayEntry.SPACER_1,
-            EnderNodeDisplayEntry.ENDERMITE_NEST,
-            EnderNodeDisplayEntry.ENCHANTED_END_STONE,
-            EnderNodeDisplayEntry.ENCHANTED_OBSIDIAN,
-            EnderNodeDisplayEntry.ENCHANTED_ENDER_PEARL,
-            EnderNodeDisplayEntry.GRAND_XP_BOTTLE,
-            EnderNodeDisplayEntry.TITANIC_XP_BOTTLE,
-            EnderNodeDisplayEntry.MAGICAL_RUNE_I,
-            EnderNodeDisplayEntry.MITE_GEL,
-            EnderNodeDisplayEntry.SHRIMP_THE_FISH,
-            EnderNodeDisplayEntry.SPACER_2,
-            EnderNodeDisplayEntry.ENDER_ARMOR,
-            EnderNodeDisplayEntry.ENDERMAN_PET
+            TITLE,
+            NODES_MINED,
+            COINS_MADE,
+            SPACER_1,
+            ENDERMITE_NEST,
+            ENCHANTED_END_STONE,
+            ENCHANTED_OBSIDIAN,
+            ENCHANTED_ENDER_PEARL,
+            GRAND_XP_BOTTLE,
+            TITANIC_XP_BOTTLE,
+            MAGICAL_RUNE_I,
+            MITE_GEL,
+            SHRIMP_THE_FISH,
+            SPACER_2,
+            ENDER_ARMOR,
+            ENDERMAN_PET,
         )
     )
 
@@ -98,9 +98,9 @@ class EnderNodeConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "Click to open the settings that only apply to this tracker."
     )
-    @Accordion
+    @ConfigEditorButton(buttonText = "OPEN")
     val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
 
     @Expose

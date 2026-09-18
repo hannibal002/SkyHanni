@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -28,24 +28,24 @@ class PowderTrackerConfig {
     @ConfigEditorDraggableList
     val textFormat: Property<MutableList<PowderDisplayEntry>> = Property.of(
         mutableListOf(
-            PowderDisplayEntry.TOTAL_CHESTS,
-            PowderDisplayEntry.DOUBLE_POWDER,
-            PowderDisplayEntry.GEMSTONE_POWDER,
-            PowderDisplayEntry.SPACER_1,
-            PowderDisplayEntry.DIAMOND_ESSENCE,
-            PowderDisplayEntry.GOLD_ESSENCE,
-            PowderDisplayEntry.SPACER_2,
-            PowderDisplayEntry.HARD_STONE,
-            PowderDisplayEntry.SPACER_3,
-            PowderDisplayEntry.RUBY,
-            PowderDisplayEntry.SAPPHIRE,
-            PowderDisplayEntry.AMBER,
-            PowderDisplayEntry.AMETHYST,
-            PowderDisplayEntry.JADE,
-            PowderDisplayEntry.TOPAZ,
-            PowderDisplayEntry.FTX,
-            PowderDisplayEntry.ELECTRON,
-            PowderDisplayEntry.ROBOTRON
+            TOTAL_CHESTS,
+            DOUBLE_POWDER,
+            GEMSTONE_POWDER,
+            SPACER_1,
+            DIAMOND_ESSENCE,
+            GOLD_ESSENCE,
+            SPACER_2,
+            HARD_STONE,
+            SPACER_3,
+            RUBY,
+            SAPPHIRE,
+            AMBER,
+            AMETHYST,
+            JADE,
+            TOPAZ,
+            FTX,
+            ELECTRON,
+            ROBOTRON,
         )
     )
 
@@ -90,9 +90,9 @@ class PowderTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "Click to open the settings that only apply to this tracker."
     )
-    @Accordion
+    @ConfigEditorButton(buttonText = "OPEN")
     val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
 
     @Expose

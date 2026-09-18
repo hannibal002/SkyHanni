@@ -73,7 +73,6 @@ class ConfigManager {
         }
         configDirectory.mkdirs()
 
-
         for (fileType in ConfigFileType.entries) {
             val clazzInstance = fileType.clazz.getDeclaredConstructor().newInstance()
             setConfigHolder(fileType, firstLoadFile(fileType.file, fileType, clazzInstance))
@@ -160,7 +159,7 @@ class ConfigManager {
                 val lenientGson = BaseGsonBuilder.lenientGson().create()
                 logger.log("load-$fileName-now")
 
-                output = if (fileType == ConfigFileType.FEATURES) {
+                output = if (fileType == FEATURES) {
                     val jsonObject = lenientGson.fromJson(text, com.google.gson.JsonObject::class.java)
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
                     val run = { lenientGson.fromJson(newJsonObject, defaultValue.javaClass) }
@@ -244,6 +243,7 @@ class ConfigManager {
      */
     fun recreateConfig() {
         ConfigGuiManager.editor = null
+        IndividualTrackerConfigGuiManager.invalidate()
         PetDisplayConfigGuiManager.invalidate()
         ConfigUtils.clearEditorCache()
         val features = SkyHanniMod.feature

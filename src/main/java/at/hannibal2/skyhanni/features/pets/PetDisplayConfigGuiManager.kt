@@ -24,7 +24,6 @@ import kotlin.math.roundToInt
 
 @SkyHanniModule
 object PetDisplayConfigGuiManager {
-
     private var editor: MoulConfigEditor<PetDisplayConfig>? = null
     private val config get() = SkyHanniMod.feature.misc.pets.display
     private val widenConfig get() = SkyHanniMod.feature.gui.widenConfig
@@ -49,7 +48,7 @@ object PetDisplayConfigGuiManager {
 
     fun open() {
         resetPreviewInteraction()
-        ConfigUtils.openEditor(getEditorInstance())
+        ConfigUtils.openEditor(getEditorInstance(), previousScreen = MinecraftCompat.screen as? MoulConfigScreenComponent)
     }
 
     fun isOpen(): Boolean {

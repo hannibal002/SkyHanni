@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -25,19 +25,19 @@ class FrozenTreasureConfig {
     @ConfigOption(name = "Text Format", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
     val textFormat: MutableList<FrozenTreasureDisplayEntry> = mutableListOf(
-        FrozenTreasureDisplayEntry.TITLE,
-        FrozenTreasureDisplayEntry.TREASURES_MINED,
-        FrozenTreasureDisplayEntry.TOTAL_ICE,
-        FrozenTreasureDisplayEntry.ICE_PER_HOUR,
-        FrozenTreasureDisplayEntry.COMPACT_PROCS,
-        FrozenTreasureDisplayEntry.SPACER_1,
-        FrozenTreasureDisplayEntry.WHITE_GIFT,
-        FrozenTreasureDisplayEntry.GREEN_GIFT,
-        FrozenTreasureDisplayEntry.RED_GIFT,
-        FrozenTreasureDisplayEntry.ENCHANTED_ICE,
-        FrozenTreasureDisplayEntry.ENCHANTED_PACKED_ICE,
-        FrozenTreasureDisplayEntry.GLACIAL_FRAGMENT,
-        FrozenTreasureDisplayEntry.GLACIAL_TALISMAN
+        TITLE,
+        TREASURES_MINED,
+        TOTAL_ICE,
+        ICE_PER_HOUR,
+        COMPACT_PROCS,
+        SPACER_1,
+        WHITE_GIFT,
+        GREEN_GIFT,
+        RED_GIFT,
+        ENCHANTED_ICE,
+        ENCHANTED_PACKED_ICE,
+        GLACIAL_FRAGMENT,
+        GLACIAL_TALISMAN,
     )
 
     enum class FrozenTreasureDisplayEntry(private val displayName: String) {
@@ -87,9 +87,9 @@ class FrozenTreasureConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "Click to open the settings that only apply to this tracker."
     )
-    @Accordion
+    @ConfigEditorButton(buttonText = "OPEN")
     val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
 
     @Expose

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.MoulConfigEditorComponent
+import at.hannibal2.skyhanni.config.SkyHanniConfigScreen
 import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -20,7 +21,6 @@ import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KProperty0
 
 object ConfigUtils {
-
     private const val UNKNOWN_EDITOR_INDEX = -1
 
     private val editorProviders = listOf<() -> MoulConfigEditor<*>>(
@@ -98,16 +98,19 @@ object ConfigUtils {
     private fun MoulConfigEditor<*>.jumpToOption(option: ProcessedOption): Boolean {
         search("")
         if (!goToOption(option)) return false
-        openEditor(this)
+        val current = MinecraftCompat.screen as? MoulConfigScreenComponent
+        if ((current?.guiContext?.root as? MoulConfigEditorComponent)?.editor !== this) {
+            openEditor(this)
+        }
         return true
     }
 
-    fun openEditor(editor: MoulConfigEditor<*>) {
-        SkyHanniMod.screenToOpen = createConfigScreen(editor)
+    fun openEditor(editor: MoulConfigEditor<*>, previousScreen: Screen? = null) {
+        SkyHanniMod.screenToOpen = createConfigScreen(editor, previousScreen)
     }
 
-    internal fun createConfigScreen(editor: MoulConfigEditor<*>, previousScreen: Screen? = null) =
-        MoulConfigScreenComponent(Component.empty(), GuiContext(MoulConfigEditorComponent(editor)), previousScreen)
+    internal fun createConfigScreen(editor: MoulConfigEditor<*>, previousScreen: Screen? = null): MoulConfigScreenComponent =
+        SkyHanniConfigScreen(Component.empty(), GuiContext(MoulConfigEditorComponent(editor)), previousScreen)
 
     val configScreenCurrentlyOpen: Boolean
         get() = MinecraftCompat.screen is MoulConfigScreenComponent

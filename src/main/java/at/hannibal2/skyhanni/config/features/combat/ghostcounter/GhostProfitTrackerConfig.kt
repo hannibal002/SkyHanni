@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualItemTrackerConfig
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker.GhostTrackerLines
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -23,12 +23,12 @@ class GhostProfitTrackerConfig {
     @ConfigOption(name = "Display Text", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
     val ghostTrackerText: MutableList<GhostTrackerLines> = mutableListOf(
-        GhostTrackerLines.KILLS,
-        GhostTrackerLines.GHOSTS_SINCE_SORROW,
-        GhostTrackerLines.MAX_KILL_COMBO,
-        GhostTrackerLines.COMBAT_XP_GAINED,
-        GhostTrackerLines.AVERAGE_MAGIC_FIND,
-        GhostTrackerLines.BESTIARY_KILLS
+        KILLS,
+        GHOSTS_SINCE_SORROW,
+        MAX_KILL_COMBO,
+        COMBAT_XP_GAINED,
+        AVERAGE_MAGIC_FIND,
+        BESTIARY_KILLS,
     )
 
     @ConfigOption(
@@ -41,9 +41,9 @@ class GhostProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "Click to open the settings that only apply to this tracker."
     )
-    @Accordion
+    @ConfigEditorButton(buttonText = "OPEN")
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
     @Expose

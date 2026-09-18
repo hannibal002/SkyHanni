@@ -4,15 +4,14 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class ForagingTrackerConfig {
-
     @Expose
     @ConfigOption(name = "Enabled", desc = "Track drops from foraging.")
     @ConfigEditorBoolean
@@ -29,7 +28,6 @@ class ForagingTrackerConfig {
     @FeatureToggle
     var compactGiftChats: Boolean = true
 
-
     @Expose
     @ConfigOption(
         name = "Compact Gifts Bonus Drops",
@@ -37,13 +35,13 @@ class ForagingTrackerConfig {
     )
     @ConfigEditorDraggableList
     val compactGiftBonusDropsList: MutableList<TreeGiftBonusDropCategory> = mutableListOf(
-        TreeGiftBonusDropCategory.UNCOMMON_DROPS,
-        TreeGiftBonusDropCategory.ENCHANTED_BOOKS,
-        TreeGiftBonusDropCategory.MOBS,
-        TreeGiftBonusDropCategory.BOOSTERS,
-        TreeGiftBonusDropCategory.SHARDS,
-        TreeGiftBonusDropCategory.RUNES,
-        TreeGiftBonusDropCategory.MISC,
+        UNCOMMON_DROPS,
+        ENCHANTED_BOOKS,
+        MOBS,
+        BOOSTERS,
+        SHARDS,
+        RUNES,
+        MISC,
     )
 
     @Suppress("MaxLineLength")
@@ -80,8 +78,8 @@ class ForagingTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "Click to open the settings that only apply to this tracker."
     )
-    @Accordion
+    @ConfigEditorButton(buttonText = "OPEN")
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 }
