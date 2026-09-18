@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.LivingEntity

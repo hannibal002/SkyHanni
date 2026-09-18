@@ -180,38 +180,6 @@ object TextHelper {
         this.hover = tips.joinToString("\n").asComponent()
     }
 
-    // TODO remove this deprecated alias in November 2026
-    @Deprecated(
-        "Moved to PaginatedListHelper",
-        ReplaceWith(
-            "PaginatedListHelper.createDivider(dividerColor)",
-            "at.hannibal2.skyhanni.utils.chat.PaginatedListHelper",
-        ),
-    )
-    fun createDivider(dividerColor: ChatFormatting = BLUE) =
-        PaginatedListHelper.createDivider(dividerColor)
-
-    // TODO remove this deprecated alias in November 2026
-    @Deprecated(
-        "Moved to PaginatedListHelper",
-        ReplaceWith(
-            "PaginatedListHelper.display(title, list, chatLineId, emptyMessage, currentPage, maxPerPage, dividerColor, formatter)",
-            "at.hannibal2.skyhanni.utils.chat.PaginatedListHelper",
-        ),
-    )
-    fun <T> displayPaginatedList(
-        title: String,
-        list: List<T>,
-        chatLineId: Int,
-        emptyMessage: String,
-        currentPage: Int = 1,
-        maxPerPage: Int = 15,
-        dividerColor: ChatFormatting = BLUE,
-        formatter: (T) -> Component,
-    ): Unit = PaginatedListHelper.display(
-        title, list, chatLineId, emptyMessage, currentPage, maxPerPage, dividerColor, formatter,
-    )
-
     fun createGradientText(start: LorenzColor, end: LorenzColor, string: String): Component {
         return createGradientText(start.toColor(), end.toColor(), string)
     }

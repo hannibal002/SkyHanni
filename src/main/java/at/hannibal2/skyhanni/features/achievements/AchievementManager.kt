@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.PaginatedListHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
@@ -203,7 +203,7 @@ object AchievementManager {
                     .filter { it.getNameOrNull() != null && (!it.hidden || it.data.achieved) }
                 val totalCount = achievementList.size
                 val unlocked = achievementList.count { it.data.achieved }
-                TextHelper.displayPaginatedList(
+                PaginatedListHelper.display(
                     "SkyHanni Achievements! ($unlocked/$totalCount)",
                     achievementList,
                     ChatUtils.getUniqueMessageId(),

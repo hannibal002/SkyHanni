@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotClass
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString

@@ -28,7 +28,6 @@ data class NeuItemJson(
      * and perform further conversion ourselves. Don't use this field.
      */
     @Expose
-    @Deprecated("Use neuNbt or nbtTag instead", ReplaceWith("neuNbt or nbtTag"))
     @SerializedName("nbttag")
     private val nbtTagAny: Any,
     @Expose val damage: Int? = null,
@@ -50,7 +49,6 @@ data class NeuItemJson(
     }
 
     private val fixedNbtTagString by lazy {
-        @Suppress("DEPRECATION")
         when (nbtTagAny) {
             is String -> nbtTagAny
             is JsonObject -> nbtTagAny["nbttag"]?.asString.orEmpty()

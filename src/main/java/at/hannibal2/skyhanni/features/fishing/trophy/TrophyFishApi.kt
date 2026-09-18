@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.splitLines
+import at.hannibal2.skyhanni.utils.chat.TextHelper.splitLines
 
 object TrophyFishApi {
 

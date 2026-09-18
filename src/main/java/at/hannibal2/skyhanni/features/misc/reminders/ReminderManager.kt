@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.minutes
+import at.hannibal2.skyhanni.utils.chat.PaginatedListHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
@@ -49,7 +50,7 @@ object ReminderManager {
     }
 
     private fun listReminders(page: Int = 1) {
-        TextHelper.displayPaginatedList(
+        PaginatedListHelper.display(
             "SkyHanni Reminders",
             getSortedReminders(),
             chatLineId = REMINDERS_LIST_ID,
@@ -141,7 +142,7 @@ object ReminderManager {
     }
 
     private fun help() {
-        TextHelper.createDivider().send()
+        PaginatedListHelper.createDivider().send()
         "§6SkyHanni Reminder Commands:".asComponent().send()
         "§e/shremind <time> <reminder> - §bCreates a new reminder".asComponent().send()
         "§e/shremind list <page> - §bLists all reminders".asComponent().send()
@@ -149,7 +150,7 @@ object ReminderManager {
         "§e/shremind edit <id> <reminder> - §bEdits a reminder".asComponent().send()
         "§e/shremind move <id> <time> - §bMoves a reminder".asComponent().send()
         "§e/shremind help - §bShows this help message".asComponent().send()
-        TextHelper.createDivider().send()
+        PaginatedListHelper.createDivider().send()
     }
 
     @HandleEvent
