@@ -26,4 +26,6 @@ data class EnforcedValueData(
 data class EnforcedValue(
     @Expose val path: String,
     @Expose val value: JsonElement,
+    // Whether the enforced value also gets written to the config file instead of only being applied in memory
+    @Expose val persist: Boolean = false,
 )
