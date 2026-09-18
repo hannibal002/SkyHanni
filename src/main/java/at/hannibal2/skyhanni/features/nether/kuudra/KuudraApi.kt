@@ -123,15 +123,18 @@ object KuudraApi {
         }
     }
 
+    @Deprecated("use KuudraTier instead")
+    private val kuudraTiers = listOf("basic", "hot", "burning", "fiery", "infernal")
+
     @Deprecated(
         "use KuudraTier.getByTierNumber(tier) instead",
         ReplaceWith("at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier.getByTierNumber(tier)?.name.lowercase()"),
     )
-    fun getKuudraRunTierName(tier: Int): String = listOf("basic", "hot", "burning", "fiery", "infernal")[tier - 1]
+    fun getKuudraRunTierName(tier: Int): String = kuudraTiers[tier - 1]
 
     @Deprecated(
         "use KuudraTier.getByDisplayName(tier) instead",
         ReplaceWith("at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier.getByDisplayName(tier)?.tierNumber - 1"),
     )
-    fun getKuudraRunTierNumber(tier: String?): Int = listOf("basic", "hot", "burning", "fiery", "infernal").indexOf(tier)
+    fun getKuudraRunTierNumber(tier: String?): Int = kuudraTiers.indexOf(tier)
 }
