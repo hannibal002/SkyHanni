@@ -1,14 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.chat.ChatComponentUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper
-import net.minecraft.network.chat.Component
 import java.net.URLEncoder
 import java.util.Base64
 import java.util.Locale

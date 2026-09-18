@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils.collection
 
 import at.hannibal2.skyhanni.utils.MinMaxNumber
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.network.chat.Component
 import java.util.Collections
@@ -11,7 +10,6 @@ import java.util.PriorityQueue
 import java.util.Queue
 import java.util.WeakHashMap
 import java.util.regex.Pattern
-import kotlin.collections.filterNot
 import kotlin.math.ceil
 import kotlin.reflect.KClass
 import kotlin.time.Duration
