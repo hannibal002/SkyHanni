@@ -10,8 +10,6 @@ class CrimsonMiniBoss(
     val location: LorenzVec?,
     var doneToday: Boolean = false,
 ) {
-    val pattern by RepoPattern.pattern(
-        "crimson.reputationhelper.miniboss.${displayName.lowercase().replace(" ", "_")}",
-        " *${displayName.uppercase()} DOWN!"
-    )
+    // Entries are loaded via onRepoReload so can't use RepoPattern.pattern() here
+    val pattern = " *${displayName.uppercase()} DOWN!".toPattern()
 }
