@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -43,7 +42,6 @@ import kotlin.time.DurationUnit
 
 @SkyHanniModule
 object CarnivalZombieShootout {
-
     private val config get() = SkyHanniMod.feature.event.carnival.zombieShootout
 
     private data class ShootoutLamp(var pos: LorenzVec, var time: SimpleTimeMark)
@@ -82,7 +80,7 @@ object CarnivalZombieShootout {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         if (config.zombieTimer) event.renderZombieTimer()
@@ -151,31 +149,29 @@ object CarnivalZombieShootout {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled() || !config.lampTimer) return
 
         config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
     }
 
-    @HandleEvent(ServerBlockChangeEvent::class)
-    fun onBlockChange(event: ServerBlockChangeEvent) {
+    @HandleEvent
+    private fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled()) return
 
-        val blockOld = event.old
-        val blockNew = event.new
-        if (blockOld == "redstone_lamp" && blockNew == "redstone_lamp") {
-            val old = event.oldState.getValue(BlockStateProperties.LIT)
-            val new = event.newState.getValue(BlockStateProperties.LIT)
+        if (event.old == Blocks.REDSTONE_LAMP && event.new == Blocks.REDSTONE_LAMP) {
+            val oldLit = event.oldState.getValue(BlockStateProperties.LIT)
+            val newLit = event.newState.getValue(BlockStateProperties.LIT)
             lamp = when {
-                !old && new -> ShootoutLamp(event.location, SimpleTimeMark.now())
-                old && !new -> null
+                !oldLit && newLit -> ShootoutLamp(event.location, SimpleTimeMark.now())
+                oldLit && !newLit -> null
                 else -> lamp
             }
         }
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.enabled || !CarnivalAPI.inCarnivalArea) return
 
         val message = event.cleanMessage
@@ -188,7 +184,7 @@ object CarnivalZombieShootout {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled() || !event.isMod(2)) return
 
         if (config.coloredHitboxes || config.zombieTimer) {
@@ -204,7 +200,7 @@ object CarnivalZombieShootout {
 
     private fun updateZombies() {
         val nearbyZombies = getZombies()
-        maxType = nearbyZombies.maxByOrNull { it.type.points }?.type ?: ZombieType.LEATHER
+        maxType = nearbyZombies.maxByOrNull { it.type.points }?.type ?: LEATHER
         val maxZombies = nearbyZombies.filter { it.type == maxType }
 
         drawZombies = when {
@@ -229,7 +225,7 @@ object CarnivalZombieShootout {
             Renderable.item(lamp),
             Renderable.text("§6Disappears in $prefix$timer"),
             spacing = 1,
-            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            verticalAlign = CENTER,
         )
     }
 

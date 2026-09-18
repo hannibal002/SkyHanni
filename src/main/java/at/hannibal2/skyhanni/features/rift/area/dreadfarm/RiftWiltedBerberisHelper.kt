@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.InteractClickType
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.WiltedBerberisLocationsJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ParticleEvent
@@ -38,7 +36,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object RiftWiltedBerberisHelper {
-
     private val config get() = RiftApi.config.area.dreadfarm.wiltedBerberis
 
     private val berberisSounds = setOf("entity.donkey.death", "entity.donkey.hurt")
@@ -111,14 +108,14 @@ object RiftWiltedBerberisHelper {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         fieldCenters = event.getConstant<WiltedBerberisLocationsJson>("rift/WiltedBerberisLocations")
             .fieldCenters.associate { it.position to it.count }
         fieldSequences = fieldCenters.keys.associateWith { BerberisSequence(it) }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onTick(event: SkyHanniTickEvent) {
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
 
@@ -160,8 +157,8 @@ object RiftWiltedBerberisHelper {
             .filter { it.distanceIgnoreY(location) < maxDistance }
             .minByOrNull { it.distanceIgnoreY(location) }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT, receiveCancelled = true)
-    fun onParticle(event: ParticleEvent) {
+    @HandleEvent(onlyOnIsland = THE_RIFT, receiveCancelled = true)
+    private fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 
@@ -236,8 +233,8 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onPlaySound(event: PlaySoundEvent) {
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (!isMuteOthersSoundsEnabled()) return
 
         if (event.soundName in berberisSounds) {
@@ -245,10 +242,10 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onBlockClick(event: BlockClickEvent) {
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled() || !config.respawnSequence) return
-        if (event.clickType != InteractClickType.LEFT_CLICK) return
+        if (event.clickType != LEFT_CLICK) return
         if (event.blockState.block != Blocks.DEAD_BUSH) return
 
         for (seq in fieldSequences.values) {
@@ -260,10 +257,10 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onBlockChange(event: ServerBlockChangeEvent) {
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled() || !config.respawnSequence) return
-        if (event.old != "dead_bush" || event.new != "air") return
+        if (event.old != Blocks.DEAD_BUSH || event.new != Blocks.AIR) return
 
         for (seq in fieldSequences.values) {
             if (!seq.isRendering || seq.isAway) continue
@@ -274,8 +271,8 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 
@@ -368,7 +365,7 @@ object RiftWiltedBerberisHelper {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(60, "rift.area.dreadfarm.wiltedBerberis.hideparticles", "rift.area.dreadfarm.wiltedBerberis.hideParticles")
     }
 
