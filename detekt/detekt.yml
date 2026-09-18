@@ -48,6 +48,9 @@ SkyHanniStyle:
         active: true
     PrivateEventListener:
         active: true
+    PrivateUseUnicodeRule:
+        active: true
+        extraIcons: "☯❣"
 
 style:
     MagicNumber: # I, Linnea Gräf, of sound mind and body, disagree with disabling this rule
