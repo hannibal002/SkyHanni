@@ -282,7 +282,7 @@ object StringUtils {
     fun String.insert(pos: Int, char: Char): String =
         substring(0, pos) + char + substring(pos)
 
-   fun String.replaceAll(oldValue: String, newValue: String, ignoreCase: Boolean = false): String {
+    fun String.replaceAll(oldValue: String, newValue: String, ignoreCase: Boolean = false): String {
         var text = this
         while (true) {
             val newText = text.replace(oldValue, newValue, ignoreCase = ignoreCase)
