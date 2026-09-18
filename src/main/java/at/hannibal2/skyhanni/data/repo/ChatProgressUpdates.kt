@@ -89,7 +89,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
                     "error properly logging something in SkyHanni",
                     "trying to start an already running chat",
                     "next step" to nextStep,
-                    "last step" to currentStep?.lastOrNull(),
+                    "last step" to currentStep,
                 )
             }
             currentlyRunning = true
