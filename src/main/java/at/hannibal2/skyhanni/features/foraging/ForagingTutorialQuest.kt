@@ -27,7 +27,11 @@ object ForagingTutorialQuest {
     private var lastSuggestion = SimpleTimeMark.farPast()
 
     /**
-     * REGEX-TEST: You must complete the TODO Quest to use this!
+     * REGEX-TEST: You must complete the Foraging Tutorial Quest to use this!
+     * REGEX-TEST: You must complete the Into the Woods Quest to use this!
+     * REGEX-TEST: You must complete the A Helping Hand Quest to use this!
+     * REGEX-TEST: You must complete the The Campfire Cult Quest to use this!
+     * REGEX-TEST: You must complete the The Rebuild Quest to use this!
      */
     private val questMissingPattern by RepoPattern.pattern(
         "foraging.tutorial.quest-missing",
