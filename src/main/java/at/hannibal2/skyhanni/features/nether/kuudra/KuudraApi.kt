@@ -127,7 +127,7 @@ object KuudraApi {
         "use KuudraTier.getByTierNumber(tier) instead",
         ReplaceWith("at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier.getByTierNumber(tier)?.name.lowercase()"),
     )
-    fun getKuudraRunTierName(tier: Int): String = KuudraTier.getByTierNumber(tier)!!.name.lowercase()
+    fun getKuudraRunTierName(tier: Int): String = KuudraTier.getByTierNumber(tier)?.name?.lowercase() ?: null as String
 
     @Deprecated(
         "use KuudraTier.getByDisplayName(tier) instead",
