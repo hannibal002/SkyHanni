@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object RescueMissionWaypoints {
-
     // Logic for the parkour location waypoint system is based on the Deep Caverns Guide by hannibal2
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper.rescueMission
@@ -183,7 +182,7 @@ object RescueMissionWaypoints {
     )
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         data = event.getConstant<RescueParkourJson>("RescueMissionWaypoints")
         parkourHelper?.let {
             startParkour()

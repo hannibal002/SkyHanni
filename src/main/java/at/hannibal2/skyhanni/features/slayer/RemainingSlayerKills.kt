@@ -116,8 +116,8 @@ object RemainingSlayerKills {
     private var lastReminder = SimpleTimeMark.farPast()
     private var killComboWisdom = 0
 
-    @HandleEvent(priority = HandleEvent.HIGH)
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    @HandleEvent(priorityLevel = HIGH)
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         data = event.getConstant<SlayerData>("Slayer")
     }
 

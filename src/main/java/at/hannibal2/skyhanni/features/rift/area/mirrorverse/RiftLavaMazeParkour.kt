@@ -15,13 +15,11 @@ import net.minecraft.world.entity.Entity
 
 @SkyHanniModule
 object RiftLavaMazeParkour {
-
     private val config get() = RiftApi.config.area.mirrorverse.lavaMazeConfig
     private var parkourHelper: ParkourHelper? = null
 
-
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("RiftLavaMazeParkour")
         parkourHelper = ParkourHelper(
             data.locations,

@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import java.util.EnumSet
 
 // TODO maybe rename this class to IslandTypeGroup
@@ -14,7 +12,6 @@ import java.util.EnumSet
  * Each [IslandTypeTag] consists of one or more [IslandType] or [IslandTypeTag]
  */
 enum class IslandTypeTag(vararg types: Any) {
-
     PRIVATE_ISLAND(IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST),
     GARDEN_ISLAND(IslandType.GARDEN, IslandType.GARDEN_GUEST),
     PERSONAL_ISLAND(PRIVATE_ISLAND, GARDEN_ISLAND),
@@ -88,14 +85,11 @@ enum class IslandTypeTag(vararg types: Any) {
 
     @SkyHanniModule
     companion object {
-
         fun Collection<IslandTypeTag>.isInAnyIsland(): Boolean = any { it.isInIsland() }
 
-        private val repoReloadCoroutine = CoroutineSettings("island type tag repo reload")
-
         @HandleEvent
-        fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
-            event.getConstantAsync<Map<String, List<String>>>("IslandTypeTags").forEach { (name, values) ->
+        private suspend fun onRepoReload(event: RepositoryReloadEvent) {
+            event.getConstant<Map<String, List<String>>>("IslandTypeTags").forEach { (name, values) ->
                 EnumUtils.enumValueOfOrNull<IslandTypeTag>(name.uppercase())?.update(values)
             }
         }

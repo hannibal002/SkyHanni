@@ -15,7 +15,6 @@ class EventHandler<T : SkyHanniEvent> private constructor(
     private val listenerCollection: ListenerCollection,
     private val canReceiveCancelled: Boolean,
 ) {
-
     val invokeLog = SkyHanniEvents.EventInvokeLog()
 
     constructor(event: Class<T>, listeners: List<Listener>) : this(
@@ -33,7 +32,8 @@ class EventHandler<T : SkyHanniEvent> private constructor(
             if (!listener.shouldInvoke(event)) return@forEachCurrent true
 
             try {
-                listener.invoker.accept(event)
+                requireNotNull(listener.invoker) { "Async listener ${listener.name} registered for synchronous event $name" }
+                    .accept(event)
             } catch (originalThrowable: Throwable) {
                 val throwable = originalThrowable.maybeSkipError()
                 errors++
