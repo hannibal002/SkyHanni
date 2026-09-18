@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.FakeEntityIdProvider
 import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.HolographicEntities.renderHolographicEntity
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -26,6 +25,10 @@ import java.util.Base64
 import kotlin.math.atan2
 import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.seconds
+
+//? if >= 26.2 {
+import at.hannibal2.skyhanni.utils.FakeEntityIdProvider
+//?}
 
 @SkyHanniModule
 object FakeNpcApi {
