@@ -59,6 +59,7 @@ import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.InfernoMinionProfitTracker
+import at.hannibal2.skyhanni.features.mining.tracker.MiningTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
@@ -863,6 +864,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var flowstatePersonalBest = 0
+
+        @Expose
+        var miningTracker: MiningTracker.BucketData = MiningTracker.BucketData()
 
         @Expose
         var darkMonolithTracker: DarkMonolithFeatures.Data = DarkMonolithFeatures.Data()
