@@ -595,47 +595,52 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         val configDirectory = legacyConfigDirectory ?: return
 
         val legacyRepoDirectory = configDirectory.resolve("repo").takeIf { it.exists() }
-        legacyRepoDirectory?.let { legacyDirectory ->
+        if (legacyRepoDirectory != null) {
             logger.warn("Migrating legacy repo directory to: ${repoDirectory.absolutePath}")
             repoDirectory.mkdirs()
 
-            val copied = legacyDirectory.copyRecursively(
-                target = repoDirectory,
-                overwrite = false,
-                onError = { _, exception ->
-                    if (exception is FileAlreadyExistsException) {
-                        OnErrorAction.SKIP
-                    } else {
-                        OnErrorAction.TERMINATE
+            val copied = runCatching {
+                legacyRepoDirectory.copyRecursively(
+                    target = repoDirectory,
+                    overwrite = false,
+                    onError = { _, exception ->
+                        if (exception is FileAlreadyExistsException) {
+                            OnErrorAction.SKIP
+                        } else {
+                            OnErrorAction.TERMINATE
+                        }
                     }
-                }
-            )
+                )
+            }.onFailure { e ->
+                logger.error("Uncaught exception while migrating legacy repo: ${e.message}")
+            }.getOrDefault(false)
 
             if (copied) {
-                legacyDirectory.deleteRecursivelySafe()
+                legacyRepoDirectory.deleteRecursivelySafe()
             } else {
-                logger.error("Failed to copy legacy repo directory from ${legacyDirectory.absolutePath}")
+                logger.error("Failed to copy legacy repo directory from ${legacyRepoDirectory.absolutePath}")
+                return
             }
         }
 
         val legacyCommitFile = configDirectory.resolve("currentCommit.json").takeIf { it.exists() }
-        legacyCommitFile?.let { legacyFile ->
+        if (legacyCommitFile != null) {
             if (commitFile.exists()) {
-                legacyFile.delete()
+                legacyCommitFile.delete()
                 return@let
             }
             logger.warn("Moving legacy commit file to: ${commitFile.absolutePath}")
             commitFile.parentFile?.mkdirs()
             runCatching {
-                Files.move(legacyFile.toPath(), commitFile.toPath())
+                Files.move(legacyCommitFile.toPath(), commitFile.toPath())
             }.onFailure {
                 runCatching {
-                    legacyFile.copyTo(commitFile, overwrite = false)
+                    legacyCommitFile.copyTo(commitFile, overwrite = false)
                 }.onSuccess {
-                    legacyFile.delete()
+                    legacyCommitFile.delete()
                 }.onFailure {
                     logger.error(
-                        "Failed to move or copy legacy commit file; keeping original: ${legacyFile.absolutePath}"
+                        "Failed to move or copy legacy commit file; keeping original: ${legacyCommitFile.absolutePath}"
                     )
                 }
             }
