@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.garden.contest
 import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat.FARMING_FORTUNE
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -53,16 +53,6 @@ object FarmingPersonalBestGain {
         "ff.new.colorless",
         "\\[NPC] Jacob: Your Personal Bests perk is now granting you \\+(?<ff>.*)${FARMING_FORTUNE.hypixelIcon} (?<crop>.*) Fortune!",
     )
-
-    /**
-     * REGEX-TEST: §e[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6+46.69 Potato Fortune§f!
-     */
-    @Deprecated("Only exists for repo. Remove after 9.0.0.", level = DeprecationLevel.ERROR)
-    @Suppress("MaxLineLength")
-    private val unused by patternGroup.pattern(
-        "ff.new",
-        "§e\\[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6\\+(?<ff>.*)${FARMING_FORTUNE.hypixelIcon} (?<crop>.*) Fortune§f!",
-    )
     // </editor-fold>
 
     private val repoReloadCoroutine = CoroutineSettings("farming personal best gain repo reload")
@@ -76,30 +66,30 @@ object FarmingPersonalBestGain {
     var cropType: CropType? = null
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+    private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
         val data = event.getConstantAsync<GardenJson>("Garden")
         personalBestIncrements = data.personalBestIncrement
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(68, "garden.contestPersonalBestIncreaseFF", "garden.personalBests.increaseFF")
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
-
-        newPattern.matchMatcher(event.message) {
+        val message = event.cleanMessage
+        newPattern.matchMatcher(message) {
             newCollected = group("collected").formatDouble()
             checkDelayed()
         }
 
-        oldPattern.matchMatcher(event.message) {
+        oldPattern.matchMatcher(message) {
             oldCollected = group("collected").formatDouble()
             checkDelayed()
         }
-        newFFPattern.matchMatcher(event.message) {
+        newFFPattern.matchMatcher(message) {
             val cropName = group("crop")
             newFF = group("ff").formatDouble()
             val newFF = newFF ?: return

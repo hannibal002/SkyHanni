@@ -3,14 +3,10 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -49,19 +45,28 @@ object DeepCavernsGuide {
     }
 
     private val patternGroup = RepoPattern.group("features.mining.deepcavernsguide")
+
+    /**
+     * REGEX-TEST: [NPC] Lift Operator: Venture down into the Lapis Quarry to unlock my Lift Menu!
+     */
     private val notUnlockedPattern by patternGroup.pattern(
-        "notunlocked",
-        "§e\\[NPC] §bLift Operator§f: §rVenture down into the Lapis Quarry to unlock my Lift Menu!",
+        "notunlocked.colorless",
+        "\\[NPC] Lift Operator: Venture down into the Lapis Quarry to unlock my Lift Menu!",
+    )
+
+    private val liftInventoryPattern by patternGroup.pattern(
+        "inventory",
+        "Lift",
     )
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    private fun onIslandChange() {
         parkourHelper?.reset()
         show = false
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("DeepCavernsParkour")
         parkourHelper = ParkourHelper(
             data.locations,
@@ -77,7 +82,7 @@ object DeepCavernsGuide {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad() {
         ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()
         }
@@ -91,22 +96,22 @@ object DeepCavernsGuide {
         }
     }
 
-    @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    @HandleEvent(onlyOnIsland = DEEP_CAVERNS)
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (SkyBlockUtils.graphArea != "Gunpowder Mines") return
-        if (notUnlockedPattern.matches(event.message)) {
+        if (notUnlockedPattern.matches(event.cleanMessage)) {
             DelayedRun.runNextTick {
                 start()
             }
         }
     }
 
-    @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    @HandleEvent(onlyOnIsland = DEEP_CAVERNS)
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         showStartIcon = false
         if (!isEnabled()) return
-        if (event.inventoryName != "Lift") return
+        if (!liftInventoryPattern.matches(event.inventoryName)) return
         if (SkyBlockUtils.graphArea != "Gunpowder Mines") return
         showStartIcon = true
 
@@ -138,13 +143,13 @@ object DeepCavernsGuide {
         )
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(onlyOnIsland = DEEP_CAVERNS)
+    private fun onInventoryClose() {
         showStartIcon = false
     }
 
     @HandleEvent
-    fun replaceItem(event: ReplaceItemEvent) {
+    private fun replaceItem(event: ReplaceItemEvent) {
         if (show) return
         if (event.inventory is SimpleContainer && showStartIcon && event.slot == 49) {
             event.replace(startIcon)
@@ -152,7 +157,7 @@ object DeepCavernsGuide {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (showStartIcon && event.slotId == 49) {
             event.cancel()
             ChatUtils.chat("Manually enabled Deep Caverns Guide.")
@@ -160,18 +165,18 @@ object DeepCavernsGuide {
         }
     }
 
-    @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    @HandleEvent(onlyOnIsland = DEEP_CAVERNS)
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!show) return
 
         parkourHelper?.render(event)
     }
 
-    private fun isEnabled() = IslandType.DEEP_CAVERNS.isInIsland() && config.enabled
+    private fun isEnabled() = config.enabled
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(38, "mining.deepCavernsParkour", "mining.deepCavernsGuide")
     }
 }

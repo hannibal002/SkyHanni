@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -27,13 +27,13 @@ object DungeonCleanEnd {
     private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
 
     /**
-     * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor III
-     * REGEX-TEST: §f                        §r§cThe Catacombs §r§8- §r§eFloor VI
-     * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor II
+     * WRAPPED-REGEX-TEST: "                Master Mode The Catacombs - Floor III"
+     * WRAPPED-REGEX-TEST: "                        The Catacombs - Floor VI"
+     * WRAPPED-REGEX-TEST: "                Master Mode The Catacombs - Floor II"
      */
     private val catacombsPattern by RepoPattern.pattern(
-        "dungeon.end.chests.spawned",
-        "(?:§f)? *§r§c(?:Master Mode )?The Catacombs §r§8- §r§eFloor .*",
+        "dungeon.end.chests.spawned.colorless",
+        " *(?:Master Mode )?The Catacombs - Floor .*",
     )
 
     private var bossDone = false
@@ -41,10 +41,10 @@ object DungeonCleanEnd {
     private var lastBossId: Int = -1
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SystemMessageEvent.Allow) {
         if (!config.enabled) return
 
-        val message = event.message
+        val message = event.cleanMessage
 
         catacombsPattern.matchMatcher(message) {
             chestsSpawned = true
@@ -60,14 +60,14 @@ object DungeonCleanEnd {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         bossDone = false
         chestsSpawned = false
         lastBossId = -1
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onBossDead(event: DamageIndicatorFinalBossEvent) {
+    private fun onBossDead(event: DamageIndicatorFinalBossEvent) {
         if (bossDone) return
 
         if (lastBossId == -1) {
@@ -76,7 +76,7 @@ object DungeonCleanEnd {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
+    private fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!config.enabled) return
         if (bossDone) return
         if (lastBossId == -1) return
@@ -90,7 +90,7 @@ object DungeonCleanEnd {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
+    private fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!shouldBlock()) return
 
         val entity = event.entity
@@ -114,21 +114,21 @@ object DungeonCleanEnd {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onParticle(event: ParticleEvent) {
+    private fun onParticle(event: ParticleEvent) {
         if (shouldBlock()) {
             event.cancel()
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onPlaySound(event: PlaySoundEvent) {
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (shouldBlock() && !chestsSpawned && event.soundName.startsWith("block.note_block.")) {
             event.cancel()
         }
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dungeon.cleanEndToggle", "dungeon.cleanEnd.enabled")
         event.move(3, "dungeon.cleanEndF3IgnoreGuardians", "dungeon.cleanEnd.F3IgnoreGuardians")
         event.move(75, "dungeon.cleanEnd.F3IgnoreGuardians", "dungeon.cleanEnd.f3IgnoreGuardians")

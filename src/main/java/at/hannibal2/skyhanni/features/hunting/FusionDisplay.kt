@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.features.hunting
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.item.ShardEvent
 import at.hannibal2.skyhanni.events.item.ShardSource
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
@@ -27,16 +25,18 @@ object FusionDisplay {
     private var lastInternalName: NeuInternalName? = null
     private var pureReptiles = 0
 
+    private val patternGroup = RepoPattern.group("attributeshards")
+
     /**
-     * REGEX-TEST: §b§lPURE REPTILE
+     * REGEX-TEST: PURE REPTILE
      */
-    private val pureReptilePattern by RepoPattern.group("attributeshards").pattern(
-        "pure-reptile-chat",
-        "^§b§lPURE REPTILE",
+    private val pureReptilePattern by patternGroup.pattern(
+        "pure-reptile-chat.colorless",
+        "^PURE REPTILE",
     )
 
     @HandleEvent
-    fun onShardGain(event: ShardEvent) {
+    private fun onShardGain(event: ShardEvent) {
         if (event.source != ShardSource.FUSE) return
         if (event.amount < 0) return
         if (lastInternalName != event.shardInternalName) {
@@ -47,8 +47,8 @@ object FusionDisplay {
     }
 
     @HandleEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (event.inventoryName == "Fusion Box") makeRenderable()
+    private fun onInventoryFullyOpened() {
+        if (AttributeShardsData.fusionBoxInventory.isInside()) makeRenderable()
     }
 
     private fun makeRenderable() {
@@ -64,12 +64,12 @@ object FusionDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (pureReptilePattern.find(event.message)) pureReptiles++
+    private fun onChat(event: SystemMessageEvent.Allow) {
+        if (pureReptilePattern.find(event.cleanMessage)) pureReptiles++
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    private fun onChestGuiRender() {
         if (!config.fusionDisplay) return
         if (!AttributeShardsData.isInFusionMachine()) return
         renderable?.let {

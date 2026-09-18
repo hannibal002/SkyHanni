@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ReputationQuest
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -31,19 +31,19 @@ object DailyMiniBossHelper {
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
 
-        val message = event.message
+        val message = event.cleanMessage
         for (miniBoss in miniBosses) {
-            miniBoss.pattern.matchMatcher(message) {
+            if (miniBoss.pattern.matches(message)) {
                 finished(miniBoss)
             }
         }
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!CrimsonIsleReputationHelper.showLocations()) return
 
@@ -108,9 +108,8 @@ object DailyMiniBossHelper {
         miniBosses.clear()
         for ((displayName, quest) in data) {
             val displayItem = quest.item
-            val pattern = "§f *§r§6§l${displayName.uppercase()} DOWN!".toPattern()
             val location = CrimsonIsleReputationHelper.readLocationData(quest.location)
-            miniBosses.add(CrimsonMiniBoss(displayName, displayItem, location, pattern))
+            miniBosses.add(CrimsonMiniBoss(displayName, displayItem, location))
         }
     }
 

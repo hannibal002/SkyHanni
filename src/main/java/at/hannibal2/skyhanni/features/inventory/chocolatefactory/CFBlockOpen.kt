@@ -21,10 +21,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -48,12 +48,12 @@ object CFBlockOpen {
     )
 
     /**
-     * REGEX-TEST: §6Chocolate Factory
-     * REGEX-TEST: §6Open Chocolate Factory
+     * REGEX-TEST: Chocolate Factory
+     * REGEX-TEST: Open Chocolate Factory
      */
     private val openCfItemPattern by RepoPattern.pattern(
-        "inventory.chocolatefactory.openitem",
-        "§6(?:Open )?Chocolate Factory",
+        "inventory.chocolatefactory.openitem.colorless",
+        "(?:Open )?Chocolate Factory",
     )
     // </editor-fold>
 
@@ -78,7 +78,7 @@ object CFBlockOpen {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        val slotDisplayName = event.slot?.item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val slotDisplayName = event.slot?.item?.cleanName ?: return
         if (!openCfItemPattern.matches(slotDisplayName)) return
         if (EnchantedClockHelper.enchantedClockPattern.matches(InventoryUtils.openInventoryName())) return
 

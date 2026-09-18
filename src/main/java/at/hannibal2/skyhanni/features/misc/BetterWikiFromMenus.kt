@@ -7,13 +7,23 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object BetterWikiFromMenus {
 
     private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
+
+    /**
+     * REGEX-TEST: Click to view on the SkyBlock Wiki!
+     */
+    private val clickToViewOnWikiPattern by RepoPattern.pattern(
+        "misc.better-wiki-from-menus.click-to-view-on-wiki",
+        "Click to view on the SkyBlock Wiki!"
+    )
 
     @HandleEvent
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -35,8 +45,7 @@ object BetterWikiFromMenus {
         val isWiki = event.slotId == 11 && itemClickedName.contains("Wiki Command")
         val isWikithis = event.slotId == 15 && itemClickedName.contains("Wikithis Command")
         val inBiblioInventory = chestName == "SkyBlock Wiki" && (isWiki || isWikithis)
-        val inSBGuideInventory =
-            (itemClickedStack.getLore().let { it.any { line -> line == "§7§eClick to view on the SkyBlock Wiki!" } })
+        val inSBGuideInventory = clickToViewOnWikiPattern.anyMatches(itemClickedStack.getCleanLore())
 
         if (inBiblioInventory) {
             if (isWiki) {

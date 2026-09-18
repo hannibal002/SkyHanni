@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventS
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.Companion.RabbitData
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getEventEndMark
@@ -52,11 +52,11 @@ typealias MappedStatStrings = Map<HoppityStat, MutableList<StatString>>
 @Suppress("LargeClass")
 object HoppityEventSummary {
     /**
-     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§7You found §r§cRabbit the Fish§r§7!
+     * REGEX-TEST: HOPPITY'S HUNT You found Rabbit the Fish!
      */
     private val rabbitTheFishPattern by CFApi.patternGroup.pattern(
-        "rabbit.thefish",
-        "(?:§.)*HOPPITY'S HUNT (?:§.)*You found (?:§.)*Rabbit the Fish(?:§.)*!.*",
+        "rabbit.thefish.colorless",
+        "HOPPITY'S HUNT You found Rabbit the Fish!.*",
     )
 
     private const val LINE_HEADER = "    "
@@ -134,11 +134,11 @@ object HoppityEventSummary {
     }
 
     @HandleEvent
-    private fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SystemMessageEvent.Allow) {
         if (!HoppityApi.isHoppityEvent()) return
         val stats = getYearStats() ?: return
 
-        if (rabbitTheFishPattern.matches(event.message)) {
+        if (rabbitTheFishPattern.matches(event.cleanMessage)) {
             stats.rabbitTheFishFinds++
         }
     }

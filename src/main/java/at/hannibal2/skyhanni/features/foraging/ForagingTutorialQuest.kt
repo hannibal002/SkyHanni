@@ -12,7 +12,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -22,6 +25,14 @@ object ForagingTutorialQuest {
 
     private var lastParkWarpAttempt = SimpleTimeMark.farPast()
     private var lastSuggestion = SimpleTimeMark.farPast()
+
+    /**
+     * REGEX-TEST: You must complete the TODO Quest to use this!
+     */
+    private val questMissingPattern by RepoPattern.pattern(
+        "foraging.tutorial.quest-missing",
+        "You must complete the (?<quest>.*) Quest to use this!",
+    )
 
     private enum class Quest(val questName: String, val npcName: String, val npcLocation: LorenzVec) {
         FIRST("Foraging Tutorial", "Lumber Jack", LorenzVec(-123.5, 74.0, -30.0)),
@@ -48,7 +59,7 @@ object ForagingTutorialQuest {
     }
 
     @HandleEvent
-    fun onMessageSendToServer(event: MessageSendToServerEvent) {
+    private fun onMessageSendToServer(event: MessageSendToServerEvent) {
         val message = event.message
         if (message.lowercase() == "/warp park") {
             lastParkWarpAttempt = SimpleTimeMark.now()
@@ -56,9 +67,10 @@ object ForagingTutorialQuest {
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent.Allow) {
-        if (event.message == "§cYou don't have the requirements to use this warp!" ||
-            event.message == "§cYou haven't unlocked this fast travel destination!"
+    private fun onChat(event: SystemMessageEvent.Allow) {
+        val message = event.cleanMessage
+        if (UtilsPatterns.fastTravelNotUnlockedPattern.matches(message) ||
+            UtilsPatterns.warpMissingRequirementsPattern.matches(message)
         ) {
             if (lastParkWarpAttempt.passedSince() < 1.seconds) {
                 EntityMovementData.onNextTeleport(IslandType.HUB) {
@@ -67,7 +79,7 @@ object ForagingTutorialQuest {
             }
         }
         if (IslandType.HUB.isInIsland() || IslandType.THE_PARK.isInIsland()) {
-            "§cYou must complete the §r§6(?<quest>.*) Quest §r§cto use this!".toPattern().matchMatcher(event.message) {
+            questMissingPattern.matchMatcher(message) {
                 stepByName(group("quest"))
             }
         }
@@ -87,7 +99,7 @@ object ForagingTutorialQuest {
     }
 
     @HandleEvent
-    fun onPlayerSpawn(event: MobEvent.Spawn.DisplayNpc) {
+    private fun onPlayerSpawn(event: MobEvent.Spawn.DisplayNpc) {
         "§cRequires §6(?<quest>.*) Quest".toPattern().matchMatcher(event.mob.name) {
             stepByName(group("quest"))
         }

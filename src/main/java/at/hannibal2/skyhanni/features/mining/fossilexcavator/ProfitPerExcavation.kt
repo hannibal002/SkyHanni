@@ -10,21 +10,31 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object ProfitPerExcavation {
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator
 
+    /**
+     * REGEX-TEST: Glacite Powder
+     */
+    private val skipFossilExcavatorRewardPattern by RepoPattern.pattern(
+        "mining.fossil-excavator.skip-excavation-reward",
+        "Glacite Powder"
+    )
+
     @HandleEvent
-    fun onFossilExcavation(event: FossilExcavationEvent) {
+    private fun onFossilExcavation(event: FossilExcavationEvent) {
         if (!config.profitPerExcavation) return
         val loot = event.loot
 
         var totalProfit = 0.0
         val map = mutableMapOf<String, Double>()
         for ((name, amount) in loot) {
-            if (name == "§bGlacite Powder") continue
+            if (skipFossilExcavatorRewardPattern.matches(name)) continue
             NeuInternalName.fromItemNameOrNull(name)?.let {
                 val pricePer = it.getPrice()
                 if (pricePer == -1.0) continue

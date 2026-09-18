@@ -2,9 +2,8 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -31,15 +30,15 @@ object PreventEarlyCommands {
     private var lastCommand: String? = null
 
     /**
-     * REGEX-TEST: §cYou may only use this command after 4s on the server!
+     * REGEX-TEST: You may only use this command after 4s on the server!
      */
     private val cooldownPattern by RepoPattern.pattern(
-        "commands.cooldown",
-        "§cYou may only use this command after (?<cooldown>\\d+)s on the server!",
+        "commands.cooldown.colorless",
+        "You may only use this command after (?<cooldown>\\d+)s on the server!",
     )
 
     @HandleEvent
-    fun onMessageSendToServer(event: MessageSendToServerEvent) {
+    private fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.preventEarlyExecution) return
         if (!SkyBlockUtils.onHypixel) return
         if (!event.isAnyCommand) return
@@ -51,17 +50,17 @@ object PreventEarlyCommands {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    private fun onWorldChange() {
         worldChanged = SimpleTimeMark.now()
         lastCommand = null
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SystemMessageEvent.Allow) {
         if (!SkyBlockUtils.onHypixel) return
         if (!config.preventEarlyExecution) return
         val lastCommand = lastCommand ?: return
-        cooldownPattern.matchMatcher(event.message) {
+        cooldownPattern.matchMatcher(event.cleanMessage) {
             val cooldown = group("cooldown")
             val runIn: Duration = (cooldown?.toInt()?.seconds ?: 5.seconds) - worldChanged.absoluteDifference(SimpleTimeMark.now())
             DelayedRun.runDelayed(runIn) {

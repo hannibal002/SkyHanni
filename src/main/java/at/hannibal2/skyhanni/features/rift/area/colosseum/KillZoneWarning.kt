@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.rift.area.colosseum
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.data.title.TitleManager.TitleAddType
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -26,14 +26,14 @@ object KillZoneWarning {
     private val patternGroup = RepoPattern.group("rift.colosseum.bacte")
 
     /**
-     * REGEX-TEST: §a⚠ §r§cGet back in the arena or you will DIE! §r§a⚠
-     * REGEX-TEST: §a⚠ §r§cGet back in the arena or you will DIE!!! §r§a⚠
-     * REGEX-TEST: §a⚠ §r§cGet back in the arena or you will DIE!!!!!! §r§a⚠
-     * REGEX-TEST: §a⚠ §r§cGet back in the arena or you will DIE!!!!!!!!!!!! §r§a⚠
+     * REGEX-TEST: ⚠ Get back in the arena or you will DIE! ⚠
+     * REGEX-TEST: ⚠ Get back in the arena or you will DIE!!! ⚠
+     * REGEX-TEST: ⚠ Get back in the arena or you will DIE!!!!!! ⚠
+     * REGEX-TEST: ⚠ Get back in the arena or you will DIE!!!!!!!!!!!! ⚠
      */
     private val killZonePattern by patternGroup.pattern(
-        "chat.kill-zone",
-        "§a⚠ §r§cGet back in the arena or you will DIE(?<exclamation>!+) §r§a⚠"
+        "chat.kill-zone.colorless",
+        "⚠ Get back in the arena or you will DIE(?<exclamation>!+) ⚠"
     )
 
     private val sound by lazy { SoundUtils.createSound("entity.experience_orb.pickup", 0.0f, isWarning = true) }
@@ -43,9 +43,9 @@ object KillZoneWarning {
     private var title: TitleContext? = null
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onChatMessage(event: SkyHanniChatEvent.Allow) {
+    private fun onChatMessage(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
-        killZonePattern.matchMatcher(event.message) {
+        killZonePattern.matchMatcher(event.cleanMessage) {
             sound.playSound()
             lastMessageTime = SimpleTimeMark.now()
             val warningLevel = group("exclamation").length
@@ -54,7 +54,7 @@ object KillZoneWarning {
     }
 
     @HandleEvent(SkyHanniTickEvent::class, onlyOnIsland = IslandType.THE_RIFT)
-    fun onTick() {
+    private fun onTick() {
         if (!isEnabled()) return
         if (lastMessageTime.passedSince() > 250.milliseconds) return
         if (killDeadline.isInPast()) return

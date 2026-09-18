@@ -6,9 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.effect.EffectApi
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeType
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
@@ -16,6 +15,7 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -36,6 +37,14 @@ object NonGodPotEffectDisplay {
     private val setRecently: TimeLimitedSet<NonGodPotEffect> = TimeLimitedSet(5.seconds)
     private var display = emptyList<String>()
 
+    /**
+     * REGEX-TEST: You cleared all of your active effects!
+     */
+    private val effectsClearedChatPattern by RepoPattern.pattern(
+        "misc.non-godpot-effect-display.effects-cleared",
+        "You cleared all of your active effects!"
+    )
+
     fun isActive(effect: NonGodPotEffect): Boolean = effectDuration.any { it.key == effect && !it.value.ended }
 
     @HandleEvent
@@ -45,8 +54,8 @@ object NonGodPotEffectDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (event.message == "§aYou cleared all of your active effects!") {
+    private fun onChat(event: SystemMessageEvent.Allow) {
+        if (effectsClearedChatPattern.matches(event.cleanMessage)) {
             effectDuration.clear()
             update()
         }
@@ -132,7 +141,7 @@ object NonGodPotEffectDisplay {
 
 
     @HandleEvent
-    private fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled() || !config.displayEnabled) return
         if (RiftApi.inRift()) return
 

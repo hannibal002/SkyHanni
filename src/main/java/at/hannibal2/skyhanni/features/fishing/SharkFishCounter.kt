@@ -2,19 +2,20 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
 import java.util.EnumMap
 
@@ -31,6 +32,14 @@ object SharkFishCounter {
         GREAT_WHITE("Great White", LorenzColor.GOLD),
     }
 
+    /**
+     * REGEX-TEST: FISHING FESTIVAL The festival has concluded! Time to dry off and repair your rods!
+     */
+    private val festivalEndPattern by RepoPattern.pattern(
+        "fishing.festival.end",
+        "FISHING FESTIVAL The festival has concluded! Time to dry off and repair your rods!"
+    )
+
     private val counterMap = object : EnumMap<SharkType, Int>(SharkType::class.java) {
         override fun clear() {
             SharkType.entries.forEach { this[it] = 0 }
@@ -46,7 +55,7 @@ object SharkFishCounter {
     private var hasWaterRodInHand = false
 
     @HandleEvent
-    fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
+    private fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
 
         val eventName = event.seaCreature.name.takeIf { it.contains("Shark") } ?: return
@@ -64,7 +73,7 @@ object SharkFishCounter {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
 
         if (event.isMod(10)) {
@@ -73,8 +82,8 @@ object SharkFishCounter {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (event.message != "§b§lFISHING FESTIVAL §r§eThe festival has concluded! Time to dry off and repair your rods!") return
+    private fun onChat(event: SystemMessageEvent.Allow) {
+        if (!festivalEndPattern.matches(event.cleanMessage)) return
         val count = totalCount.takeIf { it != 0 } ?: return
 
         val (nurse, blue, tiger, great) = counterMap.entries.map { it.value }
@@ -107,7 +116,7 @@ object SharkFishCounter {
     private fun isWaterFishingRod() = FishingApi.isFishing() && !FishingApi.holdingLavaRod
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    private fun onGuiRenderOverlay() {
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
         if (!hasWaterRodInHand) return
 

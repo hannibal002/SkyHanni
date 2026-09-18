@@ -3,9 +3,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.GardenConfig
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -22,31 +21,31 @@ object GardenBurrowingSporesNotifier {
     private val patternGroup = RepoPattern.group("garden.burrowingspores")
 
     /**
-     * REGEX-TEST: §6§lVERY RARE CROP! §r§f§r§9Burrowing Spores
+     * REGEX-TEST: VERY RARE CROP! Burrowing Spores
      */
     private val sporeDropMessage by patternGroup.pattern(
-        "drop",
-        "§6§lVERY RARE CROP! (?:§.)*§9Burrowing Spores",
+        "drop.colorless",
+        "VERY RARE CROP! Burrowing Spores",
     )
     private val BURROWING_SPORES = "BURROWING_SPORES".toInternalName()
 
     private val titleSet = setOf(GardenConfig.BurrowingSporesNotificationType.TITLE, GardenConfig.BurrowingSporesNotificationType.BOTH)
     private val blinkSet = setOf(GardenConfig.BurrowingSporesNotificationType.BLINK, GardenConfig.BurrowingSporesNotificationType.BOTH)
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    @HandleEvent(onlyOnIsland = GARDEN)
+    private fun onChat(event: SystemMessageEvent.Allow) {
         val selected = config.burrowingSporesNotificationType
         val titleEnabled = selected in titleSet
         val blinkEnabled = selected in blinkSet
         if (!titleEnabled && !blinkEnabled) return
-        if (!sporeDropMessage.matches(event.message)) return
+        if (!sporeDropMessage.matches(event.cleanMessage)) return
 
         if (titleEnabled) TitleManager.sendTitle("§9Burrowing Spores!")
         if (blinkEnabled) ItemBlink.setBlink(BURROWING_SPORES.getItemStackOrNull(), 5_000)
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(99, "garden.burrowingSporesNotification", "garden.burrowingSporesNotificationType") {
             ConfigUtils.migrateBooleanToEnum(
                 it, GardenConfig.BurrowingSporesNotificationType.BOTH, GardenConfig.BurrowingSporesNotificationType.NONE,

@@ -5,12 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -23,7 +20,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.Collections
-import kotlin.collections.buildList
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -37,15 +33,24 @@ object KingTalismanHelper {
     private val patternGroup = RepoPattern.group("mining.kingtalisman")
 
     /**
-     * REGEX-TEST: §7You have received a §r§fKing Talisman§r§7!
+     * REGEX-TEST: You have received a King Talisman!
      */
     private val talismanPattern by patternGroup.pattern(
-        "talisman",
-        "§7You have received a §r§fKing Talisman§r§7!",
+        "talisman.colorless",
+        "You have received a King Talisman!",
+    )
+
+    // TODO: Commissions API
+    /**
+     * REGEX-TEST: Commissions
+     */
+    private val commissionsInventoryPattern by patternGroup.pattern(
+        "commissions",
+        "Commissions",
     )
 
     private fun resetKings() {
-        storage?.kingsTalkedTo = mutableListOf<String>()
+        storage?.kingsTalkedTo = mutableListOf()
         update()
     }
 
@@ -68,8 +73,8 @@ object KingTalismanHelper {
         SkyBlockUtils.graphArea == "Royal Palace" &&
         kingLocation.distanceToPlayer() < 10
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(onlyOnIsland = DWARVEN_MINES)
+    private fun onSecondPassed() {
         if (!isEnabled()) return
 
         update()
@@ -77,14 +82,12 @@ object KingTalismanHelper {
     }
 
 
-    fun isEnabled() = config.enabled &&
-        SkyBlockUtils.inSkyBlock &&
-        (IslandType.DWARVEN_MINES.isInIsland() || config.outsideMines)
+    fun isEnabled() = config.enabled && config.outsideMines
 
-    @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Commissions") return
+    @HandleEvent(onlyOnIsland = DWARVEN_MINES)
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
+        if (!commissionsInventoryPattern.matches(event.inventoryName)) return
         if (!isNearby()) return
         val storage = storage ?: return
 
@@ -165,26 +168,25 @@ object KingTalismanHelper {
 
     private fun getCurrentKing() = getKingTimes().sortedDesc().firstNotNullOf { it.key }
 
-    @HandleEvent
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(onlyOnIsland = DWARVEN_MINES)
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
 
         config.position.renderStrings(display, posLabel = "King Talisman Helper")
     }
 
-    @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    @HandleEvent(onlyOnIsland = DWARVEN_MINES)
+    private fun onChat(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
-        if (!MiningApi.inDwarvenMines) return
 
-        if (talismanPattern.matches(event.message)) {
+        if (talismanPattern.matches(event.cleanMessage)) {
             storage?.kingsTalkedTo = kingCircles.toMutableList()
             update()
         }
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetkinghelper") {
             description = "Resets the King Talisman Helper"
             category = CommandCategory.USERS_RESET
