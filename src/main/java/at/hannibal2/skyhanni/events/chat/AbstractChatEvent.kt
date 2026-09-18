@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.events.chat
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.ChatManager
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.network.chat.Component

@@ -54,7 +54,7 @@ object SpiderDenRelicPathfinder {
      * REGEX-TEST: You've already found this relic!
      */
     private val duplicatePattern by patternGroup.pattern(
-       "chat.duplicate",
+        "chat.duplicate",
         "You've already found this relic!|You've already found all the relics!",
     )
 
