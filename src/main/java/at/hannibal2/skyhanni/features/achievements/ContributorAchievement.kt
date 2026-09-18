@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.events.FriendAddEvent
 import at.hannibal2.skyhanni.events.FriendRequestDeclinedEvent
 import at.hannibal2.skyhanni.events.FriendRequestExpiredEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
@@ -39,7 +39,7 @@ object ContributorAchievement {
                 name = "EEEEKK!".asComponent(),
                 description = componentBuilder {
                     append("Be in the same lobby as a")
-                    appendWithColor(" SkyHanni ", TextHelper.chromaStyle)
+                    appendWithColor(" SkyHanni ", ChromaFontManager.chromaTextColor)
                     append("contributor")
                 },
                 userLuckAmount = 0f,
@@ -52,7 +52,7 @@ object ContributorAchievement {
                 name = "I Know a Guy".asComponent(),
                 description = componentBuilder {
                     append("Have a ")
-                    appendWithColor("SkyHanni ", TextHelper.chromaStyle)
+                    appendWithColor("SkyHanni ", ChromaFontManager.chromaTextColor)
                     append("contributor as a friend")
                 },
                 userLuckAmount = 0f,
@@ -65,7 +65,7 @@ object ContributorAchievement {
                 name = "Notice Me Senpai".asComponent(),
                 description = componentBuilder {
                     append("Have your friend request ignored by a ")
-                    appendWithColor("SkyHanni", TextHelper.chromaStyle)
+                    appendWithColor("SkyHanni", ChromaFontManager.chromaTextColor)
                     append(" contributor")
                 },
                 userLuckAmount = 0f,
@@ -78,7 +78,7 @@ object ContributorAchievement {
                 name = "Rejected".asComponent(),
                 description = componentBuilder {
                     append("Have your friend request declined by a ")
-                    appendWithColor("SkyHanni", TextHelper.chromaStyle)
+                    appendWithColor("SkyHanni", ChromaFontManager.chromaTextColor)
                     append(" contributor")
                 },
                 userLuckAmount = 0f,
@@ -91,7 +91,7 @@ object ContributorAchievement {
                 name = "(Contributor Only Achievement) Am I famous yet?".asComponent(),
                 description = componentBuilder {
                     append("Be mentioned by other players as a ")
-                    appendWithColor("SkyHanni", TextHelper.chromaStyle)
+                    appendWithColor("SkyHanni", ChromaFontManager.chromaTextColor)
                     append(" contributor")
                 },
                 userLuckAmount = 0f,
