@@ -1,13 +1,8 @@
 package at.hannibal2.skyhanni.utils.api
 
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
-import org.apache.http.client.methods.CloseableHttpResponse
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.client.methods.HttpPost
-import org.apache.http.client.methods.HttpUriRequest
-import org.apache.http.entity.ContentType
-import org.apache.http.util.EntityUtils
-import java.nio.charset.StandardCharsets
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 
 /**
  * Represents the intention to perform an API request, and the data associated with it.
@@ -16,28 +11,25 @@ import java.nio.charset.StandardCharsets
  * @param url The URL of the API request.
  * @param apiName The name of the API being requested.
  * @param request The HTTP request to be executed.
- * @param response The HTTP response received from the API request, if any.
+ * @param silentError If true, errors will not be logged unless debugConfig.apiUtilsNeverSilent is true.
+ * @param requestBody The body sent with the request, if any. [HttpRequest] does not expose it once built.
  */
 @PublishedApi
-internal open class ApiIntentionContext(
-    open val url: String,
-    open val apiName: String,
-    val request: HttpUriRequest,
-    open var response: CloseableHttpResponse? = null,
-    open val silentError: Boolean,
+internal class ApiIntentionContext(
+    val url: String,
+    val apiName: String,
+    val request: HttpRequest,
+    val silentError: Boolean,
+    val requestBody: String? = null,
 ) {
-    constructor(request: HttpUriRequest, path: ApiStaticPath) : this(
+    var response: HttpResponse<*>? = null
+
+    constructor(request: HttpRequest, path: ApiStaticPath, requestBody: String? = null) : this(
         url = path.url,
         apiName = path.apiName,
         request = request,
         silentError = path.silentError,
-    )
-
-    constructor(request: HttpUriRequest, apiName: String, silentError: Boolean) : this(
-        url = request.uri.toURL().toString(),
-        apiName = apiName,
-        request = request,
-        silentError = silentError,
+        requestBody = requestBody,
     )
 
     /**
@@ -48,40 +40,21 @@ internal open class ApiIntentionContext(
      * @param this The ApiIntentionContext containing the API request and possibly response data.
      * @return A [List] of pairs where each pair contains a field name and its corresponding value.
      */
-    private fun collectInterestingFields(): List<Pair<String, Any?>> = buildList {
+    fun collectInterestingFields(): List<Pair<String, Any?>> = buildList {
         addAll(
             "api name" to apiName,
             "url" to url,
-            "request method" to request.method,
+            "request method" to request.method(),
         )
         response?.let { resp ->
-            add("response headers" to resp.allHeaders.joinToString { "${it.name}: ${it.value}" })
-            add("response status" to resp.statusLine.toString())
-            add("response status code" to resp.statusLine.statusCode.toString())
+            add("response headers" to resp.headers().map().entries.joinToString { "${it.key}: ${it.value.joinToString()}" })
+            add("response status code" to resp.statusCode().toString())
         }
-        if (request is HttpPost && request.entity != null) {
-            val parsedContent = EntityUtils.toString(request.entity, StandardCharsets.UTF_8)
-                ?: "No content in request entity"
-            val contentType = ContentType.get(request.entity).mimeType
+        requestBody?.let { body ->
             addAll(
-                "post body" to parsedContent,
-                "content mime type" to contentType,
+                "post body" to body,
+                "content mime type" to request.headers().firstValue("Content-Type").orElse("unknown"),
             )
         }
     }
 }
-
-/**
- * See [ApiIntentionContext] for general field definitions.
- * Represents the intention to perform a GET request to an API endpoint.
- * @param tryForceGzip If true, the GET request will attempt to use gzip compression.
- */
-@PublishedApi
-internal data class GetApiIntentionContext(
-    override val url: String,
-    override val apiName: String,
-    val getRequest: HttpGet,
-    override var response: CloseableHttpResponse? = null,
-    override val silentError: Boolean,
-    val tryForceGzip: Boolean = false,
-) : ApiIntentionContext(url, apiName, getRequest, response, silentError)
