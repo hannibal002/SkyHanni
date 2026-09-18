@@ -17,6 +17,7 @@ object UpdateKeybinds {
         for (keybindPath in SkyHanniConfigSearchResetCommand.allKeybinds) {
             event.transform(147, keybindPath) { element ->
                 val oldCode = element.asInt
+                // TODO: For 26.3 hardcode each int to path conversation
                 val type =
                     if (oldCode in 0 until MouseCompat.NUMBER_OF_MOUSE_BUTTONS) InputConstants.Type.MOUSE else InputConstants.Type.KEYSYM
                 val newStringName = type.getOrCreate(oldCode).name
