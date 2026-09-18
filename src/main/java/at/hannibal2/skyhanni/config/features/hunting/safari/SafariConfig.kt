@@ -27,6 +27,11 @@ class SafariConfig {
     var hideyhoFinder: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Safari Checklist", desc = "Displays the Critter Safari unique shards caught during the current run.")
+    @Accordion
+    val checklist = SafariChecklistConfig()
+
+    @Expose
     @ConfigOption(name = "Critter Capsules", desc = "")
     @Accordion
     val critterCapsules: CritterCapsuleConfig = CritterCapsuleConfig()
