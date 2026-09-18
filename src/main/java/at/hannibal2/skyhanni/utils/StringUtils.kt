@@ -166,7 +166,6 @@ object StringUtils {
                 // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
-
         } else {
             internalCleanPlayerName()
         }
