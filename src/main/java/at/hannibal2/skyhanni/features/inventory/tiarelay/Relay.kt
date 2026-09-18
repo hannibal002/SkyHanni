@@ -50,7 +50,7 @@ enum class Relay(
     );
 
     val chatPattern by RepoPattern.pattern(
-        "relay.chat.${relayName.lowercase().replace(" ", "_")}.colorless",
+        "relay.chat.${relayName.lowercase().replace(" ", "-")}.colorless",
         chatMessage
     )
 
