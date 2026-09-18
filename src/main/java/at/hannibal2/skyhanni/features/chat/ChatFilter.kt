@@ -265,7 +265,7 @@ object ChatFilter {
      */
     private val miningAbilityUsedPattern by miningAbilityPatternGroup.pattern(
         "used",
-        "§aYou used your §r.*§r§aPickaxe Ability!",
+        "§aYou used your §r.+§r§aPickaxe Ability!",
     )
 
     /**
@@ -282,7 +282,7 @@ object ChatFilter {
      */
     private val deployableRemovedPattern by deployablePatternGroup.pattern(
         "removed",
-        "§eYour previous §r.*§r§ewas removed!",
+        "§eYour previous §r.+§r§ewas removed!",
     )
 
     // Party
@@ -326,14 +326,13 @@ object ChatFilter {
     )
 
     // Ability Damage
+    // This is a special case done ahead of the full ChatFilter refactor. It's matched against event.cleanMessage.
     /**
-     * REGEX-TEST: §7Your Implosion hit Zealot for §r§c1,234 §r§7damage.
-     * REGEX-TEST: §7Your Molten Wave hit Zealot for §r§c1,234 §r§7damage.
-     * REGEX-TEST: §7Your Spirit Sceptre hit Zealot for §r§c1,234 §r§7damage.
+     * REGEX-TEST: Your Implosion hit 1 enemy for 1,234 damage.
      */
     private val abilityDamagePattern by abilityDamagePatternGroup.pattern(
         "hit",
-        "§7Your .* hit (.*) for §r§c(.*) §r§7damage.",
+        """Your [\w ]+ hit \d+ enem(?:y|ies) for [\d,.]+ damage\.""",
     )
 
     // Blocked Actions
@@ -611,7 +610,6 @@ object ChatFilter {
         "profile_join" to profileJoinPatterns,
         "mining_abilities" to listOf(miningAbilityUsedPattern, miningAbilityExpiredPattern),
         "deployable_removed" to listOf(deployableRemovedPattern),
-        "ability_damage" to listOf(abilityDamagePattern),
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -650,7 +648,7 @@ object ChatFilter {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        var blockReason = block(event.message)
+        var blockReason = block(event.message, event.cleanMessage)
         if (blockReason == null && config.powderMining.enabled) blockReason = powderMiningBlock(event)
         if (blockReason == null && config.crystalNucleus.enabled) blockReason = crystalNucleusBlock(event)
 
@@ -666,10 +664,11 @@ object ChatFilter {
     /**
      * Checks if the message should be blocked
      * @param message The message to check
+     * @param cleanMessage The message with color codes stripped, used by colorless-matched patterns
      * @return The reason why the message was blocked, empty if not blocked
      */
     @Suppress("CyclomaticComplexMethod", "MaxLineLength")
-    private fun block(message: String): String? = when {
+    private fun block(message: String, cleanMessage: String): String? = when {
         config.hypixelHub && message.isPresent("lobby") -> "lobby"
         config.empty && StringUtils.isEmpty(message) -> "empty"
         config.warping && message.isPresent("warping") -> "warping"
@@ -694,7 +693,7 @@ object ChatFilter {
         config.auctionBazaarSetup && message.isPresent("money") -> "money"
         config.winterIsland && message.isPresent("winter_island") -> "winter_island"
         config.uselessWarning && message.isPresent("useless_warning") -> "useless_warning"
-        config.abilityDamage && message.isPresent("ability_damage") -> "ability_damage"
+        config.abilityDamage && abilityDamagePattern.matches(cleanMessage) -> "ability_damage"
         config.blockedActions && message.isPresent("blocked_actions") -> "blocked_actions"
         config.npcAnnouncements && message.isPresent("npc_announcements") -> "npc_announcements"
         config.systemNoise && message.isPresent("system_noise") -> "system_noise"
