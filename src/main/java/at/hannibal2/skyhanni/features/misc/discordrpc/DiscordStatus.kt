@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
+import java.util.Locale
 import kotlin.time.Duration.Companion.minutes
 
 // There is no consistent way to get the full username of the owner of an island you are visiting (as far as I know)
@@ -160,7 +161,7 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
             val heldItemName = heldItem?.cleanName
 
             if (heldItem == null || heldItemName == "Air") "No item in hand"
-            else String.format(java.util.Locale.US, "Holding $heldItemName")
+            else String.format(Locale.US, "Holding $heldItemName")
         },
     ),
 

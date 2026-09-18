@@ -9,9 +9,9 @@ import java.util.Locale
 import java.util.TreeMap
 import kotlin.math.absoluteValue
 import kotlin.math.pow
+import kotlin.math.round
 
 object NumberUtil {
-
     private val config get() = SkyHanniMod.feature
 
     private val suffixes = TreeMap<Long, String>().apply {
@@ -90,7 +90,7 @@ object NumberUtil {
      */
     fun Double.roundTo(precision: Int): Double {
         val scale = 10.0.pow(precision)
-        return kotlin.math.round(this * scale) / scale
+        return round(this * scale) / scale
     }
 
     fun Float.roundTo(precision: Int): Float = toDouble().roundTo(precision).toFloat()

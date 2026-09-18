@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboar
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getRankConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getRankGoalIfValid
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
@@ -48,6 +47,7 @@ import kotlin.math.abs
 import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -97,7 +97,7 @@ object EliteFarmersLeaderboard {
     }
 
     @HandleEvent
-    fun onCropCollectionAdd(event: CropCollectionAddEvent) {
+    private fun onCropCollectionAdd(event: CropCollectionAddEvent) {
         if (event.cropCollectionType == CropCollectionType.UNKNOWN) return
         val leaderboardType = EliteLeaderboardType.Crop(event.crop, EliteLeaderboardMode.MONTHLY)
         val currentAmount = leaderboardAmountMap?.get(leaderboardType) ?: event.amount.toDouble()
@@ -105,15 +105,15 @@ object EliteFarmersLeaderboard {
     }
 
     @HandleEvent
-    fun onPestKill(event: PestKillEvent) {
+    private fun onPestKill(event: PestKillEvent) {
         addPestKill(EliteLeaderboardType.Pest(event.pestType, EliteLeaderboardMode.ALL_TIME))
         addPestKill(EliteLeaderboardType.Pest(event.pestType, EliteLeaderboardMode.MONTHLY))
         addPestKill(EliteLeaderboardType.Pest(null, EliteLeaderboardMode.MONTHLY))
         addPestKill(EliteLeaderboardType.Pest(null, EliteLeaderboardMode.ALL_TIME))
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed() {
+    @HandleEvent(onlyOnIsland = GARDEN)
+    private fun onSecondPassed() {
         if (lastPassedMessage.passedSince() < 30.seconds) return
         eliteLeaderboardData.forEach { lbType ->
             if (!getLeaderboardConfig(lbType.key).showLbChange) return@forEach
@@ -299,7 +299,7 @@ object EliteFarmersLeaderboard {
                         eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }.lastUpdate = SimpleTimeMark.now()
                     }
                 }
-            } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+            } catch (e: TimeoutCancellationException) {
                 apiUnavailable = true
                 throw e
             }
@@ -322,7 +322,6 @@ object EliteFarmersLeaderboard {
                 "§7(§e#${oldPosition.addSeparators()} §7-> §e#${currentPosition.addSeparators()}§7)",
         )
     }
-
 
     private suspend fun loadLeaderboardPosition(leaderboardType: EliteLeaderboardType): Int? {
         val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
@@ -527,7 +526,7 @@ object EliteFarmersLeaderboard {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("elite leaderboard")
         event.addIrrelevant {
             eliteLeaderboardData.forEach {
@@ -539,7 +538,7 @@ object EliteFarmersLeaderboard {
     private const val BETTER_THAN_DEV_ACHIEVEMENT = "Better Than Dev Achievement"
 
     @HandleEvent
-    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+    private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             name = "Better than the devs".asComponent(),
             description = componentBuilder {

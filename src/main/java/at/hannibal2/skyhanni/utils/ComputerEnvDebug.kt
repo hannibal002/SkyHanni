@@ -13,6 +13,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.sun.management.OperatingSystemMXBean
+import net.fabricmc.loader.api.FabricLoader
 import java.lang.management.ManagementFactory
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.hours
@@ -20,7 +22,6 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ComputerEnvDebug {
-
     private var launchers: List<LauncherEntry> = listOf()
     private var genericStacks: List<String> = listOf()
 
@@ -83,7 +84,7 @@ object ComputerEnvDebug {
         }
     }
 
-    private fun getFirstStack(): String? = kotlin.runCatching {
+    private fun getFirstStack(): String? = runCatching {
         Thread.currentThread().stackTrace.last().toString()
     }.onFailure { e ->
         ErrorManager.logErrorWithData(e, "Failed loading current thread stack trace info")
@@ -129,7 +130,7 @@ object ComputerEnvDebug {
         text.add("Minecraft Allocated: $allocatedPercentage% ${totalMemoryGB.formatGB()} GB")
 
         // Get total system memory using OS-specific APIs
-        val osBean = ManagementFactory.getOperatingSystemMXBean() as com.sun.management.OperatingSystemMXBean
+        val osBean = ManagementFactory.getOperatingSystemMXBean() as OperatingSystemMXBean
         val totalPhysicalMemory = osBean.totalMemorySize
         val freePhysicalMemory = osBean.freeMemorySize
         val usedPhysicalMemory = totalPhysicalMemory - freePhysicalMemory
@@ -197,7 +198,7 @@ object ComputerEnvDebug {
     private fun DebugDataCollectEvent.performanceMods() {
         if (PlatformUtils.isDevEnvironment) return
         title("Performance Mods")
-        val hasSodium = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium")
+        val hasSodium = FabricLoader.getInstance().isModLoaded("sodium")
         if (!hasSodium) {
             addData {
                 add("Sodium is not installed")

@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.events.minecraft.packet
 
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import net.minecraft.client.multiplayer.ClientPacketListener
 import net.minecraft.network.protocol.Packet
 
 @PrimaryFunction("onPacketSent")
 class PacketSentEvent(val packet: Packet<*>) : CancellableSkyHanniEvent() {
-
     fun findOriginatingModCall(skipSkyhanni: Boolean = false): StackTraceElement? {
         return Thread.currentThread().stackTrace
             // Skip calls before the event is being called
@@ -21,7 +21,7 @@ class PacketSentEvent(val packet: Packet<*>) : CancellableSkyHanniEvent() {
     }
 
     companion object {
-        private val networkClassName = net.minecraft.client.multiplayer.ClientPacketListener::class.java.name
+        private val networkClassName = ClientPacketListener::class.java.name
         private fun isNetworkHandlerClass(className: String) = className == networkClassName
 
         private fun startsWithMinecraft(string: String): Boolean {

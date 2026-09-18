@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.utils.ChatUtils
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import java.io.Closeable
 import java.io.IOException
@@ -30,7 +31,7 @@ class DiscordIPC(
 
     // We need to use our own GSON here, rather than the ConfigManager one,
     // as we need NON-null serialization, as discord does not play nice with nulls.
-    private val gson = com.google.gson.GsonBuilder().create()
+    private val gson = GsonBuilder().create()
 
     /** Whether this client is currently connected and ready for Discord IPC. */
     val isConnected: Boolean get() = _connected
