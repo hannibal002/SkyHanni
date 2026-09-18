@@ -323,7 +323,7 @@ object CropMilestonesApi {
         val levelUpLine = "§r§b§lGARDEN MILESTONE §3$cropName §8$oldLevel➜§3$newLevel§r"
 
         val messages = buildList {
-            add("§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r")
+            add("§r§3§l---------------------------------------------§r")
             add("  $levelUpLine")
             if (goalReached) {
                 add("")
@@ -332,7 +332,7 @@ object CropMilestonesApi {
             }
             add("  §r§a§lREWARDS§r")
             addAll(rewards)
-            add("§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r")
+            add("§r§3§l---------------------------------------------§r")
         }
 
         clickableChat(

@@ -15,7 +15,7 @@ object VincentAchievement {
     /**
      * REGEX-TEST: Vincent accepts your rose and is delighted to visit your Garden soon.
      */
-    private val vincentPattern by AchievementManager.group.pattern(
+    private val vincentPattern by AchievementManager.patternGroup.pattern(
         "vincent",
         "Vincent accepts your rose and is delighted to visit your Garden soon.",
     )

@@ -190,7 +190,7 @@ object SkillProgress {
         }
 
         val messages = buildList {
-            add("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
+            add("§3§l---------------------------------------------")
             add("  §r§b§lSKILL LEVEL UP §3$skillName §8$oldLevel➜§3$newLevel")
             if (goalReached) {
                 add("")
@@ -199,7 +199,7 @@ object SkillProgress {
             }
             add("  §r§a§lREWARDS")
             addAll(rewards)
-            add("§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
+            add("§3§l---------------------------------------------")
         }
 
         chat(messages, prefix = false)
