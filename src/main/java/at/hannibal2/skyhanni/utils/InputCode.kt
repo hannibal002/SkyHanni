@@ -91,7 +91,8 @@ enum class InputCode(
     KEY_RIGHT(InputConstants.KEY_RIGHT),
     KEY_UP(InputConstants.KEY_UP),
     KEY_ADD(InputConstants.KEY_ADD),
-    KEY_SUBTRACT(InputConstants.KEY_ADD - 1),
+    KEY_SUBTRACT("key.keyboard.keypad.subtract"),
+    KEY_DIVIDE("key.keyboard.keypad.divide"),
     KEY_APOSTROPHE(InputConstants.KEY_APOSTROPHE),
     KEY_BACKSLASH(InputConstants.KEY_BACKSLASH),
     KEY_COMMA(InputConstants.KEY_COMMA),
@@ -127,6 +128,9 @@ enum class InputCode(
     KEY_PAUSE(InputConstants.KEY_PAUSE),
     KEY_SCROLLLOCK(InputConstants.KEY_SCROLLLOCK),
     KEY_PRINTSCREEN(InputConstants.KEY_PRINTSCREEN),
+    KEY_MENU("key.keyboard.menu"),
+    KEY_WORLD_1("key.keyboard.world.1"),
+    KEY_WORLD_2("key.keyboard.world.2"),
     LEFT_MOUSE(InputConstants.MOUSE_BUTTON_LEFT, MOUSE),
     RIGHT_MOUSE(InputConstants.MOUSE_BUTTON_RIGHT, MOUSE),
     MIDDLE_MOUSE(InputConstants.MOUSE_BUTTON_MIDDLE, MOUSE),
@@ -135,12 +139,6 @@ enum class InputCode(
     MOUSE_BUTTON_6(InputConstants.MOUSE_BUTTON_6, MOUSE),
     MOUSE_BUTTON_7(InputConstants.MOUSE_BUTTON_7, MOUSE),
     MOUSE_BUTTON_8(InputConstants.MOUSE_BUTTON_8, MOUSE),
-    MOD_SHIFT(InputConstants.MOD_SHIFT),
-    MOD_CONTROL(InputConstants.MOD_CONTROL),
-    MOD_ALT(InputConstants.MOD_ALT),
-    MOD_SUPER(InputConstants.MOD_SUPER),
-    MOD_CAPS_LOCK(InputConstants.MOD_CAPS_LOCK),
-    MOD_NUM_LOCK(InputConstants.MOD_NUM_LOCK),
     ;
 
     constructor(value: Int, type: InputConstants.Type = InputConstants.Type.KEYSYM) : this(type.getOrCreate(value))
