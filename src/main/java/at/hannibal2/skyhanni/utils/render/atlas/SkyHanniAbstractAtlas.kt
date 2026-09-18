@@ -6,18 +6,17 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniAbstractItemTexture
 import com.mojang.blaze3d.platform.TextureUtil
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.textures.GpuTexture
+import com.mojang.renderpearl.api.textures.GpuTexture
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.texture.Dumpable
 import net.minecraft.resources.Identifier
 import java.nio.file.Path
 
 //? if >= 26.2 {
-import com.mojang.blaze3d.GpuFormat
+import com.mojang.renderpearl.api.GpuFormat
 //?}
 
 abstract class SkyHanniAbstractAtlas<K : Any, E : SkyHanniAbstractAtlasEntry> : SkyHanniAbstractItemTexture(), Dumpable {
-
     protected abstract val identifier: Identifier
 
     init {

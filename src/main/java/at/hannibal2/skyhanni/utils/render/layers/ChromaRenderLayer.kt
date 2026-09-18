@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.utils.compat.RenderCompat.createRenderPass
 import at.hannibal2.skyhanni.utils.compat.RenderCompat.drawIndexed
 import at.hannibal2.skyhanni.utils.compat.RenderCompat.enableRenderPassScissorStateIfAble
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
-import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.MeshData
-import com.mojang.blaze3d.vertex.VertexFormat
+import com.mojang.renderpearl.api.buffers.GpuBuffer
+import com.mojang.renderpearl.api.vertex.VertexFormat
 import net.minecraft.client.renderer.rendertype.RenderSetup
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.resources.Identifier
@@ -30,7 +30,6 @@ class ChromaRenderLayer(
         RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_TEXT()).withTexture("Sampler0", texture)
     }.createRenderSetup(),
 ) {
-
     override fun draw(buffer: MeshData) {
         val renderPipeline = this.state.pipeline
         val matrix4fStack = RenderSystem.getModelViewStack()
@@ -100,6 +99,5 @@ class ChromaRenderLayer(
             matrix4fStack.popMatrix()
         }
     }
-
 }
 *///?}

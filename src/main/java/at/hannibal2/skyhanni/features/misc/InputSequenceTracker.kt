@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -40,7 +40,7 @@ object InputSequenceTracker {
         // Anything that is not a single character breaks the sequence, otherwise editing keys
         // like backspace would change the chat input while leaving the buffer untouched.
         // The counter goes with it, since it can no longer describe what is in that input
-        val typed = KeyboardManager.getKeyName(event.keyCode).lowercase()
+        val typed = event.key.displayName.lowercase()
         if (typed.length != 1) {
             buffer = ""
             lettersInChat = 0
@@ -129,11 +129,11 @@ object InputSequenceTracker {
             if (openedAt.passedSince() > 7.seconds) onClose()
         }
 
-        override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
+        override fun onKeyTyped(typedChar: Char?, key: InputCode) {
             onClose()
         }
 
-        override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
+        override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: InputCode) {
             onClose()
         }
     }

@@ -1,5 +1,8 @@
 #version 120
 
+//? if >= 26.3
+#extension GL_ARB_separate_shader_objects : require
+
 varying vec4 outColor;
 
 void main() {

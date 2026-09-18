@@ -39,7 +39,7 @@ import net.minecraft.world.entity.animal.sheep.Sheep
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon
 import net.minecraft.world.entity.boss.wither.WitherBoss
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster.Enderman
 import net.minecraft.world.entity.monster.Giant
 import net.minecraft.world.entity.monster.Guardian
 import net.minecraft.world.entity.monster.Witch
@@ -179,7 +179,6 @@ object MobFilter {
         ;
 
         companion object {
-
             val toRegexLine = DungeonAttribute.entries.joinToString("|") { it.name }
         }
     }
@@ -361,7 +360,7 @@ object MobFilter {
     ): MobResult? =
         if (DungeonApi.inDungeon()) {
             when {
-                (baseEntity is EnderMan || baseEntity is Giant) &&
+                (baseEntity is Enderman || baseEntity is Giant) &&
                     extraEntityList.lastOrNull()?.name.formattedTextCompatLessResets() == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿" -> MobResult.illegal // Livid Start Animation
                 else -> null
             }

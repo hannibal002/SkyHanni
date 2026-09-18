@@ -21,7 +21,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FireVeilWandParticles {
-
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.fireVeilWands
     private val item = "FIRE_VEIL_WAND".toInternalName()
 
@@ -31,7 +30,8 @@ object FireVeilWandParticles {
     fun onParticle(event: ParticleEvent) {
         if (config.display == DisplayEntry.PARTICLES) return
         if (lastClick.passedSince() > 5.5.seconds) return
-        if (event.type == ParticleTypes.FLAME && event.speed == 0.55f) {
+        // TODO verify on 26.3
+        if (event.type == ParticleTypes.FLAME && event.isSpeed(0.55f)) {
             event.cancel()
         }
     }

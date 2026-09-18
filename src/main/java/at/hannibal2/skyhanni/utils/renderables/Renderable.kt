@@ -15,8 +15,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ColorUtils.toInt
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
-import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -154,16 +153,15 @@ interface Renderable {
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
             onHover: () -> Unit = {},
-        ) = clickable(render, mapOf(LEFT_MOUSE to onLeftClick), bypassChecks, condition, tips, onHover)
+        ) = clickable(render, mapOf(InputCode.LEFT_MOUSE to onLeftClick), bypassChecks, condition, tips, onHover)
 
         fun clickable(
             text: String,
             /**
              * This should be a direct map of key code int, to the unit that should be invoked.
-             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
-             * For keyboard codes, use the [org.lwjgl.glfw.GLFW] enums.
+             * Use [at.hannibal2.skyhanni.utils.InputCode].
              */
-            onAnyClick: Map<Int, () -> Unit>,
+            onAnyClick: Map<InputCode, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
@@ -174,10 +172,9 @@ interface Renderable {
             render: Renderable,
             /**
              * This should be a direct map of key code int, to the unit that should be invoked.
-             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
-             * For keyboard codes, use the [org.lwjgl.glfw.GLFW] enums.
+             * Use [at.hannibal2.skyhanni.utils.InputCode].
              */
-            onAnyClick: Map<Int, () -> Unit>,
+            onAnyClick: Map<InputCode, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
@@ -195,7 +192,7 @@ interface Renderable {
 
         private fun multiClickable(
             render: Renderable,
-            onAnyClick: Map<Int, () -> Unit>,
+            onAnyClick: Map<InputCode, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             /**
@@ -232,7 +229,7 @@ interface Renderable {
 
         fun clickableAndScrollable(
             render: Renderable,
-            onAnyClick: Map<Int, () -> Unit>,
+            onAnyClick: Map<InputCode, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             scrollValue: ScrollValue = ScrollValue(),
@@ -525,7 +522,7 @@ interface Renderable {
                     textInput.makeActive()
                     textInput.handle()
                     val yOff: Int = if (shouldRenderTopElseBottom) 0 else content.height + ySpacing
-                    if (isBoxHovered(mouseOffsetX, width, mouseOffsetY + yOff, textBoxHeight) && RIGHT_MOUSE.isKeyClicked()) {
+                    if (isBoxHovered(mouseOffsetX, width, mouseOffsetY + yOff, textBoxHeight) && InputCode.RIGHT_MOUSE.isKeyClicked()) {
                         textInput.clear()
                     }
                 } else {
@@ -646,7 +643,7 @@ interface Renderable {
             content: Renderable,
             onClick: (Boolean) -> Unit,
             onHover: (Boolean) -> Unit = {},
-            button: Int = LEFT_MOUSE,
+            button: InputCode = LEFT_MOUSE,
             bypassChecks: Boolean = false,
             condition: (Boolean) -> Boolean = { true },
             startState: Boolean = false,
@@ -754,7 +751,6 @@ interface Renderable {
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),
             velocity: Double = 2.0,
-            button: Int? = null,
             bypassChecks: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
@@ -778,7 +774,6 @@ interface Renderable {
                 0,
                 virtualHeight - height + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
                 velocity,
-                button,
             )
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
@@ -848,7 +843,6 @@ interface Renderable {
                 0,
                 virtualHeight - height + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
                 velocity,
-                button,
             )
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {

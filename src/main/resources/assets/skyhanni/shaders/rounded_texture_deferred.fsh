@@ -1,5 +1,8 @@
 #version 150
 
+//? if >= 26.3
+#extension GL_ARB_separate_shader_objects : require
+
 in vec2 texCoord;
 in vec4 roundedParams0;
 in vec4 roundedParams1;
