@@ -298,7 +298,7 @@ object CarnivalFruitDigging {
                     event.drawWaypointFilled(vec, config.bestDigColor.toColor(), seeThroughBlocks = true, minimumAlpha = 0.35f)
                     event.drawDynamicText(
                         vec.add(0.5, 1.35, 0.5),
-                        "§aDig §cHERE §7with §8(§c${rec.shovel}§8) §7${rec.pBomb.formatPercentage()} bomb",
+                        "§aDig §cHERE §7with §8(${rec.shovel}§8) §7${rec.pBomb.formatPercentage()} bomb",
                         1.35,
                         seeThroughBlocks = true,
                     )
