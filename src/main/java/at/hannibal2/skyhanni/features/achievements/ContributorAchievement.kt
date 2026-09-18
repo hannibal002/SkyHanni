@@ -102,7 +102,7 @@ object ContributorAchievement {
     }
 
     private fun isContributorAndShouldDiscover(ign: String): Boolean {
-        return ign in ContributorManager.contributorNames && !ContributorManager.hasDisabledAchivementDiscovery(ign)
+        return ign in ContributorManager.contributorNames && !ContributorManager.hasDisabledAchievementDiscovery(ign)
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
