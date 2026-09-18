@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse
 
-import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypointType
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -11,14 +10,13 @@ import net.minecraft.world.entity.decoration.ArmorStand
 enum class CorpseType(
     val type: String,
     val color: LorenzColor,
-    val waypointType: MineshaftWaypointType,
     helmetInternalName: String,
     keyInternalName: String? = null,
 ) {
-    LAPIS("Lapis", LorenzColor.BLUE, MineshaftWaypointType.LAPIS, "LAPIS_ARMOR_HELMET"),
-    TUNGSTEN("Tungsten", LorenzColor.GRAY, MineshaftWaypointType.TUNGSTEN, "MINERAL_HELMET", "TUNGSTEN_KEY"),
-    UMBER("Umber", LorenzColor.GOLD, MineshaftWaypointType.UMBER, "ARMOR_OF_YOG_HELMET", "UMBER_KEY"),
-    VANGUARD("Vanguard", LorenzColor.WHITE, MineshaftWaypointType.VANGUARD, "VANGUARD_HELMET", "SKELETON_KEY"),
+    LAPIS("Lapis", LorenzColor.BLUE, "LAPIS_ARMOR_HELMET"),
+    TUNGSTEN("Tungsten", LorenzColor.GRAY, "MINERAL_HELMET", "TUNGSTEN_KEY"),
+    UMBER("Umber", LorenzColor.GOLD, "ARMOR_OF_YOG_HELMET", "UMBER_KEY"),
+    VANGUARD("Vanguard", LorenzColor.WHITE, "VANGUARD_HELMET", "SKELETON_KEY"),
     ;
 
     val displayName = color.getChatColor() + type
