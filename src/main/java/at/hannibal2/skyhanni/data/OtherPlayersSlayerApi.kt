@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobCategory
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.combat.OtherPlayersSlayerEvent
+import at.hannibal2.skyhanni.events.entity.slayer.SlayerDeathEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -49,5 +50,10 @@ object OtherPlayersSlayerApi {
         val owner = mob.ownerNameOrEmpty
 
         eventType(slayerType, tier, owner).post()
+
+        if (eventType == OtherPlayersSlayerEvent::Death) {
+            @Suppress("DEPRECATION")
+            SlayerDeathEvent(slayerType, tier, owner).post()
+        }
     }
 }

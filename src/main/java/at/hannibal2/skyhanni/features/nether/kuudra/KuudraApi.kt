@@ -122,4 +122,16 @@ object KuudraApi {
             KuudraCompleteEvent(tier).post()
         }
     }
+
+    @Deprecated(
+        "use KuudraTier.getByTierNumber(tier) instead",
+        ReplaceWith("at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier.getByTierNumber(tier)?.name.lowercase()"),
+    )
+    fun getKuudraRunTierName(tier: Int): String = KuudraTier.getByTierNumber(tier)!!.name.lowercase()
+
+    @Deprecated(
+        "use KuudraTier.getByDisplayName(tier) instead",
+        ReplaceWith("at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier.getByDisplayName(tier)?.tierNumber - 1"),
+    )
+    fun getKuudraRunTierNumber(tier: String?): Int = KuudraTier.getByDisplayName(tier ?: return -1)?.ordinal ?: -1
 }
