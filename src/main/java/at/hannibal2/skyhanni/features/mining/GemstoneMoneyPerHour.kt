@@ -83,14 +83,14 @@ object GemstoneMoneyPerHour {
         if (!isEnabled() || !useNextSackChange) return
         useNextSackChange = false
 
-        for ((delta1, internalName) in event.sackChanges) {
-            if (delta1 < 0) continue
+        for ((delta, internalName) in event.sackChanges) {
+            if (delta < 0) continue
 
             roughGemstoneNamePattern.matchMatcher(internalName.readableInternalName) {
                 val gemstone = group("gemstone")
                 val configGemstonePrice = getPrice(convertToInternalName(gemstone))
-                val delta = delta1.toDouble() * getFraction(1) * configGemstonePrice
-                coins += delta.toInt()
+                val actualDelta = delta.toDouble() * getFraction(1) * configGemstonePrice
+                coins += actualDelta.toInt()
             }
         }
     }
