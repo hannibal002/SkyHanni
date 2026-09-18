@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -11,10 +10,11 @@ import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -22,7 +22,6 @@ import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object DungeonCopilot {
-
     private val config get() = SkyHanniMod.feature.dungeon.dungeonCopilot
 
     private val patternGroup = RepoPattern.group("dungeon.copilot")
@@ -51,8 +50,8 @@ object DungeonCopilot {
     private var nextStep: Renderable? = null
     private var searchForKey = false
 
-    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    @HandleEvent(onlyOnIsland = CATACOMBS)
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.enabled) return
 
         handleChatMessage(event.message)?.let {
@@ -109,53 +108,50 @@ object DungeonCopilot {
         nextStep = step?.let { Renderable.text(it) }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
+    @HandleEvent(onlyOnIsland = CATACOMBS)
+    private fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         val entity = event.entity
 
         if (!searchForKey) return
 
-        if (entity.name.formattedTextCompatLessResets() == "§6§8Wither Key") {
-            changeNextStep("Pick up Wither Key")
-            searchForKey = false
-        }
-        if (entity.name.formattedTextCompatLessResets() == "§c§cBlood Key") {
-            changeNextStep("Pick up Blood Key")
+        val name = entity.cleanName
+        if (name.equalsOneOf("Wither Key", "Blood Key")) {
+            changeNextStep("Pick up $name")
             searchForKey = false
         }
     }
 
     @HandleEvent
-    fun onDungeonStart(event: DungeonStartEvent) {
+    private fun onDungeonStart(event: DungeonStartEvent) {
         changeNextStep("Clear first room")
         searchForKey = true
     }
 
     @HandleEvent
-    fun onDungeonStart(event: DungeonEnterEvent) {
+    private fun onDungeonStart(event: DungeonEnterEvent) {
         changeNextStep("Talk to Mort")
         searchForKey = true
     }
 
     @HandleEvent
-    fun onDungeonBossRoomEnter(event: DungeonBossRoomEnterEvent) {
+    private fun onDungeonBossRoomEnter(event: DungeonBossRoomEnterEvent) {
         changeNextStep("Defeat the boss! Good luck :)")
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         changeNextStep()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(onlyOnIsland = CATACOMBS)
+    private fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
         val nextStep = nextStep ?: return
         config.pos.renderRenderable(nextStep, posLabel = "Dungeon Copilot")
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dungeon.messageFilterKeysAndDoors", "dungeon.messageFilter.keysAndDoors")
         event.move(3, "dungeon.copilotEnabled", "dungeon.dungeonCopilot.enabled")
         event.move(3, "dungeon.copilotPos", "dungeon.dungeonCopilot.pos")
