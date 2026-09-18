@@ -28,7 +28,7 @@ import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object FakeNpcAPI {
+object FakeNpcApi {
 
     private val npcs = mutableMapOf<String, ActiveNpc>()
 
@@ -202,7 +202,7 @@ object FakeNpcAPI {
                 }
             }
             literal("remove") {
-                argCallback("id", BrigadierArguments.string(), getNpcs().map { it.id} ) { id ->
+                argCallback("id", BrigadierArguments.string(), getNpcs().map { it.id }) { id ->
                     removeNpc(id)
                 }
             }

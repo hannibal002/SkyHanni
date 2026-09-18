@@ -141,7 +141,7 @@ object HolographicEntities {
         entity: T,
         position: LorenzVec,
         yaw: Float,
-        pitch: Float
+        pitch: Float,
     ): HolographicEntity<T> {
         //? if >= 26.2
         entity.id = FakeEntityIdProvider.getNextId()
