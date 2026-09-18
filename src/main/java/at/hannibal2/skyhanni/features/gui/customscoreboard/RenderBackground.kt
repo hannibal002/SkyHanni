@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.BackgroundConfig
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
@@ -7,13 +8,11 @@ import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 object RenderBackground {
-
     private val config get() = CustomScoreboard.config.background
-    private val textureLocation = createResourceLocation("skyhanni", "scoreboard.png")
+    private val textureLocation = SkyHanniMod.id("scoreboard.png")
 
     internal fun addBackground(renderable: Renderable): Renderable {
         with(config) {

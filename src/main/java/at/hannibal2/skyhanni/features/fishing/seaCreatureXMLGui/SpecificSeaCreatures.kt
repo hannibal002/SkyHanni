@@ -3,13 +3,11 @@ package at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.XmlUtils
-import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 import io.github.notenoughupdates.moulconfig.xml.Bind
@@ -18,7 +16,6 @@ class SpecificSeaCreatures(
     @field:Bind
     val seaCreatures: ObservableList<SpecificSeaCreatureStorageXMLHelper>,
 ) {
-
     @field:Bind
     var search: String = ""
 
@@ -33,22 +30,21 @@ class SpecificSeaCreatures(
 
     @SkyHanniModule
     companion object {
-
         @HandleEvent
-        fun onCommandRegistration(event: CommandRegistrationEvent) {
+        private fun onCommandRegistration(event: CommandRegistrationEvent) {
             event.registerBrigadier("shseacreatures") {
                 description = "Opens a Special Config Menu for Specific Sea Creature Settings."
-                category = CommandCategory.USERS_ACTIVE
+                category = USERS_ACTIVE
                 aliases = listOf("shsc")
                 simpleCallback {
                     val existingSettings = updateList()
-                    val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/seacreaturetoggles.xml")
+                    val location = SkyHanniMod.id("gui/seacreaturetoggles/seacreaturetoggles.xml")
                     XmlUtils.openXmlScreen(SpecificSeaCreatures(existingSettings), location)
                 }
             }
             event.registerBrigadier("shresetSeaCreatureSpecificSettings") {
                 description = "Resets entirety of Specific Sea Creature Settings to Default."
-                category = CommandCategory.USERS_RESET
+                category = USERS_RESET
                 simpleCallback {
                     resetConfig()
                 }
@@ -189,8 +185,7 @@ class SpecificSeaCreatures(
     }
 
     private fun openXML(string: String) {
-        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/$string.xml")
+        val location = SkyHanniMod.id("gui/seacreaturetoggles/$string.xml")
         XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
     }
-
 }
