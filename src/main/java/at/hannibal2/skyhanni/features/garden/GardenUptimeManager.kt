@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
+import at.hannibal2.skyhanni.features.garden.tracker.FarmingProfitTracker
 import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.tracker.RareCropTracker
@@ -25,6 +26,7 @@ object GardenUptimeManager {
     private val config get() = GardenApi.config.trackerUptimeSettings
     private val trackerSet: Set<SkyHanniTracker<*, *>> = setOf(
         RareCropTracker.tracker,
+        FarmingProfitTracker,
         CropFeverTracker,
         PestProfitTracker,
         GardenBpsTracker.tracker,
@@ -32,19 +34,19 @@ object GardenUptimeManager {
     private val afkTracker = Stopwatch()
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.types) {
             modify { it.update() }
         }
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    private fun onWorldChange(event: WorldChangeEvent) {
         modify { it.pauseSessionUptime() }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5)) return
         if (!afkTracker.isPaused()) {
             modify { it.update() }
@@ -56,21 +58,25 @@ object GardenUptimeManager {
     }
 
     @HandleEvent
-    fun onCropBreak(event: CropClickEvent) {
+    private fun onCropBreak(event: CropClickEvent) {
         // we do not want this tracker to be greedy, and exclude visitor/pest downtime whenever possible
         modify { it.swapActiveSession(SessionUptime.Garden(GardenSession.CROP), false) }
         afkTracker.start(true)
     }
 
     @HandleEvent
-    fun onPestKill(event: PestKillEvent) {
+    private fun onPestKill(event: PestKillEvent) {
         modify { it.swapActiveSession(SessionUptime.Garden(GardenSession.PEST)) }
         afkTracker.start(true)
     }
 
     @HandleEvent
-    fun onVisitorOpen(event: VisitorOpenEvent) {
+    private fun onVisitorOpen(event: VisitorOpenEvent) {
         modify { it.swapActiveSession(SessionUptime.Garden(GardenSession.VISITOR)) }
+        afkTracker.start(true)
+    }
+
+    internal fun resumeAfkTracking() {
         afkTracker.start(true)
     }
 
