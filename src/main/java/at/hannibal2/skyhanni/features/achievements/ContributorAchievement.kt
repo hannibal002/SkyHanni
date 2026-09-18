@@ -101,31 +101,35 @@ object ContributorAchievement {
         )
     }
 
+    private fun isContributorAndShouldDiscover(ign: String): Boolean {
+        return ign in ContributorManager.contributorNames && !ContributorManager.hasDisabledAchievementDiscovery(ign)
+    }
+
     @HandleEvent(priority = HandleEvent.LOW)
     private fun onProfileJoin() {
         val friends = FriendApi.getAllFriends()
-        if (friends.any { it.name in ContributorManager.contributorNames }) {
+        if (friends.any { isContributorAndShouldDiscover(it.name) }) {
             AchievementManager.completeAchievement(CONTRIBUTOR_FRIEND_ACHIEVEMENT)
         }
     }
 
     @HandleEvent
     private fun onFriendAdd(event: FriendAddEvent) {
-        if (event.playerName in ContributorManager.contributorNames) {
+        if (isContributorAndShouldDiscover(event.playerName)) {
             AchievementManager.completeAchievement(CONTRIBUTOR_FRIEND_ACHIEVEMENT)
         }
     }
 
     @HandleEvent
     private fun onFriendRequestExpired(event: FriendRequestExpiredEvent) {
-        if (event.playerName in ContributorManager.contributorNames) {
+        if (isContributorAndShouldDiscover(event.playerName)) {
             AchievementManager.completeAchievement(CONTRIBUTOR_NOBODY_ACHIEVEMENT)
         }
     }
 
     @HandleEvent
     private fun onFriendRequestDeclined(event: FriendRequestDeclinedEvent) {
-        if (event.playerName in ContributorManager.contributorNames) {
+        if (isContributorAndShouldDiscover(event.playerName)) {
             AchievementManager.completeAchievement(CONTRIBUTOR_REJECTED_ACHIEVEMENT)
         }
     }
