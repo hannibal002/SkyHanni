@@ -10,11 +10,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -38,7 +38,7 @@ object NpcVisitorFix {
     )
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
         val name = staticVisitors.firstOrNull { event.inventoryName.contains(it) } ?: return
         val nearest = findNametags(name).firstOrNull { it.distanceToPlayer() < 3 } ?: return
         DelayedRun.runDelayed(200.milliseconds) {
@@ -63,12 +63,12 @@ object NpcVisitorFix {
     private var lastVisitorOpen = SimpleTimeMark.farPast()
 
     @HandleEvent(VisitorOpenEvent::class)
-    fun onVisitorOpen() {
+    private fun onVisitorOpen() {
         lastVisitorOpen = SimpleTimeMark.now()
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         barnSkinChangePattern.matchMatcher(event.message) {
             GardenApi.storage?.npcVisitorLocations?.clear()
         }
@@ -96,7 +96,7 @@ object NpcVisitorFix {
 
     private fun findNametags(visitorName: String): MutableList<ArmorStand> {
         return EntityUtils.getEntitiesInBoundingBox<ArmorStand>(GardenApi.barnArea) {
-            it.name.string.removeColor() == visitorName
+            it.cleanName == visitorName
         }.toMutableList()
     }
 }

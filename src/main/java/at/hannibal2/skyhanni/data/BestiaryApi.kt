@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.TextCompat.stripped
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Items
@@ -501,7 +501,7 @@ object BestiaryApi {
         var currentKillToNextLevel: Long,
         var actualRealTotalKill: Long,
     ) {
-        val cleanName: String get() = name.string.removeColor()
+        val cleanName: String get() = name.stripped
         val romanLevel: String get() = takeUnless { level == 0 }?.let { level.toRoman() } ?: "0"
 
         fun killNeededToMax(): Long = 0L.coerceAtLeast(killToMax - actualRealTotalKill)
@@ -519,6 +519,6 @@ object BestiaryApi {
         val name: Component,
         val level: Int,
     ) {
-        val cleanName: String get() = name.string.removeColor().removeSuffix(" (Master)")
+        val cleanName: String get() = name.stripped.removeSuffix(" (Master)")
     }
 }
