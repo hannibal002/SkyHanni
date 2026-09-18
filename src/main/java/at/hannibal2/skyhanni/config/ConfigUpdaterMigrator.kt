@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
-import at.hannibal2.skyhanni.utils.json.asIntOrNull
+import at.hannibal2.skyhanni.utils.json.JsonUtils.asIntOrNull
 import at.hannibal2.skyhanni.utils.json.shDeepCopy
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -12,7 +12,7 @@ import com.google.gson.JsonPrimitive
 
 object ConfigUpdaterMigrator {
     val logger = SkyHanniLogger("ConfigMigration")
-    const val CONFIG_VERSION = 146
+    const val CONFIG_VERSION = 147
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
