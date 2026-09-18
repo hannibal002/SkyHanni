@@ -20,7 +20,7 @@ object SkyHanniRepoManager : AbstractRepoManager<RepositoryReloadEvent>() {
     override val updateCommand: String = "shupdaterepo"
     override val statusCommand: String = "shrepostatus"
     override val reloadCommand: String = "shreloadlocalrepo"
-    override val updateCommandAliases = listOf("shrepoupdate")
+    override val updateCommandAliases: List<String> = listOf("shrepoupdate")
 
     override val progressCategory = ChatProgressUpdates.category("SkyHanni Repo")
 
