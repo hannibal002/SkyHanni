@@ -167,11 +167,11 @@ object GraphUtils {
         return mappedNodes.zipWithNext { a, b -> findShortestDistance(a, b) }.sum()
     }
 
-    var playerPosition = LorenzVec(0, 0, 0)
+    var playerPosition = LorenzVec()
         private set
 
     fun updatePlayerPosition() {
-        playerPosition = LocationUtils.playerEyeLocation().roundToBlock()
+        playerPosition = LocationUtils.playerEyeLocationOrNull()?.roundToBlock() ?: LorenzVec()
     }
 
     fun GenericNode.distanceToPlayer(): Double = position.distance(playerPosition)
