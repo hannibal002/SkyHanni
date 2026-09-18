@@ -91,6 +91,11 @@ style:
         maxDestructuringEntries: 5
     AbstractClassCanBeConcreteClass: # this is usually intentional
         active: false
+    ForbiddenMethodCall:
+        active: true
+        methods:
+          # ConcurrentHashMap.contains() checks values, not keys. Use containsKey() or containsValue() instead.
+          - "java.util.concurrent.ConcurrentHashMap.contains"
 
 ktlint:
     MaximumLineLength: # ktlint - handled by detekt
