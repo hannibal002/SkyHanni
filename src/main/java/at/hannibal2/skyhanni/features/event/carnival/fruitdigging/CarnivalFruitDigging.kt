@@ -1,15 +1,23 @@
-package at.hannibal2.skyhanni.features.event.carnival
+package at.hannibal2.skyhanni.features.event.carnival.fruitdigging
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.ContinuedBlockBreakEvent
 import at.hannibal2.skyhanni.events.DataWatcherUpdatedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.event.carnival.CarnivalAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -17,30 +25,34 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDowsingMode
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.fillFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
 import java.awt.Color
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CarnivalFruitDigging {
-
-    private val config get() = SkyHanniMod.feature.event.carnival.fruitDigging
-
     private const val GRID_LENGTH = 7
     const val MAX_DIGS = 15
 
+    private val config get() = SkyHanniMod.feature.event.carnival.fruitDigging
+
     private var isPlayingFruitDigging = false
+    private var lastSquareDigging: GamePos? = null
     private var lastSquareDug: GamePos? = null
     private var remainingFruit = Fruit.entries.associateWith { it.count }.toMutableMap()
 
@@ -48,14 +60,15 @@ object CarnivalFruitDigging {
     private var recommendation: FruitDiggingSolver.Recommendation? = null
     private var solverDirty = false
     private var digsUsed = 0
+    private var dowsingMode: DowsingMode? = null
 
-    private val patternGroup = RepoPattern.group("event.carnival")
+    private val patternGroup = RepoPattern.group("event.carnival.fruitdigging")
 
     /**
      * REGEX-TEST: [NPC] Carnival Pirateman: Good luck, matey!
      */
     private val startPattern by patternGroup.pattern(
-        "fruitdigging.started",
+        "started",
         "^\\[NPC] Carnival Pirateman: Good luck, matey!$",
     )
 
@@ -63,8 +76,8 @@ object CarnivalFruitDigging {
      * WRAPPED-REGEX-TEST: "                               Fruit Digging"
      */
     private val endPattern by patternGroup.pattern(
-        "fruitdigging.end",
-        " {31}Fruit Digging",
+        "end",
+        " +Fruit Digging",
     )
 
     /**
@@ -72,7 +85,7 @@ object CarnivalFruitDigging {
      * REGEX-TEST: TREASURE! There is an Apple nearby.
      */
     private val treasurePattern by patternGroup.pattern(
-        "fruitdigging.treasure",
+        "treasure",
         "^TREASURE! There is an? (?<fruit>.*) nearby\\.$",
     )
 
@@ -81,7 +94,7 @@ object CarnivalFruitDigging {
      * REGEX-TEST: ANCHOR! There are no fruits nearby!
      */
     private val noFruitsNearbyPattern by patternGroup.pattern(
-        "fruitdigging.nofruitsnearby",
+        "nofruitsnearby",
         "^(?:TREASURE|ANCHOR)! There are no fruits nearby!$",
     )
 
@@ -90,7 +103,7 @@ object CarnivalFruitDigging {
      * REGEX-TEST: MINES! There are 2 bombs hidden nearby.
      */
     private val minesPattern by patternGroup.pattern(
-        "fruitdigging.mines",
+        "mines",
         "^MINES! There (?:is|are) (?<bombs>\\d+) bombs? hidden nearby\\.$",
     )
 
@@ -100,7 +113,7 @@ object CarnivalFruitDigging {
      * REGEX-TEST: Rum
      */
     private val revealFruitPattern by patternGroup.pattern(
-        "fruitdigging.reveal",
+        "reveal",
         "^(?<name>[A-Za-z ]+)(?: \\(\\+\\d+\\))?$",
     )
 
@@ -205,7 +218,7 @@ object CarnivalFruitDigging {
     private var gameGrid = GameGrid()
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
 
         if (config.remainingFruitDisplay) {
@@ -233,7 +246,12 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        dowsingMode = event.newStack.getDowsingMode()
+    }
+
+    @HandleEvent
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         if (solverDirty) {
@@ -248,8 +266,7 @@ object CarnivalFruitDigging {
 
                 // indicate if not diggable
                 if (!cell.isDiggable) {
-                    val aabb = AABB(pos.toBlockPos()).expandTowards(0.0, 0.1, 0.0)
-                    event.drawFilledBoundingBox(aabb, Color.GRAY, seeThroughBlocks = false)
+                    event.fillFace(AABB(pos.toBlockPos()), Direction.UP, Color.GRAY)
                 }
 
                 val label = mutableListOf<Pair<String, Color>>()
@@ -294,12 +311,21 @@ object CarnivalFruitDigging {
             recommendation?.let { rec ->
                 val pos = GamePos(rec.targetRow, rec.targetCol)
                 if (gameGrid[pos].isDiggable) {
+                    event.fillFace(AABB(pos.toBlockPos()), Direction.UP, config.bestDigColor.toColor(), alpha = 0.35f)
                     val vec = pos.toLorenzVec()
-                    event.drawWaypointFilled(vec, config.bestDigColor.toColor(), seeThroughBlocks = true, minimumAlpha = 0.35f)
+                    val color = if (dowsingMode == rec.shovel) 'a' else 'c'
+                    val textPos = vec.add(y = 1.35)
                     event.drawDynamicText(
-                        vec.add(0.5, 1.35, 0.5),
-                        "§aDig §cHERE §7with §8(§c${rec.shovel}§8) §7${rec.pBomb.formatPercentage()} bomb",
+                        textPos,
+                        "§eDig §8(§$color${rec.shovel}§8)",
                         1.35,
+                        seeThroughBlocks = true,
+                    )
+                    event.drawDynamicText(
+                        textPos,
+                        "§7(${rec.pBomb.formatPercentage()} bomb)",
+                        1.0,
+                        yOff = 15f,
                         seeThroughBlocks = true,
                     )
                 }
@@ -321,7 +347,14 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onBlockChange(event: ServerBlockChangeEvent) {
+    private fun onContinuedBlockBreak(event: ContinuedBlockBreakEvent) {
+        lastSquareDigging =
+            if (event.position.getBlockAt() == Blocks.SAND) GamePos.fromLorenzVec(event.position) else null
+        checkShovelMode()
+    }
+
+    @HandleEvent
+    private fun onBlockChange(event: ServerBlockChangeEvent) {
         val blockOld = event.oldState
         val blockNew = event.newState
 
@@ -330,17 +363,56 @@ object CarnivalFruitDigging {
         val cell = gameGrid[pos]
         cell.isDiggable = false
 
-        if (blockNew.block == Blocks.SANDSTONE) {
+        // Position check is to ensure Bomb & Watermelon explosions don't count as dug squares
+        if (blockNew.block == Blocks.SANDSTONE && pos == lastSquareDigging) {
             lastSquareDug = pos
-            digsUsed++
+            checkShovelMode()
+            incrementDigs()
         } else if (blockNew.block == Blocks.SANDSTONE_STAIRS) {
             updateRemainingFruit(cell, cell.solvedFruit)
         }
         solverDirty = true
     }
 
+    private fun incrementDigs() {
+        digsUsed++
+        if (digsUsed >= MAX_DIGS) {
+            if (digsUsed > MAX_DIGS) {
+                ErrorManager.logErrorStateWithData(
+                    "Fruit Digging solver encountered an invalid state",
+                    "digs used is higher than max digs",
+                    "digs used" to digsUsed,
+                    "max digs" to MAX_DIGS,
+                )
+            }
+            // TODO uncomment once we are confident round detection has no issues
+            //resetData()
+        }
+    }
+
+    private fun checkShovelMode() {
+        if (!config.enabled) return
+        val diggingPos = lastSquareDigging ?: return
+        val rec = recommendation ?: return
+        val recommendedPos = GamePos(rec.targetRow, rec.targetCol)
+        if (diggingPos != recommendedPos) return
+
+        val itemInHand = InventoryUtils.getItemInHand() ?: return
+
+        val mode = itemInHand.getDowsingMode() ?: return
+        val expectedMode = rec.shovel
+        if (mode == expectedMode) return
+
+        SoundUtils.plingSound.playSound()
+        TitleManager.sendTitle("§cWrong Mode!", duration = 1.seconds)
+        ChatUtils.chat(
+            "§6Use §a$expectedMode §6mode to dig this square! §8(Current: §c$mode§8)",
+            replaceSameMessage = true,
+        )
+    }
+
     @HandleEvent
-    fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<ItemEntity>) {
+    private fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<ItemEntity>) {
         if (!isEnabled()) return
         handleAnchor(event.entity)
     }
@@ -369,7 +441,7 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+    private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         if (!isEnabled()) return
 
         // Armor stand appears when a fruit is dug or exposed by watermelon
@@ -391,7 +463,7 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.enabled || !CarnivalAPI.inCarnivalArea) return
 
         val message = event.cleanMessage
@@ -436,7 +508,7 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         resetData()
     }
 
