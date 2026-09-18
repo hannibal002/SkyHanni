@@ -376,7 +376,7 @@ object AttributeShardsData {
         bossShardPattern to BOSS,
     )
 
-    @HandleEvent(priority = HandleEvent.LOWEST)
+    @HandleEvent(priorityLevel = LOW)
     private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val attributesJson = event.getConstant<NeuAttributeShardJson>("attribute_shards")
         attributeLevelling = attributesJson.attributeLevelling
@@ -402,7 +402,7 @@ object AttributeShardsData {
             val shardInternalName = shardNameToInternalName(shardName) ?: return
             processShard(shardInternalName, level, untilNext)
 
-            ShardEvent(shardInternalName, -group("amount").toInt(), ShardSource.SYPHON).post()
+            ShardEvent(shardInternalName, -group("amount").toInt(), SYPHON).post()
 
             lastSyphonedMessage = SimpleTimeMark.now()
             return
@@ -414,7 +414,7 @@ object AttributeShardsData {
             val shardInternalName = shardNameToInternalName(shardName) ?: return
             processShard(shardInternalName, 10, 0)
 
-            ShardEvent(shardInternalName, -group("amount").toInt(), ShardSource.SYPHON).post()
+            ShardEvent(shardInternalName, -group("amount").toInt(), SYPHON).post()
 
             lastSyphonedMessage = SimpleTimeMark.now()
             return
@@ -469,9 +469,9 @@ object AttributeShardsData {
         fusionShardPattern.matchMatcher(message) {
             val currentFusionData = FusionData.currentFusionData ?: return
             val amount = groupOrNull("amount")?.toInt() ?: 1
-            ShardEvent(currentFusionData.outputShard, amount, ShardSource.FUSE).post()
-            ShardEvent(currentFusionData.firstShard.internalName, -currentFusionData.firstShard.amount, ShardSource.FUSE).post()
-            ShardEvent(currentFusionData.secondShard.internalName, -currentFusionData.secondShard.amount, ShardSource.FUSE).post()
+            ShardEvent(currentFusionData.outputShard, amount, FUSE).post()
+            ShardEvent(currentFusionData.firstShard.internalName, -currentFusionData.firstShard.amount, FUSE).post()
+            ShardEvent(currentFusionData.secondShard.internalName, -currentFusionData.secondShard.amount, FUSE).post()
         }
     }
 
@@ -595,7 +595,7 @@ object AttributeShardsData {
         }?.amountInBox = amount
     }
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
+    @HandleEvent(priorityLevel = HIGHEST)
     private fun onShardGain(event: ShardEvent) {
         val attributeName = shardInternalNameToShardName(event.shardInternalName)
         val existing = storage?.get(attributeName)?.amountInBox ?: 0

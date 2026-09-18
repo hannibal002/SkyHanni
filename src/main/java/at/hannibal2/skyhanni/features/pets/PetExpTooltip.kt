@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -25,14 +24,13 @@ import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object PetExpTooltip {
-
     private val config get() = SkyHanniMod.feature.misc.pets.petExperienceToolTip
     private const val LEVEL_100_COMMON = 5_624_785
     private const val LEVEL_100_LEGENDARY = 25_353_230
     private const val LEVEL_200_LEGENDARY = 210_255_385
 
-    @HandleEvent(priority = HandleEvent.LOWEST, onlyOnSkyblock = true)
-    fun onTooltip(event: ToolTipTextEvent) {
+    @HandleEvent(priorityLevel = LOW, onlyOnSkyblock = true)
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!config.petDisplay) return
         if (!KeyboardManager.isShiftKeyDown() && !config.showAlways) return
 
@@ -63,7 +61,7 @@ object PetExpTooltip {
             val percentageFormat = percentage.formatPercentage()
 
             if (percentage < 1) {
-                val isBelowLegendary = itemStack.getItemRarityOrNull()?.let { it < LorenzRarity.LEGENDARY } ?: false
+                val isBelowLegendary = itemStack.getItemRarityOrNull()?.let { it < LEGENDARY } ?: false
                 val addLegendaryColor = if (isBelowLegendary) "§6" else ""
                 val progressTextLine = "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat"
 
@@ -71,7 +69,6 @@ object PetExpTooltip {
                 val progressBarLine = "$progressBar §e${petExperience.addSeparators()}§6/§e${maxXP.shortFormat()}"
 
                 event.toolTip.addAll(fixedIndex, listOf(progressTextLine, progressBarLine, " "))
-
             }
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
@@ -94,7 +91,6 @@ object PetExpTooltip {
 
         index = toolTip.indexOfFirst { it.string.contains("Progress to Level") }
         if (index != -1) {
-
             val offset = 3
             return index + offset
         }
@@ -119,7 +115,7 @@ object PetExpTooltip {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petExperienceToolTip.petDisplay", "misc.pets.petExperienceToolTip.petDisplay")
         event.move(3, "misc.petExperienceToolTip.showAlways", "misc.pets.petExperienceToolTip.showAlways")
         event.move(3, "misc.petExperienceToolTip.showGoldenDragonEgg", "misc.pets.petExperienceToolTip.showGoldenDragonEgg")
