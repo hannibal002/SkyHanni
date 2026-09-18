@@ -627,7 +627,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         if (legacyCommitFile != null) {
             if (commitFile.exists()) {
                 legacyCommitFile.delete()
-                return@let
+                return
             }
             logger.warn("Moving legacy commit file to: ${commitFile.absolutePath}")
             commitFile.parentFile?.mkdirs()
