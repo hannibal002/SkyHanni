@@ -257,6 +257,14 @@ class DebugConfig {
     var remainingKillsDebug: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "Hide all Entities",
+        desc = "Makes literally every entity invisible for 'performance' §4(THIS WILL BE UNPLAYABLE)"
+    )
+    @ConfigEditorBoolean
+    var hideAllEntities: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Track Sound", desc = "")
     @Accordion
     val trackSound: TrackCommandConfig = TrackCommandConfig()
