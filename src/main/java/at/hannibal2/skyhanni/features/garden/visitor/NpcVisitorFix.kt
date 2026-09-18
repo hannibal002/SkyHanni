@@ -66,7 +66,7 @@ object NpcVisitorFix {
     }
 
     @HandleEvent
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (barnSkinChangePattern.matches(event.cleanMessage)) {
             GardenApi.storage?.npcVisitorLocations?.clear()
         }

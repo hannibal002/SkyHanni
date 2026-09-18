@@ -82,7 +82,7 @@ object SharkFishCounter {
     }
 
     @HandleEvent
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!festivalEndPattern.matches(event.cleanMessage)) return
         val count = totalCount.takeIf { it != 0 } ?: return
 

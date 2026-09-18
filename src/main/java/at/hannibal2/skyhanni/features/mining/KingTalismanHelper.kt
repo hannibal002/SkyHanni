@@ -176,7 +176,7 @@ object KingTalismanHelper {
     }
 
     @HandleEvent(onlyOnIsland = DWARVEN_MINES)
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
 
         if (talismanPattern.matches(event.cleanMessage)) {

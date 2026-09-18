@@ -49,7 +49,7 @@ object ChickenHeadTimer {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!config.displayTimer || !hasChickenHead) return
         if (chickenHeadActivatePattern.matches(event.cleanMessage)) {
             lastTime = SimpleTimeMark.now()

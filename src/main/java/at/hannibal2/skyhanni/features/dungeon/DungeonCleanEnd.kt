@@ -41,7 +41,7 @@ object DungeonCleanEnd {
     private var lastBossId: Int = -1
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!config.enabled) return
 
         val message = event.cleanMessage

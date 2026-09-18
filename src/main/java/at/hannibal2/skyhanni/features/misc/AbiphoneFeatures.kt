@@ -39,7 +39,7 @@ object AbiphoneFeatures {
     )
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (callRingPattern.matches(event.cleanMessage) && acceptUUID == null) readPickupUuid(event)
     }
 

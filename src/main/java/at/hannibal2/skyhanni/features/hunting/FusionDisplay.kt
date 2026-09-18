@@ -64,7 +64,7 @@ object FusionDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (pureReptilePattern.find(event.cleanMessage)) pureReptiles++
     }
 

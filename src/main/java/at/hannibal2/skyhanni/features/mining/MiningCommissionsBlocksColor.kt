@@ -76,7 +76,7 @@ object MiningCommissionsBlocksColor {
 
     // TODO Commission API
     @HandleEvent
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!enabled) return
         commissionCompletePattern.matchMatcher(event.cleanMessage) {
             val name = group("name")

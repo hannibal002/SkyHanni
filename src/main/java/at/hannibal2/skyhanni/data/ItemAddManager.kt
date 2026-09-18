@@ -174,7 +174,7 @@ object ItemAddManager {
     }
 
     @HandleEvent
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (diceRollChatPattern.matches(event.cleanMessage)) {
             lastDiceRoll = SimpleTimeMark.now()
             val achievement = AchievementManager.getAchievement(DICE_ACHIEVEMENT)

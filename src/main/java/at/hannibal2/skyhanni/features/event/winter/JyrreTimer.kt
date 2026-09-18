@@ -46,7 +46,7 @@ object JyrreTimer {
     }
 
     @HandleEvent
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!isEnabled() || !drankBottlePattern.matches(event.cleanMessage)) return
         duration = 60.minutes
     }

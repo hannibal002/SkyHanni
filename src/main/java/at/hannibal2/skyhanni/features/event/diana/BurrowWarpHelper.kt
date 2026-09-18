@@ -101,7 +101,7 @@ object BurrowWarpHelper {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!UtilsPatterns.fastTravelNotUnlockedPattern.matches(event.cleanMessage)) return
         if (lastWarpTime.passedSince() > 1.seconds) return
         lastWarp?.let {

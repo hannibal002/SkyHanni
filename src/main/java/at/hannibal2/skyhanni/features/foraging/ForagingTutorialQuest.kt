@@ -71,7 +71,7 @@ object ForagingTutorialQuest {
     }
 
     @HandleEvent
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         val message = event.cleanMessage
         if (UtilsPatterns.fastTravelNotUnlockedPattern.matches(message) ||
             UtilsPatterns.warpMissingRequirementsPattern.matches(message)

@@ -27,7 +27,7 @@ object SuperCraftFeatures {
     private val config get() = SkyHanniMod.feature.inventory.gfs
 
     @HandleEvent
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!config.superCraftGFS) return
         val (internalName, amount) = craftedPattern.matchMatcher(event.cleanMessage) {
             NeuInternalName.fromItemName(group("item")) to (group("amount")?.formatInt() ?: 1)

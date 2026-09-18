@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.chat
 
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.skyhanni.events.chat.AbstractChatEvent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
@@ -92,7 +92,7 @@ object ChatComponentUtils {
     /**
      * Applies a transformation on the message of a SystemMessageEvent if possible.
      */
-    fun SystemMessageEvent.Modify.applyIfPossible(
+    fun AbstractChatEvent.Modify.applyIfPossible(
         transformationReason: String? = null,
         transform: (String) -> String,
     ) {

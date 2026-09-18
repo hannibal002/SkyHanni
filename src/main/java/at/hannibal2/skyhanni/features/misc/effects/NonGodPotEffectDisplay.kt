@@ -54,7 +54,7 @@ object NonGodPotEffectDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (effectsClearedChatPattern.matches(event.cleanMessage)) {
             effectDuration.clear()
             update()

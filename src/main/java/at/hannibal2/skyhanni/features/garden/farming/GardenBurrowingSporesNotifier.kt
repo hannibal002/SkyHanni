@@ -33,7 +33,7 @@ object GardenBurrowingSporesNotifier {
     private val blinkSet = setOf(GardenConfig.BurrowingSporesNotificationType.BLINK, GardenConfig.BurrowingSporesNotificationType.BOTH)
 
     @HandleEvent(onlyOnIsland = GARDEN)
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         val selected = config.burrowingSporesNotificationType
         val titleEnabled = selected in titleSet
         val blinkEnabled = selected in blinkSet

@@ -134,7 +134,7 @@ object HoppityEventSummary {
     }
 
     @HandleEvent
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!HoppityApi.isHoppityEvent()) return
         val stats = getYearStats() ?: return
 

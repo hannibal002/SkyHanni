@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.tiarelay
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.NpcChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -35,7 +35,7 @@ object TiaRelayWaypoints {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onChat(event: NpcChatEvent.Allow) {
         if (!config.nextWaypoint) return
 
         val message = event.cleanMessage
