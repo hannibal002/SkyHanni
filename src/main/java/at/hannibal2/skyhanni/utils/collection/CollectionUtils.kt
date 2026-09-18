@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.utils.collection
 
 import at.hannibal2.skyhanni.utils.MinMaxNumber
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import net.minecraft.network.chat.Component
 import java.util.Collections
 import java.util.EnumMap
 import java.util.PriorityQueue
@@ -548,6 +551,23 @@ object CollectionUtils {
         while (iter.hasNext()) {
             val line = iter.next()
             if (pattern.matcher(line).find()) {
+                iter.add(content)
+            }
+        }
+    }
+
+    /**
+     * Insert content after a line that matches the given pattern.
+     *
+     * @param pattern the pattern to match
+     * @param content the content to insert
+     */
+    @JvmName("insertLineAfterComponent")
+    fun MutableList<Component>.insertLineAfter(pattern: Pattern, content: Component) {
+        val iter = this.listIterator()
+        while (iter.hasNext()) {
+            val line = iter.next()
+            pattern.findMatcher(line) {
                 iter.add(content)
             }
         }

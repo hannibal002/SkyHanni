@@ -124,11 +124,6 @@ class GardenConfig {
     val farmingFortunes: FarmingFortuneConfig = FarmingFortuneConfig()
 
     @Expose
-    @ConfigOption(name = "Tooltip Tweaks", desc = "")
-    @Accordion
-    val tooltipTweak: TooltipTweaksConfig = TooltipTweaksConfig()
-
-    @Expose
     @ConfigOption(name = "Yaw and Pitch", desc = "")
     @Accordion
     val yawPitchDisplay: YawPitchDisplayConfig = YawPitchDisplayConfig()

@@ -23,10 +23,11 @@ import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.applyFormattingFrom
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.ChatComponentUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.applyFormattingFrom
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.merge
 import at.hannibal2.skyhanni.utils.chat.TextHelper.style
@@ -89,14 +90,14 @@ object PlayerNameFormatter {
             if (config.sameChatColor) message.intoComponent().changeColor(LorenzColor.WHITE)
             else message.intoComponent(),
         )
-        val component = StringUtils.replaceIfNeeded(event.chatComponent, all) ?: return
+        val component = ChatComponentUtils.replaceIfNeeded(event.chatComponent, all) ?: return
         event.replaceComponent(component, "player_chat_formatting")
     }
 
     @HandleEvent
     fun onCoopChat(event: CoopChatEvent.Modify) {
         if (!isEnabled()) return
-        val component = StringUtils.replaceIfNeeded(
+        val component = ChatComponentUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("§bCo-op > ") {
                 append(nameFormat(event.authorComponent))
@@ -110,7 +111,7 @@ object PlayerNameFormatter {
     @HandleEvent
     fun onGuildChat(event: GuildChatEvent.Modify) {
         if (!isEnabled()) return
-        val component = StringUtils.replaceIfNeeded(
+        val component = ChatComponentUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("§2Guild > ") {
                 append(nameFormat(event.authorComponent, guildRank = event.guildRank))
@@ -124,7 +125,7 @@ object PlayerNameFormatter {
     @HandleEvent
     fun onPartyChat(event: PartyChatEvent.Modify) {
         if (!isEnabled()) return
-        val component = StringUtils.replaceIfNeeded(
+        val component = ChatComponentUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("§9Party §8> ") {
                 append(nameFormat(event.authorComponent))
@@ -138,7 +139,7 @@ object PlayerNameFormatter {
     @HandleEvent
     fun onPrivateChat(event: PrivateMessageChatEvent.Modify) {
         if (!isEnabled()) return
-        val component = StringUtils.replaceIfNeeded(
+        val component = ChatComponentUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("§d${event.direction.text}") {
                 append(" ")
@@ -156,7 +157,7 @@ object PlayerNameFormatter {
     @HandleEvent
     fun onPlayerShowItemChat(event: PlayerShowItemChatEvent.Modify) {
         if (!isEnabled()) return
-        val component = StringUtils.replaceIfNeeded(
+        val component = ChatComponentUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("") {
                 append(

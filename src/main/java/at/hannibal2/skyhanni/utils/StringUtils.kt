@@ -187,13 +187,6 @@ object StringUtils {
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
     fun Double.removeUnusedDecimal() = if (this % 1 == 0.0) toInt().toString() else toString()
 
-    // TODO remove this deprecated alias in November 2026
-    @Deprecated(
-        "Moved to TextHelper",
-        ReplaceWith("this.splitLines(width)", "at.hannibal2.skyhanni.utils.chat.TextHelper.splitLines"),
-    )
-    fun String.splitLines(width: Int): String = with(TextHelper) { splitLines(width) }
-
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
      * this = the list of strings to join into a string, containing 0 or more elements.
@@ -244,16 +237,6 @@ object StringUtils {
         return builder.toString()
     }
 
-    // TODO remove this deprecated alias in November 2026
-    @Deprecated(
-        "Moved to TextHelper",
-        ReplaceWith(
-            "this.capAtMinecraftLength(limit)",
-            "at.hannibal2.skyhanni.utils.chat.TextHelper.capAtMinecraftLength",
-        ),
-    )
-    fun String.capAtMinecraftLength(limit: Int) = with(TextHelper) { capAtMinecraftLength(limit) }
-
     fun String.getPlayerNameFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("username")
 
     fun String.getPlayerNameAndRankFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("rankedName")
@@ -303,44 +286,7 @@ object StringUtils {
     fun String.insert(pos: Int, char: Char): String =
         substring(0, pos) + char + substring(pos)
 
-    // TODO remove this deprecated alias in November 2026
-    @Deprecated(
-        "Moved to ChatComponentUtils",
-        ReplaceWith(
-            "ChatComponentUtils.replaceIfNeeded(original, newText)",
-            "at.hannibal2.skyhanni.utils.chat.ChatComponentUtils",
-        ),
-    )
-    fun replaceIfNeeded(original: Component, newText: String): Component? =
-        ChatComponentUtils.replaceIfNeeded(original, newText)
-
-    // TODO remove this deprecated alias in November 2026
-    @Deprecated(
-        "Moved to ChatComponentUtils",
-        ReplaceWith(
-            "ChatComponentUtils.replaceIfNeeded(original, newText)",
-            "at.hannibal2.skyhanni.utils.chat.ChatComponentUtils",
-        ),
-    )
-    fun <T : Component> replaceIfNeeded(
-        original: T,
-        newText: T,
-    ): T? = ChatComponentUtils.replaceIfNeeded(original, newText)
-
-    // TODO remove this deprecated alias in November 2026
-    @Deprecated(
-        "Moved to ChatComponentUtils",
-        ReplaceWith(
-            "this.applyIfPossible(transformationReason, transform)",
-            "at.hannibal2.skyhanni.utils.chat.ChatComponentUtils.applyIfPossible",
-        ),
-    )
-    fun SystemMessageEvent.Modify.applyIfPossible(
-        transformationReason: String? = null,
-        transform: (String) -> String,
-    ) = with(ChatComponentUtils) { applyIfPossible(transformationReason, transform) }
-
-    fun String.replaceAll(oldValue: String, newValue: String, ignoreCase: Boolean = false): String {
+   fun String.replaceAll(oldValue: String, newValue: String, ignoreCase: Boolean = false): String {
         var text = this
         while (true) {
             val newText = text.replace(oldValue, newValue, ignoreCase = ignoreCase)
@@ -365,49 +311,6 @@ object StringUtils {
         }
         return message
     }
-
-    // TODO remove this deprecated alias in November 2026
-    @Deprecated(
-        "Moved to TextHelper",
-        ReplaceWith(
-            "this.applyFormattingFrom(original)",
-            "at.hannibal2.skyhanni.utils.chat.TextHelper.applyFormattingFrom",
-        ),
-    )
-    fun String.applyFormattingFrom(original: ComponentSpan): Component =
-        with(TextHelper) { applyFormattingFrom(original) }
-
-    // TODO remove this deprecated alias in November 2026
-    @Deprecated(
-        "Moved to TextHelper",
-        ReplaceWith(
-            "this.applyFormattingFrom(original)",
-            "at.hannibal2.skyhanni.utils.chat.TextHelper.applyFormattingFrom",
-        ),
-    )
-    fun String.applyFormattingFrom(original: Component): Component =
-        with(TextHelper) { applyFormattingFrom(original) }
-
-    // TODO remove this deprecated alias in November 2026
-    @Deprecated(
-        "Moved to TextHelper",
-        ReplaceWith("this.contains(other)", "at.hannibal2.skyhanni.utils.chat.TextHelper.contains"),
-    )
-    fun Component.contains(other: String): Boolean = with(TextHelper) { contains(other) }
-
-    // TODO remove this deprecated alias in November 2026
-    @Deprecated(
-        "Moved to TextHelper",
-        ReplaceWith("this.startsWith(other)", "at.hannibal2.skyhanni.utils.chat.TextHelper.startsWith"),
-    )
-    fun Component.startsWith(other: String): Boolean = with(TextHelper) { startsWith(other) }
-
-    // TODO remove this deprecated alias in November 2026
-    @Deprecated(
-        "Moved to TextHelper",
-        ReplaceWith("this.width()", "at.hannibal2.skyhanni.utils.chat.TextHelper.width"),
-    )
-    fun String.width(): Int = with(TextHelper) { width() }
 
     private val vowels = "aeiouAEIOU".toSet()
 
