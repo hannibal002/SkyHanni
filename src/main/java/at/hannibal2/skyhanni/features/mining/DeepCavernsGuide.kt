@@ -148,7 +148,7 @@ object DeepCavernsGuide {
         showStartIcon = false
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = DEEP_CAVERNS)
     private fun replaceItem(event: ReplaceItemEvent) {
         if (show) return
         if (event.inventory is SimpleContainer && showStartIcon && event.slot == 49) {
@@ -156,7 +156,7 @@ object DeepCavernsGuide {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
+    @HandleEvent(onlyOnIsland = DEEP_CAVERNS, priority = HandleEvent.HIGH)
     private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (showStartIcon && event.slotId == 49) {
             event.cancel()
