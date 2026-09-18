@@ -365,8 +365,8 @@ object BestiaryApi {
 
     private fun getMobVariant(stack: SafeItemStack): BestiaryMobVariant? {
         val (name, levelOrTier) = mobVariantPattern.matchStyledMatcher(stack.hoverName.intoSpan()) {
-            val name = group("name")?.intoComponent() ?: return@matchStyledMatcher null
-            val levelOrTier = group("level")?.getText()?.formatInt() ?: return@matchStyledMatcher null
+            val name = groupOrNull("name")?.intoComponent() ?: return@matchStyledMatcher null
+            val levelOrTier = groupOrNull("level")?.getText()?.formatInt() ?: return@matchStyledMatcher null
             name to levelOrTier
         } ?: return null
 
@@ -376,7 +376,7 @@ object BestiaryApi {
     private fun parseStackName(component: Component): Pair<Component, String>? {
         var level = "0"
         val name = mobLevelPattern.matchStyledMatcher(component) {
-            level = group("level")?.getText() ?: "0"
+            level = groupOrNull("level")?.getText() ?: "0"
             group("name")
         }?.intoComponent() ?: return null
         return name to level
