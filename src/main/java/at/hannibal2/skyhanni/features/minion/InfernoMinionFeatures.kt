@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.InfernoMinionFuelsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
@@ -15,7 +14,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -40,29 +38,28 @@ object InfernoMinionFeatures {
     private var inInventory = false
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<InfernoMinionFuelsJson>("InfernoMinionFuels")
         fuelItemIds = data.minionFuels.toSet()
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = infernoMinionTitlePattern.matches(event.inventoryName)
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         inInventory = false
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.infernoFuelBlocker) return
         if (!inInventory) return
 
         val fuelItemName = event.container.getSlot(MINION_FUEL_SLOT).item.hoverName
-        val containsFuel =
-            NeuInternalName.fromItemNameOrNull(fuelItemName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds
+        val containsFuel = NeuInternalName.fromItemNameOrNull(fuelItemName) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot?.index == MINION_FUEL_SLOT || event.slot?.index == MINION_PICKUP_SLOT) {
@@ -72,12 +69,12 @@ object InfernoMinionFeatures {
     }
 
     @HandleEvent
-    fun onToolTip(event: ToolTipTextEvent) {
+    private fun onToolTip(event: ToolTipTextEvent) {
         if (!config.infernoFuelBlocker) return
         if (!inInventory) return
         event.slot?.index ?: return
 
-        val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds
+        val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.hoverName) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot.index == MINION_FUEL_SLOT) {
