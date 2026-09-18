@@ -17,4 +17,13 @@ class FishingBaitWarningsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var noBaitWarning: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Dark/Light Bait Warning",
+        desc = "Show a warning when using dark bait in day, and light bait at night."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var darkAndLightWarning = false
 }
