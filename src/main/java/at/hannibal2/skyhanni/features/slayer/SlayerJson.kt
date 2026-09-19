@@ -46,7 +46,7 @@ data class SlayerJson(
 
     @Expose @SerializedName("slayer_bonus_rewards_reduction") val bonusRewardsReduction: Double,
 
-    @Expose @SerializedName("brewery_contribution_cost_reduction") val breweryContributionCostReduction: Double
+    @Expose @SerializedName("brewery_contribution_cost_reduction") val breweryContributionCostReduction: Double,
 )
 
 data class SlayerSpecificPetData(
