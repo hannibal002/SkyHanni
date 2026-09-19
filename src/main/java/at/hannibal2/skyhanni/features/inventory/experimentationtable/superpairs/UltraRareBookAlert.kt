@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -22,9 +21,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object UltraRareBookAlert {
-
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
-    private val dragonSound by lazy { createSound("entity.ender_dragon.growl", 1f) }
+    private val dragonSound by lazy { createSound("entity.ender_dragon.growl", 1f, isWarning = true) }
 
     private var enchantsFound = false
 
@@ -53,8 +51,8 @@ object UltraRareBookAlert {
         )
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(onlyOnIsland = PRIVATE_ISLAND)
+    private fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (lastNotificationTime.passedSince() > 5.seconds) return
 
@@ -65,21 +63,21 @@ object UltraRareBookAlert {
         )
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onTableRareUncover(event: TableRareUncoverEvent) {
+    @HandleEvent(onlyOnIsland = PRIVATE_ISLAND)
+    private fun onTableRareUncover(event: TableRareUncoverEvent) {
         if (enchantsFound || !isEnabled()) return
         lastUncoveredWasBook = event.isBook
         notification(event.dropName, event.isBook)
         enchantsFound = true
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(onlyOnIsland = PRIVATE_ISLAND)
+    private fun onInventoryClose(event: InventoryCloseEvent) {
         enchantsFound = false
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(59, "inventory.helper.enchanting.ultraRareBookAlert", "inventory.experimentationTable.ultraRareBookAlert")
 
         val pathBase = "inventory.experimentationTable"

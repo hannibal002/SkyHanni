@@ -67,9 +67,10 @@ import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.EnderMan
-import net.minecraft.world.entity.monster.MagmaCube
+import net.minecraft.world.entity.monster.cubemob.MagmaCube
 import net.minecraft.world.entity.monster.zombie.Zombie
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -82,7 +83,6 @@ typealias EntityData = DamageIndicatorEntityData
 @SkyHanniModule
 @Suppress("LargeClass")
 object DamageIndicatorManager {
-
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
     // TODO use repoPattern
@@ -90,7 +90,7 @@ object DamageIndicatorManager {
     private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
 
     private var mobFinder: MobFinder? = null
-    private val data = mutableMapOf<UUID, EntityData>()
+    private val data = ConcurrentHashMap<UUID, EntityData>()
     private val maxHealth = mutableMapOf<UUID, Long>()
     // EntityData is owned by the field 'data', so we can use weak keys
     private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds, useWeakKeys = true)
@@ -129,14 +129,14 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onServerTick() {
+    private fun onServerTick() {
         data.forEach {
             it.value.serverTicksAlive++
         }
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         mobFinder = MobFinder()
         data.clear()
 
@@ -145,12 +145,14 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         mobFinder?.handleChat(event.cleanMessage)
     }
 
+    // TODO split up
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         if (SkyBlockUtils.debug) {
@@ -374,7 +376,7 @@ object DamageIndicatorManager {
     class Highlight(val location: LorenzVec, val text: String, val decayAt: SimpleTimeMark)
 
     @HandleEvent
-    fun onMobSpawn(event: MobEvent.Spawn) {
+    private fun onMobSpawn(event: MobEvent.Spawn) {
         val mob = event.mob
 
         if (SkyBlockUtils.debug) {
@@ -396,7 +398,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (!isEnabled()) return
         data.values.forEach(::update)
         // TODO config to define between 100ms and 5 sec
@@ -470,7 +472,6 @@ object DamageIndicatorManager {
         entity: LivingEntity,
         maxHealth: Long,
     ): String? {
-
         when (entityData.bossType) {
             BossType.DUNGEON_F4_THORN -> {
                 val thorn = checkThorn(health, maxHealth)
@@ -564,9 +565,7 @@ object DamageIndicatorManager {
 
             BossType.BACTE -> return checkBacte(entityData)
 
-
             BossType.END_ENDER_DRAGON -> return checkEnderDragon(entityData)
-
 
             else -> return ""
         }
@@ -951,7 +950,7 @@ object DamageIndicatorManager {
 
     private fun grabData(mob: ShMob): EntityData? {
         val entity = mob.baseEntity
-        if (data.contains(entity.uuid)) return data[entity.uuid]
+        if (data.containsKey(entity.uuid)) return data[entity.uuid]
 
         val entityResult = mobFinder?.tryAdd(mob) ?: return null
 
@@ -982,14 +981,14 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onEntityJoin(event: EntityEnterWorldEvent<*>) {
+    private fun onEntityJoin(event: EntityEnterWorldEvent<*>) {
         mobFinder?.handleNewEntity(event.entity)
     }
 
     private val dummyDamageCache = mutableListOf<UUID>()
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
+    private fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
 
@@ -1029,7 +1028,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
+    private fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         val uuid = event.entity.uuid
         val data = data[uuid] ?: return
 
@@ -1078,7 +1077,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "damageIndicator", "combat.damageIndicator")
         event.move(3, "slayer.endermanPhaseDisplay", "slayer.endermen.phaseDisplay")
         event.move(3, "slayer.blazePhaseDisplay", "slayer.blazes.phaseDisplay")
@@ -1095,7 +1094,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Damage Indicator")
         if (!DevApi.mainToggles.damageIndicator) {
             event.addData("Damage Indicator is manually disabled!")

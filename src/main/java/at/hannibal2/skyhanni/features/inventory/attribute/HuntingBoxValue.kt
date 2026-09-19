@@ -3,11 +3,10 @@ package at.hannibal2.skyhanni.features.inventory.attribute
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -16,11 +15,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import net.minecraft.world.inventory.Slot
 
 @SkyHanniModule
 object HuntingBoxValue {
@@ -33,7 +30,7 @@ object HuntingBoxValue {
     private var totalInstantSell = 0L
     private var totalInstantBuy = 0L
 
-    fun processInventory(slots: List<Slot>) {
+    fun processInventory(items: Map<Int, SafeItemStack>) {
         if (!config.huntingBoxValue) return
 
         totalShards = 0
@@ -42,10 +39,8 @@ object HuntingBoxValue {
 
         val table = mutableListOf<DisplayTableEntry>()
 
-        for (slot in slots) {
-            val slotNumber = slot.index
-            if (!isValidSlotNumber(slotNumber)) continue
-            val stack = slot.item.orNull() ?: continue
+        for ((slotNumber, stack) in items) {
+            if (!AttributeShardsData.isValidSlotNumber(slotNumber)) continue
             processAttributeShardSlot(slotNumber, stack, table)
         }
 
@@ -55,7 +50,7 @@ object HuntingBoxValue {
             if (table.isNotEmpty()) {
                 add(RenderableUtils.fillScrollTable(table, padding = 5, itemScale = 0.7, height = 225, velocity = 5.0))
             } else {
-                possiblyAddWarning()
+                possiblyAddWarning(items)
             }
 
             addString("§7Total Attribute Shards: §a$totalShards")
@@ -64,8 +59,8 @@ object HuntingBoxValue {
         }
     }
 
-    private fun MutableList<Renderable>.possiblyAddWarning() {
-        InventoryUtils.getItemAtSlotIndex(10).orNull() ?: return
+    private fun MutableList<Renderable>.possiblyAddWarning(items: Map<Int, SafeItemStack>) {
+        if (!items.containsKey(10)) return
 
         addString("§cError detected!")
         addString("§cPlease run §e/shdebug repo§c to get debug information.")
@@ -75,7 +70,7 @@ object HuntingBoxValue {
     private fun processAttributeShardSlot(slotNumber: Int, stack: SafeItemStack, table: MutableList<DisplayTableEntry>) {
         val internalName = stack.getInternalNameOrNull() ?: return
 
-        val amountOwned = AttributeShardsData.amountOwnedPattern.firstMatcher(stack.getLore()) {
+        val amountOwned = AttributeShardsData.amountOwnedPattern.firstMatcher(stack.getCleanLore()) {
             group("amount").formatInt()
         } ?: return
         totalShards += amountOwned
@@ -111,14 +106,8 @@ object HuntingBoxValue {
         )
     }
 
-    private fun isValidSlotNumber(slot: Int): Boolean {
-        if (slot !in 9..44) return false
-        val modNine = slot % 9
-        return modNine != 0 && modNine != 8
-    }
-
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChestGuiRender() {
+    private fun onChestGuiRender() {
         if (!config.huntingBoxValue) return
         if (!AttributeShardsData.huntingBoxInventory.isInside()) return
 

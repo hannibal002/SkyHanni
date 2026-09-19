@@ -4,6 +4,19 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.test.command.ErrorManager
 
+/**
+ * Collects the data that the debug command prints.
+ *
+ * A handler sets a title, then adds exactly one block of data below it.
+ *
+ * [addIrrelevant] is the default. It keeps the block out of the plain dump, where it would
+ * only be noise. Switch a block to [addData] when its content is relevant right now, for
+ * example while a reported bug in that area is being investigated.
+ *
+ * @param list the collected output, written to by [addData] and [addIrrelevant].
+ * @param search an empty string shows only relevant blocks, "all" shows every block,
+ *  anything else shows the blocks whose title contains it.
+ */
 @PrimaryFunction("onDebugDataCollect")
 class DebugDataCollectEvent(private val list: MutableList<String>, private val search: String) : SkyHanniEvent() {
 

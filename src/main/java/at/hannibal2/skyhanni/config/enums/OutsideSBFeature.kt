@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.enums
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.EventListeners
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents.DirtyReason
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -40,7 +41,7 @@ enum class OutsideSBFeature(private val displayName: String) {
         @HandleEvent
         fun onConfigLoad() {
             config.afterChange {
-                EventListeners.markEventCacheDirty()
+                SkyHanniEvents.markEventCacheDirty(DirtyReason.OUTSIDE_SB_FEATURE_CHANGED)
             }
         }
     }

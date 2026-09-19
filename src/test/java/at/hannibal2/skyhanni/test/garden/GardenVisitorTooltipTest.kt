@@ -2,14 +2,13 @@ package at.hannibal2.skyhanni.test.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.SkyHanniConfig
-import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTooltip
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import net.minecraft.world.item.Items
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -41,7 +40,7 @@ class GardenVisitorTooltipTest {
 
     @Test
     fun `visitor tooltip parses copper line and rare reward with heart suffix`() {
-        val offerItem = ItemUtils.createItemStack(Items.GREEN_TERRACOTTA, "§aAccept Offer", spacemanLore)
+        val offerItem = ItemUtils.createItemStack(ColoredBlockCompat.GREEN.clayBlock.asItem(), "§aAccept Offer", spacemanLore)
         val visitor = VisitorApi.Visitor(
             visitorName = "§cSpaceman",
             status = VisitorApi.VisitorStatus.NEW,
@@ -49,7 +48,7 @@ class GardenVisitorTooltipTest {
         )
 
         assertDoesNotThrow {
-            GardenVisitorTooltip.onVisitorOpen(VisitorOpenEvent(visitor))
+            GardenVisitorTooltip.readVisitorOffer(visitor)
         }
 
         assertNotNull(visitor.pricePerCopper)

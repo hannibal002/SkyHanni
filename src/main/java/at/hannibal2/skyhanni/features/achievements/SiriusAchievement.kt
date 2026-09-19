@@ -14,7 +14,7 @@ object SiriusAchievement {
     /**
      * REGEX-TEST: [NPC] Lucius: You've purchased 15 items from the Dark Auction.
      */
-    private val daItemsPattern by AchievementManager.group.pattern(
+    private val daItemsPattern by AchievementManager.patternGroup.pattern(
         "da-item-count",
         "\\[NPC] Lucius: You've purchased (?<count>\\d+) items from the Dark Auction.",
     )

@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.features.inventory.attribute
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 @SkyHanniModule
 object AttributesShardsInventory {
@@ -21,7 +21,7 @@ object AttributesShardsInventory {
 
         val internalName = event.stack.getInternalNameOrNull() ?: return
         if (!AttributeShardsData.isAttributeShard(internalName)) return
-        AttributeShardsData.attributeShardNamePattern.matchMatcher(event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+        AttributeShardsData.attributeShardNamePattern.matchMatcher(event.stack.cleanName) {
             val tier = groupOrNull("tier")?.romanToDecimal() ?: 0
             val color = when (tier) {
                 0 -> "§c"

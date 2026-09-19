@@ -67,7 +67,7 @@ object BetterContainers {
         "disallowed",
         "(?i)navigate the maze.*",
     )
-    val disallowedInventory = InventoryDetector(disallowedInventoryPattern)
+    val disallowedInventory = InventoryDetector { disallowedInventoryPattern }
 
     val isRendering: Boolean get() = loaded && gpuTex != null
     val isOverriding: Boolean get() = chestOpen && isRendering && !disallowedInventory.isInside()
@@ -98,8 +98,8 @@ object BetterContainers {
     }
 
     @JvmStatic
-    fun slotCanBeHighlighted(slot: Slot): Boolean {
-        return if (!isOverriding) slot.isHighlightable
+    fun slotCanBeHighlighted(slot: Slot, original: Boolean): Boolean {
+        return if (!isOverriding) original
         else !isBlankStack(slot.item)
     }
 

@@ -7,7 +7,10 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
+import at.hannibal2.skyhanni.utils.ChatUtils.passedSinceSent
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.compat.value
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object CompactBestiaryChatMessage {
@@ -34,7 +37,8 @@ object CompactBestiaryChatMessage {
         if (message == TITLE_MESSAGE) {
             event.blockedReason = "bestiary"
             ChatManager.deleteMessages(amount = 2, reason = "bestiary") {
-                it.chatMessage.isEmpty() || it.chatMessage == BORDER
+                it.passedSinceSent() < 500.milliseconds &&
+                    (StringUtils.isEmpty(it.chatMessage) || it.chatMessage == BORDER)
             }
 
             for (sibling in event.chatComponent.siblings) {

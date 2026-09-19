@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.UtilsPatterns.seasonPattern
 import kotlin.time.Duration.Companion.seconds
@@ -11,10 +12,30 @@ enum class SkyblockSeason(
     private val middleMonth: Int, // 0 indexed
 ) {
 
-    SPRING("§dSpring", "§7Gain §6+25☘ Farming Fortune§7.", "§6+25☘", 1),
-    SUMMER("§6Summer", "§7Gain §3+20☯ Farming Wisdom§7.", "§3+20☯", 4),
-    AUTUMN("§eAutumn", "§4Pests §7spawn §a15% §7more often.", "§a15%+§4", 7),
-    WINTER("§9Winter", "§7Visitors give §a5% §7more §cCopper.", "§a5%+§cC", 10),
+    SPRING(
+        "§dSpring",
+        "§7Gain §6+25${SkyblockStat.FARMING_FORTUNE.hypixelIcon} Farming Fortune§7.",
+        "§6+25${SkyblockStat.FARMING_FORTUNE.hypixelIcon}",
+        1
+    ),
+    SUMMER(
+        "§6Summer",
+        "§7Gain §3+20${SkyblockStat.FARMING_WISDOM.hypixelIcon} Farming Wisdom§7.",
+        "§3+20${SkyblockStat.FARMING_WISDOM.hypixelIcon}",
+        4
+    ),
+    AUTUMN(
+        "§eAutumn",
+        "§4Pests §7spawn §a15% §7more often.",
+        "§a15%+§\uE07F",
+        7
+    ),
+    WINTER(
+        "§9Winter",
+        "§7Visitors give §a5% §7more §cCopper.",
+        "§a5%+§cC",
+        10
+    ),
     ;
 
     override fun toString(): String = season
