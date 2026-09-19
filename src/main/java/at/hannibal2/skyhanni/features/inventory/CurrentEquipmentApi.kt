@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentTyp
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.InternalNameArgumentType
 import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyblockEquipmentDataUpdateEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -99,7 +99,7 @@ object CurrentEquipmentApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         chatEquipRegex.matchMatcher(event.cleanMessage) {
             if (lastClickedEquipmentTime.passedSince() > 1.seconds) return@matchMatcher
             val chatItem = group("item")
