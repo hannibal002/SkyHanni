@@ -37,7 +37,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CompatCoroutineManager
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.coroutines.SkyHanniCoroutineManager
-import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -90,7 +89,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
         with(SkyHanniMod) { asyncUnScopedCoroutine(block) }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         val screenToOpen = screenToOpen ?: return
         screenTicks++
         if (screenTicks != 5) return
@@ -106,14 +105,9 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     }
 
     @HandleEvent
-    fun onClientShutdown() {
+    private fun onClientShutdown() {
         configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
-    }
-
-    @HandleEvent
-    fun onRenderShutdown() {
         SkyHanniItemRenderCoordinator.closeAtlas()
-        SkyHanniRoundedShapeRenderManager.closeAtlas()
     }
 
     const val MODID: String = "skyhanni"
@@ -121,7 +115,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
 
     fun id(path: String): Identifier = Identifier.fromNamespaceAndPath(MODID, path)
 
-    val modVersion: ModVersion = ModVersion.fromString(VERSION)
+    val modVersion: ModVersion = ModVersion.installed
 
     val isBetaVersion: Boolean
         get() = modVersion.isBeta
@@ -157,7 +151,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("sh") {
             aliases = listOf("skyhanni")
             description = "Opens the main SkyHanni config"

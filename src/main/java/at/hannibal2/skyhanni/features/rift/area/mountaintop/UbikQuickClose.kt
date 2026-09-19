@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.Items
 
@@ -22,7 +21,7 @@ object UbikQuickClose {
         "Split or Steal",
     )
 
-    private val inventory = InventoryDetector { name -> inventoryNamePattern.matches(name) }
+    private val inventory = InventoryDetector { inventoryNamePattern }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {

@@ -277,7 +277,10 @@ object TrophyFishDisplay {
     private fun renderDisplay() {
         if (!isEnabled() || !canRender()) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
-        if (FishingApi.hasTreasureHook || !matchesArmorRequirement()) return
+        if (FishingApi.hasTreasureHook) return
+        if (config.requireArmor.get()) {
+            if (!FishingApi.isTrophyFishing()) return
+        }
 
         config.position.renderRenderables(
             display,
@@ -285,10 +288,6 @@ object TrophyFishDisplay {
             posLabel = "Trophy Fishing Display",
         )
     }
-
-    private fun matchesArmorRequirement() = if (config.requireArmor.get()) {
-        FishingApi.wearingTrophyArmor || FishingApi.wearingEmberArmor
-    } else true
 
     private fun canRender(): Boolean = when (config.whenToShow.get()!!) {
         WhenToShow.ALWAYS -> true

@@ -40,6 +40,11 @@ object FossilExcavatorApi {
      */
     private val emptyPattern by chatPatternGroup.pattern("empty", "§cYou didn't find anything. Maybe next time!")
 
+    /**
+     * REGEX-TEST: Fossil Excavator
+     */
+    private val excavatorInventoryPattern by patternGroup.pattern("inventory", "Fossil Excavator")
+
     private var inLoot = false
     private val loot = mutableListOf<Pair<String, Int>>()
 
@@ -48,9 +53,8 @@ object FossilExcavatorApi {
     val scrapItem = "SUSPICIOUS_SCRAP".toInternalName()
 
     val excavatorInventory = InventoryDetector(
-        checkInventoryName = { it == "Fossil Excavator" },
         onCloseInventory = { inExcavatorMenu = false }
-    )
+    ) { excavatorInventoryPattern }
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {

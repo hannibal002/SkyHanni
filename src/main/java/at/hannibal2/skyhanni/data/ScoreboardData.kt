@@ -164,6 +164,7 @@ object ScoreboardData {
      * @param text The line to check and possibly replace
      * @return The replaced line, or null if it should be hidden
      */
+    @JvmStatic
     fun tryToReplaceScoreboardLine(text: Component): Component {
         try {
             return tryToReplaceScoreboardLineHarder(text)

@@ -49,7 +49,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
@@ -201,7 +200,7 @@ object GardenApi {
 
     fun hasActiveSunsGrasp(): Boolean =
         CurrentEquipmentApi.getEquipment(EquipmentSlot.GLOVES)?.getInternalName() == SUNS_GRASP &&
-            InventoryUtils.getItemInHand()?.isEmpty == true
+            InventoryUtils.getItemInHand() == null
 
     fun NeuInternalName.getCropType(): CropType? =
         if (this.startsWith("THEORETICAL_HOE_SUNFLOWER")) CropType.getTimeFlower()
@@ -245,7 +244,7 @@ object GardenApi {
         "toolkit.inventory",
         "Farming Toolkit"
     )
-    val toolkitInventory = InventoryDetector { name -> toolkitInventoryPattern.matches(name) }
+    val toolkitInventory = InventoryDetector { toolkitInventoryPattern }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
