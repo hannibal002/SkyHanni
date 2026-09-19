@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import com.mojang.blaze3d.platform.InputConstants
-import net.minecraft.client.input.KeyEvent
 
 /**
  * Represents a key or mouse button input code.
