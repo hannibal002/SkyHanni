@@ -25,31 +25,44 @@ class MemoryRepoFileSystem(
         if (path.isEmpty()) {
             storage.clear()
         } else {
-            val prefix = if (path.endsWith("/")) path else "$path/"
+            val prefix = path.toPrefix()
             storage.keys.removeIf { it == path || it.startsWith(prefix) }
         }
     }
 
-    override fun list(path: String): List<String> {
-        val prefix = when {
-            path.isEmpty() -> ""
-            path.endsWith("/") -> path
-            else -> "$path/"
-        }
+    override fun listFiles(path: String, extension: String): List<String> {
+        val prefix = path.toPrefix()
+        val targetSuffix = ".$extension"
+        val results = mutableListOf<String>()
 
-        return storage.keys.mapNotNull { key ->
+        for (key in storage.keys) {
             if (key.startsWith(prefix)) {
-                val relativePath = key.removePrefix(prefix)
-                if (!relativePath.contains("/") && relativePath.endsWith(".json")) {
-                    relativePath
-                } else null
-            } else null
+                val nextSlashIndex = key.indexOf('/', prefix.length)
+
+                if (nextSlashIndex == -1 && key.endsWith(targetSuffix)) {
+                    results.add(key.substring(prefix.length))
+                }
+            }
         }
+        return results
     }
 
-    /**
-     * Loads entries from [tgzFile] into in-memory storage (via [loadFromTgz])
-     */
+    override fun listDirectories(path: String): List<String> {
+        val prefix = path.toPrefix()
+        val results = mutableSetOf<String>()
+
+        for (key in storage.keys) {
+            if (key.startsWith(prefix)) {
+                val nextSlashIndex = key.indexOf('/', prefix.length)
+
+                if (nextSlashIndex != -1) {
+                    results.add(key.substring(prefix.length, nextSlashIndex))
+                }
+            }
+        }
+        return results.toList()
+    }
+
     override suspend fun loadFromTgz(progress: ChatProgressUpdates, tgzFile: File): Boolean {
         progress.update("repo memory file system loadFromTgz")
         val success = super.loadFromTgz(progress, tgzFile)
@@ -60,4 +73,6 @@ class MemoryRepoFileSystem(
     override fun clear() = storage.clear()
 
     override fun dispose() = clear()
+
+    private fun String.toPrefix() = if (isEmpty() || endsWith("/")) this else "$this/"
 }
