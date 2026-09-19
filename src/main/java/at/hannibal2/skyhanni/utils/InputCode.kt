@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import com.mojang.blaze3d.platform.InputConstants
-import net.minecraft.client.input.KeyEvent
 
 /**
  * Represents a key or mouse button input code.
@@ -175,6 +174,8 @@ enum class InputCode(
     *///?}
 
     companion object {
+        private val keyLookup = entries.associateBy { it.key }
+
         fun fromKeyIdentifier(identifier: String): InputCode {
             val key = runCatching {
                 InputConstants.getKey(
@@ -194,19 +195,14 @@ enum class InputCode(
         }
 
         //~ if < 26.3 'KEYBOARD' -> 'KEYSYM' {
+        @JvmStatic
         fun fromKeyCode(keyCode: Int): InputCode =
             fromKey(InputConstants.Type.KEYBOARD.getOrCreate(keyCode))
         //~}
 
-        @JvmStatic
-        fun fromKeyEvent(keyEvent: KeyEvent): InputCode =
-            fromKey(InputConstants.getKey(keyEvent))
-
         fun fromMouseButton(mouseButton: Int): InputCode =
             fromKey(InputConstants.Type.MOUSE.getOrCreate(mouseButton))
 
-        // TODO: Optimize
-        fun fromKey(key: InputConstants.Key): InputCode =
-            entries.firstOrNull { it.key == key } ?: UNKNOWN
+        fun fromKey(key: InputConstants.Key): InputCode = keyLookup[key] ?: UNKNOWN
     }
 }
