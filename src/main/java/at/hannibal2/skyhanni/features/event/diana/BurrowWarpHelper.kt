@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -29,7 +28,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonArray
-import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -62,9 +60,8 @@ object BurrowWarpHelper {
         if (GriffinBurrowHelper.mobAlive) return
 
         val text = "§bWarp to " + warp.displayName
-        val keybindSuffix = if (config.keyBindWarp != GLFW.GLFW_KEY_UNKNOWN) {
-            val keyName = KeyboardManager.getKeyName(config.keyBindWarp)
-            " §7(§ePress $keyName§7)"
+        val keybindSuffix = if (config.keyBindWarp != UNKNOWN) {
+            " §7(§ePress ${config.keyBindWarp.displayName}§7)"
         } else ""
 
         val warpText = Renderable.text(text + keybindSuffix, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
@@ -74,7 +71,7 @@ object BurrowWarpHelper {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (event.keyCode != config.keyBindWarp) return
+        if (event.key != config.keyBindWarp) return
         if (warpQueued) return
 
         if (cannotWarpUntil.isInFuture()) {

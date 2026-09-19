@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.InputCode
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
@@ -47,13 +48,14 @@ abstract class SkyHanniBaseScreen(title: Component = Component.empty()) : Screen
 
     private fun postMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
         try {
-            onMouseClicked(originalMouseX, originalMouseY, mouseButton)
+            val key = InputCode.fromMouseButton(mouseButton)
+            onMouseClicked(originalMouseX, originalMouseY, key)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error while clicking mouse", "screen" to this)
         }
     }
 
-    open fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {}
+    open fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: InputCode) {}
 
     override fun keyPressed(input: KeyEvent): Boolean {
         postKeyTyped(null, input.key)
@@ -67,13 +69,14 @@ abstract class SkyHanniBaseScreen(title: Component = Component.empty()) : Screen
 
     private fun postKeyTyped(typedChar: Char?, keyCode: Int?) {
         try {
-            onKeyTyped(typedChar, keyCode)
+            val key = keyCode?.let { InputCode.fromKeyCode(it) }
+            onKeyTyped(typedChar, key)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error while typing key", "screen" to this)
         }
     }
 
-    open fun onKeyTyped(typedChar: Char?, keyCode: Int?) {}
+    open fun onKeyTyped(typedChar: Char?, key: InputCode?) {}
 
     override fun mouseReleased(click: MouseButtonEvent): Boolean {
         postMouseReleased(click.x.toInt(), click.y.toInt(), click.button())

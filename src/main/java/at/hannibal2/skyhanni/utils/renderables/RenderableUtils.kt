@@ -3,8 +3,7 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
-import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -386,7 +385,7 @@ internal object RenderableUtils {
             }
         }
 
-        val onClick: (Int) -> Unit = onClick@{ keyCode ->
+        val onClick: (InputCode) -> Unit = onClick@{ keyCode ->
             if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) < 150) return@onClick
             val next = when (keyCode) {
                 LEFT_MOUSE -> universe.circle(current)
@@ -399,8 +398,8 @@ internal object RenderableUtils {
         }
 
         val clickMap = mapOf(
-            LEFT_MOUSE to { onClick(LEFT_MOUSE) },
-            RIGHT_MOUSE to { onClick(RIGHT_MOUSE) },
+            InputCode.LEFT_MOUSE to { onClick(LEFT_MOUSE) },
+            InputCode.RIGHT_MOUSE to { onClick(RIGHT_MOUSE) },
         )
 
         return Renderable.horizontal {

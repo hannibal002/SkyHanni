@@ -43,7 +43,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getRawBaseStats
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
@@ -77,7 +76,6 @@ import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.chunk.LevelChunk
-import org.lwjgl.glfw.GLFW
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AnnotationNode
@@ -512,7 +510,7 @@ object SkyHanniDebugsAndTests {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onGuiRender() {
-        if (debugConfig.copyCosmeticsSkullData == GLFW.GLFW_KEY_UNKNOWN) return
+        if (debugConfig.copyCosmeticsSkullData == UNKNOWN) return
         val stack = InventoryCompat.stackUnderCursor() ?: return
         if (!stack.getCleanLore().any { it.contains("Right-click to preview!") }) return
 
