@@ -159,8 +159,6 @@ enum class InputCode(
     fun isKeyHeld(): Boolean = key.isKeyHeld()
     fun isKeyClicked(): Boolean = key.isKeyClicked()
 
-    fun isUnknown(): Boolean = this == UNKNOWN
-
     fun toKeyIdentifier(): String = key.name
 
     override fun toString(): String = key.value.toString()

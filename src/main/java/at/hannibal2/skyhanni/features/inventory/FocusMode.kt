@@ -36,7 +36,7 @@ object FocusMode {
         }
 
         val keyName = config.toggleKey.displayName
-        val hint = !config.disableHint && !config.alwaysEnabled && !config.toggleKey.isUnknown()
+        val hint = !config.disableHint && !config.alwaysEnabled && config.toggleKey != UNKNOWN
         if (active || config.alwaysEnabled) {
             val newTooltip = buildList {
                 add(event.toolTip.first())
