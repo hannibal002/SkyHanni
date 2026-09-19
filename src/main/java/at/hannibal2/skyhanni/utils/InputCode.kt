@@ -168,7 +168,7 @@ enum class InputCode(
     fun toKeyIdentifier(): String = key.name
     //?} else {
     /*fun toKeyIdentifier(): String = when (key.name) {
-        "key.keyboard.decimal.decimal" -> "key.keyboard.keypad.period"
+        "key.keyboard.keypad.decimal" -> "key.keyboard.keypad.period"
         "key.keyboard.menu" -> "key.keyboard.application"
         else -> key.name
     }
@@ -182,7 +182,7 @@ enum class InputCode(
                     identifier
                     //?} else {
                     /*when (identifier) {
-                        "key.keyboard.keypad.period" -> "key.keyboard.decimal.decimal"
+                        "key.keyboard.keypad.period" -> "key.keyboard.keypad.decimal"
                         "key.keyboard.application" -> "key.keyboard.menu"
                         else -> identifier
                     }
