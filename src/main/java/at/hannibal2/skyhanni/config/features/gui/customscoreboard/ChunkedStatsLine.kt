@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
 enum class ChunkedStatsLine(
-    private val configLine: String,
+    private val displayName: String,
 ) {
     PURSE("§6Purse"),
     MOTES("§dMotes"),
@@ -15,5 +15,5 @@ enum class ChunkedStatsLine(
     NORTH_STARS("§dNorth Stars"),
     ;
 
-    override fun toString() = configLine
+    override fun toString() = displayName
 }
