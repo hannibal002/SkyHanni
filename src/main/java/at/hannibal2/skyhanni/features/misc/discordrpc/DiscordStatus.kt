@@ -119,7 +119,7 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
     PURSE(
         {
             val coins = PurseApi.getPurse().toLong()
-            val motes = RiftApi.motes ?: 0
+            val motes = RiftApi.motes
 
             if (RiftApi.inRift()) {
                 "${motes.addSeparators()} ${StringUtils.pluralize(motes, "Mote")}"

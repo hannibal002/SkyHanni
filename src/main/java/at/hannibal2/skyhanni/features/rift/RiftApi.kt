@@ -52,7 +52,7 @@ object RiftApi {
     var trackingButtons = false
     var allButtonsHit = false
 
-    val motes: Long? = SkyblockCurrency.MOTES.getOwnedAmountOrNull()
+    val motes: Long get() = SkyblockCurrency.MOTES.getOwnedAmountOrNull() ?: 0
 
     @HandleEvent
     private fun onAreaChange(event: GraphAreaChangeEvent) {
