@@ -60,7 +60,7 @@ object ItemStars {
         val internalName = getInternalNameOrNull() ?: return null
         val baseStars = getDungeonStarCount() ?: getStarCount()
         if (!internalName.isKuudraArmor()) return baseStars
-        val tier = internalName.getArmorKuudraTier() ?: return baseStars
+        val tier = internalName.getArmorKuudraTier()?.tierNumber ?: return baseStars
         return (baseStars ?: 0) + (tier - 1) * 10
     }
 

@@ -15,7 +15,7 @@ enum class OutsideSBFeature(private val displayName: String) {
     TPS_DISPLAY("TPS Display"),
     MARKED_PLAYERS("Marked Players"),
     FARMING_WEIGHT("Farming Weight"),
-    NEXT_JACOB_CONTEST("Next Jacobs's Contest"),
+    NEXT_JACOB_CONTEST("Next Jacob's Contest"),
     COMPOSTER_TIME("Composter Time"),
     YAW_AND_PITCH("Yaw and Pitch"),
     ATMOSPHERIC_FILTER("Atmospheric Filter"),

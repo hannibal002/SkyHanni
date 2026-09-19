@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi.DungeonChest
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi.inDungeon
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -189,8 +190,15 @@ object CroesusChestTracker {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0"
                     )
-            if (run.floor == "F0" && kuudraPattern.matches(itemName)) run.floor =
-                ("T" + KuudraApi.getKuudraRunTierNumber(lore.firstNotNullOfOrNull { kuudraPattern.matchMatcher(it) { group("tier") } }))
+            if (run.floor == "F0") kuudraPattern.matchMatcher(itemName) {
+                val tier = group("tier")
+                val kuudraTier = KuudraTier.getByDisplayName(tier) ?: ErrorManager.skyHanniError(
+                    "unknown kuudra tier in croesus chest",
+                    "tier" to tier,
+                    "item name" to itemName,
+                )
+                run.floor = "T" + kuudraTier.tierNumber
+            }
             run.openState = OpenedState.getOpenState(lore)
         }
     }
@@ -261,7 +269,7 @@ object CroesusChestTracker {
 
     @HandleEvent
     private fun onKuudraComplete(event: KuudraCompleteEvent) {
-        addCroesusChest("T${event.kuudraTier}")
+        addCroesusChest("T${event.kuudraTier.tierNumber}")
     }
 
     @HandleEvent

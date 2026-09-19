@@ -524,6 +524,8 @@ object DungeonApi {
     fun getPlayerInfo(username: String): TeamMember =
         playerTeamClasses.find { it.username == username.removeColor() } ?: TeamMember(username)
 
+    fun getPlayerNames(): List<String> = playerTeamClasses.map { it.username }
+
     @HandleEvent
     private fun onTabUpdate(event: TabListUpdateEvent) {
         if (!inDungeon() || !started || completed) return
