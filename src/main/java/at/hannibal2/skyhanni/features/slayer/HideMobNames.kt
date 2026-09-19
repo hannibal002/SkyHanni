@@ -20,7 +20,7 @@ object HideMobNames {
     // TODO: use SkyblockIcons instead of hardcoding the mob types
     private const val ALL_MOB_TYPES =
         "\uE070\uE071\uE072\uE073\uE074\uE075\uE076\uE077\uE078\uE079\uE07A\uE07B" +
-            "\uE07C\uE07D\uE07E\uE018\uE080\uE081\uE082\uE083\uE084\uE085\uE086\uE087"
+            "\uE07C\uE07D\uE07E\uE018\uE07F\uE080\uE081\uE082\uE083\uE084\uE085\uE086\uE087"
 
     /**
      * REGEX-TEST: [Lv1]  Graveyard Zombie 100/100❤

@@ -7,17 +7,23 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.WikiJson
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.net.URLEncoder
 
 @SkyHanniModule
@@ -28,17 +34,38 @@ object WikiManager {
 
     val wiki get() = data.unofficial
 
+    /**
+     * REGEX-TEST: Close
+     * REGEX-TEST: Go Back
+     */
+    private val ignoredKeybindItemPattern by RepoPattern.pattern(
+        "commands.wiki.ignored-item",
+        "Close|Go Back",
+    )
+
     @HandleEvent
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(136, "commands.betterWiki.sbGuide", "commands.betterWiki.skyblockGuide")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onGuiKeyPress() {
-        val stack = stackUnderCursor() ?: return
-
+    private fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.wikiKeybind.isKeyHeld()) return
+
+        val stack = event.stackUnderCursor?.takeUnlessEmpty() ?: return
+        if (isIgnoredItem(stack)) return
+
         wikiTheItem(stack, config.menuOpenWiki)
+    }
+
+    // Menu items the wiki search should never be triggered on
+    private fun isIgnoredItem(stack: SafeItemStack): Boolean {
+        if (ItemUtils.isSkyBlockMenuItem(stack)) return true
+        if (stack.getInternalNameOrNull() != null) return false
+
+        // Filler panes have a blank name, which would open the wiki start page
+        val name = stack.cleanName.trim()
+        return name.isBlank() || ignoredKeybindItemPattern.matches(name)
     }
 
     fun getSearchUrl(search: String): String {

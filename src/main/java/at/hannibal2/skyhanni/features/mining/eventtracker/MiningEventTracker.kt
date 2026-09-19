@@ -211,6 +211,8 @@ object MiningEventTracker {
         val miningEventData = ConfigManager.gson.fromJson<MiningEventDataReceive>(receivedData)
 
         if (!miningEventData.success) {
+            apiErrorCount++
+            canRequestAt = SimpleTimeMark.now() + 20.minutes
             if (receivedData.toString().trim() == "{}") ChatUtils.chat(
                 "§cFailed loading Mining Event data!\n" +
                     "§cPlease wait until the server-problem fixes itself! There is nothing else to do at the moment.",
@@ -221,11 +223,22 @@ object MiningEventTracker {
                 "cause" to miningEventData.cause,
                 "receivedData" to receivedData,
             )
+            return
         }
 
+        val data = miningEventData.data ?: run {
+            apiErrorCount++
+            canRequestAt = SimpleTimeMark.now() + 20.minutes
+            ErrorManager.logErrorStateWithData(
+                "Mining Event Tracker received incomplete data!",
+                "miningEventData.data is null despite success = true",
+                "receivedData" to receivedData,
+            )
+            return
+        }
         apiErrorCount = 0
-        canRequestAt = SimpleTimeMark.now() + miningEventData.data.updateIn.milliseconds
-        MiningEventDisplay.updateData(miningEventData.data)
+        canRequestAt = SimpleTimeMark.now() + data.updateIn.milliseconds
+        MiningEventDisplay.updateData(data)
     }
 
     @HandleEvent

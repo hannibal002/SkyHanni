@@ -12,14 +12,14 @@ import at.hannibal2.skyhanni.utils.NeuItems.getRecipes
 
 @SkyHanniModule
 object DiscountUtils {
-    // TODO: Add Shifty Talismans, Too complex for initial PR
+    // TODO: Add Shady Talismans (Shady Ring, Crooked Artifact, Seal of the Family), Too complex for initial PR
 
     private val itemPriceCoinOnly = mutableMapOf<NeuInternalName, Int>()
     private val emissaryItems = mutableListOf<NeuInternalName>()
     private val emissaryScalingDiscounts = mutableMapOf<Int, Double>()
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemDiscountsJson>("misc/ItemDiscounts")
         data.itemPriceCoinOnly.forEach { (string, coins) ->
             itemPriceCoinOnly[string.toInternalName()] = coins
@@ -48,9 +48,9 @@ object DiscountUtils {
 
     private fun NeuInternalName.getEmissaryDiscountedPrice(lowestNPCPrice: Double): Double {
         val rep = ProfileStorageData.profileSpecific?.crimsonIsle?.reputation?.maxBy { it.value }?.value ?: 0
-        var itemDiscount = 1.0
+        var itemDiscount = 0.0
         emissaryScalingDiscounts.forEach { (reputation, discount) ->
-            if (rep > reputation) itemDiscount = (1.0 - discount)
+            if (rep > reputation) itemDiscount = (discount) / 100
         }
         val priceDecrease = itemPriceCoinOnly[this]?.times(itemDiscount) ?: 0.0
         return lowestNPCPrice - priceDecrease

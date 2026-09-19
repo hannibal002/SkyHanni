@@ -431,9 +431,8 @@ object GriffinBurrowHelper {
     }
 
     fun shouldBurrowParticlesBeVisible(timeInPast: Duration = 2.seconds): Boolean {
-        val spade = InventoryUtils.getItemInHand()?.isDianaSpade == true
         val time = InventoryUtils.lastItemChangeTime.passedSince()
-        return spade && time > timeInPast
+        return DianaApi.hasSpadeInHand() && time > timeInPast
     }
 
     fun removeSpadeWarnTitle() {
@@ -576,11 +575,12 @@ object GriffinBurrowHelper {
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     private fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
+        if (!DianaApi.hasSpadeInHand()) return
 
         val location = event.position
 
         getGuess(location)?.let {
-            if (event.itemInHand?.isDianaSpade == true && it.burrowType == BurrowType.UNKNOWN && it.getCurrent() == location) {
+            if (it.burrowType == BurrowType.UNKNOWN && it.getCurrent() == location) {
                 DelayedRun.runDelayed(
                     200.milliseconds,
                     {
