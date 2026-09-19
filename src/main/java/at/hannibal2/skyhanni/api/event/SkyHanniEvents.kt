@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger
 
 @SkyHanniModule
 object SkyHanniEvents {
-
     private val listeners: MutableMap<Class<out SkyHanniEvent>, EventListeners> = mutableMapOf()
     private val handlers: MutableMap<Class<out SkyHanniEvent>, EventHandler<out SkyHanniEvent>> = mutableMapOf()
     private var disabledHandlers = emptySet<String>()
@@ -139,16 +138,16 @@ object SkyHanniEvents {
 
     fun markEventCacheDirty(type: DirtyReason) {
         when (type) {
-            DirtyReason.REPO_RELOAD,
-            DirtyReason.OUTSIDE_SB_FEATURE_CHANGED,
+            REPO_RELOAD,
+            OUTSIDE_SB_FEATURE_CHANGED,
             -> listenerCacheGeneration.incrementAndGet()
 
-            DirtyReason.LOCATION_CHANGED -> {
+            LOCATION_CHANGED -> {
                 listenerCacheGeneration.incrementAndGet()
                 currentStateIndex.set(ListenerCollection.getCurrentStateIndex())
             }
 
-            DirtyReason.SERVER_DISCONNECTED -> {
+            SERVER_DISCONNECTED -> {
                 listenerCacheGeneration.incrementAndGet()
                 currentStateIndex.set(ListenerCollection.OUTSIDE)
             }
@@ -165,8 +164,8 @@ object SkyHanniEvents {
         REPO_RELOAD,
     }
 
-    // This is marked highest priority to let it
-    // disable other RepositoryReloadEvent listeners before they happen
+    // This is marked highest priority to let it disable other RepositoryReloadEvent listeners
+    // before they happen. All other listeners of this event must use HIGH or lower priority.
     @HandleEvent(priority = HandleEvent.HIGHEST)
     private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
@@ -175,9 +174,8 @@ object SkyHanniEvents {
         val mcVersion = PlatformUtils.MC_VERSION
         disabledHandlers = data.disabledHandlers + data.disabledHandlersVersioned.activeNames(version, mcVersion)
         disabledHandlerInvokers = data.disabledInvokers + data.disabledInvokersVersioned.activeNames(version, mcVersion)
-        markEventCacheDirty(DirtyReason.REPO_RELOAD)
+        markEventCacheDirty(REPO_RELOAD)
     }
-
 
     private fun Set<DisabledEventVersionedJson>.activeNames(
         version: ModVersion,
@@ -198,7 +196,6 @@ object SkyHanniEvents {
 
             for (second in seconds) {
                 if (event.repeatSeconds(second)) {
-
                     for (handler in list) {
                         val log = handler.invokeLog
                         val current = log.invokeCount
@@ -221,7 +218,6 @@ object SkyHanniEvents {
     class EventInvokeData(var oldValue: Long, var diff: Long)
 
     class EventInvokeLog {
-
         var invokeCount: Long = 0L
 
         var overTimeLog = mutableMapOf<Int, EventInvokeData>()
@@ -252,7 +248,6 @@ object SkyHanniEvents {
 
                             append(" ")
                             append("${(log.invokeCount / (ClientEvents.totalTicks / 20)).addSeparators()}/s")
-
                         },
                     )
                 }

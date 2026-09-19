@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 @SkyHanniModule
 object EggAchievement {
 
-    private val eggPatternPattern by AchievementManager.group.pattern(
+    private val eggPatternPattern by AchievementManager.patternGroup.pattern(
         "laid-egg",
         "You laid an egg!",
     )
