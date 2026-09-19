@@ -164,23 +164,29 @@ enum class InputCode(
     fun isKeyHeld(): Boolean = key.isKeyHeld()
     fun isKeyClicked(): Boolean = key.isKeyClicked()
 
-    // TODO: Remove workaround for 26.3
-    fun toKeyIdentifier(): String = when (key.name) {
+    //? if >= 26.3 {
+    fun toKeyIdentifier(): String = key.name
+    //?} else {
+    /*fun toKeyIdentifier(): String = when (key.name) {
         "key.keyboard.decimal.decimal" -> "key.keyboard.keypad.period"
         "key.keyboard.menu" -> "key.keyboard.application"
         else -> key.name
     }
+    *///?}
 
     companion object {
         fun fromKeyIdentifier(identifier: String): InputCode {
             val key = runCatching {
                 InputConstants.getKey(
-                    // TODO: Remove workaround for 26.3
-                    when (identifier) {
+                    //? if >= 26.3 {
+                    identifier
+                    //?} else {
+                    /*when (identifier) {
                         "key.keyboard.keypad.period" -> "key.keyboard.decimal.decimal"
                         "key.keyboard.application" -> "key.keyboard.menu"
                         else -> identifier
                     }
+                    *///?}
                 )
             }.getOrNull()
 
