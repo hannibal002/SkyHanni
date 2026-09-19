@@ -44,7 +44,7 @@ object UpdateKeybinds {
     }
 
     // https://github.com/Polyfrost/OneConfig/blob/feat/26.3/minecraft/src/main/java/org/polyfrost/oneconfig/api/ui/v1/keybind/internal/MinecraftKeybindCodec.java
-    // Commented out the 2 keycodes that changed from 26.2 to 26.3 since I don't want a Minecraft version migration here.
+    // Note that "key.keyboard.application" and "key.keyboard.keypad.period" are 26.3 only. and as such got special handling in InputCode
     @Suppress("CyclomaticComplexMethod")
     private fun glfwKeyName(code: Int): String? {
         if (code == -1) return "key.keyboard.unknown"
@@ -90,7 +90,7 @@ object UpdateKeybinds {
             282 -> "key.keyboard.num.lock"
             283 -> "key.keyboard.print.screen"
             284 -> "key.keyboard.pause"
-//            330 -> "key.keyboard.keypad.period"
+            330 -> "key.keyboard.keypad.period"
             331 -> "key.keyboard.keypad.divide"
             332 -> "key.keyboard.keypad.multiply"
             333 -> "key.keyboard.keypad.subtract"
@@ -105,7 +105,7 @@ object UpdateKeybinds {
             345 -> "key.keyboard.right.control"
             346 -> "key.keyboard.right.alt"
             347 -> "key.keyboard.right.win"
-            // 348 -> "key.keyboard.application"
+            348 -> "key.keyboard.application"
             else -> null
         }
     }

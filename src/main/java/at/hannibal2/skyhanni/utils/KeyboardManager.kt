@@ -167,7 +167,13 @@ object KeyboardManager {
     fun getKeyName(key: InputConstants.Key): String {
         if (key == InputCode.UNKNOWN.key) return "NONE"
         val displayName = key.displayName
-        return displayName.tryCollapseToString() ?: displayName.string
+        val collapsedDisplayName = displayName.tryCollapseToString() ?: displayName.string
+        // In case of fallback, we will attempt to collapse the string to a more readable format.
+        return when {
+            collapsedDisplayName.startsWith("key.mouse.") -> "Button ${collapsedDisplayName.removePrefix("key.mouse.").capitalize()}"
+            collapsedDisplayName.startsWith("key.keyboard.") -> collapsedDisplayName.removePrefix("key.keyboard.").capitalize()
+            else -> collapsedDisplayName
+        }
     }
 
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
