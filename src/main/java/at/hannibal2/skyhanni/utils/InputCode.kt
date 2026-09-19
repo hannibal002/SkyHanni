@@ -5,6 +5,12 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.input.KeyEvent
 
+/**
+ * Represents a key or mouse button input code.
+ *
+ * Intentionally missing "key.keyboard.menu" and "key.keyboard.decimal" due to being changed between 26.2 and 26.3.
+ * @property key The corresponding InputConstants.Key for this input code.
+ */
 @Suppress("unused")
 enum class InputCode(
     val key: InputConstants.Key,
@@ -128,7 +134,6 @@ enum class InputCode(
     KEY_PAUSE(InputConstants.KEY_PAUSE),
     KEY_SCROLLLOCK(InputConstants.KEY_SCROLLLOCK),
     KEY_PRINTSCREEN(InputConstants.KEY_PRINTSCREEN),
-    KEY_MENU("key.keyboard.menu"),
     KEY_WORLD_1("key.keyboard.world.1"),
     KEY_WORLD_2("key.keyboard.world.2"),
     LEFT_MOUSE(InputConstants.MOUSE_BUTTON_LEFT, MOUSE),
