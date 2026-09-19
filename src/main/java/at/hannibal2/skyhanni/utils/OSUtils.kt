@@ -151,7 +151,8 @@ object OSUtils {
      * follow symbolic links, so it will only delete the link, and not the contents of the target
      * directory.
      */
-    fun File.deleteRecursivelySafe() {
-        this.toPath().deleteRecursively()
-    }
+    fun File.deleteRecursivelySafe(): Boolean =
+        runCatching {
+            toPath().deleteRecursively()
+        }.isSuccess
 }
