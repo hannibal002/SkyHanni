@@ -2,12 +2,12 @@ package style
 
 import SkyHanniRule
 import dev.detekt.api.Config
-import utils.DetektUtils.hasAnnotation
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtIfExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
+import utils.DetektUtils.hasAnnotation
 
 class IsInIslandEarlyReturn(config: Config) : SkyHanniRule(
     config,

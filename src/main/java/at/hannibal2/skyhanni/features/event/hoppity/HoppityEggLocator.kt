@@ -4,18 +4,20 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -25,6 +27,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
@@ -33,8 +36,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.projectile.FishingHook
-import net.minecraft.world.item.ItemStack
-import kotlin.math.sign
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -43,9 +44,14 @@ object HoppityEggLocator {
     private val waypointsConfig get() = config.waypoints
     val locatorItem = "EGGLOCATOR".toInternalName()
 
+    private const val MAX_GUESS_DISTANCE = 5.0
+
     private var lastClick = SimpleTimeMark.farPast()
 
     private var drawLocations = false
+
+    @Volatile
+    private var warningPending = false
 
     var sharedEggLocation: LorenzVec? = null
     var possibleEggLocations = listOf<LorenzVec>()
@@ -53,12 +59,12 @@ object HoppityEggLocator {
     var currentEggNote: String? = null
 
     @HandleEvent
-    fun onEggFound(event: EggFoundEvent) {
+    private fun onEggFound(event: EggFoundEvent) {
         if (event.type.isResetting) resetData()
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         resetData()
     }
 
@@ -69,15 +75,16 @@ object HoppityEggLocator {
         currentEggType = null
         currentEggNote = null
         bezierFitter.reset()
+        warningPending = false
     }
 
     @HandleEvent
-    fun onEggSpawn(event: EggSpawnedEvent) {
+    private fun onEggSpawned(event: EggSpawnedEvent) {
         if (event.eggType == currentEggType) resetData()
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         if (drawLocations) {
@@ -158,56 +165,55 @@ object HoppityEggLocator {
 
     private val bezierFitter = ParticlePathBezierFitter(3)
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    @HandleEvent(onlyOnSkyblock = true, receiveCancelled = true)
+    private fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         if (!event.isVillagerParticle()) return
         if (lastClick.passedSince() > 5.seconds) return
-        val pos = event.location
 
-        if (bezierFitter.isEmpty()) {
-            bezierFitter.addPoint(pos)
-            return
-        }
-
-        val lastPoint = bezierFitter.getLastPoint() ?: return
-        val dist = lastPoint.distance(pos)
-        if (dist == 0.0 || dist > 3.0) return
-
-        if (pos.getEntitiesNearby<FishingHook>(0.3).any()) return
-
-        bezierFitter.addPoint(pos)
+        val endCondition: (LorenzVec) -> Boolean = { it.getEntitiesNearby<FishingHook>(0.3).any() }
+        if (!bezierFitter.tryAdd(event.location, maxDistanceToLast = 3.0, endCondition = endCondition)) return
 
         val guess = guessEggLocation() ?: return
-        if (!SkyBlockUtils.currentIsland.isInBounds(guess)) return
         possibleEggLocations = listOf(guess)
         drawLocations = true
-        if (possibleEggLocations.size == 1) {
-            trySendingGraph()
-        }
+        warningPending = false
+        trySendingGraph()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onItemClick(event: ItemClickEvent) {
-        if (!isEnabled()) return
+    private fun onItemClick(event: ItemClickEvent) {
         val item = event.itemInHand ?: return
+        if (event.clickType != InteractClickType.RIGHT_CLICK || !item.isLocatorItem) return
 
-        if (event.clickType == ClickType.RIGHT_CLICK && item.isLocatorItem && lastClick.passedSince() >= 5.seconds) {
-            lastClick = SimpleTimeMark.now()
-            MythicRabbitPetWarning.check()
-            trySendingGraph()
-            bezierFitter.reset()
-        }
+        if (!isEnabled()) return
+        if (lastClick.passedSince() < 5.seconds) return
+
+        val clickTime = SimpleTimeMark.now()
+        lastClick = clickTime
+        warningPending = true
+        MythicRabbitPetWarning.check()
+        trySendingGraph()
+        bezierFitter.reset()
+        DelayedRun.runDelayed(5.5.seconds) { warnIfNoGuessFound(clickTime) }
+    }
+
+    /** Tells the player that the run produced nothing usable. Silent for an outdated use and on islands without known eggs. */
+    private fun warnIfNoGuessFound(clickTime: SimpleTimeMark) {
+        if (lastClick != clickTime) return
+        if (!warningPending) return
+        if (bezierFitter.isEmpty()) return
+        if (HoppityEggLocations.islandLocations.isEmpty()) return
+        ChatUtils.chat("Egglocator result was unreliable, please use it again!")
     }
 
     private fun guessEggLocation(): LorenzVec? {
         val guessLocation = bezierFitter.solve() ?: return null
+        if (!SkyBlockUtils.currentIsland.isInBounds(guessLocation)) return null
 
-        val guessEgg = HoppityEggLocations.islandLocations.sortedWith { a, b ->
-            sign(a.distanceSq(guessLocation) - b.distanceSq(guessLocation)).toInt()
-        }.firstOrNull()
+        val closestEgg = HoppityEggLocations.islandLocations.minByOrNull { it.distanceSq(guessLocation) }
 
-        return guessEgg
+        return closestEgg?.takeIf { it.distance(guessLocation) <= MAX_GUESS_DISTANCE }
     }
 
     private fun trySendingGraph() {
@@ -222,20 +228,20 @@ object HoppityEggLocator {
         it.distance(location) < 5.0
     }
 
-    private fun ReceiveParticleEvent.isVillagerParticle() = type == ParticleTypes.HAPPY_VILLAGER && speed == 0f && count == 1
+    private fun ParticleEvent.isVillagerParticle() = type == ParticleTypes.HAPPY_VILLAGER && speed == 0f && count == 1
 
     fun isEnabled() =
         SkyBlockUtils.inSkyBlock && config.waypoints.enabled && !GardenApi.inGarden() && !ReminderUtils.isBusy(true) &&
             HoppityApi.isHoppityEvent()
 
-    private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
+    private val SafeItemStack.isLocatorItem get() = getInternalName() == locatorItem
 
     private val locatorInHotbar by RecalculatingValue(1.seconds) {
         SkyBlockUtils.inSkyBlock && InventoryUtils.getItemsInHotbar().any { it.isLocatorItem }
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Hoppity Eggs Locations")
 
         if (!isEnabled()) {
@@ -253,7 +259,7 @@ object HoppityEggLocator {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestrabbitpaths") {
             description = "Tests pathfinding to rabbit eggs. Use a number 0-14."
             category = CommandCategory.DEVELOPER_TEST

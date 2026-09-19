@@ -19,11 +19,11 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object MagicalPowerDisplay {
@@ -44,13 +44,13 @@ object MagicalPowerDisplay {
      * REGEX-TEST: Auctions Browser
      * REGEX-TEST: Auctions: "ligma"
      * REGEX-TEST: Auctions: ""sugoma""
-     * */
+     */
     private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
         "^(?:Accessory Bag(?: \\(\\d+\\/\\d+\\))?|Auctions Browser|Manage Auctions|Auctions: \".*\"?)$",
     )
 
-    private val abiphoneGroup = RepoPattern.group("data.abiphone")
+    private val patternGroup = RepoPattern.group("data.abiphone")
 
     /**
      * REGEX-TEST: Abiphone X Plus
@@ -60,8 +60,8 @@ object MagicalPowerDisplay {
      * REGEX-TEST: Abiphone XIII Pro
      * REGEX-TEST: Abiphone XIV Enormous Purple
      * REGEX-TEST: Abiphone Flip
-     * */
-    private val abiphoneNamePattern by abiphoneGroup.pattern(
+     */
+    private val abiphoneNamePattern by patternGroup.pattern(
         "name",
         "Abiphone .*",
     )
@@ -70,8 +70,8 @@ object MagicalPowerDisplay {
      * REGEX-TEST: Your contacts: 0/0
      * REGEX-TEST: Your contacts: 1/75
      * REGEX-TEST: Your contacts: 52/60
-     * */
-    private val yourContactPattern by abiphoneGroup.pattern(
+     */
+    private val yourContactPattern by patternGroup.pattern(
         "contacts",
         "Your contacts: (?<contacts>\\d+)\\/\\d+",
     )
@@ -124,7 +124,7 @@ object MagicalPowerDisplay {
         else -> null
     }
 
-    private fun ItemStack.getAccessoryRarityOrNull(): LorenzRarity? {
+    private fun SafeItemStack.getAccessoryRarityOrNull(): LorenzRarity? {
         val category = this.getItemCategoryOrNull() ?: return null
         if (category != ItemCategory.ACCESSORY && category != ItemCategory.HATCESSORY) return null
         return this.getItemRarityOrNull()

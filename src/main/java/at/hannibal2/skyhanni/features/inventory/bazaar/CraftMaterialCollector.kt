@@ -73,7 +73,7 @@ object CraftMaterialCollector {
                 add(
                     Renderable.clickable(
                         "§eAdd to craft material collector!",
-                        tips = listOf("§eClick here to help purchasing the items!"),
+                        tips = listOf("§eClick here to get help purchasing the items!"),
                         onLeftClick = {
                             addToPurchasing(neededMaterials)
                         },

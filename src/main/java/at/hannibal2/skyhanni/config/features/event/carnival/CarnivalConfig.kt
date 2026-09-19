@@ -15,6 +15,11 @@ class CarnivalConfig {
     val zombieShootout: ZombieShootoutConfig = ZombieShootoutConfig()
 
     @Expose
+    @ConfigOption(name = "Fruit Digging", desc = "")
+    @Accordion
+    val fruitDigging: FruitDiggingConfig = FruitDiggingConfig()
+
+    @Expose
     @ConfigOption(
         name = "Reminder Daily Tickets",
         desc = "Reminds you when tickets can be claimed from the Carnival Leader."

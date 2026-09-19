@@ -21,13 +21,19 @@ import net.minecraft.network.chat.Component
 data class Achievement(
     private val name: Component? = null,
     private val description: Component = Component.empty(),
-    var userLuckAmount: Float = 0f,
+    val userLuckAmount: Float,
     var secret: Boolean = false,
     var tiers: List<Int> = listOf(),
     var hidden: Boolean = false,
     @Expose
     var data: AchievementUserData = AchievementUserData(),
 ) {
+    constructor(name: String, description: String, userLuckAmount: Float) : this(
+        name = name.asComponent(),
+        description = description.asComponent(),
+        userLuckAmount = userLuckAmount,
+    )
+
     fun getNameOrNull(): Component? {
         name ?: return null
         val tier = getCurrentTier() ?: return name

@@ -24,6 +24,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.glfw.GLFW
 
@@ -78,21 +79,25 @@ class GuiConfig {
     @Expose
     @ConfigOption(name = "Hotbar", desc = "Settings for adjusting the hotbar.")
     @Accordion
+    @SearchTag("movable moveable")
     val hotbar: HotbarConfig = HotbarConfig()
 
     @Expose
     @ConfigOption(name = "XP Bar", desc = "Settings for adjusting the XP bar.")
     @Accordion
+    @SearchTag("movable moveable")
     val xpBar: XPBarConfig = XPBarConfig()
 
     @Expose
     @ConfigOption(name = "Action Bar", desc = "Settings for adjusting the action bar.")
     @Accordion
+    @SearchTag("movable moveable")
     val actionBar: ActionBarConfig = ActionBarConfig()
 
     @Expose
     @ConfigOption(name = "Held Item Tooltip", desc = "Settings for adjusting the held item tooltip.")
     @Accordion
+    @SearchTag("movable moveable")
     val heldItemTooltip: HeldItemTooltipConfig = HeldItemTooltipConfig()
 
     @Expose
@@ -136,6 +141,11 @@ class GuiConfig {
     @ConfigOption(name = "Show Beacon Stat", desc = "Show what stat is being boosted by your beacon.")
     @ConfigEditorBoolean
     var beaconPowerStat: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Compress Beacon Stat", desc = "Compress the beacon stat display to only show the value.")
+    @ConfigEditorBoolean
+    var beaconPowerCompressStat: Boolean = false
 
     @Expose
     @ConfigLink(owner = GuiConfig::class, field = "beaconPower")
@@ -198,4 +208,12 @@ class GuiConfig {
     @ConfigOption(name = "Legion/Bobbin Overlay", desc = "")
     @Accordion
     val legionBobbinOverlay: LegionBobbinOverlayConfig = LegionBobbinOverlayConfig()
+
+    @Expose
+    @ConfigOption(
+        name = "Hide GUI in F3 menu",
+        desc = "Hide Skyhanni GUI elements in debug menu",
+    )
+    @ConfigEditorBoolean
+    var hideGuiInDebugMenu: Boolean = true
 }

@@ -10,16 +10,27 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object AnvilApi {
-    val inventory = InventoryDetector { name -> name == "Anvil" }
+    private val patternGroup = RepoPattern.group("api.anvil")
 
-    var left: ItemStack? = null
-    var right: ItemStack? = null
+    /**
+     * REGEX-TEST: Anvil
+     */
+    private val inventoryNamePattern by patternGroup.pattern(
+        "inventory",
+        "Anvil",
+    )
+
+    val inventory = InventoryDetector { inventoryNamePattern }
+
+    var left: SafeItemStack? = null
+    var right: SafeItemStack? = null
 
     // InventoryUpdatedEvent only reacts on packets from the server, but the anvil interactions are client side only
     @HandleEvent(priority = HandleEvent.HIGH)

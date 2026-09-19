@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object StereoHarmonyDisplay {
@@ -39,13 +38,11 @@ object StereoHarmonyDisplay {
 
     private var display = emptyList<Renderable>()
 
-    private val questionMarkSkull by lazy {
-        ItemUtils.createSkull(
-            displayName = "§c?",
-            uuid = "28aa984a-2077-40cc-8de7-e641adf2c497",
-            value = SkullTextureHolder.getTexture("QUESTION_MARK"),
-        )
-    }
+    private val questionMarkSkull = ItemUtils.repoSkullProvider(
+        displayName = "§c?",
+        uuid = "28aa984a-2077-40cc-8de7-e641adf2c497",
+        repoSkullId = "QUESTION_MARK",
+    )
 
     private fun update() {
         display = drawDisplay()
@@ -75,7 +72,7 @@ object StereoHarmonyDisplay {
         add(Renderable.vertical(displayList, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
     }
 
-    private fun updateActiveVinyl(stack: ItemStack?) {
+    private fun updateActiveVinyl(stack: SafeItemStack?) {
         PestApi.stereoPlayingPattern.firstMatcher(stack?.getLore() ?: return) {
             gardenStorage?.activeVinyl = VinylType.getByName(group("vinyl").trim()).takeIf { it != VinylType.NONE }
             update()

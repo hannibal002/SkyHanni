@@ -18,6 +18,5 @@ object SkyHanniChatEvent {
     class Modify(
         message: String,
         chatComponent: Component,
-        blockedReason: String? = null,
-    ) : AbstractChatEvent.Modify(message.asComponent().intoSpan(), chatComponent, blockedReason)
+    ) : AbstractChatEvent.Modify(message.asComponent().intoSpan(), chatComponent)
 }

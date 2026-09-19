@@ -22,7 +22,7 @@ class HoppityEventSummaryCFReminderConfig {
         desc = "§cNote§7: Reminders will only appear if you have added Leaderboard Change to your stat list.",
     )
     @ConfigEditorInfoText
-    var statListNote: Boolean = false
+    val statListNote: Boolean = false
 
     @Expose
     @ConfigOption(name = "Reminder Interval", desc = "How often to remind you to switch servers, in minutes.")

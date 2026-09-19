@@ -38,14 +38,13 @@ import net.minecraft.world.item.Items
  */
 @SkyHanniModule
 object AchievementManager {
-
     private val config get() = SkyHanniMod.achievementStorage.achievements
-    private val shouldShowMessages get() = SkyHanniMod.feature.misc.achievementMessages
-    val group = RepoPattern.group("achievements")
-    private val achievementSound = SoundUtils.createSound("ui.toast.challenge_complete", 1f, .8f)
+    val shouldShowMessages get() = SkyHanniMod.feature.misc.achievementMessages
+    val patternGroup = RepoPattern.group("achievements")
+    private val achievementSound = SoundUtils.createSound("ui.toast.challenge_complete", 1f, .8f, isWarning = false)
 
     @HandleEvent
-    fun onInitFinished() {
+    private fun onInitFinished() {
         val event = AchievementRegistrationEvent()
         event.post()
         for ((id, achievement) in event.getAchievements()) {
@@ -76,6 +75,7 @@ object AchievementManager {
     fun updateTieredAchievement(id: String, newProgress: Int) {
         if (HypixelData.hypixelAlpha) return
         val achievement = config[id] ?: ErrorManager.skyHanniError("Achievement with unknown id", "id" to id)
+        if (achievement.data.progress == newProgress) return
         val currentTier = achievement.getCurrentTier() ?: 0
         achievement.data.progress = newProgress
         val newTier = achievement.getCurrentTier() ?: 0
@@ -92,15 +92,17 @@ object AchievementManager {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievement progress update")
     }
 
-    fun completeAchievement(id: String) {
-        if (HypixelData.hypixelAlpha) return
+    // This function returns true if the achievement was completed, false if it was already completed or if you're in Hypixel Alpha
+    fun completeAchievement(id: String): Boolean {
+        if (HypixelData.hypixelAlpha) return false
         val achievement = config[id] ?: ErrorManager.skyHanniError("Achievement with unknown id", "id" to id)
-        if (achievement.data.achieved) return
+        if (achievement.data.achieved) return false
         achievement.data.achieved = true
         config[id] = achievement
         displayMessage(achievement)
 
         SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievement completed")
+        return true
     }
 
     private fun displayMessage(achievement: Achievement, newProgress: Int? = null) {
@@ -128,7 +130,7 @@ object AchievementManager {
                 append("!")
                 hover = achievement.getDescription()
                 command = "/shachievements"
-            }
+            },
         )
         achievementSound.playSound()
     }
@@ -136,21 +138,21 @@ object AchievementManager {
     const val TEST_ACHIEVEMENT = "Test Achievement"
 
     @HandleEvent
-    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+    private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Test Achievement".asComponent(),
-            componentBuilder {
+            name = "Test Achievement".asComponent(),
+            description = componentBuilder {
                 append("Run /shtestachievement to test the achievement system!") {
                     withColor(ChatFormatting.DARK_PURPLE)
                 }
             },
-            1f,
+            userLuckAmount = 1f,
         )
         event.register(achievement, TEST_ACHIEVEMENT)
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestachievement") {
             description = "Tests achievement granting and revoking"
             category = CommandCategory.DEVELOPER_TEST
@@ -163,7 +165,7 @@ object AchievementManager {
                     BrigadierArguments.greedyString(),
                     BrigadierUtils.dynamicSuggestionProvider {
                         config.filter { it.value.getNameOrNull() != null }.map { it.key }
-                    }
+                    },
                 ) { id ->
                     val achievement = config[id]
                     if (achievement == null) {
@@ -175,8 +177,7 @@ object AchievementManager {
                             componentBuilder {
                                 append(achievement.getName())
                                 append(" is now locked!")
-                            }
-
+                            },
                         )
                     }
                 }
@@ -206,7 +207,7 @@ object AchievementManager {
                     "SkyHanni Achievements! ($unlocked/$totalCount)",
                     achievementList,
                     ChatUtils.getUniqueMessageId(),
-                    "No Achievements Found"
+                    "No Achievements Found",
                 ) { achievement ->
                     componentBuilder {
                         if (achievement.secret && !achievement.data.achieved) {
@@ -245,7 +246,7 @@ object AchievementManager {
     }
 
     @HandleEvent
-    fun onUserLuck(event: UserLuckCalculateEvent) {
+    private fun onUserLuck(event: UserLuckCalculateEvent) {
         var luck = 0f
         var hasDoneAllAchievements = true
         for ((_, achievement) in config) {

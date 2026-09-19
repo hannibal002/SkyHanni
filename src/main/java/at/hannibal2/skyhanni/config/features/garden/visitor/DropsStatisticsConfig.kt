@@ -45,6 +45,12 @@ class DropsStatisticsConfig {
             DropsStatisticsTextEntry.VOTER_BADGE_VIP,
             DropsStatisticsTextEntry.VOTER_BADGE_ELITE,
             DropsStatisticsTextEntry.VOTER_BADGE_SUPREME,
+            DropsStatisticsTextEntry.VISITORS_GRATITUDE,
+            DropsStatisticsTextEntry.FARMING_CONTEST_DISPLAY,
+            DropsStatisticsTextEntry.ASTRONAUT_PERSONALITY,
+            DropsStatisticsTextEntry.FAST_FOOD_BARN_SKIN,
+            DropsStatisticsTextEntry.JELLY_GREENHOUSE_SKIN,
+
         )
     )
 
@@ -96,6 +102,11 @@ class DropsStatisticsConfig {
         CASHMERE_JACKET("§b6 §9Cashmere Jacket"),
         SATIN_TROUSERS("§b4 §9Satin Trousers"),
         OXFORD_SHOES("§b7 §9Oxford Shoes"),
+        VISITORS_GRATITUDE("§b7 §fVisitors' Gratitude"),
+        FARMING_CONTEST_DISPLAY("§b3 §aFarming Contest Display"),
+        ASTRONAUT_PERSONALITY("§b1 §fAstronaut Minion Skin"),
+        FAST_FOOD_BARN_SKIN("§b2 §6Fast Food Barn Skin"),
+        JELLY_GREENHOUSE_SKIN("§b2 §6Jelly Garden Greenhouse Skin"),
         ;
 
         override fun toString() = displayName

@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledApiJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.api.ApiInternalUtils.internalGetBinaryResponse
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils.internalGetJsonResponse
-import at.hannibal2.skyhanni.utils.api.ApiInternalUtils.internalGetZipResponse
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils.internalPostJson
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import com.google.gson.Gson
@@ -19,41 +19,41 @@ object ApiUtils {
 
     // <editor-fold desc="GETs">
     /**
-     * Fetches a Zip response from the given static Api path, and saves it to the specified file.
-     * @param static The [ApiStaticPath] to fetch the Zip response from.
-     * @param file The [File] to save the Zip response to.
-     * @return A [ZipApiResponse] containing the result of the request.
+     * Fetches a Binary response from the given static API path, and saves it to the specified file.
+     * @param static The [ApiStaticPath] to fetch the Binary response from.
+     * @param file The [File] to save the Binary response to.
+     * @return A [BinaryApiResponse] containing the result of the request.
      */
-    suspend fun getZipResponse(file: File, static: ApiStaticPath): ZipApiResponse = static.internalGetZipResponse(file)
+    suspend fun getBinaryResponse(file: File, static: ApiStaticPath): BinaryApiResponse = static.internalGetBinaryResponse(file)
 
     /**
-     * Fetches a Zip response from the given URL, Api name, and saves it to the specified file.
-     * Defers to creating an [ApiStaticPath] instance for the URL and Api name.
-     * @param file The [File] to save the Zip response to.
-     * @param url The URL of the Api endpoint.
-     * @param apiName The name of the Api being requested, used for logging and error handling.
+     * Fetches a Binary response from the given URL, API name, and saves it to the specified file.
+     * Defers to creating an [ApiStaticPath] instance for the URL and API name.
+     * @param file The [File] to save the Binary response to.
+     * @param url The URL of the API endpoint.
+     * @param apiName The name of the API being requested, used for logging and error handling.
      * @param silentError If true, errors will not be logged.
-     * @return A [ZipApiResponse] containing the result of the request.
+     * @return A [BinaryApiResponse] containing the result of the request.
      */
-    suspend fun getZipResponse(
+    suspend fun getBinaryResponse(
         file: File,
         url: String,
         apiName: String,
         silentError: Boolean = true,
-    ): ZipApiResponse = getZipResponse(file, ApiStaticPath(url, apiName, silentError))
+    ): BinaryApiResponse = getBinaryResponse(file, ApiStaticPath(url, apiName, silentError))
 
     /**
-     * Fetches a JSON response from the given static Api path.
+     * Fetches a JSON response from the given static API path.
      * @param static The [ApiStaticGetPath] to fetch the JSON response from.
      * @return A [JsonElement] containing the JSON response data, or null if the request failed or returned no data.
      */
     suspend fun getJsonResponse(static: ApiStaticGetPath): JsonApiResponse<JsonElement> = static.internalGetJsonResponse<JsonElement>()
 
     /**
-     * Fetches a JSON response from the given URL and Api name.
-     * Wraps the URL and Api name into an [ApiStaticGetPath] instance.
-     * @param url The URL of the Api endpoint.
-     * @param apiName The name of the Api being requested, used for logging and error handling.
+     * Fetches a JSON response from the given URL and API name.
+     * Wraps the URL and API name into an [ApiStaticGetPath] instance.
+     * @param url The URL of the API endpoint.
+     * @param apiName The name of the API being requested, used for logging and error handling.
      * @param silentError If true, errors will not be logged.
      * @param tryForceGzip If true, the request will attempt to use gzip compression.
      * @return A [JsonElement] containing the JSON response data, or null if the request failed or returned no data.
@@ -66,7 +66,7 @@ object ApiUtils {
     ): JsonApiResponse<JsonElement> = getJsonResponse(ApiStaticGetPath(url, apiName, silentError, tryForceGzip))
 
     /**
-     * Fetches a typed JSON response from the given static Api path.
+     * Fetches a typed JSON response from the given static API path.
      * @param T The type of [JsonElement] expected in the response.
      * @return
      */
@@ -75,11 +75,11 @@ object ApiUtils {
     ): JsonApiResponse<T> = static.internalGetJsonResponse<T>()
 
     /**
-     * Fetches a typed JSON response from the given URL and Api name.
-     * Wraps the URL and Api name into an [ApiStaticGetPath] instance.
+     * Fetches a typed JSON response from the given URL and API name.
+     * Wraps the URL and API name into an [ApiStaticGetPath] instance.
      * @param T The type of [JsonElement] expected in the response.
-     * @param url The URL of the Api endpoint.
-     * @param apiName The name of the Api being requested, used for logging and error handling.
+     * @param url The URL of the API endpoint.
+     * @param apiName The name of the API being requested, used for logging and error handling.
      * @param silentError If true, errors will not be logged.
      * @param tryForceGzip If true, the request will attempt to use gzip compression.
      * @return
@@ -94,7 +94,7 @@ object ApiUtils {
 
     // <editor-fold desc="POSTs">
     /**
-     * Posts a JSON body to the given static Api path.
+     * Posts a JSON body to the given static API path.
      * @param static The [ApiStaticPostPath] to post the JSON body to.
      * @param jsonBody The JSON body to post as a String.
      * @return A [JsonApiResponse] containing the result of the request, with the response data as a [JsonElement].
@@ -106,10 +106,10 @@ object ApiUtils {
 
     /**
      * Posts a JSON body to the given URL.
-     * Wraps the URL and Api name into an [ApiStaticPostPath] instance.
-     * @param url The URL of the Api endpoint.
+     * Wraps the URL and API name into an [ApiStaticPostPath] instance.
+     * @param url The URL of the API endpoint.
      * @param jsonBody The JSON body to post as a String.
-     * @param apiName The name of the Api being requested, used for logging and error handling.
+     * @param apiName The name of the API being requested, used for logging and error handling.
      * @param silentError If true, errors will not be logged.
      * @param failOnNoContentLength If true, the request will fail if the response does not contain a Content-Length header.
      * @return A [JsonApiResponse] containing the result of the request, with the response data as a [JsonElement].

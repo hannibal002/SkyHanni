@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.events.combat
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.api.VanquisherApi.VanquisherData
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 
 sealed class VanquisherEvent(val vanquisher: VanquisherData) : SkyHanniEvent() {
     /** Gets called when a Vanquisher's mob disappears, no matter the cause. */

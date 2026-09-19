@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -114,7 +114,7 @@ object HuntingProfitTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { isEnabled() && config.enabled && (isRecentPickup || heldItemEnabled()) },
+            condition = { isEnabled() && config.enabled && (config.alwaysShow || isRecentPickup || heldItemEnabled()) },
             onRender = {
                 tracker.renderDisplay(config.position)
             },
@@ -129,7 +129,7 @@ object HuntingProfitTracker {
     }
 
     @HandleEvent
-    fun onItemChange(event: ItemInHandChangeEvent) {
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
         val isTool = isHuntingTool(event.newItem.getItemStackOrNull())
         if (isTool != hasHeldTool) {
             hasHeldTool = isTool
@@ -146,7 +146,7 @@ object HuntingProfitTracker {
     private var lastToolHeldTime: SimpleTimeMark = SimpleTimeMark.farPast()
     private var hasHeldTool: Boolean = false
 
-    private fun isHuntingTool(itemStack: ItemStack?): Boolean {
+    private fun isHuntingTool(itemStack: SafeItemStack?): Boolean {
         val itemCategoryOrNull = itemStack?.getItemCategoryOrNull()
 
         // Check if the item is one of the general hunting tool categories

@@ -70,9 +70,9 @@ object EliteDevApi {
         event.registerBrigadier("shspoofweightprofile") {
             description = "Set yourself to another player for the elite dev api"
             category = CommandCategory.DEVELOPER_DEBUG
-            argCallback("uuid", BrigadierArguments.string()) { uuid ->
-                arg("profile", BrigadierArguments.string()) { profile ->
-                    spoofProfile(uuid, getArg(profile))
+            arg("uuid", BrigadierArguments.string()) { uuid ->
+                argCallback("profile", BrigadierArguments.string()) { profile ->
+                    spoofProfile(getArg(uuid), profile)
                 }
             }
             simpleCallback { resetProfile() }

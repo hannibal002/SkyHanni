@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDropsJson
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -119,30 +120,34 @@ object GhostTracker {
     private val patternGroup = RepoPattern.group("combat.ghosttracker")
 
     /**
-     * REGEX-TEST: §6§lRARE DROP! §r§9Sorrow §r§b(+§r§b210% §r§b✯ Magic Find§r§b)
-     * REGEX-TEST: §6§lRARE DROP! §r§9Sorrow §r§b(+§r§b210 §r§b✯ Magic Find§r§b)
+     * REGEX-TEST: RARE DROP! Sorrow (+210%  Magic Find)
+     * REGEX-TEST: RARE DROP! Sorrow (+210  Magic Find)
      */
     private val itemDropPattern by patternGroup.pattern(
-        "itemdrop",
-        "§6§lRARE DROP! §r§9(?<item>[^§]*) §r§b\\([+](?:§.)*(?<mf>\\d*)%? §r§b✯ Magic Find§r§b\\)",
+        "itemdrop.colorless",
+        "RARE DROP! (?<item>.+) \\(\\+(?<mf>\\d+)%? ${SkyblockStat.MAGIC_FIND.hypixelIcon} Magic Find\\)",
     )
 
     /**
-     * REGEX-TEST: §cYour Kill Combo has expired! You reached a 32 Kill Combo!
-     * REGEX-TEST: §cYour Kill Combo has expired! You reached a 1,187 Kill Combo!
+     * REGEX-TEST: Your Kill Combo has expired! You reached a 32 Kill Combo!
+     * REGEX-TEST: Your Kill Combo has expired! You reached a 1,187 Kill Combo!
      */
     private val killComboEndPattern by patternGroup.pattern(
-        "killcombo.end",
-        "§cYour Kill Combo has expired! You reached a (?<kill>[\\d,.]+) Kill Combo!",
-    )
-    private val bagOfCashPattern by patternGroup.pattern(
-        "bagofcash",
-        "§eThe ghost's death materialized §r§61,000,000 coins §r§efrom the mists!",
+        "killcombo.end.colorless",
+        "Your Kill Combo has expired! You reached a (?<kill>[\\d,.]+) Kill Combo!",
     )
 
     /**
-     * REGEX-TEST:  Ghost 21: 29,614/40,000
-     * REGEX-TEST:  Ghost 15: 12,449/12,500
+     * REGEX-TEST: The ghost's death materialized 1,000,000 coins from the mists!
+     */
+    private val bagOfCashPattern by patternGroup.pattern(
+        "bagofcash.colorless",
+        "The ghost's death materialized 1,000,000 coins from the mists!",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: " Ghost 21: 29,614/40,000"
+     * WRAPPED-REGEX-TEST: " Ghost 15: 12,449/12,500"
      */
     private val bestiaryTablistPattern by patternGroup.pattern(
         "tablist.bestiary-no-color",
@@ -150,7 +155,7 @@ object GhostTracker {
     )
 
     /**
-     * REGEX-TEST:  Ghost 25: MAX
+     * WRAPPED-REGEX-TEST: " Ghost 25: MAX"
      */
     private val maxBestiaryTablistPattern by patternGroup.pattern(
         "tablist.bestiarymax-no-color",
@@ -171,7 +176,7 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onSkillExp(event: SkillExpGainEvent) {
+    private fun onSkillExp(event: SkillExpGainEvent) {
         if (!inArea) return
         if (event.gained > 10_000) return
         tracker.modify {
@@ -180,7 +185,7 @@ object GhostTracker {
     }
 
     @HandleEvent(SecondPassedEvent::class)
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!isEnabled()) return
         if (!TabWidget.BESTIARY.isActive && lastNoWidgetWarningTime.passedSince() > 1.minutes) {
             lastNoWidgetWarningTime = SimpleTimeMark.now()
@@ -203,7 +208,7 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onSackChange(event: SackChangeEvent) {
+    private fun onSackChange(event: SackChangeEvent) {
         if (!inArea || !ProfileStorageData.loaded) return
 
         val allowedChanges = event.sackChanges.filter {
@@ -218,20 +223,20 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onShard(event: ShardGainEvent) {
+    private fun onShard(event: ShardGainEvent) {
         if (event.shardInternalName != ghostShard) return
         tracker.addItem(ghostShard, event.amount, false)
     }
 
     @HandleEvent
-    fun onItemAdd(event: ItemAddEvent) {
+    private fun onItemAdd(event: ItemAddEvent) {
         if (!inArea || event.source != ItemAddManager.Source.COMMAND) return
 
         tracker.addItem(event.internalName, event.amount, command = true)
     }
 
     @HandleEvent
-    fun onPurseChange(event: PurseChangeEvent) {
+    private fun onPurseChange(event: PurseChangeEvent) {
         if (!inArea) return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
         if (event.coins !in 200.0..15_000.0) return
@@ -239,9 +244,9 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!inArea) return
-        itemDropPattern.matchMatcher(event.message) {
+        itemDropPattern.matchMatcher(event.cleanMessage) {
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
             val mf = group("mf").formatInt()
             if (internalName !in allowedDrops) return
@@ -257,14 +262,14 @@ object GhostTracker {
             }
             return
         }
-        killComboEndPattern.matchMatcher(event.message) {
+        killComboEndPattern.matchMatcher(event.cleanMessage) {
             val kill = group("kill").formatLong()
             tracker.modify {
                 it.maxKillCombo = kill.coerceAtLeast(it.maxKillCombo)
             }
             return
         }
-        if (bagOfCashPattern.matches(event.message)) {
+        if (bagOfCashPattern.matches(event.cleanMessage)) {
             tracker.addCoins(1_000_000, false)
             return
         }
@@ -299,7 +304,7 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BESTIARY)) return
         if (isMaxBestiary || !inArea) return
         parseBestiaryWidget(event.lines)
@@ -310,20 +315,20 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val ghostDropsConstant = event.getConstant<GhostDropsJson>("GhostDrops")
         allowedDrops = ghostDropsConstant.ghostDrops
         allowedSackDrops = ghostDropsConstant.sacksDrops
     }
 
     @HandleEvent
-    fun onAreaChange(event: GraphAreaChangeEvent) {
+    private fun onAreaChange(event: GraphAreaChangeEvent) {
         inArea = event.area == "The Mist" && IslandType.DWARVEN_MINES.isInIsland()
         if (inArea) parseBestiaryWidget(TabWidget.BESTIARY.lines)
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    private fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.DWARVEN_MINES) {
             tracker.firstUpdate()
         }
@@ -368,7 +373,7 @@ object GhostTracker {
     }
 
     @HandleEvent(ConfigLoadEvent::class)
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         val storage = storage ?: return
         if (storage.migratedTotalKills) return
         tracker.modify {
@@ -378,7 +383,7 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetghosttracker") {
             description = "Resets the Ghost Profit Tracker"
             category = CommandCategory.USERS_RESET
@@ -387,7 +392,7 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
 
         fun migrateItem(oldData: JsonElement): JsonElement {
             val oldAmount = oldData.asInt

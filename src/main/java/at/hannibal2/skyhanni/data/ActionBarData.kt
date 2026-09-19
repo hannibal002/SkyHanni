@@ -43,7 +43,7 @@ object ActionBarData {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Action Bar")
         debugActionBar?.let {
             event.addData {

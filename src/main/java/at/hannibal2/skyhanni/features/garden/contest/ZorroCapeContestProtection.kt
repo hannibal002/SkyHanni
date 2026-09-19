@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -25,12 +25,12 @@ object ZorroCapeContestProtection {
         if (!config.zorroCapeProtection) return
         if (!FarmingContestApi.inInventory) return
 
-        val cloak = EquipmentApi.getEquipment(EquipmentSlot.CLOAK)?.getInternalNameOrNull()
+        val cloak = CurrentEquipmentApi.getEquipment(EquipmentSlot.CLOAK)?.getInternalNameOrNull()
         if (cloak == zorroCape) return
 
         val stack = event.item ?: return
         val claimableContest = JacobFarmingContestsInventory.isClaimableContest(stack)
-        val isBulkClaim = stack.cleanName() == "Bulk Claim"
+        val isBulkClaim = stack.cleanName == "Bulk Claim"
         if (claimableContest || isBulkClaim) {
             event.cancel()
             notifyUser()

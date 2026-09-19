@@ -36,7 +36,7 @@ object GardenInventoryTooltipOverflow {
         val stack = event.itemStack
         if (!stack.getLoreComponent().any { it.string.contains("Max tier reached!") }) return
 
-        val split = stack.cleanName().split(" ")
+        val split = stack.cleanName.split(" ")
         val crop = getCrop(split)
 
         val currentTier = crop.getCurrentMilestoneTier() ?: return

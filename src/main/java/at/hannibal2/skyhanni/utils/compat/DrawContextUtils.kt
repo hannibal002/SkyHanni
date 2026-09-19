@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.client.renderer.state.gui.GuiElementRenderState
 
 /**
  * Utils methods related to DrawContext, also known on 1.8 as GLStateManager
  */
 object DrawContextUtils {
 
-    private var _drawContext: GuiGraphics? = null
+    private var _drawContext: GuiGraphicsExtractor? = null
 
     /**
      * This is used to track the depth of the render context stack.
@@ -19,15 +20,15 @@ object DrawContextUtils {
      */
     private var renderDepth = 0
 
-    val drawContext: GuiGraphics
+    val drawContext: GuiGraphicsExtractor
         get() = _drawContext ?: run {
             ErrorManager.crashInDevEnv("drawContext is null")
             ErrorManager.skyHanniError("drawContext is null")
         }
 
-    fun drawItem(item: ItemStack, x: Int, y: Int) = drawContext.renderItem(item, x, y)
+    fun drawItem(item: SafeItemStack, x: Int, y: Int) = drawContext.item(item, x, y)
 
-    fun setContext(context: GuiGraphics) {
+    fun setContext(context: GuiGraphicsExtractor) {
         renderDepth++
         if (_drawContext != null) {
             return
@@ -136,5 +137,9 @@ object DrawContextUtils {
 
     fun loadIdentity() {
         drawContext.pose().identity()
+    }
+
+    fun addGuiElement(state: GuiElementRenderState) {
+        drawContext.guiRenderState.addGuiElement(state)
     }
 }

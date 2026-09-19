@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
@@ -29,31 +28,31 @@ object VerminHighlighter {
     private val config get() = RiftApi.config.area.westVillage.verminHighlight
 
     private val TURBOMAX_VACUUM = "TURBOMAX_VACUUM".toInternalName()
-    private val VERMIN_FLY_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_FLY") }
-    private val VERMIN_SPIDER_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_SPIDER") }
+    private val VERMIN_FLY_TEXTURE by SkullTextureHolder.texture("VERMIN_FLY")
+    private val VERMIN_SPIDER_TEXTURE by SkullTextureHolder.texture("VERMIN_SPIDER")
 
     @HandleEvent
-    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
+    private fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (shouldDiscover()) tryAdd(event.entity)
     }
 
     @HandleEvent
-    fun onEntityMaxHealthUpdate(event: EntityMaxHealthUpdateEvent) {
+    private fun onEntityMaxHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         if (shouldDiscover()) tryAdd(event.entity)
     }
 
     @HandleEvent
-    fun onEntityEnterWorld(event: EntityEnterWorldEvent<LivingEntity>) {
+    private fun onEntityEnterWorld(event: EntityEnterWorldEvent<LivingEntity>) {
         if (shouldDiscover()) tryAdd(event.entity)
     }
 
     @HandleEvent
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+    private fun onItemInHandChange(event: ItemInHandChangeEvent) {
         if (event.newItem == TURBOMAX_VACUUM) refreshLoadedEntities()
     }
 
     @HandleEvent
-    fun onAreaChange(event: ScoreboardAreaChangeEvent) {
+    private fun onScoreboardAreaChange(event: ScoreboardAreaChangeEvent) {
         if (event.area == "West Village" || event.area == "Infested House") refreshLoadedEntities()
     }
 
@@ -64,7 +63,7 @@ object VerminHighlighter {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad() {
         ConditionalUtils.onToggle(config.color) {
             refreshLoadedEntities()
         }

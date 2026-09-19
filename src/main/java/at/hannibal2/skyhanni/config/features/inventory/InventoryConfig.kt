@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.config.features.inventory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFConfig
+import at.hannibal2.skyhanni.config.features.inventory.customloadout.CustomLoadoutConfig
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
 import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig
+import at.hannibal2.skyhanni.config.features.inventory.npctrade.NpcTradeConfig
 import at.hannibal2.skyhanni.config.features.inventory.sacks.OutsideSackValueConfig
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
@@ -54,12 +56,17 @@ class InventoryConfig {
     val customWardrobe: CustomWardrobeConfig = CustomWardrobeConfig()
 
     @Expose
+    @Category(name = "Custom Loadout", desc = "New Loadout menu look.")
+    val customLoadout: CustomLoadoutConfig = CustomLoadoutConfig()
+
+    @Expose
     @Category(name = "Chocolate Factory", desc = "Features to help you master the Chocolate Factory idle game.")
     val chocolateFactory: CFConfig = CFConfig()
 
     @Expose
-    @ConfigOption(name = "Improved SB Menus", desc = "")
+    @ConfigOption(name = "Improved SkyBlock Menus", desc = "")
     @Accordion
+    @SearchTag("better container sb")
     val improvedSBMenus: ImprovedSBMenusConfig = ImprovedSBMenusConfig()
 
     @Expose
@@ -176,10 +183,22 @@ class InventoryConfig {
     @SearchTag(EVOLVING_ITEMS_SEARCH_TAG)
     val evolvingItems: EvolvingItemsConfig = EvolvingItemsConfig()
 
+    // TODO rename to playerTrade
     @Expose
-    @ConfigOption(name = "Trade Value", desc = "Creates a trade value overlay")
+    @ConfigOption(name = "Player Trade", desc = "Creates a trade value overlay")
     @Accordion
-    val trade: TradeConfig = TradeConfig()
+    val trade: PlayerTradeConfig = PlayerTradeConfig()
+
+    @Expose
+    @ConfigOption(name = "NPC Trade", desc = "")
+    @Accordion
+    val npcTrade: NpcTradeConfig = NpcTradeConfig()
+
+    @Expose
+    @ConfigOption(name = "Hub Selector", desc = "Highlight near-capacity lobbies in the hub selector.")
+    @Accordion
+    @SearchTag("lobby full players")
+    val hubSelector: HubSelectorConfig = HubSelectorConfig()
 
     @Expose
     @ConfigOption(name = "Item Number", desc = "Show the item number as a stack size for these items.")
@@ -196,6 +215,7 @@ class InventoryConfig {
         MASTER_STAR_TIER("§bMaster Star Tier"),
         MASTER_SKULL_TIER("§bMaster Skull Tier"),
         DUNGEON_HEAD_FLOOR_NUMBER("§bDungeon Head Floor Number"),
+        DUNGEON_ITEM_QUALITY("§bDungeon Item Quality"),
         NEW_YEAR_CAKE("§bNew Year Cake"),
         PET_LEVEL("§bPet Level"),
         MINION_TIER("§bMinion Tier"),
@@ -327,6 +347,13 @@ class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var ministerInCalendar: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Oringo Pet in Calendar", desc = "Show the future legendary pet Oringo will offer in the Calendar.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @SearchTag("traveling zoo")
+    var oringoPetInCalendar: Boolean = true
 
     @Expose
     @ConfigOption(name = "Show hex as actual color", desc = "Changes the color of hex codes to the actual color.")

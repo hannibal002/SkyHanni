@@ -91,10 +91,11 @@ object DungeonLividFinder {
     /**
      * REGEX-TEST: §2﴾ §2§lLivid§r§r §a7M§c❤ §2﴿
      * REGEX-TEST: §5﴾ §5§lLivid§r§r §a7M§c❤ §5﴿
+     * REGEX-TEST: §5﴾ §e§5 §5§lLivid§r§r §a7M§c❤ §5﴿
      */
     private val lividArmorStandNamePattern by RepoPattern.pattern(
         "dungeon.f5.livid.armorstand",
-        "^§(?<colorCode>.)﴾ §.§lLivid.*$",
+        "§(?<colorCode>.)﴾ (?:§e\uE07B§5\uE073 )?§.§lLivid.*",
     )
 
     /**
@@ -312,7 +313,7 @@ object DungeonLividFinder {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Livid Finder")
 
         if (!inLividBossRoom()) {

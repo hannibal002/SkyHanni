@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
 import kotlin.math.pow
+import kotlin.time.Duration.Companion.seconds
 
 class PolynomialFitter(private val degree: Int) {
     private val xPointMatrix: ArrayList<DoubleArray> = ArrayList()
@@ -70,6 +71,45 @@ open class BezierFitter(private val degree: Int) {
         fitters.forEach { it.reset() }
         lastCurve = null
     }
+
+    @Suppress("ReturnCount")
+    fun tryAdd(
+        location: LorenzVec,
+        maxDistanceToLast: Double,
+        lastAbilityUse: SimpleTimeMark? = null,
+        emptyCondition: (LorenzVec) -> Boolean = { false },
+        endCondition: (LorenzVec) -> Boolean = { false },
+    ): Boolean {
+        lastAbilityUse?.let {
+            if (it.passedSince() > 1.seconds) return false
+        }
+        if (isEmpty()) {
+            if (emptyCondition(location)) return false
+            addPoint(location)
+            return false
+        }
+        val distToLast = getLastPoint()?.distance(location) ?: return false
+        if (distToLast > maxDistanceToLast) return false
+        if (isAlreadyUsed(location)) return false
+        if (endCondition(location)) return false
+
+        addPoint(location)
+        return true
+    }
+
+    /**
+     * Hypixel repeats particle positions, usually right after each other, sometimes interleaved as A, B, A, B.
+     * Comparing against the last point alone therefore lets a used position back in, so every point is checked.
+     * [addPoint] uses a point's position in the list as its curve parameter, so a repeat stalls the curve and
+     * distorts the derivative at the start that [ParticlePathBezierFitter.solve] extrapolates from. With degree 3
+     * the result can land thousands of blocks away.
+     */
+    private fun isAlreadyUsed(location: LorenzVec) = points.any { it.distanceSq(location) < REPEAT_TOLERANCE_SQ }
+
+    companion object {
+        /** 0.01 blocks, squared. */
+        private const val REPEAT_TOLERANCE_SQ = 0.0001
+    }
 }
 
 class ParticlePathBezierFitter(degree: Int) : BezierFitter(degree) {
@@ -92,25 +132,21 @@ class BezierCurve(private val coefficients: List<DoubleArray>) {
         require(coefficients.size == 3) { "Coefficients must be for a 3d curve!" }
     }
 
-    fun derivativeAt(t: Double): LorenzVec {
-        return coefficients.map {
-            var result = 0.0
-            val reversed = it.reversedArray().dropLast(1)
-            for ((i, coeff) in reversed.withIndex()) {
-                result = result * t + coeff * (reversed.size - i)
-            }
-            result
-        }.toLorenzVec()
-    }
+    fun derivativeAt(t: Double): LorenzVec = coefficients.map {
+        var result = 0.0
+        val reversed = it.reversedArray().dropLast(1)
+        for ((i, coefficient) in reversed.withIndex()) {
+            result = result * t + coefficient * (reversed.size - i)
+        }
+        result
+    }.toLorenzVec()
 
-    fun at(t: Double): LorenzVec {
-        return coefficients.map {
-            var result = 0.0
-            val reversed = it.reversed()
-            for (coeff in reversed) {
-                result = result * t + coeff
-            }
-            result
-        }.toLorenzVec()
-    }
+    fun at(t: Double): LorenzVec = coefficients.map {
+        var result = 0.0
+        val reversed = it.reversed()
+        for (coefficient in reversed) {
+            result = result * t + coefficient
+        }
+        result
+    }.toLorenzVec()
 }

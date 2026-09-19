@@ -44,7 +44,7 @@ data class RepoComparison(
     fun reportForceRebuild() = reportRepoOutdated("Force redownloading repo..")
 
     fun reportRepoOutdated(
-        mainMessage: String = "$repoName Repo is outdated, updating..",
+        mainMessage: String = "$repoName Repo is outdated, updating...",
     ) = ChatUtils.clickToClipboard(
         mainMessage,
         lines = buildList {

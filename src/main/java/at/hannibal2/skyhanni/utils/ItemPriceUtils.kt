@@ -42,8 +42,9 @@ object ItemPriceUtils {
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
         pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double? {
+        SkyblockCurrency.getByInternalNameOrNull(this)?.coinValue?.let { return it }
+
         when (this) {
-            SKYBLOCK_COIN -> return 1.0
             NeuInternalName.GEMSTONE_COLLECTION -> return 0.0
             NeuInternalName.JASPER_CRYSTAL -> return 0.0
             NeuInternalName.RUBY_CRYSTAL -> return 0.0
@@ -158,7 +159,7 @@ object ItemPriceUtils {
     }
 
     private val lowBinStatic = ApiStaticGetPath(
-        "https://api.eliteskyblock.com/resources/auctions/neu",
+        "https://api.eliteskyblock.com/resources/auctions/neu?mode=smooth",
         "EliteSkyblock Lowest Bin"
     )
 

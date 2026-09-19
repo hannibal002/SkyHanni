@@ -72,7 +72,7 @@ object AtomHitBox {
         ),
         ;
 
-        val skullTexture by lazy { SkullTextureHolder.getTexture(textureId) }
+        val skullTexture by SkullTextureHolder.texture(textureId)
 
         override fun toString(): String = displayName
 

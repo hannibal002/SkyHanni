@@ -12,12 +12,12 @@ import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateSkillLevel
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import kotlin.math.ceil
@@ -41,7 +42,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SkillProgress {
-
     val config get() = SkyHanniMod.feature.skillProgress
     private val barConfig get() = config.skillProgressBarConfig
     private val allSkillConfig get() = config.allSkillDisplayConfig
@@ -57,7 +57,7 @@ object SkillProgress {
     var hideInActionBar = listOf<String>()
 
     @HandleEvent
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -75,7 +75,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onChestGuiRender() {
+    private fun onChestGuiRender() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -85,13 +85,23 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onGuiRender() {
+    private fun onGuiRenderTop() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
         if (allSkillConfig.enabled.get()) {
-            config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
+            if (InventoryUtils.inAnyInventory()) {
+                InventoryGuiScaleCompat.withOriginalHudScale {
+                    renderAllSkillsDisplay()
+                }
+            } else {
+                renderAllSkillsDisplay()
+            }
         }
+    }
+
+    private fun renderAllSkillsDisplay() {
+        config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
     }
 
     private fun renderDisplay() {
@@ -143,7 +153,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onProfileJoin() {
+    private fun onProfileJoin() {
         display = emptyList()
         allDisplay = emptyList()
         etaDisplay = emptyList()
@@ -151,7 +161,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed(event: SecondPassedEvent) {
         if (!isDisplayEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 
@@ -165,7 +175,7 @@ object SkillProgress {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onLevelUp(event: SkillOverflowLevelUpEvent) {
+    private fun onLevelUp(event: SkillOverflowLevelUpEvent) {
         if (!config.overflowConfig.enableInChat) return
         val skillName = event.skill.displayName
         val oldLevel = event.oldLevel
@@ -179,7 +189,7 @@ object SkillProgress {
                 add("  §r§7§8+§d50 SkyHanni User Luck")
         }
         val messages = listOf(
-            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
+            "§3§l---------------------------------------------",
             "  §r§b§lSKILL LEVEL UP §3$skillName §8$oldLevel➜§3$newLevel",
             if (goalReached)
                 listOf(
@@ -190,7 +200,7 @@ object SkillProgress {
                 "",
             "  §r§a§lREWARDS",
             rewards.joinToString("\n"),
-            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
+            "§3§l---------------------------------------------",
         )
 
         chat(messages.joinToString("\n"), false)
@@ -198,11 +208,11 @@ object SkillProgress {
         if (goalReached)
             chat("§lYou have reached your goal level of §b§l${skill.customGoalLevel} §e§lin the §b§l$skillName §e§lskill!")
 
-        SoundUtils.createSound("entity.player.levelup", 1f, 1f).playSound()
+        SoundUtils.createSound("entity.player.levelup", 1f, 1f, isWarning = false).playSound()
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         onToggle(
             config.enabled,
             config.alwaysShow,
@@ -225,7 +235,7 @@ object SkillProgress {
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onActionBar(event: ActionBarUpdateEvent) {
+    private fun onActionBar(event: ActionBarUpdateEvent) {
         if (!config.hideInActionBar || !isDisplayEnabled()) return
         var msg = event.actionBar
         for (line in hideInActionBar) {
@@ -258,6 +268,17 @@ object SkillProgress {
         return newList
     }
 
+    /**
+     * Progress towards [SkillApi.SkillInfo.customGoalLevel], expressed as cumulative XP out of the
+     * cumulative XP that goal level requires.
+     *
+     * [SkillApi.SkillInfo.totalXp] is already cumulative, so it can be compared against
+     * [SkillUtil.xpRequiredForLevel] directly. [SkillApi.SkillInfo.overflowTotalXp] can not: it only
+     * counts the XP gained past the level cap.
+     */
+    private fun SkillApi.SkillInfo.customGoalProgress() =
+        SkillLevel(overflowLevel, totalXp, SkillUtil.xpRequiredForLevel(customGoalLevel), totalXp)
+
     private fun drawAllDisplay() = buildMap {
         val skillMap = SkillApi.storage ?: return@buildMap
         val sortedMap = SkillType.entries.filter { it.displayName.isNotEmpty() }.sortedBy { it.displayName.take(2) }
@@ -267,19 +288,9 @@ object SkillProgress {
             val lockedLevels = skillInfo.overflowCurrentXp > skillInfo.overflowCurrentXpMax
             val useCustomGoalLevel =
                 skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInAllDisplay
-            val targetLevel = skillInfo.customGoalLevel
-            var xp = skillInfo.overflowTotalXp
-            if (targetLevel in 50..60 && skillInfo.overflowLevel >= 50) xp += SkillUtil.xpRequiredForLevel(50)
-            else if (targetLevel > 60 && skillInfo.overflowLevel >= 60) xp += SkillUtil.xpRequiredForLevel(60)
-
-            var have = skillInfo.overflowTotalXp
-            val need = SkillUtil.xpRequiredForLevel(targetLevel)
-            if (targetLevel in 51..59) have += SkillUtil.xpRequiredForLevel(50)
-            else if (targetLevel > 60) have += SkillUtil.xpRequiredForLevel(60)
-
             val (level, currentXP, currentXPMax, totalXP) =
                 if (useCustomGoalLevel)
-                    SkillLevel(skillInfo.overflowLevel, have, need, xp)
+                    skillInfo.customGoalProgress()
                 else if (config.overflowConfig.enableInAllDisplay.get() && !lockedLevels)
                     SkillLevel(
                         skillInfo.overflowLevel,
@@ -404,23 +415,10 @@ object SkillProgress {
         val skillMap = SkillApi.storage ?: return@buildList
         val skill = skillMap[activeSkill] ?: return@buildList
         val useCustomGoalLevel = skill.customGoalLevel != 0 && skill.customGoalLevel > skill.overflowLevel
-        val targetLevel = skill.customGoalLevel
-        val xp = skill.totalXp
-        val lvl = skill.level
-        val cap = activeSkill.maxLevel
-        // This code is probably still wrong for hunting
-        // But I can not understand why we are doing this in the first place
-        val add = if (lvl >= 50) {
-            SkillUtil.xpRequiredForLevel(cap)
-        } else {
-            0
-        }
-        val (currentLevel, _, _, xpTotalCurrent) = calculateSkillLevel(xp + add, cap)
-        val need = SkillUtil.xpRequiredForLevel(targetLevel)
 
         val (level, currentXP, currentXPMax, _) =
             if (useCustomGoalLevel && customGoalConfig.enableInDisplay)
-                SkillLevel(currentLevel, xp + add, need, xpTotalCurrent)
+                skill.customGoalProgress()
             else if (config.overflowConfig.enableInDisplay.get())
                 SkillLevel(skill.overflowLevel, skill.overflowCurrentXp, skill.overflowCurrentXpMax, skill.overflowTotalXp)
             else
@@ -495,7 +493,6 @@ object SkillProgress {
         if (xpInfo.lastTotalXP > 0) {
             val delta = totalXP - xpInfo.lastTotalXP
             if (delta > 0) {
-
                 xpInfo.timer = when (SkillApi.activeSkill) {
                     SkillType.FARMING -> etaConfig.farmingPauseTime
                     SkillType.MINING -> etaConfig.miningPauseTime

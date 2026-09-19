@@ -142,28 +142,32 @@ object HoppityEggsManager {
     private var lastMeal: HoppityEggType? = null
     private var lastNote: String? = null
 
-    // has claimed all eggs at least once
+    // Prevents warnings from firing on unknown startup state before any claim or observed rollover.
     private var warningActive = false
     private var lastWarnTime = SimpleTimeMark.farPast()
+    private val observedSpawnedEggs = mutableSetOf<HoppityEggType>()
 
     private var latestWaypointOnclick: () -> Unit = {}
     private var syncedFromConfig: Boolean = false
 
     @HandleEvent(ProfileJoinEvent::class)
     fun onProfileJoin() {
+        warningActive = false
+        lastWarnTime = SimpleTimeMark.farPast()
+        observedSpawnedEggs.clear()
         if (!HoppityApi.isHoppityEvent()) return
         resettingEntries.forEach {
             val lastFound = profileStorage?.mealLastFound?.get(it) ?: SimpleTimeMark.farFuture()
             if (lastFound.isInPast()) it.markClaimed(lastFound)
 
             val nextSpawn = profileStorage?.mealNextSpawn?.get(it) ?: SimpleTimeMark.farFuture()
-            if (nextSpawn.isInPast() && it.hasRemainingSpawns() && !it.hasNotFirstSpawnedYet()) it.markSpawned()
+            if (nextSpawn.isInPast() && it.hasRemainingSpawns() && !it.hasNotFirstSpawnedYet()) markObservedSpawned(it)
         }
     }
 
     @HandleEvent
     fun onEggSpawned(event: EggSpawnedEvent) {
-        event.eggType.markSpawned(setLastReset = true)
+        markObservedSpawned(event.eggType, setLastReset = true)
     }
 
     @HandleEvent
@@ -178,9 +182,16 @@ object HoppityEggsManager {
         profileStorage?.mealNextSpawn?.filter {
             it.value.isInPast()
         }?.keys?.forEach {
-            if (HoppityApi.isHoppityEvent()) it.markSpawned()
+            if (HoppityApi.isHoppityEvent()) markObservedSpawned(it)
         }
         syncedFromConfig = true
+    }
+
+    private fun markObservedSpawned(eggType: HoppityEggType, setLastReset: Boolean = false) {
+        if (HoppityApi.isHoppityEvent() && eggType.isResetting) {
+            observedSpawnedEggs.add(eggType)
+        }
+        eggType.markSpawned(setLastReset)
     }
 
     @HandleEvent
@@ -282,7 +293,9 @@ object HoppityEggsManager {
 
     private fun checkWarn() {
         val allEggsRemaining = HoppityEggType.allEggsUnclaimed()
-        if (!warningActive) warningActive = !allEggsRemaining
+        if (!warningActive) {
+            warningActive = !allEggsRemaining || observedSpawnedEggs.containsAll(resettingEntries)
+        }
 
         if (warningActive && allEggsRemaining) warn()
     }

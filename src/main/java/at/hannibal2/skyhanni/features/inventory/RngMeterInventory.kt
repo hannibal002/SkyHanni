@@ -7,12 +7,11 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -34,7 +33,7 @@ object RngMeterInventory {
 
         val stack = event.stack
         if (config.floorName && chestName == "Catacombs RNG Meter") {
-            if (stack.hoverName.string.removeColor() == "RNG Meter") {
+            if (stack.cleanName == "RNG Meter") {
                 floorPattern.firstMatcher(stack.getLore()) {
                     event.stackTip = group("floor")
                 }

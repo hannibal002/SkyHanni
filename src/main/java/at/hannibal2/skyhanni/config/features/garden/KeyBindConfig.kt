@@ -29,6 +29,15 @@ class KeyBindConfig {
 
     @Expose
     @ConfigOption(
+        name = "Include Vacuum",
+        desc = "Also use custom keybinds while holding a Vacuum in your hand.\n" +
+            "§eRequires main toggle to be enabled!",
+    )
+    @ConfigEditorBoolean
+    var vacuum: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Include Fishing Rod",
         desc = "Also use custom keybinds while holding a fishing rod in your hand.\n" +
             "§eRequires main toggle to be enabled!",
@@ -45,8 +54,9 @@ class KeyBindConfig {
     @ConfigEditorBoolean
     var sunsGrasp: Boolean = true
 
+    // TODO Rename excludeBarn to excludeUnfarmablePlots
     @Expose
-    @ConfigOption(name = "Exclude Barn", desc = "Disable this feature while on the barn plot.")
+    @ConfigOption(name = "Exclude Unfarmable Plots", desc = "Disable this feature while on the barn plot or in a greenhouse.")
     @ConfigEditorBoolean
     var excludeBarn: Boolean = false
 

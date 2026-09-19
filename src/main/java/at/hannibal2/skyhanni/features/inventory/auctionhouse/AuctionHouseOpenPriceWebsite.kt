@@ -12,11 +12,12 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.player.Inventory
-import net.minecraft.world.item.ItemStack
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.seconds
 
@@ -37,7 +38,7 @@ object AuctionHouseOpenPriceWebsite {
     )
 
     private var searchTerm = ""
-    private var displayItem: ItemStack? = null
+    private var displayItem: SafeItemStack? = null
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -50,7 +51,7 @@ object AuctionHouseOpenPriceWebsite {
     }
 
     private fun createDisplayItem() = ItemUtils.createItemStack(
-        "PAPER".toInternalName().getItemStack().item,
+        "PAPER".toInternalName().getItemStack().itemType,
         "§bPrice History",
         "§8(From SkyHanni)",
         "",

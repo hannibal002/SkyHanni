@@ -15,7 +15,7 @@ object DungeonsAchievements {
     /**
      * REGEX-TEST: RNG METER! Reselected the Enchanted Book (Rejuvenate I) for Catacombs - Floor 1! CLICK HERE to select a new drop!
      */
-    private val woodRngPattern by AchievementManager.group.pattern(
+    private val woodRngPattern by AchievementManager.patternGroup.pattern(
         "wood-rng",
         "RNG METER! Reselected the Enchanted Book \\((?:Rejuvenate I|Infinite Quiver VI|Feather Falling VI|Bank I|Ultimate Jerry I)\\) for Catacombs - Floor 1! CLICK HERE to select a new drop!",
     )
@@ -25,10 +25,10 @@ object DungeonsAchievements {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Use RNG Meter to get a Book from F1 Wood Chest".asComponent(),
-            "Even the smallest rng drop can be chosen.".asComponent(),
-            10f,
-            true,
+            name = "Use RNG Meter to get a Book from F1 Wood Chest".asComponent(),
+            description = "Even the smallest rng drop can be chosen.".asComponent(),
+            userLuckAmount = 10f,
+            secret = true,
         )
         event.register(achievement, WOOD_ACHIEVEMENT)
     }

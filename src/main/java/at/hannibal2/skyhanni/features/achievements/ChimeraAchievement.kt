@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object ChimeraAchievement {
@@ -15,9 +14,9 @@ object ChimeraAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Pet Symbiosis".asComponent(),
-            "Make your weapon gain all the stats of your pet".asComponent(),
-            25f,
+            name = "Pet Symbiosis",
+            description = "Make your weapon gain all the stats of your pet",
+            userLuckAmount = 25f,
         )
         event.register(achievement, CHIMERA_ACHIEVEMENT)
     }

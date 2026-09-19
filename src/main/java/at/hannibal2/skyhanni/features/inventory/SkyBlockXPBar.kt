@@ -26,7 +26,7 @@ object SkyBlockXPBar {
         if (event.type != RenderLayer.EXPERIENCE_BAR) return
         val (level, xp) = SkyBlockXPApi.levelXPPair ?: return
 
-        with(MinecraftCompat.localPlayer) {
+        with(MinecraftCompat.localPlayerOrThrow) {
             cache = OriginalValues(experienceProgress, totalExperience, experienceLevel)
             setExperienceValues(xp / 100f, 100, level)
         }
@@ -36,7 +36,7 @@ object SkyBlockXPBar {
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderLayer.EXPERIENCE_BAR) return
         with(cache ?: return) {
-            MinecraftCompat.localPlayer.setExperienceValues(currentXP, maxXP, level)
+            MinecraftCompat.localPlayerOrThrow.setExperienceValues(currentXP, maxXP, level)
             cache = null
         }
     }

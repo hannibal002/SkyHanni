@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import kotlin.time.Duration
 
 /**
@@ -109,6 +110,7 @@ data class SkyBlockTime(
             return time
         }
 
+        // TODO: Move this to SkyblockSeason and make it use getSeasonNameByMonth
         fun monthName(month: Int): String {
             val prefix = when ((month - 1) % 3) {
                 0 -> "Early "
@@ -139,7 +141,7 @@ data class SkyBlockTime(
             }
         }
 
-        fun isDay(): Boolean = ServerTime.dayTime % 24000 in 1..12000
+        fun isDay(): Boolean = MinecraftCompat.serverTime % 24000 in 1..12000
 
         fun getSBMonthByName(month: String): Int {
             var monthNr = 0

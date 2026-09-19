@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.ModernPatterns
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -30,6 +29,7 @@ import at.hannibal2.skyhanni.utils.renderables.buildSearchableScrollable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object CoralFishHelper {
@@ -38,11 +38,40 @@ object CoralFishHelper {
 
     private const val OVERVIEW_FISH_SLOT = 4
 
+    private val patternGroup = RepoPattern.group("misc.coral.fish")
+
+    /**
+     * REGEX-TEST: Nope the Fish
+     * REGEX-TEST: Cluck the Fish
+     * REGEX-TEST: Herring the Fish
+     */
+    private val coralFishNamePattern by patternGroup.pattern(
+        "name.colorless",
+        "\\w+ the Fish",
+    )
+
+    /**
+     * REGEX-TEST: Fish Shown: 1/31
+     * REGEX-TEST: Fish Shown: 15/31
+     */
+    private val coralFishFoundPattern by patternGroup.pattern(
+        "shown",
+        "Fish Shown: (?<found>\\d+)/(?<total>\\d+)",
+    )
+
+    /**
+     * REGEX-TEST: (1/31) Fish Family
+     * REGEX-TEST: (15/31) Fish Family
+     */
+    private val coralMenuPattern by patternGroup.pattern(
+        "inventory",
+        "\\(\\d+/\\d+\\) Fish Family",
+    )
+
     init {
         InventoryDetector(
-            pattern = "\\(\\d+/\\d+\\) Fish Family".toPattern(),
             onOpenInventory = { DelayedRun.runNextTick { checkInventoryItems() } },
-        )
+        ) { coralMenuPattern }
     }
 
     private var display = emptyList<Renderable>()
@@ -52,17 +81,17 @@ object CoralFishHelper {
         val items = InventoryUtils.getItemsInOpenChest().map { it.item }
 
         val overviewItem = items[OVERVIEW_FISH_SLOT]
-        val overviewItemLore = overviewItem.getLore().map { it.removeColor() }
+        val overviewItemLore = overviewItem.getCleanLore()
 
-        val (amountFound, totalAmount) = ModernPatterns.coralFishFoundPattern.firstMatcher(overviewItemLore) {
+        val (amountFound, totalAmount) = coralFishFoundPattern.firstMatcher(overviewItemLore) {
             group("found").toInt() to group("total").toInt()
         } ?: return
 
         val neededFish = mutableListOf<String>()
 
         for (item in items) {
-            val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
-            if (!ModernPatterns.coralFishNamePattern.matches(itemName)) continue
+            val itemName = item.cleanName
+            if (!coralFishNamePattern.matches(itemName)) continue
 
             if (!item.isDye(DyeCompat.GRAY)) continue
             neededFish.add(itemName)

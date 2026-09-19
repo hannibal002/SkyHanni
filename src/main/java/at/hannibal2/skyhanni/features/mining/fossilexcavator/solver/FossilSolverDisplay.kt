@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -77,7 +78,7 @@ object FossilSolverDisplay {
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) = clearData()
 
-    // Todo reshape to a data class, use Resettable
+    // TODO reshape to a data class, use Resettable
     private fun clearData() {
         foundPercentage = false
         percentage = null
@@ -94,7 +95,7 @@ object FossilSolverDisplay {
     fun onTick() {
         if (!isEnabled()) return
         val slots = InventoryUtils.getItemsInOpenChest()
-        val itemNames = slots.map { it.item.hoverName.string.removeColor() }
+        val itemNames = slots.map { it.item.cleanName }
         if (itemNames != inventoryItemNames) {
             inventoryItemNames = itemNames
             if (inExcavatorMenu) return
@@ -111,7 +112,7 @@ object FossilSolverDisplay {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val stack = slot.item
             val slotIndex = slot.containerSlot
-            val stackName = stack.hoverName.string.removeColor()
+            val stackName = stack.cleanName
             val isDirt = stackName == "Dirt"
             val isFossil = stackName == "Fossil"
             when {

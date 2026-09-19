@@ -2,12 +2,11 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -86,9 +85,8 @@ object DianaFixChat {
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
-        val item = event.itemInHand ?: return
-        if (!item.isDianaSpade) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
+        if (!DianaApi.hasSpadeInHand()) return
 
         if (lastSpadeUse.passedSince() > 5.seconds) {
             lastSpadeUse = SimpleTimeMark.now()

@@ -1,19 +1,17 @@
 package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.misc.items.enchants.Enchant
+import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantsJson
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -30,23 +28,41 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import net.minecraft.client.Minecraft
-import net.minecraft.world.item.ItemStack
 import org.lwjgl.glfw.GLFW
 import kotlin.math.roundToLong
+import kotlin.time.Duration.Companion.milliseconds
+
+private typealias NeuGemstoneCostJson = HashMap<NeuInternalName, HashMap<String, List<String>>>
 
 @SkyHanniModule
 object EstimatedItemValue {
 
     val config: EstimatedItemValueConfig get() = SkyHanniMod.feature.inventory.estimatedItemValues
+
+    private val repoReloadCoroutine = CoroutineSettings("estimated item value repo reload")
+    private val neuRepoReloadCoroutine = CoroutineSettings("estimated item value neu repo reload")
+
+    private val tooltipTimeout = 200.milliseconds
+
+    // dwell time on the same slot before the first display of an inventory session
+    private val hoverDelay get() = config.hoverDelay.milliseconds
+
     private var display = emptyList<Renderable>()
-    private val cache = mutableMapOf<ItemStack, List<Renderable>>()
-    private var lastToolTipTime = 0L
-    var gemstoneUnlockCosts = HashMap<NeuInternalName, HashMap<String, List<String>>>()
+    private val cache = mutableMapOf<SafeItemStack, List<Renderable>>()
+    private var lastToolTipTime = SimpleTimeMark.farPast()
+    private var hoveredItem: SafeItemStack? = null
+    private var hoverStart = SimpleTimeMark.farPast()
+    private var hoverDelayOver = false
+
+    var gemstoneUnlockCosts = NeuGemstoneCostJson()
     var hasLegacyGemstoneSlots = emptyList<NeuInternalName>()
     var bookBundleAmount = mapOf<String, Int>()
     var crimsonPrestigeCosts = mapOf<String, Map<NeuInternalName, Int>>()
@@ -55,25 +71,24 @@ object EstimatedItemValue {
     var itemValueCalculationData: ItemValueCalculationDataJson? = null
         private set
 
-    var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
+    internal var stackingEnchants: Map<String, Enchant.Stacking> = emptyMap()
         private set
 
-    fun isCurrentlyShowing() = currentlyShowing && Minecraft.getInstance().screen != null
+    fun isCurrentlyShowing() = currentlyShowing && MinecraftCompat.screen != null
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        gemstoneUnlockCosts =
-            event.getConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
+    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) = neuRepoReloadCoroutine.launch {
+        gemstoneUnlockCosts = event.getConstantAsync<NeuGemstoneCostJson>("gemstonecosts")
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ItemsJson>("Items")
+    private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+        val data = event.getConstantAsync<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
         crimsonPrestigeCosts = data.crimsonPrestigeCosts
-        hasLegacyGemstoneSlots = data.hasLegacyGemstoneSlots ?: emptyList()
-        stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
+        hasLegacyGemstoneSlots = data.hasLegacyGemstoneSlots.orEmpty()
+        stackingEnchants = event.getConstantAsync<EnchantsJson>("Enchants").stacking
     }
 
     // TODO test if this can go now since NEU pv is gone (SB-PV mod support?)
@@ -86,7 +101,7 @@ object EstimatedItemValue {
     private var renderedItems = 0
 
     @HandleEvent
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    private fun onGuiRenderOverlay() {
         renderedItems = 0
     }
 
@@ -121,28 +136,45 @@ object EstimatedItemValue {
     }
 
     @HandleEvent
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    private fun onChestGuiRender() {
         tryRendering()
     }
 
     private fun checkCurrentlyVisible(): Boolean {
         if (!SkyBlockUtils.inSkyBlock) return false
         if (!config.enabled) return false
-        if (!config.hotkey.isKeyHeld() && !config.alwaysEnabled) return false
-        if (System.currentTimeMillis() > lastToolTipTime + 200) return false
+        val hotkeyHeld = config.hotkey.isKeyHeld()
+        if (!hotkeyHeld && !config.alwaysEnabled) return false
+        if (lastToolTipTime.passedSince() > tooltipTimeout) return false
 
         if (display.isEmpty()) return false
+        if (hotkeyHeld) return true
 
+        // after the display check on purpose, an empty display must not end the delay
+        return passHoverDelay()
+    }
+
+    private fun passHoverDelay(): Boolean {
+        if (hoverDelayOver) return true
+        if (!hoverDelay.isPositive()) return true
+        // null before the first hover of an inventory session
+        if (hoveredItem == null) return false
+        // measured on the tooltip stream, so the linger time after leaving a slot does not count
+        if (lastToolTipTime - hoverStart < hoverDelay) return false
+
+        hoverDelayOver = true
         return true
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         cache.clear()
+        hoveredItem = null
+        hoverDelayOver = false
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(
                 enchantmentsCap,
@@ -158,16 +190,24 @@ object EstimatedItemValue {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
+    private fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
         if (!config.enabled) return
 
         updateItem(event.stack)
     }
 
-    fun updateItem(item: ItemStack) {
+    private fun updateHoverTime(item: SafeItemStack) {
+        // also restarts when the tooltip stream was interrupted, e.g. by moving over an empty area
+        if (item === hoveredItem && lastToolTipTime.passedSince() <= tooltipTimeout) return
+        hoveredItem = item
+        hoverStart = SimpleTimeMark.now()
+    }
+
+    fun updateItem(item: SafeItemStack) {
+        updateHoverTime(item)
         cache[item]?.let {
             display = it
-            lastToolTipTime = System.currentTimeMillis()
+            lastToolTipTime = SimpleTimeMark.now()
             return
         }
 
@@ -199,10 +239,10 @@ object EstimatedItemValue {
 
         cache[item] = newDisplay
         display = newDisplay
-        lastToolTipTime = System.currentTimeMillis()
+        lastToolTipTime = SimpleTimeMark.now()
     }
 
-    private fun ItemStack.shouldIgnoreDraw(): Boolean {
+    private fun SafeItemStack.shouldIgnoreDraw(): Boolean {
         this.getInternalNameOrNull()?.let { internalName ->
             val name = this.hoverName.formattedTextCompatLeadingWhiteLessResets()
             return (
@@ -224,7 +264,7 @@ object EstimatedItemValue {
         } ?: return true
     }
 
-    private fun draw(stack: ItemStack): List<Renderable> {
+    private fun draw(stack: SafeItemStack): List<Renderable> {
         if (stack.shouldIgnoreDraw()) return listOf()
 
         val list = mutableListOf<String>()
@@ -245,7 +285,7 @@ object EstimatedItemValue {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.estimatedIemValueEnabled", "misc.estimatedItemValues.enabled")
         event.move(3, "misc.estimatedItemValueHotkey", "misc.estimatedItemValues.hotkey")
         event.move(3, "misc.estimatedIemValueAlwaysEnabled", "misc.estimatedItemValues.alwaysEnabled")

@@ -106,7 +106,7 @@ object KeyboardManager {
         val isClose = keycode.matchesClosureKey() || keycode == GLFW.GLFW_KEY_ESCAPE
         if (!isClose) return false
 
-        return AttemptedInventoryCloseEvent().post()
+        return AttemptedInventoryCloseEvent().post().isCancelled
     }
 
     fun getModifierKeyName(short: Boolean = false): String =
@@ -158,48 +158,17 @@ object KeyboardManager {
 
     fun getKeyName(keyCode: Int): String = IMinecraft.INSTANCE.getKeyName(keyCode).text
 
-    object WasdInputMatrix : Iterable<KeyMapping> {
-        operator fun contains(keyBinding: KeyMapping) = when (keyBinding) {
-            w, a, s, d, up, down -> true
-            else -> false
-        }
+    object WasdInputMatrix {
+        val w get() = Minecraft.getInstance().options.keyUp
+        val a get() = Minecraft.getInstance().options.keyLeft
+        val s get() = Minecraft.getInstance().options.keyDown
+        val d get() = Minecraft.getInstance().options.keyRight
 
-        val w get() = Minecraft.getInstance().options.keyUp!!
-        val a get() = Minecraft.getInstance().options.keyLeft!!
-        val s get() = Minecraft.getInstance().options.keyDown!!
-        val d get() = Minecraft.getInstance().options.keyRight!!
+        val up get() = Minecraft.getInstance().options.keyJump
+        val down get() = Minecraft.getInstance().options.keyShift
 
-        val up get() = Minecraft.getInstance().options.keyJump!!
-        val down get() = Minecraft.getInstance().options.keyShift!!
+        private val all get() = listOf(w, a, s, d, up, down)
 
-        override fun iterator(): Iterator<KeyMapping> =
-            object : Iterator<KeyMapping> {
-
-                var current = w
-                var finished = false
-
-                override fun hasNext(): Boolean =
-                    !finished
-
-                override fun next(): KeyMapping {
-                    if (!hasNext()) throw NoSuchElementException()
-
-                    return current.also {
-                        current = when (it) {
-                            w -> a
-                            a -> s
-                            s -> d
-                            d -> up
-                            up -> down
-                            else -> {
-                                finished = true
-                                throw NoSuchElementException()
-                            }
-                        }
-                    }
-                }
-
-            }
-
+        operator fun contains(keyBinding: KeyMapping) = keyBinding in all
     }
 }

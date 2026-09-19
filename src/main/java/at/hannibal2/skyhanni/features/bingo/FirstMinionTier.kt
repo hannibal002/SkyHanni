@@ -1,12 +1,11 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 object FirstMinionTier {
 
@@ -42,7 +41,7 @@ object FirstMinionTier {
         minionId: NeuInternalName,
     ) {
         if (recipe.ingredients.any { help.contains(it.internalName) }) {
-            val name = recipe.output?.internalName?.getItemStackOrNull()?.hoverName?.string.orEmpty().removeColor()
+            val name = recipe.output?.internalName?.getItemStackOrNull()?.cleanName.orEmpty()
             val abc = name.replace(" I", " 0")
             minions[abc] = minionId.replace("_1", "_0")
         }

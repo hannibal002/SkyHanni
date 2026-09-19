@@ -21,5 +21,5 @@ class FishingCocoonConfig {
 
     @ConfigOption(name = "Custom Cocoon Settings", desc = "Both Above Features can be customized under /shseacreatures!")
     @ConfigEditorInfoText
-    var notice: String = ""
+    val notice: String = ""
 }

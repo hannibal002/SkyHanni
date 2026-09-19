@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
@@ -38,7 +39,7 @@ object CollectionApi {
     )
 
     /**
-     * REGEX-TEST:                           43,649/50k
+     * WRAPPED-REGEX-TEST: "                          43,649/50k"
      * REGEX-TEST: Total collected: 277,252
      */
     private val counterPattern by patternGroup.pattern(
@@ -82,7 +83,7 @@ object CollectionApi {
         "§7Progress to .* I: .*",
     )
 
-    val collectionInventory = InventoryDetector { name -> collectionInventoryPattern.matches(name) }
+    val collectionInventory = InventoryDetector { collectionInventoryPattern }
     val collectionValue = mutableMapOf<NeuInternalName, Long>()
 
     // TODO repo
@@ -113,9 +114,9 @@ object CollectionApi {
             CollectionUpdateEvent.post()
         }
 
-        if (inventoryName.endsWith("s") && inventoryName != "Boss Collections") {
+        if (inventoryName.endsWith("s") && !DungeonApi.bossCollectionsInventoryPattern.matches(event.inventoryName)) {
             for ((_, stack) in event.inventoryItems) {
-                val name = stack.cleanName()
+                val name = stack.cleanName
                 if ("Collections" in name) continue
 
                 val lore = stack.getLoreComponent()

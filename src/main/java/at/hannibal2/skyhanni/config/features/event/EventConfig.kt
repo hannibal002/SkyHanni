@@ -38,6 +38,11 @@ class EventConfig {
     @Category(name = "Hoppity Eggs", desc = "Features for the Hoppity event that happens every SkyBlock spring.")
     val hoppityEggs: HoppityEggsConfig = HoppityEggsConfig()
 
+    @ConfigOption(name = "Event Timings", desc = "")
+    @Accordion
+    @Expose
+    val timing: EventTimingConfig = EventTimingConfig()
+
     @ConfigOption(name = "City Project", desc = "")
     @Accordion
     @Expose
@@ -62,13 +67,7 @@ class EventConfig {
     @Category(name = "Harvest Feast", desc = "Features for the Harvest Feast yearly farming event.")
     val feast: HarvestFeastConfig = HarvestFeastConfig()
 
-    // comment in if the event is needed again
-    //    @ConfigOption(name = "300þ Anniversary Celebration", desc = "Features for the 300þ year of SkyBlock")
-    @Accordion
-    @Expose
-    val century: CenturyConfig = CenturyConfig()
-
-    // TODO remove 400
+    // TODO rename to centuryCelebration
     @ConfigOption(name = "Century Celebration", desc = "Features for the Century Celebration Event in SkyBlock.")
     @Accordion
     @Expose

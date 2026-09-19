@@ -12,7 +12,7 @@ object HighHeatSound {
     private val config get() = SkyHanniMod.feature.mining
 
     @HandleEvent
-    fun onSound(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled()) return
         if (LocationUtils.playerLocation().y > 65.0 || MiningApi.heat < 90) return
 

@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
+import at.hannibal2.skyhanni.data.model.SkyblockStat.FARMING_FORTUNE
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -16,39 +18,56 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 object FarmingPersonalBestGain {
-    private val config get() = GardenApi.config.jacobContest.personalBests
-    private val patternGroup = RepoPattern.group("garden.contest.personal.best")
-    private var personalBestIncrements = mapOf<CropType, Int>()
 
+    private val config get() = GardenApi.config.jacobContest.personalBests
+
+    private val patternGroup = RepoPattern.group("garden.contest.personal.best")
+
+    // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: §e[NPC] Jacob§f: §rYou collected §e1,400,694 §fitems! §d§lPERSONAL BEST§f!
+     * REGEX-TEST: [NPC] Jacob: You collected 1,400,694 items! PERSONAL BEST!
      */
     private val newPattern by patternGroup.pattern(
-        "collection.new",
-        "§e\\[NPC] Jacob§f: §rYou collected §e(?<collected>.*) §fitems! §d§lPERSONAL BEST§f!",
+        "collection.new.colorless",
+        "\\[NPC] Jacob: You collected (?<collected>[\\d,]+) items! PERSONAL BEST!",
     )
 
     /**
-     * REGEX-TEST: §e[NPC] Jacob§f: §rYour previous Personal Best was §e1,176,372§f.
+     * REGEX-TEST: [NPC] Jacob: Your previous Personal Best was 1,176,372.
      */
     private val oldPattern by patternGroup.pattern(
-        "collection.old",
-        "§e\\[NPC] Jacob§f: §rYour previous Personal Best was §e(?<collected>.*)§f.",
+        "collection.old.colorless",
+        "\\[NPC] Jacob: Your previous Personal Best was (?<collected>[\\d,]+)\\.",
     )
 
     /**
-     * REGEX-TEST: §e[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6+46.69☘ Potato Fortune§f!
-     *
+     * REGEX-TEST: [NPC] Jacob: Your Personal Bests perk is now granting you +46.69 Potato Fortune!
      */
     private val newFFPattern by patternGroup.pattern(
-        "ff.new",
-        "§e\\[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6\\+(?<ff>.*)☘ (?<crop>.*) Fortune§f!",
+        "ff.new.colorless",
+        "\\[NPC] Jacob: Your Personal Bests perk is now granting you \\+(?<ff>.*)${FARMING_FORTUNE.hypixelIcon} (?<crop>.*) Fortune!",
     )
+
+    /**
+     * REGEX-TEST: §e[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6+46.69 Potato Fortune§f!
+     */
+    @Deprecated("Only exists for repo. Remove after 9.0.0.", level = DeprecationLevel.ERROR)
+    @Suppress("MaxLineLength")
+    private val unused by patternGroup.pattern(
+        "ff.new",
+        "§e\\[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6\\+(?<ff>.*)${FARMING_FORTUNE.hypixelIcon} (?<crop>.*) Fortune§f!",
+    )
+    // </editor-fold>
+
+    private val repoReloadCoroutine = CoroutineSettings("farming personal best gain repo reload")
+
+    private var personalBestIncrements = mapOf<CropType, Int>()
 
     var newCollected: Double? = null
     var oldCollected: Double? = null
@@ -57,8 +76,8 @@ object FarmingPersonalBestGain {
     var cropType: CropType? = null
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<GardenJson>("Garden")
+    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+        val data = event.getConstantAsync<GardenJson>("Garden")
         personalBestIncrements = data.personalBestIncrement
     }
 

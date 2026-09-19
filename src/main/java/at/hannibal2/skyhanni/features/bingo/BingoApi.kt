@@ -76,7 +76,7 @@ object BingoApi {
     var lastBingoCardOpenTime = SimpleTimeMark.farPast()
 
     /**
-     * REGEX-TEST:  §9Ⓑ §9Bingo
+     * WRAPPED-REGEX-TEST: " §9Ⓑ §9Bingo"
      */
     private val detectionPattern by RepoPattern.pattern(
         "bingo.detection.scoreboard",

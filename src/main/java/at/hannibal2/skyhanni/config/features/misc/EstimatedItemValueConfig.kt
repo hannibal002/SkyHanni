@@ -37,6 +37,15 @@ class EstimatedItemValueConfig {
     var alwaysEnabled: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Hover Delay",
+        desc = "How long to hover over the same slot before the value shows up, in milliseconds. " +
+            "Only applies to the first item after opening an inventory. Set to 0 to disable."
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 2000f, minStep = 50f)
+    var hoverDelay: Int = 500
+
+    @Expose
     @ConfigOption(name = "Enchantments Cap", desc = "Only show the top # most expensive enchantments.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 30f, minStep = 1f)
     val enchantmentsCap: Property<Int> = Property.of(7)
@@ -56,6 +65,12 @@ class EstimatedItemValueConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var armor: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Show Equipment Value", desc = "Show the value of the full equipment set in the Equipment Wardrobe inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var equipment: Boolean = true
 
     @Expose
     @ConfigOption(name = "Ignore Helmet Skins", desc = "Ignore helmet Skins from the total value.")

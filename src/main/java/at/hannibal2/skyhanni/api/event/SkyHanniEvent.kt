@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 /**
  * Use @[HandleEvent]
@@ -15,14 +15,10 @@ abstract class SkyHanniEvent protected constructor() {
 
     fun post(onError: (Throwable) -> Unit = {}) = prePost(onError)
 
-    private fun prePost(onError: ((Throwable) -> Unit)?): Boolean {
-        if (this is Rendering) {
-            DrawContextUtils.setContext(this.context)
-            val result = SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
-            DrawContextUtils.clearContext()
-            return result
-        }
-        return SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
+    private fun prePost(onError: ((Throwable) -> Unit)?): SkyHanniEvent = apply {
+        (this as? Rendering)?.let { DrawContextUtils.setContext(it.context) }
+        SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
+        if (this is Rendering) DrawContextUtils.clearContext()
     }
 
     interface Cancellable {
@@ -33,6 +29,6 @@ abstract class SkyHanniEvent protected constructor() {
     }
 
     interface Rendering {
-        val context: GuiGraphics
+        val context: GuiGraphicsExtractor
     }
 }

@@ -17,7 +17,7 @@ class EliteFarmersLeaderboardsConfig {
     @ConfigOption(name = "Enabled", desc = "Enable leaderboard features.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    val enabled: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -28,7 +28,7 @@ class EliteFarmersLeaderboardsConfig {
     )
     @ConfigEditorDraggableList
     val display: Property<MutableList<EliteLeaderboards>> = Property.of(
-        mutableListOf(EliteLeaderboards.CROP, EliteLeaderboards.PEST, EliteLeaderboards.WEIGHT)
+        mutableListOf(EliteLeaderboards.PEST, EliteLeaderboards.WEIGHT)
     )
 
     @Expose

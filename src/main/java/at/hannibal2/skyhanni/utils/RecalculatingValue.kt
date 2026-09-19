@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 import kotlin.time.Duration
@@ -53,13 +53,52 @@ class ResettableValue<T>(private val calculation: () -> T) : ReadOnlyProperty<An
     }
 }
 
-class AutoUpdatingItemStack(internalName: NeuInternalName) : ReadOnlyProperty<Any?, ItemStack> {
+class StableOrTransientValue<T>(
+    private val transientExpireTime: Duration,
+    private val calculation: () -> Result<T>,
+) : ReadOnlyProperty<Any?, T> {
 
-    private val value: ResettableValue<ItemStack> = ResettableValue {
+    private var currentValue: Any? = UNINITIALIZED_VALUE
+    private var lastCalculationTime = SimpleTimeMark.farPast()
+    private var stable = false
+
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = get()
+
+    fun get(): T {
+        if (currentValue === UNINITIALIZED_VALUE || (!stable && lastCalculationTime.passedSince() > transientExpireTime)) {
+            val result = calculation()
+            currentValue = result.value
+            stable = result.stable
+            lastCalculationTime = SimpleTimeMark.now()
+        }
+        @Suppress("UNCHECKED_CAST")
+        return currentValue as T
+    }
+
+    fun reset() {
+        currentValue = UNINITIALIZED_VALUE
+        lastCalculationTime = SimpleTimeMark.farPast()
+        stable = false
+    }
+
+    data class Result<T>(val value: T, val stable: Boolean)
+
+    companion object {
+        private val UNINITIALIZED_VALUE = Any()
+
+        fun <T> stable(value: T) = Result(value, stable = true)
+
+        fun <T> transient(value: T) = Result(value, stable = false)
+    }
+}
+
+class AutoUpdatingItemStack(internalName: NeuInternalName) : ReadOnlyProperty<Any?, SafeItemStack> {
+
+    private val value: ResettableValue<SafeItemStack> = ResettableValue {
         internalName.getItemStack()
     }.also { list.add(it) }
 
-    override fun getValue(thisRef: Any?, property: KProperty<*>): ItemStack = value.getValue(thisRef, property)
+    override fun getValue(thisRef: Any?, property: KProperty<*>): SafeItemStack = value.getValue(thisRef, property)
 
     @SkyHanniModule
     companion object {
@@ -68,7 +107,7 @@ class AutoUpdatingItemStack(internalName: NeuInternalName) : ReadOnlyProperty<An
         fun of(internalName: String) = AutoUpdatingItemStack(internalName.toInternalName())
         operator fun invoke(internalName: String) = of(internalName)
 
-        val list = mutableListOf<ResettableValue<ItemStack>>()
+        val list = mutableListOf<ResettableValue<SafeItemStack>>()
 
         @HandleEvent(RepositoryReloadEvent::class)
         fun onRepoReload() {

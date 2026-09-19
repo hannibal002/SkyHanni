@@ -14,7 +14,9 @@ object GraphEditorNodeOperations {
     fun addNode() {
         val closestNode = state.closestNode
         if (closestNode != null && closestNode.distanceSqToPlayer() < 9.0 && closestNode == state.activeNode) {
-            GraphEditor.feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
+            GraphEditor.feedback(
+                "Removed node since you were closer than 3 blocks from the active node."
+            )
             GraphEditorHistory.save("removed node")
             nodes.remove(closestNode)
             edges.removeIf { it.isInEdge(closestNode) }
@@ -25,17 +27,20 @@ object GraphEditorNodeOperations {
         }
 
         if (nodes.any { it.position == playerPosition }) {
-            GraphEditor.feedBackInTutorial("Can't create node, here is already another one.")
+            GraphEditor.feedback("Can't create node, here is already another one.")
             return
         }
         val node = GraphingNode(state.id++, playerPosition)
         GraphEditorHistory.save("added node")
         nodes.add(node)
-        GraphEditor.feedBackInTutorial("Added graph node.")
+        GraphEditor.feedback("Added graph node.")
         state.activeNode?.let {
             addEdge(it, node)
         }
         GraphEditor.updateCache()
+        if (GraphEditor.config.autoSelectNode) {
+            state.activeNode = node
+        }
     }
 
     fun addEdge(node1: GraphingNode?, node2: GraphingNode?, direction: EdgeDirection = EdgeDirection.BOTH): Boolean {
@@ -52,7 +57,7 @@ object GraphEditorNodeOperations {
         if (!state.dissolvePossible) return
         val activeNode = state.activeNode ?: return
 
-        GraphEditor.feedBackInTutorial("Dissolved the node, now it is gone.")
+        GraphEditor.feedback("Dissolved the node, now it is gone.")
         val edgePair = edges.filter { it.isInEdge(activeNode) }
         val edge1 = edgePair[0]
         val edge2 = edgePair[1]
@@ -87,19 +92,19 @@ object GraphEditorNodeOperations {
         }
     }
 
-    fun handleConnect() {
+    fun handleConnectNodes() {
         if (state.activeNode == state.closestNode) return
         val edge = GraphEditor.state.getEdgeIndex(state.activeNode, state.closestNode)
         if (edge == null) {
             GraphEditorHistory.save("added edge")
             addEdge(state.activeNode, state.closestNode)
-            GraphEditor.feedBackInTutorial("Added new edge.")
+            GraphEditor.feedback("Added new edge.")
         } else {
             GraphEditorHistory.save("removed edge")
             edges.removeAt(edge)
             state.checkDissolve()
             state.selectedEdge = GraphEditor.state.findEdgeBetweenActiveAndClosest()
-            GraphEditor.feedBackInTutorial("Removed edge.")
+            GraphEditor.feedback("Removed edge.")
             GraphEditor.updateRender()
         }
     }

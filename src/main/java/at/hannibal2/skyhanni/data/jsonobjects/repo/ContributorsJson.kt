@@ -10,8 +10,8 @@ data class ContributorsJson(
 
 data class ContributorJsonEntry(
     @Expose val suffix: String = "§c:O",
-    @Expose val componentSuffix: Component? = null,
+    @Expose @SerializedName(value = "component_suffix", alternate = ["componentSuffix"]) val componentSuffix: Component? = null,
     @Expose val spinny: Boolean = false,
-    @Expose val upsideDown: Boolean = false,
+    @Expose @SerializedName(value = "upside_down", alternate = ["upsideDown"]) val upsideDown: Boolean = false,
     @Expose @SerializedName("display_name") val displayName: String? = null,
 )

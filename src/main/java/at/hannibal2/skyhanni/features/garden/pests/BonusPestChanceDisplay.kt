@@ -4,6 +4,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -18,8 +21,15 @@ object BonusPestChanceDisplay {
         if (config.pestChanceDisplay == DisplayFormat.DISABLED) return
         if (GardenApi.hideExtraGuis()) return
 
-        SkyblockStat.BONUS_PEST_CHANCE.renderFormattedDisplay(config.pestChanceDisplayPosition) {
-            var it = it // yes
+    /**
+     * WRAPPED-REGEX-TEST: " Bonus Pest Chance: 70"
+     * WRAPPED-REGEX-TEST: " Bonus Pest Chance: 100"
+     */
+    private val bonusPestChancePattern by patternGroup.pattern(
+        "widget-no-color",
+        "\\s+Bonus Pest Chance: ${SkyblockStat.BONUS_PEST_CHANCE.hypixelIcon}(?<amount>[\\d,.]+)",
+    )
+    private var display: Renderable? = null
 
             val compact = config.pestChanceDisplay == DisplayFormat.COMPACT
             val disabled = it.contains("§m")
@@ -29,9 +39,11 @@ object BonusPestChanceDisplay {
             if (compact)
                 it = it.replace("Bonus Pest Chance", "BPC") // shorten name
 
-            if (disabled) {
-                it = it.replace("§f", "§c§m") // strikethrough
-                if (!compact) it = it.plus("§r §cDISABLED") // add disabled text if no compact
+            display = Renderable.text {
+                if (compact) append("§2 BPC ") else append("§2 Bonus Pest Chance ")
+                if (disabled) append("§c§m") else append("§f")
+                append("$amount%")
+                if (disabled && !compact) append("§r §cDISABLED")
             }
 
             it // return modified text

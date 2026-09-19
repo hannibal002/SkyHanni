@@ -20,9 +20,9 @@ object BoopAchievement {
      * REGEX-TEST: To [MVP+] Bloxigus: Boop!
      * REGEX-TEST: To qtLuna: Boop!
      */
-    private val boopPattern by AchievementManager.group.pattern(
+    private val boopPattern by AchievementManager.patternGroup.pattern(
         "boop",
-        "To .*: Boop!"
+        "To .*: Boop!",
     )
 
     private const val BOOP_ACHIEVEMENT = "Social Butterfly"
@@ -30,8 +30,8 @@ object BoopAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Social Butterfly".asComponent(),
-            componentBuilder {
+            name = "Social Butterfly".asComponent(),
+            description = componentBuilder {
                 append("Annoy 10 people with ")
                 append("BOOP!") {
                     withColor(ChatFormatting.LIGHT_PURPLE)
@@ -39,7 +39,6 @@ object BoopAchievement {
                 }
             },
             userLuckAmount = 1f,
-            secret = false,
             tiers = listOf(10),
         )
         event.register(achievement, BOOP_ACHIEVEMENT)

@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.world.item.DyeColor
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
@@ -20,150 +20,150 @@ import net.minecraft.world.level.block.state.BlockState
 enum class ColoredBlockCompat(
     private val metaColor: Int,
     private val color: LorenzColor,
-    private val glassBlock: Block,
-    private val glassPaneBlock: Block,
-    private val woolBlock: Block,
-    private val clayBlock: Block,
+    val glassBlock: Block,
+    val glassPaneBlock: Block,
+    val woolBlock: Block,
+    val clayBlock: Block,
 ) {
     WHITE(
         0,
         LorenzColor.WHITE,
-        Blocks.WHITE_STAINED_GLASS,
-        Blocks.WHITE_STAINED_GLASS_PANE,
-        Blocks.WHITE_WOOL,
-        Blocks.WHITE_TERRACOTTA,
+        Blocks.STAINED_GLASS.white(),
+        Blocks.STAINED_GLASS_PANE.white(),
+        Blocks.WOOL.white(),
+        Blocks.DYED_TERRACOTTA.white(),
     ),
     ORANGE(
         1,
         LorenzColor.GOLD,
-        Blocks.ORANGE_STAINED_GLASS,
-        Blocks.ORANGE_STAINED_GLASS_PANE,
-        Blocks.ORANGE_WOOL,
-        Blocks.ORANGE_TERRACOTTA,
+        Blocks.STAINED_GLASS.orange(),
+        Blocks.STAINED_GLASS_PANE.orange(),
+        Blocks.WOOL.orange(),
+        Blocks.DYED_TERRACOTTA.orange(),
     ),
     MAGENTA(
         2,
         LorenzColor.LIGHT_PURPLE,
-        Blocks.MAGENTA_STAINED_GLASS,
-        Blocks.MAGENTA_STAINED_GLASS_PANE,
-        Blocks.MAGENTA_WOOL,
-        Blocks.MAGENTA_TERRACOTTA,
+        Blocks.STAINED_GLASS.magenta(),
+        Blocks.STAINED_GLASS_PANE.magenta(),
+        Blocks.WOOL.magenta(),
+        Blocks.DYED_TERRACOTTA.magenta(),
     ),
     LIGHT_BLUE(
         3,
         LorenzColor.AQUA,
-        Blocks.LIGHT_BLUE_STAINED_GLASS,
-        Blocks.LIGHT_BLUE_STAINED_GLASS_PANE,
-        Blocks.LIGHT_BLUE_WOOL,
-        Blocks.LIGHT_BLUE_TERRACOTTA,
+        Blocks.STAINED_GLASS.lightBlue(),
+        Blocks.STAINED_GLASS_PANE.lightBlue(),
+        Blocks.WOOL.lightBlue(),
+        Blocks.DYED_TERRACOTTA.lightBlue(),
     ),
     YELLOW(
         4,
         LorenzColor.YELLOW,
-        Blocks.YELLOW_STAINED_GLASS,
-        Blocks.YELLOW_STAINED_GLASS_PANE,
-        Blocks.YELLOW_WOOL,
-        Blocks.YELLOW_TERRACOTTA,
+        Blocks.STAINED_GLASS.yellow(),
+        Blocks.STAINED_GLASS_PANE.yellow(),
+        Blocks.WOOL.yellow(),
+        Blocks.DYED_TERRACOTTA.yellow(),
     ),
     LIME(
         5,
         LorenzColor.GREEN,
-        Blocks.LIME_STAINED_GLASS,
-        Blocks.LIME_STAINED_GLASS_PANE,
-        Blocks.LIME_WOOL,
-        Blocks.LIME_TERRACOTTA,
+        Blocks.STAINED_GLASS.lime(),
+        Blocks.STAINED_GLASS_PANE.lime(),
+        Blocks.WOOL.lime(),
+        Blocks.DYED_TERRACOTTA.lime(),
     ),
     PINK(
         6,
         LorenzColor.LIGHT_PURPLE,
-        Blocks.PINK_STAINED_GLASS,
-        Blocks.PINK_STAINED_GLASS_PANE,
-        Blocks.PINK_WOOL,
-        Blocks.PINK_TERRACOTTA,
+        Blocks.STAINED_GLASS.pink(),
+        Blocks.STAINED_GLASS_PANE.pink(),
+        Blocks.WOOL.pink(),
+        Blocks.DYED_TERRACOTTA.pink(),
     ),
     GRAY(
         7,
         LorenzColor.GRAY,
-        Blocks.GRAY_STAINED_GLASS,
-        Blocks.GRAY_STAINED_GLASS_PANE,
-        Blocks.GRAY_WOOL,
-        Blocks.GRAY_TERRACOTTA,
+        Blocks.STAINED_GLASS.gray(),
+        Blocks.STAINED_GLASS_PANE.gray(),
+        Blocks.WOOL.gray(),
+        Blocks.DYED_TERRACOTTA.gray(),
     ),
     LIGHT_GRAY(
         8,
         LorenzColor.GRAY,
-        Blocks.LIGHT_GRAY_STAINED_GLASS,
-        Blocks.LIGHT_GRAY_STAINED_GLASS_PANE,
-        Blocks.LIGHT_GRAY_WOOL,
-        Blocks.LIGHT_GRAY_TERRACOTTA,
+        Blocks.STAINED_GLASS.lightGray(),
+        Blocks.STAINED_GLASS_PANE.lightGray(),
+        Blocks.WOOL.lightGray(),
+        Blocks.DYED_TERRACOTTA.lightGray(),
     ),
     CYAN(
         9,
         LorenzColor.DARK_AQUA,
-        Blocks.CYAN_STAINED_GLASS,
-        Blocks.CYAN_STAINED_GLASS_PANE,
-        Blocks.CYAN_WOOL,
-        Blocks.CYAN_TERRACOTTA,
+        Blocks.STAINED_GLASS.cyan(),
+        Blocks.STAINED_GLASS_PANE.cyan(),
+        Blocks.WOOL.cyan(),
+        Blocks.DYED_TERRACOTTA.cyan(),
     ),
     PURPLE(
         10,
         LorenzColor.DARK_PURPLE,
-        Blocks.PURPLE_STAINED_GLASS,
-        Blocks.PURPLE_STAINED_GLASS_PANE,
-        Blocks.PURPLE_WOOL,
-        Blocks.PURPLE_TERRACOTTA,
+        Blocks.STAINED_GLASS.purple(),
+        Blocks.STAINED_GLASS_PANE.purple(),
+        Blocks.WOOL.purple(),
+        Blocks.DYED_TERRACOTTA.purple(),
     ),
     BLUE(
         11,
         LorenzColor.BLUE,
-        Blocks.BLUE_STAINED_GLASS,
-        Blocks.BLUE_STAINED_GLASS_PANE,
-        Blocks.BLUE_WOOL,
-        Blocks.BLUE_TERRACOTTA,
+        Blocks.STAINED_GLASS.blue(),
+        Blocks.STAINED_GLASS_PANE.blue(),
+        Blocks.WOOL.blue(),
+        Blocks.DYED_TERRACOTTA.blue(),
     ),
     BROWN(
         12,
         LorenzColor.GOLD,
-        Blocks.BROWN_STAINED_GLASS,
-        Blocks.BROWN_STAINED_GLASS_PANE,
-        Blocks.BROWN_WOOL,
-        Blocks.BROWN_TERRACOTTA,
+        Blocks.STAINED_GLASS.brown(),
+        Blocks.STAINED_GLASS_PANE.brown(),
+        Blocks.WOOL.brown(),
+        Blocks.DYED_TERRACOTTA.brown(),
     ),
     GREEN(
         13,
         LorenzColor.DARK_GREEN,
-        Blocks.GREEN_STAINED_GLASS,
-        Blocks.GREEN_STAINED_GLASS_PANE,
-        Blocks.GREEN_WOOL,
-        Blocks.GREEN_TERRACOTTA,
+        Blocks.STAINED_GLASS.green(),
+        Blocks.STAINED_GLASS_PANE.green(),
+        Blocks.WOOL.green(),
+        Blocks.DYED_TERRACOTTA.green(),
     ),
     RED(
         14,
         LorenzColor.RED,
-        Blocks.RED_STAINED_GLASS,
-        Blocks.RED_STAINED_GLASS_PANE,
-        Blocks.RED_WOOL,
-        Blocks.RED_TERRACOTTA,
+        Blocks.STAINED_GLASS.red(),
+        Blocks.STAINED_GLASS_PANE.red(),
+        Blocks.WOOL.red(),
+        Blocks.DYED_TERRACOTTA.red(),
     ),
     BLACK(
         15,
         LorenzColor.DARK_GRAY,
-        Blocks.BLACK_STAINED_GLASS,
-        Blocks.BLACK_STAINED_GLASS_PANE,
-        Blocks.BLACK_WOOL,
-        Blocks.BLACK_TERRACOTTA,
+        Blocks.STAINED_GLASS.black(),
+        Blocks.STAINED_GLASS_PANE.black(),
+        Blocks.WOOL.black(),
+        Blocks.DYED_TERRACOTTA.black(),
     );
 
-    fun createGlassStack(amount: Int = 1): ItemStack {
-        return ItemStack(glassBlock, amount)
+    fun createGlassStack(amount: Int = 1): SafeItemStack {
+        return SafeItemStack(glassBlock, amount)
     }
 
-    fun createGlassPaneStack(amount: Int = 1): ItemStack {
-        return ItemStack(glassPaneBlock, amount)
+    fun createGlassPaneStack(amount: Int = 1): SafeItemStack {
+        return SafeItemStack(glassPaneBlock, amount)
     }
 
-    fun createWoolStack(amount: Int = 1): ItemStack {
-        return ItemStack(woolBlock, amount)
+    fun createWoolStack(amount: Int = 1): SafeItemStack {
+        return SafeItemStack(woolBlock, amount)
     }
 
     fun createWoolBlockState(): BlockState {
@@ -178,8 +178,8 @@ enum class ColoredBlockCompat(
         return this.glassBlock.withPropertiesOf(state)
     }
 
-    fun createStainedClay(amount: Int = 1): ItemStack {
-        return ItemStack(clayBlock, amount)
+    fun createStainedClay(amount: Int = 1): SafeItemStack {
+        return SafeItemStack(clayBlock, amount)
     }
 
     fun getDyeColor(): DyeColor {
@@ -190,37 +190,37 @@ enum class ColoredBlockCompat(
     }
 
     companion object {
-        fun ItemStack.isStainedGlass(color: ColoredBlockCompat): Boolean = this.isStainedGlass(color.metaColor)
-        fun ItemStack.isStainedGlassPane(color: ColoredBlockCompat): Boolean = this.isStainedGlassPane(color.metaColor)
-        fun ItemStack.isWool(color: ColoredBlockCompat): Boolean = this.isWool(color.metaColor)
-        fun ItemStack.isStainedClay(color: ColoredBlockCompat): Boolean = this.isStainedClay(color.metaColor)
+        fun SafeItemStack.isStainedGlass(color: ColoredBlockCompat): Boolean = this.isStainedGlass(color.metaColor)
+        fun SafeItemStack.isStainedGlassPane(color: ColoredBlockCompat): Boolean = this.isStainedGlassPane(color.metaColor)
+        fun SafeItemStack.isWool(color: ColoredBlockCompat): Boolean = this.isWool(color.metaColor)
+        fun SafeItemStack.isStainedClay(color: ColoredBlockCompat): Boolean = this.isStainedClay(color.metaColor)
 
         /**
          * No metadata means any stained-glass
          */
-        fun ItemStack.isStainedGlass(meta: Int? = null): Boolean {
-            return entries.any { (meta == null || it.metaColor == meta) && this.item == it.glassBlock.asItem() }
+        fun SafeItemStack.isStainedGlass(meta: Int? = null): Boolean {
+            return entries.any { (meta == null || it.metaColor == meta) && this.`is`(it.glassBlock.asItem()) }
         }
 
         /**
          * No metadata means any stained-glass pane
          */
-        fun ItemStack.isStainedGlassPane(meta: Int? = null): Boolean {
-            return entries.any { (meta == null || it.metaColor == meta) && this.item == it.glassPaneBlock.asItem() }
+        fun SafeItemStack.isStainedGlassPane(meta: Int? = null): Boolean {
+            return entries.any { (meta == null || it.metaColor == meta) && this.`is`(it.glassPaneBlock.asItem()) }
         }
 
         /**
          * No metadata means any wool
          */
-        fun ItemStack.isWool(meta: Int? = null): Boolean {
-            return entries.any { (meta == null || it.metaColor == meta) && this.item == it.woolBlock.asItem() }
+        fun SafeItemStack.isWool(meta: Int? = null): Boolean {
+            return entries.any { (meta == null || it.metaColor == meta) && this.`is`(it.woolBlock.asItem()) }
         }
 
         /**
          * No metadata means any stained clay
          */
-        fun ItemStack.isStainedClay(meta: Int? = null): Boolean {
-            return entries.any { (meta == null || it.metaColor == meta) && this.item == it.clayBlock.asItem() }
+        fun SafeItemStack.isStainedClay(meta: Int? = null): Boolean {
+            return entries.any { (meta == null || it.metaColor == meta) && this.`is`(it.clayBlock.asItem()) }
         }
 
         fun BlockState.isStainedGlass(color: ColoredBlockCompat): Boolean = isStainedGlass(color.metaColor)

@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributeString
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPersonalCompactorActive
@@ -26,20 +27,19 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.container.RenderableInventory.fakeInventory
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object PersonalCompactorOverlay {
 
     private val config get() = SkyHanniMod.feature.inventory.personalCompactor
 
-    private val group = RepoPattern.group("inventory.personalcompactor")
+    private val patternGroup = RepoPattern.group("inventory.personalcompactor")
 
     /**
      * REGEX-TEST: PERSONAL_COMPACTOR_4000
      * REGEX-TEST: PERSONAL_DELETOR_7000
      */
-    private val internalNamePattern by group.pattern(
+    private val internalNamePattern by patternGroup.pattern(
         "internalname",
         "PERSONAL_(?<type>[^_]+)_(?<tier>\\d+)",
     )
@@ -128,7 +128,7 @@ object PersonalCompactorOverlay {
         PersonalCompactorConfig.VisibilityMode.EXCEPT_KEYBIND -> !config.keybind.isKeyHeld()
     }
 
-    private fun getPersonalCompactorEnabled(itemStack: ItemStack): Boolean? {
+    private fun getPersonalCompactorEnabled(itemStack: SafeItemStack): Boolean? {
         val uuid = itemStack.getItemUuid() ?: return null
         return compactorEnabledMap.getOrPut(uuid) { itemStack.getPersonalCompactorActive() }
     }

@@ -17,10 +17,10 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.player.LocalPlayer
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.sync.Mutex
 
 @SkyHanniModule
 object IslandAreaBackend {
@@ -67,17 +67,21 @@ object IslandAreaBackend {
     }
 
     private var hasMoved = false
+    private var lastDrawnTarget: GraphNode? = null
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled() || !event.isMod(2) || !hasMoved) return
-        update()
+        if (!isEnabled() || !event.isMod(2)) return
+        val target = IslandGraphs.currentTargetNode
+        if (!hasMoved && target == lastDrawnTarget) return
+        lastDrawnTarget = target
         hasMoved = false
+        update()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        if (isEnabled() && event.isLocalPlayer) {
+        if (isEnabled()) {
             hasMoved = true
         }
     }

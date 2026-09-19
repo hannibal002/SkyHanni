@@ -35,6 +35,11 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
     SATIN_TROUSERS("SATIN_TROUSERS", "§9Satin Trousers"),
     OXFORD_SHOES("OXFORD_SHOES", "§9Oxford Shoes"),
     CARNIVAL_TICKET("CARNIVAL_TICKET", "§aCarnival Ticket"),
+    VISITORS_GRATITUDE("VISITORS_GRATITUDE", "§fVisitors' Gratitude"),
+    FARMING_CONTEST_DISPLAY("FARMING_CONTEST_DISPLAY", "§aFarming Contest Display"),
+    ASTRONAUT_PERSONALITY("ASTRONAUT_PERSONALITY", "§fAstronaut Minion Skin"),
+    FAST_FOOD_BARN_SKIN("FAST_FOOD_BARN_SKIN", "§6Fast Food Barn Skin"),
+    JELLY_GREENHOUSE_SKIN("JELLY_GREENHOUSE_SKIN", "§6Jelly Garden Greenhouse Skin"),
     ;
 
     private val internalName = rawInternalName.toInternalName()

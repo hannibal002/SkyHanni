@@ -14,7 +14,7 @@ class RescueMissionConfig {
     @Expose
     @ConfigOption(
         name = "Agent Path",
-        desc = "Show a path to the §eUndercover Agent §fwhen talking to the Rescue Recruter",
+        desc = "Show a path to the §eUndercover Agent §7when talking to the Rescue Recruiter.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

@@ -28,7 +28,7 @@ object TabListReader {
         private set
 
     private var lastTab: List<Component>? = null
-    private var lastFooter: Component? = null
+    private var lastFooter: List<Component>? = null
 
     private var inUpgrades = false
 
@@ -127,20 +127,20 @@ object TabListReader {
     )
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         ConditionalUtils.onToggle(config.enabled) {
             rebuildRenderColumns()
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    private fun onTabListUpdate(event: TabListUpdateEvent) {
         lastTab = event.tabList
         rebuildRenderColumns()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
+    private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
         lastFooter = event.footer
         rebuildRenderColumns()
     }
@@ -192,7 +192,7 @@ object TabListReader {
 
         if (component.contains(hypixelAdvertisingString)) return@apply
 
-        // These lines were consumed into the active effects header — skip them
+        // These lines were consumed into the active effects header - skip them
         if (godPotTimer != null && godPotPattern.matches(component)) return@apply
         if (effectCountPattern.matches(component)) return@apply
         if (effectsUseCommandPattern.matches(component)) return@apply
@@ -210,7 +210,7 @@ object TabListReader {
             return@apply
         }
 
-        // For these three, the component itself is already correct — no reconstruction needed
+        // For these three, the component itself is already correct - no reconstruction needed
         cookiePattern.matchMatcher(component) {
             return@apply addComponent(component)
         }
@@ -267,10 +267,8 @@ object TabListReader {
     // TODO refactor
     @Suppress("CyclomaticComplexMethod")
     private fun parseFooterAsColumn(): TabColumn? {
-        val component = lastFooter ?: return null
+        val lines = lastFooter ?: return null
         inUpgrades = false
-
-        val lines = TextHelper.split(component, "\n") ?: listOf(component)
 
         val godPotTimer = lines.firstNotNullOfOrNull {
             godPotPattern.matchMatcher(it.string) { group("timer") }

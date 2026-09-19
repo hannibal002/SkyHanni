@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
@@ -179,7 +178,7 @@ object GriffinBurrowHelper {
         val inaccurate = allGuesses.filter { it.spadeGuess }.toSet()
         val toDelete = mutableSetOf<GuessEntry>()
         for (item in inaccurate) {
-            val player = MinecraftCompat.localPlayer
+            val player = MinecraftCompat.localPlayerOrThrow
             val eyePos = player.eyePosition.toLorenzVec()
             val lookAngle = player.lookAngle.toLorenzVec()
             val toTarget = item.getCurrent().minus(eyePos)
@@ -191,7 +190,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Helper")
 
         if (!DianaApi.isDoingDiana()) {
@@ -268,7 +267,7 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
-        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayerOrThrow)
 
         val newLocation = event.guess.getCurrent()
         val playerLocation = LocationUtils.playerLocation()
@@ -283,7 +282,7 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
-        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayerOrThrow)
         val burrowLocation = event.burrowLocation
         val currentEntry = getGuess(burrowLocation)
 
@@ -335,7 +334,7 @@ object GriffinBurrowHelper {
     @HandleEvent
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
-        if (event.distance > 10 && event.isLocalPlayer) {
+        if (event.distance > 10) {
             update()
         }
     }
@@ -429,9 +428,8 @@ object GriffinBurrowHelper {
     }
 
     fun shouldBurrowParticlesBeVisible(timeInPast: Duration = 2.seconds): Boolean {
-        val spade = InventoryUtils.getItemInHand()?.isDianaSpade == true
         val time = InventoryUtils.lastItemChangeTime.passedSince()
-        return spade && time > timeInPast
+        return DianaApi.hasSpadeInHand() && time > timeInPast
     }
 
     fun removeSpadeWarnTitle() {
@@ -565,11 +563,12 @@ object GriffinBurrowHelper {
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
+        if (!DianaApi.hasSpadeInHand()) return
 
         val location = event.position
 
         getGuess(location)?.let {
-            if (event.itemInHand?.isDianaSpade == true && it.burrowType == BurrowType.UNKNOWN && it.getCurrent() == location) {
+            if (it.burrowType == BurrowType.UNKNOWN && it.getCurrent() == location) {
                 DelayedRun.runDelayed(
                     200.milliseconds,
                     {
@@ -620,7 +619,7 @@ object GriffinBurrowHelper {
             }
         }
 
-        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayerOrThrow)
         val location = LocationUtils.playerLocation().roundLocation()
         addGuess(GuessEntry(listOf(location), burrowType = type), "added test burrow from command")
         update()

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.hunting
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -28,10 +27,10 @@ object FusionKeybinds {
 
         when {
             AttributeShardsData.fusionBoxInventory.isInside() && repeatHeld && !confirmHeld ->
-                InventoryUtils.clickSlot(47, mouseButton = 2, mode = ClickType.MIDDLE)
+                InventoryUtils.clickSlot(47, button = MIDDLE_CLICK)
 
             AttributeShardsData.confirmFusionInventory.isInside() && confirmHeld && !repeatHeld ->
-                InventoryUtils.clickSlot(33, mouseButton = 2, mode = ClickType.MIDDLE)
+                InventoryUtils.clickSlot(33, button = MIDDLE_CLICK)
         }
     }
 

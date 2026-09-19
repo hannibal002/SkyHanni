@@ -54,7 +54,7 @@ object TrevorSolver {
     // TODO: use entity events
     @OptIn(AllEntitiesGetter::class)
     fun findMob() {
-        val hasBlindness = MinecraftCompat.localPlayer.hasPotionEffect(EffectsCompat.BLINDNESS)
+        val hasBlindness = MinecraftCompat.localPlayerOrThrow.hasPotionEffect(EffectsCompat.BLINDNESS)
         for (entity in EntityUtils.getAllEntities()) {
             if (entity is RemotePlayer) continue
             val mob = MobData.entityToMob[entity]
@@ -66,7 +66,7 @@ object TrevorSolver {
             if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
 
                 val currentMob = currentMob ?: ErrorManager.skyHanniError(
-                    "Found trevor mob but current mob is null",
+                    "Found Trevor mob but current mob is null",
                     "entity" to entity,
                     "mobDataMob" to mob,
                 )

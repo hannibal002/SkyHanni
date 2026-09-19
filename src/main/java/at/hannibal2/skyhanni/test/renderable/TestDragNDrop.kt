@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test.renderable
 
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -11,15 +12,14 @@ import at.hannibal2.skyhanni.utils.renderables.interactables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.interactables.toDragItem
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 @SkyHanniModule(devOnly = true)
 object TestDragNDrop : RenderableTestSuite.TestRenderable("drag") {
 
     override fun renderable(): Renderable {
-        val bone = ItemStack(Items.BONE, 1).toDragItem()
-        val leaf = ItemStack(BlockCompat.getAllLeaves().first(), 1).toDragItem()
+        val bone = SafeItemStack(Items.BONE, 1).toDragItem()
+        val leaf = SafeItemStack(BlockCompat.getAllLeaves().first(), 1).toDragItem()
 
         return with(Renderable) {
             vertical(
@@ -31,15 +31,15 @@ object TestDragNDrop : RenderableTestSuite.TestRenderable("drag") {
                     text("Feed Dog", 1.0),
                     object : Droppable {
                         override fun handle(drop: Any?) {
-                            val unit = drop as ItemStack
-                            if (unit.item == Items.BONE) {
+                            val unit = drop as SafeItemStack
+                            if (unit.`is`(Items.BONE)) {
                                 ChatUtils.chat("Oh, a bone!")
                             } else {
                                 ChatUtils.chat("Disgusting that is not a bone!")
                             }
                         }
 
-                        override fun validTarget(item: Any?) = item is ItemStack
+                        override fun validTarget(item: Any?) = item is SafeItemStack
 
                     },
                 ),
