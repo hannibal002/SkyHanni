@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables.container.table
 
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -17,6 +18,7 @@ class ScrollTable private constructor(
     override val height: Int,
     scrollValue: ScrollValue = ScrollValue(),
     velocity: Double = 2.0,
+    button: InputCode? = null,
     override val xSpacing: Int = 1,
     override val ySpacing: Int = 0,
     private val header: List<Renderable> = emptyList(),
@@ -48,6 +50,7 @@ class ScrollTable private constructor(
         minHeight = lowerBound,
         maxHeight = upperBound,
         velocity = velocity,
+        dragScrollMouseButton = button,
     )
 
     private var renderY = 0
@@ -94,6 +97,7 @@ class ScrollTable private constructor(
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),
             velocity: Double = 2.0,
+            button: InputCode? = null,
             xSpacing: Int = 1,
             ySpacing: Int = 0,
             header: List<Renderable> = emptyList(),
@@ -105,6 +109,7 @@ class ScrollTable private constructor(
             height = height,
             scrollValue = scrollValue,
             velocity = velocity,
+            button = button,
             xSpacing = xSpacing,
             ySpacing = ySpacing,
             header = header,

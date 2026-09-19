@@ -161,15 +161,15 @@ enum class InputCode(
     fun isKeyHeld(): Boolean = key.isKeyHeld()
     fun isKeyClicked(): Boolean = key.isKeyClicked()
 
-    fun isUnknown(): Boolean = this == UNKNOWN
-
     fun toKeyIdentifier(): String = key.name
 
     override fun toString(): String = key.value.toString()
 
     companion object {
-        fun fromKeyIdentifier(identifier: String): InputCode =
-            fromKey(InputConstants.getKey(identifier))
+        fun fromKeyIdentifier(identifier: String): InputCode {
+            val key = runCatching { InputConstants.getKey(identifier) }.getOrNull()
+            return key?.let { fromKey(it) } ?: UNKNOWN
+        }
 
         //~ if < 26.3 'KEYBOARD' -> 'KEYSYM' {
         fun fromKeyCode(keyCode: Int): InputCode =

@@ -198,7 +198,7 @@ class GuiPositionEditor(
         }
     }
 
-    override fun onKeyTyped(typedChar: Char?, key: InputCode) {
+    override fun onKeyTyped(typedChar: Char?, key: InputCode?) {
         if (key == config.keyBindReset) {
             positions.firstOrNull { it.isHoveredWithMetrics() }?.resetPositionAndScale()
             return

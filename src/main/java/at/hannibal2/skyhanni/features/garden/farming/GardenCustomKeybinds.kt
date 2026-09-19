@@ -33,7 +33,7 @@ object GardenCustomKeybinds {
     fun isKeyDown(keyBinding: KeyMapping, isDown: Boolean, cir: CallbackInfoReturnable<Boolean>) {
         if (!updateActiveState()) return
         val override = map[keyBinding] ?: run {
-            if (map.contains(keyBinding)) {
+            if (map.isUsedAsOverride(keyBinding)) {
                 cir.returnValue = false
             }
             return
@@ -50,7 +50,7 @@ object GardenCustomKeybinds {
     fun isKeyPressed(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
         if (!updateActiveState()) return
         val override = map[keyBinding] ?: run {
-            if (map.contains(keyBinding)) {
+            if (map.isUsedAsOverride(keyBinding)) {
                 cir.returnValue = false
             }
             return
@@ -125,7 +125,7 @@ object GardenCustomKeybinds {
         this is ToggleKeyMapping && needsToggle.asBoolean
 
     private fun KeyMapping.isRemappedFrom(override: InputCode): Boolean =
-        key.value != override.value
+        key != override.key
 
     private fun KeyMapping.updateToggleState(override: InputCode, isDown: Boolean): Boolean {
         if (!override.isKeyHeld()) {
@@ -172,8 +172,8 @@ object GardenCustomKeybinds {
 
     private fun hasGuiOpen() = MinecraftCompat.screen != null
 
-    private fun Map<KeyMapping, InputCode>.contains(value: KeyMapping): Boolean =
-        values.any { it.value == value.key.value }
+    private fun Map<KeyMapping, InputCode>.isUsedAsOverride(value: KeyMapping): Boolean =
+        values.any { it.key == value.key }
 
     @JvmStatic
     fun disableAll() {

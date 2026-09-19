@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
@@ -155,6 +156,7 @@ class ChangeLogViewerScreen : SkyHanniBaseScreen() {
         velocity = 12.0,
         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         scrollValue = changelogScroll,
+        button = InputCode.LEFT_MOUSE
     )
 
     private fun makeChangeLogToRenderable(

@@ -402,7 +402,7 @@ object SkyHanniConfigSearchResetCommand {
             description = "Resets all of your SkyHanni keybinds"
             aliases = listOf("shkeybindreset")
             simpleCallback {
-                CoroutineSettings("findKeybinds").launch {
+                CoroutineSettings("Resetting all keybinds").launch {
                     for (keybind in allKeybinds) {
                         // TODO: Have some bulk reset command
                         resetCommand(
