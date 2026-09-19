@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigElement
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -182,7 +180,7 @@ object MaxwellApi {
     fun isThaumaturgyInventory(inventoryName: String) = thaumaturgyGuiPattern.matches(inventoryName)
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
@@ -190,10 +188,6 @@ object MaxwellApi {
         chatPowerUnlockedPattern.tryReadPower(message)
         if (!tuningAutoAssignedPattern.matches(event.message)) return
         if (tunings.isNullOrEmpty()) return
-        with(CustomScoreboard.config) {
-            if (!enabled.get() || ScoreboardConfigElement.TUNING !in scoreboardEntries.get()) return
-            ChatUtils.chat("Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.")
-        }
     }
 
     private fun Pattern.tryReadPower(message: String) {
@@ -213,7 +207,7 @@ object MaxwellApi {
 
     // load earlier, so that other features can already use the api in this event
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
 
         if (isThaumaturgyInventory(event.inventoryName)) {
@@ -365,7 +359,7 @@ object MaxwellApi {
 
     // Load powers from repo
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<MaxwellPowersJson>("MaxwellPowers")
         powers = data.powers
     }

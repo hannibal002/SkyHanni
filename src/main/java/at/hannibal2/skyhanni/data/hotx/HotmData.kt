@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -539,9 +538,22 @@ enum class HotmData(
          * WRAPPED-REGEX-TEST: " Mithril: 99,918"
          * WRAPPED-REGEX-TEST: " Gemstone: 37,670"
          */
-        private val powderPattern by patternGroup.pattern(
+        private val widgetPowderPattern by patternGroup.pattern(
             "widget.powder-nocolor",
             "\\s*(?<type>\\w+): (?<amount>[\\d,.]+)",
+        )
+
+        /**
+         * REGEX-TEST: ᠅ Mithril: 35,448
+         * REGEX-TEST: ᠅ Gemstone: 36,758
+         * REGEX-TEST: ᠅ Glacite: 29,537
+         * REGEX-TEST: ᠅ Mithril Powder: 35,448
+         * REGEX-TEST: ᠅ Gemstone Powder: 36,758
+         * REGEX-TEST: ᠅ Glacite Powder: 29,537
+         */
+        val scoreboardPowderPattern by patternGroup.pattern(
+            "scoreboard.powder",
+            "᠅ (?<type>Gemstone|Mithril|Glacite)(?: Powder)?: (?<amount>[\\d,.]*)",
         )
         // </editor-fold>
 
@@ -615,7 +627,7 @@ enum class HotmData(
 
         @HandleEvent(onlyOnSkyblock = true)
         private fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
-            ScoreboardPattern.powderPattern.firstMatcher(event.added) {
+            scoreboardPowderPattern.firstMatcher(event.added.map { it.removeColor() }) {
                 val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 type.setAmount(amount, postEvent = true)
@@ -631,8 +643,8 @@ enum class HotmData(
         @HandleEvent
         private fun onWidgetUpdate(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.POWDER)) return
-            event.lines.forEach { line ->
-                powderPattern.matchMatcher(line.string.removeColor()) {
+            event.cleanLines.forEach { line ->
+                widgetPowderPattern.matchMatcher(line) {
                     val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                     val amount = group("amount").formatLong()
                     type.setAmount(amount, postEvent = true)
