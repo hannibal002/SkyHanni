@@ -62,14 +62,11 @@ object KuudraApi {
         "(?<chesttype>(?:Paid|Free) Chest)(?: Chest)?",
     )
 
-    // TODO migrate this to KuudraTier
-    val kuudraArmorTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
-
     fun NeuInternalName.isKuudraArmor(): Boolean = kuudraArmorPattern.matches(asString())
 
-    fun NeuInternalName.getArmorKuudraTier(): Int? {
+    fun NeuInternalName.getArmorKuudraTier(): KuudraTier? {
         val tier = kuudraArmorPattern.matchGroup(asString(), "tier") ?: return null
-        return (kuudraArmorTiers.indexOf(tier) + 1).takeIf { it != 0 }
+        return KuudraTier.getByArmorName(tier)
     }
 
     fun NeuInternalName.removeKuudraTier(): NeuInternalName {
