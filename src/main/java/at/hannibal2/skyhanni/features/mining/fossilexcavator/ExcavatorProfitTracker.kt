@@ -4,14 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.enums.ProfitCalcSettings
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -59,6 +60,11 @@ object ExcavatorProfitTracker {
         override fun getCoinDescription(item: TrackedItem) = listOf("<no coins>")
     }
 
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.profileProfitSetting.onToggle(tracker::update)
+    }
+
     private val scrapItem get() = FossilExcavatorApi.scrapItem
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -73,11 +79,9 @@ object ExcavatorProfitTracker {
             ).toSearchable(),
         )
 
-        val profileType = config.profileProfitSetting.get()
-        val isZeroCostProfile = (profileType == ProfitCalcSettings.ALL_PROFILES ||
-            (profileType == ProfitCalcSettings.NO_TRADE && SkyBlockUtils.noTradeMode))
+        val profitType = config.profileProfitSetting.get()
 
-        if (!isZeroCostProfile) {
+        if (!profitType.ignoreMaterialCost()) {
             profit = addScrap(timesExcavated, profit)
         }
 

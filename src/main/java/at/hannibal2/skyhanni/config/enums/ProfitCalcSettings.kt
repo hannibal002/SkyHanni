@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.config.enums
 
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+
 enum class ProfitCalcSettings(private val displayName: String) {
 
     NONE("§cNone"),
@@ -8,4 +10,8 @@ enum class ProfitCalcSettings(private val displayName: String) {
     ;
 
     override fun toString(): String = displayName
+
+    fun ignoreMaterialCost(): Boolean {
+        return this == ALL_PROFILES || (this == NO_TRADE && SkyBlockUtils.noTradeMode)
+    }
 }

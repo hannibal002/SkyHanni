@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.api.ExperimentationTableApi.experimentRenewPattern
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.enums.ProfitCalcSettings
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -32,7 +31,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -199,12 +197,10 @@ object ExperimentsProfitTracker {
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lExperiments Profit Tracker")
 
-        val profileType = config.profileProfitSetting.get()
-        val isZeroCostProfile = (profileType == ProfitCalcSettings.ALL_PROFILES ||
-            (profileType == ProfitCalcSettings.NO_TRADE && SkyBlockUtils.noTradeMode))
+        val profitType = config.profileProfitSetting.get()
 
         val startCost = when {
-            isZeroCostProfile || SkyHanniMod.feature.misc.tracker.priceSource == ItemPriceSource.NPC_SELL -> 0
+            profitType.ignoreMaterialCost() || SkyHanniMod.feature.misc.tracker.priceSource == ItemPriceSource.NPC_SELL -> 0
             else -> data.startCost
         }
 
@@ -219,7 +215,7 @@ object ExperimentsProfitTracker {
         val startCostFormat = startCost.absoluteValue
         val bitCostFormat = data.bitCost
 
-        if (isZeroCostProfile) {
+        if (profitType.ignoreMaterialCost()) {
             add(
                 Renderable.hoverTips(
                     "§eTotal Cost: §b${bitCostFormat.shortFormat()} bits",
