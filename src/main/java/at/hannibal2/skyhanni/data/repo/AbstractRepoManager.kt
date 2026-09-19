@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.system.LazyVar
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
 import com.google.gson.JsonElement
@@ -111,8 +110,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     abstract val statusCommand: String
     abstract val reloadCommand: String
 
-    var repoFileSystem: RepoFileSystem by LazyVar { MemoryRepoFileSystem(logger) }
-        private set
+    val repoFileSystem: RepoFileSystem by lazy { MemoryRepoFileSystem(logger) }
 
     var localRepoCommit: RepoCommit = RepoCommit()
         private set
@@ -496,8 +494,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     private fun prepCleanRepoFileSystem(progress: ChatProgressUpdates) {
-        progress.update("createAndClean")
-        repoFileSystem = MemoryRepoFileSystem(logger).apply { deleteRecursively("") }
+        progress.update("clearExistingRepoFileSystem")
+        repoFileSystem.clear()
 
         progress.update("createNewFile")
         repoTgzFile.parentFile?.mkdirs()

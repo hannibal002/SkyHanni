@@ -19,6 +19,7 @@ sealed interface RepoFileSystem {
     fun write(path: String, data: ByteArray)
     fun list(path: String): List<String>
     fun validatePath(relativePath: String) = Unit
+    fun clear() = deleteRecursively("")
 
     /**
      * Deletes everything under [path].

@@ -30,6 +30,8 @@ class MemoryRepoFileSystem(
         it.startsWith("$path/") && it.removePrefix("$path/").endsWith(".json")
     }.map { it.removePrefix("$path/") }
 
+    override fun clear() = storage.clear()
+
     /**
      * Loads entries from [tgzFile] into in-memory storage (via [loadFromTgz])
      */
@@ -40,5 +42,5 @@ class MemoryRepoFileSystem(
         return success
     }
 
-    override fun dispose() = storage.clear()
+    override fun dispose() = clear()
 }
