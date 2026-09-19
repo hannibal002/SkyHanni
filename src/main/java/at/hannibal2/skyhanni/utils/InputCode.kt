@@ -164,8 +164,10 @@ enum class InputCode(
     override fun toString(): String = key.value.toString()
 
     companion object {
-        fun fromKeyIdentifier(identifier: String): InputCode =
-            fromKey(InputConstants.getKey(identifier))
+        fun fromKeyIdentifier(identifier: String): InputCode {
+            val key = runCatching { InputConstants.getKey(identifier) }.getOrNull()
+            return key?.let { fromKey(it) } ?: UNKNOWN
+        }
 
         fun fromKeyCode(keyCode: Int): InputCode =
             fromKey(InputConstants.Type.KEYSYM.getOrCreate(keyCode))
