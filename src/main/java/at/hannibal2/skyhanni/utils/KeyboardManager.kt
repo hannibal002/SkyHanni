@@ -30,18 +30,6 @@ object KeyboardManager {
         if (InputCode.KEY_NUMPADENTER.isKeyHeld()) lockedKeys.add(InputCode.KEY_NUMPADENTER.key)
     }
 
-    // InputConstants.UNKNOWN exists, but is not a compile time constant
-    //~ if < 26.3 '0' -> '-1'
-    const val KEY_UNKNOWN: Int = 0
-
-    const val LEFT_MOUSE = InputConstants.MOUSE_BUTTON_LEFT
-    const val RIGHT_MOUSE = InputConstants.MOUSE_BUTTON_RIGHT
-    const val MIDDLE_MOUSE = InputConstants.MOUSE_BUTTON_MIDDLE
-
-    const val KEY_ADD = InputConstants.KEY_ADD
-    // This constant isn't defined in InputConstants for some reason
-    const val KEY_SUBTRACT = InputConstants.KEY_ADD - 1
-
     /**
      * Represents whether either the left or right Super key (also known as Windows key) is down.
      * On macOS, this is the Command key.

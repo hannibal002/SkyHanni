@@ -71,8 +71,7 @@ enum class InputCode(
     KEY_F22(InputConstants.KEY_F22),
     KEY_F23(InputConstants.KEY_F23),
     KEY_F24(InputConstants.KEY_F24),
-    // KEY_F25 does not exist in SDL / Minecraft 26.3+
-    KEY_F25(InputConstants.KEY_F24 + 1),
+    KEY_F25(InputConstants.KEY_F25),
     KEY_NUMLOCK(InputConstants.KEY_NUMLOCK),
     KEY_NUMPAD0(InputConstants.KEY_NUMPAD0),
     KEY_NUMPAD1(InputConstants.KEY_NUMPAD1),
@@ -92,7 +91,8 @@ enum class InputCode(
     KEY_RIGHT(InputConstants.KEY_RIGHT),
     KEY_UP(InputConstants.KEY_UP),
     KEY_ADD(InputConstants.KEY_ADD),
-    KEY_SUBTRACT(InputConstants.KEY_ADD - 1),
+    KEY_SUBTRACT("key.keyboard.keypad.subtract"),
+    KEY_DIVIDE("key.keyboard.keypad.divide"),
     KEY_APOSTROPHE(InputConstants.KEY_APOSTROPHE),
     KEY_BACKSLASH(InputConstants.KEY_BACKSLASH),
     KEY_COMMA(InputConstants.KEY_COMMA),
@@ -110,13 +110,11 @@ enum class InputCode(
     KEY_LALT(InputConstants.KEY_LALT),
     KEY_LCONTROL(InputConstants.KEY_LCONTROL),
     KEY_LSHIFT(InputConstants.KEY_LSHIFT),
-    //~ if < 26.3 'InputConstants.KEY_LGUI' -> 'InputConstants.KEY_LSUPER'
-    KEY_LSUPER(InputConstants.KEY_LGUI),
+    KEY_LSUPER(InputConstants.KEY_LSUPER),
     KEY_RALT(InputConstants.KEY_RALT),
     KEY_RCONTROL(InputConstants.KEY_RCONTROL),
     KEY_RSHIFT(InputConstants.KEY_RSHIFT),
-    //~ if < 26.3 'InputConstants.KEY_RGUI' -> 'InputConstants.KEY_RSUPER'
-    KEY_RSUPER(InputConstants.KEY_RGUI),
+    KEY_RSUPER(InputConstants.KEY_RSUPER),
     KEY_RETURN(InputConstants.KEY_RETURN),
     KEY_ESCAPE(InputConstants.KEY_ESCAPE),
     KEY_BACKSPACE(InputConstants.KEY_BACKSPACE),
@@ -130,6 +128,9 @@ enum class InputCode(
     KEY_PAUSE(InputConstants.KEY_PAUSE),
     KEY_SCROLLLOCK(InputConstants.KEY_SCROLLLOCK),
     KEY_PRINTSCREEN(InputConstants.KEY_PRINTSCREEN),
+    KEY_MENU("key.keyboard.menu"),
+    KEY_WORLD_1("key.keyboard.world.1"),
+    KEY_WORLD_2("key.keyboard.world.2"),
     LEFT_MOUSE(InputConstants.MOUSE_BUTTON_LEFT, MOUSE),
     RIGHT_MOUSE(InputConstants.MOUSE_BUTTON_RIGHT, MOUSE),
     MIDDLE_MOUSE(InputConstants.MOUSE_BUTTON_MIDDLE, MOUSE),
@@ -138,16 +139,9 @@ enum class InputCode(
     MOUSE_BUTTON_6(InputConstants.MOUSE_BUTTON_6, MOUSE),
     MOUSE_BUTTON_7(InputConstants.MOUSE_BUTTON_7, MOUSE),
     MOUSE_BUTTON_8(InputConstants.MOUSE_BUTTON_8, MOUSE),
-    MOD_SHIFT(InputConstants.MOD_SHIFT),
-    MOD_CONTROL(InputConstants.MOD_CONTROL),
-    MOD_ALT(InputConstants.MOD_ALT),
-    MOD_SUPER(InputConstants.MOD_SUPER),
-    MOD_CAPS_LOCK(InputConstants.MOD_CAPS_LOCK),
-    MOD_NUM_LOCK(InputConstants.MOD_NUM_LOCK),
     ;
 
-    //~ if < 26.3 'KEYBOARD' -> 'KEYSYM'
-    constructor(value: Int, type: InputConstants.Type = InputConstants.Type.KEYBOARD) : this(type.getOrCreate(value))
+    constructor(value: Int, type: InputConstants.Type = InputConstants.Type.KEYSYM) : this(type.getOrCreate(value))
 
     constructor(name: String) : this(InputConstants.getKey(name))
 
@@ -170,10 +164,8 @@ enum class InputCode(
         fun fromKeyIdentifier(identifier: String): InputCode =
             fromKey(InputConstants.getKey(identifier))
 
-        //~ if < 26.3 'KEYBOARD' -> 'KEYSYM' {
         fun fromKeyCode(keyCode: Int): InputCode =
-            fromKey(InputConstants.Type.KEYBOARD.getOrCreate(keyCode))
-        //~}
+            fromKey(InputConstants.Type.KEYSYM.getOrCreate(keyCode))
 
         @JvmStatic
         fun fromKeyEvent(keyEvent: KeyEvent): InputCode =

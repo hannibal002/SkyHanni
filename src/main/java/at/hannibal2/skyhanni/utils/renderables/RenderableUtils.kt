@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InputCode
-import at.hannibal2.skyhanni.utils.InputCode.LEFT_MOUSE
-import at.hannibal2.skyhanni.utils.InputCode.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -400,8 +398,8 @@ internal object RenderableUtils {
         }
 
         val clickMap = mapOf(
-            LEFT_MOUSE to { onClick(LEFT_MOUSE) },
-            RIGHT_MOUSE to { onClick(RIGHT_MOUSE) },
+            InputCode.LEFT_MOUSE to { onClick(LEFT_MOUSE) },
+            InputCode.RIGHT_MOUSE to { onClick(RIGHT_MOUSE) },
         )
 
         return Renderable.horizontal {

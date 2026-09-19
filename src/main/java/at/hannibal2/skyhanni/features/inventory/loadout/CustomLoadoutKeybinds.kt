@@ -52,9 +52,5 @@ object CustomLoadoutKeybinds {
 
     fun allowInput() = isEnabled() && keybinds.filter { it != InputCode.UNKNOWN }.any { it.isKeyHeld() }
 
-    fun allowMouseClick() = isEnabled() && keybinds.filter { it != InputCode.UNKNOWN }.any { it.isKeyHeld() }
-
-    fun allowKeyboardClick() = isEnabled() && keybinds.filter { it != InputCode.UNKNOWN }.any { it.isKeyHeld() }
-
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && LoadoutApi.inLoadouts() && config.slotKeybindsToggle
 }
