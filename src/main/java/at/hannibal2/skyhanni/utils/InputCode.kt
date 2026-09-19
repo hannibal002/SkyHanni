@@ -7,7 +7,6 @@ import com.mojang.blaze3d.platform.InputConstants
 /**
  * Represents a key or mouse button input code.
  *
- * Intentionally missing "key.keyboard.menu" and "key.keyboard.decimal" due to being changed between 26.2 and 26.3.
  * @property key The corresponding InputConstants.Key for this input code.
  */
 @Suppress("unused")
