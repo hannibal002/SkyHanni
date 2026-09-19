@@ -16,6 +16,4 @@ class ToolTipEvent(val slot: Slot, val itemStack: SafeItemStack, private val too
             toolTip0.addAll(value)
         }
         get() = toolTip0
-
-    fun toolTipRemovedPrefix() = toolTip.map { it.removePrefix("§5§o") }
 }

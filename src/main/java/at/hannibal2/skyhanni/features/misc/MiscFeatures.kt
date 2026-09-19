@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.entity.EndermanTeleportEvent
@@ -21,28 +20,28 @@ import net.minecraft.core.particles.ParticleTypes
 object MiscFeatures {
 
     /**
-     * REGEX-TEST: §6§LCHICKEN RACING §e00:26.842     §b2/9   §a§lJUMP
+     * REGEX-TEST: CHICKEN RACING 00:26.842     2/9   JUMP
      */
     private val chickenRacePattern by RepoPattern.pattern(
-        "misc.chickenrace.active",
-        "(?:§.)*CHICKEN RACING.*",
+        "misc.chickenrace.active.colorless",
+        "CHICKEN RACING.*",
     )
 
     private var inChickenRace = false
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEndermanTeleport(event: EndermanTeleportEvent) {
+    private fun onEndermanTeleport(event: EndermanTeleportEvent) {
         if (!SkyHanniMod.feature.combat.mobs.endermanTeleportationHider) return
         event.cancel()
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
-        inChickenRace = IslandType.WINTER.isInIsland() && chickenRacePattern.matches(event.actionBar)
+    @HandleEvent(onlyOnIsland = WINTER)
+    private fun onActionBarUpdate(event: ActionBarUpdateEvent) {
+        inChickenRace = chickenRacePattern.matches(event.cleanActionBar)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onParticle(event: ParticleEvent) {
+    private fun onParticle(event: ParticleEvent) {
         if (!SkyHanniMod.feature.misc.hideExplosions) return
         if (inChickenRace) return
 
@@ -57,7 +56,7 @@ object MiscFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderBlockOverlay(event: BlockOverlayRenderEvent) {
+    private fun onRenderBlockOverlay(event: BlockOverlayRenderEvent) {
         if (!SkyHanniMod.feature.misc.hideFireOverlay) return
 
         if (event.overlayType == OverlayType.FIRE) {
@@ -66,7 +65,7 @@ object MiscFeatures {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "mobs", "combat.mobs")
     }
 }

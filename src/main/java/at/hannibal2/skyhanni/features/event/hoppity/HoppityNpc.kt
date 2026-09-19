@@ -6,18 +6,15 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
+import at.hannibal2.skyhanni.utils.LoreCostUtils.hasTradeLine
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -41,7 +38,7 @@ object HoppityNpc {
     private var inShop = false
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened() {
         if (!HoppityApi.hoppityDetector.isInside()) return
         // TODO maybe we could add an annoying chat message that tells you how many years you have skipped
         //  or the last year you have opened the shop before.
@@ -51,7 +48,7 @@ object HoppityNpc {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed() {
         if (!isReminderEnabled()) return
         if (ReminderUtils.isBusy()) return
         if (SkyBlockUtils.isStrandedProfile) return
@@ -79,28 +76,28 @@ object HoppityNpc {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         clear()
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         clear()
     }
 
     @HandleEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inShop) return
         slotsToHighlight.clear()
         for ((slot, item) in event.inventoryItems) {
-            if (item.getLore().contains("§eClick to trade!")) {
+            if (item.getCleanLore().hasTradeLine()) {
                 slotsToHighlight.add(slot)
             }
         }
     }
 
     @HandleEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    private fun onBackgroundDrawn() {
         if (!isHighlightEnabled()) return
         if (!inShop) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {

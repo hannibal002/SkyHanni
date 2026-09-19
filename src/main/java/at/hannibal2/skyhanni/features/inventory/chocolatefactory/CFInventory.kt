@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -20,16 +20,16 @@ object CFInventory {
     private val config get() = CFApi.config
 
     /**
-     * REGEX-TEST: §7§aYou have 1 unclaimed reward!
-     * REGEX-TEST: §7§aYou have 2 unclaimed rewards!
+     * REGEX-TEST: You have 1 unclaimed reward!
+     * REGEX-TEST: You have 2 unclaimed rewards!
      */
     private val unclaimedRewardsPattern by CFApi.patternGroup.pattern(
-        "unclaimedrewards",
-        "§7§aYou have \\d+ unclaimed rewards?!",
+        "unclaimedrewards.colorless",
+        "You have \\d+ unclaimed rewards?!",
     )
 
     @HandleEvent
-    fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    private fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!CFApi.inChocolateFactory) return
         if (!CFApi.isEnabled()) return
         if (!config.highlightUpgrades) return
@@ -45,7 +45,7 @@ object CFInventory {
     }
 
     @HandleEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    private fun onBackgroundDrawn() {
         if (!CFApi.inChocolateFactory) return
         if (!CFApi.isEnabled()) return
         if (!config.highlightUpgrades) return
@@ -68,7 +68,7 @@ object CFInventory {
                 slot.highlight(LorenzColor.RED)
             }
             if (slotIndex == CFApi.milestoneIndex) {
-                unclaimedRewardsPattern.firstMatcher(slot.item.getLore()) {
+                unclaimedRewardsPattern.firstMatcher(slot.item.getCleanLore()) {
                     slot.highlight(LorenzColor.RED)
                 }
             }
@@ -84,7 +84,7 @@ object CFInventory {
     }
 
     @HandleEvent
-    fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
+    private fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!CFApi.inChocolateFactory) return
         if (!CFApi.isEnabled()) return
         if (!config.showStackSizes) return
@@ -94,7 +94,7 @@ object CFInventory {
     }
 
     @HandleEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!CFApi.inChocolateFactory) return
         if (!CFApi.isEnabled()) return
         val slot = event.slot ?: return

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 /**
@@ -41,13 +41,13 @@ object BazaarOrderApi {
     private val sellOffers get() = storage?.sellOffers
 
     /**
-     * REGEX-TEST: §a§lBUY §fWheat
-     * REGEX-TEST: §a§lBUY §aMagma Slug Shard
-     * REGEX-TEST: §a§lBUY §dWither Essence
+     * REGEX-TEST: BUY Wheat
+     * REGEX-TEST: BUY Magma Slug Shard
+     * REGEX-TEST: BUY Wither Essence
      */
     private val itemNamePattern by patternGroup.pattern(
-        "itemname",
-        "§.§l(?<type>BUY|SELL) (?<name>.*)",
+        "itemname.colorless",
+        "(?<type>BUY|SELL) (?<name>.*)",
     )
 
     /**
@@ -152,7 +152,7 @@ object BazaarOrderApi {
         inventoryItems.mapNotNull { (slot, stack) -> parseOrder(slot, stack) }
 
     private fun parseOrder(slot: Int, stack: SafeItemStack): BazaarOrder? {
-        val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val name = stack.cleanName
         val (type, itemName) = itemNamePattern.matchMatcher(name) {
             val type = when (group("type")) {
                 "BUY" -> BazaarApi.SimpleTransactionType.BUY_ORDER

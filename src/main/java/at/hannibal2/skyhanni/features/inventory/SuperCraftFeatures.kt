@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackApi
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -17,19 +17,19 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object SuperCraftFeatures {
 
     /**
-     * REGEX-TEST: §eYou Supercrafted §r§r§r§aEnchanted Ender Pearl§r§e!
-     * REGEX-TEST: §eYou Supercrafted §r§r§r§9Enchanted Mithril §r§8x3§r§e!
+     * REGEX-TEST: You Supercrafted Enchanted Ender Pearl!
+     * REGEX-TEST: You Supercrafted Enchanted Mithril x3!
      */
     val craftedPattern by RepoPattern.pattern(
-        "inventory.supercrafting.craft.new",
-        "§eYou Supercrafted §r§r§r§.(?<item>[^§]+)(?:§r§8x(?<amount>[\\d,]+))?§r§e!",
+        "inventory.supercrafting.craft.colorless",
+        "You Supercrafted (?<item>.*)(?:x(?<amount>[\\d,]+))?!",
     )
     private val config get() = SkyHanniMod.feature.inventory.gfs
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!config.superCraftGFS) return
-        val (internalName, amount) = craftedPattern.matchMatcher(event.message) {
+        val (internalName, amount) = craftedPattern.matchMatcher(event.cleanMessage) {
             NeuInternalName.fromItemName(group("item")) to (group("amount")?.formatInt() ?: 1)
         } ?: return
         if (!SackApi.sackListInternalNames.contains(internalName.asString())) return

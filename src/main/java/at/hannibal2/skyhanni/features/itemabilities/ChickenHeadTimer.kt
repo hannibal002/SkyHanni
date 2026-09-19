@@ -3,18 +3,19 @@ package at.hannibal2.skyhanni.features.itemabilities
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -27,22 +28,30 @@ object ChickenHeadTimer {
     private var lastTime = SimpleTimeMark.farPast()
     private val cooldown = 5.seconds
 
+    /**
+     * REGEX-TEST: You laid an egg!
+     */
+    private val chickenHeadActivatePattern by RepoPattern.pattern(
+        "chicken-head.activate.colorless",
+        "You laid an egg!",
+    )
+
     // Todo (I'm pretty sure?) we have an event that triggers when inv slots change
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!config.displayTimer || !event.isMod(5)) return
         hasChickenHead = InventoryUtils.getHelmet()?.getInternalName() == chickenHead
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         lastTime = SimpleTimeMark.now()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!config.displayTimer || !hasChickenHead) return
-        if (event.message == "§aYou laid an egg!") {
+        if (chickenHeadActivatePattern.matches(event.cleanMessage)) {
             lastTime = SimpleTimeMark.now()
             if (config.hideChat) {
                 event.blockedReason = "chicken_head_timer"
@@ -51,7 +60,7 @@ object ChickenHeadTimer {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    private fun onGuiRenderOverlay() {
         if (!config.displayTimer || !hasChickenHead) return
 
         val remainingTime = cooldown - lastTime.passedSince()
@@ -67,7 +76,7 @@ object ChickenHeadTimer {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.chickenHeadTimerHideChat", "itemAbilities.chickenHead.hideChat")
         event.move(2, "misc.chickenHeadTimerPosition", "itemAbilities.chickenHead.position")
         event.move(2, "misc.chickenHeadTimerDisplay", "itemAbilities.chickenHead.displayTimer")

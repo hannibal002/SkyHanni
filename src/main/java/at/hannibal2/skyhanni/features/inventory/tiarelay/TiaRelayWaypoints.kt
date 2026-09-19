@@ -3,14 +3,16 @@ package at.hannibal2.skyhanni.features.inventory.tiarelay
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.NpcChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object TiaRelayWaypoints {
@@ -20,15 +22,23 @@ object TiaRelayWaypoints {
     private var waypointName: String? = null
     private var island = IslandType.NONE
 
+    /**
+     * REGEX-TEST: You completed the maintenance on the relay!
+     */
+    private val completedAllRelaysPattern by RepoPattern.pattern(
+        "relay.complete-all",
+        "You completed the maintenance on the relay!"
+    )
+
     init {
         Relay.entries.forEach { it.chatPattern }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: NpcChatEvent.Allow) {
         if (!config.nextWaypoint) return
 
-        val message = event.message
+        val message = event.cleanMessage
         Relay.entries.firstOrNull { it.checkChatMessage(message) }?.let { relay ->
             waypoint = relay.waypoint
             waypointName = relay.relayName
@@ -36,14 +46,14 @@ object TiaRelayWaypoints {
             return
         }
 
-        if (message == "§aYou completed the maintenance on the relay!") {
+        if (completedAllRelaysPattern.matches(message)) {
             waypoint = null
             island = IslandType.NONE
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
 
         if (config.allWaypoints) {
             for (relay in Relay.entries) {

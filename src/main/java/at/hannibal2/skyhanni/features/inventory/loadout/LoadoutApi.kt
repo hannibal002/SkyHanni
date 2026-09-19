@@ -11,10 +11,11 @@ import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.find
-import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
@@ -69,13 +70,13 @@ object LoadoutApi {
     )
 
     /**
-     * REGEX-TEST: §7Current: §aHeart of the Forest 1
-     * REGEX-TEST: §7Current: §aHeart of the Mountain 1
-     * REGEX-TEST: §7Current: §aHurtful
+     * REGEX-TEST: Current: Heart of the Forest 1
+     * REGEX-TEST: Current: Heart of the Mountain 1
+     * REGEX-TEST: Current: Hurtful
      */
     private val currentSelectionPattern by patternGroup.pattern(
-        "currentselection",
-        "Current: (?:§.)*(?<selection>.+)",
+        "currentselection.colorless",
+        "Current: (?<selection>.+)",
     )
 
     /**
@@ -207,11 +208,7 @@ object LoadoutApi {
     // This is for Hotm, Hotf and Powerstone
     private fun SafeItemStack?.parseCurrentSelection(): String? {
         if (this == null) return null
-        return this.getLoreComponent().firstNotNullOfOrNull {
-            currentSelectionPattern.findMatcher(it.formattedTextCompatLessResets()) {
-                group("selection")
-            }
-        }
+        return currentSelectionPattern.firstMatchGroup(getCleanLore(), "selection")
     }
 
     private fun SafeItemStack?.parseTunings(): List<String>? {

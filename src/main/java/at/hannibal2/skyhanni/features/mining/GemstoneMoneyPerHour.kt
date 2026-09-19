@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.mining.GemstoneMoneyPerHourConfig
 import at.hannibal2.skyhanni.data.IslandTypeTag
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -35,12 +35,12 @@ import kotlin.time.Duration.Companion.seconds
 object GemstoneMoneyPerHour {
 
     /**
-     * REGEX-TEST: §d§lPRISTINE! §r§fYou found §r§a☘ Flawed Jade Gemstone §r§8x20§r§f!
-     * REGEX-TEST: §d§lPRISTINE! §r§fYou found §r§a❈ Flawed Amethyst Gemstone §r§8x16§r§f!
+     * REGEX-TEST: PRISTINE! You found ☘ Flawed Jade Gemstone x20!
+     * REGEX-TEST: PRISTINE! You found ❈ Flawed Amethyst Gemstone x16!
      */
     private val pristineMessagePattern by RepoPattern.pattern(
-        "mining.pristine",
-        "§d§lPRISTINE! §r§fYou found §r§a. Flawed (?<gemstone>\\w+) Gemstone §r§8x(?<amount>\\d+)§r§f!",
+        "mining.pristine.colorless",
+        "PRISTINE! You found . Flawed (?<gemstone>\\w+) Gemstone x(?<amount>\\d+)!",
     )
 
     /**
@@ -63,9 +63,9 @@ object GemstoneMoneyPerHour {
     private var paused: Boolean = false
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
-        pristineMessagePattern.matchMatcher(event.message) {
+        pristineMessagePattern.matchMatcher(event.cleanMessage) {
             if (start.isFarPast()) start = SimpleTimeMark.now()
             if (paused) paused = false
             useNextSackChange = true
@@ -79,18 +79,18 @@ object GemstoneMoneyPerHour {
     }
 
     @HandleEvent
-    fun onSackChange(event: SackChangeEvent) {
+    private fun onSackChange(event: SackChangeEvent) {
         if (!isEnabled() || !useNextSackChange) return
         useNextSackChange = false
 
-        for (change in event.sackChanges) {
-            if (change.delta < 0) continue
+        for ((delta, internalName) in event.sackChanges) {
+            if (delta < 0) continue
 
-            roughGemstoneNamePattern.matchMatcher(change.internalName.readableInternalName) {
+            roughGemstoneNamePattern.matchMatcher(internalName.readableInternalName) {
                 val gemstone = group("gemstone")
                 val configGemstonePrice = getPrice(convertToInternalName(gemstone))
-                val delta = change.delta.toDouble() * getFraction(1) * configGemstonePrice
-                coins += delta.toInt()
+                val actualDelta = delta.toDouble() * getFraction(1) * configGemstonePrice
+                coins += actualDelta.toInt()
             }
         }
     }
@@ -174,7 +174,7 @@ object GemstoneMoneyPerHour {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderTop() {
+    private fun onGuiRenderTop() {
         if (!isEnabled()) return
         display.ifEmpty { updateDisplay() }
         if (display.isNotEmpty()) {
@@ -187,7 +187,7 @@ object GemstoneMoneyPerHour {
     }
 
     @HandleEvent
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!isEnabled() || lastMined.isFarPast()) display = listOf()
         else if (lastMined.passedSince() > config.timeoutTime.toInt().seconds) {
             if (config.shouldPause) paused = true
@@ -197,7 +197,7 @@ object GemstoneMoneyPerHour {
     }
 
     @HandleEvent
-    fun onIslandJoin() {
+    private fun onIslandJoin() {
         if (!paused) return
         if (!isEnabled() || !IslandTypeTag.MINING.isInIsland()) return reset()
         paused = true
@@ -214,7 +214,7 @@ object GemstoneMoneyPerHour {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetgemstone") {
             description = "Resets the gemstone money per hour display."
             category = CommandCategory.USERS_RESET

@@ -1,18 +1,16 @@
 package at.hannibal2.skyhanni.test.garden
 
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.test.BootstrapExtension
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.verify
-import net.minecraft.network.chat.Component
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -38,7 +36,7 @@ class VisitorListenerTest {
     fun `onTablistUpdate it should add new visitors to the list`() {
         every { VisitorApi.visitorsInTabList(any()) } returns listOf("§cSpaceman", "§6Madame Eleanor Q. Goldsworth III", "§fJacob")
 
-        listener.onWidgetUpdate(fakeTabWidget(mutableListOf("")))
+        listener.onWidgetLines(listOf(""))
 
         verify { VisitorApi.addVisitor("§fJacob") }
         verify { VisitorApi.addVisitor("§cSpaceman") }
@@ -51,10 +49,8 @@ class VisitorListenerTest {
             mockk { every { visitorName } returns "§fJacob" },
         )
 
-        listener.onWidgetUpdate(
-            fakeTabWidget(
-                mutableListOf("§b§lVisitors: §r§f(0)", ""),
-            ),
+        listener.onWidgetLines(
+            listOf("§b§lVisitors: §r§f(0)", ""),
         )
 
         verify { VisitorApi.removeVisitor("§fJacob") }
@@ -68,16 +64,14 @@ class VisitorListenerTest {
 
         every { SkyBlockUtils.lastWorldSwitch } returns SimpleTimeMark.now()
 
-        listener.onWidgetUpdate(
-            fakeTabWidget(
-                mutableListOf("§b§lVisitors: §r§f(0)", ""),
-            ),
+        listener.onWidgetLines(
+            listOf("§b§lVisitors: §r§f(0)", ""),
         )
 
         verify(exactly = 0) { VisitorApi.removeVisitor("§fJacob") }
     }
 
-    private fun fakeTabWidget(lines: List<String>): WidgetUpdateEvent {
-        return WidgetUpdateEvent(TabWidget.VISITORS, lines.map { Component.literal(it) })
+    private fun VisitorListener.onWidgetLines(lines: List<String>) {
+        onWidgetLines(lines.map { it.asComponent() })
     }
 }

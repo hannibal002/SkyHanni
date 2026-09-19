@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -24,13 +24,13 @@ import kotlin.time.Duration.Companion.seconds
 object EntityMovementData {
 
     /**
-     * REGEX-TEST: §7Sending a visit request...
-     * REGEX-TEST: §7Finding player...
-     * REGEX-TEST: §7Warping you to your SkyBlock island...
+     * REGEX-TEST: Sending a visit request...
+     * REGEX-TEST: Finding player...
+     * REGEX-TEST: Warping you to your SkyBlock island...
      */
     private val warpingPattern by RepoPattern.pattern(
-        "data.entity.warping",
-        "§7(?:Warping|Warping you to your SkyBlock island|Warping using transfer token|Finding player|Sending a visit request)\\.\\.\\.",
+        "data.entity.warping.colorless",
+        "(?:Warping|Warping you to your SkyBlock island|Warping using transfer token|Finding player|Sending a visit request)\\.\\.\\.",
     )
 
     private var nextTeleport: OnNextTeleport? = null
@@ -105,8 +105,8 @@ object EntityMovementData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!warpingPattern.matches(event.message)) return
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
+        if (!warpingPattern.matches(event.cleanMessage)) return
         DelayedRun.runNextTick {
             SkyHanniWarpEvent.post()
         }

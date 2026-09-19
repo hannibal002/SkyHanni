@@ -6,19 +6,19 @@ import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.NumberF
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.data.SackApi
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.SackOpenEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButt
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 private typealias GemstoneQuality = SkyBlockItemModifierUtils.GemstoneQuality
 
@@ -44,6 +45,14 @@ object SackDisplay {
 
     private val MAGMA_FISH = "MAGMA_FISH".toInternalName()
     private val textInputs = mutableMapOf<String, SearchTextInput>()
+
+    /**
+     * REGEX-TEST: Stored: 1,000
+     */
+    private val storedAmountPattern by RepoPattern.pattern(
+        "inventory.sack.stored-amount",
+        "Stored: .*",
+    )
 
     private fun getSackTextInput(name: String) = textInputs.getOrPut(name) { SearchTextInput() }
 
@@ -59,19 +68,18 @@ object SackDisplay {
     }
 
     @HandleEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    private fun onBackgroundDrawn() {
         if (!SackApi.inventory.isInside()) return
         if (!config.highlightFull) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val lore = slot.item.getLore()
-            if (lore.any { it.startsWith("§7Stored: §a") }) {
+            if (storedAmountPattern.anyMatches(slot.item.getCleanLore())) {
                 slot.highlight(LorenzColor.RED)
             }
         }
     }
 
     @HandleEvent
-    fun onSackOpen(event: SackOpenEvent) {
+    private fun onSackOpen(event: SackOpenEvent) {
         DelayedRun.runOrNextTick {
             update(event.isNewInventory)
         }

@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentTyp
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.InternalNameArgumentType
 import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyblockEquipmentDataUpdateEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -70,18 +69,18 @@ object CurrentEquipmentApi {
     private val repoGroup = RepoPattern.group("data.equipment")
 
     /**
-     * REGEX-TEST: §aYou equipped a §r§dSnowy Gillsplash Cloak§r§a!
+     * REGEX-TEST: You equipped a Snowy Gillsplash Cloak!
      */
     private val chatEquipRegex by repoGroup.pattern(
-        "chat.equip",
-        "§aYou equipped a (?<item>.+)§r§a!",
+        "chat.equip.colorless",
+        "You equipped a (?<item>.+)!",
     )
 
     private var lastClickedEquipment: Pair<SafeItemStack, EquipmentSlot>? = null
     private var lastClickedEquipmentTime = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryUpdate(event: InventoryOpenEvent) {
+    private fun onInventoryUpdate(event: InventoryOpenEvent) {
         if (!inventory.isInside()) return
         EquipmentSlot.entries.forEach {
             handleInventoryItem(it, event.inventoryItems[it.slot])
@@ -89,7 +88,7 @@ object CurrentEquipmentApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onItemClick(event: ItemClickEvent) {
+    private fun onItemClick(event: ItemClickEvent) {
         if (event.clickType != InteractClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
         val category = item.getItemCategoryOrNull() ?: return
@@ -100,10 +99,10 @@ object CurrentEquipmentApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        chatEquipRegex.matchMatcher(event.message) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
+        chatEquipRegex.matchMatcher(event.cleanMessage) {
             if (lastClickedEquipmentTime.passedSince() > 1.seconds) return@matchMatcher
-            val chatItem = group("item").removeColor()
+            val chatItem = group("item")
             val (item, slot) = lastClickedEquipment ?: return@matchMatcher
             if (item.cleanName != chatItem) return@matchMatcher
             setEquipment(slot, item)
@@ -112,7 +111,7 @@ object CurrentEquipmentApi {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shspoofequipment") {
             description = "Spoofs a SkyBlock equipment slot."
             category = CommandCategory.DEVELOPER_TEST
@@ -126,7 +125,7 @@ object CurrentEquipmentApi {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Equipment")
         event.addIrrelevant {
             val storage = storage ?: run {
