@@ -22,7 +22,7 @@ enum class KuudraTier(val displayName: String, val armorName: String) {
 
     private var intLocation: LorenzVec? = null
     private var intTierNumber: Int = ordinal + 1
-    private var intDisplayItem: NeuInternalName = "KUUDRA_${armorName.takeIfNotEmpty()?.plus("_") ?: ""}TIER_KEY".toInternalName()
+    private var intDisplayItem: NeuInternalName = "KUUDRA_${armorName.takeIfNotEmpty()?.plus('_').orEmpty()}TIER_KEY".toInternalName()
 
     val location: LorenzVec? get() = intLocation
     val tierNumber: Int get() = intTierNumber
