@@ -182,7 +182,7 @@ class GuiPositionEditor(
 
                 when (mouseButton) {
                     RIGHT_MOUSE -> position.jumpToConfigOptions()
-                    MIDDLE_MOUSE -> if (config.keyBindReset == InputCode.MIDDLE_MOUSE) position.resetPositionAndScale()
+                    MIDDLE_MOUSE -> if (config.keyBindReset == MIDDLE_MOUSE) position.resetPositionAndScale()
                     LEFT_MOUSE -> if (!position.clicked) {
                         clickedPos = i
                         position.clicked = true

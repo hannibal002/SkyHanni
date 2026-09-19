@@ -10,8 +10,7 @@ import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.InputCode.LEFT_MOUSE
-import at.hannibal2.skyhanni.utils.InputCode.RIGHT_MOUSE
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -208,8 +207,8 @@ object ScrapGFS {
             borderOutlineThickness = 2,
         ),
         onAnyClick = mapOf(
-            LEFT_MOUSE to { scrollWithStaggerSound(-1) },
-            RIGHT_MOUSE to { scrollWithStaggerSound(1) },
+            InputCode.LEFT_MOUSE to { scrollWithStaggerSound(-1) },
+            InputCode.RIGHT_MOUSE to { scrollWithStaggerSound(1) },
         )
     ).let { add(it) }
 

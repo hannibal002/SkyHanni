@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
-import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
@@ -49,15 +48,15 @@ object FusionKeybinds {
         val confirmFusionKeybind = config.confirmFusionKeybind.get()
 
         config.repeatFusionKeybind.afterChange {
-            if (this != InputCode.UNKNOWN && this == confirmFusionKeybind) {
-                config.repeatFusionKeybind.set(InputCode.UNKNOWN)
+            if (this != UNKNOWN && this == confirmFusionKeybind) {
+                config.repeatFusionKeybind.set(UNKNOWN)
                 warnDuplicateKeybinds()
             }
         }
 
         config.confirmFusionKeybind.afterChange {
-            if (this != InputCode.UNKNOWN && this == repeatFusionKeybind) {
-                config.confirmFusionKeybind.set(InputCode.UNKNOWN)
+            if (this != UNKNOWN && this == repeatFusionKeybind) {
+                config.confirmFusionKeybind.set(UNKNOWN)
                 warnDuplicateKeybinds()
             }
         }
