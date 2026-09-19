@@ -60,7 +60,7 @@ class SearchableScrollTable private constructor(
         minHeight = lowerBound,
         maxHeight = upperBound,
         velocity = velocity,
-        dragScrollMouseButton = button
+        dragScrollMouseButton = button,
     )
 
     init {
