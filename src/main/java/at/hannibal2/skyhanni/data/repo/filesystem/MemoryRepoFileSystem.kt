@@ -1,33 +1,16 @@
 package at.hannibal2.skyhanni.data.repo.filesystem
 
-import at.hannibal2.skyhanni.SkyHanniMod.launchUnScoped
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.data.repo.RepoLogger
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import java.io.File
 import java.io.FileNotFoundException
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.DisposableHandle
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 class MemoryRepoFileSystem(
-    override val root: File,
     override val logger: RepoLogger,
-    private val coroutineSettings: CoroutineSettings,
 ) : RepoFileSystem, DisposableHandle {
     private val storage = ConcurrentHashMap<String, ByteArray>()
-
-    /**
-     * Tracks the result of the background disk-flush started in [loadFromTgz].
-     * Completed (successfully or exceptionally) before [transitionAfterReload] proceeds.
-     */
-    private var flushResult: CompletableDeferred<Unit>? = null
 
     override fun exists(path: String) = storage.containsKey(path)
     override fun readAllBytes(path: String) = storage[path] ?: throw FileNotFoundException(path)
@@ -48,111 +31,14 @@ class MemoryRepoFileSystem(
     }.map { it.removePrefix("$path/") }
 
     /**
-     * Loads entries from [tgzFile] into in-memory storage (via [loadFromTgz]), then
-     * kicks off a background [flushResult] job to persist those bytes to [root].
-     *
-     * The flush is intentionally deferred to after the reload event fires, so that event
-     * handlers benefit from fast in-memory reads without waiting for disk I/O. Call
-     * [transitionAfterReload] to wait for the flush and switch to [DiskRepoFileSystem].
+     * Loads entries from [tgzFile] into in-memory storage (via [loadFromTgz])
      */
     override suspend fun loadFromTgz(progress: ChatProgressUpdates, tgzFile: File): Boolean {
         progress.update("repo memory file system loadFromTgz")
         val success = super.loadFromTgz(progress, tgzFile)
-        check(flushResult == null) {
-            "loadFromTgz called twice on the same MemoryRepoFileSystem instance"
-        }
-        flushResult = flushToDisk(progress.category, root)
         progress.update("loadFromTgz end")
         return success
     }
 
-    // Launched into the module-level scope so it outlives this call site and can be
-    // awaited later in transitionAfterReload.
-    // We use CompletableDeferred to propagate success or failure, because launchUnScoped routes
-    // through runWithErrorHandling which would otherwise swallow exceptions silently.
-    private fun flushToDisk(
-        category: ChatProgressUpdates.ChatProgressCategory,
-        root: File,
-    ): CompletableDeferred<Unit> {
-        val deferred = CompletableDeferred<Unit>()
-        coroutineSettings.withIOContext().launchUnScoped {
-            try {
-                saveToDisk(category, root)
-                deferred.complete(Unit)
-            } catch (e: CancellationException) {
-                deferred.completeExceptionally(e)
-                // Have to re-throw to ensure propagation
-                throw e
-            } catch (e: Throwable) {
-                deferred.completeExceptionally(e)
-            }
-        }
-        return deferred
-    }
-
     override fun dispose() = storage.clear()
-
-    /**
-     * Waits for the background disk flush to complete, then disposes in-memory storage and
-     * returns a [DiskRepoFileSystem] backed by [root].
-     *
-     * If the flush failed, the error is logged and the transition still proceeds.
-     * Callers should treat unsuccessful repo constants as the signal that something went wrong on disk.
-     */
-    override suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem {
-        val deferred = flushResult
-        flushResult = null
-
-        deferred?.let {
-            progress.update("waiting for disk flush")
-            runCatching { it.await() }.onFailure { e ->
-                // Disk state may be incomplete. We still transition so that memory is freed,
-                // but callers will observe failures via unsuccessfulConstants.
-                progress.update("disk flush failed! repo on disk may be incomplete: ${e.message}")
-            }
-        }
-
-        progress.update("dispose in-memory storage")
-        dispose()
-        return DiskRepoFileSystem(root, logger)
-    }
-
-    /**
-     * Persists all in-memory entries to [root] in parallel using structured concurrency.
-     *
-     * Using [kotlinx.coroutines.coroutineScope] + [launch] here (rather than any module-level launch helper)
-     * ensures that:
-     *  - every child write is a structural child of this coroutine
-     *  - a failure in any single write cancels siblings and propagates to the caller
-     *  - cancellation of the parent automatically cancels all writes
-     */
-    private suspend fun saveToDisk(
-        group: ChatProgressUpdates.ChatProgressCategory,
-        root: File,
-    ) = group.startSuspendBlock("saveToDisk") { progress ->
-        val base = root.toPath()
-        progress.update("createDirectoriesFor")
-        base.createDirectoriesFor(storage.keys)
-
-        val entries = storage.entries.toList()
-        progress.innerProgressStart(entries.size)
-        progress.update("writing entries")
-
-        coroutineScope {
-            for ((relativePath, bytes) in entries) {
-                launch {
-                    Files.write(base.resolve(relativePath), bytes)
-                    progress.innerProgressStep()
-                }
-            }
-        }
-
-        progress.end("saveToDisk end")
-    }
-
-    private fun Path.createDirectoriesFor(relativePaths: Set<String>) = relativePaths.mapNotNull { p ->
-        Paths.get(p).parent
-    }.toSet().forEach { dir ->
-        Files.createDirectories(this.resolve(dir))
-    }
 }

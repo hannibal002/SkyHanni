@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates.ChatProgressCategory
-import at.hannibal2.skyhanni.data.repo.filesystem.DiskRepoFileSystem
 import at.hannibal2.skyhanni.data.repo.filesystem.MemoryRepoFileSystem
 import at.hannibal2.skyhanni.data.repo.filesystem.RepoFileSystem
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -17,7 +16,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.json.getJson
 import at.hannibal2.skyhanni.utils.system.LazyVar
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
@@ -57,16 +55,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     open val legacyConfigDirectory: File? = null
 
     abstract val config: AbstractRepoConfig
-
-    /**
-     * The root directory for this specific repo.
-     *
-     * For example:
-     * `.minecraft/skyhanni/shrepo` or `.minecraft/skyhanni/neurepo`
-     */
-    val repoDirectory: File by lazy {
-        SkyHanniMod.dataDir.resolve(repoFolderName)
-    }
 
     /**
      * Stores the currently checked-out commit for this repo.
@@ -114,7 +102,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         GitRepo(config.location) { SkyHanniMod.feature.dev.debug.logRepoErrors }
     }
     private val repoMutex = Mutex()
-    private val repoIOCoroutineConfig = repoCoroutineConfig("IO")
     private val repoInitCoroutineConfig = repoCoroutineConfig("Init", repoMutex)
     private val repoReloadCoroutineConfig = repoCoroutineConfig("Reload", repoMutex)
     private val repoUpdateCoroutineConfig = repoCoroutineConfig("Update", repoMutex)
@@ -124,7 +111,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     abstract val statusCommand: String
     abstract val reloadCommand: String
 
-    var repoFileSystem: RepoFileSystem by LazyVar { DiskRepoFileSystem(repoDirectory, logger) }
+    var repoFileSystem: RepoFileSystem by LazyVar { MemoryRepoFileSystem(logger) }
         private set
 
     var localRepoCommit: RepoCommit = RepoCommit()
@@ -194,15 +181,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     @PublishedApi
     internal fun readJsonElement(path: String): JsonElement? {
         if (repoFileSystem.exists(path)) return repoFileSystem.readJson(path)
-        val fallback = repoDirectory.resolve(path)
-        if (fallback.isFile) return fallback.getJson()
-        val repoDiagnostic = when {
-            !repoDirectory.exists() -> "repo directory does not exist at '${repoDirectory.absolutePath}'"
-            !repoDirectory.isDirectory -> "repo path exists but is not a directory: '${repoDirectory.absolutePath}'"
-            else -> repoDirectory.list()?.size?.let { "$it top-level entries in repo directory" }
-                ?: "repo directory exists but could not be listed"
-        }
-        logger.error("Repo file not found: $path ($repoDiagnostic)")
+        logger.error("Repo file not found in memory: $path")
         return null
     }
 
@@ -329,7 +308,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             progress.update("Failed to load backup repo from tar.gz file: ${repoTgzFile.absolutePath}")
             logger.throwError("Failed to load backup repo from tar.gz file: ${repoTgzFile.absolutePath}")
         }
-        deleteArchiveFiles()
 
         isUsingBackup = true
         progress.update("writeToFile: switchToBackupRepo")
@@ -441,8 +419,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      *  load from an empty or non-existent repo directory.
      * @return true if the repo directory exists and has .json files, false otherwise.
      */
-    private fun repoDirectoryHasContent() = repoDirectory.exists() &&
-        repoDirectory.walkTopDown().any { it.isFile && it.extension == "json" }
+    private fun repoDirectoryHasContent() = repoTgzFile.exists() && repoTgzFile.length() > 0
 
     /**
      * Determines the latest commit on the GitHub repo and compares it to the current commit.
@@ -511,7 +488,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             if (switchToBackupOnFail) switchToBackupRepo(progress)
             else FetchUnpackResult.FAILED
         } else {
-            deleteArchiveFiles()
             progress.update("writeToFile: fetchAndUnpackRepo")
             commitStorage.writeToFile(comparison.latest)
             isUsingBackup = false
@@ -520,18 +496,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     private fun prepCleanRepoFileSystem(progress: ChatProgressUpdates) {
-        progress.update("deleteRecursively")
-        repoDirectory.listFiles()?.forEach { it.deleteRecursivelySafe() }
-
         progress.update("createAndClean")
-        repoFileSystem = repoDirectory.let { root ->
-            if (config.unzipToMemory) MemoryRepoFileSystem(root, logger, repoIOCoroutineConfig)
-            else DiskRepoFileSystem(root, logger)
-        }.apply { deleteRecursively("") }
+        repoFileSystem = MemoryRepoFileSystem(logger).apply { deleteRecursively("") }
 
-        progress.update("mkdirs")
-        repoDirectory.mkdirs()
         progress.update("createNewFile")
+        repoTgzFile.parentFile?.mkdirs()
         repoTgzFile.createNewFile()
         progress.update("done with prepCleanRepoFileSystem")
     }
@@ -548,7 +517,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             return
         }
         shouldManuallyReload = false
-        deleteArchiveFiles()
         loadingError = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()
@@ -564,12 +532,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             loadingError = true
         }
         progress.update("post done")
-        // Only check if we can dispose after the event has been posted, as we may see speed increases using
-        // the MemoryRepoFileSystem for the event, and writing to disk after the event.
-        progress.update("transitionAfterReload")
-        repoFileSystem = repoFileSystem.transitionAfterReload(progress)
 
-        progress.update("transitionAfterReload done")
         if (answerMessage.isNotEmpty() && !loadingError) {
             progress.end("answerMessage: $answerMessage")
             logger.chat("§a$answerMessage")
@@ -587,40 +550,13 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
     }
 
-    private fun deleteArchiveFiles() {
-        repoTgzFile.delete()
-    }
-
     private fun updateLegacyFiles() {
         val configDirectory = legacyConfigDirectory ?: return
 
         val legacyRepoDirectory = configDirectory.resolve("repo").takeIf { it.exists() }
         if (legacyRepoDirectory != null) {
-            logger.warn("Migrating legacy repo directory to: ${repoDirectory.absolutePath}")
-            repoDirectory.mkdirs()
-
-            val copied = runCatching {
-                legacyRepoDirectory.copyRecursively(
-                    target = repoDirectory,
-                    overwrite = false,
-                    onError = { _, exception ->
-                        if (exception is FileAlreadyExistsException) {
-                            OnErrorAction.SKIP
-                        } else {
-                            OnErrorAction.TERMINATE
-                        }
-                    }
-                )
-            }.onFailure { e ->
-                logger.error("Uncaught exception while migrating legacy repo: ${e.message}")
-            }.getOrDefault(false)
-
-            if (copied) {
-                legacyRepoDirectory.deleteRecursivelySafe()
-            } else {
-                logger.error("Failed to copy legacy repo directory from ${legacyRepoDirectory.absolutePath}")
-                return
-            }
+            logger.warn("Deleting legacy repo directory")
+            legacyRepoDirectory.deleteRecursivelySafe()
         }
 
         val legacyCommitFile = configDirectory.resolve("currentCommit.json").takeIf { it.exists() }
@@ -649,13 +585,12 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     internal fun dumpDiagnosticsToLog(vararg extraData: Pair<String, Any?>) = with(logger) {
         val loc = config.location
-        val fileCount = repoDirectory.walkTopDown().count { it.isFile }
         debug("Diagnostic dump for $commonName:")
-        debug("  config: autoUpdate=${config.repoAutoUpdate}, unzipToMemory=${config.unzipToMemory}")
+        debug("  config: autoUpdate=${config.repoAutoUpdate}")
         debug("  location: ${loc.user}/${loc.repoName}@${loc.branch} (default=${loc.hasDefaultSettings()})")
         debug("  localCommit: sha=${localRepoCommit.sha ?: "none"}, time=${localRepoCommit.time ?: "none"}")
         debug("  usingBackup: $isUsingBackup")
-        debug("  repoDir: exists=${repoDirectory.exists()}, files=$fileCount, path=${repoDirectory.absolutePath}")
+        debug("  tgzFile: exists=${repoTgzFile.exists()}, size=${repoTgzFile.length()}")
         debug("  fileSystem: ${repoFileSystem::class.simpleName}")
         debug("  successful: ${successfulConstants.size}, failed: ${unsuccessfulConstants.size}")
         if (unsuccessfulConstants.isNotEmpty()) {

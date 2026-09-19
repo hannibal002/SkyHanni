@@ -12,7 +12,6 @@ import java.io.File
 private const val MAX_EMPTY_TGZ_ENTRIES = 10
 
 sealed interface RepoFileSystem {
-    val root: File
     val logger: RepoLogger
 
     fun exists(path: String): Boolean
@@ -20,7 +19,6 @@ sealed interface RepoFileSystem {
     fun write(path: String, data: ByteArray)
     fun list(path: String): List<String>
     fun validatePath(relativePath: String) = Unit
-    suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem = this
 
     /**
      * Deletes everything under [path].
