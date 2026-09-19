@@ -12,20 +12,19 @@ import java.io.File
 private const val MAX_EMPTY_TGZ_ENTRIES = 10
 
 sealed interface RepoFileSystem {
-    val root: File
     val logger: RepoLogger
 
     fun exists(path: String): Boolean
     fun readAllBytes(path: String): ByteArray
     fun write(path: String, data: ByteArray)
-    fun list(path: String): List<String>
+    fun listFiles(path: String, extension: String): List<String>
+    fun listDirectories(path: String): List<String>
     fun validatePath(relativePath: String) = Unit
-    suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem = this
+    fun clear() = deleteRecursively("")
 
     /**
      * Deletes everything under [path].
      * If [path] is empty, deletes all entries.
-     * Should NOT delete logs.
      */
     fun deleteRecursively(path: String)
 
