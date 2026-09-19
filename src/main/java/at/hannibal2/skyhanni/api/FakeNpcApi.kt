@@ -26,10 +26,6 @@ import kotlin.math.atan2
 import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.seconds
 
-//? if >= 26.2 {
-import at.hannibal2.skyhanni.utils.FakeEntityIdProvider
-//?}
-
 @SkyHanniModule
 object FakeNpcApi {
 
@@ -219,11 +215,6 @@ object FakeNpcApi {
             MinecraftCompat.localWorldOrThrow,
             Minecraft.getInstance().playerSkinRenderCache(),
         ) {
-            //? if >= 26.2 {
-            init {
-                id = FakeEntityIdProvider.getNextId()
-            }
-            //?}
 
             override fun getProfile(): ResolvableProfile = profile
         }
