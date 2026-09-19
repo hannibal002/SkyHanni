@@ -38,8 +38,13 @@ object ProfitPerExcavation {
         val scrapItem = FossilExcavatorApi.scrapItem
 
         val scrapPrice = scrapItem.getPrice()
-        map["${scrapItem.repoItemName}: §c-${scrapPrice.shortFormat()}"] = -scrapPrice
-        totalProfit -= scrapPrice
+
+        val profitType = config.profileProfitSetting.get()
+
+        if (!profitType.ignoreMaterialCost()) {
+            totalProfit -= scrapPrice
+            map["${scrapItem.repoItemName}: §c-${scrapPrice.shortFormat()}"] = -scrapPrice
+        }
 
         val hover = map.sortedDesc().keys.toMutableList()
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"

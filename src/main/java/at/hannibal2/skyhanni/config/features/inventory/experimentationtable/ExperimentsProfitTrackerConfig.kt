@@ -3,13 +3,16 @@ package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.enums.ProfitCalcSettings
 import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ExperimentsProfitTrackerConfig {
     @Expose
@@ -22,6 +25,11 @@ class ExperimentsProfitTrackerConfig {
     @ConfigOption(name = "Hide Messages", desc = "Change the messages to be hidden after completing Add-on/Main experiments.")
     @ConfigEditorDraggableList
     val hideMessages: MutableList<ExperimentationTableApi.ExperimentationMessages> = mutableListOf()
+
+    @Expose
+    @ConfigOption(name = "Ignore Material Costs", desc = "Removes the cost of Experience Bottles from the Profit.")
+    @ConfigEditorDropdown
+    val profileProfitSetting: Property<ProfitCalcSettings> = Property.of(ProfitCalcSettings.NO_TRADE)
 
     @Expose
     @ConfigOption(name = "Track Time Spent", desc = "Track time spent doing addons and experiments.")
@@ -41,7 +49,7 @@ class ExperimentsProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "",
     )
     @Accordion
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()

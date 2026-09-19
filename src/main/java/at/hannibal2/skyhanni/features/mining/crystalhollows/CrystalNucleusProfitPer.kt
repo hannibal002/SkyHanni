@@ -44,14 +44,21 @@ object CrystalNucleusProfitPer {
 
         val jungleKeyCost = JUNGLE_KEY_ITEM.getPrice()
         val partsCost = CrystalNucleusApi.getPrecursorRunPrice { it.getPrice() }
-        totalProfit -= (jungleKeyCost + partsCost)
+
+        val profitType = config.profileProfitSetting.get()
+
+        if (!profitType.ignoreMaterialCost()) {
+            totalProfit -= (jungleKeyCost + partsCost)
+        }
 
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"
         val totalMessage = "Profit for Crystal Nucleus Run§e: $profitPrefix${totalProfit.shortFormat()}"
 
-        hover.add("")
-        hover.add("§cUsed §5Jungle Key§7: §c-${jungleKeyCost.shortFormat()}")
-        hover.add("§cUsed §9Robot Parts§7: §c-${partsCost.shortFormat()}")
+        if (!profitType.ignoreMaterialCost()) {
+            hover.add("")
+            hover.add("§cUsed §5Jungle Key§7: §c-${jungleKeyCost.shortFormat()}")
+            hover.add("§cUsed §9Robot Parts§7: §c-${partsCost.shortFormat()}")
+        }
         hover.add("")
         hover.add("§e$totalMessage")
 

@@ -6,11 +6,13 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -58,6 +60,11 @@ object ExcavatorProfitTracker {
         override fun getCoinDescription(item: TrackedItem) = listOf("<no coins>")
     }
 
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.profileProfitSetting.onToggle(tracker::update)
+    }
+
     private val scrapItem get() = FossilExcavatorApi.scrapItem
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -72,7 +79,12 @@ object ExcavatorProfitTracker {
             ).toSearchable(),
         )
 
-        profit = addScrap(timesExcavated, profit)
+        val profitType = config.profileProfitSetting.get()
+
+        if (!profitType.ignoreMaterialCost()) {
+            profit = addScrap(timesExcavated, profit)
+        }
+
         if (config.showFossilDust) {
             profit = addFossilDust(data.fossilDustGained, profit)
         }
