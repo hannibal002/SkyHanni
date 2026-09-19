@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobCategory
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.combat.OtherPlayersSlayerEvent
-import at.hannibal2.skyhanni.events.entity.slayer.SlayerDeathEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -24,15 +23,15 @@ object OtherPlayersSlayerApi {
     private fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (spawnedMobs.contains(event.mob.id)) return
 
-        detectAndPost(event.mob, OtherPlayersSlayerEvent::Spawn)
         spawnedMobs.add(event.mob.id)
+        detectAndPost(event.mob, OtherPlayersSlayerEvent::Spawn)
     }
 
     @HandleEvent
     private fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob.health == 0f) {
-            detectAndPost(event.mob, OtherPlayersSlayerEvent::Death)
             spawnedMobs.remove(event.mob.id)
+            detectAndPost(event.mob, OtherPlayersSlayerEvent::Death)
         }
     }
 
@@ -50,9 +49,10 @@ object OtherPlayersSlayerApi {
         val owner = mob.ownerNameOrEmpty
 
         eventType(slayerType, tier, owner).post()
+    }
 
-        if (eventType == OtherPlayersSlayerEvent::Death) {
-            SlayerDeathEvent(slayerType, tier, owner).post()
-        }
+    @HandleEvent
+    private fun onOtherPlayersSlayerDeath(event: OtherPlayersSlayerEvent.Death) {
+        SlayerDeathEvent(event.slayer, event.tier, event.owner).post()
     }
 }
