@@ -41,6 +41,12 @@ data class SlayerJson(
     @Expose @SerializedName("arbitrary_multiplier") val arbitraryMultiplier: Double,
 
     @Expose @SerializedName("aatrox_slayer_xp_buff_multiplier") val aatroxSlayerXPBuffMultiplier: Double,
+
+    @Expose @SerializedName("slayer_bonus_rewards_reduction_level") val bonusRewardsReductionLevel: Int,
+
+    @Expose @SerializedName("slayer_bonus_rewards_reduction") val bonusRewardsReduction: Double,
+
+    @Expose @SerializedName("brewery_contribution_cost_reduction") val breweryContributionCostReduction: Double
 )
 
 data class SlayerSpecificPetData(

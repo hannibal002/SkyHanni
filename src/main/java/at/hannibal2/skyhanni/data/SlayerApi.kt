@@ -174,10 +174,6 @@ object SlayerApi {
      */
     fun isInBossFight() = state == ActiveQuestState.BOSS_FIGHT
 
-    const val COST_REDUCTION = 0.96 // -4% from Slayer Bonus Rewards level 7
-    const val BREWERY_CONTRIBUTION_REDUCTION = 0.95 // -5% from contributing to the brewery community project
-    const val COST_REDUCTION_LEVEL = 7 // Slayer Bonus Rewards level required to get the -4% discount
-
     val storage: ProfileSpecificStorage.SlayerStorage?
         get() = ProfileStorageData.profileSpecific?.slayer
 
@@ -416,7 +412,7 @@ object SlayerApi {
         bonusRewardsLevel = value
     }
 
-    @HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true)
+    @HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     private fun onScoreboardChange() {
         updateSlayerState()
     }

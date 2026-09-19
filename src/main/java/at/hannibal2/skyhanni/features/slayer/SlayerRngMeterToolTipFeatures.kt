@@ -62,7 +62,7 @@ object SlayerRngMeterToolTipFeatures {
      */
     private val bonusRewardsLevelPattern by patternGroup.pattern(
         "bonus.tooltip.level",
-        "✔ LVL (?<level>\\d)",
+        "✔ LVL (?<level>\\d+)",
     )
 
     private data class OddsInfo(
@@ -133,10 +133,12 @@ object SlayerRngMeterToolTipFeatures {
         val expectedCoins = SlayerApi.activeType?.calculateSpawnCost(SlayerApi.tier, includeReduction = false) ?: return
         val changeNegation = (event.coins * -1).roundToInt()
 
-        val hasSlayerBonusRewards = changeNegation == (expectedCoins * SlayerApi.COST_REDUCTION).roundToInt()
-        val hasBartender = changeNegation == (expectedCoins * SlayerApi.BREWERY_CONTRIBUTION_REDUCTION).roundToInt()
+        val jsonData = SlayerApi.jsonData ?: return
 
-        if (hasSlayerBonusRewards) SlayerApi.updateBonusRewardsLevel(SlayerApi.COST_REDUCTION_LEVEL)
+        val hasSlayerBonusRewards = changeNegation == (expectedCoins * jsonData.bonusRewardsReduction).roundToInt()
+        val hasBartender = changeNegation == (expectedCoins * jsonData.breweryContributionCostReduction).roundToInt()
+
+        if (hasSlayerBonusRewards) SlayerApi.updateBonusRewardsLevel(jsonData.bonusRewardsReductionLevel)
         SlayerApi.updateBreweryContribution(hasBartender)
     }
 

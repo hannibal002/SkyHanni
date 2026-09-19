@@ -58,22 +58,28 @@ enum class SlayerType(
     // The cost reduction gained by contributing to the Bartender's Brewery project (5%)
     // overrides the discount gained by having all slayers at level 7 (4%).
     fun calculateSpawnCost(tier: Int, includeReduction: Boolean = true): Double? {
-        val base = SlayerApi.jsonData?.spawnCosts?.get(this)?.get(tier) ?: return null
+        val jsonData = SlayerApi.jsonData ?: return null
+        val base = jsonData.spawnCosts[this]?.get(tier) ?: return null
+
         val bonusLevel = SlayerApi.bonusRewardsLevel
+        val bonusLevelRequired = jsonData.bonusRewardsReductionLevel
+        val bonusLevelReduction = jsonData.bonusRewardsReduction
+
+        val breweryReduction = jsonData.breweryContributionCostReduction
 
         val reduction = when {
             SlayerApi.breweryContribution ->
-                SlayerApi.BREWERY_CONTRIBUTION_REDUCTION
+                breweryReduction
 
-            bonusLevel >= SlayerApi.COST_REDUCTION_LEVEL -> {
-                if (bonusLevel > SlayerApi.COST_REDUCTION_LEVEL) {
+            bonusLevel >= bonusLevelRequired -> {
+                if (bonusLevel > bonusLevelRequired) {
                     ErrorManager.logErrorStateWithData(
-                        "Slayer Bonus Rewards Level is above max level ($bonusLevel).",
+                        "Slayer Bonus Rewards Level is above max level ($bonusLevelRequired).",
                         "Slayer Bonus Rewards level too high, has it changed?",
-                        "Bonus Rewards Level" to bonusLevel,
+                        "Bonus Rewards Level" to bonusLevelRequired,
                     )
                 }
-                SlayerApi.COST_REDUCTION
+                bonusLevelReduction
             }
 
             else -> 1.0
