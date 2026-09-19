@@ -377,7 +377,7 @@ object SkyHanniConfigSearchResetCommand {
 
     val allKeybinds: Set<String> by lazy {
         buildSet {
-            ConfigUtils.traverseConfig(SkyHanniMod.feature) { _, field, path ->
+            ConfigUtils.traverseConfig(defaultConfig) { _, field, path ->
                 if (field.getAnnotation(ConfigEditorKeyMapping::class.java) != null) {
                     add(path)
                 }
