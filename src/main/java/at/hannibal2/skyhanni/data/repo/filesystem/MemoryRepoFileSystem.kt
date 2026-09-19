@@ -22,15 +22,30 @@ class MemoryRepoFileSystem(
         "path='$path', inMemory=${storage.containsKey(path)}, totalEntries=${storage.size}"
 
     override fun deleteRecursively(path: String) {
-        if (path.isEmpty()) storage.clear()
-        else storage.keys.removeIf { it == path || it.startsWith("$path/") }
+        if (path.isEmpty()) {
+            storage.clear()
+        } else {
+            val prefix = if (path.endsWith("/")) path else "$path/"
+            storage.keys.removeIf { it == path || it.startsWith(prefix) }
+        }
     }
 
-    override fun list(path: String) = storage.keys.filter {
-        it.startsWith("$path/") && it.removePrefix("$path/").endsWith(".json")
-    }.map { it.removePrefix("$path/") }
+    override fun list(path: String): List<String> {
+        val prefix = when {
+            path.isEmpty() -> ""
+            path.endsWith("/") -> path
+            else -> "$path/"
+        }
 
-    override fun clear() = storage.clear()
+        return storage.keys.mapNotNull { key ->
+            if (key.startsWith(prefix)) {
+                val relativePath = key.removePrefix(prefix)
+                if (!relativePath.contains("/") && relativePath.endsWith(".json")) {
+                    relativePath
+                } else null
+            } else null
+        }
+    }
 
     /**
      * Loads entries from [tgzFile] into in-memory storage (via [loadFromTgz])
@@ -41,6 +56,8 @@ class MemoryRepoFileSystem(
         progress.update("loadFromTgz end")
         return success
     }
+
+    override fun clear() = storage.clear()
 
     override fun dispose() = clear()
 }
