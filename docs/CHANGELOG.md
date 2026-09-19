@@ -1,5 +1,48 @@
 # SkyHanni - Change Log
 
+## Version 10.0.0
+
+### New Features
+
+#### Hunting
+
++ Added an option to hide Critter Capsules on the Critter Safari. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6542)
+    + Capsules in flight can be hidden always or only while close to the player.
+    + Capsules lying on the ground can be hidden with a separate option.
++ Added Critter Safari Shard Checklist. - pan_truskawka045 (https://github.com/hannibal002/SkyHanni/pull/6526)
+    + Tracks which shards you caught during the current run and shows the ones still missing.
+    + Can show every biome, the current biome first, or only the current biome with a one-line summary for the rest.
+    + Can hide already caught shards and the shard icons.
+
+### Improvements
+
+#### Mining
+
++ Added an In Dwarven Mines option to the Fallen Star Cult Timer. - Ironfort9 (https://github.com/hannibal002/SkyHanni/pull/6547)
+
+### Fixes
+
+#### Chat
+
++ Fixed being kicked from Hypixel when copying and sending the Overflow level-up messages for Skills and Garden Milestones. - Rhynohowl (https://github.com/hannibal002/SkyHanni/pull/6544)
+
+#### Combat
+
++ Fixed ConcurentModificationException errors in chat from Damage Indicator. - Luna (https://github.com/hannibal002/SkyHanni/pull/6548)
+
+#### Events
+
++ Fixed Shiny Orb Rewards not being detected. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6558)
+
+#### Misc
+
++ Fixed wrong colors in Fix Colored Particles. - Luna (https://github.com/hannibal002/SkyHanni/pull/6549)
+    + Green and blue were swapped, so green particles rendered blue and blue ones green.
+
+### Technical Details
++ Added the internal item name to the `/shcopyentities` output. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6542)
++ Renamed most variables of RepoPatternGroup. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6527)
+
 ## Version 9.0.0
 
 ### New Features

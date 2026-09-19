@@ -15,6 +15,8 @@ import net.minecraft.util.ARGB
  *
  * Note: The method is named `setRBGColorF` in MCP, but this is a misspelling.
  * It is clear from the source code that the colors are stored as XYZ=RGB.
+ *
+ * Note: Each channel is read inverted (`1 - offset`).
  */
 @SkyHanniModule
 object ColorParticleFix {
