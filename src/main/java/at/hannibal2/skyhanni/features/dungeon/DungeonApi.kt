@@ -349,7 +349,7 @@ object DungeonApi {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         val floor = dungeonFloor ?: return
-        if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
+        if (event.cleanMessage == "[NPC] Mort: Here, I found this map when I first entered the dungeon.") {
             started = true
             DungeonStartEvent(floor).post()
         }

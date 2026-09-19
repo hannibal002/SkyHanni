@@ -157,14 +157,14 @@ object DungeonChatFilter {
         "§a(.*) §r§f(.*) §r§c(.*)§r§f -> §r§a(.*)".toPattern(),
     )
     private val startMessages = listOf(
-        "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.",
-        "§e[NPC] §bMort§f: §rYou should find it useful if you get lost.",
-        "§e[NPC] §bMort§f: §rGood luck.",
-        "§e[NPC] §bMort§f: §rTalk to me to change your class and ready up.",
+        "[NPC] Mort: Here, I found this map when I first entered the dungeon.",
+        "[NPC] Mort: You should find it useful if you get lost.",
+        "[NPC] Mort: Good luck.",
+        "[NPC] Mort: Talk to me to change your class and ready up.",
     )
     private val preparePatterns = listOf(
         "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.".toPattern(),
-        "§e[NPC] §bMort§f: §rTalk to me to change your class and ready up.".toPattern(),
+        "§e[NPC] §r§bMort§r§f: §rTalk to me to change your class and ready up.".toPattern(),
         "(.*)§a is now ready!".toPattern(),
         "§aDungeon starts in (.*) seconds.".toPattern(),
     )
@@ -173,6 +173,7 @@ object DungeonChatFilter {
         "§aYour active Potion Effects have been paused and stored. They will be restored when you leave Dungeons! You are not allowed to use existing Potion Effects while in Dungeons.",
         "§aDungeon starts in 1 second.",
         "§aYou can no longer consume or splash any potions during the remainder of this Dungeon run!",
+        "[NPC] Mort: Talk to me to change your class and ready up.",
     )
 
     private val messagesMap: Map<MessageTypes, List<String>> = mapOf(
@@ -206,7 +207,7 @@ object DungeonChatFilter {
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (config.dungeonFilteredMessageTypes.isEmpty()) return
 
-        val blockReason = block(event.message)
+        val blockReason = block(event.message).ifEmpty { block(event.cleanMessage) }
         if (blockReason != "") {
             event.blockedReason = "dungeon_$blockReason"
         }
