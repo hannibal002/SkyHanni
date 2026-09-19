@@ -216,7 +216,7 @@ object PestFinder {
     private fun onKeyPress(event: KeyPressEvent) {
         if (MinecraftCompat.screen != null) return
 
-        if (event.keyCode != config.teleportHotkey) return
+        if (event.key != config.teleportHotkey) return
         if (lastKeyPress.passedSince() < 2.seconds) return
         lastKeyPress = SimpleTimeMark.now()
 

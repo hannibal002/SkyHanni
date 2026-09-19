@@ -5,7 +5,6 @@ import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 
 object PoseStackUtils {
-
     /**
      * Rotates the PoseStack by the given rotation vector (in degrees).
      * Returns true if a rotation was applied, false if the rotation vector was (0,0,0).
@@ -19,7 +18,8 @@ object PoseStackUtils {
         if (xRad == 0f && yRad == 0f && zRad == 0f) return false
 
         quaternionf.rotateXYZ(xRad, yRad, zRad)
-        mulPose(quaternionf)
+        //~ if < 26.3 'rotate' -> 'mulPose'
+        rotate(quaternionf)
         return true
     }
 }

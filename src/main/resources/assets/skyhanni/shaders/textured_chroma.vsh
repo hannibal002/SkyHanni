@@ -1,11 +1,14 @@
 #version 150
 
+//? if >= 26.3
+#extension GL_ARB_separate_shader_objects : require
+
 in vec3 Position;
 in vec2 UV0;
 in vec4 Color;
 
-#moj_import <minecraft:dynamictransforms.glsl>
-#moj_import <minecraft:projection.glsl>
+#include <minecraft:dynamictransforms.glsl>
+#include <minecraft:projection.glsl>
 
 out vec4 vertexColor;
 out vec2 texCoord0;

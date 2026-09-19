@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.renderpearl.api.commands.RenderPass;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
@@ -36,7 +36,7 @@ public abstract class MixinGuiRenderer {
     }
 
     //~ if < 26.2 'shift = At.Shift.AFTER' -> 'ordinal = 1'
-    @Inject(method = "executeDrawRange", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", shift = At.Shift.AFTER))
+    @Inject(method = "executeDrawRange", at = @At(value = "INVOKE", target = "Lcom/mojang/renderpearl/api/commands/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;)V", shift = At.Shift.AFTER))
     public void insertChromaSetUniform(
         CallbackInfo ci,
         @Local RenderPass renderPass) {
@@ -45,7 +45,7 @@ public abstract class MixinGuiRenderer {
 
     @WrapOperation(
         method = "addElementToMesh",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;pipeline()Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;")
     )
     public RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);

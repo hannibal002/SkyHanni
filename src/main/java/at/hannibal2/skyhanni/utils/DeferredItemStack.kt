@@ -12,12 +12,15 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.ItemStackTemplate
 
+//? if >= 26.3 {
+import net.minecraft.core.component.Removed.isNotRemoved
+//?}
+
 internal class DeferredItemStack private constructor(
     private val sourceItem: Item,
     private val factory: () -> ItemStackTemplate,
     count: Int,
 ) : ItemStack(Holder.direct(sourceItem), count, DataComponentPatch.EMPTY) {
-
     private var isBuilt = false
     private val removedComponents = mutableSetOf<DataComponentType<*>>()
 
@@ -83,8 +86,10 @@ internal class DeferredItemStack private constructor(
 
     override fun applyComponents(patch: DataComponentPatch) {
         if (!isBuilt) {
-            patch.entrySet().forEach { (type, value) ->
-                if (value.isPresent) removedComponents.remove(type)
+            //~ if < 26.3 'patch.map.entries' -> 'patch.entrySet()'
+            patch.map.entries.forEach { (type, value) ->
+                //~ if < 26.3 'isNotRemoved(value)' -> 'value.isPresent'
+                if (isNotRemoved(value)) removedComponents.remove(type)
                 else removedComponents.add(type)
             }
         }
@@ -108,8 +113,12 @@ internal class DeferredItemStack private constructor(
         if (removedComponents.isEmpty()) return pendingPatch
 
         val builder = DataComponentPatch.builder()
-        pendingPatch.entrySet().forEach { (type, value) ->
-            if (value.isPresent) builder.setUnchecked(type, value.get())
+        //~ if < 26.3 'pendingPatch.map.entries' -> 'pendingPatch.entrySet()'
+        pendingPatch.map.entries.forEach { (type, value) ->
+            //? if >= 26.3 {
+            if (value != null && isNotRemoved(value)) builder.setUnchecked(type, value)
+            //?} else
+            //if (value.isPresent) builder.setUnchecked(type, value.get())
             else builder.removeUnchecked(type)
         }
         removedComponents.forEach(builder::removeUnchecked)
