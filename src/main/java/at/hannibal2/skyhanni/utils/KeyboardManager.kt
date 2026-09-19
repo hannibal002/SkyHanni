@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import com.mojang.blaze3d.platform.InputConstants
-import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
@@ -162,8 +161,17 @@ object KeyboardManager {
 
     fun KeyMapping.isKeyClicked(): Boolean = key.isKeyClicked()
 
-    // TODO: Use The type of the key to determine if it is a mouse button or keyboard key, and use the appropriate method to get the name.
-    fun getKeyName(key: InputConstants.Key): String = IMinecraft.INSTANCE.getKeyName(key.value).text
+    fun getKeyName(key: InputConstants.Key): String {
+        if (key == InputCode.UNKNOWN.key) return "NONE"
+        val displayName = key.displayName
+        val collapsedDisplayName = displayName.tryCollapseToString() ?: displayName.string
+        // In case of fallback, we will attempt to collapse the string to a more readable format.
+        return when {
+            collapsedDisplayName.startsWith("key.mouse.") -> "Button ${collapsedDisplayName.removePrefix("key.mouse.").capitalize()}"
+            collapsedDisplayName.startsWith("key.keyboard.") -> collapsedDisplayName.removePrefix("key.keyboard.").capitalize()
+            else -> collapsedDisplayName
+        }
+    }
 
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
         processor.registerConfigEditor(ConfigEditorKeyMapping::class.java) { option, annotation ->
