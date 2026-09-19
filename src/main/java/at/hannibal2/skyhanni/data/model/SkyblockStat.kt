@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.model
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -166,12 +168,16 @@ enum class SkyblockStat(
 
     var lastSource: StatSourceType = StatSourceType.UNKNOWN
 
-    var lastAssignment: SimpleTimeMark = SimpleTimeMark.farPast()
+    val capitalizedName = name.lowercase().allLettersFirstUppercase()
+    val iconWithName get() = "$icon $capitalizedName"
 
-    private val capitalizedName = name.lowercase().allLettersFirstUppercase()
+    val formattedDisplay get() = iconWithName + (lastKnownValue?.let { " §f" + it.roundToInt() } ?: " §c???")
 
-    val iconWithName
-        get() = "$icon $capitalizedName"
+    fun renderFormattedDisplay(position: Position, transform: ((String) -> String)? = null) =
+        position.renderRenderable(
+            Renderable.text(formattedDisplay.let { transform?.invoke(it) ?: it }),
+            "$capitalizedName Stat Display",
+        )
 
     private val keyName = name.lowercase().replace('_', '.')
 

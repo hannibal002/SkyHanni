@@ -10,20 +10,16 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchAllComponents
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.compat.iterator
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object BonusPestChanceDisplay {
 
     private val config get() = PestApi.config
 
-    private val patternGroup = RepoPattern.group("garden.bonuspestchance")
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onGuiRenderOverlay() {
+        if (config.pestChanceDisplay == DisplayFormat.DISABLED) return
+        if (GardenApi.hideExtraGuis()) return
 
     /**
      * WRAPPED-REGEX-TEST: " Bonus Pest Chance: 70"
@@ -35,18 +31,13 @@ object BonusPestChanceDisplay {
     )
     private var display: Renderable? = null
 
-    @HandleEvent
-    fun onWorldChange() {
-        display = null
-    }
+            val compact = config.pestChanceDisplay == DisplayFormat.COMPACT
+            val disabled = it.contains("§m")
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.STATS)) return
-        val compact = config.pestChanceDisplay.get() == DisplayFormat.COMPACT
-        bonusPestChancePattern.matchAllComponents(event.widget.lines) { line ->
-            val disabled = line.iterator().any { it.style.isStrikethrough }
-            val amount = group("amount").formatInt()
+            it = it.plus("%") // add %
+
+            if (compact)
+                it = it.replace("Bonus Pest Chance", "BPC") // shorten name
 
             display = Renderable.text {
                 if (compact) append("§2 BPC ") else append("§2 Bonus Pest Chance ")
@@ -54,15 +45,9 @@ object BonusPestChanceDisplay {
                 append("$amount%")
                 if (disabled && !compact) append("§r §cDISABLED")
             }
-            return
-        }
-    }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onGuiRenderOverlay() {
-        if (!isEnabled()) return
-        val display = display ?: return
-        config.pestChanceDisplayPosition.renderRenderable(display, posLabel = "Bonus Pest Chance")
+            it // return modified text
+        }
     }
 
     @HandleEvent
@@ -72,12 +57,10 @@ object BonusPestChanceDisplay {
         }
     }
 
-    private fun isEnabled() = GardenApi.inGarden() && config.pestChanceDisplay.get() != DisplayFormat.DISABLED && !GardenApi.hideExtraGuis()
-
     enum class DisplayFormat(private val displayName: String) {
-        DISABLED("Disabled"),
+        FULL("Enabled"),
         COMPACT("Compact"),
-        FULL("Full"),
+        DISABLED("Disabled"),
         ;
 
         override fun toString() = displayName

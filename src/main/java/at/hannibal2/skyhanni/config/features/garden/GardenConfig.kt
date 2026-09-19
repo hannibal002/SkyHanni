@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.config.features.garden.optimalAngles.OptimalAnglesC
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
+import at.hannibal2.skyhanni.features.garden.OverbloomDisplay
 import at.hannibal2.skyhanni.features.garden.farming.NoBreak.NoBreakItem
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -188,10 +189,18 @@ class GardenConfig {
     @Accordion
     val seeThroughWindow: SeeThroughWindowConfig = SeeThroughWindowConfig()
 
-    @Expose
     @ConfigOption(name = "Farming Toolkit", desc = "")
     @Accordion
     val farmingToolkit: FarmingToolkitIconConfig = FarmingToolkitIconConfig()
+
+    @Expose
+    @ConfigOption(name = "Overbloom Display", desc = "Displays your overbloom.")
+    @ConfigEditorDropdown
+    var overbloomDisplayFormat: OverbloomDisplay.DisplayFormat = OverbloomDisplay.DisplayFormat.DISABLED
+
+    @Expose
+    @ConfigLink(owner = GardenConfig::class, field = "overbloomDisplayFormat")
+    val overbloomDisplayPosition: Position = Position(5, -105)
 
     @Expose
     @ConfigOption(

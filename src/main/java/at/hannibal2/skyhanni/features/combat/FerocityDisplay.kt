@@ -4,10 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule
 object FerocityDisplay {
@@ -21,6 +17,4 @@ object FerocityDisplay {
             config.position.renderRenderable(Renderable.text(it), posLabel = "Ferocity Display")
         }
     }
-
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }
