@@ -1,8 +1,11 @@
-#version 150
+#version 330
+
+//? if >= 26.3
+#extension GL_ARB_separate_shader_objects : require
 
 const float pi = 3.14159265f;
 
-in vec4 vertexColor;
+layout(location = 0) in vec4 vertexColor;
 
 layout(std140) uniform SkyHanniRoundedUniforms {
     float scaleFactor;
@@ -17,7 +20,7 @@ layout(std140) uniform SkyHanniCircleUniforms {
     float angle1;
     float angle2;
 };
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 void main() {
     float xScale = modelViewMatrix[0][0];

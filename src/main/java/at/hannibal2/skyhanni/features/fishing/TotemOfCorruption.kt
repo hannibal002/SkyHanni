@@ -42,7 +42,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TotemOfCorruption {
-
     private val config get() = SkyHanniMod.feature.fishing.totemOfCorruption
 
     private var display = emptyList<Renderable>()
@@ -101,7 +100,8 @@ object TotemOfCorruption {
         if (!config.hideParticles) return
 
         for (totem in allTotems) {
-            if (event.type == ParticleTypes.WITCH && event.speed == 0f) {
+            // TODO verify on 26.3
+            if (event.type == ParticleTypes.WITCH && event.isSpeed(0f)) {
                 if (totem.location.distance(event.location) < 4.0) {
                     event.cancel()
                 }

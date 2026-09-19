@@ -28,7 +28,7 @@ plugins {
 }
 
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
-val primaryTarget = ProjectTarget.MODERN_26200
+val primaryTarget = ProjectTarget.MODERN_26300
 
 // Toolchains:
 java {
@@ -165,16 +165,19 @@ dependencies {
     "productionRuntimeMods"(target.hypixelModApiFabricVersion)
 
     val reiVersion = when (target) {
+        ProjectTarget.MODERN_26300 -> null
         ProjectTarget.MODERN_26200 -> "26.2.820"
         ProjectTarget.MODERN_26100 -> "26.1.819"
     }
-    val reiApi = "me.shedaniel:RoughlyEnoughItems-api:$reiVersion"
-    compileOnly(reiApi) { isTransitive = false }
-    "minecraftTestClientRuntimeLibraries"(reiApi) {
-        isTransitive = false
+    if (reiVersion != null) {
+        val reiApi = "me.shedaniel:RoughlyEnoughItems-api:$reiVersion"
+        compileOnly(reiApi) { isTransitive = false }
+        "minecraftTestClientRuntimeLibraries"(reiApi) {
+            isTransitive = false
+        }
+        compileOnly(libs.basicMath)
+        "minecraftTestClientRuntimeLibraries"(libs.basicMath)
     }
-    compileOnly(libs.basicMath)
-    "minecraftTestClientRuntimeLibraries"(libs.basicMath)
 
     // getting clock offset
     shadowImpl(libs.commons.net)

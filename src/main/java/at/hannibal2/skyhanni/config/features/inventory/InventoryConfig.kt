@@ -39,6 +39,7 @@ class InventoryConfig {
     @Category(name = "Experimentation Table", desc = "QOL features for the Experimentation Table.")
     val experimentationTable: ExperimentationTableConfig = ExperimentationTableConfig()
 
+    @JvmField
     @Expose
     @Category(name = "Enchant Parsing", desc = "Settings for SkyHanni's Enchant Parsing")
     val enchantParsing: EnchantParsingConfig = EnchantParsingConfig()

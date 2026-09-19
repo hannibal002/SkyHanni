@@ -7,13 +7,23 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
-import org.lwjgl.util.tinyfd.TinyFileDialogs
 import kotlin.time.Duration
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
 
+//? if >= 26.3 {
+import net.minecraft.client.Minecraft
+import org.lwjgl.sdl.SDLMessageBox
+//?} else {
+/*import org.lwjgl.util.tinyfd.TinyFileDialogs
+*///?}
+
 @SkyHanniModule
 object DialogUtils {
+    //? if >= 26.3 {
+    // https://wiki.libsdl.org/SDL3/SDL_MessageBoxFlags
+    private const val SDL_MESSAGEBOX_INFORMATION = 0x40
+    //?}
 
     private val dialogMutex = Mutex()
 
@@ -23,7 +33,8 @@ object DialogUtils {
         withIOContext = true,
     ).withMutex(dialogMutex)
 
-    /**
+    //? if < 26.3 {
+    /*/**
      * tinyfd replaces the whole string with `INVALID MESSAGE WITH QUOTES` if any of these are present,
      * as the Unix backends build a shell command line.
      */
@@ -35,13 +46,14 @@ object DialogUtils {
      */
     private const val QUERY_TITLE = "tinyfd_query"
 
-    private val hasGraphicalBackend by lazy { messageBox(QUERY_TITLE, "") }
+    private val hasGraphicalBackend by lazy { tinyfdMessageBox(QUERY_TITLE, "") }
 
     /**
      * The backend the query selected, e.g. `applescript` or `basicinput` for the console fallback.
      * Only meaningful directly after a call, so it is read while still holding [dialogMutex].
      */
     private fun currentBackend(): String? = TinyFileDialogs.tinyfd_getGlobalChar("tinyfd_response")
+    *///?}
 
     /**
      * Opens a modal message box outside the game window.
@@ -56,7 +68,15 @@ object DialogUtils {
         runCatching {
             if (!condition()) return@runCatching
 
-            if (!hasGraphicalBackend) {
+            //? if >= 26.3 {
+            SDLMessageBox.SDL_ShowSimpleMessageBox(
+                SDL_MESSAGEBOX_INFORMATION,
+                title,
+                message,
+                Minecraft.getInstance().window.handle(),
+            )
+            //?} else {
+            /*if (!hasGraphicalBackend) {
                 ErrorManager.logErrorStateWithData(
                     "Failed to open a popup window",
                     "No graphical dialog backend is available",
@@ -68,8 +88,8 @@ object DialogUtils {
                 )
                 return@runCatching
             }
-
-            messageBox(title.stripForbiddenChars(), message.stripForbiddenChars())
+            tinyfdMessageBox(title.stripForbiddenChars(), message.stripForbiddenChars())
+            *///?}
         }.onFailure { e ->
             ErrorManager.logErrorWithData(
                 e, "Failed to open a popup window",
@@ -79,11 +99,13 @@ object DialogUtils {
         }
     }
 
-    private fun String.stripForbiddenChars(): String = filterNot { it in forbiddenCharacters }
+    //? if < 26.3 {
+    /*private fun String.stripForbiddenChars(): String = filterNot { it in forbiddenCharacters }
 
-    private fun messageBox(title: String, message: String): Boolean {
+    private fun tinyfdMessageBox(title: String, message: String): Boolean {
         return TinyFileDialogs.tinyfd_messageBox(title, message, "ok", "info", 1) != 0
     }
+    *///?}
 
     @HandleEvent
     private fun onCommandRegistration(event: CommandRegistrationEvent) {

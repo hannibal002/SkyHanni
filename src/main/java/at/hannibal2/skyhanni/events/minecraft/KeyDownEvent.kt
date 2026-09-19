@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.events.minecraft
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import at.hannibal2.skyhanni.utils.InputCode
 
 /**
  * Fired once when a key is pressed down. Use this for taps.
@@ -12,7 +13,9 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
  *
  * Not fired while no player exists, for an unknown key code, or while the REI search bar has focus.
  *
- * @param keyCode the GLFW key code of the pressed key
+ * @param key the input code the user pressed
  */
 @PrimaryFunction("onKeyDown")
-class KeyDownEvent(val keyCode: Int) : SkyHanniEvent()
+class KeyDownEvent(val key: InputCode) : SkyHanniEvent() {
+    val keyCode: Int get() = key.value
+}
