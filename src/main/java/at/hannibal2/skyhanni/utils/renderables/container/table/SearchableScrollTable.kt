@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.renderables.container.table
 
 import at.hannibal2.skyhanni.data.model.TextInput
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -20,6 +21,7 @@ class SearchableScrollTable private constructor(
     override val height: Int,
     private val scrollValue: ScrollValue = ScrollValue(),
     private val velocity: Double = 2.0,
+    private val button: InputCode? = null,
     textInput: TextInput,
     key: Int,
     override val xSpacing: Int = 1,
@@ -58,6 +60,7 @@ class SearchableScrollTable private constructor(
         minHeight = lowerBound,
         maxHeight = upperBound,
         velocity = velocity,
+        dragScrollMouseButton = button
     )
 
     init {
@@ -134,6 +137,7 @@ class SearchableScrollTable private constructor(
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),
             velocity: Double = 2.0,
+            button: InputCode? = null,
             textInput: TextInput,
             key: Int,
             xSpacing: Int = 1,
@@ -148,6 +152,7 @@ class SearchableScrollTable private constructor(
             height = height,
             scrollValue = scrollValue,
             velocity = velocity,
+            button = button,
             textInput = textInput,
             key = key,
             xSpacing = xSpacing,
