@@ -185,12 +185,9 @@ enum class InputCode(
             return key?.let { fromKey(it) } ?: UNKNOWN
         }
 
+        @JvmStatic
         fun fromKeyCode(keyCode: Int): InputCode =
             fromKey(InputConstants.Type.KEYSYM.getOrCreate(keyCode))
-
-        @JvmStatic
-        fun fromKeyEvent(keyEvent: KeyEvent): InputCode =
-            fromKey(InputConstants.getKey(keyEvent))
 
         fun fromMouseButton(mouseButton: Int): InputCode =
             fromKey(InputConstants.Type.MOUSE.getOrCreate(mouseButton))
