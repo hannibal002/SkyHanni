@@ -190,8 +190,15 @@ object CroesusChestTracker {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0"
                     )
-            if (run.floor == "F0" && kuudraPattern.matches(itemName)) run.floor =
-                ("T" + KuudraTier.getByDisplayName(lore.firstNotNullOf { kuudraPattern.matchMatcher(it) { group("tier") } })?.tierNumber)
+            if (run.floor == "F0") kuudraPattern.matchMatcher(itemName) {
+                val tier = group("tier")
+                val kuudraTier = KuudraTier.getByDisplayName(tier) ?: ErrorManager.skyHanniError(
+                    "unknown kuudra tier in croesus chest",
+                    "tier" to tier,
+                    "item name" to itemName,
+                )
+                run.floor = "T" + kuudraTier.tierNumber
+            }
             run.openState = OpenedState.getOpenState(lore)
         }
     }

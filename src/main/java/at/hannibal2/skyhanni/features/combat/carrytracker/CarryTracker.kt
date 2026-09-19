@@ -32,7 +32,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.PaginatedListHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.width
@@ -332,7 +332,7 @@ object CarryTracker {
     }
 
     fun listPrices(page: Int = 1) {
-        TextHelper.displayPaginatedList(
+        PaginatedListHelper.display(
             "Carry Tracker Prices",
             carryTypes.filter { it.pricePer != 0.0 },
             PRICE_LIST_MESSAGE_ID,

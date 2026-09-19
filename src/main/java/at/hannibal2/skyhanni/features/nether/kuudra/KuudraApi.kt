@@ -62,6 +62,7 @@ object KuudraApi {
         "(?<chesttype>(?:Paid|Free) Chest)(?: Chest)?",
     )
 
+    // TODO migrate this to KuudraTier
     val kuudraArmorTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
 
     fun NeuInternalName.isKuudraArmor(): Boolean = kuudraArmorPattern.matches(asString())
@@ -124,17 +125,26 @@ object KuudraApi {
     }
 
     @Deprecated("use KuudraTier instead")
-    private val kuudraTiers = listOf("basic", "hot", "burning", "fiery", "infernal")
+    val kuudraTiers = KuudraTier.entries.map { it.name.lowercase() }
+
+    @Deprecated("just dont use this, idk why this exists since it has never been used before")
+    val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
     @Deprecated(
         "use KuudraTier.getByTierNumber(tier) instead",
-        ReplaceWith("at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier.getByTierNumber(tier)?.name.lowercase()"),
+        ReplaceWith(
+            "KuudraTier.getByTierNumber(tier)?.name.lowercase()",
+            "at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier",
+        ),
     )
     fun getKuudraRunTierName(tier: Int): String = kuudraTiers[tier - 1]
 
     @Deprecated(
         "use KuudraTier.getByDisplayName(tier) instead",
-        ReplaceWith("at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier.getByDisplayName(tier)?.tierNumber - 1"),
+        ReplaceWith(
+            "KuudraTier.getByDisplayName(tier)?.tierNumber - 1",
+            "at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier",
+        ),
     )
     fun getKuudraRunTierNumber(tier: String?): Int = kuudraTiers.indexOf(tier)
 }

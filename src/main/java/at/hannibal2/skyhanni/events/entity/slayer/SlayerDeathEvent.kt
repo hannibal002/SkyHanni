@@ -5,6 +5,9 @@ import at.hannibal2.skyhanni.features.slayer.SlayerType
 
 @Deprecated(
     "use OtherPlayersSlayerEvent.Death instead",
-    ReplaceWith("at.hannibal2.skyhanni.events.entity.slayer.OtherPlayersSlayerEvent.Death"),
+    ReplaceWith(
+        "OtherPlayersSlayerEvent.Death",
+        "at.hannibal2.skyhanni.events.combat.OtherPlayersSlayerEvent",
+    ),
 )
 class SlayerDeathEvent(val slayerType: SlayerType, val tier: Int, val owner: String?) : SkyHanniEvent()
