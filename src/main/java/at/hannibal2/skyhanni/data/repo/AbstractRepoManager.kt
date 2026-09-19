@@ -248,7 +248,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun initRepo() = progressCategory.startBlock("auto loading on init") { progress ->
         shouldManuallyReload = true
         repoInitCoroutineConfig.launch {
-            updateLegacyFiles()
+            deleteLegacyFiles()
             if (config.repoAutoUpdate) {
                 if (!fetchAndUnpackRepo(progress, command = false).canContinue) {
                     progress.end("Failed to fetch & unpack repo - aborting.")
@@ -548,7 +548,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     // TODO: Remove in 10.0.0
-    private fun updateLegacyFiles() {
+    private fun deleteLegacyFiles() {
+        SkyHanniMod.dataDir.resolve(repoFolderName).deleteRecursivelySafe()
         val configDirectory = legacyConfigDirectory ?: return
         configDirectory.resolve("repo").deleteRecursivelySafe()
         configDirectory.resolve("currentCommit.json").delete()
