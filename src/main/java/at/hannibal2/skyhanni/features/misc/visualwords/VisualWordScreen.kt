@@ -55,7 +55,7 @@ class VisualWordScreen : SkyHanniBaseScreen() {
         }
     }
 
-    override fun onKeyTyped(typedChar: Char?, key: InputCode) {
+    override fun onKeyTyped(typedChar: Char?, key: InputCode?) = key?.let {
         when {
             key == KEY_ESCAPE || KeyboardManager.checkIsInventoryClosure(key) ->
                 if (currentlyEditing) exitEditMode() else onClose()
@@ -66,7 +66,7 @@ class VisualWordScreen : SkyHanniBaseScreen() {
             (key == KEY_RETURN || key == KEY_NUMPADENTER) && currentlyEditing ->
                 exitEditMode()
         }
-    }
+    } ?: Unit
 
     override fun isPauseScreen() = false
 

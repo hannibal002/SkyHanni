@@ -69,14 +69,14 @@ abstract class SkyHanniBaseScreen(title: Component = Component.empty()) : Screen
 
     private fun postKeyTyped(typedChar: Char?, keyCode: Int?) {
         try {
-            val key = keyCode?.let { InputCode.fromKeyCode(it) } ?: InputCode.UNKNOWN
+            val key = keyCode?.let { InputCode.fromKeyCode(it) }
             onKeyTyped(typedChar, key)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error while typing key", "screen" to this)
         }
     }
 
-    open fun onKeyTyped(typedChar: Char?, key: InputCode) {}
+    open fun onKeyTyped(typedChar: Char?, key: InputCode?) {}
 
     override fun mouseReleased(click: MouseButtonEvent): Boolean {
         postMouseReleased(click.x.toInt(), click.y.toInt(), click.button())

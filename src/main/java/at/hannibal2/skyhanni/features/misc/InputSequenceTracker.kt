@@ -129,7 +129,7 @@ object InputSequenceTracker {
             if (openedAt.passedSince() > 7.seconds) onClose()
         }
 
-        override fun onKeyTyped(typedChar: Char?, key: InputCode) {
+        override fun onKeyTyped(typedChar: Char?, key: InputCode?) {
             onClose()
         }
 

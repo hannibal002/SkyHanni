@@ -46,7 +46,7 @@ class CustomWardrobeScreen(
         }
     }
 
-    override fun onKeyTyped(typedChar: Char?, key: InputCode) {
+    override fun onKeyTyped(typedChar: Char?, key: InputCode?) {
         CustomWardrobeKeybinds.handlePress()
     }
 
