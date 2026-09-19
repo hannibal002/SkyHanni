@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 
 abstract class ScrollInput(
@@ -7,6 +8,7 @@ abstract class ScrollInput(
     protected val minValue: Int,
     protected val maxValue: Int,
     protected val velocity: Double,
+    protected val dragScrollMouseButton: InputCode?,
     startValue: Double?,
 ) {
 
@@ -56,12 +58,21 @@ abstract class ScrollInput(
             minHeight: Int,
             maxHeight: Int,
             velocity: Double,
+            dragScrollMouseButton: InputCode? = null,
             startValue: Double? = null,
-        ) : ScrollInput(scrollValue, minHeight, maxHeight, velocity, startValue) {
+        ) : ScrollInput(scrollValue, minHeight, maxHeight, velocity, dragScrollMouseButton, startValue) {
             override fun update(isValid: Boolean) {
                 if (maxValue < minValue) return
                 if (!isValid) return
                 var changed = false
+                if (
+                    dragScrollMouseButton != null &&
+                    dragScrollMouseButton.isKeyHeld() &&
+                    consumeMouseMoveEvent()
+                ) {
+                    scroll += MouseCompat.getEventDY() * velocity
+                    changed = true
+                }
                 if (consumeScrollEvent()) {
                     val deltaWheel = MouseCompat.getPreciseScrollDelta()
                     scroll += -deltaWheel * 2.5 * velocity
@@ -77,7 +88,7 @@ abstract class ScrollInput(
          */
         class PureVertical(
             scrollValue: ScrollValue = ScrollValue(),
-        ) : Vertical(scrollValue, -1, 1, 1.0, 0.0) {
+        ) : Vertical(scrollValue, -1, 1, 1.0, null, 0.0) {
             override fun update(isValid: Boolean) {
                 // For pure events, we don't care about tracking state
                 // and only care about tracking a 1/-1 for the scroll status.
