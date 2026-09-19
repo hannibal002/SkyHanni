@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -61,7 +60,7 @@ object BurrowWarpHelper {
         if (GriffinBurrowHelper.mobAlive) return
 
         val text = "§bWarp to " + warp.displayName
-        val keybindSuffix = if (config.keyBindWarp != InputCode.UNKNOWN) {
+        val keybindSuffix = if (config.keyBindWarp != UNKNOWN) {
             " §7(§ePress ${config.keyBindWarp.displayName}§7)"
         } else ""
 

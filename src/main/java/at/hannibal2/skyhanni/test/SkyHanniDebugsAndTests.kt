@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -511,7 +510,7 @@ object SkyHanniDebugsAndTests {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onGuiRender() {
-        if (debugConfig.copyCosmeticsSkullData == InputCode.UNKNOWN) return
+        if (debugConfig.copyCosmeticsSkullData == UNKNOWN) return
         val stack = InventoryCompat.stackUnderCursor() ?: return
         if (!stack.getCleanLore().any { it.contains("Right-click to preview!") }) return
 

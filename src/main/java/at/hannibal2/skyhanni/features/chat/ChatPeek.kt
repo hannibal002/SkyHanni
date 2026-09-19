@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 
@@ -15,7 +14,7 @@ object ChatPeek {
         val key = SkyHanniMod.feature.chat.peekChat
 
         if (!MinecraftCompat.localPlayerExists) return false
-        if (key <= InputCode.UNKNOWN) return false
+        if (key == UNKNOWN) return false
         if (MinecraftCompat.screen is SignEditScreen) return false
         if (ConfigUtils.configScreenCurrentlyOpen) return false
 

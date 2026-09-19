@@ -23,8 +23,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.InputCode.LEFT_MOUSE
-import at.hannibal2.skyhanni.utils.InputCode.RIGHT_MOUSE
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -331,8 +330,8 @@ object TunnelsMaps {
                     "§eRight Click for override",
                 ),
                 onAnyClick = mapOf(
-                    LEFT_MOUSE to guiSetActive(campfireName),
-                    RIGHT_MOUSE to ::campfireOverride,
+                    InputCode.LEFT_MOUSE to guiSetActive(campfireName),
+                    InputCode.RIGHT_MOUSE to ::campfireOverride,
                 ),
             ),
         )
