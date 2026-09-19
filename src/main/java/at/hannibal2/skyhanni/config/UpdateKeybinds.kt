@@ -26,6 +26,7 @@ object UpdateKeybinds {
 
     // https://github.com/Polyfrost/OneConfig/blob/feat/26.3/minecraft/src/main/java/org/polyfrost/oneconfig/api/ui/v1/keybind/internal/MinecraftKeybindCodec.java
     // Commented out the 2 keycodes that changed from 26.2 to 26.3 since I don't want a Minecraft version migration here.
+    @Suppress("CyclomaticComplexMethod")
     private fun glfwKeyName(code: Int): String? {
         if (code == -1) return "key.keyboard.unknown"
         if (code in 3..7) return "key.mouse." + (code + 1)
