@@ -164,7 +164,7 @@ enum class InputCode(
 
     // TODO: Remove workaround for 26.3
     fun toKeyIdentifier(): String = when (key.name) {
-        "key.keyboard.decimal.decimal" -> "key.keyboard.keypad.period"
+        "key.keyboard.keypad.decimal" -> "key.keyboard.keypad.period"
         "key.keyboard.menu" -> "key.keyboard.application"
         else -> key.name
     }
@@ -175,7 +175,7 @@ enum class InputCode(
                 InputConstants.getKey(
                     // TODO: Remove workaround for 26.3
                     when (identifier) {
-                        "key.keyboard.keypad.period" -> "key.keyboard.decimal.decimal"
+                        "key.keyboard.keypad.period" -> "key.keyboard.keypad.decimal"
                         "key.keyboard.application" -> "key.keyboard.menu"
                         else -> identifier
                     }
