@@ -170,6 +170,8 @@ enum class InputCode(
     }
 
     companion object {
+        private val keyLookup = entries.associateBy { it.key }
+
         fun fromKeyIdentifier(identifier: String): InputCode {
             val key = runCatching {
                 InputConstants.getKey(
@@ -192,8 +194,6 @@ enum class InputCode(
         fun fromMouseButton(mouseButton: Int): InputCode =
             fromKey(InputConstants.Type.MOUSE.getOrCreate(mouseButton))
 
-        // TODO: Optimize
-        fun fromKey(key: InputConstants.Key): InputCode =
-            entries.firstOrNull { it.key == key } ?: UNKNOWN
+        fun fromKey(key: InputConstants.Key): InputCode = keyLookup[key] ?: UNKNOWN
     }
 }
