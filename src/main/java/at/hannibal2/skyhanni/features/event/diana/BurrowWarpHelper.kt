@@ -62,7 +62,7 @@ object BurrowWarpHelper {
 
         val text = "§bWarp to " + warp.displayName
         val keybindSuffix = if (config.keyBindWarp != InputCode.UNKNOWN) {
-            " §7(§ePress $${config.keyBindWarp.displayName}§7)"
+            " §7(§ePress ${config.keyBindWarp.displayName}§7)"
         } else ""
 
         val warpText = Renderable.text(text + keybindSuffix, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
