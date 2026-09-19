@@ -3,6 +3,7 @@ package style
 import SkyHanniRule
 import dev.detekt.api.Config
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import utils.DetektUtils.getAnnotation
 
 class OnlyOnIslandSpecificity(config: Config) : SkyHanniRule(
     config,
@@ -10,10 +11,7 @@ class OnlyOnIslandSpecificity(config: Config) : SkyHanniRule(
 ) {
 
     override fun visitNamedFunction(function: KtNamedFunction) {
-        val annotations = function.annotationEntries
-        val handleEventAnnotation = annotations.find { it.calleeExpression?.text == "HandleEvent" }
-
-        handleEventAnnotation?.let { annotation ->
+        function.getAnnotation("HandleEvent")?.let { annotation ->
             val arguments = annotation.valueArguments
             val hasOnlyOnSkyblock = arguments.any { it.asElement().text.contains("onlyOnSkyblock") }
             val hasOnlyOnIsland = arguments.any { it.asElement().text.contains("onlyOnIsland") }

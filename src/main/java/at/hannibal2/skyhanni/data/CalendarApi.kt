@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
@@ -19,7 +20,6 @@ import kotlin.time.Duration
 
 @SkyHanniModule
 object CalendarApi {
-    private val group = RepoPattern.group("calendarapi")
 
     var inMainCalendar = false
         private set
@@ -31,10 +31,12 @@ object CalendarApi {
     var calendarMonth = 0
         private set
 
+    private val patternGroup = RepoPattern.group("calendarapi")
+
     /**
      * REGEX-TEST: Calendar and Events
      */
-    private val calendarGuiPattern by group.pattern(
+    private val calendarGuiPattern by patternGroup.pattern(
         "gui",
         "Calendar and Events",
     )
@@ -49,7 +51,7 @@ object CalendarApi {
      * REGEX-TEST: Winter, Year 498
      * REGEX-TEST: Late Winter, Year 498
      */
-    private val calendarSeasonPattern by group.pattern(
+    private val calendarSeasonPattern by patternGroup.pattern(
         "date",
         "(?<season>(?:Early |Late )?(?:Spring|Summer|Autumn|Winter)), Year (?<year>\\d+)"
     )
@@ -59,7 +61,7 @@ object CalendarApi {
      * REGEX-TEST: Day 2
      * REGEX-TEST: Day 1
      */
-    val dayHeaderPattern by group.pattern(
+    val dayHeaderPattern by patternGroup.pattern(
         "day-header",
         "Day (?<dayNum>\\d+)"
     )
@@ -74,7 +76,7 @@ object CalendarApi {
      * REGEX-TEST: 12:00 am-11:59 pm: Jacob's Farming Contest
      * REGEX-TEST: 12:00 am-12:41 am: 61,680th Dark Auction
      */
-    val eventLinePattern by group.pattern(
+    val eventLinePattern by patternGroup.pattern(
         "event-line",
         """^(?<timePrefix>.*?):\s+(?<eventName>.*?)(?:\s+\((?<countdown>\d+h)\))?$"""
     )
@@ -85,7 +87,7 @@ object CalendarApi {
      * REGEX-TEST: Starts in: 40s
      * REGEX-TEST: Starts in: 1d 2h 58m 40s
      */
-    val mainCalendarStartsInPattern by group.pattern(
+    val mainCalendarStartsInPattern by patternGroup.pattern(
         "main.startsin",
         "Starts in: (?<time>(?:\\d\\d?[dhms] ?)+)"
     )
@@ -94,7 +96,7 @@ object CalendarApi {
      * REGEX-TEST: Event lasts for 1h!
      * REGEX-TEST: Event lasts for 2h 40m!
      */
-    val mainCalendarDurationPattern by group.pattern(
+    val mainCalendarDurationPattern by patternGroup.pattern(
         "main.duration",
         "Event lasts for (?<time>(?:\\d\\d?[hms] ?)+)!"
     )
@@ -163,7 +165,7 @@ object CalendarApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH)
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
         if (calendarGuiPattern.matches(event.inventoryName)) {
             inMainCalendar = true
         }
@@ -175,7 +177,7 @@ object CalendarApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOW)
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose(event: InventoryCloseEvent) {
         if (!event.reopenSameName) {
             inMainCalendar = false
             inCalendar = false
@@ -193,15 +195,13 @@ object CalendarApi {
         val lore = item.getCleanLore()
         if (lore.size < 2) return null
         val eventName = item.cleanName
-        val startTimeLine = lore[0]
-        val durationLine = lore[1]
 
-        val startTime = mainCalendarStartsInPattern.matchMatcher(startTimeLine) {
+        val startTime = mainCalendarStartsInPattern.firstMatcher(lore) {
             val timeString = group("time")
             TimeUtils.getDurationOrNull(timeString)?.fromNow()
         } ?: return null
 
-        val duration = mainCalendarDurationPattern.matchMatcher(durationLine) {
+        val duration = mainCalendarDurationPattern.firstMatcher(lore) {
             val timeString = group("time")
             TimeUtils.getDurationOrNull(timeString)
         } ?: return null

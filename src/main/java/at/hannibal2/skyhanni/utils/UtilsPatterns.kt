@@ -100,14 +100,6 @@ object UtilsPatterns {
         "(?<name>(?:§.)*(?:[^§] ?)+)(?:§8x(?<amount>[\\d,]+))?",
     )
 
-    /**
-     * REGEX-TEST: §7Cost
-     */
-    val costLinePattern by patternGroup.pattern(
-        "item.cost.line",
-        "(?:§5§o)?§7Cost.*",
-    )
-
     @Suppress("MaxLineLength")
     val timeAmountPattern by patternGroup.pattern(
         "time.amount",
@@ -192,6 +184,8 @@ object UtilsPatterns {
         "inventory.skyblockmenu",
         "SkyBlock Menu",
     )
+
+    val skyblockMenuInventory = InventoryDetector { skyblockMenuGuiPattern }
 
     /**
      * REGEX-TEST: §7Source: §fVerdant Shard §8(C11)

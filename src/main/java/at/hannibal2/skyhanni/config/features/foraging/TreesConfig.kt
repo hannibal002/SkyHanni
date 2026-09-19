@@ -10,11 +10,10 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 class TreesConfig {
 
     @Expose
-    @ConfigOption(name = "Clean Tree View", desc = "Hides the floating blocks when mining trees in galatea.")
-    @ConfigEditorBoolean
-    @FeatureToggle
+    @ConfigOption(name = "Clean Tree View", desc = "")
+    @Accordion
     @SearchTag("fig mangrove helix")
-    var cleanView = true
+    val cleanView = CleanTreeViewConfig()
 
     @Expose
     @ConfigOption(name = "Tree Progress Display", desc = "")

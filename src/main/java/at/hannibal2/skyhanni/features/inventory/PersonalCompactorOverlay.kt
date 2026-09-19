@@ -33,13 +33,13 @@ object PersonalCompactorOverlay {
 
     private val config get() = SkyHanniMod.feature.inventory.personalCompactor
 
-    private val group = RepoPattern.group("inventory.personalcompactor")
+    private val patternGroup = RepoPattern.group("inventory.personalcompactor")
 
     /**
      * REGEX-TEST: PERSONAL_COMPACTOR_4000
      * REGEX-TEST: PERSONAL_DELETOR_7000
      */
-    private val internalNamePattern by group.pattern(
+    private val internalNamePattern by patternGroup.pattern(
         "internalname",
         "PERSONAL_(?<type>[^_]+)_(?<tier>\\d+)",
     )

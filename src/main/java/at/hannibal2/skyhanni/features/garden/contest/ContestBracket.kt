@@ -13,6 +13,6 @@ enum class ContestBracket(val color: String) {
     val displayName = "§$color§l$name"
     val bracketPattern by RepoPattern.pattern(
         "garden.farming.contest.bracket" + this.name.lowercase(),
-        "$displayName §7\\(§bTop \\d{1,2}%§7\\): §6(?<amount>.*)"
+        "$name \\(Top \\d{1,2}%\\): (?<amount>[\\d,]+)"
     )
 }

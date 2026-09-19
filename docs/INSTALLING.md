@@ -45,7 +45,7 @@ Prism Launcher can handle Fabric, the dependencies, RAM, and Java all from one i
 > **2: Install Fabric Loader**
 > Fabric is the system that loads your mods into the game.
 > 1. Download the [Fabric Installer](https://fabricmc.net/use/installer/).
-> 2. Run the installer and select the Minecraft version you want (e.g., 1.21.11 or 26.1+).
+> 2. Run the installer and select the Minecraft version you want (e.g. 26.1.2).
 > 3. Click "Install" to create a new profile in your Minecraft Launcher.
 
 > **3: Download SkyHanni Dependencies**

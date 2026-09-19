@@ -27,19 +27,15 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.components.ChatComponent
 import net.minecraft.client.multiplayer.chat.GuiMessage
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ServerboundChatCommandPacket
 import net.minecraft.network.protocol.game.ServerboundChatPacket
 import kotlin.math.floor
-
-//? if >= 26.1 {
-import net.minecraft.client.multiplayer.chat.GuiMessageSource
-//?} else {
-/*import at.hannibal2.skyhanni.mixins.hooks.MessageStore.Companion.parent
-*///?}
 
 @SkyHanniModule
 object ChatManager {
@@ -245,9 +241,20 @@ object ChatManager {
         }
     }
 
-    // TODO add another predicate to stop searching after a certain amount of lines have been
-    //  searched or if the lines were sent too long ago. Same thing for the deleteChatMessage
-    //  function.
+    /**
+     * The messages that currently have lines in [ChatComponent.trimmedMessages], from newest to oldest.
+     *
+     * [ChatComponent.allMessages] is trimmed to a number of messages while [ChatComponent.trimmedMessages]
+     * is trimmed to a number of *lines*, and messages rejected by the visible message filter never get
+     * any lines at all. A message still being in the history therefore does not mean it is still on
+     * screen, so only the messages returned here can be edited or removed without asking Minecraft to
+     * resplit the entire chat.
+     */
+    private fun ChatComponent.displayedMessages(): List<GuiMessage> =
+        trimmedMessages.mapNotNull { it.parent }.distinctBy { IdentityCharacteristics(it) }
+
+    // TODO add another predicate to stop searching if the lines were sent too long ago. Same thing
+    //  for the deleteMessages function.
     /**
      * Edits the first message in chat that matches the given [predicate] to the [replacement].
      */
@@ -259,9 +266,18 @@ object ChatManager {
         val mc = Minecraft.getInstance()
         val chatGui = MinecraftCompat.hud.chat
 
-        val (messageIndex, message) = chatGui.allMessages.withIndex().firstOrNull {
-            predicate(it.value)
-        } ?: return@runOrNextTick
+        val message = chatGui.displayedMessages().firstOrNull(predicate) ?: return@runOrNextTick
+        // Compare by identity so that two identical system messages added on the same GUI tick
+        // aren't treated as the same message
+        val messageIndex = chatGui.allMessages.indexOfFirst { it === message }
+        if (messageIndex == -1) {
+            ErrorManager.logErrorWithData(
+                IllegalStateException("Chat line without an associated message"),
+                "Error while editing message",
+                "message" to message,
+            )
+            return@runOrNextTick
+        }
         val counter = message.addedTime()
         val id = message.signature
         val oldComponent = message.content
@@ -281,9 +297,7 @@ object ChatManager {
             counter,
             newComponent,
             id,
-            //? if >= 26.1 {
             GuiMessageSource.SYSTEM_CLIENT,
-            //?}
             GuiMessageTag.system(),
         )
         chatGui.allMessages[messageIndex] = newMessage
@@ -293,33 +307,21 @@ object ChatManager {
         while (iterator.hasNext()) {
             val lineIndex = iterator.nextIndex()
             val line = iterator.next()
-            if (line.parent == message) {
+            // Compare by identity so that two identical system messages added on the same GUI tick
+            // aren't treated as the same message
+            if (line.parent === message) {
                 if (targetIndex == null) targetIndex = lineIndex
                 iterator.remove()
             }
         }
-        if (targetIndex == null) {
-            ErrorManager.logErrorWithData(
-                IllegalStateException("Failed to find associated chat lines"),
-                "Error while editing message",
-                "message" to message,
-                "newMessage" to newMessage,
-            )
-            // Fall back to safe but potentially laggy path
-            chatGui.refreshTrimmedMessages()
-            return@runOrNextTick
-        }
+        val insertIndex = targetIndex ?: chatGui.trimmedMessages.size
         val maxWidth = floor(chatGui.width / chatGui.scale).toInt()
         val lines = newMessage.splitLines(mc.font, maxWidth)
         for ((lineIndex, line) in lines.withIndex()) {
             val endOfEntry = lineIndex == lines.size - 1
-            //? if >= 26.1 {
-            val newLine = GuiMessage.Line(message, line, endOfEntry)
-            //?} else {
-            /*val newLine = GuiMessage.Line(newMessage.addedTime(), line, newMessage.tag(), endOfEntry)
-            newLine.parent = newMessage
-            *///?}
-            chatGui.trimmedMessages.add(targetIndex++, newLine)
+            val newLine = GuiMessage.Line(newMessage, line, endOfEntry)
+            // Minecraft stores the lines of a message in reverse, so every line goes to the same index
+            chatGui.trimmedMessages.add(insertIndex, newLine)
         }
     }
 
@@ -341,36 +343,22 @@ object ChatManager {
     ) = DelayedRun.runOrNextTick {
         val chatGui = MinecraftCompat.hud.chat
 
-        val iterator = chatGui.allMessages.iterator()
         var removed = 0
-        while (iterator.hasNext() && removed < amount) {
-            val message = iterator.next()
+        for (message in chatGui.displayedMessages()) {
+            if (removed >= amount) break
+            if (!predicate(message)) continue
 
-            // message can be null. maybe bc of other mods?
-            @Suppress("SENSELESS_COMPARISON")
-            if (message == null) continue
+            // Compare by identity so that two identical system messages added on the same GUI tick
+            // aren't treated as the same message
+            chatGui.trimmedMessages.removeIf { it.parent === message }
+            chatGui.allMessages.removeIf { it === message }
 
-            if (predicate(message)) {
-                iterator.remove()
-
-                val found = chatGui.trimmedMessages.removeIf { it.parent == message }
-                if (!found) {
-                    ErrorManager.logErrorWithData(
-                        IllegalStateException("Failed to find associated chat lines"),
-                        "Error while deleting message",
-                        "message" to message,
-                    )
-                    // Fall back to safe but potentially laggy path
-                    chatGui.refreshTrimmedMessages()
-                }
-
-                removed++
-                val key = IdentityCharacteristics(message.content)
-                reason?.let {
-                    messageHistory[key]?.let { history ->
-                        history.actionKind = ActionKind.RETRACTED
-                        history.actionReason = it.uppercase()
-                    }
+            removed++
+            val key = IdentityCharacteristics(message.content)
+            reason?.let {
+                messageHistory[key]?.let { history ->
+                    history.actionKind = ActionKind.RETRACTED
+                    history.actionReason = it.uppercase()
                 }
             }
         }
