@@ -71,7 +71,7 @@ object HolographicEntities {
             "HolographicEntityDebug: Zombie not found in entityHoloBases (size=${entityHoloBases.size})"
         )
         @Suppress("UNCHECKED_CAST")
-        debugHologram = (base as HolographicBase<Zombie>).instance(pos, player.yRot)
+        debugHologram = (base as HolographicBase<Zombie>).instance(pos, player.yRot, player.xRot)
         debugHologramTransparency = transparency
     }
 
@@ -91,10 +91,12 @@ object HolographicEntities {
         val entity: T,
         var position: LorenzVec,
         var yaw: Float,
+        var pitch: Float,
     ) {
         var isChild: Boolean = false
         var lastPosition: LorenzVec = position
         var lastYaw: Float = yaw
+        var lastPitch: Float = pitch
         val createdAt = SimpleTimeMark.now()
         internal var cachedRenderState: EntityRenderState? = null
 
@@ -103,16 +105,19 @@ object HolographicEntities {
         /**
          * Should be called exactly once per tick or never over the lifetime of this [HolographicEntity].
          */
-        fun moveTo(position: LorenzVec, yaw: Float, isTeleport: Boolean = false) {
+        fun moveTo(position: LorenzVec, yaw: Float, pitch: Float, isTeleport: Boolean = false) {
             if (isTeleport) {
                 this.lastYaw = yaw
                 this.lastPosition = position
+                this.lastPitch = pitch
             } else {
                 this.lastYaw = this.yaw
                 this.lastPosition = this.position
+                this.lastPitch = this.pitch
             }
             this.position = position
             this.yaw = yaw
+            this.pitch = pitch
         }
 
         fun interpolatedPosition(partialTicks: Float): LorenzVec =
@@ -120,6 +125,28 @@ object HolographicEntities {
 
         fun interpolatedYaw(partialTicks: Float): Float =
             interpolateRotation(lastYaw, yaw, partialTicks)
+
+        fun interpolatedPitch(partialTicks: Float): Float =
+            interpolateRotation(lastPitch, pitch, partialTicks)
+    }
+
+    /**
+     * Creates a holographic entity from an already-created entity.
+     *
+     * Unlike [HolographicBase.instance], this does not create the entity
+     * through an EntityType. This is useful for entities such as
+     * ClientMannequin that aren't normally created through an EntityType.
+     */
+    fun <T : LivingEntity> create(
+        entity: T,
+        position: LorenzVec,
+        yaw: Float,
+        pitch: Float,
+    ): HolographicEntity<T> {
+        //? if >= 26.2
+        entity.id = FakeEntityIdProvider.getNextId()
+
+        return HolographicEntity(entity, position, yaw, pitch)
     }
 
     /**
@@ -128,12 +155,12 @@ object HolographicEntities {
      * being instantiated.
      */
     class HolographicBase<T : LivingEntity> internal constructor(internal val entityType: EntityType<T>) {
-        fun instance(position: LorenzVec, yaw: Float): HolographicEntity<T>? {
+        fun instance(position: LorenzVec, yaw: Float, pitch: Float): HolographicEntity<T>? {
             val level = Minecraft.getInstance().level ?: return null
             val entity = entityType.create(level, EntitySpawnReason.COMMAND) ?: return null
             //? if >= 26.2
             entity.id = FakeEntityIdProvider.getNextId()
-            return HolographicEntity(entity, position, yaw)
+            return HolographicEntity(entity, position, yaw, pitch)
         }
     }
 
@@ -175,6 +202,7 @@ object HolographicEntities {
         val entity = holographicEntity.entity
         val mobPosition = holographicEntity.interpolatedPosition(partialTicks)
         val interpolatedYaw = holographicEntity.interpolatedYaw(partialTicks)
+        val interpolatedPitch = holographicEntity.interpolatedPitch(partialTicks)
 
         // Populate entity fields that extractRenderState will read.
         // These are safe to set because HolographicBase entities are never ticked.
@@ -184,6 +212,8 @@ object HolographicEntities {
         entity.yBodyRotO = interpolatedYaw
         entity.yHeadRot = interpolatedYaw
         entity.yHeadRotO = interpolatedYaw
+        entity.xRot = interpolatedPitch
+        entity.xRotO = interpolatedPitch
 
         val client = Minecraft.getInstance()
         @Suppress("UNCHECKED_CAST")
