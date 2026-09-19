@@ -370,6 +370,11 @@ object SkyHanniConfigSearchResetCommand {
         else -> toString()
     }
 
+    fun getDefaultValue(path: String): Any {
+        val (_, value, _) = getComplexField(path, defaultConfig)
+        return value
+    }
+
     val allKeybinds: Set<String> by lazy {
         buildSet {
             ConfigUtils.traverseConfig(defaultConfig) { _, field, path ->
