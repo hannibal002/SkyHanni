@@ -95,6 +95,14 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(
+        name = "Burrow Waypoint & Line Customization",
+        desc = ""
+    )
+    @Accordion
+    val burrowCustomization: BurrowCustomization = BurrowCustomization()
+
+    @Expose
+    @ConfigOption(
         name = "Warn On Failure",
         desc = "Sends \"Use Spade\" title when arrow guess fails.",
     )
