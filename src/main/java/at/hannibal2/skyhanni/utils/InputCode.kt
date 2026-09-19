@@ -153,6 +153,9 @@ enum class InputCode(
     val value: Int
         get() = key.value
 
+    val type: InputConstants.Type
+        get() = key.type
+
     val displayName: String
         get() = KeyboardManager.getKeyName(key)
 
