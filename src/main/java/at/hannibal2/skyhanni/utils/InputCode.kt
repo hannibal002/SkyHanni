@@ -71,7 +71,6 @@ enum class InputCode(
     KEY_F22(InputConstants.KEY_F22),
     KEY_F23(InputConstants.KEY_F23),
     KEY_F24(InputConstants.KEY_F24),
-    KEY_F25(InputConstants.KEY_F25),
     KEY_NUMLOCK(InputConstants.KEY_NUMLOCK),
     KEY_NUMPAD0(InputConstants.KEY_NUMPAD0),
     KEY_NUMPAD1(InputConstants.KEY_NUMPAD1),
@@ -110,11 +109,13 @@ enum class InputCode(
     KEY_LALT(InputConstants.KEY_LALT),
     KEY_LCONTROL(InputConstants.KEY_LCONTROL),
     KEY_LSHIFT(InputConstants.KEY_LSHIFT),
-    KEY_LSUPER(InputConstants.KEY_LSUPER),
+    //~ if < 26.3 'InputConstants.KEY_LGUI' -> 'InputConstants.KEY_LSUPER'
+    KEY_LSUPER(InputConstants.KEY_LGUI),
     KEY_RALT(InputConstants.KEY_RALT),
     KEY_RCONTROL(InputConstants.KEY_RCONTROL),
     KEY_RSHIFT(InputConstants.KEY_RSHIFT),
-    KEY_RSUPER(InputConstants.KEY_RSUPER),
+    //~ if < 26.3 'InputConstants.KEY_RGUI' -> 'InputConstants.KEY_RSUPER'
+    KEY_RSUPER(InputConstants.KEY_RGUI),
     KEY_RETURN(InputConstants.KEY_RETURN),
     KEY_ESCAPE(InputConstants.KEY_ESCAPE),
     KEY_BACKSPACE(InputConstants.KEY_BACKSPACE),
@@ -141,7 +142,8 @@ enum class InputCode(
     MOUSE_BUTTON_8(InputConstants.MOUSE_BUTTON_8, MOUSE),
     ;
 
-    constructor(value: Int, type: InputConstants.Type = InputConstants.Type.KEYSYM) : this(type.getOrCreate(value))
+    //~ if < 26.3 'KEYBOARD' -> 'KEYSYM'
+    constructor(value: Int, type: InputConstants.Type = InputConstants.Type.KEYBOARD) : this(type.getOrCreate(value))
 
     constructor(name: String) : this(InputConstants.getKey(name))
 
@@ -164,8 +166,10 @@ enum class InputCode(
         fun fromKeyIdentifier(identifier: String): InputCode =
             fromKey(InputConstants.getKey(identifier))
 
+        //~ if < 26.3 'KEYBOARD' -> 'KEYSYM' {
         fun fromKeyCode(keyCode: Int): InputCode =
-            fromKey(InputConstants.Type.KEYSYM.getOrCreate(keyCode))
+            fromKey(InputConstants.Type.KEYBOARD.getOrCreate(keyCode))
+        //~}
 
         @JvmStatic
         fun fromKeyEvent(keyEvent: KeyEvent): InputCode =
