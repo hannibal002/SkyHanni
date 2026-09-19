@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -13,6 +15,7 @@ import at.hannibal2.skyhanni.events.slayer.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.slayer.SlayerJson
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -24,6 +27,8 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessaryOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -68,6 +73,22 @@ object SlayerApi {
     )
 
     /**
+     * REGEX-TEST: Revenant Horror RNG Meter
+     */
+    val rngMeterSlayerTypePattern by patternGroup.pattern(
+        "rngmeter.type",
+        "(?<type>.+) RNG Meter",
+    )
+
+    /**
+     * REGEX-TEST: Slayer
+     */
+    val inventoryNamePattern by patternGroup.pattern(
+        "inventory.name",
+        "Slayer",
+    )
+
+    /**
      * WRAPPED-REGEX-TEST: "  SLAYER QUEST FAILED!"
      */
     private val questFailedPattern by patternGroup.pattern(
@@ -82,9 +103,20 @@ object SlayerApi {
         "cocooned.colorless",
         "\\s+YOU COCOONED YOUR SLAYER BOSS",
     )
+
+    /**
+     * WRAPPED-REGEX-TEST: "1-2"
+     */
+    private val repoDropAmountPattern by patternGroup.pattern(
+        "repo.drops.amounts",
+        "(?<min>\\d+)-?(?<max>\\d+)?"
+    )
     // </editor-fold>
 
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
+
+    var jsonData: SlayerJson? = null
+        private set
 
     var questStartTime = SimpleTimeMark.farPast()
 
@@ -142,6 +174,21 @@ object SlayerApi {
      */
     fun isInBossFight() = state == ActiveQuestState.BOSS_FIGHT
 
+    val storage: ProfileSpecificStorage.SlayerStorage?
+        get() = ProfileStorageData.profileSpecific?.slayer
+
+    var bonusRewardsLevel: Int
+        get() = storage?.bonusRewardsLevel ?: 0
+        private set(value) {
+            storage?.bonusRewardsLevel = value
+        }
+
+    var breweryContribution: Boolean
+        get() = storage?.breweryContributionReduction == true
+        private set(value) {
+            storage?.breweryContributionReduction = value
+        }
+
     private class SlayerData {
         var currentState: ActiveQuestState = ActiveQuestState.NO_ACTIVE_QUEST
         var currentStateRaw: String? = null
@@ -164,6 +211,15 @@ object SlayerApi {
 
             internalName.getPriceName(amount, pricePer = maxPrice) to totalPrice
         }
+
+    fun getItemDropAmountForTier(internalName: NeuInternalName, tier: Int): Pair<Int, Int?> {
+        val dropAmount = jsonData?.dropAmounts?.get(internalName) ?: return 1 to null
+        val dropString = dropAmount[tier] ?: return 1 to null
+        return repoDropAmountPattern.matchMatcher(dropString) {
+            val min = group("min")?.toInt() ?: return 1 to null
+            min to groupOrNull("max")?.toInt()
+        } ?: (1 to null)
+    }
 
     @HandleEvent
     private fun onDebugDataCollect(event: DebugDataCollectEvent) {
@@ -348,7 +404,15 @@ object SlayerApi {
         }
     }
 
-    @HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true)
+    fun updateBreweryContribution(value: Boolean) {
+        breweryContribution = value
+    }
+
+    fun updateBonusRewardsLevel(value: Int) {
+        bonusRewardsLevel = value
+    }
+
+    @HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     private fun onScoreboardChange() {
         updateSlayerState()
     }
@@ -393,6 +457,11 @@ object SlayerApi {
                 updateArea()
             }
         }
+    }
+
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    private fun onRepoReload(event: RepositoryReloadEvent) {
+        jsonData = event.getConstant<SlayerJson>("Slayer")
     }
 
     @HandleEvent

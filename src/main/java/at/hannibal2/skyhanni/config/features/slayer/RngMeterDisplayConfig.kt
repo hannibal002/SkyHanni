@@ -25,6 +25,11 @@ class RngMeterDisplayConfig {
     var hideChat: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Coins/Boss", desc = "Display coins gained per boss.")
+    @ConfigEditorBoolean
+    var coinsPerBoss: Boolean = false
+
+    @Expose
     @ConfigLink(owner = RngMeterDisplayConfig::class, field = "enabled")
     val pos: Position = Position(410, 110)
 }
