@@ -248,7 +248,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun initRepo() = progressCategory.startBlock("auto loading on init") { progress ->
         shouldManuallyReload = true
         repoInitCoroutineConfig.launch {
-            // TODO: Remove in 10.0.0
             updateLegacyFiles()
             if (config.repoAutoUpdate) {
                 if (!fetchAndUnpackRepo(progress, command = false).canContinue) {
@@ -548,37 +547,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
     }
 
+    // TODO: Remove in 10.0.0
     private fun updateLegacyFiles() {
         val configDirectory = legacyConfigDirectory ?: return
-
-        val legacyRepoDirectory = configDirectory.resolve("repo").takeIf { it.exists() }
-        if (legacyRepoDirectory != null) {
-            logger.warn("Deleting legacy repo directory")
-            legacyRepoDirectory.deleteRecursivelySafe()
-        }
-
-        val legacyCommitFile = configDirectory.resolve("currentCommit.json").takeIf { it.exists() }
-        if (legacyCommitFile != null) {
-            if (commitFile.exists()) {
-                legacyCommitFile.delete()
-                return
-            }
-            logger.warn("Moving legacy commit file to: ${commitFile.absolutePath}")
-            commitFile.parentFile?.mkdirs()
-            runCatching {
-                Files.move(legacyCommitFile.toPath(), commitFile.toPath())
-            }.onFailure {
-                runCatching {
-                    legacyCommitFile.copyTo(commitFile, overwrite = false)
-                }.onSuccess {
-                    legacyCommitFile.delete()
-                }.onFailure {
-                    logger.error(
-                        "Failed to move or copy legacy commit file; keeping original: ${legacyCommitFile.absolutePath}"
-                    )
-                }
-            }
-        }
+        configDirectory.resolve("repo").deleteRecursivelySafe()
+        configDirectory.resolve("currentCommit.json").delete()
     }
 
     internal fun dumpDiagnosticsToLog(vararg extraData: Pair<String, Any?>) = with(logger) {
