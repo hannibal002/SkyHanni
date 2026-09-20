@@ -28,7 +28,7 @@ object GlobalRender {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shrendertoggle") {
-            description = "Disables/enables the rendering of all skyhanni guis."
+            description = "Disables/enables the rendering of all SkyHanni guis."
             category = CommandCategory.USERS_BUG_FIX
             callback {
                 enabled = !enabled
