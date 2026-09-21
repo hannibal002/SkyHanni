@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.FriendAddEvent
 import at.hannibal2.skyhanni.events.FriendRequestDeclinedEvent
 import at.hannibal2.skyhanni.events.FriendRequestExpiredEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -33,7 +32,7 @@ object ContributorAchievement {
 
     const val CONTRIBUTOR_ACHIEVEMENT_GOT = "Achievement Get! EEEEKK!!"
 
-    private val contributorQueue = mutableListOf<GameProfile>()
+    private val queue = mutableListOf<GameProfile>()
 
     @HandleEvent
     private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
@@ -135,15 +134,20 @@ object ContributorAchievement {
 
     @HandleEvent
     private fun onWorldChange() {
-        for (contributor in contributorQueue) {
+        for (contributor in queue) {
             grantAchievement(contributor)
         }
-        contributorQueue.clear()
+        queue.clear()
+    }
+
+    @HandleEvent
+    private fun onDisconnect() {
+        queue.clear()
     }
 
     fun onUniqueContributorSeen(profile: GameProfile) {
         if (ContributorManager.shouldDeferAchievement(profile.id)) {
-            contributorQueue.add(profile)
+            queue.add(profile)
         } else {
             grantAchievement(profile)
         }
@@ -179,11 +183,6 @@ object ContributorAchievement {
             append(player)
             appendWithColor(" ${profile.name}", ChatFormatting.AQUA)
             appendWithColor(" for the first time!", ChatFormatting.GRAY)
-            if (ContributorManager.shouldDeferAchievement(profile.id)) {
-                append("\n")
-                appendWithColor("However, they wanted to avoid the attention,\n", ChatFormatting.GRAY)
-                appendWithColor("so you have been notified with a delay.", ChatFormatting.GRAY)
-            }
         }
     }
 
