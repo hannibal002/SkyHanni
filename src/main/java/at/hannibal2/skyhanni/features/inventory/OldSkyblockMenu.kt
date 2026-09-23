@@ -71,7 +71,7 @@ object OldSkyblockMenu {
             sbButton.command.call()
         } else {
             TitleManager.sendTitle("Requires cookie buff!", location = TitleManager.TitleLocation.INVENTORY)
-            SoundUtils.playErrorSound()
+            SoundUtils.playErrorSound(isWarning = false)
         }
     }
 

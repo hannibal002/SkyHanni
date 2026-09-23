@@ -27,7 +27,7 @@ enum class SkyblockSeason(
     AUTUMN(
         "§eAutumn",
         "§4Pests §7spawn §a15% §7more often.",
-        "§a15%+§",
+        "§a15%+§\uE07F",
         7
     ),
     WINTER(

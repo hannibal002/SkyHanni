@@ -33,6 +33,8 @@ import kotlin.time.DurationUnit
 object TimeUtils {
     private val patternGroup = RepoPattern.group("timeutils")
 
+    private const val TIME_UNTIL_DATE_FORMAT = "dd MMM, hh:mm a"
+
     val isAprilFoolsDay: Boolean by RecalculatingValue(1.seconds) {
         val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
         val (always, never) = SkyHanniMod.feature.dev.debug.let { it.alwaysFunnyTime to it.neverFunnyTime }
@@ -206,6 +208,13 @@ object TimeUtils {
             },
         ).formattedTextCompat()
     }
+
+    /**
+     * Formats how long it takes until [this], plus the real life date, e.g. `4d 3h (14 Jan, 09:32 PM)`.
+     * The time part follows the 24-hour setting in the config.
+     */
+    fun SimpleTimeMark.formatTimeUntilWithDate(): String =
+        "${timeUntil().format(maxUnits = 2)} (${formattedDate(TIME_UNTIL_DATE_FORMAT)})"
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
 
