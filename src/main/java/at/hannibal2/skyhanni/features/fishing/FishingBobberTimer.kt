@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.events.fishing.FishingCatchEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -21,7 +19,7 @@ object FishingBobberTimer {
     private var deployTime: SimpleTimeMark = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onBobberCast(event: FishingBobberCastEvent) {
+    private fun onBobberCast() {
         if (config.startOnLiquidTouch) {
             deployTime = SimpleTimeMark.farPast()
         } else {
@@ -30,24 +28,25 @@ object FishingBobberTimer {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onBobberInLiquid(event: FishingBobberInLiquidEvent) {
+    private fun onBobberInLiquid(event: FishingBobberInLiquidEvent) {
         if (config.startOnLiquidTouch) deployTime = SimpleTimeMark.now()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onFishingCatch(event: FishingCatchEvent) {
+    private fun onFishingCatch(event: FishingCatchEvent) {
         deployTime = SimpleTimeMark.farPast()
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         deployTime = SimpleTimeMark.farPast()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    private fun onGuiRenderOverlay() {
         if (!config.enabled) return
         if (deployTime.isFarPast()) return
+        if (!FishingApi.holdingRod) return
         if (FishingApi.bobber == null) {
             deployTime = SimpleTimeMark.farPast()
             return

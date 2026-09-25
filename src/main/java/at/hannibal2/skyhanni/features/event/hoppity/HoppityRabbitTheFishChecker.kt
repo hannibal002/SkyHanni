@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -22,7 +23,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityRabbitTheFishChecker {
-
     // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: Chocolate Breakfast Egg
@@ -58,7 +58,7 @@ object HoppityRabbitTheFishChecker {
     private var rabbitTheFishIndex: Int? = null
 
     @HandleEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    private fun onBackgroundDrawn() {
         if (!isEnabled()) return
 
         val index = rabbitTheFishIndex ?: return
@@ -66,7 +66,7 @@ object HoppityRabbitTheFishChecker {
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         rabbitTheFishIndex = null
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
@@ -77,15 +77,15 @@ object HoppityRabbitTheFishChecker {
         }?.key
     }
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    @HandleEvent(priority = HIGHEST)
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || rabbitTheFishIndex == null) return
 
-        // Prevent opening chocolate factory when Rabbit the Fish is present
-        val stack = event.slot?.item ?: return
-        if (openCfSlotLorePattern.anyMatches(stack.getLore())) {
+        // Prevent opening Chocolate Factory when Rabbit the Fish is present
+        val slot = event.slot ?: return
+        if (openCfSlotLorePattern.anyMatches(slot.item.getLore())) {
             event.sendPreventClosureTitle()
-        } else if (rabbitTheFishIndex == event.slot.containerSlot) {
+        } else if (rabbitTheFishIndex == slot.containerSlot) {
             rabbitTheFishIndex = null
         }
     }

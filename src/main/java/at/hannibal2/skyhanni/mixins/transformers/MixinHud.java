@@ -28,7 +28,6 @@ import net.minecraft.client.gui.Hud;
 //~ if < 26.2 'Hud' -> 'Gui'
 @Mixin(Hud.class)
 public abstract class MixinHud {
-
     @Inject(method = "displayScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/scores/Objective;)V", at = @At("HEAD"), cancellable = true)
     public void renderScoreboard(GuiGraphicsExtractor drawContext, Objective objective, CallbackInfo ci) {
         if (CustomScoreboard.isHideVanillaScoreboardEnabled()) {
@@ -134,7 +133,8 @@ public abstract class MixinHud {
         }
     }
 
-    @Inject(method = "extractOverlayMessage", at = @At("TAIL"))
+    // RETURN rather than TAIL: the method returns early when there is no overlay message
+    @Inject(method = "extractOverlayMessage", at = @At("RETURN"))
     public void renderOverlayMessagePost(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
         RenderEvents.postActionBarLayerEventPost(context);
     }

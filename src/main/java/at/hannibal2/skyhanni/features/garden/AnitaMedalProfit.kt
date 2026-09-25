@@ -15,8 +15,10 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LoreCostUtils
+import at.hannibal2.skyhanni.utils.LoreCostUtils.hasTradeLine
 import at.hannibal2.skyhanni.utils.LoreCostUtils.readLoreCosts
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -27,6 +29,7 @@ import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -96,17 +99,20 @@ object AnitaMedalProfit {
     }
 
     private fun readItem(slot: Int, item: SafeItemStack, table: MutableList<DisplayTableEntry>) {
-        val itemName = getItemName(item)
-        if (isInvalidItemName(itemName.string)) return
+        val lore = item.getLoreComponent().map { it.formattedTextCompatLessResets() }
+        if (!lore.hasTradeLine()) return
 
-        val requiredItems = item.readLoreCosts()
+        val itemName = getItemName(item)
+        val nameString = itemName.formattedTextCompatLeadingWhiteLessResets()
+
+        val requiredItems = lore.readLoreCosts(nameString)
         val additionalMaterials = getAdditionalMaterials(requiredItems)
         val additionalCost = getAdditionalCost(additionalMaterials)
 
         // Ignore items without medal cost, e.g. InfiniDirt Wand
         val bronzeCost = getBronzeCost(requiredItems) ?: return
 
-        val (name, amount) = ItemUtils.readItemAmount(itemName.formattedTextCompatLeadingWhiteLessResets()) ?: return
+        val (name, amount) = ItemUtils.readItemAmount(nameString) ?: return
 
         var internalName = NeuInternalName.fromItemNameOrNull(name)
         if (internalName == null) {
@@ -156,15 +162,6 @@ object AnitaMedalProfit {
             add(internalName.getPriceName(amount))
         }
     }
-
-    private val invalidItemNames = listOf(
-        " ",
-        "Close",
-        "Unique Gold Medals",
-        "Medal Trades",
-    )
-
-    private fun isInvalidItemName(itemName: String): Boolean = itemName in invalidItemNames
 
     private fun getItemName(item: SafeItemStack): Component {
         val name = item.hoverName

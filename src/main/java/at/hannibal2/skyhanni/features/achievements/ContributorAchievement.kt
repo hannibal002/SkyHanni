@@ -136,8 +136,8 @@ object ContributorAchievement {
         showContributorDiscovered(profile)
     }
 
-    private fun showContributorDiscovered(profile: GameProfile) {
-        if (!config.discoverContributorMessage) return
+    private fun showContributorDiscovered(profile: GameProfile, firstTime: Boolean = false) {
+        if (!config.discoverContributorMessage && !firstTime) return
         val message = getDiscoverComponent(profile)
         ChatUtils.chat {
             appendWithColor("A wild SkyHanni contributor appears!", ChatFormatting.GOLD)
@@ -148,8 +148,7 @@ object ContributorAchievement {
 
     private fun showContributorAchievement(profile: GameProfile, completed: Boolean): Boolean {
         if (!completed || !AchievementManager.shouldShowMessages) return false
-        val message = getDiscoverComponent(profile)
-        ChatUtils.chat(message)
+        showContributorDiscovered(profile, firstTime = true)
         return true
     }
 

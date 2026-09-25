@@ -12,20 +12,19 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FishingBaitWarnings {
-
     private val config get() = SkyHanniMod.feature.fishing.fishingBaitWarnings
 
     private var lastBait: FishingApi.BaitType? = null
     private var wasUsingBait = true
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         lastBait = null
         wasUsingBait = true
     }
 
     @HandleEvent
-    fun onBaitUpdate(event: BaitUpdateEvent) {
+    private fun onBaitUpdate(event: BaitUpdateEvent) {
         if (!FishingApi.holdingRod) {
             wasUsingBait = false
             lastBait = null
@@ -46,12 +45,12 @@ object FishingBaitWarnings {
     }
 
     @HandleEvent
-    fun onBobberCast(event: FishingBobberCastEvent) {
+    private fun onBobberCast(event: FishingBobberCastEvent) {
         if (config.noBaitWarning && !wasUsingBait) showNoBaitWarning()
     }
 
     private fun showBaitChangeWarning(before: String, after: String) {
-        SoundUtils.playClickSound()
+        SoundUtils.playClickSound(isWarning = true)
         TitleManager.sendTitle("§eBait changed!", duration = 2.seconds)
         ChatUtils.chat("Fishing Bait changed: $before §e-> $after")
     }

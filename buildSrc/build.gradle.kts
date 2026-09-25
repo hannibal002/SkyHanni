@@ -13,7 +13,7 @@ repositories {
     mavenCentral()
     maven("https://jitpack.io") {
         content {
-            includeGroupByRegex("com\\.github\\..*")
+            includeGroupAndSubgroups("com.github")
         }
     }
 }
