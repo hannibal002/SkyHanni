@@ -58,15 +58,7 @@ object CFApi {
     // <editor-fold desc="Patterns">
 
     private class chocolateFactoryNamePatterns : Iterable<Pattern> {
-        override fun iterator(): Iterator<Pattern> = listOf(hoppityInventoryNamePattern, chocolateFactoryInventoryNamePattern).iterator()
-
-        /**
-         * REGEX-TEST: Hoppity
-         */
-        val hoppityInventoryNamePattern by patternGroup.pattern(
-            "inventory.name.hoppity",
-            "Hoppity",
-        )
+        override fun iterator(): Iterator<Pattern> = listOf(HoppityApi.hoppityInventoryPattern, chocolateFactoryInventoryNamePattern).iterator()
 
         /**
          * REGEX-TEST: Chocolate Factory
@@ -165,7 +157,7 @@ object CFApi {
 
             if (namePatterns.chocolateFactoryInventoryNamePattern.matches(it)) return@InventoryDetector true
 
-            if (namePatterns.hoppityInventoryNamePattern.matches(it)) {
+            if (HoppityApi.hoppityInventoryPattern.matches(it)) {
                 return@InventoryDetector namePatterns.chocolateFactoryShortcutNamePattern.matches(shortcutSlotItemName)
             }
 
