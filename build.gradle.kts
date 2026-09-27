@@ -482,5 +482,4 @@ tasks.withType<ValidateAccessWidenerTask>().configureEach {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven("https://maven.teamresourceful.com/repository/maven-public/")
 }

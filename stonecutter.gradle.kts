@@ -70,8 +70,8 @@ allprojects {
         // MoulConfig and a few Detekt rules
         exclusiveContent {
             forRepositories(
-                repositories.mavenLocal(),
-                repositories.maven("https://maven.notenoughupdates.org/releases"),
+                mavenLocal(),
+                maven("https://maven.notenoughupdates.org/releases"),
             )
             filter {
                 includeGroupAndSubgroups("org.notenoughupdates")
@@ -111,10 +111,21 @@ allprojects {
 
         exclusiveContent {
             forRepositories(
-                repositories.maven("https://maven.azureaaron.net/releases"),
+                maven("https://maven.azureaaron.net/releases"),
             )
             filter {
                 includeGroupAndSubgroups("net.azureaaron")
+            }
+        }
+
+        // SkyblockAPI
+        exclusiveContent {
+            forRepositories(
+                maven("https://maven.teamresourceful.com/repository/maven-public/"),
+            )
+            filter {
+                includeGroupAndSubgroups("tech.thatgravyboat")
+                includeGroup("me.owdding")
             }
         }
     }
