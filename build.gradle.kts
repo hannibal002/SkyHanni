@@ -478,6 +478,7 @@ tasks.withType<ValidateAccessWidenerTask>().configureEach {
 tasks.withType<ProcessResources>().configureEach {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
+    // Taken From SkyOcean, this is a workaround since stonecutter does not work in shaders
     if (stonecutter.eval(stonecutter.current.version, "< 26.3")) {
         filesMatching(listOf("**/*.fsh", "**/*.vsh")) {
             filter { if (it.startsWith("#include")) "#moj_import ${it.substringAfter(' ')}" else it }
