@@ -33,7 +33,7 @@ object SkyHanniEvents {
     }
 
     fun unregister(instance: Any) {
-        SbAPIEventRouter.unregisterFromSba(instance)
+        SbAPIEventRouter.unregister(instance)
 
         instance.javaClass.declaredMethods.forEach { method ->
             val (_, eventTypes) = getEventData(method) ?: return
@@ -61,7 +61,7 @@ object SkyHanniEvents {
 
             if (SkyBlockEvent::class.java.isAssignableFrom(eventType)) {
                 @Suppress("UNCHECKED_CAST")
-                SbAPIEventRouter.registerToSba(
+                SbAPIEventRouter.register(
                     instance,
                     method,
                     eventType as Class<out SkyBlockEvent>,

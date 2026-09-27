@@ -11,7 +11,7 @@ import java.lang.reflect.Method
 object SbAPIEventRouter {
     private val sbaSubscriptions = mutableMapOf<Any, MutableList<(SkyBlockEvent) -> Unit>>()
 
-    private fun getSbaPriority(skyHanniPriority: Int): Int = when (skyHanniPriority) {
+    private fun convertPriority(skyHanniPriority: Int): Int = when (skyHanniPriority) {
         HandleEvent.HIGHEST -> Subscription.HIGHEST
         HandleEvent.HIGH -> Subscription.HIGH
         0 -> 0
@@ -23,13 +23,13 @@ object SbAPIEventRouter {
     /**
      * Directly registers a @HandleEvent method into SBA's native Event Bus
      */
-    fun registerToSba(
+    fun register(
         instance: Any,
         method: Method,
         eventType: Class<out SkyBlockEvent>,
         options: HandleEvent
     ) {
-        val sbaPriority = getSbaPriority(options.priority)
+        val sbaPriority = convertPriority(options.priority)
         val eventName = SkyHanniEvents.getEventName(eventType)
         val listenerName = ReflectionUtils.buildMethodName(method)
         val eventConsumer = EventListeners.createConsumerFromMethod(method, instance)
@@ -58,7 +58,7 @@ object SbAPIEventRouter {
         sbaSubscriptions.getOrPut(instance) { mutableListOf() }.add(callback)
     }
 
-    fun unregisterFromSba(instance: Any) {
+    fun unregister(instance: Any) {
         val callbacks = sbaSubscriptions.remove(instance) ?: return
         callbacks.forEach { SkyBlockAPI.eventBus.unregister(it) }
     }
