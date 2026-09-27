@@ -160,6 +160,7 @@ enum class SkyHanniRenderPipeline(
     private val internalPipeline: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
             .withLocation(SkyHanniMod.id(this.name.lowercase()))
+            // Taken From SkyOcean
             //? if < 26.3
             //.withShaderDefine("NO_LAYOUT")
             //? if >= 26.2 {
