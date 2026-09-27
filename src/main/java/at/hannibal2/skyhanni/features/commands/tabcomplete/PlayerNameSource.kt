@@ -5,20 +5,22 @@ import at.hannibal2.skyhanni.data.GuildApi
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
 import at.hannibal2.skyhanni.utils.PlayerUtils
 
-enum class PlayerNameSource(private val usernamesGetter: () -> List<String>) {
-    ISLAND_PLAYERS({ EntityUtils.getPlayerEntities().map { it.name.string } }),
-    SELF({ listOf(PlayerUtils.getName()) }),
-    PARTY({ PartyApi.partyMembers }),
-    GUILD({ GuildApi.getAllMembers() }),
-    FRIENDS({ FriendApi.getAllFriends().map { it.name } }),
-    BEST_FRIENDS({ FriendApi.getAllFriends().filter { it.bestFriend }.map { it.name } }),
-    CARRY_CUSTOMER({ CarryTracker.getCustomers().map { it.name } }),
+enum class PlayerNameSource(
+    private val displayName: String,
+    private val usernamesGetter: () -> List<String>,
+) {
+    ISLAND_PLAYERS("§aIsland Players", { EntityUtils.getPlayerEntities().map { it.gameProfile.name } }),
+    SELF("§bYourself", { listOf(PlayerUtils.getName()) }),
+    PARTY("§dParty Members", { PartyApi.partyMembers }),
+    GUILD("§2Guild Members", { GuildApi.getAllMembers() }),
+    FRIENDS("§eFriends", { FriendApi.getAllFriends().map { it.name } }),
+    BEST_FRIENDS("§6Best Friends", { FriendApi.getAllFriends().filter { it.bestFriend }.map { it.name } }),
+    CARRY_CUSTOMER("§cCarry Customers", { CarryTracker.getCustomers().map { it.name } }),
     ;
 
     val usernames: List<String> get() = usernamesGetter()
 
-    override fun toString(): String = toFormattedName()
+    override fun toString(): String = displayName
 }
