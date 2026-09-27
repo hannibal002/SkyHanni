@@ -168,4 +168,16 @@ object ReflectionUtils {
         @Suppress("UNCHECKED_CAST")
         return type.actualTypeArguments[index] as Class<T>
     }
+
+    fun buildMethodName(method: Method): String {
+        val paramTypesString = method.parameterTypes.joinTo(
+            StringBuilder(),
+            prefix = "(",
+            postfix = ")",
+            separator = ", ",
+            transform = Class<*>::getTypeName,
+        ).toString()
+
+        return "${method.declaringClass.name}.${method.name}$paramTypesString"
+    }
 }

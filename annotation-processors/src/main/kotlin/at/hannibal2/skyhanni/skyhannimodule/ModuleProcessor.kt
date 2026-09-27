@@ -32,16 +32,17 @@ class ModuleProcessor(
     cacheDir: String?,
 ) : BaseProcessor(codeGenerator, logger, modVersion) {
 
-    private var skyHanniEvent: KSType? = null
+    private var eventTypes: List<KSType> = emptyList()
 
     private val cache = KspIncrementalCache(cacheDir, mcVersion, "ksp-module-state")
 
     private fun Int.withPlural(string: String) = "$this $string${if (this == 1) "" else "s"}"
 
     override fun processSymbols(resolver: Resolver): List<KSAnnotated> {
-        skyHanniEvent = resolver.getClassDeclarationByName(
+        eventTypes = listOf(
             "at.hannibal2.skyhanni.api.event.SkyHanniEvent",
-        )?.asStarProjectedType()
+            "tech.thatgravyboat.skyblockapi.api.events.base.SkyBlockEvent"
+        ).mapNotNull { resolver.getClassDeclarationByName(it)?.asStarProjectedType() }
 
         val symbols = processBuildPaths(
             resolver.getSymbolsWithAnnotation(SKYHANNI_MODULE).toList(),
@@ -150,10 +151,10 @@ class ModuleProcessor(
         }
 
         if (isDirty) {
-            val event = skyHanniEvent ?: return symbol
+            val events = eventTypes.takeUnless { it.isEmpty() } ?: return symbol
             for (function in symbol.getDeclaredFunctions()) {
                 val handleEvent = function.annotations.find { it.getQualifiedName() == HANDLE_EVENT } ?: continue
-                validateHandleEvent(function, primaryFunctionNames, handleEvent, event)
+                validateHandleEvent(function, primaryFunctionNames, handleEvent, events)
             }
         }
         return symbol
@@ -163,7 +164,7 @@ class ModuleProcessor(
         function: KSFunctionDeclaration,
         primaryFunctionNames: Set<String>,
         handleEvent: KSAnnotation,
-        event: KSType,
+        events: List<KSType>,
     ) {
         val eventParameterType = function.extensionReceiver?.resolve()
             ?: function.parameters.firstOrNull()?.type?.resolve()
@@ -182,7 +183,7 @@ class ModuleProcessor(
                 )
             }
 
-            1 -> if (eventParameterType == null || !event.isAssignableFrom(eventParameterType)) {
+            1 -> if (eventParameterType == null || events.none { it.isAssignableFrom(eventParameterType) }) {
                 logger.error(
                     "Function $name must have an event assignable from SkyHanniEvent " +
                         "because it is annotated with @HandleEvent",

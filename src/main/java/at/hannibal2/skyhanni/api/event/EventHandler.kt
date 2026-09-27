@@ -19,7 +19,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
     val invokeLog = SkyHanniEvents.EventInvokeLog()
 
     constructor(event: Class<T>, listeners: List<Listener>) : this(
-        (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
+        SkyHanniEvents.getEventName(event),
         ListenerCollection(listeners),
         listeners.any { it.receiveCancelled },
     )
