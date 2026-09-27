@@ -7,7 +7,6 @@ import net.fabricmc.loom.api.fabricapi.FabricApiExtension
 import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
-import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -481,11 +480,7 @@ tasks.withType<ProcessResources>().configureEach {
 
     if (stonecutter.eval(stonecutter.current.version, "< 26.3")) {
         filesMatching(listOf("**/*.fsh", "**/*.vsh")) {
-            filter<ReplaceTokens>(
-                "tokens" to mapOf(
-                    "#include" to "#moj_import"
-                )
-            )
+            filter { if (it.startsWith("#include")) "#moj_import ${it.substringAfter(' ')}" else it }
         }
     }
 }
