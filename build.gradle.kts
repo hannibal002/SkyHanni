@@ -198,6 +198,13 @@ dependencies {
         "productionRuntimeMods"("net.azureaaron:render-chest:$it")
         "minecraftTestClientRuntimeLibraries"("net.azureaaron:render-chest:$it")
     }
+
+    api(libs.skyblockapi) {
+        capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${target.minecraftVersion.versionName}") }
+    }
+    include(libs.skyblockapi) {
+        capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${target.minecraftVersion.versionName}") }
+    }
 }
 
 /**
@@ -475,4 +482,5 @@ tasks.withType<ValidateAccessWidenerTask>().configureEach {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven("https://maven.teamresourceful.com/repository/maven-public/")
 }

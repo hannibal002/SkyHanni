@@ -2,21 +2,26 @@
 
 package at.hannibal2.skyhanni.utils
 
+import com.google.common.collect.Multimap
+import com.google.common.collect.MultimapBuilder
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.PatchedDataComponentMap
 import net.minecraft.core.component.TypedDataComponent
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.ItemStackTemplate
+import tech.thatgravyboat.skyblockapi.impl.debug.ItemDebugAccessor
+import tech.thatgravyboat.skyblockapi.impl.debug.ItemDebugCategory
 
 internal class DeferredItemStack private constructor(
     private val sourceItem: Item,
     private val factory: () -> ItemStackTemplate,
     count: Int,
-) : ItemStack(Holder.direct(sourceItem), count, DataComponentPatch.EMPTY) {
+) : ItemStack(Holder.direct(sourceItem), count, DataComponentPatch.EMPTY), ItemDebugAccessor {
 
     private var isBuilt = false
     private val removedComponents = mutableSetOf<DataComponentType<*>>()
@@ -115,6 +120,9 @@ internal class DeferredItemStack private constructor(
         removedComponents.forEach(builder::removeUnchecked)
         return builder.build()
     }
+
+    override fun `skyblockapi$addEntry`(category: ItemDebugCategory, entry: Component) = Unit
+    override fun `skyblockapi$getEntries`(): Multimap<ItemDebugCategory, Component> = MultimapBuilder.hashKeys().arrayListValues().build()
 
     companion object {
         operator fun invoke(sourceItem: Item, factory: () -> ItemStackTemplate, count: Int): DeferredItemStack =

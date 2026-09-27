@@ -24,6 +24,7 @@ commons-net = "3.13.0"
 keval = "1.2.0"
 httpclient = "4.5.14"
 detektrules-neu = "1.0.0"
+skyblockapi = "4.2.28"
 
 [libraries]
 libautoupdate = { module = "moe.nea:libautoupdate", version.ref = "libautoupdate" }
@@ -37,6 +38,7 @@ kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "
 changelog-builder = { module = "com.github.SkyHanniStudios:SkyHanniChangelogBuilder", version.ref = "changelog-builder" }
 methanol = { module = "com.github.mizosoft.methanol:methanol", version.ref = "methanol" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
+skyblockapi = { module = "tech.thatgravyboat:skyblock-api", version.ref = "skyblockapi" }
 
 devauth = { module = "me.djtheredstoner:DevAuth-fabric", version.ref = "devauth" }
 junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
