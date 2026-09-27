@@ -27,7 +27,7 @@ object SbAPIEventRouter {
         instance: Any,
         method: Method,
         eventType: Class<out SkyBlockEvent>,
-        options: HandleEvent
+        options: HandleEvent,
     ) {
         val sbaPriority = convertPriority(options.priority)
         val eventName = SkyHanniEvents.getEventName(eventType)
