@@ -76,7 +76,7 @@ object WarpApi {
         reset()
         val warpsJson = event.getConstant<WarpsJson>("Warps").warpLocation
         warps = warpsJson.map { (name, warp) ->
-            val commands = warp.commands.takeIfNotEmpty() ?: listOf(name.lowercase())
+            val commands = warp.commands.orEmpty().takeIfNotEmpty() ?: listOf(name.lowercase())
             WarpLocation(
                 identifier = name,
                 displayName = warp.displayName,

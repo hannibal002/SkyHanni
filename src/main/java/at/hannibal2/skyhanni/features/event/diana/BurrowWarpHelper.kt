@@ -269,7 +269,7 @@ object BurrowWarpHelper {
                 val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
                 for (entry in locationData) {
                     if (entry.key.equals(this.name, true)) {
-                        return entry.value.commands.firstOrNull() ?: this.name.lowercase()
+                        return entry.value.commands?.firstOrNull() ?: this.name.lowercase()
                     }
                 }
                 ErrorManager.skyHanniError("repo invalid for diana warp")
