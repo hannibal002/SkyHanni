@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.IslandType
@@ -81,7 +82,7 @@ object VisitorNavigation {
             coroutineArgCallback(
                 "visitor",
                 BrigadierArguments.greedyString(),
-                currentIslandVisitors.map { it.name },
+                BrigadierUtils.dynamicSuggestionProvider { currentIslandVisitors.map { it.name } },
             ) { name ->
                 val visitor = currentIslandVisitors.firstOrNull {
                     it.name.equals(name, ignoreCase = true)
