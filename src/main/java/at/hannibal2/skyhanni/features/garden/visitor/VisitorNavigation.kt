@@ -4,10 +4,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.WarpApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenVisitor
+import at.hannibal2.skyhanni.data.model.graph.Graph
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllApi
@@ -152,14 +155,9 @@ object VisitorNavigation {
 
     private fun startAllNavigation() {
         val graph = IslandGraphs.currentIslandGraph ?: return
-
         val npcNodes = graph.getNodesWithTags(NPC)
-
         val nodes = currentIslandVisitors.map { visitor ->
-            val position = visitor.position
-            npcNodes.filter { it.name == visitor.name }
-                .minByOrNull { it.position.distanceSq(position) }
-                ?: graph.getNearestNode(position)
+            getClosestNode(graph, npcNodes, visitor)
         }
 
         NavigateAllApi.navigateAll(
@@ -177,11 +175,19 @@ object VisitorNavigation {
     }
 
     private fun startNavigation(visitor: VisitorNavigationData) {
-        IslandGraphs.pathFind(
-            location = visitor.position,
+        val graph = IslandGraphs.currentIslandGraph ?: return
+        val npcNodes = graph.getNodesWithTags(NPC)
+        val node = getClosestNode(graph, npcNodes, visitor)
+        node.pathFind(
             label = visitor.name,
             color = LorenzColor.DARK_PURPLE.toColor(),
             condition = { true },
         )
+    }
+
+    private fun getClosestNode(graph: Graph, candidateNodes: List<GraphNode>, visitor: VisitorNavigationData): GraphNode {
+        return candidateNodes.filter { it.name == visitor.name }
+            .minByOrNull { it.position.distanceSq(visitor.position) }
+            ?: graph.getNearestNode(visitor.position)
     }
 }
