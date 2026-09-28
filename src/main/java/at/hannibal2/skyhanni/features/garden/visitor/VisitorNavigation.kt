@@ -81,7 +81,7 @@ object VisitorNavigation {
             coroutineArgCallback(
                 "visitor",
                 BrigadierArguments.greedyString(),
-                getVisitorSuggestions(),
+                currentIslandVisitors.map { it.name },
             ) { name ->
                 val visitor = currentIslandVisitors.firstOrNull {
                     it.name.equals(name, ignoreCase = true)
@@ -104,17 +104,6 @@ object VisitorNavigation {
                 startAllNavigation()
             }
         }
-    }
-
-    // Suggests visitors from the current island, other islands, and visitors without a fixed location, in that order.
-    private fun getVisitorSuggestions(): List<String> {
-        val currentIsland = currentIslandVisitors.map { it.name }
-        val otherIslands = visitors
-            .filterKeys { it != SkyBlockUtils.currentIsland }
-            .values
-            .flatten()
-            .map { it.name }
-        return (currentIsland + otherIslands + noPositionVisitors).toList()
     }
 
     private fun visitorNotFound(rawName: String) {
