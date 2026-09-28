@@ -1,7 +1,5 @@
 #version 330
 
-const float pi = 3.14159265f;
-
 #ifdef NO_LAYOUT
 in vec4 vertexColor;
 in vec4 roundedParams0;
@@ -17,6 +15,8 @@ layout(location = 2) in vec4 roundedParams1;
 
 layout(location = 0) out vec4 fragColor;
 #endif
+
+const float pi = 3.14159265f;
 
 void main() {
     float smoothness = roundedParams0.y;

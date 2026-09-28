@@ -1,7 +1,5 @@
 #version 330
 
-const float tau = 6.2831853f;
-
 #ifdef NO_LAYOUT
 in vec4 roundedParams0;
 in vec4 roundedParams1;
@@ -21,6 +19,8 @@ layout(location = 4) in vec4 gradientParams2;
 
 layout(location = 0) out vec4 fragColor;
 #endif
+
+const float tau = 6.2831853f;
 
 void main() {
     float smoothness = roundedParams0.y;
