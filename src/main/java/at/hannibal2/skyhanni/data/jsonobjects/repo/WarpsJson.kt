@@ -17,5 +17,5 @@ data class WarpLocationData(
     @Expose val y: Double,
     @Expose val z: Double,
     @Expose @SerializedName("extra_diana_warp_blocks") val extraDianaWarpBlocks: Int = 0,
-    @Expose val commands: List<String>? = null
+    @Expose val commands: List<String>? = null,
 )
