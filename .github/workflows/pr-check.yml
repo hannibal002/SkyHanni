@@ -30,27 +30,12 @@ jobs:
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: ./.github/actions/setup-normal-workspace
-                if: github.repository == 'hannibal002/SkyHanni'
-            -   uses: ./.github/actions/setup-normal-workspace
-                if: github.repository != 'hannibal002/SkyHanni'
 
             -   name: Grant execute permission for gradlew
                 run: chmod +x gradlew
 
-
             -   name: Run ChangeLog verification w/retry
-                id: check_main
-                if: github.repository == 'hannibal002/SkyHanni'
-                continue-on-error: true
-                env:
-                    PR_TITLE: ${{ github.event.pull_request.title }}
-                    PR_BODY: ${{ github.event.pull_request.body }}
-                uses: ./.github/actions/gradle-retry
-                with:
-                    gradle-command: checkPrDescription
-            -   name: Run ChangeLog verification w/retry
-                id: check_fork
-                if: github.repository != 'hannibal002/SkyHanni'
+                id: check_changelog
                 continue-on-error: true
                 env:
                     PR_TITLE: ${{ github.event.pull_request.title }}
@@ -60,7 +45,7 @@ jobs:
                     gradle-command: checkPrDescription
 
             -   name: Upload changelog check failure artifact
-                if: steps.check_main.outcome == 'failure' || steps.check_fork.outcome == 'failure'
+                if: steps.check_changelog.outcome == 'failure'
                 uses: actions/upload-artifact@v7
                 with:
                     name: changelog-check-failure
@@ -68,7 +53,7 @@ jobs:
                     if-no-files-found: error
 
             -   name: Fail job if changelog check failed
-                if: steps.check_main.outcome == 'failure' || steps.check_fork.outcome == 'failure'
+                if: steps.check_changelog.outcome == 'failure'
                 run: exit 1
 
     # This job intentionally does nothing. When a PR is converted to a draft, verify-changelog is skipped,

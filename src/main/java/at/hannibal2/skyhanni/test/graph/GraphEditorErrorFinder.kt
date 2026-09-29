@@ -33,6 +33,7 @@ object GraphEditorErrorFinder {
 
     private var errorsInWorld = emptyMap<GraphNode, Set<String>>()
     private var renderedErrors = emptyList<Pair<GraphNode, Set<String>>>()
+    private var hasErrors = false
 
     private enum class ErrorCategory(val displayName: String) {
         CONFLICTING_TAGS("conflicting tags"),
@@ -50,10 +51,13 @@ object GraphEditorErrorFinder {
 
         val totalErrors get() = categoryCounts.values.sum()
 
+        var foundError = false
+
         /** Duplicate messages on the same node are dropped and therefore not counted. */
         fun add(node: GraphNode, category: ErrorCategory, error: String) {
             if (!errors.getOrPut(node) { mutableSetOf() }.add(error)) return
             categoryCounts.addOrPut(category, 1)
+            foundError = true
         }
     }
 
@@ -66,31 +70,38 @@ object GraphEditorErrorFinder {
     private fun asyncTest() {
         val graph = IslandGraphs.currentIslandGraph ?: return
         val errors = ErrorCollector()
-
         checkConflictingTags(graph, errors)
         checkConflictingAreas(graph, errors)
         checkMissingData(graph, errors)
         checkDeprecatedTags(graph, errors)
         checkInvalidNames(graph, errors)
-        checkHasSpawn(graph)
+        checkHasSpawn(graph, errors)
         checkOneWayEdges(graph, errors)
 
         errorsInWorld = errors.errors
         updateRenderedErrors()
-        reportErrorCount(errors)
+        sendErrorsInChat(errors)
         errors.errors.keys.minByOrNull {
             it.distanceSqToPlayer()
-        }?.pathFind("Graph Editor Error", Color.RED, condition = { isEnabled() })
+        }?.pathFind("Graph Editor Error", Color.RED, condition = { isEnabled() && errorsInWorld.isNotEmpty() })
     }
 
-    private fun reportErrorCount(errors: ErrorCollector) {
-        val totalErrors = errors.totalErrors
-        if (totalErrors == 0) return
-        val breakdown = errors.categoryCounts.entries.sortedByDescending { it.value }
-            .joinToString("\n") { (category, count) -> " §7${category.displayName}: §e${count.addSeparators()}" }
-        ChatUtils.chat(
-            "§cGraph errors: ${totalErrors.addSeparators()} on ${errors.errors.size.addSeparators()} nodes\n$breakdown",
-        )
+    private fun sendErrorsInChat(errors: ErrorCollector) {
+        if (!errors.foundError) {
+            if (hasErrors) {
+                ChatUtils.chat("§aGraph Editor errors are now gone.")
+                hasErrors = false
+            }
+            return
+        }
+        hasErrors = true
+        if (errors.errors.isNotEmpty()) {
+            val breakdown = errors.categoryCounts.entries.sortedByDescending { it.value }
+                .joinToString("\n") { (category, count) -> " §7${category.displayName}: §e${count.addSeparators()}" }
+            val totalErrorCount = errors.totalErrors.addSeparators()
+            val nodeCount = errors.errors.size.addSeparators()
+            ChatUtils.chat("§cGraph Editor errors: $totalErrorCount on $nodeCount nodes\n$breakdown")
+        }
     }
 
     private fun checkDeprecatedTags(graph: Graph, errors: ErrorCollector) {
@@ -121,9 +132,10 @@ object GraphEditorErrorFinder {
         }
     }
 
-    private fun checkHasSpawn(graph: Graph) {
+    private fun checkHasSpawn(graph: Graph, errors: ErrorCollector) {
         if (graph.none { it.hasTag(GraphNodeTag.POI) && it.name == "Spawn" }) {
-            ChatUtils.chat("§cGraph editor without spawn point!")
+            ChatUtils.chat("§cGraph Editor without spawn point!")
+            errors.foundError = true
         }
     }
 

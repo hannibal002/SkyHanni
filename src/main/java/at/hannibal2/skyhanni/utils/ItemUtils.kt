@@ -97,7 +97,6 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 @Suppress("LargeClass")
 object ItemUtils {
-
     private val patternGroup = RepoPattern.group("utils.item")
 
     // <editor-fold desc="Patterns">
@@ -400,13 +399,12 @@ object ItemUtils {
     }
 
     class AutoUpdatingRepoSkullItemStack internal constructor(
-        private val displayName: String,
-        private val uuid: String,
-        private val repoSkullId: String,
-        private val lore: List<String>,
-        private val extraOps: (SafeItemStack.() -> Unit)?,
+        displayName: String,
+        uuid: String,
+        repoSkullId: String,
+        lore: List<String>,
+        extraOps: (SafeItemStack.() -> Unit)?,
     ) : ItemStackProvider {
-
         private val value = StableOrTransientValue(1.seconds) {
             val texture = SkullTextureHolder.getTexture(repoSkullId)
             val stack = createSkull(
@@ -475,7 +473,7 @@ object ItemUtils {
     private fun SafeItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         if (this.getPetInfo() != null) return getPetRarity(this) to ItemCategory.PET
 
-        val cleanLore = this.getLoreComponent().map { it.string.removeColor() }
+        val cleanLore = getCleanLore()
         for (line in cleanLore.reversed()) {
             if (UtilsPatterns.notRarityLoreLinePattern.matches(line)) continue
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {

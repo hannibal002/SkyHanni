@@ -38,6 +38,11 @@ class EventConfig {
     @Category(name = "Hoppity Eggs", desc = "Features for the Hoppity event that happens every SkyBlock spring.")
     val hoppityEggs: HoppityEggsConfig = HoppityEggsConfig()
 
+    @ConfigOption(name = "Event Timings", desc = "")
+    @Accordion
+    @Expose
+    val timing: EventTimingConfig = EventTimingConfig()
+
     @ConfigOption(name = "City Project", desc = "")
     @Accordion
     @Expose

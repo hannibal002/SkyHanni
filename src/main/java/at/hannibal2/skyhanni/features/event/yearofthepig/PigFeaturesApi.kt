@@ -73,14 +73,15 @@ object PigFeaturesApi {
     )
 
     /**
-     * REGEX-TEST: SHINY! You extracted Shiny Token and Blood God Crest from the piglet's orb!
-     * REGEX-TEST: SHINY! You extracted Shiny Token and +1,185,000 Coins from the piglet's orb!
-     * REGEX-TEST: SHINY! You extracted Shiny Token and +1,000 Foraging XP from the piglet's orb!
-     * REGEX-TEST: SHINY! You extracted Shiny Token and 16x Enchanted Potato from the piglet's orb!
+     * REGEX-TEST: SHINY! You received a Shiny Token and Blood God Crest from the Shiny Pig's orb!
+     * REGEX-TEST: SHINY! You received a Shiny Token and +1,185,000 Coins from the Shiny Pig's orb!
+     * REGEX-TEST: SHINY! You received a Shiny Token and +1,000 Foraging XP from the Shiny Pig's orb!
+     * REGEX-TEST: SHINY! You received a Shiny Token and 16x Enchanted Potato from the Shiny Pig's orb!
+     * REGEX-TEST: SHINY! You received a Shiny Token and +5,000 Combat XP from the Shiny Pig's orb!
      */
     private val orbLootedChatPattern by patternGroup.pattern(
         "chat.orb.looted",
-        "SHINY! You extracted Shiny Token and (?<reward>.+) from the piglet's orb!",
+        "SHINY! You received a Shiny Token and (?<reward>.+) from the Shiny Pig's orb!",
     )
 
     /**

@@ -200,7 +200,7 @@ object GardenApi {
 
     fun hasActiveSunsGrasp(): Boolean =
         CurrentEquipmentApi.getEquipment(EquipmentSlot.GLOVES)?.getInternalName() == SUNS_GRASP &&
-            InventoryUtils.getItemInHand()?.isEmpty == true
+            InventoryUtils.getItemInHand() == null
 
     fun NeuInternalName.getCropType(): CropType? =
         if (this.startsWith("THEORETICAL_HOE_SUNFLOWER")) CropType.getTimeFlower()
