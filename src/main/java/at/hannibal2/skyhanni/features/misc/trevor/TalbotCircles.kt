@@ -34,7 +34,7 @@ object TalbotCircles {
 
     @Suppress("HandleEventInspection")
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
-    fun drawGuesses(event: SkyHanniRenderWorldEvent) {
+    private fun drawGuesses(event: SkyHanniRenderWorldEvent) {
         val mobFound = findMob(event)
         if (!(config.talbotCircles && !mobFound)) return
         if (constraints.isEmpty()) return
