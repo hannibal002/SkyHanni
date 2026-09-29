@@ -287,13 +287,6 @@ object TrevorFeatures {
         if (event.entity == trevorEntity) trevorEntity = null
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
-    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (config.cooldown) event.renderCooldown()
-        val mobFound = event.findMob()
-        if (config.talbotCircles && !mobFound) TalbotCircles.drawGuesses(event)
-    }
-
     private fun SkyHanniRenderWorldEvent.renderCooldown() {
         val entity = trevorEntity ?: return
 
