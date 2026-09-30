@@ -218,10 +218,11 @@ object ChestValue {
         for ((i, stack) in stacks) {
             val internalName = stack.getInternalNameOrNull() ?: continue
             if (internalName.getItemStackOrNull() == null) continue
-            val list = mutableListOf<String>()
-            val total = EstimatedItemValueCalculator.calculate(stack, list).first
+            val estimateData = EstimatedItemValueCalculator.calculate(stack)
+            val total = estimateData.totalPrice
             val key = "$internalName+$total"
 
+            val list = estimateData.breakdown.toMutableList()
             list.add("§aTotal: §6§l${total.formatPrice()} coins")
             if (total == 0.0) continue
             val item = getOrPut(key) {
