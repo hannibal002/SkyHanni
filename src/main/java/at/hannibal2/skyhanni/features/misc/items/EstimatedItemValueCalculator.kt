@@ -80,6 +80,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.SizeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
@@ -95,6 +96,8 @@ object EstimatedItemValueCalculator {
 
     var starChange = 0
         get() = if (SkyBlockUtils.debug) field else 0
+
+    private val cache = SizeLimitedCache<SafeItemStack, Pair<Double, Double>>(128, useWeakKeys = true)
 
     private val additionalCostFunctions = listOf(
         ::addReforgeStone,
@@ -176,7 +179,7 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
-    fun calculate(stack: SafeItemStack, list: MutableList<String>): Pair<Double, Double> {
+    fun calculate(stack: SafeItemStack, list: MutableList<String>): Pair<Double, Double> = cache.getOrPut(stack) {
         val basePrice = addBaseItem(stack, list)
         // The value of enchantments will already be added in ::addEnchantments, so set to 0 to avoid double counting
         val foldValue = if (stack.getItemId() == "ENCHANTED_BOOK") 0.0
