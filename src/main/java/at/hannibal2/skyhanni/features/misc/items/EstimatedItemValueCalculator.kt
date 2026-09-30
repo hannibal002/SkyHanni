@@ -97,7 +97,13 @@ object EstimatedItemValueCalculator {
     var starChange = 0
         get() = if (SkyBlockUtils.debug) field else 0
 
-    private val cache = SizeLimitedCache<SafeItemStack, Pair<Double, Double>>(128, useWeakKeys = true)
+    data class EstimatedItemValueResult(
+        val totalPrice: Double,
+        val basePrice: Double,
+        val breakdown: List<String>,
+    )
+
+    private val cache = SizeLimitedCache<SafeItemStack, EstimatedItemValueResult>(128, useWeakKeys = true)
 
     private val additionalCostFunctions = listOf(
         ::addReforgeStone,
@@ -179,13 +185,23 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
-    fun calculate(stack: SafeItemStack, list: MutableList<String>): Pair<Double, Double> = cache.getOrPut(stack) {
-        val basePrice = addBaseItem(stack, list)
-        // The value of enchantments will already be added in ::addEnchantments, so set to 0 to avoid double counting
-        val foldValue = if (stack.getItemId() == "ENCHANTED_BOOK") 0.0
-        else basePrice
-        val totalPrice = additionalCostFunctions.fold(foldValue) { total, function -> total + function(stack, list) }
-        return totalPrice to basePrice
+    fun calculate(stack: SafeItemStack, outList: MutableList<String>): Pair<Double, Double> {
+        val value = cache.getOrPut(stack) {
+            val list = mutableListOf<String>()
+            val basePrice = addBaseItem(stack, list)
+            // The value of enchantments will already be added in ::addEnchantments, so set to 0 to avoid double counting
+            val foldValue = if (stack.getItemId() == "ENCHANTED_BOOK") 0.0
+            else basePrice
+            val totalPrice = additionalCostFunctions.fold(foldValue) { total, function -> total + function(stack, list) }
+
+            EstimatedItemValueResult(
+                totalPrice = totalPrice,
+                basePrice = basePrice,
+                breakdown = list
+            )
+        }
+        outList.addAll(value.breakdown)
+        return value.totalPrice to value.basePrice
     }
 
     private fun addReforgeStone(stack: SafeItemStack, list: MutableList<String>): Double {
