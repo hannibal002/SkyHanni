@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.SizeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
@@ -51,7 +52,7 @@ object BetterContainers {
 
     private val config get() = SkyHanniMod.feature.inventory.improvedSBMenus
 
-    private val x: Identifier = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54")
+    private val shouldRenderCache = SizeLimitedCache<SafeItemStack, Boolean>(128, useWeakKeys = true)
 
     private val toggleOff = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/toggle_off.png")
     private val toggleOn = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/toggle_on.png")
@@ -113,18 +114,19 @@ object BetterContainers {
     }
 
     @HandleEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isOverriding) return
         val slot = event.slot ?: return
         val isBlankStack = isBlankStack(slot.item)
         val isButtonStack = isButtonStack(slot.item)
         if (!(isBlankStack || isButtonStack)) return
         clickSlot(event.slotId)
+        shouldRenderCache.clear()
         if (isBlankStack) event.makePickblock()
     }
 
     @HandleEvent
-    fun onSlotPre(event: GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre) {
+    private fun onSlotPre(event: GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre) {
         if (!isOverriding) return
         val slot = event.slot
         val shouldRender = shouldRenderStack(slot.item)
@@ -132,7 +134,7 @@ object BetterContainers {
     }
 
     @HandleEvent
-    fun onGuiContainerPreDraw(event: GuiContainerEvent.PreDraw) {
+    private fun onGuiContainerPreDraw(event: GuiContainerEvent.PreDraw) {
         if (event.gui !is ContainerScreen) return reset()
         chestOpen = SkyBlockUtils.inSkyBlock && config.enabled
         if (!chestOpen) return
@@ -167,19 +169,6 @@ object BetterContainers {
     }.getOrNull()
     // </editor-fold>
 
-    private fun tintMask(mask: BufferedImage, colour: Int): BufferedImage {
-        val w = mask.width
-        val h = mask.height
-        val out = BufferedImage(mask.colorModel, mask.copyData(null), mask.isAlphaPremultiplied, null)
-        for (y in 0 until h) for (x in 0 until w) {
-            val p = mask.getRGB(x, y)
-            val a = p ushr 24 and 0xFF
-            if (a < 10) continue
-            out.setRGB(x, y, (a shl 24) or (colour and 0xFFFFFF))
-        }
-        return out
-    }
-
     private fun getBaseTextColor(
         backgroundStyle: LegacyBetterContainers.BackgroundStyle
     ) = readJsonResource(backgroundStyle.configId)?.use { reader ->
@@ -203,8 +192,8 @@ object BetterContainers {
         bufferedImageButton = readImageResources(buttonStyle.buttonId, dynamic54Button)
     }
 
-    private fun shouldRenderStack(stack: SafeItemStack): Boolean {
-        return !isBlankStack(stack) && !isToggleOff(stack) && !isToggleOn(stack)
+    private fun shouldRenderStack(stack: SafeItemStack): Boolean = shouldRenderCache.getOrPut(stack) {
+        !isBlankStack(stack) && !isToggleOff(stack) && !isToggleOn(stack)
     }
 
     fun clickSlot(slot: Int) {
