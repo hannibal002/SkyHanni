@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.features.inventory.BetterContainers.SlotType.TOGGLE_ON
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CTMUtils
@@ -52,7 +53,15 @@ object BetterContainers {
 
     private val config get() = SkyHanniMod.feature.inventory.improvedSBMenus
 
-    private val shouldRenderCache = SizeLimitedCache<SafeItemStack, Boolean>(128, useWeakKeys = true)
+    enum class SlotType {
+        BLANK,
+        TOGGLE_ON,
+        TOGGLE_OFF,
+        BUTTON,
+        OTHER,
+    }
+
+    private val slotTypeCache = SizeLimitedCache<SafeItemStack, SlotType>(128, useWeakKeys = true)
 
     private val toggleOff = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/toggle_off.png")
     private val toggleOn = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/toggle_on.png")
@@ -121,7 +130,7 @@ object BetterContainers {
         val isButtonStack = isButtonStack(slot.item)
         if (!(isBlankStack || isButtonStack)) return
         clickSlot(event.slotId)
-        shouldRenderCache.clear()
+        slotTypeCache.clear()
         if (isBlankStack) event.makePickblock()
     }
 
@@ -129,8 +138,12 @@ object BetterContainers {
     private fun onSlotPre(event: GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre) {
         if (!isOverriding) return
         val slot = event.slot
-        val shouldRender = shouldRenderStack(slot.item)
-        if (!shouldRender) event.cancel()
+        val slotType = slot.item.slotType
+        val shouldNotRender = when (slotType) {
+            BLANK, TOGGLE_ON, TOGGLE_OFF -> true
+            else -> false
+        }
+        if (shouldNotRender) event.cancel()
     }
 
     @HandleEvent
@@ -192,8 +205,30 @@ object BetterContainers {
         bufferedImageButton = readImageResources(buttonStyle.buttonId, dynamic54Button)
     }
 
-    private fun shouldRenderStack(stack: SafeItemStack): Boolean = shouldRenderCache.getOrPut(stack) {
-        !isBlankStack(stack) && !isToggleOff(stack) && !isToggleOn(stack)
+    private fun isBlankStackInternal(stack: SafeItemStack): Boolean =
+        stack.isStainedGlassPane(ColoredBlockCompat.BLACK) &&
+            stack.count == 1 &&
+            stack.getTooltip().isEmpty()
+
+    private fun isButtonStackInternal(
+        stack: SafeItemStack?,
+    ): Boolean {
+        val realStack = stack ?: return false
+        val isGlassPane = realStack.isStainedGlassPane()
+        val isUnknownInternalName = realStack.getInternalNameOrNull() == null
+        // Toggles also count as buttons by this definition,
+        // but they are handled separately in the slotTypeCache
+        return !isGlassPane && !isUnknownInternalName
+    }
+
+    private val SafeItemStack.slotType get() = slotTypeCache.getOrPut(this) {
+        when {
+            isBlankStackInternal(this) -> BLANK
+            isToggleCommon(this, "disable") -> TOGGLE_ON
+            isToggleCommon(this, "enable") -> TOGGLE_OFF
+            isButtonStackInternal(this) -> BUTTON
+            else -> SlotType.OTHER
+        }
     }
 
     fun clickSlot(slot: Int) {
@@ -203,22 +238,12 @@ object BetterContainers {
 
     private fun getClickedSlot(): Int = if (clickedSlotAt.passedSince() <= 500.milliseconds) clickedSlot else -1
 
-    private fun isBlankStack(stack: SafeItemStack): Boolean = stack.isStainedGlassPane(ColoredBlockCompat.BLACK) &&
-        stack.count == 1 &&
-        stack.getTooltip().isEmpty()
+    private fun isBlankStack(stack: SafeItemStack): Boolean = stack.slotType == BLANK
 
-    private fun isButtonStack(
-        stack: SafeItemStack?,
-    ): Boolean {
-        val realStack = stack ?: return false
-        val isGlassPane = realStack.isStainedGlassPane()
-        val isUnknownInternalName = realStack.getInternalNameOrNull() == null
-        val isToggle = isToggleOn(realStack) || isToggleOff(realStack)
-        return !isGlassPane && !isUnknownInternalName && !isToggle
-    }
+    private fun isButtonStack(stack: SafeItemStack): Boolean = stack.slotType == BUTTON
 
-    private fun isToggleOn(stack: SafeItemStack): Boolean = isToggleCommon(stack, "disable")
-    private fun isToggleOff(stack: SafeItemStack): Boolean = isToggleCommon(stack, "enable")
+    private fun isToggleOn(stack: SafeItemStack): Boolean = stack.slotType == TOGGLE_ON
+    private fun isToggleOff(stack: SafeItemStack): Boolean = stack.slotType == TOGGLE_OFF
     private fun isToggleCommon(stack: SafeItemStack, verb: String): Boolean {
         val hasText = stack.getLore().takeIfNotEmpty()?.last()?.endsWith("Click to $verb!") ?: false
         return hasText && stack.isDye()
