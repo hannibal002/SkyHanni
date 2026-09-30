@@ -139,11 +139,10 @@ object BetterContainers {
         if (!isOverriding) return
         val slot = event.slot
         val slotType = slot.item.slotType
-        val shouldNotRender = when (slotType) {
-            BLANK, TOGGLE_ON, TOGGLE_OFF -> true
-            else -> false
+        when (slotType) {
+            BLANK, TOGGLE_ON, TOGGLE_OFF -> event.cancel()
+            else -> {}
         }
-        if (shouldNotRender) event.cancel()
     }
 
     @HandleEvent
