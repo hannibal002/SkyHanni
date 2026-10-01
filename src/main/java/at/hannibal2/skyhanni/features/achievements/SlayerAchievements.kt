@@ -19,7 +19,7 @@ object SlayerAchievements {
     /**
      * WRAPPED-REGEX-TEST: "   RNG Meter - 728,269 Stored XP"
      */
-    private val rngMeterPattern by AchievementManager.group.pattern(
+    private val rngMeterPattern by AchievementManager.patternGroup.pattern(
         "rng-meter",
         "\\s*RNG Meter - (?<xp>[\\d,]+) Stored XP",
     )

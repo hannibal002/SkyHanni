@@ -20,7 +20,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
-private val repoGroup by RepoPattern.exclusiveGroup("tab.widgetcomponent.enum")
+private val patternGroup by RepoPattern.exclusiveGroup("tab.widgetcomponent.enum")
 
 /**
  * This class defines various widgets within the tab list, specifically focusing on the reading of the values.
@@ -388,7 +388,7 @@ enum class TabWidget(
     ;
 
     /** The pattern for the first line of the widget*/
-    val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*(?:$pattern0)")
+    val pattern by patternGroup.pattern(name.replace("_", ".").lowercase(), "\\s*(?:$pattern0)")
 
     /** The current active information from tab list.
      *
@@ -530,7 +530,7 @@ enum class TabWidget(
 
         @HandleEvent(priority = HandleEvent.LOW)
         private fun onRepoReload(event: RepositoryReloadEvent) {
-            extraPatterns = repoGroup.getUnusedPatterns()
+            extraPatterns = patternGroup.getUnusedPatterns()
         }
 
         private fun filterTabList(tabList: List<Component>): List<Component> {
