@@ -19,6 +19,7 @@ object PoseStackUtils {
         if (xRad == 0f && yRad == 0f && zRad == 0f) return false
 
         quaternionf.rotateXYZ(xRad, yRad, zRad)
+        //~ if >= 26.3 'mulPose' -> 'rotate'
         mulPose(quaternionf)
         return true
     }

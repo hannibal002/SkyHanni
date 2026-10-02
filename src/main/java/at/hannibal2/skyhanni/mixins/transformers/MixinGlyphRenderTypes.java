@@ -19,7 +19,11 @@ public abstract class MixinGlyphRenderTypes {
     @Unique
     private Identifier skyhanni$identifier;
 
+    //? if >= 26.3 {
+    /*@ModifyReturnValue(method = {"createForColorTexture", "createForGrayscaleTexture"}, at = @At("RETURN"))
+    *///?} else {
     @ModifyReturnValue(method = {"createForColorTexture", "createForIntensityTexture"}, at = @At("RETURN"))
+    //?}
     private static GlyphRenderTypes ofMethods(GlyphRenderTypes original, @Local(argsOnly = true) Identifier identifier) {
         ((MixinGlyphRenderTypes) (Object) original).skyhanni$identifier = identifier;
         return original;

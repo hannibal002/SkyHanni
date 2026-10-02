@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.render.item.atlas
 
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
+import at.hannibal2.skyhanni.utils.render.item.ItemTexturePassPlan
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.FilterMode
@@ -38,11 +39,15 @@ internal class SkyHanniItemAtlasRenderer(
         val size = sizePixels.toFloat()
         val bufferSlice = projectionBuffer.getBuffer(Projection().apply { this.setupOrtho(-1000f, 1000f, size, size, true) })
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
+        //? if >= 26.3 {
+        /*block()
+        *///?} else {
         RenderSystem.outputColorTextureOverride = textureView
         RenderSystem.outputDepthTextureOverride = depthTextureView
         block()
         RenderSystem.outputColorTextureOverride = null
         RenderSystem.outputDepthTextureOverride = null
+        //?}
     }
 
     fun renderItemToAtlas(
@@ -63,6 +68,9 @@ internal class SkyHanniItemAtlasRenderer(
             centerX = slotX.toFloat() + pixelSize / 2.0f,
             centerY = slotY.toFloat() + pixelSize / 2.0f,
             pixelSize = pixelSize,
+            //? if >= 26.3 {
+            /*passPlan = ItemTexturePassPlan.atlasSlot(textureView, depthTextureView, sizePixels, slotX, slotY, pixelSize),
+            *///?}
         )
         RenderSystem.disableScissorForRenderTypeDraws()
     }
@@ -101,6 +109,9 @@ internal class SkyHanniItemAtlasRenderer(
         RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(
             texture, GuiRenderer.CLEAR_COLOR, depthTexture, RenderCompat.CLEAR_DEPTH,
             x, sizePixels - y - size, size, size,
+            //? if >= 26.3 {
+            /*0,
+            *///?}
         )
     }
 }

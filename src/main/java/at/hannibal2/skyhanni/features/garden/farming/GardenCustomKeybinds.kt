@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.KeyboardManager.keybindCode
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -36,7 +37,7 @@ object GardenCustomKeybinds {
     fun isKeyDown(keyBinding: KeyMapping, isDown: Boolean, cir: CallbackInfoReturnable<Boolean>) {
         if (!updateActiveState()) return
         val override = map[keyBinding] ?: run {
-            if (map.containsValue(keyBinding.key.value)) {
+            if (map.containsValue(keyBinding.keybindCode())) {
                 cir.returnValue = false
             }
             return
@@ -53,7 +54,7 @@ object GardenCustomKeybinds {
     fun isKeyPressed(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
         if (!updateActiveState()) return
         val override = map[keyBinding] ?: run {
-            if (map.containsValue(keyBinding.key.value)) {
+            if (map.containsValue(keyBinding.keybindCode())) {
                 cir.returnValue = false
             }
             return
@@ -128,7 +129,7 @@ object GardenCustomKeybinds {
         this is ToggleKeyMapping && needsToggle.asBoolean
 
     private fun KeyMapping.isRemappedFrom(override: Int): Boolean =
-        key.value != override
+        keybindCode() != override
 
     private fun KeyMapping.updateToggleState(override: Int, isDown: Boolean): Boolean {
         if (!override.isKeyHeld()) {

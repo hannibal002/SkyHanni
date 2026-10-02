@@ -1,5 +1,6 @@
 #version 150
 
+//~ if >= 26.3 'in vec4 vertexColor;' -> 'layout(location = 0) in vec4 vertexColor;'
 in vec4 vertexColor;
 
 // Rect specific uniforms
@@ -18,6 +19,7 @@ layout(std140) uniform SkyHanniRoundedOutlineUniforms {
     float borderBlur;
 };
 
+//~ if >= 26.3 'out vec4 outColor;' -> 'layout(location = 0) out vec4 outColor;'
 out vec4 outColor;
 
 // From https://www.shadertoy.com/view/WtdSDs

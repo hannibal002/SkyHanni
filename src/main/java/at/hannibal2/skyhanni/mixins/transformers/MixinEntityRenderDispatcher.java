@@ -44,7 +44,11 @@ public abstract class MixinEntityRenderDispatcher<E extends Entity, S extends En
     }
 
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
+    //? if >= 26.3 {
+    /*private void shouldRender(Entity entity, Frustum camera, double camX, double camY, double camZ, float partialTick, CallbackInfoReturnable<Boolean> cir) {
+    *///?} else {
     private void shouldRender(Entity entity, Frustum camera, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir) {
+    //?}
         if (!EntityData.shouldRender(entity, camX, camY, camZ)) {
             cir.setReturnValue(false);
         }

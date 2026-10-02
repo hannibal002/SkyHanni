@@ -172,7 +172,11 @@ enum class SkyHanniRenderPipeline(
                 if (sampler != null || uniforms.isNotEmpty()) {
                     withBindGroupLayout(
                         BindGroupLayout.builder().apply {
+                            //? if >= 26.3 {
+                            /*sampler?.let { withUniform(it, UniformType.COMBINED_IMAGE_SAMPLER) }
+                            *///?} else {
                             sampler?.let(this::withSampler)
+                            //?}
                             uniforms.forEach(this::withUniform)
                         }.build(),
                     )
@@ -193,7 +197,13 @@ enum class SkyHanniRenderPipeline(
 
 private object SkyHanniRenderPipelineUtils {
     //? if >= 26.2 {
-    val MATRICES_PROJECTION_SNIPPET = RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).buildSnippet()
+    val MATRICES_PROJECTION_SNIPPET = RenderPipeline.builder()
+        //? if >= 26.3 {
+        /*.withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS).withBindGroupLayout(BindGroupLayouts.PROJECTION)
+        *///?} else {
+        .withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
+        //?}
+        .buildSnippet()
     //?} else
     //val MATRICES_PROJECTION_SNIPPET = RenderPipelines.MATRICES_PROJECTION_SNIPPET
 

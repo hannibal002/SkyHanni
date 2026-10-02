@@ -35,6 +35,18 @@ enum class ProjectTarget(
         modrinthInfo = ModrinthInfo.FABRIC_26_2,
     ),
 
+    MODERN_26300(
+        "26.3",
+        MinecraftVersion.MC26300,
+        fabricLoaderVersion = "net.fabricmc:fabric-loader:0.19.5",
+        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.161.0+26.3",
+        hypixelModApiVersion = "net.hypixel:mod-api:1.0.2",
+        hypixelModApiFabricVersion = "maven.modrinth:hypixel-mod-api:1.0.2+build.1+mc26.1",
+        modMenuVersion = "21.0.0",
+        renderChestVersion = "1.0.3+26.3",
+        modrinthInfo = ModrinthInfo.FABRIC_26_3,
+    ),
+
     ;
 
     val projectPath get() = ":$projectName"

@@ -21,6 +21,7 @@ layout(std140) uniform SkyHanniRadialGradientCircleUniforms {
     int reverse;
 };
 
+//~ if >= 26.3 'out vec4 fragColor;' -> 'layout(location = 0) out vec4 fragColor;'
 out vec4 fragColor;
 
 void main() {

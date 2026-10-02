@@ -70,8 +70,11 @@ allprojects {
         // MoulConfig and a few Detekt rules
         exclusiveContent {
             forRepositories(
-                repositories.mavenLocal(),
-                repositories.maven("https://maven.notenoughupdates.org/releases"),
+                *listOfNotNull(
+                    providers.gradleProperty("moulconfigPortRepository").orNull?.let { repositories.maven(it) },
+                    repositories.mavenLocal(),
+                    repositories.maven("https://maven.notenoughupdates.org/releases"),
+                ).toTypedArray()
             )
             filter {
                 includeGroupAndSubgroups("org.notenoughupdates")
@@ -111,7 +114,10 @@ allprojects {
 
         exclusiveContent {
             forRepositories(
-                repositories.maven("https://maven.azureaaron.net/releases"),
+                *listOfNotNull(
+                    providers.gradleProperty("renderChestPortRepository").orNull?.let { repositories.maven(it) },
+                    repositories.maven("https://maven.azureaaron.net/releases"),
+                ).toTypedArray()
             )
             filter {
                 includeGroupAndSubgroups("net.azureaaron")
@@ -159,6 +165,54 @@ stonecutter parameters {
                 replace("STAINED_GLASS_PANE.$lower()", "${upper}_STAINED_GLASS_PANE")
                 replace("DYED_TERRACOTTA.$lower()", "${upper}_TERRACOTTA")
             }
+        }
+    }
+
+    replacements {
+        string(current.parsed >= "26.3") {
+            replace("#version 150", "#version 330\n#extension GL_ARB_separate_shader_objects : require")
+            replace("#moj_import", "#include")
+            replace("org.lwjgl.glfw.GLFW", "at.hannibal2.skyhanni.utils.compat.SdlInputCompat")
+            replace("GLFW.", "SdlInputCompat.")
+            replace("com.mojang.blaze3d.pipeline.RenderPipeline", "com.mojang.renderpearl.api.pipeline.RenderPipeline")
+            replace("EnderMan", "Enderman")
+            replace("MixinEnderman", "MixinEnderMan")
+            replace("Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer\$CrumblingOverlay;", "Lnet/minecraft/client/renderer/texture/UvMapping;I")
+            replace("IIILnet/minecraft/client/renderer/feature/ModelFeatureRenderer\$CrumblingOverlay;)V", "III)V")
+            replace("entityTranslucentCullItemTarget", "entityTranslucentCull")
+            replace("RenderTypes.glintTranslucent", "at.hannibal2.skyhanni.utils.render.NativeRenderTypes263.glintTranslucent")
+            replace("com.mojang.blaze3d.PrimitiveTopology", "com.mojang.renderpearl.api.pipeline.PrimitiveTopology")
+            replace("com/mojang/blaze3d/PrimitiveTopology", "com/mojang/renderpearl/api/pipeline/PrimitiveTopology")
+            replace("com.mojang.blaze3d.IndexType", "com.mojang.renderpearl.api.pipeline.IndexType")
+            replace("com/mojang/blaze3d/IndexType", "com/mojang/renderpearl/api/pipeline/IndexType")
+            replace("com.mojang.blaze3d.GpuFormat", "com.mojang.renderpearl.api.GpuFormat")
+            replace("com/mojang/blaze3d/GpuFormat", "com/mojang/renderpearl/api/GpuFormat")
+            replace("com.mojang.blaze3d.pipeline.BindGroupLayout", "com.mojang.renderpearl.api.pipeline.BindGroupLayout")
+            replace("com/mojang/blaze3d/pipeline/BindGroupLayout", "com/mojang/renderpearl/api/pipeline/BindGroupLayout")
+            replace("com.mojang.blaze3d.pipeline.BlendFunction", "com.mojang.renderpearl.api.pipeline.BlendFunction")
+            replace("com/mojang/blaze3d/pipeline/BlendFunction", "com/mojang/renderpearl/api/pipeline/BlendFunction")
+            replace("com.mojang.blaze3d.pipeline.ColorTargetState", "com.mojang.renderpearl.api.pipeline.ColorTargetState")
+            replace("com/mojang/blaze3d/pipeline/ColorTargetState", "com/mojang/renderpearl/api/pipeline/ColorTargetState")
+            replace("com.mojang.blaze3d.pipeline.DepthStencilState", "com.mojang.renderpearl.api.pipeline.DepthStencilState")
+            replace("com/mojang/blaze3d/pipeline/DepthStencilState", "com/mojang/renderpearl/api/pipeline/DepthStencilState")
+            replace("com.mojang.blaze3d.shaders.UniformType", "com.mojang.renderpearl.api.pipeline.UniformType")
+            replace("com/mojang/blaze3d/shaders/UniformType", "com/mojang/renderpearl/api/pipeline/UniformType")
+            replace("com.mojang.blaze3d.systems.RenderPass", "com.mojang.renderpearl.api.commands.RenderPass")
+            replace("com/mojang/blaze3d/systems/RenderPass", "com/mojang/renderpearl/api/commands/RenderPass")
+            replace("com.mojang.blaze3d.systems.GpuDevice", "com.mojang.renderpearl.api.device.GpuDevice")
+            replace("com/mojang/blaze3d/systems/GpuDevice", "com/mojang/renderpearl/api/device/GpuDevice")
+            replace("com.mojang.blaze3d.buffers.GpuBuffer", "com.mojang.renderpearl.api.buffers.GpuBuffer")
+            replace("com/mojang/blaze3d/buffers/GpuBuffer", "com/mojang/renderpearl/api/buffers/GpuBuffer")
+            replace("com.mojang.blaze3d.textures.GpuTexture", "com.mojang.renderpearl.api.textures.GpuTexture")
+            replace("com/mojang/blaze3d/textures/GpuTexture", "com/mojang/renderpearl/api/textures/GpuTexture")
+            replace("com.mojang.blaze3d.textures.FilterMode", "com.mojang.renderpearl.api.textures.FilterMode")
+            replace("com/mojang/blaze3d/textures/FilterMode", "com/mojang/renderpearl/api/textures/FilterMode")
+            replace("com.mojang.blaze3d.textures.GpuSampler", "com.mojang.renderpearl.api.textures.GpuSampler")
+            replace("com/mojang/blaze3d/textures/GpuSampler", "com/mojang/renderpearl/api/textures/GpuSampler")
+            replace("com.mojang.blaze3d.vertex.VertexFormat", "com.mojang.renderpearl.api.vertex.VertexFormat")
+            replace("com/mojang/blaze3d/vertex/VertexFormat", "com/mojang/renderpearl/api/vertex/VertexFormat")
+            replace("InputConstants.Type.KEYSYM", "InputConstants.Type.KEYBOARD")
+            replace("com/mojang/blaze3d/pipeline/RenderPipeline", "com/mojang/renderpearl/api/pipeline/RenderPipeline")
         }
     }
 

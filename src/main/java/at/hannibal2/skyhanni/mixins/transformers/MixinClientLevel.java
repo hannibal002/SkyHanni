@@ -27,8 +27,13 @@ public abstract class MixinClientLevel {
         }
     }
 
+    //? if >= 26.3 {
+    /*@Inject(method = "addBreakingParticles", at = @At("HEAD"), cancellable = true)
+    private void onAddBlockBreakingParticles(BlockPos blockPos, Direction direction, BlockState state, CallbackInfo ci) {
+    *///?} else {
     @Inject(method = "addBreakingBlockEffect", at = @At("HEAD"), cancellable = true)
     private void onAddBlockBreakingParticles(BlockPos blockPos, Direction direction, CallbackInfo ci) {
+    //?}
         if (ParticleHider.shouldHideBlockParticles()) {
             ci.cancel();
         }

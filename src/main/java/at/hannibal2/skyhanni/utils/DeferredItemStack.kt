@@ -83,10 +83,16 @@ internal class DeferredItemStack private constructor(
 
     override fun applyComponents(patch: DataComponentPatch) {
         if (!isBuilt) {
+            //? if >= 26.3 {
+            /*val split = patch.split()
+            split.added().keySet().forEach(removedComponents::remove)
+            split.removed().forEach(removedComponents::add)
+            *///?} else {
             patch.entrySet().forEach { (type, value) ->
                 if (value.isPresent) removedComponents.remove(type)
                 else removedComponents.add(type)
             }
+            //?}
         }
         super.applyComponents(patch)
     }
@@ -108,10 +114,16 @@ internal class DeferredItemStack private constructor(
         if (removedComponents.isEmpty()) return pendingPatch
 
         val builder = DataComponentPatch.builder()
+        //? if >= 26.3 {
+        /*val split = pendingPatch.split()
+        split.added().forEach { builder.setUnchecked(it.type(), it.value()) }
+        split.removed().forEach(builder::removeUnchecked)
+        *///?} else {
         pendingPatch.entrySet().forEach { (type, value) ->
             if (value.isPresent) builder.setUnchecked(type, value.get())
             else builder.removeUnchecked(type)
         }
+        //?}
         removedComponents.forEach(builder::removeUnchecked)
         return builder.build()
     }

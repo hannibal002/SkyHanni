@@ -45,6 +45,7 @@ object RenderCompat {
 
     private fun RenderTarget.findColorAttachment() = this.colorTextureView
 
+    //~ if >= 26.3 'this.useDepth' -> 'this.hasDepth()'
     private fun RenderTarget.findDepthAttachment() = if (this.useDepth) this.depthTextureView else null
 
     fun GpuDevice.createRenderPass(name: String, framebuffer: RenderTarget): RenderPass {

@@ -13,6 +13,7 @@ import kotlin.math.sign
  */
 object MouseCompat {
 
+    //~ if >= 26.3 '6' -> '9'
     const val NUMBER_OF_MOUSE_BUTTONS = 6
 
     @JvmStatic
@@ -40,12 +41,12 @@ object MouseCompat {
     private val mouse by lazy { Minecraft.getInstance().mouseHandler }
 
     fun isButtonDown(button: Int): Boolean {
-        if (button in 0..5) return buttonStates[button]
+        if (button in buttonStates.indices) return buttonStates[button]
         return false
     }
 
     fun setButtonState(button: Int, down: Boolean) {
-        if (button in 0..5) {
+        if (button in buttonStates.indices) {
             buttonStates[button] = down
         }
     }
@@ -85,12 +86,18 @@ object MouseCompat {
     @JvmStatic
     fun handleMouseButton(input: MouseButtonInfo, action: Int) {
         val button: Int = input.button()
+        val keybind =
+            //? if >= 26.3 {
+            /*SdlKeybindSchema.fromNativeMouse(button)
+            *///?} else {
+            button
+            //?}
         if (action == 1) {
             setButtonState(button, true)
-            KeyDownEvent(button).post()
-            KeyPressEvent(button).post()
+            KeyDownEvent(keybind).post()
+            KeyPressEvent(keybind).post()
         } else {
-            KeyPressEvent(button).post()
+            KeyPressEvent(keybind).post()
             DelayedRun.runNextTickEnd {
                 setButtonState(button, false)
             }

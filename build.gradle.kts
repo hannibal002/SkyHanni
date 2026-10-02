@@ -138,16 +138,39 @@ dependencies {
 
     implementation("maven.modrinth:modmenu:${target.modMenuVersion}")
 
+    // Minecraft26.3 stopped shipping TinyFD. Keep the original synchronous native dialogs.
+    if (target == ProjectTarget.MODERN_26300) {
+        shadowImpl("org.lwjgl:lwjgl-tinyfd:3.4.3")
+        listOf(
+            "natives-freebsd",
+            "natives-linux-arm32",
+            "natives-linux-arm64",
+            "natives-linux-ppc64le",
+            "natives-linux-riscv64",
+            "natives-linux",
+            "natives-macos-arm64",
+            "natives-macos",
+            "natives-windows-arm64",
+            "natives-windows-x86",
+            "natives-windows",
+        ).forEach { classifier ->
+            // Native JARs have distinct OS/architecture resource directories; LWJGL selects its own.
+            shadowOnly("org.lwjgl:lwjgl-tinyfd:3.4.3:$classifier")
+            runtimeOnly("org.lwjgl:lwjgl-tinyfd:3.4.3:$classifier")
+        }
+    }
+
     runtimeOnly(libs.devauth)
     "productionRuntimeMods"(libs.devauth)
 
     val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
-    shadowImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
+    val moulconfigLibraryVersion = if (target == ProjectTarget.MODERN_26300) "4.7.2-codex26.3.1" else libs.versions.moulconfig.get()
+    shadowImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${moulconfigLibraryVersion}") {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
     "minecraftTestClientRuntimeLibraries"(
-        "org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}"
+        "org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${moulconfigLibraryVersion}"
     )
 
     shadowImpl(libs.libautoupdate) {
@@ -166,6 +189,7 @@ dependencies {
 
     val reiVersion = when (target) {
         ProjectTarget.MODERN_26200 -> "26.2.820"
+        ProjectTarget.MODERN_26300 -> "26.3.823"
         ProjectTarget.MODERN_26100 -> "26.1.819"
     }
     val reiApi = "me.shedaniel:RoughlyEnoughItems-api:$reiVersion"
@@ -369,6 +393,10 @@ tasks.shadowJar {
     }
     exclude("META-INF/versions/**")
     exclude("META-INF/*.kotlin_module")
+    // ServiceFileTransformer must see all providers before merging and relocating them.
+    filesMatching("META-INF/services/**") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")

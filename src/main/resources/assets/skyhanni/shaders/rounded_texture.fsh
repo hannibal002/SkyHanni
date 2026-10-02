@@ -1,5 +1,6 @@
 #version 150
 
+//~ if >= 26.3 'in vec2 texCoord;' -> 'layout(location = 0) in vec2 texCoord;'
 in vec2 texCoord;
 
 layout(std140) uniform SkyHanniRoundedUniforms {
@@ -13,6 +14,7 @@ layout(std140) uniform SkyHanniRoundedUniforms {
 
 uniform sampler2D textureSampler;
 
+//~ if >= 26.3 'out vec4 outColor;' -> 'layout(location = 0) out vec4 outColor;'
 out vec4 outColor;
 
 // From https://www.shadertoy.com/view/WtdSDs

@@ -22,7 +22,11 @@ object ClipboardUtils {
     }
 
     private fun copyToClipboardInternal(text: String, step: Int = 0): Boolean = runCatching {
+        //? if >= 26.3 {
+        /*ClipboardManager().setClipboard(text)
+        *///?} else {
         ClipboardManager().setClipboard(Minecraft.getInstance().window, text)
+        //?}
         true
     }.getOrElse {
         if (step == 3) {
@@ -33,9 +37,17 @@ object ClipboardUtils {
 
     fun readFromClipboard(step: Int = 0): String? {
         var shouldRetry = false
-        val clipboard = ClipboardManager().getClipboard(Minecraft.getInstance().window) { _, _ ->
-            shouldRetry = true
-        }
+        val clipboard =
+            //? if >= 26.3 {
+            /*runCatching { ClipboardManager().getClipboard() }.getOrElse {
+                shouldRetry = true
+                ""
+            }
+            *///?} else {
+            ClipboardManager().getClipboard(Minecraft.getInstance().window) { _, _ ->
+                shouldRetry = true
+            }
+            //?}
         return if (!shouldRetry) clipboard
         else if (step == 3) {
             ErrorManager.logErrorStateWithData(

@@ -120,7 +120,7 @@ object KeyboardManager {
     // and in renderable calls have time to react first, and lock this key press event properly.
     fun KeyMapping.isActive(): Boolean {
         try {
-            if (key.value.isKeyHeld()) return true
+            if (keybindCode().isKeyHeld()) return true
         } catch (e: IndexOutOfBoundsException) {
             ErrorManager.logErrorWithData(
                 e,
@@ -132,7 +132,21 @@ object KeyboardManager {
         return isDown || consumeClick()
     }
 
+    fun KeyMapping.keybindCode(): Int =
+        //? if >= 26.3 {
+        /*if (key.type == InputConstants.Type.MOUSE) at.hannibal2.skyhanni.utils.compat.SdlKeybindSchema.fromNativeMouse(key.value) else key.value
+        *///?} else {
+        key.value
+        //?}
+
     fun Int.isKeyHeld(): Boolean = when {
+        //? if >= 26.3 {
+        /*at.hannibal2.skyhanni.utils.compat.SdlKeybindSchema.isMouse(this) ->
+            MouseCompat.isButtonDown(at.hannibal2.skyhanni.utils.compat.SdlKeybindSchema.nativeMouse(at.hannibal2.skyhanni.utils.compat.SdlKeybindSchema.logicalMouse(this)))
+        this == -1 || this == 0 -> false
+        this < 0 -> ErrorManager.skyHanniError("Error while checking if a key is pressed. Key code is invalid: $this")
+        else -> InputConstants.isKeyDown(this)
+        *///?} else {
         this < -1 -> ErrorManager.skyHanniError(
             "Error while checking if a key is pressed. Key code is invalid: $this",
         )
@@ -140,6 +154,7 @@ object KeyboardManager {
         this == -1 -> false
         this in 0..5 -> MouseCompat.isButtonDown(this)
         else -> InputConstants.isKeyDown(Minecraft.getInstance().window, this)
+        //?}
     }
 
     private val lockedKeys = mutableSetOf<Int>()

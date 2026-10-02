@@ -101,6 +101,9 @@ data class SkyHanniGuiItemRenderState(
         centerX: Float,
         centerY: Float,
         pixelSize: Int,
+        //? if >= 26.3 {
+        /*passPlan: ItemTexturePassPlan<com.mojang.renderpearl.api.textures.GpuTextureView>,
+        *///?}
     ) {
         val ps = PoseStack()
         ps.translate(centerX, centerY, 0.0f)
@@ -120,7 +123,19 @@ data class SkyHanniGuiItemRenderState(
         //~ if < 26.2 'submitNodeStorage' -> 'featureRenderDispatcher.submitNodeStorage'
         trackingState.submit(ps, submitNodeStorage, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
         //? if >= 26.2 {
+        //? if >= 26.3 {
+        /*featureRenderDispatcher.prepareFrame(submitNodeStorage).use { frame ->
+            com.mojang.blaze3d.systems.RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+                { "SkyHanni item texture" }, passPlan.colorAttachment(), java.util.Optional.empty(), passPlan.depthAttachment(), java.util.OptionalDouble.empty(),
+            ).use { pass ->
+                com.mojang.blaze3d.systems.RenderSystem.bindDefaultUniforms(pass)
+                passPlan.scissor()?.let { pass.enableScissor(it.x(), it.y(), it.width(), it.height()) }
+                FeatureRenderDispatcher.renderAllFeatures(pass, frame)
+            }
+        }
+        *///?} else {
         featureRenderDispatcher.renderAllFeatures(submitNodeStorage)
+        //?}
         //?} else {
         /*featureRenderDispatcher.renderAllFeatures()
         bufferSource.endBatch()

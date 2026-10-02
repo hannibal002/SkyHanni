@@ -28,6 +28,7 @@ accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScr
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
 accessible field net/minecraft/client/gui/screens/inventory/AbstractSignEditScreen line I
+#~ if >= 26.3 'Lnet/minecraft/world/level/block/entity/SignText;' -> 'Lnet/minecraft/world/level/block/entity/SignText$Mutable;'
 accessible field net/minecraft/client/gui/screens/inventory/AbstractSignEditScreen text Lnet/minecraft/world/level/block/entity/SignText;
 accessible field net/minecraft/client/multiplayer/MultiPlayerGameMode destroyBlockPos Lnet/minecraft/core/BlockPos;
 accessible field net/minecraft/client/renderer/RenderPipelines DEBUG_FILLED_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
@@ -35,7 +36,9 @@ accessible field net/minecraft/client/renderer/RenderPipelines GUI_SNIPPET Lcom/
 accessible field net/minecraft/client/renderer/RenderPipelines LINES_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible field net/minecraft/client/renderer/RenderPipelines TEXT_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible field net/minecraft/client/renderer/rendertype/RenderSetup layeringTransform Lnet/minecraft/client/renderer/rendertype/LayeringTransform;
+#? if < 26.3 {
 accessible field net/minecraft/client/renderer/rendertype/RenderSetup outputTarget Lnet/minecraft/client/renderer/rendertype/OutputTarget;
+#?}
 accessible field net/minecraft/client/renderer/rendertype/RenderSetup pipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;
 accessible field net/minecraft/client/renderer/rendertype/RenderSetup textures Ljava/util/Map;
 accessible field net/minecraft/client/renderer/rendertype/RenderSetup$TextureBinding location Lnet/minecraft/resources/Identifier;
@@ -99,4 +102,10 @@ accessible field net/minecraft/client/renderer/state/gui/GuiTextRenderState y I
 #inject-interface net/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
 #inject-interface net/minecraft/client/renderer/SubmitNodeStorage$ModelPartSubmit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
 #inject-interface net/minecraft/client/renderer/SubmitNodeStorage$ModelSubmit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
+#?}
+
+#? if >= 26.3 {
+#accessible field net/minecraft/client/renderer/RenderPipelines ENTITY_SNIPPET Lcom/mojang/renderpearl/api/pipeline/RenderPipeline$Snippet;
+#accessible method net/minecraft/client/renderer/RenderPipelines register (Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;)Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;
+#accessible method net/minecraft/client/renderer/rendertype/RenderType create (Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)Lnet/minecraft/client/renderer/rendertype/RenderType;
 #?}

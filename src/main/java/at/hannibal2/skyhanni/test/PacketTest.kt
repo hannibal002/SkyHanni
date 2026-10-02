@@ -209,6 +209,7 @@ object PacketTest {
 
     private fun getLocation(packet: Packet<*>, entity: Entity?): LorenzVec? {
         if (packet is ClientboundLevelParticlesPacket) {
+            //~ if >= 26.3 'LorenzVec(packet.x, packet.y, packet.z)' -> 'LorenzVec(packet.x(), packet.y(), packet.z())'
             return LorenzVec(packet.x, packet.y, packet.z)
         }
 

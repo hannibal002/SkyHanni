@@ -321,8 +321,10 @@ fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
 fun Rotations.toLorenzVec(): LorenzVec = LorenzVec(x(), y(), z())
 
+//~ if >= 26.3 'LorenzVec(x, y, z)' -> 'LorenzVec(x(), y(), z())'
 fun ClientboundLevelParticlesPacket.toLorenzVec() = LorenzVec(x, y, z)
 
+//~ if >= 26.3 'LorenzVec(xDist, yDist, zDist)' -> 'LorenzVec(xDist(), yDist(), zDist())'
 fun ClientboundLevelParticlesPacket.toOffset() = LorenzVec(xDist, yDist, zDist)
 
 fun Array<Double>.toLorenzVec(): LorenzVec {

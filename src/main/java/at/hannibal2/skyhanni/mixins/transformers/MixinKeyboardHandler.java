@@ -23,6 +23,9 @@ public abstract class MixinKeyboardHandler {
         int key = input.key();
         if (Minecraft.getInstance().player == null) return;
         if (key == GLFW.GLFW_KEY_UNKNOWN) return;
+        //? if >= 26.3 {
+        /*if (key == 0) return;
+        *///?}
         //System.out.println("Key: " + key + " Scancode: " + scancode + " Action: " + action + " Modifiers: " + modifiers);
 
         // Don't send key events if REI search bar is selected

@@ -12,6 +12,7 @@ import com.google.gson.JsonPrimitive
 
 object ConfigUpdaterMigrator {
     val logger = SkyHanniLogger("ConfigMigration")
+    //~ if >= 26.3 '146' -> '147'
     const val CONFIG_VERSION = 146
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
@@ -228,6 +229,11 @@ object ConfigUpdaterMigrator {
                 },
                 i, 0, dynamicPrefix,
             ).also { it.post() }
+            //? if >= 26.3 {
+            /*if (i == 146) {
+                at.hannibal2.skyhanni.utils.compat.SdlKeybindSchema.migrateDocument(migration.old, SkyHanniConfig::class.java)
+            }
+            *///?}
             logger.log("Transformations scheduled: ${migration.new}")
             val mergesPerformed = merge(migration.old, migration.new)
             logger.log("Migration done with $mergesPerformed merges and ${migration.movesPerformed} moves performed")

@@ -24,11 +24,15 @@ object ParticleUtils {
     fun postParticleEvent(packet: ClientboundLevelParticlesPacket) {
         if (!MinecraftCompat.localPlayerExists) return
         if (ParticleEvent(
+                //~ if >= 26.3 'packet.particle.type' -> 'packet.particle().type'
                 type = packet.particle.type,
                 location = packet.toLorenzVec(),
+                //~ if >= 26.3 'packet.count' -> 'packet.count()'
                 count = packet.count,
+                //~ if >= 26.3 'packet.maxSpeed' -> 'packet.xMaxSpeed()'
                 speed = packet.maxSpeed,
                 offset = packet.toOffset(),
+                //~ if >= 26.3 'packet.isOverrideLimiter' -> 'packet.overrideLimiter()'
                 longDistance = packet.isOverrideLimiter,
             ).post().isCancelled
         ) {

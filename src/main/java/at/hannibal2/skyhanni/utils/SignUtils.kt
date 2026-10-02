@@ -110,5 +110,6 @@ object SignUtils {
     }
 
     private val AbstractSignEditScreen.signText: Array<Component>
+        //~ if >= 26.3 'this.text.getMessages(false)' -> 'this.text.asImmutable().getMessages(false).toTypedArray()'
         get() = this.text.getMessages(false)
 }

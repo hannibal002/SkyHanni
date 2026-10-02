@@ -73,6 +73,12 @@ object WorldRenderUtils {
             //? if >= 26.2 {
             submitNodeCollector.submitCustom(
                 SubmitRenderPhases.AFTER_TERRAIN,
+                //? if >= 26.3 {
+                /*TextFeatureRenderer.Submit(
+                    Matrix4f(matrices.last().pose()), SEE_THROUGH, light,
+                    TextFeatureRenderer.Content.Text(x, y, text, shadow, color, backgroundColor, 0),
+                ),
+                *///?} else {
                 TextFeatureRenderer.Submit(
                     Matrix4f(matrices.last().pose()),
                     x,
@@ -85,6 +91,7 @@ object WorldRenderUtils {
                     backgroundColor,
                     0,
                 ),
+                //?}
             )
             //?} else {
             /*queuedSeeThroughText.add(
@@ -368,6 +375,7 @@ object WorldRenderUtils {
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
         )
+        //~ if >= 26.3 'mulPose' -> 'rotate'
         matrices.mulPose(camera.rotation())
         matrices.translate(0f, -yOffset * adjustedScale, 0f)
         matrices.scale(adjustedScale, -adjustedScale, adjustedScale)

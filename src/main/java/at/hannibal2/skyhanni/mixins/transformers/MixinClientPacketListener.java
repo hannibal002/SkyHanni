@@ -36,7 +36,11 @@ public abstract class MixinClientPacketListener {
     }
 
     @WrapOperation(
+        //? if >= 26.3 {
+        /*method = "tryAddParticle",
+        *///?} else {
         method = "handleParticleEvent",
+        //?}
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/multiplayer/ClientLevel;addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZZDDDDDD)V"
