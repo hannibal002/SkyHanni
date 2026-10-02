@@ -226,7 +226,7 @@ object BetterContainers {
             isToggleCommon(this, "disable") -> TOGGLE_ON
             isToggleCommon(this, "enable") -> TOGGLE_OFF
             isButtonStackInternal(this) -> BUTTON
-            else -> SlotType.OTHER
+            else -> OTHER
         }
     }
 
