@@ -16,6 +16,15 @@ class CustomWardrobeConfig {
     var enabled: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Custom Equipment Menu",
+        desc = "Also replace the Equipment Sets menu with a custom GUI. Uses the same settings as the Custom Wardrobe.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var equipmentEnabled: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Follow mouse", desc = "Whether the \"players\" follow the movement of the mouse.")
     @ConfigEditorBoolean
     var eyesFollowMouse: Boolean = true
@@ -32,6 +41,9 @@ class CustomWardrobeConfig {
 
     @Expose
     var onlyFavorites: Boolean = false
+
+    @Expose
+    var equipmentOnlyFavorites: Boolean = false
 
     @Expose
     @ConfigOption(name = "Estimated Value", desc = "Show a §2$ §7sign you can hover to see the wardrobe slot value.")

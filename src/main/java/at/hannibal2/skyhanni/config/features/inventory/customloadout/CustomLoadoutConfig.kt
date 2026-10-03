@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory.customloadout
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.ColorConfig
-import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.SpacingConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -26,12 +24,12 @@ class CustomLoadoutConfig {
     @Expose
     @ConfigOption(name = "Colors", desc = "Change the color settings.")
     @Accordion
-    val color: ColorConfig = ColorConfig()
+    val color: LoadoutColorConfig = LoadoutColorConfig()
 
     @Expose
     @ConfigOption(name = "Spacing", desc = "")
     @Accordion
-    val spacing: SpacingConfig = SpacingConfig()
+    val spacing: LoadoutSpacingConfig = LoadoutSpacingConfig()
 
     @Expose
     @ConfigOption(name = "Keybinds", desc = "")

@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MaxwellApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
@@ -14,13 +13,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
@@ -110,7 +107,9 @@ object LoadoutApi {
 
     var currentPage: Int? = null
     private var inLoadouts = false
-    var inCustomLoadout = false
+
+    internal var loadedFromMenu = false
+        private set
 
     val maxPage get() = slots.maxOfOrNull { it.page } ?: MAX_PAGES
 
@@ -143,14 +142,17 @@ object LoadoutApi {
 
     private fun getLoadoutSlotFromId(id: Int?) = slots.find { it.id == id }
 
-    fun inLoadouts() = InventoryUtils.inInventory() && inLoadouts
+    fun inLoadouts() = inLoadouts && (InventoryUtils.inInventory() || CustomLoadout.inCustomLoadout)
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        inventoryPattern.matches(event.inventoryName).let {
-            inLoadouts = it
-            if (CustomLoadout.config.enabled) inCustomLoadout = it
-        }
+        matchesInventoryName(event.inventoryName)
+    }
+
+    internal fun matchesInventoryName(inventoryName: String): Boolean {
+        val matched = inventoryPattern.matches(inventoryName)
+        inLoadouts = matched
+        return matched
     }
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
@@ -159,6 +161,7 @@ object LoadoutApi {
             inLoadouts = true
             currentPage = group("currentPage").formatInt()
         } ?: return
+        loadedFromMenu = true
 
         val itemsList = event.inventoryItems
 
@@ -172,6 +175,7 @@ object LoadoutApi {
         var anyLoadoutEquipped = false
         for (slot in slots.filter { it.isInCurrentPage() }) {
             val icon = itemsList[slot.inventorySlot]
+            slot.icon = icon
 
             if (icon?.isDye(DyeCompat.GRAY) == true) {
                 slot.getData()?.clear()
@@ -234,18 +238,16 @@ object LoadoutApi {
         return if (tunings.isEmpty()) null else tunings.map { it.formattedTextCompatLessResets() }
     }
 
-    @HandleEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!inLoadouts) return
-        val loadoutSlotFromId = getLoadoutSlotFromId(currentSlot) ?: return
-        if (!(loadoutSlotFromId.isInCurrentPage())) return
-        event.container.getSlot(loadoutSlotFromId.inventorySlot).highlight(LorenzColor.GREEN)
-    }
-
     fun clickSlot(slot: LoadoutSlot) {
         if (!slot.isInCurrentPage() || slot.locked) return
         currentSlot = slot.id
         InventoryUtils.clickSlot(slot.inventorySlot)
+    }
+
+    @HandleEvent
+    private fun onProfileJoin() {
+        loadedFromMenu = false
+        slots.forEach { it.icon = null }
     }
 
     @HandleEvent
@@ -260,7 +262,7 @@ object LoadoutApi {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Loadout")
         event.addIrrelevant {
             if (slots.isEmpty()) {
@@ -285,7 +287,6 @@ object LoadoutApi {
                             data.tunings?.let { add("   Tunings: ${it.joinToString(", ")}") }
                             data.hotm?.let { add("   HotM: $it") }
                             data.hotf?.let { add("   HotF: $it") }
-                            add(slot.locked.toString())
                         }
                     }
                 }

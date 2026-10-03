@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.wardrobe
+package at.hannibal2.skyhanni.features.inventory.loadout
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -13,22 +13,21 @@ import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.ChestMenu
 import java.awt.Color
 
-class CustomWardrobeEditScreen(
+class CustomLoadoutEditScreen(
     menu: ChestMenu,
     inventory: Inventory,
     title: Component,
-    val wardrobe: AbstractCustomWardrobe,
 ) : ContainerScreen(menu, inventory, title) {
     private val inventoryButtonPosition: Position = Position().ignoreScale()
     private var inventoryButton: Renderable? = null
 
     override fun init() {
-        wardrobe.switchingScreens = false
+        CustomLoadout.switchingScreens = false
         super.init()
     }
 
     override fun removed() {
-        if (!wardrobe.switchingScreens) {
+        if (!CustomLoadout.switchingScreens) {
             super.removed()
         }
     }
@@ -41,7 +40,7 @@ class CustomWardrobeEditScreen(
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e,
-                "Error while drawing editable custom wardrobe screen",
+                "Error while drawing editable custom loadout screen",
                 "screen" to this,
             )
         } finally {
@@ -55,17 +54,17 @@ class CustomWardrobeEditScreen(
         val posX = this.leftPos + (1.05 * this.imageWidth).toInt()
         val posY = this.topPos + (this.imageHeight - renderable.height) / 2
         inventoryButtonPosition.moveTo(posX, posY)
-            .renderRenderable(renderable, posLabel = wardrobe.guiName, addToGuiManager = false)
+            .renderRenderable(renderable, posLabel = CustomLoadout.GUI_NAME, addToGuiManager = false)
     }
 
     private fun addReEnableButton(): Renderable {
         val color = Color(116, 150, 255, 200)
-        return wardrobe.createLabeledButton(
+        return CustomLoadout.createLabeledButton(
             "§bEdit",
             hoveredColor = color,
             unhoveredColor = color.darker(0.8),
             onClick = {
-                wardrobe.exitEditMode()
+                CustomLoadout.exitEditMode()
             },
         )
     }

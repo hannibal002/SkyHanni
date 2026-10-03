@@ -361,6 +361,8 @@ object MaxwellApi {
 
     fun getPowerByNameOrNull(name: String) = powers.find { it == name }
 
+    fun getPowerByApiIdOrNull(id: String) = powers.find { it.equals(id.replace('_', ' '), ignoreCase = true) }
+
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && !SkyBlockUtils.isOnAlphaServer && storage != null
 
     // Load powers from repo

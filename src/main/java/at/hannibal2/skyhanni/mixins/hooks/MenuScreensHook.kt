@@ -1,5 +1,10 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
+import at.hannibal2.skyhanni.features.inventory.loadout.CustomLoadout
+import at.hannibal2.skyhanni.features.inventory.loadout.CustomLoadoutEditScreen
+import at.hannibal2.skyhanni.features.inventory.loadout.CustomLoadoutScreen
+import at.hannibal2.skyhanni.features.inventory.wardrobe.AbstractCustomWardrobe
+import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomEquipmentWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeEditScreen
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeScreen
@@ -28,7 +33,13 @@ object MenuScreensHook {
         val inventory = player.inventory
         val inventoryName = name.unformattedTextCompat()
 
-        if (openCustomWardrobe(inventoryName, name, type, client, id, inventory)) {
+        for (wardrobe in listOf(CustomWardrobe, CustomEquipmentWardrobe)) {
+            if (openCustomWardrobe(wardrobe, inventoryName, name, type, client, id, inventory)) {
+                return true
+            }
+        }
+
+        if (openCustomLoadout(inventoryName, name, type, client, id, inventory)) {
             return true
         }
 
@@ -36,6 +47,7 @@ object MenuScreensHook {
     }
 
     private fun <T : AbstractContainerMenu> openCustomWardrobe(
+        wardrobe: AbstractCustomWardrobe,
         inventoryName: String,
         name: Component,
         type: MenuType<T>,
@@ -43,18 +55,43 @@ object MenuScreensHook {
         id: Int,
         inventory: Inventory,
     ): Boolean {
-        if (!CustomWardrobe.shouldReplace(inventoryName)) return false
+        if (!wardrobe.shouldReplace(inventoryName)) return false
 
         val menu = type.create(id, inventory) as? ChestMenu ?: return false
 
         client.player?.containerMenu = menu
 
         when (val screen = MinecraftCompat.screen) {
-            is CustomWardrobeScreen -> screen.changeHandler(menu, name)
-            is CustomWardrobeEditScreen ->
-                MinecraftCompat.screen = CustomWardrobeEditScreen(menu, inventory, name)
+            is CustomWardrobeScreen if screen.wardrobe === wardrobe -> screen.changeHandler(menu, name)
+            is CustomWardrobeEditScreen if screen.wardrobe === wardrobe ->
+                MinecraftCompat.screen = CustomWardrobeEditScreen(menu, inventory, name, wardrobe)
+
+            else -> MinecraftCompat.screen = CustomWardrobeScreen(menu, name, wardrobe)
+        }
+
+        return true
+    }
+
+    private fun <T : AbstractContainerMenu> openCustomLoadout(
+        inventoryName: String,
+        name: Component,
+        type: MenuType<T>,
+        client: Minecraft,
+        id: Int,
+        inventory: Inventory,
+    ): Boolean {
+        if (!CustomLoadout.shouldReplace(inventoryName)) return false
+
+        val menu = type.create(id, inventory) as? ChestMenu ?: return false
+
+        client.player?.containerMenu = menu
+
+        when (val screen = MinecraftCompat.screen) {
+            is CustomLoadoutScreen -> screen.changeHandler(menu, name)
+            is CustomLoadoutEditScreen ->
+                MinecraftCompat.screen = CustomLoadoutEditScreen(menu, inventory, name)
             else ->
-                MinecraftCompat.screen = CustomWardrobeScreen(menu, name)
+                MinecraftCompat.screen = CustomLoadoutScreen(menu, name)
         }
 
         return true

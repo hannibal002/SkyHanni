@@ -10,15 +10,18 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -62,6 +65,10 @@ abstract class AbstractWardrobeApi {
 
     internal var currentPage: Int? = null
 
+    /** The equipment menu has fewer pages than the armor wardrobe, the slots of missing pages are not shown. */
+    internal var maxPage: Int = MAX_PAGES
+        private set
+
     var currentSlot: Int?
         get() = storage?.currentSlot
         set(value) {
@@ -90,7 +97,10 @@ abstract class AbstractWardrobeApi {
 
     private fun getWardrobeSlotFromId(id: Int?) = slots.find { it.id == id }
 
-    fun inWardrobe() = InventoryUtils.inInventory() && inThisWardrobe
+    // The custom wardrobe screen replaces the Hypixel menu, so it is not a container screen
+    fun inWardrobe() = inThisWardrobe && (InventoryUtils.inInventory() || inCustomWardrobe())
+
+    private fun inCustomWardrobe() = (MinecraftCompat.screen as? CustomWardrobeScreen)?.wardrobe?.api === this
 
     fun createPriceLore(slot: WardrobeSlot) = buildList {
         if (slot.isEmpty()) return@buildList
@@ -105,11 +115,19 @@ abstract class AbstractWardrobeApi {
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.shortFormat()} coins")
     }
 
+    // The custom gui is sized by the amount of pages, so this is read before the items arrive
     protected fun handleInventoryOpen(inventoryName: String): Boolean {
-        val matched = inventoryPattern.matches(inventoryName)
+        val matched = inventoryPattern.matchMatcher(inventoryName) { readMaxPage() } != null
         inThisWardrobe = matched
         return matched
     }
+
+    private fun Matcher.readMaxPage() {
+        groupOrNull("maxPage")?.formatInt()?.let { maxPage = it.coerceIn(1, MAX_PAGES) }
+    }
+
+    // This also modifies the "inWardrobe" property
+    internal fun matchesInventoryName(inventoryName: String): Boolean = handleInventoryOpen(inventoryName)
 
     protected fun handleInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!checkInventory(event.inventoryName)) return
@@ -141,6 +159,7 @@ abstract class AbstractWardrobeApi {
         inventoryPattern.matchMatcher(inventoryName) {
             inThisWardrobe = true
             currentPage = group("currentPage").formatInt()
+            readMaxPage()
         } != null
 
     private fun processSlots(slots: List<WardrobeSlot>, itemsList: Map<Int, SafeItemStack>): Boolean {

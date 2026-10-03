@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.inventory.customloadout.CustomLoadoutConfig
-import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.MouseClickType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
@@ -18,14 +18,15 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -35,91 +36,101 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
+import net.minecraft.core.component.DataComponents
+import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.inventory.ChestMenu
 import java.awt.Color
-import kotlin.collections.mapNotNull
 import kotlin.math.min
-import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
+@Suppress("TooManyFunctions")
 object CustomLoadout {
 
     val config: CustomLoadoutConfig get() = SkyHanniMod.feature.inventory.customLoadout
 
     private const val LOADOUTS_PER_ROW = 6
-    private const val GUI_NAME = "Custom Loadout"
+
+    internal var switchingScreens = false
+    val inCustomLoadout get() = MinecraftCompat.screen is CustomLoadoutScreen
+    val editMode get() = MinecraftCompat.screen is CustomLoadoutEditScreen
 
     private var displayRenderable: Renderable? = null
     private var waitingForInventoryUpdate = false
-    var editMode = false
 
     private val position: Position = Position().ignoreScale()
-    private val inventoryButtonPosition: Position = Position().ignoreScale()
-    private var inventoryButton: Renderable? = null
 
     private var activeScale: Int = 100
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
 
-    @HandleEvent
-    fun onGuiRender(event: GuiContainerEvent.PreDraw) {
-        if (!isEnabled() || editMode) return
-        if (renderCustomGui(event.gui.width, event.gui.height)) event.cancel()
+    internal const val GUI_NAME = "Custom Loadout"
+
+    internal fun shouldReplace(inventoryName: String): Boolean {
+        if (!isEnabled()) return false
+        return LoadoutApi.matchesInventoryName(inventoryName)
     }
 
-    private fun renderCustomGui(screenWidth: Int, screenHeight: Int): Boolean {
-        if (displayRenderable == null) update()
+    fun enterEditMode() {
+        val screen = MinecraftCompat.screen as? CustomLoadoutScreen ?: return
+        val player = MinecraftCompat.localPlayerOrNull ?: return
+
+        switchingScreens = true
+        MinecraftCompat.screen = CustomLoadoutEditScreen(
+            screen.menu,
+            player.inventory,
+            screen.title,
+        )
+    }
+
+    fun exitEditMode() {
+        val screen = MinecraftCompat.screen as? CustomLoadoutEditScreen ?: return
+        val player = MinecraftCompat.localPlayerOrNull ?: return
+        val handler = player.containerMenu as? ChestMenu ?: return
+
+        switchingScreens = true
+        MinecraftCompat.screen = CustomLoadoutScreen(
+            handler,
+            screen.title,
+        )
+    }
+
+    fun renderLoadoutOverlay(screenWidth: Int, screenHeight: Int) {
         val screenSize = screenWidth to screenHeight
+
         if (screenSize != lastScreenSize) {
             lastScreenSize = screenSize
             if (updateScreenSize(screenSize)) {
-                update()
-                return false
+                return
             }
         }
-        val renderable = displayRenderable ?: return false
+
+        if (displayRenderable == null) update()
+        val renderable = displayRenderable ?: return
         val left = (screenWidth - renderable.width) / 2
         val top = (screenHeight - renderable.height) / 2
         position.moveTo(left, top)
         position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
-        return true
     }
 
-    @HandleEvent
-    fun onChestGuiRender() {
-        if (!isEnabled() || !editMode) return
-        val gui = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return
-        val renderable = inventoryButton ?: addReEnableButton().also { inventoryButton = it }
-        val posX = gui.leftPos + (1.05 * gui.imageWidth).toInt()
-        val posY = gui.topPos + (gui.imageHeight - renderable.height) / 2
-        inventoryButtonPosition.moveTo(posX, posY)
-            .renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
-    }
-
-    @HandleEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!isEnabled()) return
-        waitingForInventoryUpdate = false
-        DelayedRun.runNextTick {
-            update()
+    @HandleEvent(priority = HandleEvent.LOW, onlyOnSkyblock = true)
+    private fun onInventoryUpdated() {
+        DelayedRun.runOrNextTick {
+            if (inCustomLoadout) onInventoryUpdate()
         }
     }
 
-    @HandleEvent
-    fun onInventoryClose() {
+    internal fun onInventoryUpdate() {
         waitingForInventoryUpdate = false
-        DelayedRun.runDelayed(300.milliseconds) {
-            if (!LoadoutApi.inLoadouts()) {
-                reset()
-            }
-        }
+        update()
     }
 
     private fun update() {
         displayRenderable = createRenderables()
     }
 
-    private fun updateScreenSize(gui: Pair<Int, Int>): Boolean {
+    internal fun updateScreenSize(gui: Pair<Int, Int>): Boolean {
         val renderable = currentMaxSize ?: run {
             activeScale = config.spacing.globalScale.get()
             update()
@@ -133,7 +144,9 @@ object CustomLoadout {
         val maxScale = min(autoScaleWidth, autoScaleHeight).toInt()
 
         activeScale = config.spacing.globalScale.get().coerceAtMost(maxScale)
-        return activeScale != previousActiveScale
+        if (activeScale == previousActiveScale) return false
+        update()
+        return true
     }
 
     private fun createRenderables(): Renderable {
@@ -146,8 +159,12 @@ object CustomLoadout {
         val backgroundPadding = (config.spacing.backgroundPadding.get() * scale).toInt()
         val buttonVerticalSpacing = (config.spacing.buttonVerticalSpacing.get() * scale).toInt()
 
+        val pageButtons = addPageButtons()
+        val pageButtonsSpacing = horizontalSpacing + (containerWidth / 5)
+
         val maxRows = ((LoadoutApi.slots.count { it.page == 1 } - 1) / LOADOUTS_PER_ROW) + 1
-        var maxWidth = LOADOUTS_PER_ROW * containerWidth + (LOADOUTS_PER_ROW - 1) * horizontalSpacing
+        var maxWidth = LOADOUTS_PER_ROW * containerWidth + (LOADOUTS_PER_ROW - 1) * horizontalSpacing +
+            pageButtonsSpacing + pageButtons.width
         var maxHeight = maxRows * containerHeight + (maxRows - 1) * verticalSpacing
 
         val bottomButtons = addBottomButtons()
@@ -171,11 +188,11 @@ object CustomLoadout {
         }
 
         val gridWithNav = Renderable.horizontal(
-            horizontalSpacing + (containerWidth / 5),
+            pageButtonsSpacing,
             verticalAlign = VerticalAlignment.CENTER,
         ) {
             add(grid)
-            add(addPageButtons())
+            add(pageButtons)
         }
 
         val total = Renderable.vertical(
@@ -203,6 +220,7 @@ object CustomLoadout {
             borderOutlineThickness = config.spacing.outlineThickness.get(),
             borderOutlineBlur = config.spacing.outlineBlur.get(),
             onClick = { clickSlot(slot) },
+            onRightClick = { rightClickSlot(slot) },
             topOutlineColor = topOutline,
             bottomOutlineColor = bottomOutline,
         )
@@ -219,7 +237,27 @@ object CustomLoadout {
             layered =
                 Renderable.doubleLayered(layered, petOverlay, blockBottomHover = false, forceBottomRenderFirst = true)
         }
-        return Renderable.hoverTips(layered, tips = buildLoadoutTooltip(slot))
+        return addTooltip(slot, layered)
+    }
+
+    private fun addTooltip(slot: LoadoutSlot, content: Renderable): Renderable {
+        val iconTooltip = slot.getUncachedIcon()?.let { getIconTooltip(it, slot) }
+            ?: return Renderable.hoverTips(content, tips = buildLoadoutTooltip(slot))
+        return Renderable.hoverTips(content, tips = iconTooltip)
+    }
+
+    private fun getIconTooltip(icon: SafeItemStack, slot: LoadoutSlot): List<Component>? {
+        try {
+            return icon.getTooltip(Minecraft.getInstance().options.advancedItemTooltips)
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Failed to get tooltip for loadout icon in CustomLoadout",
+                "Icon" to icon,
+                "Slot" to slot.id,
+            )
+            return null
+        }
     }
 
     private fun addSlotName(slot: LoadoutSlot, containerWidth: Int): Renderable? {
@@ -294,7 +332,7 @@ object CustomLoadout {
         containerHeight: Int,
     ): Renderable {
         val fakePlayer = FakePlayer.fromLocalPlayerOrThrow()
-        val armor = slot.getData()?.armor ?: LoadoutApi.emptyArmor()
+        val armor = slot.getDisplayedArmor()
 
         for (equipment in Inventory.EQUIPMENT_SLOT_MAPPING.values) {
             val armorOrdinal = equipment.ordinal - 2
@@ -311,6 +349,17 @@ object CustomLoadout {
             entityScale = playerScale.toInt(),
             padding = 0,
         )
+    }
+
+    private fun LoadoutSlot.getDisplayedArmor(): List<SafeItemStack?> {
+        val armorPiece = getUncachedArmorPiece() ?: return getData()?.armor ?: LoadoutApi.emptyArmor()
+        val armorIndex = when (armorPiece.get(DataComponents.EQUIPPABLE)?.slot()) {
+            EquipmentSlot.CHEST -> 1
+            EquipmentSlot.LEGS -> 2
+            EquipmentSlot.FEET -> 3
+            else -> 0
+        }
+        return List(LoadoutApi.emptyArmor().size) { index -> armorPiece.takeIf { index == armorIndex } }
     }
 
     private fun buildLoadoutTooltip(slot: LoadoutSlot): List<String> {
@@ -377,7 +426,7 @@ object CustomLoadout {
             onClick = {
                 DelayedRun.runNextTick {
                     reset()
-                    editMode = true
+                    enterEditMode()
                 }
             },
         )
@@ -395,23 +444,9 @@ object CustomLoadout {
         )
     }
 
-    private fun addReEnableButton(): Renderable {
-        val color = Color(116, 150, 255, 200)
-        return createLabeledButton(
-            "§bEdit",
-            hoveredColor = color,
-            unhoveredColor = color.darker(0.8),
-            onClick = {
-                editMode = false
-                update()
-            },
-        )
-    }
-
     private fun exit(inventorySlot: Int) {
         InventoryUtils.clickSlot(inventorySlot)
         reset()
-        LoadoutApi.currentPage = null
     }
 
     private fun changePage(delta: Int) {
@@ -426,10 +461,14 @@ object CustomLoadout {
     }
 
     fun clickSlot(slot: LoadoutSlot) {
+        if (waitingForInventoryUpdate) return
+        LoadoutApi.clickSlot(slot)
+        update()
+    }
+
+    private fun rightClickSlot(slot: LoadoutSlot) {
         if (!slot.isInCurrentPage() || slot.locked || waitingForInventoryUpdate) return
-        LoadoutApi.currentSlot = slot.id
-        InventoryUtils.clickSlot(slot.inventorySlot)
-        if (isActive()) update()
+        InventoryUtils.clickSlot(slot.inventorySlot, button = MouseClickType.RIGHT_CLICK)
     }
 
     fun displayedSlots(): List<LoadoutSlot> {
@@ -437,13 +476,9 @@ object CustomLoadout {
         return if (config.onlyFavorites) pageSlots.filter { it.favorite || it.isCurrentSlot() } else pageSlots
     }
 
-    fun isActive() = isEnabled() && !editMode
-
-    private fun reset() {
-        LoadoutApi.inCustomLoadout = false
-        editMode = false
+    internal fun reset() {
         displayRenderable = null
-        inventoryButton = null
+        waitingForInventoryUpdate = false
     }
 
     private fun LoadoutSlot.getOutlineColor(): Pair<Color, Color> {
@@ -458,7 +493,7 @@ object CustomLoadout {
         when {
             isCurrentSlot() -> equippedColor.toColor()
             favorite && !config.onlyFavorites -> favoriteColor.toColor()
-            else -> samePageColor.toColor().transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
+            else -> slotColor.toColor().transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
         }
     }
 
@@ -468,7 +503,7 @@ object CustomLoadout {
         padding = borderPadding,
     )
 
-    private fun createLabeledButton(
+    fun createLabeledButton(
         text: String,
         hoveredColor: Color = Color(130, 130, 130, 200),
         unhoveredColor: Color = hoveredColor.darker(0.57),
@@ -511,12 +546,16 @@ object CustomLoadout {
         borderOutlineThickness: Int,
         borderOutlineBlur: Float = 0.5f,
         onClick: () -> Unit,
+        onRightClick: () -> Unit = {},
         topOutlineColor: Color,
         bottomOutlineColor: Color,
     ): Renderable = Renderable.hoverable(
         Renderable.drawInsideRoundedRectWithOutline(
             Renderable.doubleLayered(
-                Renderable.clickable(hoveredRenderable, onClick),
+                Renderable.clickable(
+                    hoveredRenderable,
+                    mapOf(KeyboardManager.LEFT_MOUSE to onClick, KeyboardManager.RIGHT_MOUSE to onRightClick),
+                ),
                 topLayerRenderable,
             ),
             hoveredColor,
@@ -543,25 +582,22 @@ object CustomLoadout {
         color: Color = Color.WHITE,
     ) = Renderable.text(text, scale, color, horizontalAlign = HorizontalAlignment.CENTER)
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && LoadoutApi.inLoadouts()
-
-    @JvmStatic
-    fun shouldHideNormalTooltip(): Boolean = LoadoutApi.inCustomLoadout && !editMode
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         var customWardrobeEnabled = true
-        event.transform(137, "inventory.customWardrobe.enabled") { element ->
+        event.transform(147, "inventory.customWardrobe.enabled") { element ->
             customWardrobeEnabled = element.asBoolean
             element
         }
-        event.add(137, "inventory.customLoadout.enabled") {
+        event.add(147, "inventory.customLoadout.enabled") {
             JsonPrimitive(customWardrobeEnabled)
         }
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         with(config.spacing) {
             ConditionalUtils.onToggle(
                 globalScale, outlineThickness, outlineBlur,
