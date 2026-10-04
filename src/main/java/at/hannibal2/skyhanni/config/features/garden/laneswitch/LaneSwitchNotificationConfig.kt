@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class LaneSwitchNotificationConfig {
+
     @Expose
     @ConfigOption(
         name = "Enabled",
@@ -30,6 +31,22 @@ class LaneSwitchNotificationConfig {
     @ConfigOption(name = "Text", desc = "The text with color to be displayed as the notification.")
     @ConfigEditorText
     var text: String = "&eLane Switch incoming."
+
+    @Expose
+    @ConfigOption(
+        name = "Send Chat Message",
+        desc = "Also send a message to chat when the lane switch notification triggers.",
+    )
+    @ConfigEditorBoolean
+    var sendChatMessage: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Chat Message",
+        desc = "The text with color to be sent in chat when lane switch happens.",
+    )
+    @ConfigEditorText
+    var chatMessage: String = "&e[SkyHanni] Lane Switch!"
 
     @Expose
     @ConfigOption(name = "Sound Settings", desc = "")
