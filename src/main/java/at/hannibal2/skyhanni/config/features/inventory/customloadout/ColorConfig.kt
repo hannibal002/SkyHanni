@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.inventory.customwardrobe
+package at.hannibal2.skyhanni.config.features.inventory.customloadout
 
 import at.hannibal2.skyhanni.config.storage.Resettable
 import com.google.gson.annotations.Expose
@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class ColorConfig : Resettable {
 
-    @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe color settings to the default.")
+    @ConfigOption(name = "Reset to Default", desc = "Reset all color settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
     val resetColor: Runnable = Runnable(::reset)
 
@@ -19,17 +19,17 @@ class ColorConfig : Resettable {
     var backgroundColor: ChromaColour = ChromaColour.fromStaticRGB(0, 0, 0, 127)
 
     @Expose
-    @ConfigOption(name = "Equipped", desc = "Color of the currently equipped wardrobe slot.")
+    @ConfigOption(name = "Equipped", desc = "Color of the currently equipped slot.")
     @ConfigEditorColour
     var equippedColor: ChromaColour = ChromaColour.fromStaticRGB(85, 255, 85, 127)
 
     @Expose
-    @ConfigOption(name = "Favorite", desc = "Color of the wardrobe slots that have been added as favorites.")
+    @ConfigOption(name = "Favorite", desc = "Color of the slots that have been added as favorites.")
     @ConfigEditorColour
     var favoriteColor: ChromaColour = ChromaColour.fromStaticRGB(255, 85, 85, 127)
 
     @Expose
-    @ConfigOption(name = "Same Page", desc = "Color of wardrobe slots in the same page.")
+    @ConfigOption(name = "Same Page", desc = "Color of slots in the same page.")
     @ConfigEditorColour
     var samePageColor: ChromaColour = ChromaColour.fromStaticRGB(94, 108, 255, 127)
 

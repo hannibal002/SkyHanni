@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.config.features.inventory.customloadout.CustomLoado
 import at.hannibal2.skyhanni.events.MouseClickType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.AbstractCustomMenu
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.FakePlayer
@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -40,21 +39,16 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.player.Inventory
-import net.minecraft.world.inventory.ChestMenu
 import java.awt.Color
 import kotlin.math.min
 
 @SkyHanniModule
 @Suppress("TooManyFunctions")
-object CustomLoadout {
+object CustomLoadout : AbstractCustomMenu("Custom Loadout") {
 
     val config: CustomLoadoutConfig get() = SkyHanniMod.feature.inventory.customLoadout
 
     private const val LOADOUTS_PER_ROW = 6
-
-    internal var switchingScreens = false
-    val inCustomLoadout get() = MinecraftCompat.screen is CustomLoadoutScreen
-    val editMode get() = MinecraftCompat.screen is CustomLoadoutEditScreen
 
     private var displayRenderable: Renderable? = null
     private var waitingForInventoryUpdate = false
@@ -65,38 +59,18 @@ object CustomLoadout {
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
 
-    internal const val GUI_NAME = "Custom Loadout"
-
-    internal fun shouldReplace(inventoryName: String): Boolean {
+    override fun shouldReplace(inventoryName: String): Boolean {
         if (!isEnabled()) return false
         return LoadoutApi.matchesInventoryName(inventoryName)
     }
 
-    fun enterEditMode() {
-        val screen = MinecraftCompat.screen as? CustomLoadoutScreen ?: return
-        val player = MinecraftCompat.localPlayerOrNull ?: return
-
-        switchingScreens = true
-        MinecraftCompat.screen = CustomLoadoutEditScreen(
-            screen.menu,
-            player.inventory,
-            screen.title,
-        )
+    override fun handleKeybinds() {
+        CustomLoadoutKeybinds.handlePress()
     }
 
-    fun exitEditMode() {
-        val screen = MinecraftCompat.screen as? CustomLoadoutEditScreen ?: return
-        val player = MinecraftCompat.localPlayerOrNull ?: return
-        val handler = player.containerMenu as? ChestMenu ?: return
+    override fun onScreenClosed() = reset()
 
-        switchingScreens = true
-        MinecraftCompat.screen = CustomLoadoutScreen(
-            handler,
-            screen.title,
-        )
-    }
-
-    fun renderLoadoutOverlay(screenWidth: Int, screenHeight: Int) {
+    override fun renderOverlay(screenWidth: Int, screenHeight: Int) {
         val screenSize = screenWidth to screenHeight
 
         if (screenSize != lastScreenSize) {
@@ -111,17 +85,17 @@ object CustomLoadout {
         val left = (screenWidth - renderable.width) / 2
         val top = (screenHeight - renderable.height) / 2
         position.moveTo(left, top)
-        position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
+        position.renderRenderable(renderable, posLabel = guiName, addToGuiManager = false)
     }
 
     @HandleEvent(priority = HandleEvent.LOW, onlyOnSkyblock = true)
     private fun onInventoryUpdated() {
         DelayedRun.runOrNextTick {
-            if (inCustomLoadout) onInventoryUpdate()
+            if (inCustomMenu) onInventoryUpdate()
         }
     }
 
-    internal fun onInventoryUpdate() {
+    override fun onInventoryUpdate() {
         waitingForInventoryUpdate = false
         update()
     }
@@ -130,9 +104,9 @@ object CustomLoadout {
         displayRenderable = createRenderables()
     }
 
-    internal fun updateScreenSize(gui: Pair<Int, Int>): Boolean {
+    override fun updateScreenSize(gui: Pair<Int, Int>): Boolean {
         val renderable = currentMaxSize ?: run {
-            activeScale = config.spacing.globalScale.get()
+            activeScale = config.spacing.globalScale
             update()
             return true
         }
@@ -143,7 +117,7 @@ object CustomLoadout {
         val autoScaleHeight = 0.95 * gui.second / unscaledHeight
         val maxScale = min(autoScaleWidth, autoScaleHeight).toInt()
 
-        activeScale = config.spacing.globalScale.get().coerceAtMost(maxScale)
+        activeScale = config.spacing.globalScale.coerceAtMost(maxScale)
         if (activeScale == previousActiveScale) return false
         update()
         return true
@@ -151,13 +125,13 @@ object CustomLoadout {
 
     private fun createRenderables(): Renderable {
         val scale = activeScale / 100.0
-        val containerWidth = (config.spacing.slotWidth.get() * scale).toInt()
-        val containerHeight = (config.spacing.slotHeight.get() * scale).toInt()
-        val playerScale = containerWidth * (config.spacing.playerScale.get() / 100.0)
-        val horizontalSpacing = (config.spacing.horizontalSpacing.get() * scale).toInt()
-        val verticalSpacing = (config.spacing.verticalSpacing.get() * scale).toInt()
-        val backgroundPadding = (config.spacing.backgroundPadding.get() * scale).toInt()
-        val buttonVerticalSpacing = (config.spacing.buttonVerticalSpacing.get() * scale).toInt()
+        val containerWidth = (config.spacing.slotWidth * scale).toInt()
+        val containerHeight = (config.spacing.slotHeight * scale).toInt()
+        val playerScale = containerWidth * (config.spacing.playerScale / 100.0)
+        val horizontalSpacing = (config.spacing.horizontalSpacing * scale).toInt()
+        val verticalSpacing = (config.spacing.verticalSpacing * scale).toInt()
+        val backgroundPadding = (config.spacing.backgroundPadding * scale).toInt()
+        val buttonSlotsVerticalSpacing = (config.spacing.buttonSlotsVerticalSpacing * scale).toInt()
 
         val pageButtons = addPageButtons()
         val pageButtonsSpacing = horizontalSpacing + (containerWidth / 5)
@@ -169,7 +143,7 @@ object CustomLoadout {
 
         val bottomButtons = addBottomButtons()
         if (bottomButtons.width > maxWidth) maxWidth = bottomButtons.width
-        maxHeight += bottomButtons.height + buttonVerticalSpacing
+        maxHeight += bottomButtons.height + buttonSlotsVerticalSpacing
         maxWidth += 2 * backgroundPadding
         maxHeight += 2 * backgroundPadding
         currentMaxSize = maxWidth to maxHeight
@@ -196,7 +170,7 @@ object CustomLoadout {
         }
 
         val total = Renderable.vertical(
-            buttonVerticalSpacing,
+            buttonSlotsVerticalSpacing,
             horizontalAlign = HorizontalAlignment.CENTER,
         ) {
             add(gridWithNav)
@@ -217,8 +191,8 @@ object CustomLoadout {
             Renderable.placeholder(containerWidth, containerHeight),
             topLayerRenderable = addSlotHoverableButtons(slot),
             hoveredColor = slot.getSlotColor(),
-            borderOutlineThickness = config.spacing.outlineThickness.get(),
-            borderOutlineBlur = config.spacing.outlineBlur.get(),
+            borderOutlineThickness = config.spacing.outlineThickness,
+            borderOutlineBlur = config.spacing.outlineBlur,
             onClick = { clickSlot(slot) },
             onRightClick = { rightClickSlot(slot) },
             topOutlineColor = topOutline,
@@ -393,7 +367,7 @@ object CustomLoadout {
 
     private fun addPageButtons(): Renderable {
         val current = LoadoutApi.currentPage ?: 1
-        val verticalSpacing = (config.spacing.buttonVerticalSpacing.get() * (activeScale / 100.0)).toInt()
+        val verticalSpacing = (config.spacing.buttonVerticalSpacing * (activeScale / 100.0)).toInt()
         val upButton = createLabeledButton("§a▲", onClick = { changePage(-1) })
         val downButton = createLabeledButton("§a▼", onClick = { changePage(1) })
         val pageIndicator = centerString("§7$current/${LoadoutApi.maxPage}", scale = activeScale / 100.0)
@@ -406,8 +380,8 @@ object CustomLoadout {
     }
 
     private fun addBottomButtons(): Renderable {
-        val horizontalSpacing = (config.spacing.buttonHorizontalSpacing.get() * (activeScale / 100.0)).toInt()
-        val verticalSpacing = (config.spacing.buttonVerticalSpacing.get() * (activeScale / 100.0)).toInt()
+        val horizontalSpacing = (config.spacing.buttonHorizontalSpacing * (activeScale / 100.0)).toInt()
+        val verticalSpacing = (config.spacing.buttonVerticalSpacing * (activeScale / 100.0)).toInt()
         val backButton = createLabeledButton("§aBack", onClick = { exit(48) })
         val closeButton = createLabeledButton("§cClose", onClick = { exit(49) })
 
@@ -479,6 +453,8 @@ object CustomLoadout {
     internal fun reset() {
         displayRenderable = null
         waitingForInventoryUpdate = false
+        currentMaxSize = null
+        lastScreenSize = null
     }
 
     private fun LoadoutSlot.getOutlineColor(): Pair<Color, Color> {
@@ -493,7 +469,7 @@ object CustomLoadout {
         when {
             isCurrentSlot() -> equippedColor.toColor()
             favorite && !config.onlyFavorites -> favoriteColor.toColor()
-            else -> slotColor.toColor().transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
+            else -> samePageColor.toColor().transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
         }
     }
 
@@ -503,14 +479,14 @@ object CustomLoadout {
         padding = borderPadding,
     )
 
-    fun createLabeledButton(
+    override fun createLabeledButton(
         text: String,
-        hoveredColor: Color = Color(130, 130, 130, 200),
-        unhoveredColor: Color = hoveredColor.darker(0.57),
+        hoveredColor: Color,
+        unhoveredColor: Color,
         onClick: () -> Unit,
     ): Renderable {
-        val buttonWidth = (config.spacing.buttonWidth.get() * (activeScale / 100.0)).toInt()
-        val buttonHeight = (config.spacing.buttonHeight.get() * (activeScale / 100.0)).toInt()
+        val buttonWidth = (config.spacing.buttonWidth * (activeScale / 100.0)).toInt()
+        val buttonHeight = (config.spacing.buttonHeight * (activeScale / 100.0)).toInt()
         val textScale = activeScale / 100.0
 
         return Renderable.hoverable(
@@ -586,29 +562,31 @@ object CustomLoadout {
 
     @HandleEvent
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val wardrobe = "inventory.customWardrobe"
+        val loadout = "inventory.customLoadout"
+
+        // The custom loadout gui is off by default, but gets enabled for everyone who used the custom wardrobe
         var customWardrobeEnabled = true
-        event.transform(147, "inventory.customWardrobe.enabled") { element ->
+        event.move(147, "$wardrobe.enabled", "$loadout.wardrobe.enabled") { element ->
             customWardrobeEnabled = element.asBoolean
             element
         }
-        event.add(147, "inventory.customLoadout.enabled") {
+        event.add(147, "$loadout.enabled") {
             JsonPrimitive(customWardrobeEnabled)
         }
-    }
 
-    @HandleEvent
-    private fun onConfigLoad() {
-        with(config.spacing) {
-            ConditionalUtils.onToggle(
-                globalScale, outlineThickness, outlineBlur,
-                slotWidth, slotHeight, playerScale,
-                horizontalSpacing, verticalSpacing,
-                buttonHorizontalSpacing, buttonVerticalSpacing,
-                buttonWidth, buttonHeight, backgroundPadding,
-            ) {
-                currentMaxSize = null
-                lastScreenSize = null
-            }
+        // These are now shared between the loadout, wardrobe and equipment guis
+        event.move(147, "$wardrobe.eyesFollowMouse", "$loadout.eyesFollowMouse")
+        event.move(147, "$wardrobe.color", "$loadout.color")
+        event.move(147, "$wardrobe.spacing.maxPlayersPerRow", "$loadout.wardrobe.maxPlayersPerRow")
+        event.move(147, "$wardrobe.spacing", "$loadout.spacing")
+
+        val wardrobeOptions = listOf(
+            "hideEmptySlots", "hideLockedSlots", "onlyFavorites", "estimatedValue", "loadingText",
+            "showTooltipOnlyKeybind", "tooltipKeybind", "showReiItems", "keybinds",
+        )
+        for (option in wardrobeOptions) {
+            event.move(147, "$wardrobe.$option", "$loadout.wardrobe.$option")
         }
     }
 }

@@ -5,29 +5,25 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
 class CustomWardrobeConfig {
     @Expose
-    @ConfigOption(name = "Enable", desc = "Enable the Custom Wardrobe GUI.")
+    @ConfigOption(name = "Custom Wardrobe", desc = "Enable the Custom Wardrobe GUI.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
 
     @Expose
     @ConfigOption(
-        name = "Custom Equipment Menu",
-        desc = "Also replace the Equipment Sets menu with a custom GUI. Uses the same settings as the Custom Wardrobe.",
+        name = "Custom Equipment",
+        desc = "Enable the Custom Equipment GUI.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var equipmentEnabled: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Follow mouse", desc = "Whether the \"players\" follow the movement of the mouse.")
-    @ConfigEditorBoolean
-    var eyesFollowMouse: Boolean = true
 
     @Expose
     @ConfigOption(name = "Hide Empty Slots", desc = "Hide wardrobe slots with no armor.")
@@ -77,14 +73,9 @@ class CustomWardrobeConfig {
     var showReiItems: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Colors", desc = "Change the color settings.")
-    @Accordion
-    val color: ColorConfig = ColorConfig()
-
-    @Expose
-    @ConfigOption(name = "Spacing", desc = "")
-    @Accordion
-    val spacing: SpacingConfig = SpacingConfig()
+    @ConfigOption(name = "Slots per Row", desc = "Max amount of wardrobe slots per row.")
+    @ConfigEditorSlider(minValue = 5f, maxValue = 18f, minStep = 1f)
+    var maxPlayersPerRow: Int = 9
 
     @Expose
     @ConfigOption(name = "Keybinds", desc = "")

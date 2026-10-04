@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
+import at.hannibal2.skyhanni.utils.CustomMenuScreen
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -100,7 +101,8 @@ abstract class AbstractWardrobeApi {
     // The custom wardrobe screen replaces the Hypixel menu, so it is not a container screen
     fun inWardrobe() = inThisWardrobe && (InventoryUtils.inInventory() || inCustomWardrobe())
 
-    private fun inCustomWardrobe() = (MinecraftCompat.screen as? CustomWardrobeScreen)?.wardrobe?.api === this
+    private fun inCustomWardrobe() =
+        ((MinecraftCompat.screen as? CustomMenuScreen)?.gui as? AbstractCustomWardrobe)?.api === this
 
     fun createPriceLore(slot: WardrobeSlot) = buildList {
         if (slot.isEmpty()) return@buildList
@@ -132,24 +134,8 @@ abstract class AbstractWardrobeApi {
     protected fun handleInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!checkInventory(event.inventoryName)) return
 
-        val itemsList = event.inventoryItems
-
-        val allGrayDye = slots.all {
-            itemsList[it.inventorySlot]?.isDye(DyeCompat.GRAY) == true || !it.isInCurrentPage()
-        }
-
-        if (allGrayDye) {
-            val allSlotsEmpty = slots.filter { it.isInCurrentPage() }.all { slot ->
-                (slot.inventorySlots.all { getWardrobeItem(itemsList[it]) == null })
-            }
-            if (allSlotsEmpty) {
-                for (slot in slots.filter { it.isInCurrentPage() }) {
-                    slot.getData()?.armor = emptyItems()
-                }
-            } else return
-        }
-
-        val foundCurrentSlot = processSlots(slots, itemsList)
+        // A gray dye only means that the set is not selected, so whether a slot is empty is read from its items
+        val foundCurrentSlot = processSlots(slots, event.inventoryItems)
         if (!foundCurrentSlot && getWardrobeSlotFromId(currentSlot)?.page == currentPage) {
             currentSlot = null
         }

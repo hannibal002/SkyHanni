@@ -48,7 +48,7 @@ object CustomWardrobe : AbstractCustomWardrobe(ArmorWardrobeApi, "Custom Wardrob
 
         return Renderable.fakePlayer(
             fakePlayer,
-            followMouse = config.eyesFollowMouse,
+            followMouse = loadoutConfig.eyesFollowMouse,
             width = containerWidth,
             height = containerHeight,
             entityScale = scale.toInt(),

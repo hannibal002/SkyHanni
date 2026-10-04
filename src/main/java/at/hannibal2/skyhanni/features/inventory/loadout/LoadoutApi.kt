@@ -87,8 +87,30 @@ object LoadoutApi {
         "Your tuning:",
     )
 
+    /**
+     * REGEX-TEST: Helmet: None
+     * REGEX-TEST: Gloves/Bracelet: None
+     * REGEX-TEST: Pet: None
+     * REGEX-TEST: HOTM: None
+     * REGEX-TEST: Tuning Template Slot: None
+     * REGEX-FAIL: Power Stone: Silky
+     */
+    private val unsetComponentPattern by patternGroup.pattern(
+        "component",
+        "(?<component>[^:]+): None",
+    )
+
     private val ARMOR_SLOTS = listOf(11, 20, 29, 38)
     private val EQUIPMENT_SLOTS = listOf(10, 19, 28, 37)
+
+    // The names of the loadout components in the lore of the loadout icons
+    private val ARMOR_LABELS = listOf("Helmet", "Chestplate", "Leggings", "Boots")
+    private val EQUIPMENT_LABELS = listOf("Necklace", "Cloak", "Belt", "Gloves/Bracelet")
+    private const val PET_LABEL = "Pet"
+    private const val POWERSTONE_LABEL = "Power Stone"
+    private const val TUNINGS_LABEL = "Tuning Template Slot"
+    private const val HOTM_LABEL = "HOTM"
+    private const val HOTF_LABEL = "HOTF"
     private const val PET_SLOT = 21
     private const val POWERSTONE_SLOT = 27
     private const val TUNINGS_SLOT = 36
@@ -107,9 +129,6 @@ object LoadoutApi {
 
     var currentPage: Int? = null
     private var inLoadouts = false
-
-    internal var loadedFromMenu = false
-        private set
 
     val maxPage get() = slots.maxOfOrNull { it.page } ?: MAX_PAGES
 
@@ -142,7 +161,7 @@ object LoadoutApi {
 
     private fun getLoadoutSlotFromId(id: Int?) = slots.find { it.id == id }
 
-    fun inLoadouts() = inLoadouts && (InventoryUtils.inInventory() || CustomLoadout.inCustomLoadout)
+    fun inLoadouts() = inLoadouts && (InventoryUtils.inInventory() || CustomLoadout.inCustomMenu)
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
@@ -161,12 +180,12 @@ object LoadoutApi {
             inLoadouts = true
             currentPage = group("currentPage").formatInt()
         } ?: return
-        loadedFromMenu = true
 
         val itemsList = event.inventoryItems
 
         processIcons(itemsList)
         processSelectedLoadout(itemsList)
+        slots.filter { it.isInCurrentPage() }.forEach { it.removeUnsetComponents() }
     }
 
     // Loadouts are supposed to change stuff on the Player.
@@ -219,6 +238,27 @@ object LoadoutApi {
         }
     }
 
+    private fun LoadoutSlot.removeUnsetComponents() {
+        val unset = icon.getUnsetComponents()
+        if (unset.isEmpty()) return
+        val data = getData() ?: return
+
+        data.armor = data.armor.mapIndexed { index, item -> item.takeIf { ARMOR_LABELS.getOrNull(index) !in unset } }
+        data.equipment = data.equipment.mapIndexed { index, item -> item.takeIf { EQUIPMENT_LABELS.getOrNull(index) !in unset } }
+        if (PET_LABEL in unset) data.pet = null
+        if (POWERSTONE_LABEL in unset) data.powerstone = null
+        if (TUNINGS_LABEL in unset) data.tunings = null
+        if (HOTM_LABEL in unset) data.hotm = null
+        if (HOTF_LABEL in unset) data.hotf = null
+    }
+
+    private fun SafeItemStack?.getUnsetComponents(): Set<String> {
+        if (this == null) return emptySet()
+        return getLoreComponent().mapNotNull { line ->
+            unsetComponentPattern.matchMatcher(line) { group("component") }
+        }.toSet()
+    }
+
     // This is for Hotm, Hotf and Powerstone
     private fun SafeItemStack?.parseCurrentSelection(): String? {
         if (this == null) return null
@@ -246,7 +286,6 @@ object LoadoutApi {
 
     @HandleEvent
     private fun onProfileJoin() {
-        loadedFromMenu = false
         slots.forEach { it.icon = null }
     }
 

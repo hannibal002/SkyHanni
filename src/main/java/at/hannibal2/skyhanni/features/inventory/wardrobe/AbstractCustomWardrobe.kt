@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.inventory.customloadout.CustomLoadoutConfig
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
 import at.hannibal2.skyhanni.features.inventory.wardrobe.AbstractWardrobeApi.Companion.MAX_SLOT_PER_PAGE
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.AbstractCustomMenu
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
@@ -20,7 +22,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -30,22 +31,20 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderabl
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.network.chat.Component
-import net.minecraft.world.inventory.ChestMenu
 import java.awt.Color
 import kotlin.math.min
 
 @Suppress("TooManyFunctions")
 abstract class AbstractCustomWardrobe(
     val api: AbstractWardrobeApi,
-    internal val guiName: String,
-) {
+    guiName: String,
+) : AbstractCustomMenu(guiName) {
 
-    val config: CustomWardrobeConfig get() = SkyHanniMod.feature.inventory.customWardrobe
-
-    internal var switchingScreens = false
-    val inCustomWardrobe get() = (MinecraftCompat.screen as? CustomWardrobeScreen)?.wardrobe === this
-    val editMode get() = (MinecraftCompat.screen as? CustomWardrobeEditScreen)?.wardrobe === this
+    /** Holds the colors, spacing and other settings that are shared with the custom loadout gui. */
+    protected val loadoutConfig: CustomLoadoutConfig get() = SkyHanniMod.feature.inventory.customLoadout
+    val config: CustomWardrobeConfig get() = loadoutConfig.wardrobe
 
     /** Stored separately per wardrobe, so the favorite filter of one gui does not hide the slots of the other. */
     abstract var onlyFavorites: Boolean
@@ -72,43 +71,26 @@ abstract class AbstractCustomWardrobe(
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
 
-    var renderableTopCorner: Pair<Int, Int> = 0 to 0
-        private set
-    var renderableDimensions: Pair<Int, Int> = 0 to 0
-        private set
+    private var renderableTopCorner: Pair<Int, Int> = 0 to 0
+    private var renderableDimensions: Pair<Int, Int> = 0 to 0
 
-    // Called by MenuScreensHook
-    internal fun shouldReplace(inventoryName: String): Boolean {
+    override val rectangle
+        get() = ScreenRectangle(
+            renderableTopCorner.first,
+            renderableTopCorner.second,
+            renderableDimensions.first,
+            renderableDimensions.second,
+        )
+
+    override fun shouldReplace(inventoryName: String): Boolean {
         return isEnabled() && api.matchesInventoryName(inventoryName)
     }
 
-    fun enterEditMode() {
-        val screen = MinecraftCompat.screen as? CustomWardrobeScreen ?: return
-        val player = MinecraftCompat.localPlayerOrNull ?: return
+    override fun shouldShowItemList(): Boolean = config.showReiItems
 
-        switchingScreens = true
-        MinecraftCompat.screen = CustomWardrobeEditScreen(
-            screen.menu,
-            player.inventory,
-            screen.title,
-            this,
-        )
-    }
+    override fun handleKeybinds() = CustomWardrobeKeybinds.handlePress(this)
 
-    fun exitEditMode() {
-        val screen = MinecraftCompat.screen as? CustomWardrobeEditScreen ?: return
-        val player = MinecraftCompat.localPlayerOrNull ?: return
-        val handler = player.containerMenu as? ChestMenu ?: return
-
-        switchingScreens = true
-        MinecraftCompat.screen = CustomWardrobeScreen(
-            handler,
-            screen.title,
-            this,
-        )
-    }
-
-    fun renderWardrobeOverlay(screenWidth: Int, screenHeight: Int) {
+    override fun renderOverlay(screenWidth: Int, screenHeight: Int) {
         val screenSize = screenWidth to screenHeight
 
         if (screenSize != lastScreenSize) {
@@ -146,18 +128,19 @@ abstract class AbstractCustomWardrobe(
         }
     }
 
-    internal fun onInventoryUpdate() {
+    override fun onInventoryUpdate() {
         waitingForInventoryUpdate = false
         update()
     }
 
     internal fun update() {
         displayRenderable = createRenderables()
+        lastScreenSize?.let { updateRenderablePosition(it) }
     }
 
-    internal fun updateScreenSize(gui: Pair<Int, Int>): Boolean {
+    override fun updateScreenSize(gui: Pair<Int, Int>): Boolean {
         val renderable = currentMaxSize ?: run {
-            activeScale = config.spacing.globalScale.get() / 100.0
+            activeScale = loadoutConfig.spacing.globalScale / 100.0
             update()
             updateRenderablePosition(gui)
             return true
@@ -169,7 +152,7 @@ abstract class AbstractCustomWardrobe(
         val autoScaleHeight = 0.95 * gui.second / unscaledRenderableHeight
         val maxScale = min(autoScaleWidth, autoScaleHeight)
 
-        activeScale = (config.spacing.globalScale.get() / 100.0).coerceAtMost(maxScale)
+        activeScale = (loadoutConfig.spacing.globalScale / 100.0).coerceAtMost(maxScale)
 
         if (activeScale != previousActiveScale) {
             update()
@@ -278,15 +261,15 @@ abstract class AbstractCustomWardrobe(
     private fun createRenderables(): Renderable {
         val (wardrobeWarning, list) = createWarning(api.slots.filter { it.page <= api.maxPage })
 
-        val maxPlayersPerRow = config.spacing.maxPlayersPerRow.get().coerceAtLeast(1)
+        val maxPlayersPerRow = config.maxPlayersPerRow.coerceAtLeast(1)
         val maxPlayersRows = ((MAX_SLOT_PER_PAGE * api.maxPage - 1) / maxPlayersPerRow) + 1
-        val containerWidth = (config.spacing.slotWidth.get() * activeScale).toInt()
-        val containerHeight = (config.spacing.slotHeight.get() * activeScale).toInt()
-        val playerWidth = (containerWidth * (config.spacing.playerScale.get() / 100.0))
-        val horizontalSpacing = (config.spacing.horizontalSpacing.get() * activeScale).toInt()
-        val verticalSpacing = (config.spacing.verticalSpacing.get() * activeScale).toInt()
-        val backgroundPadding = (config.spacing.backgroundPadding.get() * activeScale).toInt()
-        val buttonVerticalSpacing = (config.spacing.buttonVerticalSpacing.get() * activeScale).toInt()
+        val containerWidth = (loadoutConfig.spacing.slotWidth * activeScale).toInt()
+        val containerHeight = (loadoutConfig.spacing.slotHeight * activeScale).toInt()
+        val playerWidth = (containerWidth * (loadoutConfig.spacing.playerScale / 100.0))
+        val horizontalSpacing = (loadoutConfig.spacing.horizontalSpacing * activeScale).toInt()
+        val verticalSpacing = (loadoutConfig.spacing.verticalSpacing * activeScale).toInt()
+        val backgroundPadding = (loadoutConfig.spacing.backgroundPadding * activeScale).toInt()
+        val buttonSlotsVerticalSpacing = (loadoutConfig.spacing.buttonSlotsVerticalSpacing * activeScale).toInt()
 
         var maxRenderableWidth = maxPlayersPerRow * containerWidth + (maxPlayersPerRow - 1) * horizontalSpacing
         var maxRenderableHeight = maxPlayersRows * containerHeight + (maxPlayersRows - 1) * verticalSpacing
@@ -294,7 +277,7 @@ abstract class AbstractCustomWardrobe(
         val button = addButtons()
 
         if (button.width > maxRenderableWidth) maxRenderableWidth = button.width
-        maxRenderableHeight += button.height + buttonVerticalSpacing
+        maxRenderableHeight += button.height + buttonSlotsVerticalSpacing
 
         maxRenderableWidth += 2 * backgroundPadding
         maxRenderableHeight += 2 * backgroundPadding
@@ -310,7 +293,7 @@ abstract class AbstractCustomWardrobe(
             val withButtons = Renderable.vertical(
                 warningRenderable,
                 button,
-                spacing = buttonVerticalSpacing,
+                spacing = buttonSlotsVerticalSpacing,
                 horizontalAlign = HorizontalAlignment.CENTER,
             )
             return addGuiBackground(withButtons, backgroundPadding)
@@ -327,8 +310,8 @@ abstract class AbstractCustomWardrobe(
                     armorTooltipRenderable,
                     topLayerRenderable = addSlotHoverableButtons(slot),
                     hoveredColor = slot.getSlotColor(),
-                    borderOutlineThickness = config.spacing.outlineThickness.get(),
-                    borderOutlineBlur = config.spacing.outlineBlur.get(),
+                    borderOutlineThickness = loadoutConfig.spacing.outlineThickness,
+                    borderOutlineBlur = loadoutConfig.spacing.outlineBlur,
                     onClick = { slot.clickSlot() },
                     topOutlineColor = topOutline,
                     bottomOutlineColor = bottomOutline,
@@ -354,7 +337,7 @@ abstract class AbstractCustomWardrobe(
 
         val withButtons = Renderable.vertical(
             listOf(allSlotsRenderable, button),
-            buttonVerticalSpacing,
+            buttonSlotsVerticalSpacing,
             horizontalAlign = HorizontalAlignment.CENTER,
         )
 
@@ -380,7 +363,7 @@ abstract class AbstractCustomWardrobe(
                 ),
                 blockBottomHover = false,
             ),
-            config.color.backgroundColor.toColor(),
+            loadoutConfig.color.backgroundColor.toColor(),
             padding = borderPadding,
         )
 
@@ -389,8 +372,8 @@ abstract class AbstractCustomWardrobe(
     }
 
     private fun addButtons(): Renderable {
-        val (horizontalSpacing, verticalSpacing) = with(config.spacing) {
-            buttonHorizontalSpacing.get() * activeScale to buttonVerticalSpacing.get() * activeScale
+        val (horizontalSpacing, verticalSpacing) = with(loadoutConfig.spacing) {
+            buttonHorizontalSpacing * activeScale to buttonVerticalSpacing * activeScale
         }
 
         val backButton = createLabeledButton(
@@ -481,14 +464,14 @@ abstract class AbstractCustomWardrobe(
         return Renderable.vertical(list, 1, HorizontalAlignment.RIGHT)
     }
 
-    fun createLabeledButton(
+    override fun createLabeledButton(
         text: String,
-        hoveredColor: Color = Color(130, 130, 130, 200),
-        unhoveredColor: Color = hoveredColor.darker(0.57),
+        hoveredColor: Color,
+        unhoveredColor: Color,
         onClick: () -> Unit,
     ): Renderable {
-        val buttonWidth = (config.spacing.buttonWidth.get() * activeScale).toInt()
-        val buttonHeight = (config.spacing.buttonHeight.get() * activeScale).toInt()
+        val buttonWidth = (loadoutConfig.spacing.buttonWidth * activeScale).toInt()
+        val buttonHeight = (loadoutConfig.spacing.buttonHeight * activeScale).toInt()
         val textScale = activeScale
 
         val renderable = Renderable.hoverable(
@@ -503,8 +486,8 @@ abstract class AbstractCustomWardrobe(
                 ),
                 hoveredColor,
                 padding = 0,
-                topOutlineColor = config.color.topBorderColor.toColor().rgb,
-                bottomOutlineColor = config.color.bottomBorderColor.toColor().rgb,
+                topOutlineColor = loadoutConfig.color.topBorderColor.toColor().rgb,
+                bottomOutlineColor = loadoutConfig.color.bottomBorderColor.toColor().rgb,
                 borderOutlineThickness = 2,
                 horizontalAlign = HorizontalAlignment.CENTER,
             ),
@@ -567,7 +550,7 @@ abstract class AbstractCustomWardrobe(
         )
 
     private fun WardrobeSlot.getOutlineColor(): Pair<Color, Color> {
-        val (top, bottom) = config.color.topBorderColor.toColor() to config.color.bottomBorderColor.toColor()
+        val (top, bottom) = loadoutConfig.color.topBorderColor.toColor() to loadoutConfig.color.bottomBorderColor.toColor()
         return when {
             isEmpty() || locked -> ColorUtils.TRANSPARENT_COLOR to ColorUtils.TRANSPARENT_COLOR
             !isInCurrentPage() -> top.darker(0.5) to bottom.darker(0.5)
@@ -598,7 +581,7 @@ abstract class AbstractCustomWardrobe(
         update()
     }
 
-    private fun WardrobeSlot.getSlotColor(): Color = with(config.color) {
+    private fun WardrobeSlot.getSlotColor(): Color = with(loadoutConfig.color) {
         when {
             isCurrentSlot() -> equippedColor
             favorite && !onlyFavorites -> favoriteColor

@@ -40,7 +40,7 @@ object EstimatedWardrobePrice {
     }
 
     private fun activeWardrobeApi(): AbstractWardrobeApi? {
-        if (CustomWardrobe.inCustomWardrobe || CustomEquipmentWardrobe.inCustomWardrobe) return null
+        if (CustomWardrobe.inCustomMenu || CustomEquipmentWardrobe.inCustomMenu) return null
         return when {
             config.armor && ArmorWardrobeApi.inWardrobe() -> ArmorWardrobeApi
             config.equipment && EquipmentWardrobeApi.inWardrobe() -> EquipmentWardrobeApi

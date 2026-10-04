@@ -8,7 +8,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 object CustomWardrobeKeybinds {
 
-    private val config get() = SkyHanniMod.feature.inventory.customWardrobe
+    private val config get() = SkyHanniMod.feature.inventory.customLoadout.wardrobe
     private val keybinds
         get() = listOf(
             config.keybinds.slot1,
@@ -40,5 +40,5 @@ object CustomWardrobeKeybinds {
     }
 
     private fun isEnabled(wardrobe: AbstractCustomWardrobe) =
-        SkyBlockUtils.inSkyBlock && wardrobe.inCustomWardrobe && config.keybinds.slotKeybindsToggle
+        SkyBlockUtils.inSkyBlock && wardrobe.inCustomMenu && config.keybinds.slotKeybindsToggle
 }
