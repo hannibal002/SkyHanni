@@ -431,7 +431,6 @@ object CustomLoadout : AbstractCustomMenu("Custom Loadout") {
         LoadoutApi.currentPage = target
         waitingForInventoryUpdate = true
         InventoryUtils.clickSlot(if (delta < 0) LoadoutApi.PREVIOUS_PAGE_SLOT else LoadoutApi.NEXT_PAGE_SLOT)
-        update()
     }
 
     fun clickSlot(slot: LoadoutSlot) {
