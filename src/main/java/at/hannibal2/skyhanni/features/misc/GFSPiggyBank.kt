@@ -16,12 +16,12 @@ object GFSPiggyBank {
 
     private val ENCHANTED_PORK by lazy { "ENCHANTED_PORK".toInternalName().makePrimitiveStack(8) }
 
-    private val group = RepoPattern.group("misc.piggybank")
+    private val patternGroup = RepoPattern.group("misc.piggybank")
 
     /**
      * REGEX-TEST: §cYou died and your piggy bank cracked!
      */
-    private val crackedPattern by group.pattern(
+    private val crackedPattern by patternGroup.pattern(
         "cracked",
         "§cYou died and your piggy bank cracked!",
     )
@@ -29,7 +29,7 @@ object GFSPiggyBank {
     /**
      * REGEX-TEST: §cYou died, lost 50,000 coins and your piggy bank broke!
      */
-    private val brokePattern by group.pattern(
+    private val brokePattern by patternGroup.pattern(
         "broke",
         "§cYou died, lost [\\d.,]* coins and your piggy bank broke!",
     )
