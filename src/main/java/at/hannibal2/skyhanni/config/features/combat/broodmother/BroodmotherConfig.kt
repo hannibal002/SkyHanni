@@ -2,11 +2,9 @@ package at.hannibal2.skyhanni.config.features.combat.broodmother
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.combat.BroodmotherFeatures.StageEntry
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -33,19 +31,10 @@ class BroodmotherConfig {
     val spawnAlert: BroodmotherSpawnAlertConfig = BroodmotherSpawnAlertConfig()
 
     @Expose
-    @ConfigOption(name = "Imminent Warning", desc = "Warns you when the Broodmother is 1 minute away from spawning.")
+    @ConfigOption(name = "Imminent Warning", desc = "Warns you when the Broodmother is 30 seconds away from spawning.")
     @ConfigEditorBoolean
     @FeatureToggle
     var imminentWarning: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Chat Messages",
-        desc = "Send a chat message when the Broodmother enters these stages.\n" +
-            "§cThe 'Alive!' and 'Imminent' stages are overridden by the \"Spawn Alert\" and \"Imminent Warning\" features."
-    )
-    @ConfigEditorDraggableList
-    val stages: MutableList<StageEntry> = mutableListOf()
 
     @Expose
     @ConfigOption(
@@ -58,8 +47,17 @@ class BroodmotherConfig {
 
     @Expose
     @ConfigOption(
+        name = "Slain message",
+        desc = "Send a chat message when the Broodmother is killed.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var slainMessage: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Hide own kills",
-        desc = "Disable the chat message for the §eSlain §rstage if at the Spider Mound."
+        desc = "Don't send the slain chat message if at the Spider Mound.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
