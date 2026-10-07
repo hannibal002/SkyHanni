@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dungeon.spiritleap.SpiritLeapConfig
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -164,10 +167,9 @@ class DungeonConfig {
     var shadowAssassinJumpNotifier: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Terminal Waypoints", desc = "Displays Waypoints in the F7/M7 Goldor Phase.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var terminalWaypoints: Boolean = true
+    @ConfigOption(name = "Terminal Waypoints", desc = "")
+    @Accordion
+    val terminalWaypoints: TerminalWaypointsConfig = TerminalWaypointsConfig()
 
     @Expose
     @ConfigOption(name = "Creation Cooldown", desc = "")
@@ -223,4 +225,13 @@ class DungeonConfig {
     @ConfigEditorBoolean
     @SearchTag("Dialogue Message Title")
     var bloodCampTimer: Boolean = false
+
+    @SkyHanniModule
+    companion object {
+
+        @HandleEvent
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(146, "dungeon.terminalWaypoints", "dungeon.terminalWaypoints.enabled")
+        }
+    }
 }
