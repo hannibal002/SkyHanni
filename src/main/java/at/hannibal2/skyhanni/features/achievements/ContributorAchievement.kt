@@ -32,6 +32,8 @@ object ContributorAchievement {
 
     const val CONTRIBUTOR_ACHIEVEMENT_GOT = "Achievement Get! EEEEKK!!"
 
+    private val queue = mutableListOf<GameProfile>()
+
     @HandleEvent
     private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         event.register(
@@ -130,7 +132,28 @@ object ContributorAchievement {
         }
     }
 
+    @HandleEvent
+    private fun onWorldChange() {
+        for (contributor in queue) {
+            grantAchievement(contributor)
+        }
+        queue.clear()
+    }
+
+    @HandleEvent
+    private fun onDisconnect() {
+        queue.clear()
+    }
+
     fun onUniqueContributorSeen(profile: GameProfile) {
+        if (ContributorManager.shouldDeferAchievement(profile.id)) {
+            queue.add(profile)
+        } else {
+            grantAchievement(profile)
+        }
+    }
+
+    private fun grantAchievement(profile: GameProfile) {
         val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
         if (showContributorAchievement(profile, completed)) return
         showContributorDiscovered(profile)
