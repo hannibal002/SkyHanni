@@ -99,7 +99,7 @@ enum class SkyblockStat(
     FISHING_SPEED(AQUA, '\uE00C'),
     SEA_CREATURE_CHANCE(DARK_AQUA, '\uE021'),
     DOUBLE_HOOK_CHANCE(BLUE, '\uE009'),
-    TROPHY_FISH_CHANCE(GOLD, '\uE02A', displayName = "Trophy Chance"),
+    TROPHY_CHANCE(GOLD, '\uE02A'),
     TREASURE_CHANCE(GOLD, '\uE025'),
 
     // </editor-fold>
