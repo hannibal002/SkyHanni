@@ -282,9 +282,9 @@ enum class SkyblockStat(
             event.move(142, "#profile.stats.true_defence", "#profile.stats.true_defense")
             event.move(142, "#profile.stats.nether_wart_fortune", "#profile.stats.nether_stalk_fortune")
             event.move(142, "#profile.stats.hunter_fortune", "#profile.stats.hunting_fortune")
-            event.move(147, "#profile.stats.trophy_fish_chance", "#profile.stats.trophy_chance")
             // Left behind by stats that were read back while their rename was still missing
             event.remove(142, "#profile.stats.unknown")
+            event.move(147, "#profile.stats.trophy_fish_chance", "#profile.stats.trophy_chance")
         }
     }
 }
