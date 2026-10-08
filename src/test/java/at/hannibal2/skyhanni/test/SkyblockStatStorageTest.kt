@@ -33,20 +33,6 @@ class SkyblockStatStorageTest {
     private val uuid = "0a2af95e-21cf-4ee2-8a96-e30352680646"
     private val profilePath = "storage.players.$uuid.profiles.pear"
 
-    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(69, "#profile.stats.TRUE_DEFENCE", "#profile.stats.TRUE_DEFENSE")
-        event.move(112, "#profile.stats.NETHER_WART_FORTUNE", "#profile.stats.NETHER_STALK_FORTUNE")
-        event.remove(113, "#profile.stats.null")
-        event.move(141, "#profile.stats.HUNTER_FORTUNE", "#profile.stats.HUNTING_FORTUNE")
-        // Stats are stored under their lowercase name, so none of the renames above ever matched anything
-        event.move(142, "#profile.stats.true_defence", "#profile.stats.true_defense")
-        event.move(142, "#profile.stats.nether_wart_fortune", "#profile.stats.nether_stalk_fortune")
-        event.move(142, "#profile.stats.hunter_fortune", "#profile.stats.hunting_fortune")
-        event.move(147, "#profile.stats.trophy_fish_chance", "#profile.stats.trophy_chance")
-        // Left behind by stats that were read back while their rename was still missing
-        event.remove(142, "#profile.stats.unknown")
-    }
-
     @Test
     fun `removed stats do not break reading the surrounding storage`() {
         // Mirrors ConfigManager, where a failed read is swallowed instead of resetting the config.
@@ -83,7 +69,7 @@ class SkyblockStatStorageTest {
             movesPerformed = 0,
             dynamicPrefix = mapOf("#profile" to listOf(profilePath)),
         )
-        onConfigFix(event)
+        SkyblockStat.onConfigFix(event)
 
         val migrated = checkNotNull(event.new.at("$profilePath.stats".split("."), false) as? JsonObject) {
             "migration did not move any stats"
@@ -113,7 +99,7 @@ class SkyblockStatStorageTest {
             movesPerformed = 0,
             dynamicPrefix = mapOf("#profile" to listOf(profilePath)),
         )
-        onConfigFix(event)
+        SkyblockStat.onConfigFix(event)
 
         val migrated = checkNotNull(event.new.at("$profilePath.stats".split("."), false) as? JsonObject)
         assertEquals(5.0, migrated["trophy_chance"].asDouble)

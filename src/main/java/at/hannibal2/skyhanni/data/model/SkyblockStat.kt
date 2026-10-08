@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import org.intellij.lang.annotations.Language
+import org.jetbrains.annotations.VisibleForTesting
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
@@ -209,7 +210,7 @@ enum class SkyblockStat(
         }
 
         @HandleEvent(onlyOnSkyblock = true)
-        fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             onSkyblockMenu(event)
             onStatsMenu(event)
         }
@@ -221,7 +222,7 @@ enum class SkyblockStat(
         private var resourcePackOverrides = emptyMap<String, String>()
 
         @HandleEvent
-        fun onResourcePackReload(event: ResourcePackReloadEvent) {
+        private fun onResourcePackReload(event: ResourcePackReloadEvent) {
             val packOverrides = event.getJsonResource<Map<String, String>>(SkyHanniMod.id("icon_overrides.json"))
 
             resourcePackOverrides = packOverrides.orEmpty()
@@ -251,7 +252,7 @@ enum class SkyblockStat(
         }
 
         @HandleEvent
-        fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        private fun onWidgetUpdate(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.STATS, TabWidget.DUNGEON_SKILLS_AND_STATS)) return
             val type = if (event.isWidget(TabWidget.DUNGEON_SKILLS_AND_STATS)) StatSourceType.TABLIST_DUNGEON else StatSourceType.TABLIST
             assignEntry(event.lines.map { it.string }, type) { it.tablistPattern }
@@ -270,7 +271,9 @@ enum class SkyblockStat(
         }
 
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        @VisibleForTesting
+        @Suppress("PrivateEventListener")
+        internal fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(69, "#profile.stats.TRUE_DEFENCE", "#profile.stats.TRUE_DEFENSE")
             event.move(112, "#profile.stats.NETHER_WART_FORTUNE", "#profile.stats.NETHER_STALK_FORTUNE")
             event.remove(113, "#profile.stats.null")
