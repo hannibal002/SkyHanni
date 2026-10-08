@@ -99,7 +99,7 @@ enum class SkyblockStat(
     FISHING_SPEED(AQUA, '\uE00C'),
     SEA_CREATURE_CHANCE(DARK_AQUA, '\uE021'),
     DOUBLE_HOOK_CHANCE(BLUE, '\uE009'),
-    TROPHY_CHANCE(GOLD, '\uE02A'),
+    TROPHY_CHANCE(GOLD, '\uE02A', hypixelId = "TROPHY_FISH_CHANCE"),
     TREASURE_CHANCE(GOLD, '\uE025'),
 
     // </editor-fold>
@@ -279,6 +279,7 @@ enum class SkyblockStat(
             event.move(142, "#profile.stats.true_defence", "#profile.stats.true_defense")
             event.move(142, "#profile.stats.nether_wart_fortune", "#profile.stats.nether_stalk_fortune")
             event.move(142, "#profile.stats.hunter_fortune", "#profile.stats.hunting_fortune")
+            event.move(147, "#profile.stats.trophy_fish_chance", "#profile.stats.trophy_chance")
             // Left behind by stats that were read back while their rename was still missing
             event.remove(142, "#profile.stats.unknown")
         }

@@ -42,6 +42,7 @@ class SkyblockStatStorageTest {
         event.move(142, "#profile.stats.true_defence", "#profile.stats.true_defense")
         event.move(142, "#profile.stats.nether_wart_fortune", "#profile.stats.nether_stalk_fortune")
         event.move(142, "#profile.stats.hunter_fortune", "#profile.stats.hunting_fortune")
+        event.move(147, "#profile.stats.trophy_fish_chance", "#profile.stats.trophy_chance")
         // Left behind by stats that were read back while their rename was still missing
         event.remove(142, "#profile.stats.unknown")
     }
@@ -95,5 +96,27 @@ class SkyblockStatStorageTest {
         assertFalse(stats.has("nether_wart_fortune"))
         assertFalse(stats.has("unknown"))
         assertEquals(5.0, stats["strength"].asDouble)
+    }
+
+    @Test
+    fun `trophy chance stat is migrated`() {
+        val old = JsonObject()
+        val profile = old.at(profilePath.split("."), true) as JsonObject
+        profile.add("stats", JsonObject().apply {
+            addProperty("trophy_fish_chance", 5.0)
+        })
+
+        val event = ConfigUpdaterMigrator.ConfigFixEvent(
+            old = old,
+            new = JsonObject(),
+            oldVersion = 146,
+            movesPerformed = 0,
+            dynamicPrefix = mapOf("#profile" to listOf(profilePath)),
+        )
+        onConfigFix(event)
+
+        val migrated = checkNotNull(event.new.at("$profilePath.stats".split("."), false) as? JsonObject)
+        assertEquals(5.0, migrated["trophy_chance"].asDouble)
+        assertNull(migrated["trophy_fish_chance"])
     }
 }
