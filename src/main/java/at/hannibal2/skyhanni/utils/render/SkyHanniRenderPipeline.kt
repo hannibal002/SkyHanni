@@ -12,7 +12,6 @@ import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.resources.Identifier
 import java.util.Optional
 
 //? if >= 26.2 {
@@ -150,7 +149,7 @@ enum class SkyHanniRenderPipeline(
 
     private val internalPipeline: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
-            .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
+            .withLocation(SkyHanniMod.id(this.name.lowercase()))
             //? if >= 26.2 {
             .withVertexBinding(0, vFormat)
             .withPrimitiveTopology(vDrawMode)
@@ -159,14 +158,8 @@ enum class SkyHanniRenderPipeline(
             .apply {
                 // One or the other, never both
                 blend?.let { withColorTargetState(ColorTargetState(it)) } ?: withCull?.let(this::withCull)
-                vertexShaderPath?.let { withVertexShader(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
-                fragmentShaderPath?.let {
-                    withFragmentShader(
-                        Identifier.fromNamespaceAndPath(
-                            SkyHanniMod.MODID, it
-                        )
-                    )
-                }
+                vertexShaderPath?.let { withVertexShader(SkyHanniMod.id(it)) }
+                fragmentShaderPath?.let { withFragmentShader(SkyHanniMod.id(it)) }
 
                 //? if >= 26.2 {
                 if (sampler != null || uniforms.isNotEmpty()) {
