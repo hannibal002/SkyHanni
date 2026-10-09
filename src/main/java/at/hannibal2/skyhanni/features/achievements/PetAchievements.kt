@@ -22,7 +22,7 @@ object PetAchievements {
     /**
      * REGEX-TEST: Your Pet Score: 435
      */
-    private val petScorePattern by AchievementManager.group.pattern(
+    private val petScorePattern by AchievementManager.patternGroup.pattern(
         "pet-score",
         "Your Pet Score: (?<score>\\d+)",
     )

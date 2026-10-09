@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
-import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.resources.language.I18n
@@ -34,6 +33,18 @@ import kotlin.time.Duration.Companion.seconds
 @Suppress("MemberVisibilityCanBePrivate", "TooManyFunctions", "Unused")
 object InventoryUtils {
     var itemInHandId = NeuInternalName.NONE
+
+    /**
+     * The slot indexes of the inner inventory of a 6 row chest.
+     * This is used to filter out the border slots of the chest.
+     */
+    val innerInventorySlots: Set<Int> = listOf(
+        10..16,
+        19..25,
+        28..34,
+        37..43,
+    ).flatten().toSet()
+
     fun NeuInternalName.recentlyHeld(): Boolean = this in recentItemsInHand
 
     val recentItemsInHand = TimeLimitedSet<NeuInternalName>(30.seconds)
@@ -133,7 +144,7 @@ object InventoryUtils {
     fun getBoots(): SafeItemStack? = getArmor()[0]
 
     fun isSlotInPlayerInventory(itemStack: SafeItemStack): Boolean {
-        val slotUnderMouse = slotUnderCursor() ?: return false
+        val slotUnderMouse = InventoryCompat.slotUnderCursor() ?: return false
         return slotUnderMouse.container is Inventory && slotUnderMouse.item == itemStack
     }
 
@@ -256,4 +267,6 @@ object InventoryUtils {
     fun SkyHanniGuiContainer.slots(): List<Slot> {
         return InventoryCompat.containerSlots(this)
     }
+
+    fun <T> Map<Int, T>.filterInnerSlots(): Map<Int, T> = filter { it.key in innerInventorySlots }
 }

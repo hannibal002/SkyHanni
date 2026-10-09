@@ -101,31 +101,35 @@ object ContributorAchievement {
         )
     }
 
+    private fun countsForAchievements(ign: String): Boolean {
+        return ign in ContributorManager.contributorNames && !ContributorManager.isExcludedFromAchievements(ign)
+    }
+
     @HandleEvent(priority = HandleEvent.LOW)
     private fun onProfileJoin() {
         val friends = FriendApi.getAllFriends()
-        if (friends.any { it.name in ContributorManager.contributorNames }) {
+        if (friends.any { countsForAchievements(it.name) }) {
             AchievementManager.completeAchievement(CONTRIBUTOR_FRIEND_ACHIEVEMENT)
         }
     }
 
     @HandleEvent
     private fun onFriendAdd(event: FriendAddEvent) {
-        if (event.playerName in ContributorManager.contributorNames) {
+        if (countsForAchievements(event.playerName)) {
             AchievementManager.completeAchievement(CONTRIBUTOR_FRIEND_ACHIEVEMENT)
         }
     }
 
     @HandleEvent
     private fun onFriendRequestExpired(event: FriendRequestExpiredEvent) {
-        if (event.playerName in ContributorManager.contributorNames) {
+        if (countsForAchievements(event.playerName)) {
             AchievementManager.completeAchievement(CONTRIBUTOR_NOBODY_ACHIEVEMENT)
         }
     }
 
     @HandleEvent
     private fun onFriendRequestDeclined(event: FriendRequestDeclinedEvent) {
-        if (event.playerName in ContributorManager.contributorNames) {
+        if (countsForAchievements(event.playerName)) {
             AchievementManager.completeAchievement(CONTRIBUTOR_REJECTED_ACHIEVEMENT)
         }
     }
@@ -136,8 +140,8 @@ object ContributorAchievement {
         showContributorDiscovered(profile)
     }
 
-    private fun showContributorDiscovered(profile: GameProfile) {
-        if (!config.discoverContributorMessage) return
+    private fun showContributorDiscovered(profile: GameProfile, firstTime: Boolean = false) {
+        if (!config.discoverContributorMessage && !firstTime) return
         val message = getDiscoverComponent(profile)
         ChatUtils.chat {
             appendWithColor("A wild SkyHanni contributor appears!", ChatFormatting.GOLD)
@@ -148,8 +152,7 @@ object ContributorAchievement {
 
     private fun showContributorAchievement(profile: GameProfile, completed: Boolean): Boolean {
         if (!completed || !AchievementManager.shouldShowMessages) return false
-        val message = getDiscoverComponent(profile)
-        ChatUtils.chat(message)
+        showContributorDiscovered(profile, firstTime = true)
         return true
     }
 

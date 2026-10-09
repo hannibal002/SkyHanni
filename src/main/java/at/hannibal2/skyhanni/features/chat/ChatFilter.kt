@@ -32,11 +32,11 @@ object ChatFilter {
     private val foragingConfig get() = config.foraging
     private val huntingConfig get() = config.hunting
 
-    private val chatFilterGroup = RepoPattern.group("chat-filter")
-    private val huntingPatternGroup = chatFilterGroup.group("hunting")
-    private val foragingPatternGroup = chatFilterGroup.group("foraging")
-    private val miscPatternGroup = chatFilterGroup.group("hypixel-misc")
-    private val eventPatternGroup = chatFilterGroup.group("event")
+    private val patternGroup = RepoPattern.group("chat-filter")
+    private val huntingPatternGroup = patternGroup.group("hunting")
+    private val foragingPatternGroup = patternGroup.group("foraging")
+    private val miscPatternGroup = patternGroup.group("hypixel-misc")
+    private val eventPatternGroup = patternGroup.group("event")
 
     // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages

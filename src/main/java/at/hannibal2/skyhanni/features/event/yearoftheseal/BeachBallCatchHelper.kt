@@ -40,7 +40,7 @@ object BeachBallCatchHelper {
     private val NORMAL_BEACH_BALL by SkullTextureHolder.texture("NORMAL_BEACH_BALL")
 //     private val GIANT_BEACH_BALL by SkullTextureHolder.texture("GIANT_BEACH_BALL")
 
-    fun check(entity: ArmorStand) {
+    private fun check(entity: ArmorStand) {
         if (entity.wearingSkullTexture(NORMAL_BEACH_BALL)) {
             predictors.putIfAbsent(entity.id, Predictor(entity.getLorenzVec(), Variant.NORMAL))
             return
@@ -53,13 +53,13 @@ object BeachBallCatchHelper {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityEnterWorld(event: EntityEnterWorldEvent<ArmorStand>) {
+    private fun onEntityEnterWorld(event: EntityEnterWorldEvent<ArmorStand>) {
         if (!isEnabled()) return
         DelayedRun.runDelayed(2.ticks) { check(event.entity) }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
+    private fun onTick() {
         if (!isEnabled()) return
         predictors.removeIf { (id, predict) ->
             val entity = EntityUtils.getEntityByID(id) ?: return@removeIf true
@@ -69,12 +69,12 @@ object BeachBallCatchHelper {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (predictors.isEmpty()) return
         val color = config.bouncyBallLineColor.toColor()
-        LineDrawer.draw3D(event, 4, true) {
-            predictors.forEach { (_, predict) ->
+        LineDrawer.draw3D(event, lineWidth = 4, depth = true) {
+            predictors.values.forEach { predict ->
                 drawPath(predict.prePath, color.darker(), bezierPoint = -1.0)
                 drawPath(predict.predictedPath, color, bezierPoint = -1.0)
             }
@@ -125,13 +125,13 @@ object BeachBallCatchHelper {
         Variant.GIANT -> add(-0.9, -0.9, -0.9).boundingToOffset(1.8, 1.8, 1.8)
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onIslandChange() {
+    @HandleEvent
+    private fun onWorldChange() {
         predictors.clear()
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         config.bouncyBallLine.onDisable { DelayedRun.runDelayed(3.ticks) { predictors.clear() } }
     }
 
@@ -153,9 +153,10 @@ object BeachBallCatchHelper {
             private set
 
         var prePath = emptyList<LorenzVec>()
+            private set
 
         private var updated = 0
-        var lastPosition: LorenzVec = start
+        private var lastPosition: LorenzVec = start
 
         init {
             newData(start)
@@ -168,27 +169,28 @@ object BeachBallCatchHelper {
                 startIndex = data.lastIndex
                 minY = new.y
             }
-            prePath = data.subList(startIndex, data.lastIndex)
-            predictedPath = if (predictedPath.isEmpty()) emptyList() else predictedPath.drop(1)
+            // Copied, since subList returns a live view that breaks once data grows again
+            prePath = data.subList(startIndex, data.lastIndex).toList()
+            predictedPath = predictedPath.drop(1)
             updated++
-            // Only update the path once every 3 ticks to reduce flickering of the path
-            if (updated <= 3) return
-            predictedPath = predict(startIndex, minY)
+            // Only update the path once every 4 ticks to reduce flickering of the path
+            if (updated < 4) return
+            predictedPath = predict()
             updated = 0
         }
 
-        var positive = true
+        private var positive = true
 
-        var lastChange = SimpleTimeMark.now()
+        private var lastChange = SimpleTimeMark.now()
         var bounceCounter = 0
+            private set
 
         private fun updateDirection(newPosition: LorenzVec) {
             if (lastPosition.distance(newPosition) < 0.3) return
             if (lastChange.passedSince() < 800.milliseconds) return
             val diff = (newPosition - lastPosition).y
             val isPositive = diff > 0
-            val wasPositive = positive
-            if (isPositive && !wasPositive) {
+            if (isPositive && !positive) {
                 bounceCounter++
                 lastChange = SimpleTimeMark.now()
             }
@@ -196,7 +198,7 @@ object BeachBallCatchHelper {
             lastPosition = newPosition
         }
 
-        fun predict(startIndex: Int, minY: Double): List<LorenzVec> {
+        private fun predict(): List<LorenzVec> {
             val presentValues = data.lastIndex - startIndex
 
             val modelList = mapOf<(List<LorenzVec>) -> Model, Int>(::SmallPoly to 1, ::AveragePoly to 2, ::SpreadPoly to 1)
@@ -238,6 +240,9 @@ object BeachBallCatchHelper {
         open fun dX(start: Int, current: Int, minY: Double) = given[current].x - given[current - 1].x
         open fun dZ(start: Int, current: Int, minY: Double) = given[current].z - given[current - 1].z
 
+        // t must stay inside start + 1..current - 1, otherwise this reads before the last bounce or past the last data point
+        protected fun smoothedY(t: Int): Double = listOf(t - 1, t, t + 1).map { given[it].y }.average()
+
         override fun predict(start: Int, current: Int, minY: Double): List<LorenzVec> {
             val t1 = getT1(start, current, minY)
             val t2 = getT2(start, current, minY)
@@ -256,9 +261,11 @@ object BeachBallCatchHelper {
             val dx = dX(start, current, minY)
             val dz = dZ(start, current, minY)
 
-            val r = (current + 1..current + 300).asSequence().map { it to poly(it) }.takeWhileInclusive { it.second > minY }
-                .runningFold(given[t1]) { prev, (_, y) -> LorenzVec(prev.x + dx, y, prev.z + dz) }.toList()
-            return r
+            return (current + 1..current + 300).asSequence()
+                .map { it to poly(it) }
+                .takeWhileInclusive { it.second > minY }
+                .runningFold(given[t1]) { prev, (_, y) -> LorenzVec(prev.x + dx, y, prev.z + dz) }
+                .toList()
         }
     }
 
@@ -274,7 +281,7 @@ object BeachBallCatchHelper {
         override fun getT1(start: Int, current: Int, minY: Double): Int = current - 1
         override fun getT2(start: Int, current: Int, minY: Double): Int = current - 3
         override fun getT3(start: Int, current: Int, minY: Double): Int = current - 5
-        override fun yTransform(t: Int): Double = listOf(t - 1, t, t + 1).map { super.yTransform(t) }.average()
+        override fun yTransform(t: Int): Double = smoothedY(t)
         override fun dX(start: Int, current: Int, minY: Double): Double = listOf(
             given[current].x - given[current - 1].x,
             given[current - 1].x - given[current - 2].x,
@@ -282,9 +289,9 @@ object BeachBallCatchHelper {
         ).average()
 
         override fun dZ(start: Int, current: Int, minY: Double): Double = listOf(
-            given[current].x - given[current - 1].x,
-            given[current - 1].x - given[current - 2].x,
-            given[current - 2].x - given[current - 3].x,
+            given[current].z - given[current - 1].z,
+            given[current - 1].z - given[current - 2].z,
+            given[current - 2].z - given[current - 3].z,
         ).average()
     }
 
@@ -293,7 +300,7 @@ object BeachBallCatchHelper {
         override fun getT1(start: Int, current: Int, minY: Double): Int = current - 1
         override fun getT2(start: Int, current: Int, minY: Double): Int = (current - start) / 2 + start
         override fun getT3(start: Int, current: Int, minY: Double): Int = start + 1
-        override fun yTransform(t: Int): Double = listOf(t - 1, t, t + 1).map { super.yTransform(t) }.average()
+        override fun yTransform(t: Int): Double = smoothedY(t)
     }
 
     // TODO find correct d and g values
