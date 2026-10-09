@@ -293,11 +293,11 @@ object SackApi {
         val item = SackOtherItem()
         numPattern.firstMatcher(value.getLore()) {
             val stored = group("stored").formatInt()
-            val internalName = value.getInternalName().let {
-                if (ignoreInternalNamePattern.matches(value.cleanName)) {
-                    NeuInternalName.fromItemNameOrNull(value.cleanName) ?: it
+            val internalName = value.getInternalName().let { internalName ->
+                if (ignoreInternalNamePattern.matches(internalName.asString())) {
+                    NeuInternalName.fromItemNameOrNull(value.cleanName) ?: internalName
                 } else {
-                    it
+                    internalName
                 }
             }
 
