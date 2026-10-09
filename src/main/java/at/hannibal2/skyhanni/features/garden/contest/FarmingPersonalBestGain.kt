@@ -53,16 +53,6 @@ object FarmingPersonalBestGain {
         "ff.new.colorless",
         "\\[NPC] Jacob: Your Personal Bests perk is now granting you \\+(?<ff>.*)${FARMING_FORTUNE.hypixelIcon} (?<crop>.*) Fortune!",
     )
-
-    /**
-     * REGEX-TEST: §e[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6+46.69 Potato Fortune§f!
-     */
-    @Deprecated("Only exists for repo. Remove after 9.0.0.", level = DeprecationLevel.ERROR)
-    @Suppress("MaxLineLength")
-    private val unused by patternGroup.pattern(
-        "ff.new",
-        "§e\\[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6\\+(?<ff>.*)${FARMING_FORTUNE.hypixelIcon} (?<crop>.*) Fortune§f!",
-    )
     // </editor-fold>
 
     private val repoReloadCoroutine = CoroutineSettings("farming personal best gain repo reload")

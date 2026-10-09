@@ -48,7 +48,6 @@ enum class ElectionCandidate(
     FINNEGAN(
         "Finnegan",
         "§c",
-        Perk.PELT_POCALYPSE, // TODO remove after 9.0.0
         Perk.GRAND_FEAST,
         Perk.GOATED,
         Perk.BLOOMING_BUSINESS,
@@ -186,7 +185,6 @@ enum class Perk(val perkName: String) {
     LONG_TERM_INVESTMENT("Long Term Investment"),
 
     // Finnegan
-    @Deprecated("Remove after 9.0.0") PELT_POCALYPSE("Pelt-pocalypse"),
     GRAND_FEAST("Grand Feast"),
     GOATED("GOATed"),
     BLOOMING_BUSINESS("Blooming Business"),

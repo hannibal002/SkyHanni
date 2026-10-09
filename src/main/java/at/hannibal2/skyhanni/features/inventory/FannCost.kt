@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -15,7 +15,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.insertLineAfter
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
 import java.util.regex.Pattern
 import kotlin.math.max
 import kotlin.time.Duration
@@ -63,7 +67,7 @@ object FannCost {
     private val config get() = SkyHanniMod.feature.inventory.fannCost
     private val patternGroup = RepoPattern.group("fann.inventory")
     private val currentFannData: FannData = FannData()
-    private val generatedTooltips: MutableMap<Pattern, String> = mutableMapOf()
+    private val generatedTooltips: MutableMap<Pattern, Component> = mutableMapOf()
     private val trainingSlotInventoryDetector = InventoryDetector { trainingSlotInventoryPattern }
 
     private var lastStartTrainingLoreHash: Int = 0
@@ -163,7 +167,7 @@ object FannCost {
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onFannAnvilTooltip(event: ToolTipEvent) {
+    private fun onFannAnvilTooltip(event: ToolTipTextEvent) {
         if (!config.coinsPerXP && !config.xpPerBit) return
         if (currentFannData.trainingType == FannTrainingType.FREE) return
 
@@ -172,7 +176,7 @@ object FannCost {
         }
     }
 
-    private fun FannData.generateNewTooltips(): List<Pair<Pattern, String>> {
+    private fun FannData.generateNewTooltips(): List<Pair<Pattern, Component>> {
         val expGained = when (trainingMode) {
             FannTrainingMode.DAY_COUNT -> expEarned
             FannTrainingMode.UNTIL_LEVEL -> expDaily?.times(duration.toDouble(DurationUnit.DAYS))
@@ -182,8 +186,18 @@ object FannCost {
         val xpPerBit = expGained / max(1.0, bitCost)
 
         return listOf(
-            coinsPattern to "§7 = §6${coinPerExp.roundTo(2)} Coins§7/§bXP",
-            bitsPattern to "§7 = §b${xpPerBit.roundTo(2)} XP§7/§bBit"
+            coinsPattern to
+                componentBuilder {
+                    appendWithColor(" = ", ChatFormatting.GRAY)
+                    appendWithColor("${coinPerExp.roundTo(2)} Coins", ChatFormatting.GOLD)
+                    appendWithColor("/XP", ChatFormatting.GRAY)
+                },
+            bitsPattern to
+                componentBuilder {
+                    appendWithColor(" = ", ChatFormatting.GRAY)
+                    appendWithColor("${xpPerBit.roundTo(2)} XP", ChatFormatting.AQUA)
+                    appendWithColor("/Bit", ChatFormatting.GRAY)
+                },
         )
     }
 
@@ -195,7 +209,7 @@ object FannCost {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!trainingSlotInventoryDetector.isInside()) {
             currentFannData.reset()
             generatedTooltips.clear()

@@ -6,8 +6,9 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BaseBrigadierBuilder
 import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.StringUtils.splitLines
+import at.hannibal2.skyhanni.utils.chat.PaginatedListHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.splitLines
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.suggest
 import com.mojang.brigadier.CommandDispatcher
@@ -72,7 +73,7 @@ object HelpCommand {
 
         val title = if (search.isBlank()) "SkyHanni Commands" else "SkyHanni Commands Matching: \"$search\""
 
-        TextHelper.displayPaginatedList(
+        PaginatedListHelper.display(
             title,
             filtered,
             chatLineId = messageId,
@@ -96,7 +97,7 @@ object HelpCommand {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shcommands") {
             description = "Shows this list"
             aliases = listOf("shhelp", "shcommand", "shcmd", "shc")

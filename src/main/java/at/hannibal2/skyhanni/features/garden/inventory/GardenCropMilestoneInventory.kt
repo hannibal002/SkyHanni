@@ -3,23 +3,14 @@ package at.hannibal2.skyhanni.features.garden.inventory
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMilestoneCounter
-import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneTotalCropsForTier
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
-import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.StringUtils
 
 @SkyHanniModule
 object GardenCropMilestoneInventory {
@@ -45,30 +36,6 @@ object GardenCropMilestoneInventory {
             event.alignLeft = false
             event.stackTip = "§6Average Crop Milestone: §e$average"
         }
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun addMaxMilestoneProgress(event: ToolTipTextEvent) {
-        if (!config.tooltipTweak.cropMilestoneTotalProgress || InventoryUtils.openInventoryName() != "Crop Milestones") return
-
-        val crop = CropMilestonesApi.getCropTypeByLore(event.itemStack) ?: return
-        val tier = crop.getCurrentMilestoneTier() ?: return
-        if (tier >= 20) return // Hypixel shows progress to ms46 after ms20
-
-        val maxTier = CropMilestonesApi.getMaxTier()
-        val maxCounter = crop.milestoneTotalCropsForTier(maxTier)
-
-        val index = event.toolTip.indexOfFirst { it.string == "Rewards:" }
-        if (index == -1) return
-
-        val counter = crop.getMilestoneCounter()?.toDouble() ?: return
-        val percentage = counter / maxCounter
-        val percentageFormat = percentage.formatPercentage()
-
-        event.toolTip.add(index, " ")
-        val progressBar = StringUtils.progressBar(percentage, 19)
-        event.toolTip.add(index, "$progressBar §e${counter.addSeparators()}§6/§e${maxCounter.shortFormat()}")
-        event.toolTip.add(index, "§7Progress to Tier $maxTier: §e$percentageFormat")
     }
 
     fun updateAverage() {

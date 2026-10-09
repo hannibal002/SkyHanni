@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.StringUtils.splitLines
+import at.hannibal2.skyhanni.utils.chat.TextHelper.splitLines
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import net.minecraft.world.SimpleContainer
 

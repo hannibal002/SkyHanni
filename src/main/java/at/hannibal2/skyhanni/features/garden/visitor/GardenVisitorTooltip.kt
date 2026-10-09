@@ -117,8 +117,8 @@ object GardenVisitorTooltip {
      * Called by VisitorListener when tooltip is rendered.
      * Modifies the tooltip to show calculated prices and times.
      */
-    fun onTooltip(visitor: VisitorApi.Visitor, itemStack: SafeItemStack, toolTip: MutableList<String>) {
-        if (itemStack.cleanName != "Accept Offer") return
+    fun onTooltip(visitor: VisitorApi.Visitor, itemStack: SafeItemStack, toolTip: List<String>): List<String>? {
+        if (itemStack.cleanName != "Accept Offer") return null
 
         // The blocked tooltip looks different, so the cache is invalid after toggling the bypass key.
         val bypassing = config.rewardWarning.bypassKey.isKeyHeld()
@@ -130,8 +130,7 @@ object GardenVisitorTooltip {
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)
         }
-        toolTip.clear()
-        toolTip.addAll(visitor.lastLore)
+        return visitor.lastLore
     }
 
     private fun readItemLine(formattedLine: String, readingShoppingList: Boolean): Pair<NeuInternalName, Int>? {
@@ -154,7 +153,7 @@ object GardenVisitorTooltip {
      */
     // TODO throw an axe on this function to split it up
     @Suppress("LongMethod", "CyclomaticComplexMethod", "LoopWithTooManyJumpStatements")
-    private fun readToolTip(visitor: VisitorApi.Visitor, itemStack: SafeItemStack?, toolTip: MutableList<String>) {
+    private fun readToolTip(visitor: VisitorApi.Visitor, itemStack: SafeItemStack?, toolTip: List<String>) {
         val stack = itemStack ?: error("Accept offer item not found for visitor ${visitor.visitorName}")
 
         var totalPrice = 0.0
