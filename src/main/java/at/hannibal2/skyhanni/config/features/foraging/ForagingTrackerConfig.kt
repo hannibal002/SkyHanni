@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -23,12 +24,18 @@ class ForagingTrackerConfig {
     @ConfigLink(owner = ForagingTrackerConfig::class, field = "enabled")
     val position: Position = Position(-300, 300)
 
-    @Expose
-    @ConfigOption(name = "Compact Gifts", desc = "Compact the chat messages when you receive a tree gift.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var compactGiftChats: Boolean = true
+    enum class TreeGiftDisplayMode(val displayName: String) {
+        FULL_GIFT("Full Gift"),
+        COMPACT_GIFT("Compact Gift"),
+        NO_GIFT("No Gift");
 
+        override fun toString() = displayName
+    }
+
+    @Expose
+    @ConfigOption(name = "Display Tree Gifts", desc = "Change how the Tree Gift messages are displayed in chat.")
+    @ConfigEditorDropdown
+    var displayTreeGifts: TreeGiftDisplayMode = TreeGiftDisplayMode.COMPACT_GIFT
 
     @Expose
     @ConfigOption(
