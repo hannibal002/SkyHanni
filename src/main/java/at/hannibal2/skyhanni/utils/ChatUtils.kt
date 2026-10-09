@@ -463,6 +463,88 @@ object ChatUtils {
         )
     }
 
+    fun chat(
+        messages: List<String>,
+        prefix: Boolean = true,
+        prefixColor: String? = null,
+    ) {
+        messages.forEach { message ->
+            chat(
+                message = message,
+                prefix = prefix,
+                prefixColor = prefixColor,
+                // TODO: add support
+                replaceSameMessage = false,
+                onlySendOnce = false,
+                messageId = null,
+            )
+        }
+    }
+
+    fun clickableChat(
+        messages: List<String>,
+        onClick: () -> Unit,
+        hover: String = "§eClick here!",
+        expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
+        prefix: Boolean = true,
+        prefixColor: String? = null,
+    ) {
+        messages.forEach { message ->
+            clickableChat(
+                message = message,
+                onClick = onClick,
+                hover = hover,
+                expireAt = expireAt,
+                prefix = prefix,
+                prefixColor = prefixColor,
+                // TODO: add support
+                oneTimeClick = false,
+                replaceSameMessage = false,
+                messageId = null
+            )
+        }
+    }
+
+    fun hoverableChat(
+        messages: List<String>,
+        hover: List<String>,
+        command: String? = null,
+        prefix: Boolean = true,
+        prefixColor: String? = null,
+    ) {
+        messages.forEach { message ->
+            hoverableChat(
+                message = message,
+                hover = hover,
+                command = command,
+                prefix = prefix,
+                prefixColor = prefixColor
+            )
+        }
+    }
+
+    fun clickableLinkChat(
+        messages: List<String>,
+        url: String,
+        hover: String = "§eOpen $url",
+        autoOpen: Boolean = false,
+        prefix: Boolean = true,
+        prefixColor: String? = null,
+    ) {
+        messages.forEachIndexed { index, message ->
+            clickableLinkChat(
+                message = message,
+                url = url,
+                hover = hover,
+                autoOpen = autoOpen && index == 0,
+                prefix = prefix,
+                prefixColor = prefixColor,
+                // TODO: add support
+                replaceSameMessage = false
+            )
+        }
+    }
+
     var Component.skyhanniCreated: Boolean
         get() = (this as? MutableComponent)?.`skyhanni$didCreate`() ?: false
         set(value) {
