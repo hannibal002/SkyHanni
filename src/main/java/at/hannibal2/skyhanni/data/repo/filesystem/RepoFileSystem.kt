@@ -12,20 +12,18 @@ import java.io.File
 private const val MAX_EMPTY_TGZ_ENTRIES = 10
 
 sealed interface RepoFileSystem {
-    val root: File
     val logger: RepoLogger
 
     fun exists(path: String): Boolean
     fun readAllBytes(path: String): ByteArray
     fun write(path: String, data: ByteArray)
-    fun list(path: String): List<String>
-    fun validatePath(relativePath: String) = Unit
-    suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem = this
+    fun listFiles(path: String, extension: String): List<String>
+    fun listDirectories(path: String): List<String>
+    fun clear() = deleteRecursively("")
 
     /**
      * Deletes everything under [path].
      * If [path] is empty, deletes all entries.
-     * Should NOT delete logs.
      */
     fun deleteRecursively(path: String)
 
@@ -56,6 +54,7 @@ sealed interface RepoFileSystem {
 
     /**
      * Reads [tgzFile], validates each entry path, and writes each file into this [RepoFileSystem].
+     * Note that this does clear the repo before writing, so any existing files will be deleted.
      *
      * Aborts and returns `false` if more than [MAX_EMPTY_TGZ_ENTRIES] entries are empty,
      * as this strongly suggests the tar.gz file is corrupt and continuing would silently produce
@@ -65,6 +64,8 @@ sealed interface RepoFileSystem {
      * Callers are responsible for ensuring they are already running in an appropriate dispatcher (e.g. IO).
      */
     suspend fun loadFromTgz(progress: ChatProgressUpdates, tgzFile: File): Boolean = runCatching {
+        progress.update("loadFromTgz: clearing repo")
+        clear()
         progress.update("loadFromTgz")
         val entries = countTgzEntries(tgzFile)
         tgzFile.inputStream().use { rawInput ->
@@ -118,7 +119,6 @@ sealed interface RepoFileSystem {
                 progress.innerProgressStep()
                 val relativePath = entry.name.substringAfter('/', entry.name)
                 if (relativePath.isNotEmpty()) {
-                    validatePath(relativePath)
                     val data = tgzInput.readBytes()
                     if (data.isEmpty()) {
                         emptyDataCount += 1
