@@ -25,16 +25,13 @@ object TrophyFishMessages {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.chatMessages
 
     /**
-     * REGEX-TEST: §6 §r§6§lTROPHY FISH! §r§fYou caught a §r§9Lavahorse §r§6§lGOLD§r§f!
-     * REGEX-TEST: §6 §r§6§lTROPHY FISH! §r§fYou caught a §r§5Soul Fish §r§8§lBRONZE§r§f!
-     * REGEX-TEST: §6 §r§6§lTROPHY FISH! §r§fYou caught a §r§9Mana Ray §r§8§lBRONZE§r§f!
-     * REGEX-TEST: §6 §r§6§lTROPHY FISH! §r§fYou caught a §r§fBlobfish §r§7§lSILVER§r§f!
-     * REGEX-TEST: §6 §r§6§lTROPHY FISH! §r§fYou caught a §r§6Golden Fish §r§7§lSILVER§r§f!
+     * REGEX-TEST: §6 §r§6§lTROPHY FISH! §r§fYou caught §r§fBlobfish §r§8§lBRONZE§r§f!
+     * REGEX-TEST: §6 §r§6§lTROPHY FISH! §r§fYou caught §r§9Lavahorse §r§7§lSILVER§r§f!
      */
     @Suppress("MaxLineLength")
     val trophyFishPattern by RepoPattern.pattern(
         "fishing.trophy.trophyfish",
-        "§6\uE02A §r§6§lTROPHY FISH! §r§fYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§f!",
+        "§6\uE02A §r§6§lTROPHY FISH! §r§fYou caught §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§f!",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -91,7 +88,7 @@ object TrophyFishMessages {
                 DesignFormat.STYLE_2 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})"
                 else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
             }
-            "§6${SkyblockStat.TROPHY_FISH_CHANCE.icon} §6§lTROPHY FISH! $designFormat".asComponent()
+            "§6${SkyblockStat.TROPHY_CHANCE.icon} §6§lTROPHY FISH! $designFormat".asComponent()
         } else event.chatComponent.copy()
 
         if (config.totalAmount) {

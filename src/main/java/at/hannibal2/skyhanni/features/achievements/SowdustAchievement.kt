@@ -15,7 +15,7 @@ object SowdustAchievement {
     /**
      * WRAPPED-REGEX-TEST: " - 250,000,000 Sowdust"
      */
-    private val maxSowdustPattern by AchievementManager.group.pattern(
+    private val maxSowdustPattern by AchievementManager.patternGroup.pattern(
         "sowdust",
         " - 250,000,000 Sowdust",
     )
@@ -23,7 +23,7 @@ object SowdustAchievement {
     /**
      * REGEX-TEST: Manage Chips
      */
-    private val manageChipsInventoryPattern by AchievementManager.group.pattern(
+    private val manageChipsInventoryPattern by AchievementManager.patternGroup.pattern(
         "manage-chips-inventory",
         "Manage Chips",
     )

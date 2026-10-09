@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object ColorfulItemStats {
     private val config get() = SkyHanniMod.feature.misc.colorfulItemTooltips
 
-    private val group = RepoPattern.group("misc.itemstats")
+    private val patternGroup = RepoPattern.group("misc.itemstats")
 
     /**
      * REGEX-TEST: Crit Chance: +30%
@@ -23,7 +23,7 @@ object ColorfulItemStats {
      * REGEX-TEST: Strength: +60 (+20) (+40) (+199.2)
      * REGEX-FAIL: Health: +1000❤
      */
-    private val genericStat by group.pattern(
+    private val genericStat by patternGroup.pattern(
         "generic-stats-no-color",
         "(?<stat>[a-zA-Z ]+): (?<bonus>[-+]?[\\d.,%s]+)(?:\\s|$)",
     )

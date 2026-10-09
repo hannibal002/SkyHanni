@@ -36,11 +36,11 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.getRawBaseStats
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -56,14 +56,15 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
-import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -78,6 +79,7 @@ import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.chunk.LevelChunk
+import org.lwjgl.glfw.GLFW
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AnnotationNode
@@ -158,7 +160,7 @@ object SkyHanniDebugsAndTests {
     private var testLocation: LorenzVec? = null
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         testLocation?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
             event.drawDynamicText(it, "Debug Test", 1.5)
@@ -380,15 +382,19 @@ object SkyHanniDebugsAndTests {
     private var skinId: String? = null
     private var skinIdTime: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    @HandleEvent(GuiKeyPressEvent::class, onlyOnSkyblock = true)
-    fun onGuiKeyPress() {
-        onKeyPressCopyCosmeticsData()
-        onKeybind()
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onGuiKeyPress(event: GuiKeyPressEvent) {
+        if (debugConfig.copyCosmeticsSkullData.isKeyHeld()) {
+            val stack = event.stackUnderCursor ?: return
+            copyCosmeticsData(stack)
+        }
+        if (debugConfig.copyInternalName.isKeyHeld()) {
+            val stack = event.stackUnderCursor ?: return
+            copyInternalName(stack)
+        }
     }
 
-    private fun onKeybind() {
-        if (!debugConfig.copyInternalName.isKeyHeld()) return
-        val stack = stackUnderCursor() ?: return
+    private fun copyInternalName(stack: SafeItemStack) {
         val internalName = stack.getInternalNameOrNull() ?: return
         val rawInternalName = internalName.asString()
         OSUtils.copyToClipboard(rawInternalName)
@@ -412,7 +418,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun showItemRarity(event: ToolTipTextEvent) {
+    private fun showItemRarity(event: ToolTipTextEvent) {
         if (!debugConfig.showItemRarity) return
         val itemStack = event.itemStack
 
@@ -421,7 +427,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun showItemCategory(event: ToolTipTextEvent) {
+    private fun showItemCategory(event: ToolTipTextEvent) {
         if (!debugConfig.showItemCategory) return
         val itemStack = event.itemStack
 
@@ -430,7 +436,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowNpcPrice(event: ToolTipTextEvent) {
+    private fun onShowNpcPrice(event: ToolTipTextEvent) {
         if (!debugConfig.showNpcPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
@@ -439,7 +445,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowBaseStats(event: ToolTipTextEvent) {
+    private fun onShowBaseStats(event: ToolTipTextEvent) {
         if (!debugConfig.showBaseValues) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
@@ -454,7 +460,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowCraftPrice(event: ToolTipTextEvent) {
+    private fun onShowCraftPrice(event: ToolTipTextEvent) {
         if (!debugConfig.showCraftPrice) return
         val price = event.itemStack.getInternalNameOrNull()?.getRawCraftCostOrNull() ?: return
 
@@ -462,7 +468,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowBzPrice(event: ToolTipTextEvent) {
+    private fun onShowBzPrice(event: ToolTipTextEvent) {
         if (!debugConfig.showBZPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
@@ -475,7 +481,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowBinPrice(event: ToolTipTextEvent) {
+    private fun onShowBinPrice(event: ToolTipTextEvent) {
         if (!debugConfig.showBinPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
         if (!internalName.isAuctionHouseItem()) return
@@ -486,7 +492,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowItemName(event: ToolTipTextEvent) {
+    private fun onShowItemName(event: ToolTipTextEvent) {
         if (!debugConfig.showItemName) return
         val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
@@ -498,34 +504,33 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item name: '$name§7'")
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
-    fun onGuiRenderOverlay() {
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onGuiRenderOverlay() {
         // TODO: make this not tied to debug HUD
         if (!debugConfig.enabled || !MinecraftCompat.showDebugHud) return
         config.debugPos.renderRenderables(displayList, posLabel = "Test Display")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onOreMined(event: OreMinedEvent) {
+    private fun onOreMined(event: OreMinedEvent) {
         if (!debugConfig.oreEventMessages) return
         val originalOre = event.originalOre?.let { "$it " }.orEmpty()
         val extraBlocks = event.extraBlocks.map { "${it.key.name}: ${it.value}" }
         ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
     }
 
-    @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
-    fun onGuiRender() {
-        val stack = stackUnderCursor() ?: return
-        if (!stack.getLoreComponent().any { it.string.contains("Right-click to preview!") }) return
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onGuiRender() {
+        if (debugConfig.copyCosmeticsSkullData == GLFW.GLFW_KEY_UNKNOWN) return
+        val stack = InventoryCompat.stackUnderCursor() ?: return
+        if (!stack.getCleanLore().any { it.contains("Right-click to preview!") }) return
 
         val internalName = stack.getInternalNameOrNull() ?: return
         skinId = internalName.asString()
         skinIdTime = SimpleTimeMark.now()
     }
 
-    fun onKeyPressCopyCosmeticsData() {
-        if (!debugConfig.copyCosmeticsSkullData.isKeyHeld()) return
-        val stack = stackUnderCursor() ?: return
+    private fun copyCosmeticsData(stack: SafeItemStack) {
         if (!stack.`is`(Items.PLAYER_HEAD)) return
         val skinId = skinId ?: return
         if (skinIdTime.passedSince() > 2.minutes) return
@@ -541,7 +546,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.debugEnabled", "dev.debug.enabled")
         event.move(3, "dev.showInternalName", "dev.debug.showInternalName")
         event.move(3, "dev.showEmptyNames", "dev.debug.showEmptyNames")
@@ -553,7 +558,7 @@ object SkyHanniDebugsAndTests {
 
     @Suppress("LongMethod")
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetconfig") {
             description = "Reloads the config manager and rendering processors of MoulConfig. " +
                 "This §cWILL RESET §7your config, but also update the config files " +
