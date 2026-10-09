@@ -201,7 +201,6 @@ fun buildErrorComment(message: String, fix: String): String = buildString {
     } else {
         appendLine("GITHUB_RUN_ID is null, good luck finding the issue ;)")
     }
-
 }
 
 val Int.isHttpError: Boolean get() = this !in 200..299
@@ -985,6 +984,7 @@ fun buildGenericFailureBody(conclusion: String): String = buildString {
 fun runBuildMode(prNumber: String) {
     val log1 = readBuildLog(System.getenv("ARTIFACT_DIR_1"))
     val log2 = readBuildLog(System.getenv("ARTIFACT_DIR_2"))
+    val log3 = readBuildLog(System.getenv("ARTIFACT_DIR_3"))
 
     buildComment.staleExisting(prNumber)
 
@@ -1006,7 +1006,7 @@ fun runBuildMode(prNumber: String) {
         exitProcess(0)
     }
 
-    val versions = filterStonecutterDuplicates(listOf("26.1" to log1, "26.2" to log2))
+    val versions = filterStonecutterDuplicates(listOf("26.1" to log1, "26.2" to log2, "26.3" to log3))
     buildComment.post(prNumber, buildBuildFailureBody(versions)) {
         "Error: could not post build failure comment (HTTP $it)"
     }

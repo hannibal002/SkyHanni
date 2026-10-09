@@ -28,7 +28,7 @@ plugins {
 }
 
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
-val primaryTarget = ProjectTarget.MODERN_26200
+val primaryTarget = ProjectTarget.MODERN_26300
 
 // Toolchains:
 java {
@@ -52,7 +52,7 @@ loom.apply {
 
     runs {
         named("client") {
-            isIdeConfigGenerated = true
+            generateRunConfig.set(true)
             preferGradleTask = true
             appendProjectPathToDisplayName.set(true)
             this.runDirectory = rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir)
@@ -165,16 +165,19 @@ dependencies {
     "productionRuntimeMods"(target.hypixelModApiFabricVersion)
 
     val reiVersion = when (target) {
+        ProjectTarget.MODERN_26300 -> null
         ProjectTarget.MODERN_26200 -> "26.2.820"
         ProjectTarget.MODERN_26100 -> "26.1.819"
     }
-    val reiApi = "me.shedaniel:RoughlyEnoughItems-api:$reiVersion"
-    compileOnly(reiApi) { isTransitive = false }
-    "minecraftTestClientRuntimeLibraries"(reiApi) {
-        isTransitive = false
+    if (reiVersion != null) {
+        val reiApi = "me.shedaniel:RoughlyEnoughItems-api:$reiVersion"
+        compileOnly(reiApi) { isTransitive = false }
+        "minecraftTestClientRuntimeLibraries"(reiApi) {
+            isTransitive = false
+        }
+        compileOnly(libs.basicMath)
+        "minecraftTestClientRuntimeLibraries"(libs.basicMath)
     }
-    compileOnly(libs.basicMath)
-    "minecraftTestClientRuntimeLibraries"(libs.basicMath)
 
     // getting clock offset
     shadowImpl(libs.commons.net)
@@ -469,7 +472,18 @@ tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.config
 }
 
 tasks.withType<ValidateAccessWidenerTask>().configureEach {
-    dependsOn("stonecutterPrepare")
+    dependsOn("stonecutterGenerate")
+}
+
+tasks.withType<ProcessResources>().configureEach {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+    // Taken From SkyOcean, this is a workaround since stonecutter does not work in shaders
+    if (stonecutter.eval(stonecutter.current.version, "< 26.3")) {
+        filesMatching(listOf("**/*.fsh", "**/*.vsh")) {
+            filter { if (it.startsWith("#include")) "#moj_import ${it.substringAfter(' ')}" else it }
+        }
+    }
 }
 
 repositories {

@@ -1,16 +1,23 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import net.minecraft.util.Util
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 import kotlin.time.Duration
+import kotlinx.coroutines.Job
+
+//? if >= 26.3 {
+import com.mojang.blaze3d.Blaze3D
+import java.net.URI
+//?} else {
+/*import net.minecraft.util.Util
+*///?}
 
 object OSUtils {
-
     enum class OperatingSystem {
         LINUX,
         SOLARIS,
@@ -24,12 +31,11 @@ object OSUtils {
     fun getOperatingSystem(): OperatingSystem {
         val osName = getOperatingSystemRaw().lowercase()
         return when {
-            osName.contains("win") -> OperatingSystem.WINDOWS
-            osName.contains("mac") -> OperatingSystem.MACOS
-            osName.contains("solaris") || osName.contains("sunos") -> OperatingSystem.SOLARIS
-            osName.contains("linux") || osName.contains("unix") -> OperatingSystem.LINUX
-
-            else -> OperatingSystem.UNKNOWN
+            osName.contains("win") -> WINDOWS
+            osName.contains("mac") -> MACOS
+            osName.contains("solaris") || osName.contains("sunos") -> SOLARIS
+            osName.contains("linux") || osName.contains("unix") -> LINUX
+            else -> UNKNOWN
         }
     }
 
@@ -40,23 +46,23 @@ object OSUtils {
 
     init {
         val os = getOperatingSystem()
-        isWindows = os == OperatingSystem.WINDOWS
-        isMac = os == OperatingSystem.MACOS
-        isLinux = os == OperatingSystem.LINUX
-        isSolaris = os == OperatingSystem.SOLARIS
+        isWindows = os == WINDOWS
+        isMac = os == MACOS
+        isLinux = os == LINUX
+        isSolaris = os == SOLARIS
     }
 
     @JvmStatic
     fun openBrowser(url: String) {
-        Util.getPlatform().openUri(url)
+        //? if >= 26.3 {
+        Blaze3D.openUri(URI(url))
+        //?} else
+        //Util.getPlatform().openUri(url)
     }
 
     @JvmStatic
-    @Suppress("MaxLineLength")
     fun openSoundsListInBrowser() {
-        val url = "https://misode.github.io/sounds/"
-
-        openBrowser(url)
+        openBrowser("https://misode.github.io/sounds/")
     }
 
     @Deprecated(
@@ -90,6 +96,8 @@ object OSUtils {
     private fun File.isEmptyFile() = length() == 0L
     private fun File.isEmptyDirectory() = listFiles()?.isEmpty() == true
 
+    private val backgroundDeleteCoroutine = CoroutineSettings("deleteExpiredFiles")
+
     /**
      * Recursively deletes files and directories inside the root directory.
      *
@@ -98,38 +106,33 @@ object OSUtils {
      * Directories are removed if they are empty after file deletion.
      * Files modified on the three most recent distinct dates are always retained.
      *
-     * @param root the starting directory for recursive deletion.
-     * @param expiryDuration the duration threshold used to determine if a file is expired.
+     * @param root The starting directory for recursive deletion.
+     * @param expiryDuration The duration threshold used to determine if a file is expired.
      */
-    fun deleteExpiredFiles(root: File, expiryDuration: Duration) {
-        SkyHanniMod.launchCoroutine("deleteExpiredFiles") {
-            val allFiles = root.walk().filter { it.isFile }.toList()
-            val lastModified = allFiles.associateWith { file ->
-                file.lastModifiedTime()
-            }
+    fun deleteExpiredFiles(root: File, expiryDuration: Duration): Job = backgroundDeleteCoroutine.launch {
+        val allFiles = root.walk().filter { it.isFile }.toList()
+        val lastModified = allFiles.associateWith { file ->
+            file.lastModifiedTime()
+        }
 
-            @Suppress("ConvertCallChainIntoSequence")
-            val recentDays = lastModified.mapNotNull { it.value.toLocalDate() }
-                .distinct()
-                .sortedDescending()
-                .take(3)
-                .toSet()
+        val recentDays = lastModified
+            .asSequence()
+            .mapNotNull { it.value.toLocalDate() }
+            .distinct()
+            .sortedDescending()
+            .take(3)
+            .toSet()
 
-            root.walkBottomUp().forEach { file ->
-                when {
-                    file.isFile -> {
-                        val lastModifiedTime = lastModified[file] ?: file.lastModifiedTime()
-                        if (lastModifiedTime.toLocalDate() in recentDays) return@forEach
+        root.walkBottomUp().forEach { file ->
+            if (file.isFile) {
+                val lastModifiedTime = lastModified[file] ?: file.lastModifiedTime()
+                if (lastModifiedTime.toLocalDate() in recentDays) return@forEach
 
-                        if (file.isEmptyFile() || file.isExpired(expiryDuration, lastModifiedTime)) {
-                            file.deleteWithError()
-                        }
-                    }
-
-                    file.isDirectory && file.isEmptyDirectory() -> {
-                        file.deleteWithError()
-                    }
+                if (file.isEmptyFile() || file.isExpired(expiryDuration, lastModifiedTime)) {
+                    file.deleteWithError()
                 }
+            } else if (file.isDirectory && file.isEmptyDirectory()) {
+                file.deleteWithError()
             }
         }
     }

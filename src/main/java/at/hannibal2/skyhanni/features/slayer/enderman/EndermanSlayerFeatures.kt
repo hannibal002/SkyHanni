@@ -34,17 +34,16 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster.Enderman
 import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.seconds
 
 // TODO replace all drawLineToEye with LineToMobHandler
 @SkyHanniModule
 object EndermanSlayerFeatures {
-
     private val config get() = SlayerApi.config.endermen
     private val beaconConfig get() = config.beacon
-    private val endermenWithBeacons = mutableListOf<EnderMan>()
+    private val endermenWithBeacons = mutableListOf<Enderman>()
     private val flyingBeacons = mutableSetOf<ArmorStand>()
     private val nukekubiSkulls = mutableSetOf<ArmorStand>()
     private var sittingBeacon = mapOf<LorenzVec, SimpleTimeMark>()
@@ -57,7 +56,7 @@ object EndermanSlayerFeatures {
         val entity = event.entity
         if (entity in endermenWithBeacons || entity in flyingBeacons) return
 
-        if (entity is EnderMan && showBeacon() && hasBeaconInHand(entity) && entity.canBeSeen(
+        if (entity is Enderman && showBeacon() && hasBeaconInHand(entity) && entity.canBeSeen(
                 viewDistance = 15.0,
                 ignoreFrustum = true
             )
@@ -95,7 +94,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun hasBeaconInHand(enderman: EnderMan) = enderman.getBlockInHand()?.block == Blocks.BEACON
+    private fun hasBeaconInHand(enderman: Enderman) = enderman.getBlockInHand()?.block == Blocks.BEACON
 
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 

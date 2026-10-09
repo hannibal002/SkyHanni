@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityRenderDispatcher.class)
 public abstract class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRenderState> {
-
     @Inject(method = "submit", at = @At(value = "HEAD"), cancellable = true)
     public void onRenderPre(EntityRenderState renderState, CameraRenderState cameraRenderState, double d, double e, double f, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
         EntityRenderDispatcherHookKt.setEntity(renderState);
@@ -44,7 +43,16 @@ public abstract class MixinEntityRenderDispatcher<E extends Entity, S extends En
     }
 
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
-    private void shouldRender(Entity entity, Frustum camera, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir) {
+    private void shouldRender(
+        Entity entity,
+        Frustum culler,
+        double camX,
+        double camY,
+        double camZ,
+        //? if >= 26.3
+        float partialTicks,
+        CallbackInfoReturnable<Boolean> cir
+    ) {
         if (!EntityData.shouldRender(entity, camX, camY, camZ)) {
             cir.setReturnValue(false);
         }

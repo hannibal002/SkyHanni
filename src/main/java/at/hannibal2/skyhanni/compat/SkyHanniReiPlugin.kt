@@ -1,6 +1,9 @@
+@file:Suppress("NoEmptyFile")
+
 package at.hannibal2.skyhanni.compat
 
-import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
+//? if rei_compat {
+/*import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import me.shedaniel.math.Rectangle
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin
 import me.shedaniel.rei.api.client.registry.screen.DisplayBoundsProvider
@@ -34,3 +37,4 @@ private class SkyHanniDisplayBoundsProvider : DisplayBoundsProvider<SkyHanniBase
         return SkyHanniBaseScreen::class.java.isAssignableFrom(screen)
     }
 }
+*///?}

@@ -21,7 +21,6 @@ import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import org.joml.Vector2i
-import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -38,8 +37,8 @@ object GuiEditManager {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
-        if (event.keyCode == GLFW.GLFW_KEY_ENTER) {
+        if (event.key != SkyHanniMod.feature.gui.keyBindOpen) return
+        if (event.key == KEY_RETURN) {
             ChatUtils.chat("You can't use Enter as a keybind to open the gui editor!")
             return
         }

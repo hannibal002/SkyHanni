@@ -1,12 +1,22 @@
-#version 150
+#version 330
 
+#ifdef NO_LAYOUT
 in vec2 texCoord;
 in vec4 roundedParams0;
 in vec4 roundedParams1;
 
-uniform sampler2D Sampler0;
-
 out vec4 outColor;
+#else
+#extension GL_ARB_separate_shader_objects : require
+
+layout(location = 0) in vec2 texCoord;
+layout(location = 1) in vec4 roundedParams0;
+layout(location = 2) in vec4 roundedParams1;
+
+layout(location = 0) out vec4 outColor;
+#endif
+
+uniform sampler2D Sampler0;
 
 float roundedRectSDF(vec2 center, vec2 halfSize, float radius) {
     return length(max(abs(center) - halfSize + radius, 0.0)) - radius;

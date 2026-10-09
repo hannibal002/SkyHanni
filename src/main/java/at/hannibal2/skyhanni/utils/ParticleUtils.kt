@@ -27,9 +27,18 @@ object ParticleUtils {
                 type = packet.particle.type,
                 location = packet.toLorenzVec(),
                 count = packet.count,
-                speed = packet.maxSpeed,
+                //? if >= 26.3 {
+                xSpeed = packet.xMaxSpeed,
+                ySpeed = packet.yMaxSpeed,
+                zSpeed = packet.zMaxSpeed,
+                //?} else {
+                /*xSpeed = packet.maxSpeed,
+                ySpeed = packet.maxSpeed,
+                zSpeed = packet.maxSpeed,
+                *///?}
                 offset = packet.toOffset(),
-                longDistance = packet.isOverrideLimiter,
+                //~ if < 26.3 'overrideLimiter' -> 'isOverrideLimiter'
+                longDistance = packet.overrideLimiter(),
             ).post().isCancelled
         ) {
             packet.shouldSuppress = true

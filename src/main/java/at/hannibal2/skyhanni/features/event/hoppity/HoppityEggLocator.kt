@@ -140,7 +140,6 @@ object HoppityEggLocator {
                 // TODO add chroma color support via config
                 drawColor(eggLocation, LorenzColor.RED.toChromaColor(), false, alpha)
                 drawDynamicText(eggLocation.up(), "§cDuplicate Location!", 1.5)
-
             }
         }
     }
@@ -228,7 +227,8 @@ object HoppityEggLocator {
         it.distance(location) < 5.0
     }
 
-    private fun ParticleEvent.isVillagerParticle() = type == ParticleTypes.HAPPY_VILLAGER && speed == 0f && count == 1
+    // TODO verify on 26.3
+    private fun ParticleEvent.isVillagerParticle() = type == ParticleTypes.HAPPY_VILLAGER && isSpeed(0f) && count == 1
 
     fun isEnabled() =
         SkyBlockUtils.inSkyBlock && config.waypoints.enabled && !GardenApi.inGarden() && !ReminderUtils.isBusy(true) &&

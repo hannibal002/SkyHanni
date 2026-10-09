@@ -20,7 +20,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ArachneSpawnTimer {
-
     private val config get() = SkyHanniMod.feature.combat.mobs
 
     private val patternGroup = RepoPattern.group("combat.mobs.spawntime.arachne")
@@ -101,7 +100,8 @@ object ArachneSpawnTimer {
 
         val location = event.location.roundTo(2)
         if (arachneAltarLocation.distance(location) > 30) return
-        if (event.type == ParticleTypes.DUST && event.speed == 1f) {
+        // TODO verify on 26.3
+        if (event.type == ParticleTypes.DUST && event.isSpeed(1f)) {
             particleCounter += 1
         }
     }

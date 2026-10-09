@@ -13,8 +13,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -204,7 +202,7 @@ object HarpFeatures {
         if (index == -1) return // this should never happen unless there's an update
 
         val keyCode = getKey(index) ?: return
-        event.stackTip = KeyboardManager.getKeyName(keyCode).take(3)
+        event.stackTip = keyCode.displayName.take(3)
     }
 
     @HandleEvent

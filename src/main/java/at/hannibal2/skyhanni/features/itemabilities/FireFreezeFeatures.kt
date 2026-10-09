@@ -40,7 +40,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FireFreezeFeatures {
-
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.fireFreeze
     private const val PARTICLE_OFFSET = 3.921568568330258E-4
 
@@ -126,7 +125,8 @@ object FireFreezeFeatures {
     @HandleEvent(onlyOnSkyblock = true, receiveCancelled = true)
     fun onParticle(event: ParticleEvent) {
         if (event.type != ParticleTypes.DUST) return
-        if (event.count != 0 || event.speed != 1.0f || !event.isFreezeParticle()) return
+        // TODO verify on 26.3
+        if (event.count != 0 || !event.isSpeed(1.0f) || !event.isFreezeParticle()) return
         if (!config.customCircle) return
         if (event.location.isInAnyFireFreeze()) event.cancel()
     }
@@ -224,5 +224,4 @@ object FireFreezeFeatures {
     private fun timeFromPitch(pitch: Float): ServerTimeMark = ServerTimeMark.now() + (2.0 * pitch + 1).seconds
 
     private fun Rotations.isZero(): Boolean = x == 0.0f && y == 0.0f && z == 0.0f
-
 }

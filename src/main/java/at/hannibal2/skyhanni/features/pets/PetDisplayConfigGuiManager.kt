@@ -9,10 +9,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
@@ -121,7 +121,7 @@ object PetDisplayConfigGuiManager {
         var position = (previewPosition ?: PreviewPosition(defaultLeft, defaultTop))
             .clamped(paneWidth, paneHeight, screenWidth, screenHeight)
         val (mouseX, mouseY) = GuiScreenUtils.mousePos
-        val isMouseDown = MouseCompat.isButtonDown(0)
+        val isMouseDown = InputCode.LEFT_MOUSE.isKeyHeld()
         val isHeaderHovered = mouseX in position.left..(position.left + paneWidth) &&
             mouseY in position.top..(position.top + INNER_PAD + LABEL_HEIGHT)
 

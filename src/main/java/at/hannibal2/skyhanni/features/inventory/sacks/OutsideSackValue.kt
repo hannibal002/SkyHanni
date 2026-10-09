@@ -10,11 +10,11 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.MinMaxNumber
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -162,10 +162,10 @@ object OutsideSackValue {
     }
 
     private fun onAnyClick() = mapOf(
-        KeyboardManager.RIGHT_MOUSE to {
+        InputCode.RIGHT_MOUSE to {
             HypixelCommands.sacks()
         },
-        KeyboardManager.LEFT_MOUSE to {
+        InputCode.LEFT_MOUSE to {
             advanced = !advanced
             reset()
         },

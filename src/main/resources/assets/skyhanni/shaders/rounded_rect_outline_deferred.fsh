@@ -1,10 +1,20 @@
-#version 150
+#version 330
 
+#ifdef NO_LAYOUT
 in vec4 vertexColor;
 in vec4 roundedParams0;
 in vec4 roundedParams1;
 
 out vec4 fragColor;
+#else
+#extension GL_ARB_separate_shader_objects : require
+
+layout(location = 0) in vec4 vertexColor;
+layout(location = 1) in vec4 roundedParams0;
+layout(location = 2) in vec4 roundedParams1;
+
+layout(location = 0) out vec4 fragColor;
+#endif
 
 float roundedRectSDF(vec2 center, vec2 halfSize, float radius) {
     return length(max(abs(center) - halfSize + radius, 0.0)) - radius;

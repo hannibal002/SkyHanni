@@ -1,16 +1,18 @@
+@file:Suppress("NoEmptyFile")
+
 package at.hannibal2.skyhanni.compat
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
+//? if iris_compat {
+/*import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.utils.InitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import com.mojang.blaze3d.pipeline.RenderPipeline
+import com.mojang.renderpearl.api.pipeline.RenderPipeline
 
 @SkyHanniModule
 object IrisCompat {
-
     private const val IRIS_BASE_PATH = "net.irisshaders.iris.api.v0"
     private const val IRIS_PROGRAM_PATH = "$IRIS_BASE_PATH.IrisProgram"
     private const val IRIS_API_PATH = "$IRIS_BASE_PATH.IrisApi"
@@ -31,7 +33,7 @@ object IrisCompat {
     }
 
     @HandleEvent
-    fun onInitFinished(event: InitFinishedEvent) {
+    private fun onInitFinished(event: InitFinishedEvent) {
         if (!isIrisLoaded) return
         try {
             val irisApiClass = Class.forName(IRIS_API_PATH)
@@ -57,3 +59,4 @@ object IrisCompat {
         }
     }
 }
+*///?}
