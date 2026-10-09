@@ -29,7 +29,6 @@ jobs:
             fail-fast: false
             matrix:
                 minecraft_version:
-                    - "26.1"
                     - "26.2"
         steps:
             -   name: Checkout code

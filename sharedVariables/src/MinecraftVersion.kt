@@ -13,7 +13,6 @@ enum class MinecraftVersion(
     val versionNameOverride: String? = null,
     val moulconfigMinecraftVersionOverride: String? = null,
 ) {
-    MC26100("26.1", 25, versionNameOverride = "26.1.2"),
     MC26200("26.2", 25),
     ;
 

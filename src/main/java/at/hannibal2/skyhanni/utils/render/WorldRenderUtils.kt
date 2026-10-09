@@ -21,14 +21,17 @@ import at.hannibal2.skyhanni.utils.compat.position
 import at.hannibal2.skyhanni.utils.compat.rotation
 import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.addChainedFilledBoxVertices
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.notenoughupdates.moulconfig.ChromaColour
+import net.fabricmc.fabric.api.client.rendering.v1.SubmitRenderPhases
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font.DisplayMode
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
+import net.minecraft.client.renderer.feature.TextFeatureRenderer
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
@@ -43,14 +46,6 @@ import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
-
-//? if >= 26.2 {
-import net.fabricmc.fabric.api.client.rendering.v1.SubmitRenderPhases
-import net.minecraft.client.renderer.feature.TextFeatureRenderer
-//?} else {
-/*import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEventLegacy
-*///?}
 
 @SkyHanniModule
 @Suppress("LargeClass")
@@ -70,7 +65,6 @@ object WorldRenderUtils {
         if (displayMode == SEE_THROUGH) {
             // MC-298659: the vanilla text phase renders before translucent terrain, letting water
             // draw over see-through text. Render only our own text after translucent terrain instead.
-            //? if >= 26.2 {
             submitNodeCollector.submitCustom(
                 SubmitRenderPhases.AFTER_TERRAIN,
                 TextFeatureRenderer.Submit(
@@ -86,11 +80,6 @@ object WorldRenderUtils {
                     0,
                 ),
             )
-            //?} else {
-            /*queuedSeeThroughText.add(
-                SeeThroughText(Matrix4f(matrices.last().pose()), x, y, text, shadow, light, color, backgroundColor),
-            )
-            *///?}
             return
         }
 
@@ -107,46 +96,6 @@ object WorldRenderUtils {
             0,
         )
     }
-
-    //? if < 26.2 {
-    /*private val queuedSeeThroughText = mutableListOf<SeeThroughText>()
-
-    private data class SeeThroughText(
-        val pose: Matrix4f,
-        val x: Float,
-        val y: Float,
-        val text: FormattedCharSequence,
-        val shadow: Boolean,
-        val light: Int,
-        val color: Int,
-        val backgroundColor: Int,
-    )
-
-    // See the MC-298659 note in submitOrderedText.
-    @HandleEvent
-    private fun onRenderWorldLegacy(event: SkyHanniRenderWorldEventLegacy) {
-        if (queuedSeeThroughText.isEmpty()) return
-        try {
-            val fr = Minecraft.getInstance().font
-            for (entry in queuedSeeThroughText) {
-                fr.drawInBatch(
-                    entry.text,
-                    entry.x,
-                    entry.y,
-                    entry.color,
-                    entry.shadow,
-                    entry.pose,
-                    event.bufferSource,
-                    DisplayMode.SEE_THROUGH,
-                    entry.backgroundColor,
-                    entry.light,
-                )
-            }
-        } finally {
-            queuedSeeThroughText.clear()
-        }
-    }
-    *///?}
 
     inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
         layer: RenderType,
@@ -936,7 +885,6 @@ object WorldRenderUtils {
         )
     }
 
-    //~ if < 26.2 'mainCamera()' -> 'mainCamera'
     fun getViewerPos() = exactLocation(Minecraft.getInstance().gameRenderer.mainCamera())
 
     fun AABB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
@@ -1081,6 +1029,5 @@ object WorldRenderUtils {
     /**
      * Returns true if the camera is underwater.
      */
-    //~ if < 26.2 'mainCamera()' -> 'mainCamera'
     fun isRenderingUnderwater() = Minecraft.getInstance().gameRenderer.mainCamera().fluidInCamera == FogType.WATER
 }

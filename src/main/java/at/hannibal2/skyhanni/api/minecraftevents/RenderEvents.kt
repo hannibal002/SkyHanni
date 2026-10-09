@@ -27,11 +27,8 @@ object RenderEvents {
             RenderEvents::postGui
         )
 
-        PictureInPictureRendererRegistry.register { ctx ->
-            SkyHanniPipCoordinatorRenderer(
-                //? if < 26.2
-                //ctx.bufferSource()
-            )
+        PictureInPictureRendererRegistry.register { _ ->
+            SkyHanniPipCoordinatorRenderer()
         }
     }
 

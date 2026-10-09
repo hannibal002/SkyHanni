@@ -5,14 +5,6 @@ enum class ModrinthInfo(
     val loader: String,
     val dependencies: Map<ModrinthDependency, DependencyType>,
 ) {
-    FABRIC_26_1(
-        minecraftVersions = listOf("26.1", "26.1.1", "26.1.2"),
-        loader = "fabric",
-        dependencies = mapOf(
-            ModrinthDependency.FABRIC_API to DependencyType.REQUIRED,
-            ModrinthDependency.FABRIC_LANGUAGE_KOTLIN to DependencyType.REQUIRED,
-        )
-    ),
     FABRIC_26_2(
         minecraftVersions = listOf("26.2"),
         loader = "fabric",

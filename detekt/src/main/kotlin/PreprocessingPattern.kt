@@ -1,6 +1,6 @@
 enum class PreprocessingPattern(val text: String) {
     IF("//? if"),
-    ELSEIF("//?} elseif"),
+    ELSEIF("//?} elif"),
     ELSE("//?} else"),
     ENDIF("//?}"),
     ;
