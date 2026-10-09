@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
@@ -78,10 +79,11 @@ object PigFeaturesApi {
      * REGEX-TEST: SHINY! You received a Shiny Token and +1,000 Foraging XP from the Shiny Pig's orb!
      * REGEX-TEST: SHINY! You received a Shiny Token and 16x Enchanted Potato from the Shiny Pig's orb!
      * REGEX-TEST: SHINY! You received a Shiny Token and +5,000 Combat XP from the Shiny Pig's orb!
+     * REGEX-TEST: SHINY! You received a Shiny Token, +19,500 Coins, and Harvesting VI from the Shiny Pig's orb!
      */
     private val orbLootedChatPattern by patternGroup.pattern(
         "chat.orb.looted",
-        "SHINY! You received a Shiny Token and (?<reward>.+) from the Shiny Pig's orb!",
+        "SHINY! You received a Shiny Token(?: and |, )(?<reward>.+?)(?:, and (?<reward2>.+?))? from the Shiny Pig's orb!",
     )
 
     /**
@@ -112,12 +114,12 @@ object PigFeaturesApi {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         data.clear()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isYearOfThePig()) return
         val message = event.cleanMessage
 
@@ -127,7 +129,13 @@ object PigFeaturesApi {
         }
 
         orbLootedChatPattern.matchMatcher(message) {
-            handleLootedOrb(group("reward"))
+            val rewards = buildList {
+                add(group("reward"))
+                groupOrNull("reward2")?.let(::add)
+                groupOrNull("reward3")?.let(::add)
+            }
+
+            handleLootedOrb(rewards)
             tryToRemoveOrb()
         }
 
@@ -150,30 +158,34 @@ object PigFeaturesApi {
         }
     }
 
-    private fun handleLootedOrb(reward: String) {
-        coinsRewardPattern.matchMatcher(reward) {
-            val amount = group("amount").formatIntOrNull() ?: return@matchMatcher
-            ShinyOrbLootedEvent(coins = amount).post()
-            return tryToRemoveOrb()
+    private fun handleLootedOrb(rewards: List<String>) {
+        val parsedRewards = rewards.mapNotNull { reward ->
+            coinsRewardPattern.matchMatcher(reward) {
+                val amount = group("amount").formatIntOrNull() ?: return@matchMatcher null
+                return@mapNotNull ShinyOrbLootedEvent.Reward.Coins(amount)
+            }
+
+            skillXpRewardPattern.matchMatcher(reward) {
+                val amount = group("amount").formatIntOrNull() ?: return@matchMatcher null
+                val skill = SkillType.getByNameOrNull(group("skill")) ?: return@matchMatcher null
+                return@mapNotNull ShinyOrbLootedEvent.Reward.SkillXp(skill, amount)
+            }
+
+            val (lootName, lootAmount) = ItemUtils.readItemAmount(reward) ?: return@mapNotNull null
+            val lootInternalName = NeuInternalName.fromItemNameOrNull(lootName) ?: run {
+                ErrorManager.skyHanniError("Could not find internal name for §c\"$lootName§c\"")
+            }
+
+            ShinyOrbLootedEvent.Reward.Loot(lootInternalName, lootAmount)
         }
 
-        skillXpRewardPattern.matchMatcher(reward) {
-            val amount = group("amount").formatIntOrNull() ?: return@matchMatcher
-            val skill = SkillType.getByNameOrNull(group("skill")) ?: return@matchMatcher
-            ShinyOrbLootedEvent(skillXp = skill to amount.toLong()).post()
-            return tryToRemoveOrb()
+        if (parsedRewards.isNotEmpty()) {
+            ShinyOrbLootedEvent(parsedRewards).post()
         }
-
-        val (lootName, lootAmount) = ItemUtils.readItemAmount(reward) ?: return
-        val lootInternalName = NeuInternalName.fromItemNameOrNull(lootName) ?: run {
-            ErrorManager.skyHanniError("Could not find internal name for §c\"$lootName§c\"")
-        }
-        ShinyOrbLootedEvent(loot = lootInternalName to lootAmount).post()
-        tryToRemoveOrb()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onEntityClick(event: EntityClickEvent) {
+    private fun onEntityClick(event: EntityClickEvent) {
         if (!isYearOfThePig()) return
 
         if (InventoryUtils.getItemInHand()?.getInternalNameOrNull() != SHINY_ORB_ITEM) return
