@@ -37,7 +37,7 @@ object SkyMartCopperPrice {
     @HandleEvent
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        if (!event.inventoryName.startsWith("SkyMart ")) return
+        if (!event.inventoryName.matches(Regex("(\\(\\d+/\\d+\\) )?SkyMart .*"))) return
 
         DelayedRun.runOrNextTick {
             inInventory = true
