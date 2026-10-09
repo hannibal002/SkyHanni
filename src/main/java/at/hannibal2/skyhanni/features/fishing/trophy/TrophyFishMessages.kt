@@ -41,7 +41,7 @@ object TrophyFishMessages {
     @Suppress("MaxLineLength")
     val trophyFishPattern by RepoPattern.pattern(
         "fishing.trophy.trophyfish.colorless",
-        "${SkyblockStat.TROPHY_FISH_CHANCE.hypixelIcon} TROPHY FISH! You caught an? (?<displayName>[\\w -]+?) (?<displayRarity>[A-Z]+)(?: x(?<amount>\\d+))?!",
+        "${SkyblockStat.TROPHY_CHANCE.hypixelIcon} TROPHY FISH! You caught an? (?<displayName>[\\w -]+?) (?<displayRarity>[A-Z]+)(?: x(?<amount>\\d+))?!",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -149,7 +149,7 @@ object TrophyFishMessages {
                 }
             }
             componentBuilder {
-                append(SkyblockStat.TROPHY_FISH_CHANCE.icon)
+                append(SkyblockStat.TROPHY_CHANCE.icon)
                 appendWithColor(" TROPHY FISH! ", ChatFormatting.GOLD) {
                     bold = true
                 }
