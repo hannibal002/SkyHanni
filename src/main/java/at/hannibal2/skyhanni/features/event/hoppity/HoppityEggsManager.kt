@@ -326,7 +326,7 @@ object HoppityEggsManager {
                 actionName = actionName,
                 action = action,
             )
-        } else ChatUtils.chat(message, replaceSameMessage = true)
+        } else ChatUtils.notifyOrDisable(message, unclaimedEggsConfig::warningsEnabled)
         TitleManager.sendTitle("§e$amount Hoppity Eggs!")
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
