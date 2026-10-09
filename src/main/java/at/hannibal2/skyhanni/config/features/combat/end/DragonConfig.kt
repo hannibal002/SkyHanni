@@ -22,23 +22,32 @@ class DragonConfig {
 
     @Expose
     @ConfigOption(
-        name = "Weight HUD",
-        desc = "Shows your current dragon weight on the HUD and if hovered shows the breakdown." +
+        name = "Damage List HUD",
+        desc = "Shows a list of all damage sources and their damage during the dragon fight." +
             " The dragon widget needs to be enabled for this to work."
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var display: Boolean = false
+    var damageList: Boolean = false
 
     @Expose
-    @ConfigLink(owner = DragonConfig::class, field = "display")
-    val displayPosition: Position = Position(120, 40)
+    @ConfigLink(owner = DragonConfig::class, field = "damageList")
+    val damageListPosition: Position = Position(120, 150)
+
+    @Expose
+    @ConfigOption(
+        name = "Rare Drop Alert",
+        desc = "Announces the major loot of a dragon fight in chat, with a title for the rarest."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var dropAlert: Boolean = false
 
     @Expose
     @ConfigOption(name = "Weight Message", desc = "Shows your dragon weight in chat after the dragon died.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var chat: Boolean = true
+    var chat: Boolean = false
 
     @Expose
     @ConfigOption(name = "Skyhanni Prefix", desc = "Displays the Skyhanni prefix in the dragon weight message.")

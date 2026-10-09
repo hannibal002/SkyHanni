@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.combat.damageindicator
 import at.hannibal2.skyhanni.data.ElectionApi.ignoreDerpy
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.features.combat.end.golem.GolemLocation
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -349,7 +350,7 @@ class MobFinder {
     }
 
     private fun tryAddEntityIronGolem(mob: Mob) = when {
-        mob.name == "Endstone Protector" -> EntityResult(bossType = BossType.END_ENDSTONE_PROTECTOR)
+        mob.name == GolemLocation.GOLEM_NAME -> EntityResult(bossType = BossType.END_ENDSTONE_PROTECTOR)
         // TODO use Gaia Construct Name
         mob.baseEntity.hasMaxHealth(1_500_000) -> {
             EntityResult(bossType = BossType.GAIA_CONSTRUCT)

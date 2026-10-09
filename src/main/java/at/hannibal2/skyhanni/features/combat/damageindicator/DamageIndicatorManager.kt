@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.combat.end.DragonFightAPI
+import at.hannibal2.skyhanni.features.combat.end.dragon.DragonFightApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi
@@ -591,10 +591,10 @@ object DamageIndicatorManager {
     }
 
     private fun checkEnderDragon(entityData: EntityData): String {
-        DragonFightAPI.currentType?.let {
+        DragonFightApi.currentType?.let {
             entityData.namePrefix = "§c§l$it "
         }
-        return DragonFightAPI.currentHp?.let {
+        return DragonFightApi.currentHp?.let {
             "§c${it.shortFormat()}"
         }.orEmpty()
     }

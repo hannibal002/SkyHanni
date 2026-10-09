@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.combat.end
+package at.hannibal2.skyhanni.features.combat.end.dragon
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -16,8 +16,15 @@ import java.util.UUID
 import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Works out what a finished dragon fight dropped and hands the result to [DragonProfitTracker].
+ *
+ * Visible drops are read from their floating item labels; everything the scan cannot see is
+ * derived from the fight weight, which is why the numbers for fragments and pearls are estimates
+ * rather than measurements.
+ */
 @SkyHanniModule
-object ProfitPerDragon {
+object DragonLootDetection {
     var finishedLoot = true
 
     private val scannedLootUUIDs = mutableSetOf<UUID>()
@@ -36,34 +43,26 @@ object ProfitPerDragon {
         for (entity in entities) {
             val entityName = entity.name.formattedTextCompatLessResets()
             val amount: Int = entityName.split("§8x").last().toIntOrNull() ?: 1
-            val internalNameFromEntityName = NeuInternalName.fromItemNameOrNull(entityName)
+            val internalName = NeuInternalName.fromItemNameOrNull(entityName) ?: continue
+            if (internalName !in DragonProfitTracker.allowedItems.keys) continue
+            if (entity.uuid in scannedLootUUIDs) continue
 
-            if (internalNameFromEntityName in DragonProfitTracker.allowedItems.keys) {
-                if (internalNameFromEntityName == null) {
-                    ChatUtils.debug("Could not find internal name for entity name: $entityName")
-                    continue
-                }
-                if (entity.uuid in scannedLootUUIDs) continue
-
-                ChatUtils.debug("Adding $internalNameFromEntityName x$amount to dragon loot")
-
-                dragonLoot.addOrPut(internalNameFromEntityName, amount)
-
-                scannedLootUUIDs.add(entity.uuid)
-            }
+            ChatUtils.debug("Adding $internalName x$amount to dragon loot")
+            dragonLoot.addOrPut(internalName, amount)
+            scannedLootUUIDs.add(entity.uuid)
         }
 
-        if (dragonLoot.isNotEmpty() && DragonFeatures.weight >= 290) {
-            var weight = DragonFeatures.weight
+        if (dragonLoot.isNotEmpty() && DragonWeight.weight >= 290) {
+            var weight = DragonWeight.weight
             ChatUtils.debug("Weight: $weight")
 
             weight -= DragonProfitTracker.allowedItems[dragonLoot.keys.first()]?.weight ?: 0
             ChatUtils.debug("Weight: $weight after main drop (${dragonLoot.keys.first()})")
 
             calculateNonUniqueLoot(weight)
-        } else if (DragonFeatures.weight < 290) {
-            ChatUtils.debug("Weight: ${DragonFeatures.weight} < 290")
-            calculateNonUniqueLoot(DragonFeatures.weight)
+        } else if (DragonWeight.weight < 290) {
+            ChatUtils.debug("Weight: ${DragonWeight.weight} < 290")
+            calculateNonUniqueLoot(DragonWeight.weight)
         }
     }
 
@@ -135,8 +134,8 @@ object ProfitPerDragon {
     private var lastScanned = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onTick() {
-        if (lastScanned.passedSince() >= 1.seconds && !DragonFeatures.eggSpawned && !finishedLoot) {
+    private fun onTick() {
+        if (lastScanned.passedSince() >= 1.seconds && !DragonFightState.eggSpawned && !finishedLoot) {
             scanForLoot()
             lastScanned = SimpleTimeMark.now()
         }

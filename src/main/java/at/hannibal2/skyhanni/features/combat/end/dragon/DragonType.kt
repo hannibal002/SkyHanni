@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.combat.end
+package at.hannibal2.skyhanni.features.combat.end.dragon
 
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
