@@ -9,13 +9,13 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
-object ArachneMinisNametagHider {
+object ArachneBroodNametagHider {
 
-    private val config get() = SkyHanniMod.feature.combat.mobs
+    private val config get() = SkyHanniMod.feature.combat.mobs.arachneSettings.boss
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.SPIDER_DEN)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStand>) {
-        if (!config.hideNameTagArachneMinis) return
+    private fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStand>) {
+        if (!config.hideNameTagOfBroods) return
 
         val entity = event.entity
         if (!entity.hasCustomName()) return

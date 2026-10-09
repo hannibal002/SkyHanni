@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.slayer.enderman
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -97,7 +96,7 @@ object EndermanSlayerFeatures {
 
     private fun hasBeaconInHand(enderman: EnderMan) = enderman.getBlockInHand()?.block == Blocks.BEACON
 
-    private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
+    private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.line.showLine
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
@@ -126,14 +125,14 @@ object EndermanSlayerFeatures {
                     maxDistance = 20,
                 )
             }
-            if (config.drawLineToNukekebi) {
+            if (config.lineToNukekebi.showLine) {
                 val skullLocation = event.exactLocation(skull)
                 // TODO remove visibility check once the skull stops moving
                 if (!skull.canBeSeen(viewDistance = 20)) continue
                 event.drawLineToCrosshair(
                     skullLocation.up(),
-                    LorenzColor.GOLD.toChromaColor(),
-                    3,
+                    config.lineToNukekebi.color,
+                    config.lineToNukekebi.lineWidth,
                     true,
                 )
             }
@@ -148,12 +147,12 @@ object EndermanSlayerFeatures {
                 event.drawDynamicText(beaconLocation.add(y = 1), "§4Beacon", 1.8)
             }
 
-            if (beaconConfig.showLine) {
+            if (beaconConfig.line.showLine) {
                 val beaconLocation = event.exactLocation(beacon)
                 event.drawLineToCrosshair(
                     beaconLocation.add(0.5, 1.0, 0.5),
-                    beaconConfig.lineColor,
-                    beaconConfig.lineWidth,
+                    beaconConfig.line.color,
+                    beaconConfig.line.lineWidth,
                     true,
                 )
             }
@@ -163,11 +162,11 @@ object EndermanSlayerFeatures {
     private fun drawSittingBeacon(event: SkyHanniRenderWorldEvent) {
         for ((location, time) in sittingBeacon) {
             if (location.distanceToPlayer() > 20) continue
-            if (beaconConfig.showLine) {
+            if (beaconConfig.line.showLine) {
                 event.drawLineToCrosshair(
                     location.add(0.5, 1.0, 0.5),
-                    beaconConfig.lineColor,
-                    beaconConfig.lineWidth,
+                    beaconConfig.line.color,
+                    beaconConfig.line.lineWidth,
                     true,
                 )
             }
@@ -235,21 +234,5 @@ object EndermanSlayerFeatures {
         nukekubiSkulls.clear()
         sittingBeacon = emptyMap()
         logger.log("Reset everything (world change)")
-    }
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(
-            3,
-            "slayer.endermanBeaconConfig.highlightBeacon",
-            "slayer.endermen.endermanBeaconConfig.highlightBeacon",
-        )
-        event.move(3, "slayer.endermanBeaconConfig.beaconColor", "slayer.endermen.endermanBeaconConfig.beaconColor")
-        event.move(3, "slayer.endermanBeaconConfig.showWarning", "slayer.endermen.endermanBeaconConfig.showWarning")
-        event.move(3, "slayer.endermanBeaconConfig.showLine", "slayer.endermen.endermanBeaconConfig.showLine")
-        event.move(3, "slayer.endermanBeaconConfig.lneColor", "slayer.endermen.endermanBeaconConfig.lineColor")
-        event.move(3, "slayer.endermanBeaconConfig.lineWidth", "slayer.endermen.endermanBeaconConfig.lineWidth")
-        event.move(3, "slayer.endermanHighlightNukekebi", "slayer.endermen.highlightNukekebi")
-        event.move(9, "slayer.enderman.endermanBeaconConfig", "slayer.endermen.beacon")
     }
 }

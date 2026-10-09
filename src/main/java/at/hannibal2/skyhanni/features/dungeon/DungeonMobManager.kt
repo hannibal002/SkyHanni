@@ -26,7 +26,7 @@ object DungeonMobManager {
 
     private val config get() = SkyHanniMod.feature.dungeon.objectHighlighter
     private val starredConfig get() = config.starred
-    private val fel get() = config.fel
+    private val felConfig get() = config.fel
 
     private val staredInvisible = mutableSetOf<Mob>()
     val starredVisibleMobs = mutableSetOf<Mob>()
@@ -84,20 +84,20 @@ object DungeonMobManager {
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (fel.line) {
+        if (felConfig.line.showLine) {
             val color = getFelColor()
             felOnTheGround.filter { it.canBeSeen(30) }.forEach {
                 event.drawLineToCrosshair(
                     it.baseEntity.getLorenzVec().add(y = 0.15),
                     color,
-                    3,
+                    felConfig.line.lineWidth,
                     true,
                 )
             }
         }
 
         val color = when {
-            fel.highlight.get() -> getFelColor()
+            felConfig.highlight.get() -> getFelColor()
             starredConfig.highlight.get() -> getStarColor()
             else -> return
         }
@@ -115,7 +115,7 @@ object DungeonMobManager {
         }
     }
 
-    private fun getFelColor() = fel.color.get()
+    private fun getFelColor() = felConfig.line.color
 
     private fun handleStar(mob: Mob) {
         if (!starredConfig.highlight.get()) return
