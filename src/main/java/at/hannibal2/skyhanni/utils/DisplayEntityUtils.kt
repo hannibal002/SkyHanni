@@ -10,8 +10,8 @@ object DisplayEntityUtils {
             return renderState()?.transformation?.get(0f)
         }
 
-    fun Display.TextDisplay.arrowForwardVec(): LorenzVec {
-        val quat = transformation?.leftRotation() ?: return LorenzVec(0, 0, 1)
+    fun Display.TextDisplay.arrowForwardVec(): LorenzVec? {
+        val quat = transformation?.leftRotation() ?: return null
         val localY = Vector3f(0f, 1f, 0f)
         quat.transform(localY)
         return LorenzVec(localY.x.toDouble(), 0.0, localY.z.toDouble()).normalize()
