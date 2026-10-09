@@ -193,10 +193,128 @@ class FilterTypesConfig {
     @FeatureToggle
     var masterChef: Boolean = false
 
-    // TODO remove
     @Expose
-    @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
+    @ConfigOption(
+        name = "Transaction Setup",
+        desc = "Hide the progress messages while using the Bazaar, Auction House, or Bank (e.g. 'Putting item in escrow...').",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
-    var others: Boolean = false
+    var transactionSetup: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Transaction Orders",
+        desc = "Hide Bazaar order setup/cancellation messages and the Auction House collection reminder.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var auctionBazaarSetup: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Slayer Quests", desc = "Hide Slayer Quest start and complete announcements.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var slayer: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Slayer Drops", desc = "Hide Slayer rare and very rare drop announcements.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var slayerDrop: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Low Value Drops",
+        desc = "Hide rare drop announcements for low value items, e.g. Carrot, Potato, Enchanted Ender Pearl.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var uselessDrop: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Useless Notifications",
+        desc = "Hide player tipped and bank interest payout messages.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var uselessNotifications: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Mining Abilities",
+        desc = "Hide Heart of the Mountain pickaxe ability used/expired messages for Mining Speed Boost, " +
+            "Maniac Miner, Tunnel Vision, Gemstone Infusion, Sheer Force, and Pickobulus.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var miningAbilities: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Deployables",
+        desc = "Hide the message when a previously placed deployable (Power Orb, Lantern, Flare, " +
+            "Black Hole, etc.) gets replaced by a new one.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var deployables: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Snow Cannons", desc = "Hide Jerry's Workshop Snow Cannon mount messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var winterIsland: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Party Separator", desc = "Hide the party message separator line.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var party: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Annoying Warnings",
+        desc = "Hide annoying warning messages, e.g. rate limit warnings, combat restrictions.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var uselessWarning: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Ability Damage",
+        desc = "Hide ability damage notifications for abilities like Wither Impact, Guided Bat, etc.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var abilityDamage: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Blocked Actions",
+        desc = "Hide messages when an action is blocked, e.g. Instant Transmission having blocks in the way, insufficient Breaking Power.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var blockedActions: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "NPC Announcements",
+        desc = "Hide NPC announcement messages, e.g. Jacob's contest starting, Booster cookie required for action.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var npcAnnouncements: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "System/Dev Noise",
+        desc = "Hide internal system and debug messages that sometimes leak into the chat.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var systemNoise: Boolean = false
 }

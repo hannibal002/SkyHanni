@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonPrimitive
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -37,6 +38,9 @@ object ChatFilter {
     private val foragingPatternGroup = patternGroup.group("foraging")
     private val miscPatternGroup = patternGroup.group("hypixel-misc")
     private val eventPatternGroup = patternGroup.group("event")
+    private val miningAbilityPatternGroup = patternGroup.group("mining-ability")
+    private val abilityDamagePatternGroup = patternGroup.group("ability-damage")
+    private val deployablePatternGroup = patternGroup.group("deployable")
 
     // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
@@ -249,13 +253,36 @@ object ChatFilter {
         "(?:§a)?§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
     )
     private val uselessNotificationMessages = listOf(
-        "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!",
-        "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!",
-        "§cYour Mining Speed Boost has expired!",
-        "§a§r§6Mining Speed Boost §r§ais now available!",
         "§aYou have just received §r§60 coins §r§aas interest in your personal bank account!",
         "§aSince you've been away you earned §r§60 coins §r§aas interest in your personal bank account!",
         "§aYou have just received §r§60 coins §r§aas interest in your co-op bank account!",
+    )
+
+    // Mining Abilities
+    /**
+     * REGEX-TEST: §aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!
+     * REGEX-TEST: §aYou used your §r§6Pickobulus §r§aPickaxe Ability!
+     */
+    private val miningAbilityUsedPattern by miningAbilityPatternGroup.pattern(
+        "used",
+        "§aYou used your §r.+§r§aPickaxe Ability!",
+    )
+
+    /**
+     * REGEX-TEST: §cYour Mining Speed Boost has expired!
+     */
+    private val miningAbilityExpiredPattern by miningAbilityPatternGroup.pattern(
+        "expired",
+        "§cYour (?:Mining Speed Boost|Maniac Miner|Tunnel Vision|Gemstone Infusion|Sheer Force) has expired!",
+    )
+
+    // Deployables
+    /**
+     * REGEX-TEST: §eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!
+     */
+    private val deployableRemovedPattern by deployablePatternGroup.pattern(
+        "removed",
+        "§eYour previous §r.+§r§ewas removed!",
     )
 
     // Party
@@ -298,31 +325,35 @@ object ChatFilter {
         "§7Your radio lost signal. There's too many enjoyers on this channel.",
     )
 
-    // Annoying Spam
-    @Suppress("MaxLineLength")
-    private val annoyingSpamPatterns = listOf(
-        "§7Your Implosion hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
-        "§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
-        "§7Your Spirit Sceptre hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
-        "§cYou need a tool with a §r§aBreaking Power §r§cof §r§6(\\d)§r§c to mine (.*)§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!".toPattern(),
-        "§9§n\n§c§lYouTube Premier §eCelebrate Hypixel's 12th Anniversary with a special Minecraft Animation, live now §bhttps://youtu.be/ikT631vQd8A\n".toPattern(),
+    // Ability Damage
+    // This is a special case done ahead of the full ChatFilter refactor. It's matched against event.cleanMessage.
+    /**
+     * REGEX-TEST: Your Implosion hit 1 enemy for 1,234 damage.
+     */
+    private val abilityDamagePattern by abilityDamagePatternGroup.pattern(
+        "hit",
+        """Your [\w ]+ hit \d+ enem(?:y|ies) for [\d,.]+ damage\.""",
     )
-    private val annoyingSpamMessages = listOf(
+
+    // Blocked Actions
+    @Suppress("MaxLineLength")
+    private val blockedActionsPatterns = listOf(
+        "§cYou need a tool with a §r§aBreaking Power §r§cof §r§6(\\d)§r§c to mine (.*)§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!".toPattern(),
+    )
+    private val blockedActionsMessages = listOf(
         "§cThere are blocks in the way!",
-        "§aYour Blessing enchant got you double drops!",
-        "§cYou can't use the wardrobe in combat!",
-        "§6§lGOOD CATCH! §r§bYou found a §r§fFish Bait§r§b.",
-        "§6§lGOOD CATCH! §r§bYou found a §r§aGrand Experience Bottle§r§b.",
-        "§6§lGOOD CATCH! §r§bYou found a §r§aBlessed Bait§r§b.",
-        "§6§lGOOD CATCH! §r§bYou found a §r§fDark Bait§r§b.",
-        "§6§lGOOD CATCH! §r§bYou found a §r§fLight Bait§r§b.",
-        "§6§lGOOD CATCH! §r§bYou found a §r§aHot Bait§r§b.",
-        "§6§lGOOD CATCH! §r§bYou found a §r§fSpooky Bait§r§b.",
+    )
+
+    // NPC Announcements
+    private val npcAnnouncementsMessages = listOf(
         "§e[NPC] Jacob§f: §rMy contest has started!",
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
+    )
+
+    // System/Dev Noise
+    private val systemNoiseMessages = listOf(
         "Unknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
         "§3[SBE] §a§cUnable to download bin data. This may result in certain features not working!",
-        "§e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.",
     )
 
     private val skymallMessages = listOf(
@@ -553,7 +584,7 @@ object ChatFilter {
         "useless_notification" to uselessNotificationPatterns,
         "money" to bazaarPatterns,
         "winter_island" to winterIslandPatterns,
-        "annoying_spam" to annoyingSpamPatterns,
+        "blocked_actions" to blockedActionsPatterns,
         "winter_gift" to winterGiftPatterns,
         "fire_sale" to fireSalePatterns,
         "event" to eventPatterns,
@@ -577,6 +608,8 @@ object ChatFilter {
         "hoppity_appear" to listOf(hoppityAppearPattern),
         "hoppity_begin" to listOf(hoppityBeginPattern),
         "profile_join" to profileJoinPatterns,
+        "mining_abilities" to listOf(miningAbilityUsedPattern, miningAbilityExpiredPattern),
+        "deployable_removed" to listOf(deployableRemovedPattern),
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -591,7 +624,9 @@ object ChatFilter {
         "party" to partyMessages,
         "money" to auctionHouseMessages,
         "useless_warning" to uselessWarningMessages,
-        "annoying_spam" to annoyingSpamMessages,
+        "blocked_actions" to blockedActionsMessages,
+        "npc_announcements" to npcAnnouncementsMessages,
+        "system_noise" to systemNoiseMessages,
         "powder_mining" to powderMiningMessages,
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
@@ -613,7 +648,7 @@ object ChatFilter {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        var blockReason = block(event.message)
+        var blockReason = block(event.message, event.cleanMessage)
         if (blockReason == null && config.powderMining.enabled) blockReason = powderMiningBlock(event)
         if (blockReason == null && config.crystalNucleus.enabled) blockReason = crystalNucleusBlock(event)
 
@@ -629,10 +664,11 @@ object ChatFilter {
     /**
      * Checks if the message should be blocked
      * @param message The message to check
+     * @param cleanMessage The message with color codes stripped, used by colorless-matched patterns
      * @return The reason why the message was blocked, empty if not blocked
      */
     @Suppress("CyclomaticComplexMethod", "MaxLineLength")
-    private fun block(message: String): String? = when {
+    private fun block(message: String, cleanMessage: String): String? = when {
         config.hypixelHub && message.isPresent("lobby") -> "lobby"
         config.empty && StringUtils.isEmpty(message) -> "empty"
         config.warping && message.isPresent("warping") -> "warping"
@@ -646,7 +682,21 @@ object ChatFilter {
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 
-        config.others && isOthers(message) -> othersMsg
+        config.transactionSetup && message.isPresent("bz_ah_minis") -> "bz_ah_minis"
+        config.slayer && message.isPresent("slayer") -> "slayer"
+        config.slayerDrop && message.isPresent("slayer_drop") -> "slayer_drop"
+        config.uselessDrop && message.isPresent("useless_drop") -> "useless_drop"
+        config.uselessNotifications && message.isPresent("useless_notification") -> "useless_notification"
+        config.miningAbilities && message.isPresent("mining_abilities") -> "mining_abilities"
+        config.deployables && message.isPresent("deployable_removed") -> "deployable_removed"
+        config.party && message.isPresent("party") -> "party"
+        config.auctionBazaarSetup && message.isPresent("money") -> "money"
+        config.winterIsland && message.isPresent("winter_island") -> "winter_island"
+        config.uselessWarning && message.isPresent("useless_warning") -> "useless_warning"
+        config.abilityDamage && abilityDamagePattern.matches(cleanMessage) -> "ability_damage"
+        config.blockedActions && message.isPresent("blocked_actions") -> "blocked_actions"
+        config.npcAnnouncements && message.isPresent("npc_announcements") -> "npc_announcements"
+        config.systemNoise && message.isPresent("system_noise") -> "system_noise"
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
 
@@ -735,34 +785,6 @@ object ChatFilter {
         }
     }
 
-    private var othersMsg: String? = null
-
-    /**
-     * Checks if the message is an "other" message.
-     * Will also set the variable othersMsg to the reason why the message was blocked,
-     * so that it can be used in the block function.
-     * @param message The message to check
-     * @return True if the message is part of "other"
-     * @see othersMsg
-     * @see block
-     */
-    private fun isOthers(message: String): Boolean {
-        othersMsg = when {
-            message.isPresent("bz_ah_minis") -> "bz_ah_minis"
-            message.isPresent("slayer") -> "slayer"
-            message.isPresent("slayer_drop") -> "slayer_drop"
-            message.isPresent("useless_drop") -> "useless_drop"
-            message.isPresent("useless_notification") -> "useless_notification"
-            message.isPresent("party") -> "party"
-            message.isPresent("money") -> "money"
-            message.isPresent("winter_island") -> "winter_island"
-            message.isPresent("useless_warning") -> "useless_warning"
-            message.isPresent("annoying_spam") -> "annoying_spam"
-            else -> null
-        }
-        return othersMsg != null
-    }
-
     /**
      * Checks if the message is present in the list of messages or patterns
      * Checks against four maps that compare in different ways.
@@ -804,5 +826,23 @@ object ChatFilter {
         event.move(61, "chat.filterType.powderMiningFilter", "chat.filterType.powderMining")
         event.move(61, "chat.filterType.gemstoneFilterConfig", "chat.filterType.powderMining.gemstone")
         event.move(107, "chat.filterType.guildExp", "chat.filterType.guildEventExp")
+        event.move(147, "chat.filterType.others", "chat.filterType.transactionSetup") { element ->
+            val enabled = element.asBoolean
+            event.add(147, "chat.filterType.slayer") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.slayerDrop") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.uselessDrop") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.uselessNotifications") { JsonPrimitive(enabled) }
+            // Mining Abilities and Deployables deliberately default to off and don't inherit "others",
+            // since they can be useful information and were only bundled into "others" incidentally.
+            event.add(147, "chat.filterType.party") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.auctionBazaarSetup") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.winterIsland") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.uselessWarning") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.abilityDamage") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.blockedActions") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.npcAnnouncements") { JsonPrimitive(enabled) }
+            event.add(147, "chat.filterType.systemNoise") { JsonPrimitive(enabled) }
+            JsonPrimitive(enabled)
+        }
     }
 }
