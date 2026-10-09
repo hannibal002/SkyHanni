@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class WarpsJson(
+    // TODO: Remove and use warp_location commands instead
     @Expose @SerializedName(value = "warp_commands", alternate = ["warpCommands"]) val warpCommands: List<String>,
     @Expose @SerializedName(value = "warp_location", alternate = ["warpLocation"]) val warpLocation: Map<String, WarpLocationData>,
 )
@@ -15,5 +16,6 @@ data class WarpLocationData(
     @Expose val x: Double,
     @Expose val y: Double,
     @Expose val z: Double,
-    @Expose @SerializedName("extra_diana_warp_blocks") val extraDianaWarpBlocks: Int,
+    @Expose @SerializedName("extra_diana_warp_blocks") val extraDianaWarpBlocks: Int = 0,
+    @Expose val commands: List<String>? = null,
 )

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.VisitorBlockBehaviour
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenVisitor
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.world.entity.Entity
@@ -28,18 +30,20 @@ import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
 object HighlightVisitorsOutsideOfGarden {
-
-    private var visitorJson = mapOf<String?, List<GardenVisitor>>()
+    private var visitorJson = mapOf<IslandType, List<GardenVisitor>>()
 
     private val config get() = VisitorApi.config
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         visitorJson = event.getConstant<GardenJson>(
             "Garden",
         ).visitors.values.groupBy {
             it.mode
+        }.mapKeysNotNull {
+            it.key?.let(IslandType::getByIdOrNull)
         }
+
         for (list in visitorJson.values) {
             for (visitor in list) {
                 visitor.skinOrType = visitor.skinOrType?.replace("\\n", "")?.replace("\n", "")
@@ -55,11 +59,11 @@ object HighlightVisitorsOutsideOfGarden {
     }
 
     private fun isVisitor(entity: Entity): Boolean {
-        val island = SkyBlockUtils.currentIsland.islandData?.apiName ?: return false
+        val island = SkyBlockUtils.currentIsland
         val possibleJsons = visitorJson[island] ?: return false
         val skinOrType = getSkinOrTypeFor(entity)
         return possibleJsons.any {
-            (it.position == null || it.position.distance(entity.blockPosition().toLorenzVec()) < 1) &&
+            (it.position == null || it.position.distance(entity.blockPosition().toLorenzVec()) < 3) &&
                 it.skinOrType == skinOrType
         }
     }
@@ -67,7 +71,7 @@ object HighlightVisitorsOutsideOfGarden {
     // TODO: optimize to not get entities every second
     @OptIn(AllEntitiesGetter::class)
     @HandleEvent(SecondPassedEvent::class)
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!config.highlightVisitors) return
         val color = LorenzColor.DARK_RED.toColor().addAlpha(50)
         EntityUtils.getEntities<LivingEntity>()
@@ -88,7 +92,7 @@ object HighlightVisitorsOutsideOfGarden {
         location.getEntitiesNearby<LivingEntity>(2.0).any { isVisitor(it) }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onClickEntity(event: EntityClickEvent) {
+    private fun onEntityClick(event: EntityClickEvent) {
         if (!shouldBlock) return
         if (PlayerUtils.isSneaking()) return
         val entity = event.clickedEntity

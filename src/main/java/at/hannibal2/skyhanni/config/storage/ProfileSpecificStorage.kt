@@ -1098,4 +1098,8 @@ class ProfileSpecificStorage(
 
     @Expose
     var hiddenCoopMembers: MutableSet<String> = mutableSetOf()
+
+    // This is not the command, but the repo key name, so that aliases are also accounted for.
+    @Expose
+    val failedWarps: MutableSet<String> = mutableSetOf()
 }
