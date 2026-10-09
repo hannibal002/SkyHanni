@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
@@ -10,9 +11,12 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.transformAt
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.replace
@@ -52,13 +56,28 @@ object StockOfStonkFeature {
         " {3}Minimum Bid: (?<amount>[\\d,]+) Coins",
     )
 
+    /**
+     * REGEX-TEST: Your current bid: None
+     * REGEX-TEST: Your current bid: 2,500,500 Coins
+     */
+    private val currentBidPattern by patternGroup.pattern(
+        "currentbid",
+        "Your current bid: (?:None|(?<amount>[\\d,]+) Coins)",
+    )
+
+    /**
+     * REGEX-TEST: Auction ends in 4h 32m
+     */
+    private val auctionEndsPattern by patternGroup.pattern(
+        "endsin",
+        "Auction ends in (?<duration>.+)",
+    )
+
     var inInventory = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (isEnabled()) {
-            inInventory = inventoryPattern.matches(event.inventoryName)
-        }
+        inInventory = inventoryPattern.matches(event.inventoryName)
     }
 
     @HandleEvent
@@ -66,11 +85,14 @@ object StockOfStonkFeature {
         inInventory = false
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipTextEvent) {
-        if (!isEnabled()) return
         if (!inInventory) return
         if (!inventoryPattern.matches(event.itemStack.cleanName)) return
+
+        updateAuctionData(event)
+
+        if (!config.stonkOfStonkPrice) return
         var stonksReward = 0
         var index = 0
         var bestValueIndex = 0
@@ -96,5 +118,24 @@ object StockOfStonkFeature {
         event.toolTip.transformAt(bestValueIndex) { replace("§6§6", "§a") ?: this }
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.stonkOfStonkPrice
+    private fun updateAuctionData(event: ToolTipTextEvent) {
+        val storage = ProfileStorageData.profileSpecific ?: return
+        var roundEnd: SimpleTimeMark? = null
+        var bidAmount: Long? = null
+        for (line in event.toolTip) {
+            auctionEndsPattern.matchMatcher(line) {
+                val duration = TimeUtils.getDurationOrNull(group("duration")) ?: return@matchMatcher
+                roundEnd = duration.fromNow()
+            }
+            currentBidPattern.matchMatcher(line) {
+                bidAmount = groupOrNull("amount")?.formatLong()
+            }
+        }
+        val newRoundEnd = roundEnd ?: return
+        storage.stonksAuctionRoundEnd = newRoundEnd
+        bidAmount?.let {
+            storage.stonksAuctionLastBidRoundEnd = newRoundEnd
+            storage.stonksAuctionBidAmount = it
+        }
+    }
 }
