@@ -229,7 +229,9 @@ object PestFinder {
             ChatUtils.userError("This command only works while on the Garden!")
         }
 
-        val plot = PestApi.getNearestInfestedPlot() ?: run {
+        val plot = PestApi.getNearestInfestedPlot(
+            ignoreSinglePestPlots = config.ignoreSinglePestPlots,
+        ) ?: run {
             if (config.backToGarden) return HypixelCommands.warp("garden")
 
             ChatUtils.userError("No infested plots detected to warp to!")

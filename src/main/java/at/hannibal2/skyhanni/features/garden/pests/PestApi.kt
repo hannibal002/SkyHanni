@@ -363,7 +363,11 @@ object PestApi {
 
     fun getPlotsWithoutPests() = GardenPlotApi.plots.filter { it.pests == 0 || !it.isPestCountInaccurate }
 
-    fun getNearestInfestedPlot() = getInfestedPlots().minByOrNull { it.middle.distanceSqToPlayer() }
+    fun getNearestInfestedPlot(ignoreSinglePestPlots: Boolean = false) = getInfestedPlots()
+        .filterNot {
+            ignoreSinglePestPlots && !it.isPestCountInaccurate && it.pests == 1
+        }
+        .minByOrNull { it.middle.distanceSqToPlayer() }
 
     fun isNearPestTrap() = EntityUtils.getEntitiesNearby<ArmorStand>(10.0).any {
         pestTrapPattern.matches(it.displayName.formattedTextCompat())

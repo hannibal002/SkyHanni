@@ -94,4 +94,13 @@ class PestFinderConfig {
     )
     @ConfigEditorBoolean
     var backToGarden: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Ignore Single Pest Plots",
+        desc = "Make the Teleport Hotkey ignore plots with exactly one Pest. " +
+            "Useful when leaving one Pest alive for Infiltration.",
+    )
+    @ConfigEditorBoolean
+    var ignoreSinglePestPlots: Boolean = false
 }
