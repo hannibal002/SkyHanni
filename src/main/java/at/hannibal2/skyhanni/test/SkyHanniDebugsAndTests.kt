@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
@@ -409,7 +408,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onShowInternalName(event: ToolTipTextEvent) {
+    private fun onShowInternalName(event: ToolTipTextEvent) {
         if (!debugConfig.showInternalName) return
         val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
