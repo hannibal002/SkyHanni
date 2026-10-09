@@ -204,3 +204,7 @@ potential-bugs:
             - 'java.util.concurrent.ConcurrentHashMap.remove'
             - 'kotlin.collections.MutableMap.put'
             - 'kotlin.collections.MutableMap.remove'
+
+coroutines:
+    InjectDispatcher: # we don't use dependency injection
+        active: false

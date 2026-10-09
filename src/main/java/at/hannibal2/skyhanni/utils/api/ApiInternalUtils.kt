@@ -28,7 +28,6 @@ import javax.net.ssl.TrustManagerFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-@Suppress("InjectDispatcher")
 object ApiInternalUtils {
 
     private val debugConfig get() = SkyHanniMod.feature.dev.debug

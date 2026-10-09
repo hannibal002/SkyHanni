@@ -80,7 +80,7 @@ val includeBackupRepo = tasks.register<DownloadBackupRepo>("includeBackupRepo") 
     this.user = "hannibal002"
     this.repo = "SkyHanni-Repo"
     this.branch = "main"
-    this.resourcePath = "assets/skyhanni/repo.tar.gz"
+    this.resourcePath = "assets/skyhanni/shrepo.tar.gz"
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
 }
 
@@ -88,7 +88,7 @@ val includeBackupNeuRepo = tasks.register<DownloadBackupRepo>("includeBackupNeuR
     this.user = "NotEnoughUpdates"
     this.repo = "NotEnoughUpdates-Repo"
     this.branch = "master"
-    this.resourcePath = "assets/skyhanni/neu-repo.tar.gz"
+    this.resourcePath = "assets/skyhanni/neurepo.tar.gz"
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedNeuRepo"))
 }
 
@@ -334,6 +334,7 @@ tasks.withType<KotlinCompile> {
         allWarningsAsErrors = true
         optIn.addAll(
             "kotlin.concurrent.atomics.ExperimentalAtomicApi",
+            "kotlin.io.path.ExperimentalPathApi",
             "kotlin.time.ExperimentalTime"
         )
         freeCompilerArgs.addAll(
