@@ -1,21 +1,16 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.PurseApi
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -27,20 +22,19 @@ import kotlin.time.Duration.Companion.seconds
 object HoppityCallWarning {
     // <editor-fold desc="Patterns">
     /**
-     * WRAPPED-REGEX-TEST: "§e✆ §r§bHoppity§r§e ✆ "
-     * WRAPPED-REGEX-TEST: "§e✆ §r§aHoppity§r§e ✆ "
+     * WRAPPED-REGEX-TEST: "✆ Hoppity ✆ "
      */
     private val initHoppityCallPattern by CFApi.patternGroup.pattern(
-        "hoppity.call.init",
-        "§e✆ §r(?:§a|§b)Hoppity§r§e ✆.*",
+        "hoppity.call.init.colorless",
+        "✆ Hoppity ✆.*",
     )
 
     /**
-     * REGEX-TEST: §e[NPC] §aHoppity§f: §b✆ §f§rWhat's up, §boBlazin§f?
+     * REGEX-TEST: [NPC] Hoppity: ✆ What's up, oBlazin?
      */
     private val pickupHoppityCallPattern by CFApi.patternGroup.pattern(
-        "hoppity.call.pickup",
-        "§e\\[NPC] §aHoppity§f: §b✆ §f§rWhat's up, .*§f\\?",
+        "hoppity.call.pickup.colorless",
+        "\\[NPC] Hoppity: ✆ What's up, .*\\?",
     )
     // </editor-fold>
 
@@ -50,7 +44,6 @@ object HoppityCallWarning {
     private var nextWarningTime: Instant? = null
     private var finalWarningTime: Instant? = null
     private val callLength = 7.seconds
-    private var commandSentTimer = SimpleTimeMark.farPast()
 
     @HandleEvent
     private fun onConfigLoad(event: ConfigLoadEvent) {
@@ -65,8 +58,8 @@ object HoppityCallWarning {
     @HandleEvent(priority = HandleEvent.HIGHEST)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        if (initHoppityCallPattern.matches(event.message)) startWarningUser()
-        if (pickupHoppityCallPattern.matches(event.message)) stopWarningUser()
+        if (initHoppityCallPattern.matches(event.cleanMessage)) startWarningUser()
+        if (pickupHoppityCallPattern.matches(event.cleanMessage)) stopWarningUser()
     }
 
     @HandleEvent
@@ -98,23 +91,6 @@ object HoppityCallWarning {
             GuiScreenUtils.displayHeight,
             // Apply the shifted alpha and combine it with the RGB components of flashColor.
             shiftedRandomAlpha or (config.flashColor.toColor().rgb and 0xFFFFFF),
-        )
-    }
-
-    @HandleEvent(onlyOnSkyblock = true)
-    private fun onCommandSend(event: MessageSendToServerEvent) {
-        if (!HoppityApi.pickupOutgoingCommandPattern.matches(event.message)) return
-        if (!config.ensureCoins || commandSentTimer.passedSince() < 5.seconds) return
-        if (PurseApi.getPurse() >= config.coinThreshold) return
-
-        commandSentTimer = SimpleTimeMark.now()
-        event.cancel()
-        ChatUtils.clickToActionOrDisable(
-            "§cBlocked picking up Hoppity without enough coins!",
-            config::ensureCoins,
-            actionName = "open bank menu",
-            // TODO if no booster cookie active, suggest to warp to hub/path find to bank. ideally into an utils
-            action = { HypixelCommands.bank() },
         )
     }
 
