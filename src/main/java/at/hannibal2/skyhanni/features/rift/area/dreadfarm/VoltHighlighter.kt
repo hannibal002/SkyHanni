@@ -43,7 +43,7 @@ object VoltHighlighter {
     private var chargingSince = mapOf<Entity, SimpleTimeMark>()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onArmorChange(event: EntityEquipmentChangeEvent<Entity>) {
+    private fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<LivingEntity>) {
         if (!config.voltWarning) return
         if (event.isHead && getVoltState(event.entity) == VoltState.DOING_LIGHTNING &&
             event.entity.distanceSqToPlayer() <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
@@ -56,7 +56,7 @@ object VoltHighlighter {
 
     @OptIn(AllEntitiesGetter::class)
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!(config.voltRange || config.voltMoodMeter)) return
         for (entity in EntityUtils.getEntities<LivingEntity>()) {
             val state = getVoltState(entity).takeIf { it != VoltState.NO_VOLT } ?: continue
@@ -113,7 +113,7 @@ object VoltHighlighter {
 
     @HandleEvent
     @Suppress("AvoidBritishSpelling")
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(82, "rift.area.dreadfarm.voltCrux.voltColour", "rift.area.dreadfarm.voltCrux.voltColor")
     }
 }

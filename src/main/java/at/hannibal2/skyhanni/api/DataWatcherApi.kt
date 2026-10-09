@@ -30,7 +30,7 @@ object DataWatcherApi {
     )
 
     @HandleEvent
-    fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<Entity>) {
+    private fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<Entity>) {
         for (updatedEntry in event.updatedEntries) {
             if (updatedEntry.accessor == Entity.DATA_CUSTOM_NAME) {
                 EntityCustomNameUpdateEvent(event.entity, event.entity.customName).post()

@@ -37,7 +37,7 @@ object VerminHighlighter {
     }
 
     @HandleEvent
-    private fun onEntityMaxHealthUpdate(event: EntityMaxHealthUpdateEvent) {
+    private fun onEntityMaxHealthUpdate(event: EntityMaxHealthUpdateEvent<LivingEntity>) {
         if (shouldDiscover()) tryAdd(event.entity)
     }
 

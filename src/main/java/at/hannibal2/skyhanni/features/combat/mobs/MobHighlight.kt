@@ -25,7 +25,7 @@ object MobHighlight {
     private var arachne: Mob? = null
 
     @HandleEvent
-    fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+    private fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
         val name = mob.name
 
@@ -57,14 +57,14 @@ object MobHighlight {
     }
 
     @HandleEvent
-    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    private fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (arachne == event.mob) arachne = null
     }
 
     // TODO: change to use nametags instead
     // as this method does not work for mobs that spawn corrupted naturally
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
+    private fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!config.corruptedMobHighlight) return
 
         val entity = event.entity
@@ -78,9 +78,7 @@ object MobHighlight {
 
     // Mob detection isn't used here to allow for highlighting Zealots from further away.
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
-        if (event.entity !is EnderMan) return
-
+    private fun onEntityMaxHealthUpdate(event: EntityMaxHealthUpdateEvent<EnderMan>) {
         val entity = event.entity
 
         val heldBlock = entity.getBlockInHand()?.block
@@ -105,7 +103,7 @@ object MobHighlight {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.lineToArachne) return
 
         val arachne = arachne ?: return
