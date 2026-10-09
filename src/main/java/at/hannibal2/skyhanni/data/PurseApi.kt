@@ -5,10 +5,12 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -36,17 +38,36 @@ object PurseApi {
         "(?:§.)*Piggy: (?<coins>.*)",
     )
 
+    /**
+     * REGEX-TEST: You collected 1,732,500 coins from selling [Lvl 18] Griffin to [VIP+] NottJeff in an auction!
+     * REGEX-FAIL: [YOUTUBE] Akinsoft collected an auction for 1,732,500 coins!
+     */
+    private val auctionHouseSaleClaimPattern by patternGroup.pattern(
+        "auctionhouse.saleclaim",
+        "^You collected (?<coins>[\\d,]+) coins from selling .+ in an auction!$",
+    )
+
+    private data class PendingAuctionHouseGain(val coins: Double, val created: SimpleTimeMark)
+
     private var inventoryCloseTime = SimpleTimeMark.farPast()
+    private val pendingAuctionHouseGains = mutableListOf<PendingAuctionHouseGain>()
     var currentPurse = 0.0
         private set
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose(event: InventoryCloseEvent) {
         inventoryCloseTime = SimpleTimeMark.now()
     }
 
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
+        auctionHouseSaleClaimPattern.matchMatcher(event.cleanMessage) {
+            pendingAuctionHouseGains.add(PendingAuctionHouseGain(group("coins").formatDouble(), SimpleTimeMark.now()))
+        }
+    }
+
     @HandleEvent
-    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+    private fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         coinsPattern.firstMatcher(event.added) {
             val newPurse = group("coins").formatDouble()
             val diff = newPurse - currentPurse
@@ -67,6 +88,17 @@ object PurseApi {
             // TODO relic of coins support
             if (diff == 15.million || diff == 100.million) {
                 return PurseChangeCause.GAIN_DICE_ROLL
+            }
+
+            pendingAuctionHouseGains.removeAll { it.created.passedSince() >= 5.seconds }
+            val exactGain = pendingAuctionHouseGains.indexOfFirst { it.coins == diff }
+            if (exactGain != -1) {
+                pendingAuctionHouseGains.removeAt(exactGain)
+                return PurseChangeCause.GAIN_AUCTION_HOUSE
+            }
+            if (pendingAuctionHouseGains.isNotEmpty() && pendingAuctionHouseGains.sumOf { it.coins } == diff) {
+                pendingAuctionHouseGains.clear()
+                return PurseChangeCause.GAIN_AUCTION_HOUSE
             }
 
             if (MinecraftCompat.screen == null) {

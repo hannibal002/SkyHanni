@@ -97,6 +97,11 @@ class GardenConfig {
     val rareCropTracker: RareCropTrackerConfig = RareCropTrackerConfig()
 
     @Expose
+    @ConfigOption(name = "Farming Profit Tracker", desc = "")
+    @Accordion
+    val farmingProfitTracker: FarmingProfitTrackerConfig = FarmingProfitTrackerConfig()
+
+    @Expose
     @ConfigOption(name = "Crop Break Tracker", desc = "")
     @Accordion
     val gardenBpsTracker: GardenBpsTrackerConfig = GardenBpsTrackerConfig()
