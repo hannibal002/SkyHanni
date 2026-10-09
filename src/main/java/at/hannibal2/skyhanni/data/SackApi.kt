@@ -108,7 +108,7 @@ object SackApi {
      */
     private val gemstoneItemNamePattern by patternGroup.pattern(
         "gemstone.name.colorless",
-        "(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
+        "(?:. )?(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
     )
 
     /**
