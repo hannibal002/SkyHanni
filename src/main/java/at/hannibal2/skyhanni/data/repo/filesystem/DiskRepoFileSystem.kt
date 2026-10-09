@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.repo.filesystem
 
 import at.hannibal2.skyhanni.data.repo.RepoLogger
+import at.hannibal2.skyhanni.utils.OSUtils.deleteRecursivelySafe
 import java.io.File
 
 class DiskRepoFileSystem(
@@ -16,8 +17,8 @@ class DiskRepoFileSystem(
     }
 
     override fun deleteRecursively(path: String) {
-        if (path.isEmpty()) root.listFiles()?.forEach { if (it != logger.logsDir) it.deleteRecursively() }
-        else File(root, path).deleteRecursively()
+        if (path.isEmpty()) root.listFiles()?.forEach { it.deleteRecursivelySafe() }
+        else File(root, path).deleteRecursivelySafe()
     }
 
     override fun list(path: String) = root.resolve(path).listFiles { file ->
