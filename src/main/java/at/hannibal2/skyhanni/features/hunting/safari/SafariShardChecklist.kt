@@ -26,7 +26,7 @@ object SafariShardChecklist {
     private var lastBiome: SafariBiome? = null
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    private fun onRepoReload() {
+    private suspend fun onRepoReload() {
         DelayedRun.runOrNextTick {
             SafariShard.entries.forEach { it.resetCache() }
             updateDisplay()
@@ -34,7 +34,7 @@ object SafariShardChecklist {
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    private fun onNeuRepoReload() {
+    private suspend fun onNeuRepoReload() {
         DelayedRun.runOrNextTick {
             SafariShard.entries.forEach { it.resetCache() }
             updateDisplay()

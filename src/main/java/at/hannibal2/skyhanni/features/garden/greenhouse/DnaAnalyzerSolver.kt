@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 
 @SkyHanniModule
 object DnaAnalyzerSolver {
-
     private val config get() = SkyHanniMod.feature.garden.dnaAnalyzerSolver
 
     private var inInventory = false
@@ -97,7 +96,7 @@ object DnaAnalyzerSolver {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         dnaSolverAllowsEnds = data.dnaSolverAllowsEnds
     }

@@ -41,7 +41,6 @@ import java.util.TreeSet
  */
 @SkyHanniModule
 object EnchantParser {
-
     private val config get() = SkyHanniMod.feature.inventory.enchantParsing
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
@@ -102,7 +101,7 @@ object EnchantParser {
     private var enchants: EnchantsJson = EnchantsJson()
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         this.enchants = event.getConstant<EnchantsJson>("Enchants")
     }
 

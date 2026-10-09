@@ -27,7 +27,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object LegionBobbinOverlay {
-
     private val config get() = SkyHanniMod.feature.gui.legionBobbinOverlay
 
     private var BOBBERS_DISTANCE = 30.0
@@ -63,7 +62,7 @@ object LegionBobbinOverlay {
     private var display: List<Renderable>? = null
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items").distanceEnchantData
         val legion = data["LEGION"]
         LEGION_DISTANCE = legion?.distance ?: 30.0

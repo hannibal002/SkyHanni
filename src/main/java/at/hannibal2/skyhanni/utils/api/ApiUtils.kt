@@ -14,7 +14,6 @@ import java.io.File
 
 @SkyHanniModule
 object ApiUtils {
-
     val serializeNullsGson: Gson = BaseGsonBuilder.gson().serializeNulls().create()
 
     // <editor-fold desc="GETs">
@@ -126,7 +125,7 @@ object ApiUtils {
     private var disabledApis: DisabledApiJson? = null
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         disabledApis = event.getConstant<DisabledApiJson>("misc/DisabledApi")
     }
 

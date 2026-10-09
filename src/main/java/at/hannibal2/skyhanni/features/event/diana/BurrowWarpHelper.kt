@@ -36,7 +36,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object BurrowWarpHelper {
-
     private val config get() = SkyHanniMod.feature.event.diana
 
     var currentWarp: WarpPoint? = null
@@ -213,7 +212,7 @@ object BurrowWarpHelper {
     var warpLocationData: Map<String, WarpLocationData>? = null
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val constant = event.getConstant<WarpsJson>("Warps")
         warpLocationData = constant.warpLocation
     }

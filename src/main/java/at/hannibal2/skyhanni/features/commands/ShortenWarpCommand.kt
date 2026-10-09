@@ -12,12 +12,11 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 
 @SkyHanniModule
 object ShortenWarpCommand {
-
     private val config get() = SkyHanniMod.feature.misc.commands
     private var warps = emptyList<String>()
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<WarpsJson>("Warps")
         warps = data.warpCommands
     }

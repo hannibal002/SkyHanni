@@ -106,7 +106,7 @@ object CarryTracker {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<CarryTrackerJson>("CarryTracker")
         slayerNames = data.slayerNames.mapKeys { SlayerType.valueOf(it.key) }
     }

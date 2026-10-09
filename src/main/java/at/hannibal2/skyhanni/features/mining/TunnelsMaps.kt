@@ -61,7 +61,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TunnelsMaps {
-
     private val config get() = SkyHanniMod.feature.mining.tunnelMaps
 
     private var graph: Graph = Graph()
@@ -231,7 +230,7 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         graph = event.getConstant<Graph>("island_graphs/GLACITE_TUNNELS")
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
             value

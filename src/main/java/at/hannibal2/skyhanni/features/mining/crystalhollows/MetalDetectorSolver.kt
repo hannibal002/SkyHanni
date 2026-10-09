@@ -44,7 +44,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MetalDetectorSolver {
-
     /**
      * REGEX-TEST: §7§65,453/5,078❤     §a927§a❈ Defense     §3§lTREASURE: §b79.2m§r
      */
@@ -79,7 +78,7 @@ object MetalDetectorSolver {
     private val DWARVEN_DIAMOND_AXE = "DWARVEN_DIAMOND_AXE".toInternalName()
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         chestLocations = event.getConstant<MetalDetectorChestsJson>("MetalDetectorChests").locations
     }
     // TODO make this less complex instead of ignoring the problem

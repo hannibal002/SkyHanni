@@ -79,7 +79,7 @@ object DungeonSecretChime {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         dungeonSecretItems = data.dungeonSecretItems
     }

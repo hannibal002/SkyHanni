@@ -17,7 +17,6 @@ import io.github.notenoughupdates.moulconfig.observer.ObservableList
 
 @SkyHanniModule
 object CustomTodoDownload {
-
     var todos: List<CommunityTodo> = listOf()
         private set
 
@@ -67,7 +66,7 @@ object CustomTodoDownload {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val constant = event.getConstant<CommunityTodosJson>("community/CommunityTodos")
         constant.communityTodos.forEach { CustomTodo.fromTemplate(it.todoData) }
         todos = constant.communityTodos

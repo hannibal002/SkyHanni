@@ -20,7 +20,6 @@ import net.minecraft.world.entity.Entity
 
 @SkyHanniModule
 object RiftGunthersRace {
-
     private val config get() = RiftApi.config.area.westVillage.gunthersRace
     private var parkourHelper: ParkourHelper? = null
 
@@ -64,7 +63,7 @@ object RiftGunthersRace {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("rift/RiftRace")
         parkourHelper = ParkourHelper(
             data.locations,

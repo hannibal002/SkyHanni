@@ -29,7 +29,6 @@ import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object DeepCavernsGuide {
-
     private val config get() = SkyHanniMod.feature.mining.deepCavernsGuide
 
     private var parkourHelper: ParkourHelper? = null
@@ -61,7 +60,7 @@ object DeepCavernsGuide {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("DeepCavernsParkour")
         parkourHelper = ParkourHelper(
             data.locations,

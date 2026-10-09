@@ -49,7 +49,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule
 object CropMoneyDisplay {
-
     var multipliers = mapOf<NeuInternalName, Int>()
 
     private var display: Renderable? = null
@@ -436,7 +435,7 @@ object CropMoneyDisplay {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         ignoredItems = data.moneyPerHourIgnoredItems
     }

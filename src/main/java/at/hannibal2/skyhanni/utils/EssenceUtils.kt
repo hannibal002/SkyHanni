@@ -23,7 +23,7 @@ object EssenceUtils {
     var itemPrices = mapOf<NeuInternalName, Map<Int, EssenceUpgradePrice>>()
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val unformattedData = event.getConstant<Map<String, NeuEssenceCostJson>>("essencecosts")
         this.itemPrices = reformatData(unformattedData)
     }
@@ -33,7 +33,6 @@ object EssenceUtils {
     private fun reformatData(unformattedData: Map<String, NeuEssenceCostJson>): MutableMap<NeuInternalName, Map<Int, EssenceUpgradePrice>> {
         val itemPrices = mutableMapOf<NeuInternalName, Map<Int, EssenceUpgradePrice>>()
         for ((name, data) in unformattedData) {
-
             val essencePrices = loadEssencePrices(data)
             val extraItems = data.extraItems.orEmpty()
             val (coinPrices, iemPrices) = loadCoinAndItemPrices(extraItems)
@@ -54,7 +53,6 @@ object EssenceUtils {
     private fun loadCoinAndItemPrices(
         extraItems: Map<String, List<String>>,
     ): Pair<MutableMap<Int, Long>, MutableMap<Int, Map<NeuInternalName, Int>>> {
-
         val collectCoinPrices = mutableMapOf<Int, Long>()
         val collectItemPrices = mutableMapOf<Int, Map<NeuInternalName, Int>>()
 
@@ -104,7 +102,6 @@ object EssenceUtils {
         val coinPrice: Long?,
         val itemPrice: Map<NeuInternalName, Int>,
     ) {
-
         operator fun plus(other: EssenceUpgradePrice): EssenceUpgradePrice {
             if (other.essencePrice.essenceType != essencePrice.essenceType) ErrorManager.skyHanniError(
                 "Trying to add incompatible EssenceUpgradePrices!",
@@ -125,7 +122,6 @@ object EssenceUtils {
     }
 
     data class EssencePrice(val essenceAmount: Int, val essenceType: String) {
-
         operator fun plus(other: EssencePrice): EssencePrice {
             if (other.essenceType != essenceType) ErrorManager.skyHanniError(
                 "Trying to add incompatible essence prices!",

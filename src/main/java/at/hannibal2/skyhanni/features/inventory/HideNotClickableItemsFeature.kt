@@ -45,7 +45,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object HideNotClickableItemsFeature {
-
     private val config get() = SkyHanniMod.feature.inventory.hideNotClickable
 
     private val hideNpcSellFilter = MultiFilter()
@@ -90,7 +89,7 @@ object HideNotClickableItemsFeature {
     )
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
         hideNpcSellFilter.load(hideNotClickable.hideNpcSell)
         hideInStorageFilter.load(hideNotClickable.hideInStorage)
@@ -236,7 +235,6 @@ object HideNotClickableItemsFeature {
     private fun ItemNotClickableEvent.hideYourEquipment(): Boolean {
         if (!CurrentEquipmentApi.inventory.isInside()) return false
 
-
         if (stack.getItemCategoryOrNull() in ItemCategory.armorAndEquipmentAndMasks) {
             if (stack.getLore().any { it.contains("§l") }) {
                 showGreenLine = true
@@ -313,7 +311,6 @@ object HideNotClickableItemsFeature {
 
         showGreenLine = true
         if (ItemUtils.isSack(stack)) return false
-
 
         hideReason = "This item is not a sack!"
         return true
@@ -513,7 +510,6 @@ object HideNotClickableItemsFeature {
         val auctionHouseInventory = isAuctionHouse(chestName)
         if (!bazaarInventory && !auctionHouseInventory) return false
         showGreenLine = true
-
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             if (bazaarInventory) hideReason = "The SkyBlock Menu is not a Bazaar Product!"

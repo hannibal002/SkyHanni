@@ -31,7 +31,6 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen
 
 @SkyHanniModule
 object CrimsonIsleReputationHelper {
-
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     private var display = emptyList<Renderable>()
@@ -49,7 +48,7 @@ object CrimsonIsleReputationHelper {
     )
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<CrimsonIsleReputationJson>("CrimsonIsleReputation")
         DailyMiniBossHelper.processRepoData(data.MINIBOSS)
         DailyKuudraBossHelper.processRepoData(data.KUUDRA)

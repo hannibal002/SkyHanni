@@ -370,7 +370,7 @@ object CropMilestonesApi {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         cropMilestoneRepoData = event.getConstant<GardenJson>("Garden").cropMilestones
         missingMilestoneRepoData = false
         clearMilestoneCache()

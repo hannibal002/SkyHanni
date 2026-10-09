@@ -117,7 +117,7 @@ object RemainingSlayerKills {
     private var killComboWisdom = 0
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         data = event.getConstant<SlayerData>("Slayer")
     }
 

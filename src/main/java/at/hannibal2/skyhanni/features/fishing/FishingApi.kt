@@ -59,7 +59,6 @@ import kotlin.time.Duration.Companion.seconds
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object FishingApi {
-
     enum class RodPart {
         HOOK,
         LINE,
@@ -312,7 +311,7 @@ object FishingApi {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         lavaRods = data.lavaFishingRods
         waterRods = data.waterFishingRods

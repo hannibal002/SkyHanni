@@ -30,7 +30,6 @@ import java.util.regex.Pattern
 
 @SkyHanniModule
 object MaxwellApi {
-
     private val storage get() = ProfileStorageData.profileSpecific
 
     var currentPower: String?
@@ -365,7 +364,7 @@ object MaxwellApi {
 
     // Load powers from repo
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<MaxwellPowersJson>("MaxwellPowers")
         powers = data.powers
     }

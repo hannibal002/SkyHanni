@@ -156,7 +156,7 @@ object CFApi {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
 
         rabbitSlots = data.rabbitSlots

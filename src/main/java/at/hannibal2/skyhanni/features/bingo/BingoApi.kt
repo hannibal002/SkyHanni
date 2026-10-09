@@ -46,7 +46,6 @@ import kotlin.time.Duration.Companion.hours
 
 @SkyHanniModule
 object BingoApi {
-
     private val BINGO_NPC_OFFSET = 3.days
 
     // This may need to be made shorter than 1 hour if we start using goal data in the future
@@ -120,7 +119,7 @@ object BingoApi {
     }
 
     @HandleEvent
-    fun onRepositoryReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepositoryReload(event: RepositoryReloadEvent) {
         ranks = event.getConstant<BingoRanksJson>("BingoRanks").ranks
         data = event.getConstant<BingoJson>("Bingo").bingoTips
     }

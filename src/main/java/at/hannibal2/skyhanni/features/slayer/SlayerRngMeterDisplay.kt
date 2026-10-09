@@ -41,7 +41,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SlayerRngMeterDisplay {
-
     private val config get() = SlayerApi.config.rngMeterDisplay
 
     private val patternGroup = RepoPattern.group("slayer.rngmeter")
@@ -237,7 +236,7 @@ object SlayerRngMeterDisplay {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         rngScore = event.getConstant<NeuRNGScore>("rngscore").slayer
     }
 

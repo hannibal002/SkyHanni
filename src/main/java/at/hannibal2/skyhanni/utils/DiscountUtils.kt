@@ -19,7 +19,7 @@ object DiscountUtils {
     private val emissaryScalingDiscounts = mutableMapOf<Int, Double>()
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemDiscountsJson>("misc/ItemDiscounts")
         data.itemPriceCoinOnly.forEach { (string, coins) ->
             itemPriceCoinOnly[string.toInternalName()] = coins

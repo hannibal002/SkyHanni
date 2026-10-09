@@ -20,7 +20,7 @@ class NeuItemStackProvider(
         private val providerCache = WeakHashMap<NeuItemStackProvider, SafeItemStack>()
 
         @HandleEvent(priority = HandleEvent.LOW)
-        fun onNeuRepoReload() {
+        private suspend fun onNeuRepoReload() {
             providerCache.clear()
         }
     }

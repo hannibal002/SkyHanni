@@ -50,7 +50,6 @@ import kotlinx.coroutines.sync.withLock
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
 object EnoughUpdatesManager {
-
     val configDirectory = File("config/notenoughupdates")
     private val repoDirectory = File(configDirectory, "repo")
     private val itemsFolder = File(repoDirectory, "items")
@@ -317,7 +316,7 @@ object EnoughUpdatesManager {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         neuPetsJson = event.getConstant<NeuPetsJson>("pets")
         neuPetNums = event.getConstant<NeuPetNumsJson>("petnums")
         if (itemMap.isNotEmpty()) {
