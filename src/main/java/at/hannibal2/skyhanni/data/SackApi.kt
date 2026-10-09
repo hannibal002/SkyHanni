@@ -134,7 +134,7 @@ object SackApi {
      * REGEX-TEST: COMMON_HOOK
      */
     private val ignoreInternalNamePattern by patternGroup.pattern(
-        "ignore.internalName",
+        "ignore.internal-name",
         "COMMON_HOOK",
     )
     // </editor-fold>
@@ -399,7 +399,7 @@ object SackApi {
         }.toSet()
     }
 
-    @HandleEvent( priority = HandleEvent.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     private fun onProfileJoin() {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
     }
