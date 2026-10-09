@@ -412,12 +412,9 @@ class MiscConfig {
     val testWarningSound: Runnable = Runnable(SoundUtils::playPlingSound)
 
     @Expose
-    @ConfigOption(
-        name = "Fast Fairy Souls",
-        desc = "Uses a fast pathfinder route to get to all Fairy Souls on the current island.",
-    )
-    @ConfigEditorBoolean
-    var fastFairySouls: Boolean = false
+    @ConfigOption(name = "Fairy souls", desc = "")
+    @Accordion
+    val fairySouls: FairySoulConfig = FairySoulConfig()
 
     @Expose
     @ConfigOption(
