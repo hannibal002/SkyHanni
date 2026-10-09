@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.events.SackOpenEvent
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -118,6 +119,14 @@ object SackApi {
         "gemstone.filter",
         "(?:§.)+▶ (?<quality>.*)",
     )
+
+    /**
+     * REGEX-TEST: COMMON_HOOK
+     */
+    private val ignoreInternalNamePattern by patternGroup.pattern(
+        "ignore.internalName",
+        "COMMON_HOOK",
+    )
     // </editor-fold>
 
     var isTrophySack = false
@@ -155,7 +164,7 @@ object SackApi {
         private set
 
     @HandleEvent
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         isRuneSack = false
         isGemstoneSack = false
         gemstoneStackFilter = null
@@ -167,7 +176,7 @@ object SackApi {
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         val isNewInventory = inventoryName != lastOpenedInventory
         lastOpenedInventory = inventoryName
@@ -274,7 +283,13 @@ object SackApi {
         val item = SackOtherItem()
         numPattern.firstMatcher(value.getLore()) {
             val stored = group("stored").formatInt()
-            val internalName = value.getInternalName()
+            val internalName = value.getInternalName().let {
+                if (ignoreInternalNamePattern.matches(value.cleanName)) {
+                    NeuInternalName.fromItemNameOrNull(value.cleanName) ?: it
+                } else {
+                    it
+                }
+            }
 
             item.internalName = internalName
             item.colorCode = group("color")
@@ -323,7 +338,7 @@ object SackApi {
     private val sackChangeRegex = Regex("""([+-][\d,]+) (.+) \((.+)\)""")
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!event.cleanMessage.startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
@@ -363,7 +378,7 @@ object SackApi {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val sacksData = event.getConstant<NeuSacksJson>("sacks").sacks
         uniqueSackItems = sacksData.values.flatMap { it.contents }.toSet()
         sacks = sacksData.mapValues { it.value.contents }
@@ -377,8 +392,8 @@ object SackApi {
         }.toSet()
     }
 
-    @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
-    fun onProfileJoin() {
+    @HandleEvent( priority = HandleEvent.HIGH)
+    private fun onProfileJoin() {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
     }
 
@@ -388,36 +403,36 @@ object SackApi {
         // if it gets added and subtracted but only 1 shows it will be outdated
         val justChanged = mutableMapOf<NeuInternalName, Int>()
 
-        for (change in changes.sackChanges) {
-            if (change.internalName in justChanged) {
-                justChanged[change.internalName] = (justChanged[change.internalName] ?: 0) + change.delta
+        for ((delta, internalName) in changes.sackChanges) {
+            if (internalName in justChanged) {
+                justChanged[internalName] = (justChanged[internalName] ?: 0) + delta
             } else {
-                justChanged[change.internalName] = change.delta
+                justChanged[internalName] = delta
             }
         }
 
-        for (item in justChanged) {
-            if (sackData.containsKey(item.key)) {
-                val oldData = sackData[item.key]
-                var newAmount = oldData!!.amount + item.value
+        for ((key, value) in justChanged) {
+            if (sackData.containsKey(key)) {
+                val oldData = sackData[key]
+                var newAmount = oldData!!.amount + value
                 var changed = (newAmount - oldData.amount)
                 if (newAmount < 0) {
                     newAmount = 0
                     changed = 0
                 }
-                sackData = sackData.editCopy { this[item.key] = SackItem(newAmount, changed, oldData.getStatus()) }
+                sackData = sackData.editCopy { this[key] = SackItem(newAmount, changed, oldData.getStatus()) }
             } else {
-                val newAmount = if (item.value > 0) item.value else 0
+                val newAmount = if (value > 0) value else 0
                 sackData =
-                    sackData.editCopy { this[item.key] = SackItem(newAmount, newAmount, SackStatus.OUTDATED) }
+                    sackData.editCopy { this[key] = SackItem(newAmount, newAmount, SackStatus.OUTDATED) }
             }
         }
 
         if (changes.otherItemsAdded || changes.otherItemsRemoved) {
-            for (item in sackData) {
-                if (item.key in justChanged) continue
-                val oldData = sackData[item.key]
-                sackData = sackData.editCopy { this[item.key] = SackItem(oldData!!.amount, 0, SackStatus.ALRIGHT) }
+            for ((key) in sackData) {
+                if (key in justChanged) continue
+                val oldData = sackData[key]
+                sackData = sackData.editCopy { this[key] = SackItem(oldData!!.amount, 0, SackStatus.ALRIGHT) }
             }
         }
         saveSackData()
@@ -431,11 +446,11 @@ object SackApi {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return SackItem(0, 0, SackStatus.MISSING)
 
         if (sackData.containsKey(item)) {
-            return sackData[item] ?: return SackItem(0, 0, SackStatus.MISSING)
+            return sackData[item] ?: SackItem(0, 0, SackStatus.MISSING)
         }
 
         sackData = sackData.editCopy { this[item] = SackItem(0, 0, SackStatus.MISSING) }
-        return sackData[item] ?: return SackItem(0, 0, SackStatus.MISSING)
+        return sackData[item] ?: SackItem(0, 0, SackStatus.MISSING)
     }
 
     private fun saveSackData() {
