@@ -129,7 +129,7 @@ object EliteFarmersLeaderboard {
                             }
                             val contribUUID = ContributorManager.getUUIDFromDisplayName(name)
                             if (contribUUID != null) {
-                                if (!ContributorManager.hasDisabledAchievementDiscovery(contribUUID)) {
+                                if (!ContributorManager.isExcludedFromAchievements(contribUUID)) {
                                     AchievementManager.completeAchievement(BETTER_THAN_DEV_ACHIEVEMENT)
                                 }
                                 ContributorManager.getSuffix(contribUUID)?.let {

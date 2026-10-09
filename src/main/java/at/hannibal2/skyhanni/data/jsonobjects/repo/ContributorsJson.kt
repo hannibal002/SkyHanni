@@ -14,5 +14,5 @@ data class ContributorJsonEntry(
     @Expose val spinny: Boolean = false,
     @Expose @SerializedName(value = "upside_down", alternate = ["upsideDown"]) val upsideDown: Boolean = false,
     @Expose @SerializedName("display_name") val displayName: String? = null,
-    @Expose @SerializedName("disabled_achievement_discovery") val disabledAchievementDiscovery: Boolean = false,
+    @Expose @SerializedName("exclude_from_achievements") val excludeFromAchievements: Boolean = false,
 )
