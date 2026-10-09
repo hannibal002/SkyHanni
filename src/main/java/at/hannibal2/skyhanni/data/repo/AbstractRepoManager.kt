@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.data.repo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates.ChatProgressCategory
 import at.hannibal2.skyhanni.data.repo.filesystem.DiskRepoFileSystem
@@ -98,6 +97,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     abstract val statusCommand: String
     abstract val reloadCommand: String
 
+    open val updateCommandAliases: List<String> = emptyList()
+    open val statusCommandAliases: List<String> = emptyList()
+    open val reloadCommandAliases: List<String> = emptyList()
+
     var repoFileSystem: RepoFileSystem by LazyVar { DiskRepoFileSystem(repoDirectory, logger) }
         private set
 
@@ -132,7 +135,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     internal fun registerCommands(event: CommandRegistrationEvent) {
         event.registerBrigadier(updateCommand) {
             description = "Remove and re-download the $commonName repo"
-            category = CommandCategory.USERS_BUG_FIX
+            category = USERS_BUG_FIX
+            aliases = updateCommandAliases
             simpleCallback { updateRepo("/$updateCommand", forceReset = true) }
             argCallback("force", BoolArgumentType.bool()) {
                 description = "optionally only re-download if the repo is out of date"
@@ -141,7 +145,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
         event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
-            category = CommandCategory.USERS_BUG_FIX
+            category = USERS_BUG_FIX
+            aliases = statusCommandAliases
             coroutineSimpleCallback(commandConfig) {
                 val progress = progressCategory.start("showing status via /$statusCommand")
                 displayRepoStatus(progress, joinEvent = false, command = true)
@@ -150,7 +155,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
         event.registerBrigadier(reloadCommand) {
             description = "Reloads the local $commonName repo"
-            category = CommandCategory.DEVELOPER_TEST
+            category = DEVELOPER_TEST
+            aliases = reloadCommandAliases
             simpleCallback {
                 val progress = progressCategory.start("reloading local repo via /$reloadCommand")
                 progress.update("reloadLocalRepo")
