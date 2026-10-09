@@ -188,7 +188,6 @@ object BestiaryApi {
             overallProgressEnabled: Boolean,
             val parentCategory: Category?,
             val parentFamily: BestiaryMob?,
-            // Not read anywhere yet, kept for a future Variants overlay in BestiaryData.
             val variants: Map<Int, BestiaryMobVariant>,
         ) : Open(GuiType.MOB_VARIANTS, overallProgressEnabled)
     }
