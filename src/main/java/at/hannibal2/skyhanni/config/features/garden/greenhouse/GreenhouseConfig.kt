@@ -59,6 +59,15 @@ class GreenhouseConfig {
 
     @Expose
     @ConfigOption(
+        name = "Hide Magic Jelly Beans",
+        desc = "Hides the Magic Jelly Beans in the Greenhouse.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var magicJellyBeanHider: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Sky Mutations Link",
         desc = "Offer a link to §aSky Mutations§7 in the Carpenter inventory in the Greenhouse and in the Crop Analyzer. " +
             "The website offers useful information about mutations.",
