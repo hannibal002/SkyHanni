@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 
 open class TrackerGenericConfig {
     @Expose
-    @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown on default.")
+    @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown by default.")
     @ConfigEditorDropdown
     val defaultDisplayMode: Property<DefaultDisplayMode> = Property.of(DefaultDisplayMode.REMEMBER_LAST)
 

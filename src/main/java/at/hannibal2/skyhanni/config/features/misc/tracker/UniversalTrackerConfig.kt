@@ -22,7 +22,7 @@ class UniversalTrackerConfig : ItemTrackerGenericConfig() {
 
     @ConfigOption(
         name = "Sync All Trackers",
-        desc = "Sync all Skyhanni Trackers with these settings.\n§c§lTHIS WILL OVERRIDE ALL OF YOUR INDIVIDUAL TRACKER SETTINGS!"
+        desc = "Sync all SkyHanni Trackers with these settings.\n§c§lTHIS WILL OVERRIDE ALL OF YOUR INDIVIDUAL TRACKER SETTINGS!"
     )
     @ConfigEditorButton(buttonText = "Sync")
     val sync: Runnable = Runnable { syncAllTrackers() }

@@ -14,7 +14,7 @@ class AreasListConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Shows all island areas as list while in your inventory. Click to navigate."
+        desc = "Shows all island areas as a list while in your inventory. Click to navigate."
     )
     @ConfigEditorBoolean
     @FeatureToggle

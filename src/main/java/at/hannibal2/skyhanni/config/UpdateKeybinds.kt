@@ -50,7 +50,7 @@ object UpdateKeybinds {
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetkeybinds") {
             category = CommandCategory.USERS_RESET
-            description = "Resets all of your skyhanni keybinds"
+            description = "Resets all of your SkyHanni keybinds"
             aliases = listOf("shkeybindreset")
             simpleCallback {
                 for (keybind in keybinds) {
