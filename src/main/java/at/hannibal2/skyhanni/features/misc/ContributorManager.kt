@@ -337,6 +337,7 @@ object ContributorManager {
     private fun recordSeenContributor(gameProfile: GameProfile) {
         val uuid = gameProfile.id
         if (uuid == PlayerUtils.getRawUuid()) return
+        if (isExcludedFromAchievements(uuid)) return
         if (uuid in seenContributors) return
         seenContributors[uuid] = SimpleTimeMark.now()
         saveConfig("added new seen contributor")
@@ -353,6 +354,8 @@ object ContributorManager {
     fun shouldSpin(uuid: UUID): Boolean = contributors[uuid]?.spinny ?: false
     fun shouldBeUpsideDown(uuid: UUID): Boolean = contributors[uuid]?.upsideDown ?: false
     fun hasDisabledDiscoverMessages(uuid: UUID): Boolean = contributors[uuid]?.hideDiscoverMessage ?: false
+    fun isExcludedFromAchievements(name: String): Boolean = namesToUuid[name]?.let(::isExcludedFromAchievements) ?: false
+    fun isExcludedFromAchievements(uuid: UUID): Boolean = contributors[uuid]?.excludeFromAchievements ?: false
 
     fun isSelfContributor(): Boolean {
         isContributor?.let { return it }
