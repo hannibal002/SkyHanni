@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 
 abstract class ScrollInput(
@@ -7,7 +8,7 @@ abstract class ScrollInput(
     protected val minValue: Int,
     protected val maxValue: Int,
     protected val velocity: Double,
-    protected val dragScrollMouseButton: Int?,
+    protected val dragScrollMouseButton: InputCode?,
     startValue: Double?,
 ) {
 
@@ -57,7 +58,7 @@ abstract class ScrollInput(
             minHeight: Int,
             maxHeight: Int,
             velocity: Double,
-            dragScrollMouseButton: Int?,
+            dragScrollMouseButton: InputCode? = null,
             startValue: Double? = null,
         ) : ScrollInput(scrollValue, minHeight, maxHeight, velocity, dragScrollMouseButton, startValue) {
             override fun update(isValid: Boolean) {
@@ -66,7 +67,7 @@ abstract class ScrollInput(
                 var changed = false
                 if (
                     dragScrollMouseButton != null &&
-                    MouseCompat.isButtonDown(dragScrollMouseButton) &&
+                    dragScrollMouseButton.isKeyHeld() &&
                     consumeMouseMoveEvent()
                 ) {
                     scroll += MouseCompat.getEventDY() * velocity

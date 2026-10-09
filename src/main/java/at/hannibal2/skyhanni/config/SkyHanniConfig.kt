@@ -149,7 +149,4 @@ class SkyHanniConfig : Config() {
     @Expose
     @Suppress("unused")
     var lastVersion: Int = ConfigUpdaterMigrator.CONFIG_VERSION
-
-    @Expose
-    var lastMinecraftVersion: String? = null
 }

@@ -23,11 +23,10 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
-import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -331,8 +330,8 @@ object TunnelsMaps {
                     "§eRight Click for override",
                 ),
                 onAnyClick = mapOf(
-                    LEFT_MOUSE to guiSetActive(campfireName),
-                    RIGHT_MOUSE to ::campfireOverride,
+                    InputCode.LEFT_MOUSE to guiSetActive(campfireName),
+                    InputCode.RIGHT_MOUSE to ::campfireOverride,
                 ),
             ),
         )
@@ -483,9 +482,11 @@ object TunnelsMaps {
     private fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (MinecraftCompat.screen != null) return
-        val keyCode = event.keyCode
-        campfireKey(keyCode)
-        nextSpotKey(keyCode)
+        when (event.key) {
+            config.campfireKey -> campfireKey()
+            config.nextSpotHotkey -> nextSpot()
+            else -> return
+        }
     }
 
     @HandleEvent
@@ -496,8 +497,7 @@ object TunnelsMaps {
         nextSpot()
     }
 
-    private fun campfireKey(keyCode: Int) {
-        if (keyCode != config.campfireKey) return
+    private fun campfireKey() {
         if (lastBaseCampWarp.passedSince() < 2.seconds) return
         lastBaseCampWarp = SimpleTimeMark.now()
         if (config.travelScroll) HypixelCommands.warp("basecamp") else campfireOverride()
@@ -519,12 +519,6 @@ object TunnelsMaps {
     }
 
     private var nextSpotDelay = SimpleTimeMark.farPast()
-
-    private fun nextSpotKey(keyCode: Int) {
-        if (keyCode == config.nextSpotHotkey) {
-            nextSpot()
-        }
-    }
 
     private fun nextSpot() {
         if (!nextSpotDelay.isInPast()) return

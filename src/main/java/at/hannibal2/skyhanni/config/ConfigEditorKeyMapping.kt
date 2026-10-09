@@ -1,0 +1,7 @@
+package at.hannibal2.skyhanni.config
+
+import at.hannibal2.skyhanni.utils.InputCode
+
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.FIELD)
+annotation class ConfigEditorKeyMapping(val defaultKey: InputCode = UNKNOWN)

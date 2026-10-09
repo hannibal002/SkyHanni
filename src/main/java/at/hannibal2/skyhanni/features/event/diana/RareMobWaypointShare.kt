@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
@@ -184,8 +183,8 @@ object RareMobWaypointShare {
             // add repo kill switch
             sendRareMob()
         } else {
-            val keyName = KeyboardManager.getKeyName(config.keyBindShare)
-            val message = "§l§bYou found a Rare Diana Mob! Click §l§chere §l§bor press §c$keyName to share the location!"
+            val message = "§l§bYou found a Rare Diana Mob! Click §l§chere §l§bor press " +
+                "§c${config.keyBindShare.displayName} to share the location!"
             ChatUtils.clickableChat(
                 message,
                 onClick = ::sendRareMob,
@@ -211,7 +210,7 @@ object RareMobWaypointShare {
     private fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (MinecraftCompat.screen != null) return
-        if (event.keyCode == config.keyBindShare) sendRareMob()
+        if (event.key == config.keyBindShare) sendRareMob()
     }
 
     private fun sendDeath() {
