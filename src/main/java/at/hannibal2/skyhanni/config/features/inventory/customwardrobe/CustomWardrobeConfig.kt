@@ -5,20 +5,25 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
 class CustomWardrobeConfig {
     @Expose
-    @ConfigOption(name = "Enable", desc = "Enable the Custom Wardrobe GUI.")
+    @ConfigOption(name = "Custom Wardrobe", desc = "Enable the Custom Wardrobe GUI.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Follow mouse", desc = "Whether the \"players\" follow the movement of the mouse.")
+    @ConfigOption(
+        name = "Custom Equipment",
+        desc = "Enable the Custom Equipment GUI.",
+    )
     @ConfigEditorBoolean
-    var eyesFollowMouse: Boolean = true
+    @FeatureToggle
+    var equipmentEnabled: Boolean = false
 
     @Expose
     @ConfigOption(name = "Hide Empty Slots", desc = "Hide wardrobe slots with no armor.")
@@ -32,6 +37,9 @@ class CustomWardrobeConfig {
 
     @Expose
     var onlyFavorites: Boolean = false
+
+    @Expose
+    var equipmentOnlyFavorites: Boolean = false
 
     @Expose
     @ConfigOption(name = "Estimated Value", desc = "Show a §2$ §7sign you can hover to see the wardrobe slot value.")
@@ -65,14 +73,9 @@ class CustomWardrobeConfig {
     var showReiItems: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Colors", desc = "Change the color settings.")
-    @Accordion
-    val color: ColorConfig = ColorConfig()
-
-    @Expose
-    @ConfigOption(name = "Spacing", desc = "")
-    @Accordion
-    val spacing: SpacingConfig = SpacingConfig()
+    @ConfigOption(name = "Slots per Row", desc = "Max amount of wardrobe slots per row.")
+    @ConfigEditorSlider(minValue = 5f, maxValue = 18f, minStep = 1f)
+    var maxPlayersPerRow: Int = 9
 
     @Expose
     @ConfigOption(name = "Keybinds", desc = "")

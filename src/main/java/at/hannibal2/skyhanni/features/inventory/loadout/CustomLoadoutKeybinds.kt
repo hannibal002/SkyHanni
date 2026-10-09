@@ -40,16 +40,18 @@ object CustomLoadoutKeybinds {
         if (handlePress()) event.cancel()
     }
 
-    private fun handlePress(): Boolean {
+    internal fun handlePress(): Boolean {
         if (!isEnabled()) return false
-        val slots = LoadoutApi.slots.filter { it.isInCurrentPage() }
+        val inCustomLoadout = CustomLoadout.inCustomMenu
+        val slots = if (inCustomLoadout) CustomLoadout.displayedSlots()
+        else LoadoutApi.slots.filter { it.isInCurrentPage() }
 
         for ((index, key) in keybinds.withIndex()) {
             if (!key.isKeyHeld()) continue
             if (lastClick.passedSince() < 200.milliseconds) break
             val slot = slots.getOrNull(index) ?: continue
 
-            LoadoutApi.clickSlot(slot)
+            if (inCustomLoadout) CustomLoadout.clickSlot(slot) else LoadoutApi.clickSlot(slot)
             lastClick = SimpleTimeMark.now()
             return true
         }
@@ -60,5 +62,6 @@ object CustomLoadoutKeybinds {
     fun allowMouseClick() = isEnabled() && keybinds.filter { it < 0 }.any { it.isKeyHeld() }
     fun allowKeyboardClick() = isEnabled() && keybinds.filter { it > 0 }.any { it.isKeyHeld() }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && LoadoutApi.inLoadouts() && config.slotKeybindsToggle
+    private fun isEnabled() =
+        SkyBlockUtils.inSkyBlock && config.slotKeybindsToggle && (CustomLoadout.inCustomMenu || LoadoutApi.inLoadouts())
 }
