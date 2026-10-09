@@ -49,6 +49,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import at.hannibal2.skyhanni.utils.compat.append
@@ -59,6 +61,7 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
+import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.compat.stackHover
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -1087,4 +1090,10 @@ object ItemUtils {
     }
 
     fun SafeItemStack.takeUnlessEmpty(): SafeItemStack? = takeUnless { it.isEmpty }
+
+    val SafeItemStack.isBlank: Boolean get() = isStainedGlassPane(ColoredBlockCompat.BLACK) &&
+        count == 1 &&
+        getTooltip().isEmpty()
+
+    fun SafeItemStack.takeUnlessBlank(): SafeItemStack? = takeUnless { it.isEmpty || it.isBlank }
 }
