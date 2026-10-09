@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
@@ -54,9 +54,13 @@ object HarpFeatures {
         "menu",
         "Melody",
     )
+
+    /**
+     * REGEX-TEST: Song is selected!
+     */
     private val songSelectedPattern by patternGroup.pattern(
-        "song.selected",
-        "§aSong is selected!",
+        "song.selected.colorless",
+        "Song is selected!",
     )
 
     private fun isHarpGui(chestName: String) = inventoryTitlePattern.matches(chestName)
@@ -184,7 +188,7 @@ object HarpFeatures {
         if (event.slot?.index != CLOSE_BUTTON_SLOT) return
         if (openTime.passedSince() > 2.seconds) return
         val indexOfFirst = event.container.slots.indexOfFirst {
-            songSelectedPattern.anyMatches(it.item.getLore())
+            songSelectedPattern.anyMatches(it.item.getCleanLore())
         }
         indexOfFirst.takeIf { it != -1 }?.let {
             val clickType = event.clickType

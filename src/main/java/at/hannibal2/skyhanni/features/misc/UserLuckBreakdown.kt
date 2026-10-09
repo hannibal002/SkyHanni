@@ -17,10 +17,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -56,12 +56,12 @@ object UserLuckBreakdown {
     private val patternGroup = RepoPattern.group("misc.statsbreakdown")
 
     /**
-     * REGEX-TEST: §7Show all stats: §aYes
-     * REGEX-TEST: §7Show all stats: §cNope
+     * REGEX-TEST: Show all stats: Yes
+     * REGEX-TEST: Show all stats: Nope
      */
     private val showAllStatsPattern by patternGroup.pattern(
-        "showallstats",
-        "§7Show all stats: §.(?<toggle>.*)",
+        "showallstats.colorless",
+        "Show all stats: (?<toggle>.*)",
     )
 
     /**
@@ -91,7 +91,7 @@ object UserLuckBreakdown {
     private var skillOverflowLuck = mapOf<SkillType, Int>()
 
     @HandleEvent
-    fun replaceItem(event: ReplaceItemEvent) {
+    private fun replaceItem(event: ReplaceItemEvent) {
         if (!config.userLuck) return
         if (event.inventory !is SimpleContainer) return
         if (!inMiscStats) return
@@ -135,7 +135,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!statsBreakdownInventory.isInside()) {
             inMiscStats = false
             return
@@ -144,20 +144,18 @@ object UserLuckBreakdown {
         if (!miscStatsInventoryPattern.matches(inventoryName)) return
         inMiscStats = true
         replaceSlot = findValidSlot(event.inventoryItemsWithNull)
-        val showAllStatsLore = event.inventoryItems[50]?.getLore() ?: listOf("")
-        for (line in showAllStatsLore) {
-            showAllStatsPattern.matchMatcher(line) {
-                showAllStats = when (group("toggle")) {
-                    "Yes" -> true
-                    else -> false
-                }
+        val showAllStatsLore = event.inventoryItems[50]?.getCleanLore() ?: listOf("")
+        showAllStatsPattern.firstMatcher(showAllStatsLore) {
+            showAllStats = when (group("toggle")) {
+                "Yes" -> true
+                else -> false
             }
         }
         return
     }
 
     @HandleEvent
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         inMiscStats = false
         inCustomBreakdown = false
     }
@@ -173,7 +171,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltip(event: ToolTipTextEvent) {
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!config.userLuck) return
         event.slot ?: return
         if (!event.slot.isTopInventory()) return
@@ -235,7 +233,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.userLuck) return
         if (!inMiscStats) return
         val luckEvent = getOrPostLuckEvent()
@@ -344,7 +342,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(95, "misc.userluckEnabled", "misc.userLuck")
     }
 
@@ -373,7 +371,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun skillLuck(event: UserLuckCalculateEvent) {
+    private fun skillLuck(event: UserLuckCalculateEvent) {
         val lore = createItemLore("skills")
         val luck = skillOverflowLuck.values.sum().toFloat()
         event.addLuck(luck)
@@ -386,7 +384,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun limboLuck(event: UserLuckCalculateEvent) {
+    private fun limboLuck(event: UserLuckCalculateEvent) {
         val luck = storage?.limbo?.userLuck ?: 0f
         event.addLuck(luck)
         val stack = ItemUtils.createItemStack(
@@ -398,7 +396,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun jerryLuck(event: UserLuckCalculateEvent) {
+    private fun jerryLuck(event: UserLuckCalculateEvent) {
         if (!Perk.STATSPOCALYPSE.isActive) return
         val jerryLuck = event.getTotalLuck() * .1f
         event.addLuck(jerryLuck)
@@ -411,7 +409,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent(priority = 100)
-    fun totalLuck(event: UserLuckCalculateEvent) {
+    private fun totalLuck(event: UserLuckCalculateEvent) {
         val totalLuck = event.getTotalLuck()
         event.mainLuckStack = ItemUtils.createItemStack(
             mainLuckID,

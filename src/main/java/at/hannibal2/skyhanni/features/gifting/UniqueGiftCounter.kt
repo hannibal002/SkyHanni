@@ -4,14 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.WinterApi
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -24,20 +23,31 @@ object UniqueGiftCounter {
     private val config get() = SkyHanniMod.feature.event.gifting.uniqueGiftCounter
     private val storage get() = ProfileStorageData.playerSpecific?.winter
 
+    /**
+     * REGEX-TEST: Unique Players Gifted: 600
+     */
     private val giftedAmountPattern by RepoPattern.pattern(
-        "event.winter.uniqugifts.counter.amount",
-        "§7Unique Players Gifted: §a(?<amount>.*)",
+        "event.winter.uniqugifts.counter.amount.colorless",
+        "Unique Players Gifted: (?<amount>.*)",
+    )
+
+    /**
+     * REGEX-TEST: Generow
+     */
+    private val generowInventoryPattern by RepoPattern.pattern(
+        "event.winter.uniqugifts.inventory.name",
+        "Generow",
     )
 
     private var display: Renderable? = null
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Generow") return
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        if (!generowInventoryPattern.matches(event.inventoryName)) return
         val item = event.inventoryItems[40] ?: return
         val storage = storage ?: return
 
-        giftedAmountPattern.firstMatcher(item.getLore()) {
+        giftedAmountPattern.firstMatcher(item.getCleanLore()) {
             val amount = group("amount").formatInt()
             storage.amountGifted = amount
             update()
@@ -45,7 +55,7 @@ object UniqueGiftCounter {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    private fun onIslandChange() {
         update()
     }
 
@@ -66,7 +76,7 @@ object UniqueGiftCounter {
     }
 
     @HandleEvent
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         val display = display ?: return
 

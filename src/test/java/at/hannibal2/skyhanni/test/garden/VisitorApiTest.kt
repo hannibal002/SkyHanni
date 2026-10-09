@@ -23,8 +23,8 @@ class VisitorApiTest {
         assert(
             !VisitorApi.isVisitorInfo(
                 mutableListOf(
-                    "§a§lVisitor Info",
-                    "§7§oClick to view info about this visitor."
+                    "Visitor Info",
+                    "Click to view info about this visitor."
                 )
             )
         )
@@ -33,23 +33,23 @@ class VisitorApiTest {
         assert(
             !VisitorApi.isVisitorInfo(
                 mutableListOf(
-                    "§a§lVisitor Info",
-                    "§7§oClick to view info about this visitor.",
-                    "§7§oClick to view info about this visitor.",
-                    "§7§oClick to view info about this visitor.",
-                    "§7§oClick to view info about this visitor.",
+                    "Visitor Info",
+                    "Click to view info about this visitor.",
+                    "Click to view info about this visitor.",
+                    "Click to view info about this visitor.",
+                    "Click to view info about this visitor.",
                 )
             )
         )
 
-        // Third line is §7Offers Accepted: §a
+        // Third line is Offers Accepted:
         assert(
             VisitorApi.isVisitorInfo(
                 mutableListOf(
-                    "§a§lVisitor Info",
-                    "§7§oClick to view info about this visitor.",
-                    "§7§oClick to view info about this visitor.",
-                    "§7Offers Accepted: §a",
+                    "Visitor Info",
+                    "Click to view info about this visitor.",
+                    "Click to view info about this visitor.",
+                    "Offers Accepted: 54",
                 )
             )
         )

@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Pattern
@@ -669,7 +670,7 @@ object ChatFilter {
         foragingConfig.unmineable && IslandTypeTag.FORAGING_CUSTOM_TREES.isInIsland() && message.isPresent("unmineable_tree") -> "unmineable_tree"
         huntingConfig.redundantComments && IslandType.GALATEA.isInIsland() && message.isPresent("redundant_hunting") -> "redundant_hunting"
         huntingConfig.swoopAxeMessage && message.isPresent("swoop_axe") -> "swoop_axe"
-        config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message) -> "garden_pest"
+        config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message.removeColor()) -> "garden_pest"
         config.legacyItemsWarning && message.isPresent("legacy_items") -> "legacy_items"
 
         else -> null

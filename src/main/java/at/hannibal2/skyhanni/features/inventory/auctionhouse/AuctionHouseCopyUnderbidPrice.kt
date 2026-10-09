@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getPetInternalNameWithLevel
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -28,13 +28,13 @@ object AuctionHouseCopyUnderbidPrice {
     private val patternGroup = RepoPattern.group("auctions.underbid")
 
     /**
-     * REGEX-TEST: §7Buy it now: §61,000,000,000 coins
-     * REGEX-TEST: §7Starting bid: §6200,000,000 coins
-     * REGEX-TEST: §7Top bid: §6220,000 coins
+     * REGEX-TEST: Buy it now: 1,000,000,000 coins
+     * REGEX-TEST: Starting bid: 200,000,000 coins
+     * REGEX-TEST: Top bid: 220,000 coins
      */
     private val auctionPricePattern by patternGroup.pattern(
-        "price",
-        "§7(?:Buy it now|Starting bid|Top bid): §6(?<coins>[0-9,]+) coins",
+        "price.colorless",
+        "(?:Buy it now|Starting bid|Top bid): (?<coins>[0-9,]+) coins",
     )
 
     /**
@@ -75,7 +75,7 @@ object AuctionHouseCopyUnderbidPrice {
         if (!allowedInventoriesPattern.matches(InventoryUtils.openInventoryName())) return
         val stack = event.stackUnderCursor ?: return
 
-        auctionPricePattern.firstMatcher(stack.getLore()) {
+        auctionPricePattern.firstMatcher(stack.getCleanLore()) {
             copyPrice(group("coins").formatLong())
         }
     }

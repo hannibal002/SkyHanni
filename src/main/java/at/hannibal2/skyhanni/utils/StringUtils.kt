@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
@@ -326,19 +325,6 @@ object StringUtils {
         original: T,
         newText: T,
     ): T? = ChatComponentUtils.replaceIfNeeded(original, newText)
-
-    // TODO remove this deprecated alias in November 2026
-    @Deprecated(
-        "Moved to ChatComponentUtils",
-        ReplaceWith(
-            "this.applyIfPossible(transformationReason, transform)",
-            "at.hannibal2.skyhanni.utils.chat.ChatComponentUtils.applyIfPossible",
-        ),
-    )
-    fun SystemMessageEvent.Modify.applyIfPossible(
-        transformationReason: String? = null,
-        transform: (String) -> String,
-    ) = with(ChatComponentUtils) { applyIfPossible(transformationReason, transform) }
 
     fun String.replaceAll(oldValue: String, newValue: String, ignoreCase: Boolean = false): String {
         var text = this

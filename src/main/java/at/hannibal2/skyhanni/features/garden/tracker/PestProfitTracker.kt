@@ -203,7 +203,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     private fun SkyHanniChatEvent.Allow.checkPestChats() {
-        PestApi.pestDeathChatPattern.matchMatcher(message) {
+        PestApi.pestDeathChatPattern.matchMatcher(cleanMessage) {
             val pest = PestType.getByNameOrNull(group("pest")) ?: ErrorManager.skyHanniError(
                 "Could not find PestType for killed pest, please report this in the Discord.",
                 "pest_name" to group("pest"),

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
@@ -33,7 +34,7 @@ object TabListRenderer {
     private const val COLUMN_SPACING = 6
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
+    private fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
         if (GlobalRender.renderDisabled || event.type != RenderLayer.PLAYER_LIST || !config.enabled.get()) return
         event.cancel()
 
@@ -45,7 +46,7 @@ object TabListRenderer {
     private var isTabToggled = false
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOWEST)
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (GlobalRender.renderDisabled || !config.enabled.get() || !config.toggleTab) return
         if (MinecraftCompat.screen != null) return
 
@@ -190,20 +191,26 @@ object TabListRenderer {
         }
     }
 
+    /**
+     * REGEX-TEST: Fire Sales: (3)
+     * REGEX-TEST: Fire Sales: (10)
+     */
     private val fireSalePattern by RepoPattern.pattern(
-        "tablist.firesaletitle",
-        "§.§lFire Sales: §r§f\\([0-9]+\\)",
+        "tablist.firesaletitle.colorless",
+        "Fire Sales: \\([0-9]+\\)",
     )
 
     @HandleEvent
-    fun onSkipTablistLine(event: SkipTabListLineEvent) {
-        if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.component)) {
+    private fun onSkipTablistLine(event: SkipTabListLineEvent) {
+        if (config.hideFiresales && event.lastSubTitle != null &&
+            fireSalePattern.matches(event.lastSubTitle.component.string.removeColor())
+        ) {
             event.cancel()
         }
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "misc.compactTabList", "gui.compactTabList")
     }
 }

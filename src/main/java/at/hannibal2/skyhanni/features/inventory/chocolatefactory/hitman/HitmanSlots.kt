@@ -1,14 +1,12 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.hitmanInventoryPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.toSingleLineLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -23,11 +21,11 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 object HitmanSlots {
 
     /**
-     * REGEX-TEST: §7Hitman can store more eggs you miss! §7Cost §620,000,000 Coins §eClick to purchase!
+     * REGEX-TEST: Hitman can store more eggs you miss! Cost 20,000,000 Coins Click to purchase!
      */
     private val slotCostPattern by CFApi.patternGroup.pattern(
-        "hitman.slotcost",
-        ".*§7Cost §6(?<cost>[\\d,]+) Coins.*",
+        "hitman.slotcost.colorless",
+        ".*Cost (?<cost>[\\d,]+) Coins.*",
     )
 
     private val config get() = CFApi.config
@@ -36,19 +34,19 @@ object HitmanSlots {
     private var inInventory = false
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         inInventory = false
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = hitmanInventoryPattern.matches(event.inventoryName)
         if (!inInventory) return
         handleSlotStorageUpdate(event)
     }
 
     @HandleEvent
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    private fun onChestGuiRender() {
         if (!config.hitmanCosts || slotPricesLeft.isEmpty()) return
         if (!inInventory) return
         config.hitmanCostsPosition.renderRenderable(
@@ -60,7 +58,7 @@ object HitmanSlots {
     private fun handleSlotStorageUpdate(event: InventoryOpenEvent) {
         if (!config.hitmanCosts) return
         val leftToPurchase = event.inventoryItems.filterNotBorderSlots().count { (_, item) ->
-            val lore = item.getLore()
+            val lore = item.getCleanLore()
             item.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() && lore.isNotEmpty() &&
                 slotCostPattern.matches(lore.toSingleLineLore())
         }

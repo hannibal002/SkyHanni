@@ -2,8 +2,7 @@ package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -18,22 +17,26 @@ import kotlin.time.Duration.Companion.seconds
 object AshfangFreezeCooldown {
 
     private val config get() = AshfangManager.config
+
+    /**
+     * REGEX-TEST: Ashfang Follower's Cryogenic Blast hit you for 1,234 damage!
+     */
     private val cryogenicBlastPattern by RepoPattern.pattern(
-        "ashfang.freeze.cryogenic",
-        "§cAshfang Follower's Cryogenic Blast hit you for .* damage!",
+        "ashfang.freeze.cryogenic.colorless",
+        "Ashfang Follower's Cryogenic Blast hit you for [\\d,.]+ damage!",
     )
 
     private var unfrozenTime = SimpleTimeMark.farPast()
     private val freezeDuration = 3.seconds
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
-        if (cryogenicBlastPattern.matches(event.message)) unfrozenTime = SimpleTimeMark.now() + freezeDuration
+        if (cryogenicBlastPattern.matches(event.cleanMessage)) unfrozenTime = SimpleTimeMark.now() + freezeDuration
     }
 
     @HandleEvent
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled() || !isCurrentlyFrozen()) return
 
         val format = unfrozenTime.timeUntil().format(showMilliSeconds = true)
@@ -45,7 +48,7 @@ object AshfangFreezeCooldown {
     fun isCurrentlyFrozen() = unfrozenTime.isInFuture()
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "ashfang.freezeCooldown", "crimsonIsle.ashfang.freezeCooldown")
         event.move(2, "ashfang.freezeCooldownPos", "crimsonIsle.ashfang.freezeCooldownPos")
     }

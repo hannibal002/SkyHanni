@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -26,15 +26,15 @@ object CarrolynHelper {
     private val patternGroup = RepoPattern.group("garden.carrolyn")
 
     /**
-     * REGEX-TEST: §7Bring §63,000 §7of these to §5Carrolyn §7in
+     * REGEX-TEST: Bring 3,000 of these to Carrolyn in
      */
     private val lorePattern by patternGroup.pattern(
-        "lore",
-        "§7Bring §63,000 §7of these to §5Carrolyn §7in",
+        "lore.colorless",
+        "Bring 3,000 of these to Carrolyn in",
     )
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onTooltip(event: ToolTipTextEvent) {
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
 
         if (!event.itemStack.isCarrolynItem()) return
@@ -43,10 +43,10 @@ object CarrolynHelper {
         event.toolTip.add("§eClick to navigate to Carrolyn!")
     }
 
-    private fun SafeItemStack?.isCarrolynItem() = this?.getLore()?.any { lorePattern.matches(it) } ?: false
+    private fun SafeItemStack?.isCarrolynItem() = this?.let { lorePattern.anyMatches(it.getCleanLore()) } ?: false
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onItemClick(event: ItemClickEvent) {
+    private fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
 
         if (!event.itemInHand.isCarrolynItem()) return

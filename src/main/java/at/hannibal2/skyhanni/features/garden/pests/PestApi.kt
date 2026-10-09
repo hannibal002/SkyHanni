@@ -26,11 +26,12 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -40,7 +41,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 import org.lwjgl.glfw.GLFW
@@ -79,45 +79,53 @@ object PestApi {
     val patternGroup = RepoPattern.group("garden.pests-api")
 
     /**
-     * WRAPPED-REGEX-TEST: " §7 §aThe Garden §4§l§7 x1"
-     * WRAPPED-REGEX-TEST: " §7 §cThe Garden §4§l§7 x8"
+     * WRAPPED-REGEX-TEST: "  The Garden  x1"
+     * WRAPPED-REGEX-TEST: "  The Garden  x8"
      */
     private val pestsInScoreboardPattern by patternGroup.pattern(
-        "scoreboard.pests",
-        " §7. §[ac]The Garden §4§l[\uE07F\uE018]§7 x(?<pests>.*)",
+        "scoreboard.pests.colorless",
+        " . The Garden [\uE07F\uE018] x(?<pests>.*)",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: " §7 §aPlot §7- §b22a"
-     * WRAPPED-REGEX-TEST: " §7 §aThe Garden"
+     * WRAPPED-REGEX-TEST: "  Plot - 22a"
+     * WRAPPED-REGEX-TEST: "  The Garden"
      */
     private val noPestsInScoreboardPattern by patternGroup.pattern(
-        "scoreboard.no-pests",
-        " §7. §a(?:The Garden|Plot §7- §b.+)$",
+        "scoreboard.no-pests.colorless",
+        " . (?:The Garden|Plot - .+)$",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: "   §aPlot §7- §b4 §4§l§7 x1"
+     * WRAPPED-REGEX-TEST: "   Plot - 4  x1"
      */
     private val pestsInPlotScoreboardPattern by patternGroup.pattern(
-        "scoreboard.plot.pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*[\uE07F\uE018](?:§.)* x(?<pests>\\d+)",
+        "scoreboard.plot.pests.colorless",
+        "\\s*Plot - (?<plot>.+) [\uE07F\uE018] x(?<pests>\\d+)",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: " §aPlot §7- §b3"
+     * WRAPPED-REGEX-TEST: " Plot - 3"
      */
     private val noPestsInPlotScoreboardPattern by patternGroup.pattern(
-        "scoreboard.plot.no-pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$",
+        "scoreboard.plot.no-pests.colorless",
+        "\\s*Plot - (?<plot>.{1,3})$",
     )
 
     /**
-     * REGEX-TEST: §4§l §cThis plot has §25 §2 Pests§c!
+     * REGEX-TEST:  This plot has 5  Pests!
      */
     private val pestInventoryPattern by patternGroup.pattern(
-        "inventory",
-        "§4§l[\uE07F\uE018] §cThis plot has §.(?<amount>\\d+) §2[\uE07F\uE018] Pests?§c!",
+        "inventory.colorless",
+        "[\uE07F\uE018] This plot has (?<amount>\\d+) [\uE07F\uE018] Pests?!",
+    )
+
+    /**
+     * Configure Plots
+     */
+    private val configurePlotsInventoryPattern by patternGroup.pattern(
+        "inventory.configure-plots",
+        "Configure Plots",
     )
 
     /**
@@ -129,27 +137,27 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST: §eYou received §a7x Enchanted Potato §efor killing a §2Locust§e!
-     * REGEX-TEST: §eYou received §a6x Enchanted Cocoa Beans §efor killing a §2Moth§e!
-     * REGEX-TEST: §eYou received §a64x Enchanted Sugar §efor killing a §2Mosquito§e!
+     * REGEX-TEST: You received 7x Enchanted Potato for killing a Locust!
+     * REGEX-TEST: You received 6x Enchanted Cocoa Beans for killing a Moth!
+     * REGEX-TEST: You received 64x Enchanted Sugar for killing a Mosquito!
      */
     val pestDeathChatPattern by patternGroup.pattern(
-        "chat.pest-death",
-        "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §2(?<pest>.*)§e!",
+        "chat.pest-death.colorless",
+        "You received (?<amount>[\\d,]+)x (?<item>.*) for killing an? (?<pest>.*)!",
     )
     val noPestsChatPattern by patternGroup.pattern(
-        "chat.no-pests",
-        "§cThere are not any Pests on your Garden right now! Keep farming!",
+        "chat.no-pests.colorless",
+        "There are not any Pests on your Garden right now! Keep farming!",
     )
 
     /**
-     * REGEX-TEST: §9§lPEST TRAP #3§r
-     * REGEX-TEST: §5§lMOUSE TRAP #2§r
-     * REGEX-TEST: §6§lVERMIN TRAP #2
+     * REGEX-TEST: PEST TRAP #3
+     * REGEX-TEST: MOUSE TRAP #2
+     * REGEX-TEST: VERMIN TRAP #2
      */
     private val pestTrapPattern by patternGroup.pattern(
-        "entity.pest-trap",
-        "(?:§.)+§l(?<type>PEST|MOUSE|VERMIN) TRAP(?: #(?<number>\\d+))?(?:§.)*",
+        "entity.pest-trap.colorless",
+        "(?<type>PEST|MOUSE|VERMIN) TRAP(?: #(?<number>\\d+))?",
     )
 
     /**
@@ -162,12 +170,12 @@ object PestApi {
     val stereoInventory = InventoryDetector { stereoInventoryPattern }
 
     /**
-     * REGEX-TEST: §7Now Playing: §aWings of Harmony §8(Moth)
-     * REGEX-TEST: §7Now Playing: §a§cNone
+     * REGEX-TEST: Now Playing: Wings of Harmony (Moth)
+     * REGEX-TEST: Now Playing: None
      */
     val stereoPlayingPattern by patternGroup.pattern(
-        "stereo.playing",
-        "§7Now Playing: (?:§.)*(?<vinyl>[^§]+).*",
+        "stereo.playing.colorless",
+        "Now Playing: (?<vinyl>.*)",
     )
 
     /**
@@ -246,14 +254,14 @@ object PestApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Configure Plots") return
+        if (!configurePlotsInventoryPattern.matches(event.inventoryName)) return
 
         for (plot in GardenPlotApi.plots) {
             if (plot.isBarn() || plot.locked || plot.uncleared) continue
             plot.pests = 0
             plot.isPestCountInaccurate = false
             val item = event.inventoryItems[plot.inventorySlot] ?: continue
-            pestInventoryPattern.firstMatcher(item.getLore()) {
+            pestInventoryPattern.firstMatcher(item.getCleanLore()) {
                 plot.pests = group("amount").toInt()
             }
         }
@@ -292,7 +300,7 @@ object PestApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (noPestsChatPattern.matches(event.message)) {
+        if (noPestsChatPattern.matches(event.cleanMessage)) {
             resetAllPests()
         }
     }
@@ -366,7 +374,7 @@ object PestApi {
     fun getNearestInfestedPlot() = getInfestedPlots().minByOrNull { it.middle.distanceSqToPlayer() }
 
     fun isNearPestTrap() = EntityUtils.getEntitiesNearby<ArmorStand>(10.0).any {
-        pestTrapPattern.matches(it.displayName.formattedTextCompat())
+        pestTrapPattern.matches(it.cleanName)
     }
 
     fun GardenPlot.getPestTypesInPlot() = gardenPestTypes.getOrDefault(this, listOf())
@@ -406,7 +414,7 @@ object PestApi {
     }
 
     private fun checkScoreboardLines(list: List<String>) {
-        for (line in list) {
+        for (line in list.map { it.removeColor() }) {
             // gets if there are no pests remaining in the garden
             noPestsInScoreboardPattern.matchMatcher(line) {
                 if (scoreboardPests != 0 || getInfestedPlots().isNotEmpty()) {

@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -47,8 +47,8 @@ object TeleportPadInventoryNumber {
         )
 
         val result = mutableMapOf<String, Int>()
-        for (entry in baseNumber) {
-            result[entry.key] = entry.value
+        for ((key, value) in baseNumber) {
+            result[key] = value
         }
 
         for ((multiplyText, multiplyNumber) in multipliers) {
@@ -63,22 +63,27 @@ object TeleportPadInventoryNumber {
 
     private var inTeleportPad = false
 
+    /**
+     * REGEX-TEST: one teleport pad
+     * REGEX-TEST: two teleport pad
+     * REGEX-TEST: three teleport pad
+     */
     private val padNumberPattern by RepoPattern.pattern(
-        "misc.teleportpad.number",
-        "§.(?<number>.*) teleport pad"
+        "misc.teleportpad.number.colorless",
+        "(?<number>.*) teleport pad"
     )
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inTeleportPad =
             event.inventoryName == "Set Destination" && SkyHanniMod.feature.misc.teleportPad.inventoryNumbers
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
+    private fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!inTeleportPad) return
 
-        padNumberPattern.matchMatcher(event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets().lowercase()) {
+        padNumberPattern.matchMatcher(event.stack.cleanName.lowercase()) {
             numbers[group("number")]?.let {
                 event.stackTip = "$it"
             }

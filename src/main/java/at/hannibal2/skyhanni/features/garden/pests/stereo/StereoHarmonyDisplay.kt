@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -73,7 +73,7 @@ object StereoHarmonyDisplay {
     }
 
     private fun updateActiveVinyl(stack: SafeItemStack?) {
-        PestApi.stereoPlayingPattern.firstMatcher(stack?.getLore() ?: return) {
+        PestApi.stereoPlayingPattern.firstMatcher(stack?.getCleanLore() ?: return) {
             gardenStorage?.activeVinyl = VinylType.getByName(group("vinyl").trim()).takeIf { it != VinylType.NONE }
             update()
         }

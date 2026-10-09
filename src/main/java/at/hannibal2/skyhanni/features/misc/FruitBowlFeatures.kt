@@ -69,11 +69,11 @@ object FruitBowlFeatures {
     )
 
     /**
-     * REGEX-TEST: §2§lFRUITALICIOUS! §r§aYou completed your fruit bowl!
+     * REGEX-TEST: FRUITALICIOUS! You completed your fruit bowl!
      */
     private val chatFoundAllPattern by chatGroup.pattern(
         "chat-message.found-all",
-        "§2§lFRUITALICIOUS! §r§aYou completed your fruit bowl!",
+        "FRUITALICIOUS! You completed your fruit bowl!",
     )
 
     /**
@@ -96,12 +96,12 @@ object FruitBowlFeatures {
     )
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         highlightedPlayers.clear()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onItemInHandChange() {
+    private fun onItemInHandChange() {
         if (!config.display && !config.playerHighlighter) return
 
         namesMissing = updateNamesMissing()
@@ -125,7 +125,7 @@ object FruitBowlFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
+    private fun onTick() {
         if (!config.playerHighlighter) return
         for (mob in MobData.players) {
             if (mob !in highlightedPlayers) {
@@ -182,7 +182,7 @@ object FruitBowlFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSystemMessage(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!inHand) return
 
         val message = event.cleanMessage
@@ -219,7 +219,7 @@ object FruitBowlFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(canColor, canNotColor) {
                 if (playerHighlighter) {

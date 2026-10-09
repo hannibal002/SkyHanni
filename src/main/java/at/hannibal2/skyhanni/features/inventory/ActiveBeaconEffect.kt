@@ -2,13 +2,12 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -29,17 +28,17 @@ object ActiveBeaconEffect {
     )
 
     /**
-     * REGEX-TEST: §aActive stat boost!
+     * REGEX-TEST: Active stat boost!
      */
     private val slotPattern by patternGroup.pattern(
-        "slot.active",
-        "§aActive stat boost!",
+        "slot.active.colorless",
+        "Active stat boost!",
     )
 
     private var slot: Int? = null
 
-    @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    @HandleEvent(onlyOnIsland = PRIVATE_ISLAND)
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!inventoryPattern.matches(event.inventoryName)) {
             slot = null
@@ -47,22 +46,22 @@ object ActiveBeaconEffect {
         }
 
         slot = event.inventoryItems.filter { (_, stack) ->
-            stack.getLore().any { slotPattern.matches(it) }
+            slotPattern.anyMatches(stack.getCleanLore())
         }.firstNotNullOfOrNull { it.key }
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(onlyOnIsland = PRIVATE_ISLAND)
+    private fun onInventoryClose() {
         slot = null
     }
 
-    @HandleEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent(onlyOnIsland = PRIVATE_ISLAND)
+    private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         val slot = slot ?: return
 
         event.container.getSlot(slot).highlight(LorenzColor.GREEN)
     }
 
-    fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland() && config.highlightActiveBeaconEffect
+    fun isEnabled() = config.highlightActiveBeaconEffect
 }

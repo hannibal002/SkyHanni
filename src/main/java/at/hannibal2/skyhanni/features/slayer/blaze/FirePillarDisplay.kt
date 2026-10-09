@@ -19,20 +19,20 @@ object FirePillarDisplay {
     private val config get() = SlayerApi.config.blazes
 
     /**
-     * REGEX-TEST: §6§l2s §c§l8 hits
+     * REGEX-TEST: 2s 8 hits
      */
     private val entityNamePattern by RepoPattern.pattern(
-        "slayer.blaze.firepillar.entityname",
-        "§6§l(?<seconds>.*)s §c§l8 hits",
+        "slayer.blaze.firepillar.entityname.colorless",
+        "(?<seconds>.*)s 8 hits",
     )
 
     private var display: Renderable? = null
     private var entityId: Int = 0
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onEntityCustomNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+    private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         if (!config.firePillarDisplay) return
-        val seconds = entityNamePattern.matchGroup(event.newNameFormatted ?: return, "seconds") ?: return
+        val seconds = entityNamePattern.matchGroup(event.cleanName ?: return, "seconds") ?: return
         entityId = event.entity.id
         display = Renderable.text("§cFire Pillar: §b${seconds}s")
     }
@@ -43,7 +43,7 @@ object FirePillarDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!config.firePillarDisplay) return
 
         val display = display ?: return

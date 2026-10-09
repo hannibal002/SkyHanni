@@ -314,14 +314,14 @@ object PlayerChatManager {
     }
 
     private fun sendSystemMessage(event: SkyHanniChatEvent.Allow) {
-        with(SystemMessageEvent.Allow(event.message, event.chatComponent)) {
+        with(SystemMessageEvent.Allow(event.messageComponent, event.chatComponent)) {
             post()
             event.handleChat(blockedReason)
         }
     }
 
     private fun sendSystemMessage(event: SkyHanniChatEvent.Modify) {
-        with(SystemMessageEvent.Modify(event.message, event.chatComponent)) {
+        with(SystemMessageEvent.Modify(event.messageComponent, event.chatComponent)) {
             post()
             event.handleChat(chatComponent)
         }

@@ -3,10 +3,7 @@ package at.hannibal2.skyhanni.features.rift.everywhere.motes
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.rift.motes.RiftInventoryValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
@@ -35,9 +32,12 @@ object ShowMotesNpcSellPrice {
 
     private val config get() = RiftApi.config.motes
 
+    /**
+     * REGEX-TEST: You have 3 Grubber Stacks
+     */
     private val burgerPattern by RepoPattern.pattern(
-        "rift.everywhere.burger",
-        ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*",
+        "rift.everywhere.burger.colorless",
+        ".*You have (?<amount>\\d) Grubber Stacks.*",
     )
 
     private var display = emptyList<Renderable>()
@@ -46,7 +46,7 @@ object ShowMotesNpcSellPrice {
     private val slotList = mutableListOf<Int>()
 
     @HandleEvent
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    private fun onChestGuiRender() {
         if (!isInventoryValueEnabled()) return
         if (inInventory) {
             config.inventoryValue.position.renderRenderables(
@@ -57,14 +57,14 @@ object ShowMotesNpcSellPrice {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!isInventoryValueEnabled()) return
         if (!event.isMod(10, 1)) return
         processItems()
     }
 
     @HandleEvent
-    fun onToolTip(event: ToolTipTextEvent) {
+    private fun onToolTip(event: ToolTipTextEvent) {
         if (!isShowPriceEnabled()) return
 
         val itemStack = event.itemStack
@@ -84,12 +84,12 @@ object ShowMotesNpcSellPrice {
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened() {
         reset()
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         reset()
     }
 
@@ -121,8 +121,8 @@ object ShowMotesNpcSellPrice {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        burgerPattern.matchMatcher(event.message) {
+    private fun onChat(event: SystemMessageEvent.Allow) {
+        burgerPattern.matchMatcher(event.cleanMessage) {
             config.burgerStacks = group("amount").toInt()
             ChatUtils.chat("Set your McGrubber's burger stacks to ${group("amount")}.")
         }

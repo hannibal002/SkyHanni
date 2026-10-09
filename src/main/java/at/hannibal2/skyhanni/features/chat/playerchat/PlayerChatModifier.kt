@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.chat.playerchat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.skyhanni.events.chat.AbstractChatEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
+import at.hannibal2.skyhanni.utils.chat.ChatComponentUtils.applyIfPossible
 import at.hannibal2.skyhanni.utils.compat.value
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
@@ -24,7 +24,7 @@ object PlayerChatModifier {
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent.Modify) {
+    private fun onChat(event: AbstractChatEvent.Modify) {
         event.applyIfPossible("PLAYER_CHAT") { cutMessage(it) }
     }
 
@@ -63,7 +63,7 @@ object PlayerChatModifier {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "chat.playerRankHider", "chat.playerMessage.playerRankHider")
         event.move(3, "chat.chatFilter", "chat.playerMessage.chatFilter")
     }
