@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.combat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.features.combat.broodmother.BroodmotherConfig
+import at.hannibal2.skyhanni.config.features.combat.carrytracker.CarryTrackerConfig
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
 import at.hannibal2.skyhanni.config.features.combat.end.EndIslandConfig
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostProfitTrackerConfig
@@ -23,6 +24,10 @@ class CombatConfig {
     @Expose
     @Category(name = "End Island", desc = "Features for the End Island")
     val endIsland: EndIslandConfig = EndIslandConfig()
+
+    @Expose
+    @Category(name = "Carry Tracker", desc = "Carry Tracker settings")
+    val carryTracker: CarryTrackerConfig = CarryTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Quiver", desc = "")

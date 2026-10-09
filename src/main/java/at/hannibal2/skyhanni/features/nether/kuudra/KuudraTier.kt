@@ -7,21 +7,22 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
-enum class KuudraTier(val displayName: String) {
-    BASIC("Basic"),
-    HOT("Hot"),
-    BURNING("Burning"),
-    FIERY("Fiery"),
-    INFERNAL("Infernal"),
+enum class KuudraTier(val displayName: String, val armorName: String) {
+    BASIC("Basic", ""),
+    HOT("Hot", "HOT"),
+    BURNING("Burning", "BURNING"),
+    FIERY("Fiery", "FIERY"),
+    INFERNAL("Infernal", "INFERNAL"),
     ;
 
     var doneToday: Boolean = false
 
     private var intLocation: LorenzVec? = null
     private var intTierNumber: Int = ordinal + 1
-    private var intDisplayItem: NeuInternalName = "KUUDRA_${name}_TIER_KEY".toInternalName()
+    private var intDisplayItem: NeuInternalName = "KUUDRA_${armorName.takeIfNotEmpty()?.plus('_').orEmpty()}TIER_KEY".toInternalName()
 
     val location: LorenzVec? get() = intLocation
     val tierNumber: Int get() = intTierNumber
@@ -43,31 +44,31 @@ enum class KuudraTier(val displayName: String) {
          */
         private val kuudraQuestPattern by patternGroup.pattern(
             "quest.identifier",
-            "Kill Kuudra (?<tier>\\w+) Tier"
+            "Kill Kuudra (?<tier>\\w+) Tier",
         )
 
-        fun getQuestOrNull(
-            questName: String,
-            state: QuestState,
-        ): KuudraQuest? = kuudraQuestPattern.matchMatcher(questName) {
-            val tierName = getTierByNameOrNull(group("tier")) ?: return@matchMatcher null
-            KuudraQuest(tierName, state)
-        }
-
-        private fun getTierByNameOrNull(name: String) = entries.firstOrNull {
-            it.displayName.equals(name, ignoreCase = true) || it.name.equals(name, ignoreCase = true)
-        }
-
-        fun addRepoData(
-            displayName: String,
-            displayItem: NeuInternalName,
-            location: LorenzVec?,
-            tier: Int,
-        ) {
+        fun addRepoData(displayName: String, displayItem: NeuInternalName, location: LorenzVec?, tier: Int) {
             val target = entries.firstOrNull { it.displayName == displayName } ?: return
             target.setLocation(location)
             target.setDisplayItem(displayItem)
             target.setTierNumber(tier)
         }
+
+        fun getQuestOrNull(
+            questName: String,
+            state: QuestState,
+        ): KuudraQuest? = kuudraQuestPattern.matchMatcher(questName) {
+            val tierName = getByDisplayName(group("tier")) ?: return@matchMatcher null
+            KuudraQuest(tierName, state)
+        }
+
+        fun getByDisplayName(displayName: String): KuudraTier? =
+            entries.firstOrNull { it.displayName.equals(displayName, ignoreCase = true) }
+
+        fun getByTierNumber(tierNumber: Int): KuudraTier? =
+            entries.firstOrNull { it.tierNumber == tierNumber }
+
+        fun getByArmorName(armorName: String): KuudraTier? =
+            entries.firstOrNull { it.armorName.equals(armorName, ignoreCase = true) }
     }
 }

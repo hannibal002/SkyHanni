@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getArmorKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraArmorTiers
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.EssenceUtils.getEssencePrices
@@ -459,11 +459,12 @@ object EstimatedItemValueCalculator {
     private fun addCrimsonPrestige(stack: SafeItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalNameOrNull() ?: return 0.0
         if (!internalName.isKuudraArmor()) return 0.0
-        val tierIndex = internalName.getArmorKuudraTier()?.takeIf { it > 1 } ?: return 0.0
-        val armorTier = kuudraArmorTiers.getOrNull(tierIndex - 1) ?: return 0.0
+        val tier = internalName.getArmorKuudraTier() ?: return 0.0
+        val tierIndex = tier.tierNumber.takeIf { it > 1 } ?: return 0.0
+        val armorTier = tier.armorName
 
         val allTiersCost = (1 until tierIndex).mapNotNull { index ->
-            kuudraArmorTiers.getOrNull(index)?.let { tierName ->
+            KuudraTier.getByTierNumber(index)?.armorName?.let { tierName ->
                 EstimatedItemValue.crimsonPrestigeCosts[tierName] ?: run {
                     ErrorManager.logErrorStateWithData(
                         "Could not find crimson prestige cost for ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
@@ -527,8 +528,8 @@ object EstimatedItemValueCalculator {
     ): Pair<EssenceUtils.EssenceUpgradePrice, Pair<Int, Int>>? {
         var totalStars = inputStars
         val (price, maxStars) = if (internalName.isKuudraArmor()) {
-            val tier = (internalName.getArmorKuudraTier() ?: 0) - 1
-            totalStars += tier * 10
+            val tier = internalName.getArmorKuudraTier()?.tierNumber ?: 0
+            totalStars += (tier - 1) * 10
 
             var remainingStars = totalStars
 
@@ -540,7 +541,7 @@ object EstimatedItemValueCalculator {
 
             for ((id, _) in EssenceUtils.itemPrices) {
                 if (!id.contains(removed)) continue
-                tiers[id] = (id.getArmorKuudraTier() ?: 0) - 1
+                tiers[id] = (id.getArmorKuudraTier()?.tierNumber ?: 0) - 1
 
             }
             for ((id, _) in tiers.sorted()) {
