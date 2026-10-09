@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.dependency.FeatureDependencyDelegate
+import at.hannibal2.skyhanni.config.core.dependency.FeatureDependencyRequirement
 import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser
 import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
@@ -21,9 +23,15 @@ class EnchantParsingConfig {
     @FeatureToggle
     val colorParsing: Property<Boolean> = Property.of(true)
 
+    @FeatureDependencyDelegate("#colorParsing")
+    var isColorParsing: Boolean
+        get() = colorParsing.get()
+        set(value) = colorParsing.set(value)
+
     @Expose
     @ConfigOption(name = "Format", desc = "The way the enchants are formatted in the tooltip.")
     @ConfigEditorDropdown
+    @FeatureDependencyRequirement("#isColorParsing")
     val format: Property<EnchantFormat> = Property.of(EnchantFormat.NORMAL)
 
     enum class EnchantFormat(private val displayName: String) {

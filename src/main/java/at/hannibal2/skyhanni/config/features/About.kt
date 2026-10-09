@@ -1,13 +1,16 @@
 package at.hannibal2.skyhanni.config.features
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDeprecatedDisplay
 import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDisplay
 import at.hannibal2.skyhanni.utils.OSUtils.openBrowser
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -24,6 +27,18 @@ class About {
     @SearchTag("check download update")
     @Transient
     var currentVersion: Unit? = null
+
+
+    @ConfigOption(name = "Large Description Hover", desc = "Shows a large tooltip with the option name and description when hovering a config row for a few seconds (or immediately while holding Shift).")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @Expose
+    var bigDescriptionEnabled: Boolean = true
+
+    @ConfigOption(name = "Large Description Delay", desc = "How many seconds to hover a config row before the large description appears.")
+    @Expose
+    @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
+    var bigDescriptionDelay: Float = 3f
 
     @ConfigOption(name = "Update Stream", desc = "How frequently you want updates for SkyHanni")
     @Expose
