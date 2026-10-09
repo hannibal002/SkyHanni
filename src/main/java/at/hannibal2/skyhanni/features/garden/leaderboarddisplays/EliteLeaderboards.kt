@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.config.core.config.PositionList.Companion.updateConfigPositionList
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getLeaderboardRankConfig
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearCategories
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearEntries
@@ -21,11 +22,12 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlin.reflect.KClass
+import kotlinx.atomicfu.locks.synchronized
 
 enum class EliteLeaderboards(
     private val displayName: String,
     val display: EliteLeaderboardDisplayBase<*, *>,
-    val leaderboardType: KClass<out EliteLeaderboardType>
+    val leaderboardType: KClass<out EliteLeaderboardType>,
 ) {
     WEIGHT("Farming Weight", WeightDisplay(), EliteLeaderboardType.Weight::class),
     CROP("Crop Collection", CropDisplay(), EliteLeaderboardType.Crop::class),
@@ -42,6 +44,7 @@ enum class EliteLeaderboards(
         private val cropConfig get() = config.cropCollectionLeaderboard
         private val pestConfig get() = config.pestKillsLeaderboard
         private val weightConfig get() = config.farmingWeightLeaderboard
+        private val displayPositionsLock = Any()
 
         fun getFromTypeOrNull(type: KClass<out EliteLeaderboardType>) = entries.firstOrNull {
             it.leaderboardType == type
@@ -54,15 +57,17 @@ enum class EliteLeaderboards(
         }
 
         @HandleEvent
-        fun onGuiRenderTop() {
-            if (config.displayPositions.isEmpty()) return
-            if (!config.enabled.get()) return
-            if (InventoryUtils.inAnyInventory()) {
-                InventoryGuiScaleCompat.withOriginalHudScale {
+        private fun onGuiRenderTop() {
+            synchronized(displayPositionsLock) {
+                if (config.displayPositions.isEmpty()) return
+                if (!config.enabled.get()) return
+                if (InventoryUtils.inAnyInventory()) {
+                    InventoryGuiScaleCompat.withOriginalHudScale {
+                        renderDisplays()
+                    }
+                } else {
                     renderDisplays()
                 }
-            } else {
-                renderDisplays()
             }
         }
 
@@ -79,7 +84,7 @@ enum class EliteLeaderboards(
         }
 
         @HandleEvent
-        fun onConfigLoad() {
+        private fun onConfigLoad() {
             val weightConfigs = listOf(
                 weightConfig.rankGoals.useRankGoal,
                 weightConfig.rankGoals.monthlyRankGoal,
@@ -96,7 +101,7 @@ enum class EliteLeaderboards(
             val pestConfigs = listOf(
                 pestConfig.rankGoals.useRankGoal,
                 pestConfig.rankGoals.rankGoalTypes,
-                pestConfig.gamemode
+                pestConfig.gamemode,
             )
 
             weightConfigs.forEach {
@@ -137,7 +142,22 @@ enum class EliteLeaderboards(
         }
 
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onProfileJoin() {
+            synchronized(displayPositionsLock) {
+                with(config.displayPositions) {
+                    val newPositionList = updateConfigPositionList(
+                        this,
+                        EliteLeaderboards.entries,
+                        "garden.eliteFarmersLeaderboards.displayPositions",
+                    )
+                    clear()
+                    addAll(newPositionList)
+                }
+            }
+        }
+
+        @HandleEvent
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.transform(1, "garden.eliteFarmingWeightoffScreenDropMessage")
             event.move(3, "garden.eliteFarmingWeightDisplay", "garden.eliteFarmingWeights.display")
             event.move(3, "garden.eliteFarmingWeightPos", "garden.eliteFarmingWeights.pos")

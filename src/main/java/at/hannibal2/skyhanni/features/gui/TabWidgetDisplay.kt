@@ -2,10 +2,9 @@ package at.hannibal2.skyhanni.features.gui
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.config.PositionList.Companion.updateConfigPositionList
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
@@ -71,35 +70,37 @@ enum class TabWidgetDisplay(
 
         private val config get() = SkyHanniMod.feature.gui.tabWidget
         private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
+        private val displayPositionsLock = Any()
 
         @HandleEvent
         fun onGuiRenderOverlay() {
             if (!isEnabled()) return
             if (config.displayPositions.isEmpty()) return
-            config.display.get().forEach { widget ->
-                widget.position.renderRenderables(
-                    widget.widgets.flatMap { subWidget ->
-                        subWidget.lines.toRenderables()
-                    },
-                    posLabel = "Display Widget: ${widget.name}",
-                    extraSpace = -2
-                )
+            synchronized(displayPositionsLock) {
+                config.display.get().forEach { widget ->
+                    widget.position.renderRenderables(
+                        widget.widgets.flatMap { subWidget ->
+                            subWidget.lines.toRenderables()
+                        },
+                        posLabel = "Display Widget: ${widget.name}",
+                        extraSpace = -2,
+                    )
+                }
             }
         }
 
         @HandleEvent
         fun onProfileJoin() {
-            // Validation that the displayPositions in the config is correct
-            val sizeDiff = TabWidgetDisplay.entries.size - config.displayPositions.size
-            if (sizeDiff == 0) return
-            if (sizeDiff < 0) {
-                ErrorManager.skyHanniError(
-                    "Invalid State of config.displayPositions",
-                    "Display" to TabWidgetDisplay.entries,
-                    "Positions" to config.displayPositions,
-                )
-            } else {
-                config.displayPositions.addAll(List(sizeDiff) { Position() })
+            synchronized(displayPositionsLock) {
+                with(config.displayPositions) {
+                    val newPositionList = updateConfigPositionList(
+                        this,
+                        TabWidgetDisplay.entries,
+                        "gui.tabWidget.displayPositions",
+                    )
+                    clear()
+                    addAll(newPositionList)
+                }
             }
         }
     }
