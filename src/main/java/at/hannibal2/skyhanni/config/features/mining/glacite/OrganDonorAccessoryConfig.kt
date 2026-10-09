@@ -11,7 +11,7 @@ class OrganDonorAccessoryConfig {
         name = "Mute when all Corpses found",
         desc = "Mutes the sounds made from the Organ Donor accessory " +
             "once all Frozen Corpses in the Mineshaft have been found.\n" +
-            "§eRequires corpse locator to be enabled!",
+            "§eRequires Found Corpse waypoints to be enabled!",
     )
     @ConfigEditorBoolean
     @FeatureToggle
