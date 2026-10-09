@@ -26,4 +26,5 @@ data class EnforcedValueData(
 data class EnforcedValue(
     @Expose val path: String,
     @Expose val value: JsonElement,
+    @Expose val persist: Boolean = false,
 )

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
+import at.hannibal2.skyhanni.config.storage.EnforcedUserValuesStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.config.storage.SeenContributorStorage
 import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
@@ -137,6 +138,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     lateinit var seaCreatureStorage: SpecificSeaCreatureStorage
     lateinit var achievementStorage: AchievementStorage
     lateinit var seenContributorStorage: SeenContributorStorage
+    lateinit var enforcedUserValuesStorage: EnforcedUserValuesStorage
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
