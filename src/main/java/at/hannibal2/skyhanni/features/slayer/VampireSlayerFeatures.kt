@@ -298,7 +298,11 @@ object VampireSlayerFeatures {
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        if (config.drawLine) drawBossLines(event)
+        if (config.drawLine) {
+            for (trackedBoss in trackedBosses) {
+                event.renderBossLine(trackedBoss)
+            }
+        }
         if (!configBloodIchor.highlight && !configKillerSpring.highlight) {
             return
         }
@@ -306,38 +310,35 @@ object VampireSlayerFeatures {
             return
         }
         for (trackedBoss in trackedBosses) {
-            renderBossEffects(event, trackedBoss)
+            event.renderBossEffects(trackedBoss)
         }
     }
 
-    private fun drawBossLines(event: SkyHanniRenderWorldEvent) {
-        for (trackedBoss in trackedBosses) {
-            val boss = trackedBoss.entity
-            if (!boss.canBeSeen(MAX_SLAYER_DISTANCE)) continue
-            event.drawLineToCrosshair(
-                event.exactLocation(boss).up(SNEAKING_EYE_HEIGHT),
-                config.lineColor,
-                config.lineWidth,
-                true,
-            )
-        }
+    private fun SkyHanniRenderWorldEvent.renderBossLine(trackedBoss: TrackedBoss) {
+        val boss = trackedBoss.entity
+        if (!boss.canBeSeen(MAX_SLAYER_DISTANCE)) return
+        drawLineToCrosshair(
+            exactLocation(boss).up(SNEAKING_EYE_HEIGHT),
+            config.lineColor,
+            config.lineWidth,
+            true,
+        )
     }
 
-    private fun renderBossEffects(event: SkyHanniRenderWorldEvent, trackedBoss: TrackedBoss) {
+    private fun SkyHanniRenderWorldEvent.renderBossEffects(trackedBoss: TrackedBoss) {
         val boss = trackedBoss.entity as? RemotePlayer ?: return
         val effects = trackedBoss.effects
-        val eyeY = event.exactPlayerEyeLocation().y
+        val eyeY = exactPlayerEyeLocation().y
         val closestSprings = groupSpringStands(effects)
             .map { group -> group.minBy { abs(it.blockPosition().y + 0.5 - eyeY) } }
             .toSet()
         for ((stand, type) in effects) {
             if (type == KILLER_SPRING && stand !in closestSprings) continue
-            renderEffect(event, boss, stand, type)
+            renderEffect(boss, stand, type)
         }
     }
 
-    private fun renderEffect(
-        event: SkyHanniRenderWorldEvent,
+    private fun SkyHanniRenderWorldEvent.renderEffect(
         boss: RemotePlayer,
         stand: ArmorStand,
         type: EffectType,
@@ -347,19 +348,18 @@ object VampireSlayerFeatures {
         if (!(isIchor && config.bloodIchor.highlight) && !(isSpring && config.killerSpring.highlight)) return
         val vec = stand.blockPosition().toLorenzVec()
         if (vec.distanceToPlayer() <= MAX_SLAYER_DISTANCE) {
-            renderEffectHighlight(event, boss, stand, isIchor, isSpring, vec)
+            renderEffectHighlight(boss, stand, isIchor, isSpring, vec)
         }
         if (configBloodIchor.renderBeam && isIchor && stand.isAlive) {
-            event.drawWaypointFilled(
-                event.exactLocation(stand).add(0, y = -2, 0),
+            drawWaypointFilled(
+                exactLocation(stand).add(0, y = -2, 0),
                 configBloodIchor.color.toColor(),
                 beacon = true,
             )
         }
     }
 
-    private fun renderEffectHighlight(
-        event: SkyHanniRenderWorldEvent,
+    private fun SkyHanniRenderWorldEvent.renderEffectHighlight(
         boss: RemotePlayer,
         stand: ArmorStand,
         isIchor: Boolean,
@@ -373,8 +373,8 @@ object VampireSlayerFeatures {
             isEnabled() && trackedBosses.any { it.effects.containsKey(stand) }
         }
         val linesColor = (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toColor()
-        event.drawColor(vec.up(2.0), LorenzColor.DARK_RED.toChromaColor(), alpha = 1f)
-        event.drawDynamicText(
+        drawColor(vec.up(2.0), LorenzColor.DARK_RED.toChromaColor(), alpha = 1f)
+        drawDynamicText(
             vec.add(0.5, 2.5, 0.5),
             if (isIchor) "§4Ichor" else "§4Spring",
             1.5,
@@ -382,9 +382,9 @@ object VampireSlayerFeatures {
         )
         val showLines = (configBloodIchor.showLines && isIchor) || (configKillerSpring.showLines && isSpring)
         if (showLines && stand.canBeSeen(vecYOffset = 1.5)) {
-            event.draw3DLine(
-                event.exactPlayerEyeLocation(boss),
-                event.exactPlayerEyeLocation(stand),
+            draw3DLine(
+                exactPlayerEyeLocation(boss),
+                exactPlayerEyeLocation(stand),
                 linesColor,
                 3,
                 true,
