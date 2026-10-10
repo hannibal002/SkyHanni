@@ -3,14 +3,14 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
-import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
-import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
@@ -37,8 +36,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -69,10 +68,13 @@ object VampireSlayerFeatures {
     }
 
     private data class TrackedBoss(
-        val entity: RemotePlayer,
+        val mob: Mob,
         val effects: MutableMap<ArmorStand, EffectType> = linkedMapOf(),
         var steakAlertSent: Boolean = false,
-    )
+    ) {
+        val entity get() = mob.baseEntity
+        val armorStand get() = mob.armorStand
+    }
 
     private val trackedBosses = mutableListOf<TrackedBoss>()
 
@@ -100,6 +102,14 @@ object VampireSlayerFeatures {
         ".*TWINCLAWS.*",
     )
 
+    /**
+     * REGEX-TEST: Bloodfiend III 312/1,800❤ ҉
+     */
+    private val steakHealthPattern by patternGroup.pattern(
+        "steak-health",
+        "Bloodfiend .* [\\d,]+/[\\d,]+❤ ҉",
+    )
+
     private fun trackedBoss(entity: RemotePlayer): TrackedBoss? =
         trackedBosses.firstOrNull { it.entity === entity }
 
@@ -122,81 +132,37 @@ object VampireSlayerFeatures {
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
-    private fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        val entity = event.entity as? RemotePlayer ?: run {
-            log("health update ignored: entity is ${event.entity.javaClass.simpleName}")
-            return
-        }
-        log(
-            "health update: id=${entity.id}, cleanName='${entity.cleanName}', rawName='${entity.name}', " +
-                "position=${entity.blockPosition()}, health=${event.health}, " +
-                "tracked=${trackedBoss(entity) != null}",
-        )
-        if (!isEnabled() || trackedBoss(entity) == null) return
-        if (!bossNamePattern.matches(entity.cleanName)) {
-            log(
-                "health update rejected: id=${entity.id}, cleanName='${entity.cleanName}', " +
-                    "rawName='${entity.name}', pattern='Bloodfiend .*'",
-            )
-            trackedBosses.removeIf { it.entity === entity }
-            return
-        }
-        processBossHealth(entity, "health update")
+    private fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+        val mob = event.mob
+        if (mob.baseEntity !is RemotePlayer || !bossNamePattern.matches(mob.baseEntity.cleanName)) return
+        log("vampire mob spawned: id=${mob.baseEntity.id}, mobName='${mob.name}', armorStandId=${mob.armorStand?.id}")
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
-    private fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
-        log(
-            "remote player entered: id=${event.entity.id}, cleanName='${event.entity.cleanName}', " +
-                "rawName='${event.entity.name}', position=${event.entity.blockPosition()}",
-        )
-        if (!isEnabled()) return
-        if (bossNamePattern.matches(event.entity.cleanName)) {
-            log("boss entered untracked: id=${event.entity.id}, cleanName='${event.entity.cleanName}'")
-        } else {
-            log(
-                "entity enter rejected: id=${event.entity.id}, cleanName='${event.entity.cleanName}', " +
-                    "rawName='${event.entity.name}', pattern='Bloodfiend .*'",
-            )
+    private fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
+        val removed = trackedBosses.removeIf { it.mob === event.mob }
+        if (removed) {
+            log("tracked vampire mob despawned: id=${event.mob.baseEntity.id}, remaining=${trackedBosses.size}")
         }
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
-    private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<RemotePlayer>) {
-        log(
-            "remote player name update: id=${event.entity.id}, cleanName='${event.entity.cleanName}', " +
-                "rawName='${event.newName}', currentRawName='${event.entity.name}'",
-        )
-        if (!isEnabled()) return
-        if (bossNamePattern.matches(event.entity.cleanName)) {
-            if (trackedBoss(event.entity) != null) {
-                log("tracked boss name update: id=${event.entity.id}, tracked=${trackedBosses.size}")
-                processBossHealth(event.entity, "name update")
-            } else {
-                log("untracked boss name update: id=${event.entity.id}, cleanName='${event.entity.cleanName}'")
-            }
-        } else {
-            trackedBosses.removeIf { it.entity === event.entity }
-            log(
-                "boss removed on name update: id=${event.entity.id}, cleanName='${event.entity.cleanName}', " +
-                    "rawName='${event.newName}', pattern='Bloodfiend .*', tracked=${trackedBosses.size}",
-            )
-        }
+    private fun onEffectLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
+        trackedBosses.forEach { it.effects.remove(event.entity) }
     }
 
-    private fun processBossHealth(entity: RemotePlayer, source: String) {
-        val boss = trackedBoss(entity) ?: return
-        val realHealth = entity.findHealthReal()
-        val maxHealth = entity.baseMaxHealth
-        val canUseSteak = maxHealth > 0 && realHealth <= maxHealth * 0.2f
+    private fun processBossSteak(boss: TrackedBoss, healthName: String?) {
+        val entity = boss.entity as? RemotePlayer ?: return
+        val canUseSteak = healthName?.let { steakHealthPattern.matches(it) } == true
         log(
-            "boss health processed: source=$source, id=${entity.id}, realHealth=$realHealth, " +
-                "maxHealth=$maxHealth, canUseSteak=$canUseSteak, tracked=true",
+            "boss steak processed: id=${entity.id}, mob=${boss.mob.name}, " +
+                "healthStandId=${boss.armorStand?.id}, healthName='$healthName', " +
+                "canUseSteak=$canUseSteak, tracked=true",
         )
         if (canUseSteak) {
             if (!boss.steakAlertSent && configBoss.steakAlert) {
                 boss.steakAlertSent = true
-                log("sending steak title: bossId=${entity.id}, source=$source")
+                log("sending steak title: bossId=${entity.id}")
                 TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds)
             }
         } else {
@@ -222,16 +188,21 @@ object VampireSlayerFeatures {
                 "matchesBoss=$matches, alreadyTracked=${trackedBoss(entity) != null}",
         )
         if (!matches) return
+        val mob = entity.mob
+        if (mob == null || mob.baseEntity !== entity) return
         if (trackedBoss(entity) == null) {
-            trackedBosses.add(TrackedBoss(entity))
+            trackedBosses.add(TrackedBoss(mob))
         }
         log("boss tracked after attack: id=${entity.id}, tracked=${trackedBosses.size}")
-        processBossHealth(entity, "attack")
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onArmorStandNameChange(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         val name = event.cleanName
+        val steakBoss = trackedBosses.firstOrNull { it.armorStand === event.entity }
+        if (isEnabled() && steakBoss != null) {
+            processBossSteak(steakBoss, name)
+        }
         val matches = name?.let { twinClawsPattern.matches(it) } == true
         val boss = if (matches) closestTrackedBoss(event.entity.getLorenzVec(), 5.0) else null
         log(
@@ -294,22 +265,13 @@ object VampireSlayerFeatures {
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
-    private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<*>) {
-        log("entity leaving: id=${event.entity.id}, type=${event.entity.javaClass.simpleName}")
-        when (val entity = event.entity) {
-            is RemotePlayer -> trackedBosses.removeIf { it.entity === entity }
-            is ArmorStand -> trackedBosses.forEach { it.effects.remove(entity) }
-        }
-        log("leave cleanup: bosses=${trackedBosses.size}, effects=${trackedBosses.sumOf { it.effects.size }}")
-    }
-
-    @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         log("render: bosses=${trackedBosses.size}, effects=${trackedBosses.sumOf { it.effects.size }}")
 
         if (config.drawLine) {
-            for ((boss) in trackedBosses) {
+            for (trackedBoss in trackedBosses) {
+                val boss = trackedBoss.entity
                 val visible = boss.canBeSeen(15)
                 log("boss line candidate: id=${boss.id}, visible=$visible")
                 if (!visible) continue
@@ -329,7 +291,9 @@ object VampireSlayerFeatures {
             log("effect rendering skipped: no tracked bosses, effects=0")
             return
         }
-        for ((boss, effects) in trackedBosses) {
+        for (trackedBoss in trackedBosses) {
+            val boss = trackedBoss.entity
+            val effects = trackedBoss.effects
             for ((stand, type) in effects) {
                 val vec = stand.blockPosition().toLorenzVec()
                 val distance = vec.distanceToPlayer()
