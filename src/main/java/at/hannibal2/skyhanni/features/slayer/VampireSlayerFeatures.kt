@@ -49,6 +49,7 @@ import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.decoration.ArmorStand
+import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -109,6 +110,8 @@ object VampireSlayerFeatures {
         "Bloodfiend .* [\\d,]+/[\\d,]+❤ ҉",
     )
 
+    private const val MAX_SLAYER_DISTANCE = 20.0
+
     private fun trackedBoss(entity: RemotePlayer): TrackedBoss? =
         trackedBosses.firstOrNull { it.entity === entity }
 
@@ -119,10 +122,24 @@ object VampireSlayerFeatures {
             .minByOrNull { it.second }
             ?.first
 
+    private fun bottomSpringStands(effects: Map<ArmorStand, EffectType>): Set<ArmorStand> {
+        val springs = effects.filterValues { it == EffectType.KILLER_SPRING }.keys
+        return springs.filter { stand ->
+            val position = stand.blockPosition()
+            springs.none { other ->
+                if (other === stand) return@none false
+                val otherPosition = other.blockPosition()
+                otherPosition.y < position.y &&
+                    abs(otherPosition.x - position.x) <= 1 &&
+                    abs(otherPosition.z - position.z) <= 1
+            }
+        }.toSet()
+    }
+
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
-        val removed = trackedBosses.filter { it.entity.distanceToPlayer() > 20 }
+        val removed = trackedBosses.filter { it.entity.distanceToPlayer() > MAX_SLAYER_DISTANCE }
         trackedBosses.removeAll(removed)
     }
 
@@ -223,7 +240,7 @@ object VampireSlayerFeatures {
             BLOOD_ICHOR_TEXTURE -> EffectType.BLOOD_ICHOR
             else -> null
         }
-        val boss = type?.let { closestTrackedBoss(entity.getLorenzVec(), 15.0) }
+        val boss = type?.let { closestTrackedBoss(entity.getLorenzVec(), MAX_SLAYER_DISTANCE) }
         if (type != null && boss != null) {
             boss.effects[entity] = type
         }
@@ -235,7 +252,7 @@ object VampireSlayerFeatures {
         if (config.drawLine) {
             for (trackedBoss in trackedBosses) {
                 val boss = trackedBoss.entity
-                val visible = boss.canBeSeen(15)
+                val visible = boss.canBeSeen(MAX_SLAYER_DISTANCE)
                 if (!visible) continue
                 val vec = event.exactLocation(boss)
                 event.drawLineToCrosshair(
@@ -255,7 +272,11 @@ object VampireSlayerFeatures {
         for (trackedBoss in trackedBosses) {
             val boss = trackedBoss.entity
             val effects = trackedBoss.effects
+            val bottomSprings = bottomSpringStands(effects)
             for ((stand, type) in effects) {
+                if (type == KILLER_SPRING && stand !in bottomSprings) {
+                    continue
+                }
                 val vec = stand.blockPosition().toLorenzVec()
                 val distance = vec.distanceToPlayer()
                 val isIchor = type == BLOOD_ICHOR
@@ -266,7 +287,7 @@ object VampireSlayerFeatures {
                 val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color)
                     .toColor()
                     .addAlpha(config.withAlpha)
-                if (distance <= 15) {
+                if (distance <= MAX_SLAYER_DISTANCE) {
                     RenderLivingEntityHelper.setEntityColor(stand, color) {
                         isEnabled() && trackedBosses.any { it.effects.containsKey(stand) }
                     }
@@ -322,7 +343,7 @@ object VampireSlayerFeatures {
             for ((stand, type) in effects.toMap()) {
                 val standDistance = stand.distanceTo(event.location)
                 if (standDistance > 3.0) continue
-                val boss = closestTrackedBoss(event.location, 15.0)
+                val boss = closestTrackedBoss(event.location, MAX_SLAYER_DISTANCE)
                 if (boss != null && boss !== trackedBoss) {
                     effects.remove(stand)
                     boss.effects[stand] = type
