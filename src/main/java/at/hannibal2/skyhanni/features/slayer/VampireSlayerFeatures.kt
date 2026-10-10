@@ -22,8 +22,8 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
-import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
-import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.PlayerUtils.SNEAKING_EYE_HEIGHT
@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
@@ -56,9 +56,16 @@ object VampireSlayerFeatures {
     private val configBloodIchor get() = config.bloodIchor
     private val configKillerSpring get() = config.killerSpring
 
+
+    private data class ArmorStandEffect(val stand: ArmorStand, val type: EffectType) {
+        enum class EffectType {
+            BLOOD_ICHOR, KILLER_SPRING
+        }
+    }
+
     private val bosses = linkedSetOf<RemotePlayer>()
-    private val effectStands = linkedSetOf<ArmorStand>()
-    private var standList = mapOf<ArmorStand, RemotePlayer>()
+    private val effectStands = linkedSetOf<ArmorStandEffect>()
+    private val standList = mutableMapOf<ArmorStand, RemotePlayer>()
 
     private val BLOOD_ICHOR_TEXTURE by SkullTextureHolder.texture("BLOOD_ICHOR")
     private val KILLER_SPRING_TEXTURE by SkullTextureHolder.texture("KILLER_SPRING")
@@ -122,9 +129,16 @@ object VampireSlayerFeatures {
     private fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
-        if (entity.hasSkullTexture(BLOOD_ICHOR_TEXTURE) ||
-            entity.hasSkullTexture(KILLER_SPRING_TEXTURE)) {
-            effectStands.add(entity)
+        when {
+            entity.wearingSkullTexture(KILLER_SPRING_TEXTURE) -> {
+                effectStands.add(ArmorStandEffect(entity, KILLER_SPRING))
+            }
+            entity.wearingSkullTexture(BLOOD_ICHOR_TEXTURE) -> {
+                effectStands.add(ArmorStandEffect(entity, BLOOD_ICHOR))
+            }
+            else -> {
+                effectStands.removeIf { it.stand == entity }
+            }
         }
     }
 
@@ -132,9 +146,9 @@ object VampireSlayerFeatures {
     private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<*>) {
         when (val entity = event.entity) {
             is RemotePlayer -> bosses.remove(entity)
-            is ArmorStand -> effectStands.remove(entity)
+            is ArmorStand -> effectStands.removeIf { entity == it.stand }
         }
-        standList = standList.filterKeys { it !== event.entity }
+        standList.removeIfKey { it === event.entity }
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
@@ -155,11 +169,11 @@ object VampireSlayerFeatures {
             }
         }
         if (!configBloodIchor.highlight && !configKillerSpring.highlight) return
-        for (stand in effectStands) {
+        for ((stand, type) in effectStands) {
             val vec = stand.blockPosition().toLorenzVec()
             val distance = vec.distanceToPlayer()
-            val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
-            val isSpring = stand.hasSkullTexture(KILLER_SPRING_TEXTURE)
+            val isIchor = type == BLOOD_ICHOR
+            val isSpring = type == KILLER_SPRING
             if (!(isIchor && config.bloodIchor.highlight) && !(isSpring && config.killerSpring.highlight)) continue
             val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color).toColor().addAlpha(config.withAlpha)
             if (distance <= 15) {
@@ -211,18 +225,17 @@ object VampireSlayerFeatures {
     private fun onWorldChange() {
         bosses.clear()
         effectStands.clear()
-        standList = mutableMapOf()
+        standList.clear()
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT, receiveCancelled = true)
     private fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
-        val loc = event.location
-        for (boss in loc.getEntitiesNearby<RemotePlayer>(3.0)) {
+        for (boss in bosses) {
             if (!boss.isHighlighted() || event.type != ParticleTypes.ENCHANT) continue
-            for (ichor in event.location.getEntitiesNearby<ArmorStand>(3.0)) {
-                if (ichor.hasSkullTexture(KILLER_SPRING_TEXTURE) || ichor.hasSkullTexture(BLOOD_ICHOR_TEXTURE)) {
-                    standList = standList.editCopy { this[ichor] = boss }
+            for ((stand, _) in effectStands) {
+                if (stand.distanceTo(event.location) <= 3.0) {
+                    standList[stand] = boss
                 }
             }
         }
