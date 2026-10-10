@@ -9,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class LaneSwitchNotificationConfig {
-
     @Expose
     @ConfigOption(
         name = "Enabled",

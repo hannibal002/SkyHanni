@@ -24,9 +24,11 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+
 
 @SkyHanniModule
 object FarmingLaneFeatures {
@@ -135,6 +137,7 @@ object FarmingLaneFeatures {
     private fun showWarning() {
         with(config.laneSwitchNotification) {
             if (!enabled) return
+            val wasNull = titleContext == null
             titleContext = when (titleContext) {
                 null -> TitleManager.sendTitle(
                     text.replace("&", "§"),
@@ -143,6 +146,9 @@ object FarmingLaneFeatures {
                 )
 
                 else -> titleContext.takeIf { it?.alive == true }
+            }
+            if (wasNull && sendChatMessage) {
+                ChatUtils.chat(chatMessage.replace("&", "§"), prefix = false)
             }
             if (lastPlaySound.passedSince() >= sound.repeatDuration.ticks) {
                 lastPlaySound = SimpleTimeMark.now()
