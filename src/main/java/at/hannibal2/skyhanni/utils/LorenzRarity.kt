@@ -55,7 +55,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     companion object {
 
         // Looks up by ordinal, which is how NEU numbers pet rarities (PHOENIX;7 is Special)
-        fun getById(id: Int): LorenzRarity? = if (entries.size > id) entries[id] else null
+        fun getById(id: Int): LorenzRarity? = entries.getOrNull(id)
 
         fun getByName(name: String): LorenzRarity? = entries.find { it.name.equals(name, ignoreCase = true) }
 
