@@ -91,10 +91,10 @@ object VampireSlayerFeatures {
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
-    private fun onEntityHealthUpdate(event: EntityHealthUpdateEvent<RemotePlayer>) {
+    private fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!isEnabled()) return
         if (!configBoss.highlight) return
-        val entity = event.entity
+        val entity = event.entity as? RemotePlayer ?: return
         if (!bossNamePattern.matches(entity.cleanName)) {
             bosses.remove(entity)
             return
