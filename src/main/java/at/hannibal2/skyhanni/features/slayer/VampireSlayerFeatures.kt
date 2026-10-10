@@ -122,18 +122,24 @@ object VampireSlayerFeatures {
             .minByOrNull { it.second }
             ?.first
 
-    private fun bottomSpringStands(effects: Map<ArmorStand, EffectType>): Set<ArmorStand> {
-        val springs = effects.filterValues { it == EffectType.KILLER_SPRING }.keys
-        return springs.filter { stand ->
+    private fun groupSpringStands(effects: Map<ArmorStand, EffectType>): List<List<ArmorStand>> {
+        val groups = mutableListOf<MutableList<ArmorStand>>()
+        for (stand in effects.filterValues { it == EffectType.KILLER_SPRING }.keys) {
             val position = stand.blockPosition()
-            springs.none { other ->
-                if (other === stand) return@none false
-                val otherPosition = other.blockPosition()
-                otherPosition.y < position.y &&
-                    abs(otherPosition.x - position.x) <= 1 &&
-                    abs(otherPosition.z - position.z) <= 1
+            val group = groups.firstOrNull { members ->
+                members.any {
+                    val memberPosition = it.blockPosition()
+                    abs(position.x - memberPosition.x) <= 1 &&
+                        abs(position.z - memberPosition.z) <= 1
+                }
             }
-        }.toSet()
+            if (group == null) {
+                groups += mutableListOf(stand)
+            } else {
+                group += stand
+            }
+        }
+        return groups
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
@@ -272,9 +278,12 @@ object VampireSlayerFeatures {
         for (trackedBoss in trackedBosses) {
             val boss = trackedBoss.entity
             val effects = trackedBoss.effects
-            val bottomSprings = bottomSpringStands(effects)
+            val eyeY = event.exactPlayerEyeLocation().y
+            val closestSprings = groupSpringStands(effects)
+                .map { group -> group.minBy { abs(it.blockPosition().y + 0.5 - eyeY) } }
+                .toSet()
             for ((stand, type) in effects) {
-                if (type == KILLER_SPRING && stand !in bottomSprings) {
+                if (type == KILLER_SPRING && stand !in closestSprings) {
                     continue
                 }
                 val vec = stand.blockPosition().toLorenzVec()
