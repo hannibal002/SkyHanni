@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -73,8 +74,6 @@ class ItemResolutionQuery {
             "shard",
             "(?<name>§.[^§]+)(?: §d§lNEW SHARD)?",
         )
-
-        val petRarities = listOf("COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC")
 
         private val BAZAAR_ENCHANTMENT_PATTERN = "ENCHANTMENT_(\\D*)_(\\d+)".toPattern()
 
@@ -226,7 +225,7 @@ class ItemResolutionQuery {
             val petInfoObject = ConfigManager.gson.fromJson(petInfo, JsonObject::class.java)
             val petId = petInfoObject["type"].asString
             val petTier = petInfoObject["tier"].asString
-            val rarityIndex = petRarities.indexOf(petTier)
+            val rarityIndex = LorenzRarity.getByNameOrError(petTier).ordinal
             val rawInternalName = petId.uppercase() + ";" + rarityIndex
             return rawInternalName.toInternalName()
         } catch (e: Exception) {

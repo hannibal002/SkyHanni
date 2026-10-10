@@ -60,6 +60,7 @@ import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.LivingEntity
@@ -85,9 +86,26 @@ typealias EntityData = DamageIndicatorEntityData
 object DamageIndicatorManager {
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
-    // TODO use repoPattern
-    private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
-    private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
+    private val patternGroup = RepoPattern.group("combat.damageindicator")
+
+    /**
+     * REGEX-TEST: 86761
+     * REGEX-TEST: ✧3470472✧
+     */
+    private val damagePattern by patternGroup.pattern(
+        "damage",
+        "[✧✯]?\\d+[⚔+✧❤♞☄✷ﬗ✯]*",
+    )
+
+    /**
+     * REGEX-TEST: §8[§7Lv655§8] §5 §5Voidgloom Seraph IV §f§l94 Hits
+     * REGEX-TEST: §8[§7Lv655§8] §5 §5Voidgloom Seraph IV §c§l33 Hits
+     * REGEX-TEST: §c☠ §bVoidgloom Seraph IV §d§l1 Hit
+     */
+    private val enderSlayerHitsNumberPattern by patternGroup.pattern(
+        "enderslayer.hits",
+        ".* §.§l(?<hits>\\d+) Hits?",
+    )
 
     private var mobFinder: MobFinder? = null
     private val data = ConcurrentHashMap<UUID, EntityData>()

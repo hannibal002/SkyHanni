@@ -42,7 +42,7 @@ data class PetData(
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
     constructor(petInfo: SkyBlockItemModifierUtils.PetInfo) : this(
-        petInfo.let { "${it.type};${it.tier.id}".toInternalName() },
+        petInfo.let { "${it.type};${it.tier.ordinal}".toInternalName() },
         petInfo.properSkinItem,
         petInfo.getSkinVariantIndex(),
         petInfo.heldItem,
@@ -58,7 +58,7 @@ data class PetData(
      * Interpolated version of internal name that actually represents the state of the pet.
      * This is needed because of tier boosts.
      */
-    val fauxInternalName: NeuInternalName get() = "$properPetName;${rarity.id}".toInternalName()
+    val fauxInternalName: NeuInternalName get() = "$properPetName;${rarity.ordinal}".toInternalName()
     val cleanName: String get() = PetUtils.getCleanPetName(fauxInternalName, colored = false)
     val coloredName: String get() = "${rarity.chatColorCode}$cleanName"
     val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, fauxInternalName)
