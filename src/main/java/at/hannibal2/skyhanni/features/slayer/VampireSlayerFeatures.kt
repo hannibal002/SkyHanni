@@ -23,21 +23,19 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
-import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.PlayerUtils.SNEAKING_EYE_HEIGHT
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -121,30 +119,22 @@ object VampireSlayerFeatures {
             .minByOrNull { it.second }
             ?.first
 
-    private val logger = SkyHanniLogger("slayer/vampire")
-    private fun log(message: String) = logger.log(message)
-
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
-        val removed = trackedBosses.filter { it.entity.distanceToPlayer() > 15 }
+        val removed = trackedBosses.filter { it.entity.distanceToPlayer() > 20 }
         trackedBosses.removeAll(removed)
-        log("player move cleanup: removed=${removed.map { it.entity.id }}, remaining=${trackedBosses.size}")
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
         if (mob.baseEntity !is RemotePlayer || !bossNamePattern.matches(mob.baseEntity.cleanName)) return
-        log("vampire mob spawned: id=${mob.baseEntity.id}, mobName='${mob.name}', armorStandId=${mob.armorStand?.id}")
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
-        val removed = trackedBosses.removeIf { it.mob === event.mob }
-        if (removed) {
-            log("tracked vampire mob despawned: id=${event.mob.baseEntity.id}, remaining=${trackedBosses.size}")
-        }
+        trackedBosses.removeIf { it.mob === event.mob }
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
@@ -155,15 +145,9 @@ object VampireSlayerFeatures {
     private fun processBossSteak(boss: TrackedBoss, healthName: String?) {
         val entity = boss.entity as? RemotePlayer ?: return
         val canUseSteak = healthName?.let { steakHealthPattern.matches(it) } == true
-        log(
-            "boss steak processed: id=${entity.id}, mob=${boss.mob.name}, " +
-                "healthStandId=${boss.armorStand?.id}, healthName='$healthName', " +
-                "canUseSteak=$canUseSteak, tracked=true",
-        )
         if (canUseSteak) {
             if (!boss.steakAlertSent && configBoss.steakAlert) {
                 boss.steakAlertSent = true
-                log("sending steak title: bossId=${entity.id}")
                 TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds)
             }
         } else {
@@ -186,17 +170,12 @@ object VampireSlayerFeatures {
         val entity = event.clickedEntity as? RemotePlayer ?: return
         val cleanName = entity.cleanName
         val matches = bossNamePattern.matches(cleanName)
-        log(
-            "entity attacked: id=${entity.id}, cleanName='$cleanName', rawName='${entity.name}', " +
-                "matchesBoss=$matches, alreadyTracked=${trackedBoss(entity) != null}",
-        )
         if (!matches) return
         val mob = entity.mob
         if (mob == null || mob.baseEntity !== entity) return
         if (trackedBoss(entity) == null) {
             trackedBosses.add(TrackedBoss(mob))
         }
-        log("boss tracked after attack: id=${entity.id}, tracked=${trackedBosses.size}")
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
@@ -208,38 +187,25 @@ object VampireSlayerFeatures {
         }
         val matches = name?.let { twinClawsPattern.matches(it) } == true
         val boss = if (matches) closestTrackedBoss(event.entity.getLorenzVec(), 5.0) else null
-        log(
-            "armor stand name update: id=${event.entity.id}, cleanName='$name', " +
-                "newNameString='${event.newName?.string}', newNameComponent='${event.newName}', " +
-                "matchesTwinclaws=$matches, pattern='.*TWINCLAWS.*', " +
-                "nearbyTrackedBossId=${boss?.entity?.id}, nearbyTrackedBossDistance=${boss?.entity?.distanceTo(event.entity.getLorenzVec())}, " +
-                "requiredRange=5.0, position=${event.entity.blockPosition()}",
-        )
         if (!isEnabled() || !matches || boss == null) return
         if (!configBoss.twinClawsTitle) return
         if (twinClawsTitlePending) {
-            log("twinclaws title already pending: id=${event.entity.id}, bossId=${boss.entity.id}, name='$name'")
             return
         }
         if (nextTwinClawsTitle.passedSince() < 5.seconds) {
-            log("twinclaws title throttled: id=${event.entity.id}, bossId=${boss.entity.id}, name='$name'")
             return
         }
         val delay = config.twinclawsDelay.milliseconds
         twinClawsTitlePending = true
-        log("twinclaws detected: id=${event.entity.id}, bossId=${boss.entity.id}, name='$name', delay=$delay")
         runDelayed(delay) {
             twinClawsTitlePending = false
             if (!trackedBosses.contains(boss)) {
-                log("delayed twinclaws ignored: boss is no longer tracked, bossId=${boss.entity.id}")
                 return@runDelayed
             }
             if (nextTwinClawsTitle.passedSince() < 5.seconds) {
-                log("delayed twinclaws title throttled: id=${event.entity.id}, bossId=${boss.entity.id}, name='$name'")
                 return@runDelayed
             }
             nextTwinClawsTitle = SimpleTimeMark.now()
-            log("sending twinclaws title: standId=${event.entity.id}, bossId=${boss.entity.id}, name='$name'")
             TitleManager.sendTitle(
                 "§6§lTWINCLAWS",
                 duration = (1750 - config.twinclawsDelay).milliseconds,
@@ -249,12 +215,6 @@ object VampireSlayerFeatures {
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
-        log(
-            "armor stand equipment update: id=${event.entity.id}, position=${event.entity.blockPosition()}, " +
-                "slot=${event.equipmentSlot}, newTexture=${event.newItemStack?.getSkullTexture()}, " +
-                "killerSpring=${event.entity.hasSkullTexture(KILLER_SPRING_TEXTURE)}, " +
-                "bloodIchor=${event.entity.hasSkullTexture(BLOOD_ICHOR_TEXTURE)}",
-        )
         if (!isEnabled()) return
         val entity = event.entity
         val newTexture = event.newItemStack?.getSkullTexture()
@@ -266,22 +226,16 @@ object VampireSlayerFeatures {
         val boss = type?.let { closestTrackedBoss(entity.getLorenzVec(), 15.0) }
         if (type != null && boss != null) {
             boss.effects[entity] = type
-            log("effect detected: id=${entity.id}, type=$type, bossId=${boss.entity.id}")
-        } else if (type != null) {
-            log("effect stand unowned: id=${entity.id}, type=$type")
         }
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        log("render: bosses=${trackedBosses.size}, effects=${trackedBosses.sumOf { it.effects.size }}")
-
         if (config.drawLine) {
             for (trackedBoss in trackedBosses) {
                 val boss = trackedBoss.entity
                 val visible = boss.canBeSeen(15)
-                log("boss line candidate: id=${boss.id}, visible=$visible")
                 if (!visible) continue
                 val vec = event.exactLocation(boss)
                 event.drawLineToCrosshair(
@@ -296,7 +250,6 @@ object VampireSlayerFeatures {
             return
         }
         if (trackedBosses.isEmpty()) {
-            log("effect rendering skipped: no tracked bosses, effects=0")
             return
         }
         for (trackedBoss in trackedBosses) {
@@ -307,7 +260,6 @@ object VampireSlayerFeatures {
                 val distance = vec.distanceToPlayer()
                 val isIchor = type == BLOOD_ICHOR
                 val isSpring = type == KILLER_SPRING
-                log("effect candidate: standId=${stand.id}, type=$type, distance=$distance, bossId=${boss.id}")
                 if (!(isIchor && config.bloodIchor.highlight) && !(isSpring && config.killerSpring.highlight)) {
                     continue
                 }
@@ -335,7 +287,6 @@ object VampireSlayerFeatures {
                     )
                     if ((configBloodIchor.showLines && isIchor) || (configKillerSpring.showLines && isSpring)) {
                         if (stand.canBeSeen(vecYOffset = 1.5)) {
-                            log("rendering effect line: standId=${stand.id}, bossId=${boss.id}, type=$type")
                             event.draw3DLine(
                                 event.exactPlayerEyeLocation(boss),
                                 event.exactPlayerEyeLocation(stand),
@@ -347,7 +298,6 @@ object VampireSlayerFeatures {
                     }
                 }
                 if (configBloodIchor.renderBeam && isIchor && stand.isAlive) {
-                    log("rendering blood ichor beam: standId=${stand.id}")
                     event.drawWaypointFilled(
                         event.exactLocation(stand).add(0, y = -2, 0),
                         configBloodIchor.color.toColor(),
@@ -360,13 +310,11 @@ object VampireSlayerFeatures {
 
     @HandleEvent
     private fun onWorldChange() {
-        log("world change: bosses=${trackedBosses.size}, effects=${trackedBosses.sumOf { it.effects.size }}")
         trackedBosses.clear()
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT, receiveCancelled = true)
     private fun onParticle(event: ParticleEvent) {
-        log("particle: type=${event.type}, location=${event.location}")
         if (event.type != ParticleTypes.ENCHANT) return
         if (!isEnabled()) return
         for (trackedBoss in trackedBosses) {
@@ -375,14 +323,9 @@ object VampireSlayerFeatures {
                 val standDistance = stand.distanceTo(event.location)
                 if (standDistance > 3.0) continue
                 val boss = closestTrackedBoss(event.location, 15.0)
-                log(
-                    "particle candidate: standId=${stand.id}, standDistance=$standDistance, " +
-                        "nearestBossId=${boss?.entity?.id}",
-                )
                 if (boss != null && boss !== trackedBoss) {
                     effects.remove(stand)
                     boss.effects[stand] = type
-                    log("effect associated: standId=${stand.id}, bossId=${boss.entity.id}")
                 }
             }
         }
@@ -395,12 +338,10 @@ object VampireSlayerFeatures {
 
         if (event.soundName == "entity.wither.spawn") {
             if (lastWitherSpawnSound.passedSince() < 1.ticks) {
-                log("duplicate wither sound cancelled")
                 ChatUtils.debug("Cancelling duplicate wither spawn sound sent within the same tick")
                 return event.cancel()
             }
             lastWitherSpawnSound = ServerTimeMark.now()
-            log("wither sound accepted")
         }
     }
 
