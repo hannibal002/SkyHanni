@@ -2,43 +2,37 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.InteractClickType
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.events.entity.EntityDeathEvent
+import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
-import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.PlayerUtils.SNEAKING_EYE_HEIGHT
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -46,210 +40,109 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.core.particles.ParticleTypes
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
-import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO: optimize this entire class, its so bad
-@OptIn(AllEntitiesGetter::class)
 @SkyHanniModule
 object VampireSlayerFeatures {
 
     private val config get() = SlayerApi.config.vampire
-    private val configOwnBoss get() = config.ownBoss
-    private val configOtherBoss get() = config.othersBoss
-    private val configCoopBoss get() = config.coopBoss
+    private val configBoss get() = config.boss
     private val configBloodIchor get() = config.bloodIchor
     private val configKillerSpring get() = config.killerSpring
 
-    private val entityList = mutableListOf<LivingEntity>()
-    private val taggedEntityList = mutableListOf<Int>()
+    private val bosses = linkedSetOf<RemotePlayer>()
+    private val effectStands = linkedSetOf<ArmorStand>()
     private var standList = mapOf<ArmorStand, RemotePlayer>()
-
-    // Nicked support
-    private val username
-        get() = EntityUtils.getEntities<LocalPlayer>().firstOrNull()?.name?.formattedTextCompatLessResets()
-            ?: error("own player is null")
 
     private val BLOOD_ICHOR_TEXTURE by SkullTextureHolder.texture("BLOOD_ICHOR")
     private val KILLER_SPRING_TEXTURE by SkullTextureHolder.texture("KILLER_SPRING")
 
-    private var nextClawSend = 0L
     private var lastWitherSpawnSound = ServerTimeMark.farPast()
 
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    private val patternGroup = RepoPattern.group("slayer.vampire-features")
+
+    /**
+     * WRAPPED-REGEX-TEST: "Bloodfiend "
+     */
+    private val bossNamePattern by patternGroup.pattern(
+        "boss-name",
+        "Bloodfiend .*",
+    )
+
+    private fun RemotePlayer.isHighlighted(): Boolean = bosses.contains(this)
+
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
-        if (!event.isMod(5)) return
-        val start = LocationUtils.playerLocation()
-        if (configOwnBoss.highlight || configOtherBoss.highlight || configCoopBoss.highlight) {
-            for (player in EntityUtils.getEntities<RemotePlayer>()) {
-                val distance = start.distance(player.blockPosition().toLorenzVec())
-                if (distance <= 15)
-                    player.process()
-            }
-        }
-        if (configBloodIchor.highlight || configKillerSpring.highlight) {
-            for (stand in EntityUtils.getEntities<ArmorStand>()) {
-                val vec = stand.blockPosition().toLorenzVec()
-                val distance = start.distance(vec)
-                val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
-                if (!isIchor && !stand.hasSkullTexture(KILLER_SPRING_TEXTURE)) continue
-                val chromaColour = if (isIchor) configBloodIchor.color else configKillerSpring.color
-                val color = chromaColour.toColor().addAlpha(config.withAlpha)
-                if (distance > 15) continue
-                RenderLivingEntityHelper.setEntityColor(stand, color) { isEnabled() }
-                if (isIchor) {
-                    entityList.add(stand)
-                }
-            }
-        }
+        if (!configBoss.highlight) return
+        bosses.removeIf { it.distanceToPlayer() > 15 }
     }
 
-    @HandleEvent(SecondPassedEvent::class)
-    fun onSecondPassed() {
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onEntityHealthUpdate(event: EntityHealthUpdateEvent<RemotePlayer>) {
         if (!isEnabled()) return
-        entityList.editCopy { removeIf { it.deceased } }
-    }
-
-    private fun List<String>.spawnedByCoop(stand: ArmorStand): Boolean = any {
-        var contain = false
-        if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(stand.name.formattedTextCompatLessResets())) {
-            val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex()
-                .find(stand.name.formattedTextCompatLessResets())?.groupValues?.get(1)
-            contain = it == name
+        if (!configBoss.highlight) return
+        val entity = event.entity
+        if (entity !in bosses) return
+        val canUseSteak = entity.findHealthReal() <= entity.baseMaxHealth * 0.2f
+        val color = if (canUseSteak && config.changeColorWhenCanSteak) {
+            config.steakColor.toColor()
+        } else {
+            configBoss.highlightColor.toColor()
         }
-        contain
-    }
-
-    private fun RemotePlayer.processTwinClawsTitle() {
-        val configEnabled = configOwnBoss.twinClawsTitle || configOtherBoss.twinClawsTitle || configCoopBoss.twinClawsTitle
-        if (!configEnabled) return
-
-        for (stand in getAllNameTagsInRadiusWith("TWINCLAWS")) {
-            if (!".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s.*".toRegex()
-                    .matches(stand.name.formattedTextCompatLessResets())
-            ) continue
-            val coopList = configCoopBoss.coopMembers.split(",").toList()
-            val containUser = getAllNameTagsInRadiusWith("Spawned by").any {
-                it.name.formattedTextCompatLessResets().contains(username)
-            }
-            val containCoop = getAllNameTagsInRadiusWith("Spawned by").any {
-                configCoopBoss.highlight && coopList.spawnedByCoop(it)
-            }
-            val shouldSendTitle =
-                if (containUser && configOwnBoss.twinClawsTitle) true
-                else if (containCoop && configCoopBoss.twinClawsTitle) true
-                else taggedEntityList.contains(this.id) && configOtherBoss.twinClawsTitle
-
-            if (!shouldSendTitle) continue
-            DelayedRun.runDelayed(config.twinclawsDelay.milliseconds) {
-                if (nextClawSend < System.currentTimeMillis()) {
-                    TitleManager.sendTitle(
-                        "§6§lTWINCLAWS",
-                        duration = (1750 - config.twinclawsDelay).milliseconds,
-                    )
-                    nextClawSend = System.currentTimeMillis() + 5_000
-                }
-            }
+        RenderLivingEntityHelper.setEntityColor(entity, color) { isEnabled() }
+        if (canUseSteak && configBoss.steakAlert) {
+            TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds)
         }
     }
 
-    private fun RemotePlayer.process() {
-        if (name.formattedTextCompatLessResets() != "Bloodfiend ") return
-
-        processTwinClawsTitle()
-        for (it in getAllNameTagsInRadiusWith("Spawned by")) {
-            val coopList = configCoopBoss.coopMembers.split(",").toList()
-            val containUser = it.name.formattedTextCompatLessResets().contains(username)
-            val containCoop = coopList.spawnedByCoop(it)
-            val neededHealth = baseMaxHealth * 0.2f
-            if (containUser && taggedEntityList.contains(id)) {
-                taggedEntityList.remove(id)
-            }
-            val canUseSteak = findHealthReal() <= neededHealth
-            val ownBoss = configOwnBoss.highlight && containUser && isNpc()
-            val otherBoss = configOtherBoss.highlight && taggedEntityList.contains(id) && isNpc()
-            val coopBoss = configCoopBoss.highlight && containCoop && isNpc()
-            val shouldRender = if (ownBoss) true else if (otherBoss) true else coopBoss
-
-            val color = when {
-                canUseSteak && config.changeColorWhenCanSteak -> config.steakColor.toColor()
-                ownBoss -> configOwnBoss.highlightColor.toColor()
-                otherBoss -> configOtherBoss.highlightColor.toColor()
-                coopBoss -> configCoopBoss.highlightColor.toColor()
-                else -> Color.BLACK
-            }
-
-            val shouldSendSteakTitle =
-                if (canUseSteak && configOwnBoss.steakAlert && containUser) true
-                else if (canUseSteak && configOtherBoss.steakAlert && taggedEntityList.contains(id)) true
-                else canUseSteak && configCoopBoss.steakAlert && containCoop
-
-            if (shouldSendSteakTitle) {
-                TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds)
-            }
-
-            if (shouldRender) {
-                RenderLivingEntityHelper.setEntityColor(this, color) { isEnabled() }
-                entityList.add(this)
-            }
-        }
-    }
-
-    private fun RemotePlayer.isHighlighted(): Boolean {
-        return entityList.contains(this) || taggedEntityList.contains(id)
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onEntityClick(event: EntityClickEvent) {
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         if (!isEnabled()) return
-        if (event.clickType != InteractClickType.LEFT_CLICK) return
-        if (event.clickedEntity !is RemotePlayer) return
-        if (!event.clickedEntity.isNpc()) return
-        val coopList = configCoopBoss.coopMembers.split(",").toList()
-        val regexA = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex()
-        val regexB = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex()
-        for (armorStand in event.clickedEntity.getAllNameTagsInRadiusWith("Spawned by")) {
-            val containCoop = coopList.isNotEmpty() &&
-                coopList.any {
-                    var contain = false
-                    if (regexA.matches(armorStand.name.formattedTextCompatLessResets())) {
-                        val name = regexB.find(armorStand.name.formattedTextCompatLessResets())?.groupValues?.get(1)
-                        contain = it == name
-                    }
-                    contain
-                }
-            if (armorStand.name.formattedTextCompatLessResets().contains(username) || containCoop) return
-            if (!taggedEntityList.contains(event.clickedEntity.id)) {
-                taggedEntityList.add(event.clickedEntity.id)
-            }
+        if (bossNamePattern.matches(event.entity.cleanName)) bosses.add(event.entity)
+    }
+
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<RemotePlayer>) {
+        if (!isEnabled()) return
+        if (bossNamePattern.matches(event.entity.cleanName)) {
+            bosses.add(event.entity)
+        } else {
+            bosses.remove(event.entity)
         }
     }
 
-    @HandleEvent
-    fun onEntityDeath(event: EntityDeathEvent<*>) {
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
-        if (entityList.contains(entity)) {
-            entityList.remove(entity)
-        }
-        if (taggedEntityList.contains(entity.id)) {
-            taggedEntityList.remove(entity.id)
+        if (entity.hasSkullTexture(BLOOD_ICHOR_TEXTURE) ||
+            entity.hasSkullTexture(KILLER_SPRING_TEXTURE)) {
+            effectStands.add(entity)
         }
     }
 
-    @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<*>) {
+        when (val entity = event.entity) {
+            is RemotePlayer -> bosses.remove(entity)
+            is ArmorStand -> effectStands.remove(entity)
+        }
+        standList = standList.filterKeys { it !== event.entity }
+    }
+
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         if (config.drawLine) {
-            for (it in EntityUtils.getEntities<RemotePlayer>()) {
+            for (it in bosses) {
                 if (!it.isHighlighted()) continue
                 if (!it.canBeSeen(15)) continue
                 val vec = event.exactLocation(it)
@@ -262,7 +155,7 @@ object VampireSlayerFeatures {
             }
         }
         if (!configBloodIchor.highlight && !configKillerSpring.highlight) return
-        for (stand in EntityUtils.getAllEntities().filterIsInstance<ArmorStand>()) {
+        for (stand in effectStands) {
             val vec = stand.blockPosition().toLorenzVec()
             val distance = vec.distanceToPlayer()
             val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
@@ -315,14 +208,14 @@ object VampireSlayerFeatures {
     }
 
     @HandleEvent
-    fun onWorldChange() {
-        entityList.clear()
-        taggedEntityList.clear()
+    private fun onWorldChange() {
+        bosses.clear()
+        effectStands.clear()
         standList = mutableMapOf()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT, receiveCancelled = true)
-    fun onParticle(event: ParticleEvent) {
+    @HandleEvent(onlyOnIsland = THE_RIFT, receiveCancelled = true)
+    private fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         val loc = event.location
         for (boss in loc.getEntitiesNearby<RemotePlayer>(3.0)) {
@@ -335,8 +228,8 @@ object VampireSlayerFeatures {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onPlaySound(event: PlaySoundEvent) {
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled()) return
         if (!configKillerSpring.fixSoundSpam) return
 
@@ -350,8 +243,9 @@ object VampireSlayerFeatures {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "slayer.vampireSlayerConfig", "slayer.vampire")
+        event.move(148, "slayer.vampire.ownBoss", "slayer.vampire.boss")
     }
 
     fun isEnabled() = RiftApi.inRift() && RiftApi.inStillgoreChateau()
