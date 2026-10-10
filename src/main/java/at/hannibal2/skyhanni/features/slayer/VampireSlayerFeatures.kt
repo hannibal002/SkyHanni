@@ -19,10 +19,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
-import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -66,11 +68,13 @@ object VampireSlayerFeatures {
     private val bosses = linkedSetOf<RemotePlayer>()
     private val effectStands = linkedSetOf<ArmorStandEffect>()
     private val standList = mutableMapOf<ArmorStand, RemotePlayer>()
+    private val steakReadyBosses = mutableSetOf<Int>()
 
     private val BLOOD_ICHOR_TEXTURE by SkullTextureHolder.texture("BLOOD_ICHOR")
     private val KILLER_SPRING_TEXTURE by SkullTextureHolder.texture("KILLER_SPRING")
 
     private var lastWitherSpawnSound = ServerTimeMark.farPast()
+    private var nextTwinClawsTitle = 0L
 
     private val patternGroup = RepoPattern.group("slayer.vampire-features")
 
@@ -80,6 +84,10 @@ object VampireSlayerFeatures {
     private val bossNamePattern by patternGroup.pattern(
         "boss-name",
         "Bloodfiend .*",
+    )
+    private val twinClawsPattern by patternGroup.pattern(
+        "twinclaws-name",
+        ".*TWINCLAWS.*",
     )
 
     private fun RemotePlayer.isHighlighted(): Boolean = bosses.contains(this)
@@ -107,7 +115,7 @@ object VampireSlayerFeatures {
                 "position=${entity.blockPosition()}, health=${event.health}, " +
                 "tracked=${entity in bosses}",
         )
-        if (!isEnabled() || !configBoss.highlight) return
+        if (!isEnabled()) return
         if (!bossNamePattern.matches(entity.cleanName)) {
             log(
                 "health update rejected: id=${entity.id}, cleanName='${entity.cleanName}', " +
@@ -117,21 +125,7 @@ object VampireSlayerFeatures {
             return
         }
         bosses.add(entity)
-        val canUseSteak = entity.findHealthReal() <= entity.baseMaxHealth * 0.2f
-        log(
-            "boss health accepted: id=${entity.id}, realHealth=${entity.findHealthReal()}, " +
-                "maxHealth=${entity.baseMaxHealth}, canUseSteak=$canUseSteak",
-        )
-        val color = if (canUseSteak && config.changeColorWhenCanSteak) {
-            config.steakColor.toColor()
-        } else {
-            configBoss.highlightColor.toColor()
-        }
-        RenderLivingEntityHelper.setEntityColor(entity, color) { isEnabled() }
-        if (canUseSteak && configBoss.steakAlert) {
-            log("sending steak title: bossId=${entity.id}")
-            TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds)
-        }
+        processBossHealth(entity, "health update")
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
@@ -162,6 +156,7 @@ object VampireSlayerFeatures {
         if (bossNamePattern.matches(event.entity.cleanName)) {
             bosses.add(event.entity)
             log("boss added on name update: id=${event.entity.id}, tracked=${bosses.size}")
+            processBossHealth(event.entity, "name update")
         } else {
             bosses.remove(event.entity)
             log(
@@ -171,22 +166,75 @@ object VampireSlayerFeatures {
         }
     }
 
+    private fun processBossHealth(entity: RemotePlayer, source: String) {
+        val realHealth = entity.findHealthReal()
+        val maxHealth = entity.baseMaxHealth
+        val canUseSteak = maxHealth > 0 && realHealth <= maxHealth * 0.2f
+        log(
+            "boss health processed: source=$source, id=${entity.id}, realHealth=$realHealth, " +
+                "maxHealth=$maxHealth, canUseSteak=$canUseSteak, tracked=${entity in bosses}",
+        )
+        if (canUseSteak) {
+            if (steakReadyBosses.add(entity.id) && configBoss.steakAlert) {
+                log("sending steak title: bossId=${entity.id}, source=$source")
+                TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds)
+            }
+        } else {
+            steakReadyBosses.remove(entity.id)
+        }
+        if (!configBoss.highlight) return
+        val color = if (canUseSteak && config.changeColorWhenCanSteak) {
+            config.steakColor.toColor()
+        } else {
+            configBoss.highlightColor.toColor()
+        }
+        RenderLivingEntityHelper.setEntityColor(entity, color) { isEnabled() }
+    }
+
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+        val name = event.cleanName ?: return
+        log(
+            "armor stand name update: id=${event.entity.id}, name='$name', " +
+                "position=${event.entity.blockPosition()}",
+        )
+        if (!isEnabled() || !twinClawsPattern.matches(name)) return
+        if (!configBoss.twinClawsTitle) return
+        if (System.currentTimeMillis() < nextTwinClawsTitle) {
+            log("twinclaws title throttled: id=${event.entity.id}, name='$name'")
+            return
+        }
+        val delay = config.twinclawsDelay.milliseconds
+        log("twinclaws detected: id=${event.entity.id}, name='$name', delay=$delay")
+        runDelayed(delay) {
+            if (System.currentTimeMillis() < nextTwinClawsTitle) return@runDelayed
+            nextTwinClawsTitle = System.currentTimeMillis() + 5_000
+            log("sending twinclaws title: standId=${event.entity.id}, name='$name'")
+            TitleManager.sendTitle(
+                "§6§lTWINCLAWS",
+                duration = (1750 - config.twinclawsDelay).milliseconds,
+            )
+        }
+    }
+
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
         log(
             "armor stand equipment update: id=${event.entity.id}, position=${event.entity.blockPosition()}, " +
-                "killerSpring=${event.entity.wearingSkullTexture(KILLER_SPRING_TEXTURE)}, " +
-                "bloodIchor=${event.entity.wearingSkullTexture(BLOOD_ICHOR_TEXTURE)}",
+                "slot=${event.equipmentSlot}, newTexture=${event.newItemStack?.getSkullTexture()}, " +
+                "killerSpring=${event.entity.hasSkullTexture(KILLER_SPRING_TEXTURE)}, " +
+                "bloodIchor=${event.entity.hasSkullTexture(BLOOD_ICHOR_TEXTURE)}",
         )
         if (!isEnabled()) return
         val entity = event.entity
         effectStands.removeIf { it.stand == entity }
-        when {
-            entity.wearingSkullTexture(KILLER_SPRING_TEXTURE) -> {
+        val newTexture = event.newItemStack?.getSkullTexture()
+        when (newTexture) {
+            KILLER_SPRING_TEXTURE -> {
                 effectStands.add(ArmorStandEffect(entity, KILLER_SPRING))
                 log("killer spring detected: id=${entity.id}, effects=${effectStands.size}")
             }
-            entity.wearingSkullTexture(BLOOD_ICHOR_TEXTURE) -> {
+            BLOOD_ICHOR_TEXTURE -> {
                 effectStands.add(ArmorStandEffect(entity, BLOOD_ICHOR))
                 log("blood ichor detected: id=${entity.id}, effects=${effectStands.size}")
             }
@@ -200,7 +248,10 @@ object VampireSlayerFeatures {
     private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<*>) {
         log("entity leaving: id=${event.entity.id}, type=${event.entity.javaClass.simpleName}")
         when (val entity = event.entity) {
-            is RemotePlayer -> bosses.remove(entity)
+            is RemotePlayer -> {
+                bosses.remove(entity)
+                steakReadyBosses.remove(entity.id)
+            }
             is ArmorStand -> effectStands.removeIf { entity == it.stand }
         }
         standList.entries.removeIf { it.key === event.entity || it.value === event.entity }
@@ -227,6 +278,10 @@ object VampireSlayerFeatures {
             }
         }
         if (!configBloodIchor.highlight && !configKillerSpring.highlight) {
+            return
+        }
+        if (bosses.isEmpty()) {
+            log("effect rendering skipped: no tracked bosses, effects=${effectStands.size}")
             return
         }
         for ((stand, type) in effectStands) {
@@ -288,6 +343,7 @@ object VampireSlayerFeatures {
         bosses.clear()
         effectStands.clear()
         standList.clear()
+        steakReadyBosses.clear()
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT, receiveCancelled = true)
