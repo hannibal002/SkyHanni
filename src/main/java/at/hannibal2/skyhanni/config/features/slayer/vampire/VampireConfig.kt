@@ -11,24 +11,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class VampireConfig {
     @Expose
-    @ConfigOption(name = "Your Boss", desc = "")
+    @ConfigOption(name = "Boss", desc = "")
     @Accordion
-    val ownBoss: OwnBossConfig = OwnBossConfig()
-
-    @Expose
-    @ConfigOption(name = "Others Boss", desc = "")
-    @Accordion
-    val othersBoss: OthersBossConfig = OthersBossConfig()
-
-    @Expose
-    @ConfigOption(name = "Co-op Boss", desc = "")
-    @Accordion
-    val coopBoss: CoopBossHighlightConfig = CoopBossHighlightConfig()
-
-    @Expose
-    @ConfigOption(name = "Transparency", desc = "Choose the transparency of the color.")
-    @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 250f)
-    var withAlpha: Int = 80
+    val boss: BossConfig = BossConfig()
 
     @Expose
     @ConfigOption(name = "Low Health", desc = "Change color when the boss is below 20% health.")
