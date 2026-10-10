@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.PlayerUtils.SNEAKING_EYE_HEIGHT
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
@@ -83,24 +84,44 @@ object VampireSlayerFeatures {
 
     private fun RemotePlayer.isHighlighted(): Boolean = bosses.contains(this)
 
+    private val logger = SkyHanniLogger("slayer/vampire")
+    private fun log(message: String) = logger.log(message)
+
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
         if (!configBoss.highlight) return
-        bosses.removeIf { it.distanceToPlayer() > 15 }
+        val removed = bosses.filter { it.distanceToPlayer() > 15 }
+        bosses.removeAll(removed.toSet())
+        log("player move cleanup: removed=${removed.map { it.id }}, remaining=${bosses.size}")
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!isEnabled()) return
-        if (!configBoss.highlight) return
-        val entity = event.entity as? RemotePlayer ?: return
+        val entity = event.entity as? RemotePlayer ?: run {
+            log("health update ignored: entity is ${event.entity.javaClass.simpleName}")
+            return
+        }
+        log(
+            "health update: id=${entity.id}, cleanName='${entity.cleanName}', rawName='${entity.name}', " +
+                "position=${entity.blockPosition()}, health=${event.health}, " +
+                "tracked=${entity in bosses}",
+        )
+        if (!isEnabled() || !configBoss.highlight) return
         if (!bossNamePattern.matches(entity.cleanName)) {
+            log(
+                "health update rejected: id=${entity.id}, cleanName='${entity.cleanName}', " +
+                    "rawName='${entity.name}', pattern='Bloodfiend .*'",
+            )
             bosses.remove(entity)
             return
         }
         bosses.add(entity)
         val canUseSteak = entity.findHealthReal() <= entity.baseMaxHealth * 0.2f
+        log(
+            "boss health accepted: id=${entity.id}, realHealth=${entity.findHealthReal()}, " +
+                "maxHealth=${entity.baseMaxHealth}, canUseSteak=$canUseSteak",
+        )
         val color = if (canUseSteak && config.changeColorWhenCanSteak) {
             config.steakColor.toColor()
         } else {
@@ -108,60 +129,94 @@ object VampireSlayerFeatures {
         }
         RenderLivingEntityHelper.setEntityColor(entity, color) { isEnabled() }
         if (canUseSteak && configBoss.steakAlert) {
+            log("sending steak title: bossId=${entity.id}")
             TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds)
         }
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
+        log(
+            "remote player entered: id=${event.entity.id}, cleanName='${event.entity.cleanName}', " +
+                "rawName='${event.entity.name}', position=${event.entity.blockPosition()}",
+        )
         if (!isEnabled()) return
-        if (bossNamePattern.matches(event.entity.cleanName)) bosses.add(event.entity)
+        if (bossNamePattern.matches(event.entity.cleanName)) {
+            bosses.add(event.entity)
+            log("boss added on enter: id=${event.entity.id}, tracked=${bosses.size}")
+        } else {
+            log(
+                "entity enter rejected: id=${event.entity.id}, cleanName='${event.entity.cleanName}', " +
+                    "rawName='${event.entity.name}', pattern='Bloodfiend .*'",
+            )
+        }
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<RemotePlayer>) {
+        log(
+            "remote player name update: id=${event.entity.id}, cleanName='${event.entity.cleanName}', " +
+                "rawName='${event.newName}', currentRawName='${event.entity.name}'",
+        )
         if (!isEnabled()) return
         if (bossNamePattern.matches(event.entity.cleanName)) {
             bosses.add(event.entity)
+            log("boss added on name update: id=${event.entity.id}, tracked=${bosses.size}")
         } else {
             bosses.remove(event.entity)
+            log(
+                "boss removed on name update: id=${event.entity.id}, cleanName='${event.entity.cleanName}', " +
+                    "rawName='${event.newName}', pattern='Bloodfiend .*', tracked=${bosses.size}",
+            )
         }
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
+        log(
+            "armor stand equipment update: id=${event.entity.id}, position=${event.entity.blockPosition()}, " +
+                "killerSpring=${event.entity.wearingSkullTexture(KILLER_SPRING_TEXTURE)}, " +
+                "bloodIchor=${event.entity.wearingSkullTexture(BLOOD_ICHOR_TEXTURE)}",
+        )
         if (!isEnabled()) return
         val entity = event.entity
+        effectStands.removeIf { it.stand == entity }
         when {
             entity.wearingSkullTexture(KILLER_SPRING_TEXTURE) -> {
                 effectStands.add(ArmorStandEffect(entity, KILLER_SPRING))
+                log("killer spring detected: id=${entity.id}, effects=${effectStands.size}")
             }
             entity.wearingSkullTexture(BLOOD_ICHOR_TEXTURE) -> {
                 effectStands.add(ArmorStandEffect(entity, BLOOD_ICHOR))
+                log("blood ichor detected: id=${entity.id}, effects=${effectStands.size}")
             }
             else -> {
-                effectStands.removeIf { it.stand == entity }
+                log("effect stand removed: id=${entity.id}, effects=${effectStands.size}")
             }
         }
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<*>) {
+        log("entity leaving: id=${event.entity.id}, type=${event.entity.javaClass.simpleName}")
         when (val entity = event.entity) {
             is RemotePlayer -> bosses.remove(entity)
             is ArmorStand -> effectStands.removeIf { entity == it.stand }
         }
         standList.entries.removeIf { it.key === event.entity || it.value === event.entity }
+        log("leave cleanup: bosses=${bosses.size}, effects=${effectStands.size}, associations=${standList.size}")
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
+        log("render: bosses=${bosses.size}, effects=${effectStands.size}, associations=${standList.size}")
 
         if (config.drawLine) {
             for (it in bosses) {
-                if (!it.isHighlighted()) continue
-                if (!it.canBeSeen(15)) continue
+                val visible = it.canBeSeen(15)
+                log("boss line candidate: id=${it.id}, visible=$visible")
+                if (!it.isHighlighted() || !visible) continue
                 val vec = event.exactLocation(it)
                 event.drawLineToCrosshair(
                     vec.up(SNEAKING_EYE_HEIGHT),
@@ -171,12 +226,15 @@ object VampireSlayerFeatures {
                 )
             }
         }
-        if (!configBloodIchor.highlight && !configKillerSpring.highlight) return
+        if (!configBloodIchor.highlight && !configKillerSpring.highlight) {
+            return
+        }
         for ((stand, type) in effectStands) {
             val vec = stand.blockPosition().toLorenzVec()
             val distance = vec.distanceToPlayer()
             val isIchor = type == BLOOD_ICHOR
             val isSpring = type == KILLER_SPRING
+            log("effect candidate: standId=${stand.id}, type=$type, distance=$distance")
             if (!(isIchor && config.bloodIchor.highlight) && !(isSpring && config.killerSpring.highlight)) continue
             val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color).toColor().addAlpha(config.withAlpha)
             if (distance <= 15) {
@@ -199,22 +257,22 @@ object VampireSlayerFeatures {
                     1.5,
                     seeThroughBlocks = false,
                 )
-                for ((ichor, boss) in standList) {
-                    if (!(configBloodIchor.showLines && isIchor) && !(configKillerSpring.showLines && isSpring)) continue
-
-                    // ichors are sometimes in the ground
-                    if (!ichor.canBeSeen(vecYOffset = 1.5)) continue
-                    event.draw3DLine(
-                        event.exactPlayerEyeLocation(boss),
-                        event.exactPlayerEyeLocation(ichor),
-                        linesColorStart,
-                        3,
-                        true,
-                    )
-
+                if ((configBloodIchor.showLines && isIchor) || (configKillerSpring.showLines && isSpring)) {
+                    val boss = standList[stand]
+                    if (boss != null && stand.canBeSeen(vecYOffset = 1.5)) {
+                        log("rendering effect line: standId=${stand.id}, bossId=${boss.id}, type=$type")
+                        event.draw3DLine(
+                            event.exactPlayerEyeLocation(boss),
+                            event.exactPlayerEyeLocation(stand),
+                            linesColorStart,
+                            3,
+                            true,
+                        )
+                    }
                 }
             }
             if (configBloodIchor.renderBeam && isIchor && stand.isAlive) {
+                log("rendering blood ichor beam: standId=${stand.id}")
                 event.drawWaypointFilled(
                     event.exactLocation(stand).add(0, y = -2, 0),
                     configBloodIchor.color.toColor(),
@@ -226,6 +284,7 @@ object VampireSlayerFeatures {
 
     @HandleEvent
     private fun onWorldChange() {
+        log("world change: bosses=${bosses.size}, effects=${effectStands.size}, associations=${standList.size}")
         bosses.clear()
         effectStands.clear()
         standList.clear()
@@ -233,14 +292,22 @@ object VampireSlayerFeatures {
 
     @HandleEvent(onlyOnIsland = THE_RIFT, receiveCancelled = true)
     private fun onParticle(event: ParticleEvent) {
+        log("particle: type=${event.type}, location=${event.location}")
         if (event.type != ParticleTypes.ENCHANT) return
         if (!isEnabled()) return
-        for (boss in bosses) {
-            if (!boss.isHighlighted()) continue
-            for ((stand, _) in effectStands) {
-                if (stand.distanceTo(event.location) <= 3.0) {
-                    standList[stand] = boss
-                }
+        for ((stand, _) in effectStands) {
+            val standDistance = stand.distanceTo(event.location)
+            if (standDistance > 3.0) continue
+            val boss = bosses
+                .filter { it.isHighlighted() }
+                .minByOrNull { it.distanceTo(event.location) }
+            log(
+                "particle candidate: standId=${stand.id}, standDistance=$standDistance, " +
+                    "nearestBossId=${boss?.id}",
+            )
+            if (boss != null) {
+                standList[stand] = boss
+                log("effect associated: standId=${stand.id}, bossId=${boss.id}")
             }
         }
     }
@@ -252,10 +319,12 @@ object VampireSlayerFeatures {
 
         if (event.soundName == "entity.wither.spawn") {
             if (lastWitherSpawnSound.passedSince() < 1.ticks) {
+                log("duplicate wither sound cancelled")
                 ChatUtils.debug("Cancelling duplicate wither spawn sound sent within the same tick")
                 return event.cancel()
             }
             lastWitherSpawnSound = ServerTimeMark.now()
+            log("wither sound accepted")
         }
     }
 
