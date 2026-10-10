@@ -478,7 +478,6 @@ object ChatFilter {
         "§e\\[NPC] Feast Chef Ted§r§f: §rThanks for the donation! I've added a §eKernel §fto your purse.".toPattern(),
     )
 
-
     /**
      ** REGEX-TEST: §eYou haven't claimed your §r§6Summer Rewards §r§eyet!
      ** REGEX-TEST: §eTalk to the §r§bSummer Sloth §r§ein the §r§aHub§r§e!
@@ -561,7 +560,6 @@ object ChatFilter {
         "achievement_get" to achievementGetPatterns,
         "parkour" to parkourPatterns,
         "teleport_pads" to teleportPadPatterns,
-
     )
 
     private val repoPatternsMap: Map<String, List<Pattern>> = mapOf(
@@ -594,7 +592,6 @@ object ChatFilter {
         "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
         "teleport_pads" to teleportPadMessages,
-
     )
 
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
