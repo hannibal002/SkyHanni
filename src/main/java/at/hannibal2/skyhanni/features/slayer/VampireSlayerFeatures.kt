@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
@@ -49,6 +48,7 @@ import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.decoration.ArmorStand
+import java.awt.Color
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -343,14 +343,16 @@ object VampireSlayerFeatures {
         stand: ArmorStand,
         type: EffectType,
     ) {
-        val isIchor = type == BLOOD_ICHOR
-        val isSpring = type == KILLER_SPRING
-        if (!(isIchor && config.bloodIchor.highlight) && !(isSpring && config.killerSpring.highlight)) return
+        val shouldHighlight = when (type) {
+            BLOOD_ICHOR -> configBloodIchor.highlight
+            KILLER_SPRING -> configKillerSpring.highlight
+        }
+        if (!shouldHighlight) return
         val vec = stand.blockPosition().toLorenzVec()
         if (vec.distanceToPlayer() <= MAX_SLAYER_DISTANCE) {
-            renderEffectHighlight(boss, stand, isIchor, isSpring, vec)
+            renderEffectHighlight(boss, stand, type, vec)
         }
-        if (configBloodIchor.renderBeam && isIchor && stand.isAlive) {
+        if (configBloodIchor.renderBeam && type == BLOOD_ICHOR && stand.isAlive) {
             drawWaypointFilled(
                 exactLocation(stand).add(0, y = -2, 0),
                 configBloodIchor.color.toColor(),
@@ -362,26 +364,41 @@ object VampireSlayerFeatures {
     private fun SkyHanniRenderWorldEvent.renderEffectHighlight(
         boss: RemotePlayer,
         stand: ArmorStand,
-        isIchor: Boolean,
-        isSpring: Boolean,
+        type: EffectType,
         vec: LorenzVec,
     ) {
-        val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color)
-            .toColor()
-            .addAlpha(config.withAlpha)
+        data class EffectHighlightParams(
+            val color: Color,
+            val linesColor: Color,
+            val text: String,
+            val shouldShowLines: Boolean,
+        )
+        val (color, linesColor, text, shouldShowLines) = when (type) {
+            BLOOD_ICHOR -> EffectHighlightParams(
+                color = configBloodIchor.color.toColor(),
+                linesColor = configBloodIchor.linesColor.toColor(),
+                text = "§4Ichor",
+                shouldShowLines = configBloodIchor.showLines,
+            )
+
+            KILLER_SPRING -> EffectHighlightParams(
+                color = configKillerSpring.color.toColor(),
+                linesColor = configKillerSpring.linesColor.toColor(),
+                text = "§4Spring",
+                shouldShowLines = configKillerSpring.showLines,
+            )
+        }
         RenderLivingEntityHelper.setEntityColor(stand, color) {
             isEnabled() && trackedBosses.any { it.effects.containsKey(stand) }
         }
-        val linesColor = (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toColor()
         drawColor(vec.up(2.0), LorenzColor.DARK_RED.toChromaColor(), alpha = 1f)
         drawDynamicText(
             vec.add(0.5, 2.5, 0.5),
-            if (isIchor) "§4Ichor" else "§4Spring",
+            text,
             1.5,
             seeThroughBlocks = false,
         )
-        val showLines = (configBloodIchor.showLines && isIchor) || (configKillerSpring.showLines && isSpring)
-        if (showLines && stand.canBeSeen(vecYOffset = 1.5)) {
+        if (shouldShowLines && stand.canBeSeen(vecYOffset = 1.5)) {
             draw3DLine(
                 exactPlayerEyeLocation(boss),
                 exactPlayerEyeLocation(stand),

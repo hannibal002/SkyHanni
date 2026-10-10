@@ -16,11 +16,6 @@ class VampireConfig {
     val boss: BossConfig = BossConfig()
 
     @Expose
-    @ConfigOption(name = "Transparency", desc = "Choose the transparency of the color.")
-    @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 250f)
-    var withAlpha: Int = 80
-
-    @Expose
     @ConfigOption(name = "Low Health", desc = "Change color when the boss is below 20% health.")
     @ConfigEditorBoolean
     @FeatureToggle
