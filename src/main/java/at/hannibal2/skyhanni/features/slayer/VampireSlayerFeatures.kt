@@ -289,7 +289,7 @@ object VampireSlayerFeatures {
             boss.effects[entity] = type
             log("effect detected: id=${entity.id}, type=$type, bossId=${boss.entity.id}")
         } else {
-            log("effect stand removed or unowned: id=${entity.id}, type=$type, bossId=${boss?.entity?.id}")
+            log("effect stand removed or unowned: id=${entity.id}, type=$type")
         }
     }
 
@@ -309,8 +309,7 @@ object VampireSlayerFeatures {
         log("render: bosses=${trackedBosses.size}, effects=${trackedBosses.sumOf { it.effects.size }}")
 
         if (config.drawLine) {
-            for (trackedBoss in trackedBosses) {
-                val boss = trackedBoss.entity
+            for ((boss) in trackedBosses) {
                 val visible = boss.canBeSeen(15)
                 log("boss line candidate: id=${boss.id}, visible=$visible")
                 if (!visible) continue
@@ -330,9 +329,7 @@ object VampireSlayerFeatures {
             log("effect rendering skipped: no tracked bosses, effects=0")
             return
         }
-        for (trackedBoss in trackedBosses) {
-            val boss = trackedBoss.entity
-            val effects = trackedBoss.effects
+        for ((boss, effects) in trackedBosses) {
             for ((stand, type) in effects) {
                 val vec = stand.blockPosition().toLorenzVec()
                 val distance = vec.distanceToPlayer()
