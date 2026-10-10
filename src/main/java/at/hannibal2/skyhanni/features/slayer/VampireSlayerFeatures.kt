@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
+import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
@@ -194,13 +194,13 @@ object VampireSlayerFeatures {
                 "maxHealth=$maxHealth, canUseSteak=$canUseSteak, tracked=true",
         )
         if (canUseSteak) {
-                if (!boss.steakAlertSent && configBoss.steakAlert) {
-                    boss.steakAlertSent = true
-                    log("sending steak title: bossId=${entity.id}, source=$source")
-                    TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds)
-                }
+            if (!boss.steakAlertSent && configBoss.steakAlert) {
+                boss.steakAlertSent = true
+                log("sending steak title: bossId=${entity.id}, source=$source")
+                TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds)
+            }
         } else {
-                boss.steakAlertSent = false
+            boss.steakAlertSent = false
         }
         if (!configBoss.highlight) return
         val color = if (canUseSteak && config.changeColorWhenCanSteak) {
