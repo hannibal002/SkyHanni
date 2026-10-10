@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
@@ -36,6 +37,7 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -105,9 +107,9 @@ object VampireSlayerFeatures {
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
-        if (!configBoss.highlight) return
         val removed = bosses.filter { it.distanceToPlayer() > 15 }
         bosses.removeAll(removed.toSet())
+        steakReadyBosses.removeAll(removed.map { it.id }.toSet())
         log("player move cleanup: removed=${removed.map { it.id }}, remaining=${bosses.size}")
     }
 
@@ -122,7 +124,7 @@ object VampireSlayerFeatures {
                 "position=${entity.blockPosition()}, health=${event.health}, " +
                 "tracked=${entity in bosses}",
         )
-        if (!isEnabled()) return
+        if (!isEnabled() || entity !in bosses) return
         if (!bossNamePattern.matches(entity.cleanName)) {
             log(
                 "health update rejected: id=${entity.id}, cleanName='${entity.cleanName}', " +
@@ -143,8 +145,7 @@ object VampireSlayerFeatures {
         )
         if (!isEnabled()) return
         if (bossNamePattern.matches(event.entity.cleanName)) {
-            bosses.add(event.entity)
-            log("boss added on enter: id=${event.entity.id}, tracked=${bosses.size}")
+            log("boss entered untracked: id=${event.entity.id}, cleanName='${event.entity.cleanName}'")
         } else {
             log(
                 "entity enter rejected: id=${event.entity.id}, cleanName='${event.entity.cleanName}', " +
@@ -161,9 +162,12 @@ object VampireSlayerFeatures {
         )
         if (!isEnabled()) return
         if (bossNamePattern.matches(event.entity.cleanName)) {
-            bosses.add(event.entity)
-            log("boss added on name update: id=${event.entity.id}, tracked=${bosses.size}")
-            processBossHealth(event.entity, "name update")
+            if (event.entity in bosses) {
+                log("tracked boss name update: id=${event.entity.id}, tracked=${bosses.size}")
+                processBossHealth(event.entity, "name update")
+            } else {
+                log("untracked boss name update: id=${event.entity.id}, cleanName='${event.entity.cleanName}'")
+            }
         } else {
             bosses.remove(event.entity)
             log(
@@ -199,30 +203,54 @@ object VampireSlayerFeatures {
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onEntityClick(event: EntityClickEvent) {
+        if (!isEnabled() || event.action != ATTACK) return
+        val entity = event.clickedEntity as? RemotePlayer ?: return
+        val cleanName = entity.cleanName
+        val matches = bossNamePattern.matches(cleanName)
+        log(
+            "entity attacked: id=${entity.id}, cleanName='$cleanName', rawName='${entity.name}', " +
+                "matchesBoss=$matches, alreadyTracked=${entity in bosses}",
+        )
+        if (!matches) return
+        bosses.add(entity)
+        log("boss tracked after attack: id=${entity.id}, tracked=${bosses.size}")
+        processBossHealth(entity, "attack")
+    }
+
+    @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onArmorStandNameChange(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         val name = event.cleanName
         val matches = name?.let { twinClawsPattern.matches(it) } == true
+        val boss = if (matches) {
+            bosses
+                .filter { it.distanceTo(event.entity.getLorenzVec()) <= 5 }
+                .minByOrNull { it.distanceTo(event.entity.getLorenzVec()) }
+        } else {
+            null
+        }
         log(
             "armor stand name update: id=${event.entity.id}, cleanName='$name', " +
                 "newNameString='${event.newName?.string}', newNameComponent='${event.newName}', " +
                 "matchesTwinclaws=$matches, pattern='.*TWINCLAWS.*', " +
-                "position=${event.entity.blockPosition()}",
+                "nearbyTrackedBossId=${boss?.id}, nearbyTrackedBossDistance=${boss?.distanceTo(event.entity.getLorenzVec())}, " +
+                "requiredRange=5.0, position=${event.entity.blockPosition()}",
         )
-        if (!isEnabled() || !matches) return
+        if (!isEnabled() || !matches || boss == null) return
         if (!configBoss.twinClawsTitle) return
         if (nextTwinClawsTitle.passedSince() < 5.seconds) {
-            log("twinclaws title throttled: id=${event.entity.id}, name='$name'")
+            log("twinclaws title throttled: id=${event.entity.id}, bossId=${boss.id}, name='$name'")
             return
         }
         val delay = config.twinclawsDelay.milliseconds
-        log("twinclaws detected: id=${event.entity.id}, name='$name', delay=$delay")
+        log("twinclaws detected: id=${event.entity.id}, bossId=${boss.id}, name='$name', delay=$delay")
         runDelayed(delay) {
             if (nextTwinClawsTitle.passedSince() < 5.seconds) {
-                log("delayed twinclaws title throttled: id=${event.entity.id}, name='$name'")
+                log("delayed twinclaws title throttled: id=${event.entity.id}, bossId=${boss.id}, name='$name'")
                 return@runDelayed
             }
             nextTwinClawsTitle = SimpleTimeMark.now()
-            log("sending twinclaws title: standId=${event.entity.id}, name='$name'")
+            log("sending twinclaws title: standId=${event.entity.id}, bossId=${boss.id}, name='$name'")
             TitleManager.sendTitle(
                 "§6§lTWINCLAWS",
                 duration = (1750 - config.twinclawsDelay).milliseconds,
@@ -303,10 +331,12 @@ object VampireSlayerFeatures {
         for ((stand, type) in effectStands) {
             val vec = stand.blockPosition().toLorenzVec()
             val distance = vec.distanceToPlayer()
+            val boss = standList[stand]
             val isIchor = type == BLOOD_ICHOR
             val isSpring = type == KILLER_SPRING
-            log("effect candidate: standId=${stand.id}, type=$type, distance=$distance")
+            log("effect candidate: standId=${stand.id}, type=$type, distance=$distance, bossId=${boss?.id}")
             if (!(isIchor && config.bloodIchor.highlight) && !(isSpring && config.killerSpring.highlight)) continue
+            if (boss == null || boss !in bosses) continue
             val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color).toColor().addAlpha(config.withAlpha)
             if (distance <= 15) {
                 RenderLivingEntityHelper.setEntityColor(
@@ -329,8 +359,7 @@ object VampireSlayerFeatures {
                     seeThroughBlocks = false,
                 )
                 if ((configBloodIchor.showLines && isIchor) || (configKillerSpring.showLines && isSpring)) {
-                    val boss = standList[stand]
-                    if (boss != null && stand.canBeSeen(vecYOffset = 1.5)) {
+                    if (stand.canBeSeen(vecYOffset = 1.5)) {
                         log("rendering effect line: standId=${stand.id}, bossId=${boss.id}, type=$type")
                         event.draw3DLine(
                             event.exactPlayerEyeLocation(boss),
@@ -371,7 +400,7 @@ object VampireSlayerFeatures {
             val standDistance = stand.distanceTo(event.location)
             if (standDistance > 3.0) continue
             val boss = bosses
-                .filter { it.isHighlighted() }
+                .filter { it.isHighlighted() && it.distanceTo(event.location) <= 15 }
                 .minByOrNull { it.distanceTo(event.location) }
             log(
                 "particle candidate: standId=${stand.id}, standDistance=$standDistance, " +
