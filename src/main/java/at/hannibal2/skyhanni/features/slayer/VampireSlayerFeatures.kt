@@ -63,7 +63,7 @@ object VampireSlayerFeatures {
 
     private enum class EffectType {
         BLOOD_ICHOR,
-        KILLER_SPRING
+        KILLER_SPRING,
     }
 
     private data class TrackedBoss(
@@ -252,92 +252,6 @@ object VampireSlayerFeatures {
         }
     }
 
-    @HandleEvent(onlyOnIsland = THE_RIFT)
-    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled()) return
-        if (config.drawLine) {
-            for (trackedBoss in trackedBosses) {
-                val boss = trackedBoss.entity
-                val visible = boss.canBeSeen(MAX_SLAYER_DISTANCE)
-                if (!visible) continue
-                val vec = event.exactLocation(boss)
-                event.drawLineToCrosshair(
-                    vec.up(SNEAKING_EYE_HEIGHT),
-                    config.lineColor,
-                    config.lineWidth,
-                    true,
-                )
-            }
-        }
-        if (!configBloodIchor.highlight && !configKillerSpring.highlight) {
-            return
-        }
-        if (trackedBosses.isEmpty()) {
-            return
-        }
-        for (trackedBoss in trackedBosses) {
-            val boss = trackedBoss.entity
-            val effects = trackedBoss.effects
-            val eyeY = event.exactPlayerEyeLocation().y
-            val closestSprings = groupSpringStands(effects)
-                .map { group -> group.minBy { abs(it.blockPosition().y + 0.5 - eyeY) } }
-                .toSet()
-            for ((stand, type) in effects) {
-                if (type == KILLER_SPRING && stand !in closestSprings) {
-                    continue
-                }
-                val vec = stand.blockPosition().toLorenzVec()
-                val distance = vec.distanceToPlayer()
-                val isIchor = type == BLOOD_ICHOR
-                val isSpring = type == KILLER_SPRING
-                if (!(isIchor && config.bloodIchor.highlight) && !(isSpring && config.killerSpring.highlight)) {
-                    continue
-                }
-                val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color)
-                    .toColor()
-                    .addAlpha(config.withAlpha)
-                if (distance <= MAX_SLAYER_DISTANCE) {
-                    RenderLivingEntityHelper.setEntityColor(stand, color) {
-                        isEnabled() && trackedBosses.any { it.effects.containsKey(stand) }
-                    }
-
-                    val linesColorStart =
-                        (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toColor()
-                    val text = if (isIchor) "§4Ichor" else "§4Spring"
-                    event.drawColor(
-                        stand.blockPosition().toLorenzVec().up(2.0),
-                        LorenzColor.DARK_RED.toChromaColor(),
-                        alpha = 1f,
-                    )
-                    event.drawDynamicText(
-                        stand.blockPosition().toLorenzVec().add(0.5, 2.5, 0.5),
-                        text,
-                        1.5,
-                        seeThroughBlocks = false,
-                    )
-                    if ((configBloodIchor.showLines && isIchor) || (configKillerSpring.showLines && isSpring)) {
-                        if (stand.canBeSeen(vecYOffset = 1.5)) {
-                            event.draw3DLine(
-                                event.exactPlayerEyeLocation(boss),
-                                event.exactPlayerEyeLocation(stand),
-                                linesColorStart,
-                                3,
-                                true,
-                            )
-                        }
-                    }
-                }
-                if (configBloodIchor.renderBeam && isIchor && stand.isAlive) {
-                    event.drawWaypointFilled(
-                        event.exactLocation(stand).add(0, y = -2, 0),
-                        configBloodIchor.color.toColor(),
-                        beacon = true,
-                    )
-                }
-            }
-        }
-    }
-
     @HandleEvent
     private fun onWorldChange() {
         trackedBosses.clear()
@@ -379,6 +293,103 @@ object VampireSlayerFeatures {
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "slayer.vampireSlayerConfig", "slayer.vampire")
         event.move(148, "slayer.vampire.ownBoss", "slayer.vampire.boss")
+    }
+
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        if (!isEnabled()) return
+        if (config.drawLine) drawBossLines(event)
+        if (!configBloodIchor.highlight && !configKillerSpring.highlight) {
+            return
+        }
+        if (trackedBosses.isEmpty()) {
+            return
+        }
+        for (trackedBoss in trackedBosses) {
+            renderBossEffects(event, trackedBoss)
+        }
+    }
+
+    private fun drawBossLines(event: SkyHanniRenderWorldEvent) {
+        for (trackedBoss in trackedBosses) {
+            val boss = trackedBoss.entity
+            if (!boss.canBeSeen(MAX_SLAYER_DISTANCE)) continue
+            event.drawLineToCrosshair(
+                event.exactLocation(boss).up(SNEAKING_EYE_HEIGHT),
+                config.lineColor,
+                config.lineWidth,
+                true,
+            )
+        }
+    }
+
+    private fun renderBossEffects(event: SkyHanniRenderWorldEvent, trackedBoss: TrackedBoss) {
+        val boss = trackedBoss.entity as? RemotePlayer ?: return
+        val effects = trackedBoss.effects
+        val eyeY = event.exactPlayerEyeLocation().y
+        val closestSprings = groupSpringStands(effects)
+            .map { group -> group.minBy { abs(it.blockPosition().y + 0.5 - eyeY) } }
+            .toSet()
+        for ((stand, type) in effects) {
+            if (type == KILLER_SPRING && stand !in closestSprings) continue
+            renderEffect(event, boss, stand, type)
+        }
+    }
+
+    private fun renderEffect(
+        event: SkyHanniRenderWorldEvent,
+        boss: RemotePlayer,
+        stand: ArmorStand,
+        type: EffectType,
+    ) {
+        val isIchor = type == BLOOD_ICHOR
+        val isSpring = type == KILLER_SPRING
+        if (!(isIchor && config.bloodIchor.highlight) && !(isSpring && config.killerSpring.highlight)) return
+        val vec = stand.blockPosition().toLorenzVec()
+        if (vec.distanceToPlayer() <= MAX_SLAYER_DISTANCE) {
+            renderEffectHighlight(event, boss, stand, isIchor, isSpring, vec)
+        }
+        if (configBloodIchor.renderBeam && isIchor && stand.isAlive) {
+            event.drawWaypointFilled(
+                event.exactLocation(stand).add(0, y = -2, 0),
+                configBloodIchor.color.toColor(),
+                beacon = true,
+            )
+        }
+    }
+
+    private fun renderEffectHighlight(
+        event: SkyHanniRenderWorldEvent,
+        boss: RemotePlayer,
+        stand: ArmorStand,
+        isIchor: Boolean,
+        isSpring: Boolean,
+        vec: LorenzVec,
+    ) {
+        val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color)
+            .toColor()
+            .addAlpha(config.withAlpha)
+        RenderLivingEntityHelper.setEntityColor(stand, color) {
+            isEnabled() && trackedBosses.any { it.effects.containsKey(stand) }
+        }
+        val linesColor = (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toColor()
+        event.drawColor(vec.up(2.0), LorenzColor.DARK_RED.toChromaColor(), alpha = 1f)
+        event.drawDynamicText(
+            vec.add(0.5, 2.5, 0.5),
+            if (isIchor) "§4Ichor" else "§4Spring",
+            1.5,
+            seeThroughBlocks = false,
+        )
+        val showLines = (configBloodIchor.showLines && isIchor) || (configKillerSpring.showLines && isSpring)
+        if (showLines && stand.canBeSeen(vecYOffset = 1.5)) {
+            event.draw3DLine(
+                event.exactPlayerEyeLocation(boss),
+                event.exactPlayerEyeLocation(stand),
+                linesColor,
+                3,
+                true,
+            )
+        }
     }
 
     fun isEnabled() = RiftApi.inRift() && RiftApi.inStillgoreChateau()
