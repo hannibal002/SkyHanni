@@ -150,12 +150,6 @@ object VampireSlayerFeatures {
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
-    private fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        val mob = event.mob
-        if (mob.baseEntity !is RemotePlayer || !bossNamePattern.matches(mob.baseEntity.cleanName)) return
-    }
-
-    @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         trackedBosses.removeIf { it.mob === event.mob }
     }
@@ -189,11 +183,10 @@ object VampireSlayerFeatures {
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onEntityClick(event: EntityClickEvent) {
-        if (!isEnabled() || event.action != EntityClickEvent.ActionType.ATTACK) return
+        if (!isEnabled() || event.action != ATTACK) return
         val entity = event.clickedEntity as? RemotePlayer ?: return
         val cleanName = entity.cleanName
-        val matches = bossNamePattern.matches(cleanName)
-        if (!matches) return
+        if (!bossNamePattern.matches(cleanName)) return
         val mob = entity.mob
         if (mob == null || mob.baseEntity !== entity) return
         if (trackedBoss(entity) == null) {
