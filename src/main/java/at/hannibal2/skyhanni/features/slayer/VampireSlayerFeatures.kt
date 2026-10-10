@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.PlayerUtils.SNEAKING_EYE_HEIGHT
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.ServerTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
@@ -49,6 +50,7 @@ import net.minecraft.client.player.RemotePlayer
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object VampireSlayerFeatures {
@@ -61,7 +63,8 @@ object VampireSlayerFeatures {
 
     private data class ArmorStandEffect(val stand: ArmorStand, val type: EffectType) {
         enum class EffectType {
-            BLOOD_ICHOR, KILLER_SPRING
+            BLOOD_ICHOR,
+            KILLER_SPRING
         }
     }
 
@@ -74,7 +77,7 @@ object VampireSlayerFeatures {
     private val KILLER_SPRING_TEXTURE by SkullTextureHolder.texture("KILLER_SPRING")
 
     private var lastWitherSpawnSound = ServerTimeMark.farPast()
-    private var nextTwinClawsTitle = 0L
+    private var nextTwinClawsTitle = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("slayer.vampire-features")
 
@@ -85,6 +88,10 @@ object VampireSlayerFeatures {
         "boss-name",
         "Bloodfiend .*",
     )
+
+    /**
+     * WRAPPED-REGEX-TEST: "TWINCLAWS 1.2s"
+     */
     private val twinClawsPattern by patternGroup.pattern(
         "twinclaws-name",
         ".*TWINCLAWS.*",
@@ -193,22 +200,28 @@ object VampireSlayerFeatures {
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
     private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
-        val name = event.cleanName ?: return
+        val name = event.cleanName
+        val matches = name?.let { twinClawsPattern.matches(it) } == true
         log(
-            "armor stand name update: id=${event.entity.id}, name='$name', " +
+            "armor stand name update: id=${event.entity.id}, cleanName='$name', " +
+                "newNameString='${event.newName?.string}', newNameComponent='${event.newName}', " +
+                "matchesTwinclaws=$matches, pattern='.*TWINCLAWS.*', " +
                 "position=${event.entity.blockPosition()}",
         )
-        if (!isEnabled() || !twinClawsPattern.matches(name)) return
+        if (!isEnabled() || !matches) return
         if (!configBoss.twinClawsTitle) return
-        if (System.currentTimeMillis() < nextTwinClawsTitle) {
+        if (nextTwinClawsTitle.passedSince() < 5.seconds) {
             log("twinclaws title throttled: id=${event.entity.id}, name='$name'")
             return
         }
         val delay = config.twinclawsDelay.milliseconds
         log("twinclaws detected: id=${event.entity.id}, name='$name', delay=$delay")
         runDelayed(delay) {
-            if (System.currentTimeMillis() < nextTwinClawsTitle) return@runDelayed
-            nextTwinClawsTitle = System.currentTimeMillis() + 5_000
+            if (nextTwinClawsTitle.passedSince() < 5.seconds) {
+                log("delayed twinclaws title throttled: id=${event.entity.id}, name='$name'")
+                return@runDelayed
+            }
+            nextTwinClawsTitle = SimpleTimeMark.now()
             log("sending twinclaws title: standId=${event.entity.id}, name='$name'")
             TitleManager.sendTitle(
                 "§6§lTWINCLAWS",
@@ -234,10 +247,12 @@ object VampireSlayerFeatures {
                 effectStands.add(ArmorStandEffect(entity, KILLER_SPRING))
                 log("killer spring detected: id=${entity.id}, effects=${effectStands.size}")
             }
+
             BLOOD_ICHOR_TEXTURE -> {
                 effectStands.add(ArmorStandEffect(entity, BLOOD_ICHOR))
                 log("blood ichor detected: id=${entity.id}, effects=${effectStands.size}")
             }
+
             else -> {
                 log("effect stand removed: id=${entity.id}, effects=${effectStands.size}")
             }
@@ -252,6 +267,7 @@ object VampireSlayerFeatures {
                 bosses.remove(entity)
                 steakReadyBosses.remove(entity.id)
             }
+
             is ArmorStand -> effectStands.removeIf { entity == it.stand }
         }
         standList.entries.removeIf { it.key === event.entity || it.value === event.entity }
