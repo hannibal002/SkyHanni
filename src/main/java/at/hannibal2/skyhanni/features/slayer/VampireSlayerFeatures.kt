@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
@@ -96,7 +95,11 @@ object VampireSlayerFeatures {
         if (!isEnabled()) return
         if (!configBoss.highlight) return
         val entity = event.entity
-        if (entity !in bosses) return
+        if (!bossNamePattern.matches(entity.cleanName)) {
+            bosses.remove(entity)
+            return
+        }
+        bosses.add(entity)
         val canUseSteak = entity.findHealthReal() <= entity.baseMaxHealth * 0.2f
         val color = if (canUseSteak && config.changeColorWhenCanSteak) {
             config.steakColor.toColor()
@@ -148,7 +151,7 @@ object VampireSlayerFeatures {
             is RemotePlayer -> bosses.remove(entity)
             is ArmorStand -> effectStands.removeIf { entity == it.stand }
         }
-        standList.removeIfKey { it === event.entity }
+        standList.entries.removeIf { it.key === event.entity || it.value === event.entity }
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
@@ -230,9 +233,10 @@ object VampireSlayerFeatures {
 
     @HandleEvent(onlyOnIsland = THE_RIFT, receiveCancelled = true)
     private fun onParticle(event: ParticleEvent) {
+        if (event.type != ParticleTypes.ENCHANT) return
         if (!isEnabled()) return
         for (boss in bosses) {
-            if (!boss.isHighlighted() || event.type != ParticleTypes.ENCHANT) continue
+            if (!boss.isHighlighted()) continue
             for ((stand, _) in effectStands) {
                 if (stand.distanceTo(event.location) <= 3.0) {
                     standList[stand] = boss
