@@ -83,6 +83,7 @@ object VampireSlayerFeatures {
 
     private var lastWitherSpawnSound = ServerTimeMark.farPast()
     private var nextTwinClawsTitle = SimpleTimeMark.farPast()
+    private var twinClawsTitlePending = false
 
     private val patternGroup = RepoPattern.group("slayer.vampire-features")
 
@@ -174,7 +175,9 @@ object VampireSlayerFeatures {
         } else {
             configBoss.highlightColor.toColor()
         }
-        RenderLivingEntityHelper.setEntityColor(entity, color) { isEnabled() }
+        RenderLivingEntityHelper.setEntityColor(entity, color) {
+            isEnabled() && trackedBoss(entity) === boss
+        }
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
@@ -214,13 +217,19 @@ object VampireSlayerFeatures {
         )
         if (!isEnabled() || !matches || boss == null) return
         if (!configBoss.twinClawsTitle) return
+        if (twinClawsTitlePending) {
+            log("twinclaws title already pending: id=${event.entity.id}, bossId=${boss.entity.id}, name='$name'")
+            return
+        }
         if (nextTwinClawsTitle.passedSince() < 5.seconds) {
             log("twinclaws title throttled: id=${event.entity.id}, bossId=${boss.entity.id}, name='$name'")
             return
         }
         val delay = config.twinclawsDelay.milliseconds
+        twinClawsTitlePending = true
         log("twinclaws detected: id=${event.entity.id}, bossId=${boss.entity.id}, name='$name', delay=$delay")
         runDelayed(delay) {
+            twinClawsTitlePending = false
             if (!trackedBosses.contains(boss)) {
                 log("delayed twinclaws ignored: boss is no longer tracked, bossId=${boss.entity.id}")
                 return@runDelayed
@@ -248,7 +257,6 @@ object VampireSlayerFeatures {
         )
         if (!isEnabled()) return
         val entity = event.entity
-        trackedBosses.forEach { it.effects.remove(entity) }
         val newTexture = event.newItemStack?.getSkullTexture()
         val type = when (newTexture) {
             KILLER_SPRING_TEXTURE -> EffectType.KILLER_SPRING
@@ -259,8 +267,8 @@ object VampireSlayerFeatures {
         if (type != null && boss != null) {
             boss.effects[entity] = type
             log("effect detected: id=${entity.id}, type=$type, bossId=${boss.entity.id}")
-        } else {
-            log("effect stand removed or unowned: id=${entity.id}, type=$type")
+        } else if (type != null) {
+            log("effect stand unowned: id=${entity.id}, type=$type")
         }
     }
 
@@ -307,7 +315,9 @@ object VampireSlayerFeatures {
                     .toColor()
                     .addAlpha(config.withAlpha)
                 if (distance <= 15) {
-                    RenderLivingEntityHelper.setEntityColor(stand, color) { isEnabled() }
+                    RenderLivingEntityHelper.setEntityColor(stand, color) {
+                        isEnabled() && trackedBosses.any { it.effects.containsKey(stand) }
+                    }
 
                     val linesColorStart =
                         (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toColor()
