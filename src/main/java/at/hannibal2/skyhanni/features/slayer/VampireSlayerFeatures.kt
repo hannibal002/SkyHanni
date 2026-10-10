@@ -199,7 +199,7 @@ object VampireSlayerFeatures {
     }
 
     @HandleEvent(onlyOnIsland = THE_RIFT)
-    private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+    private fun onArmorStandNameChange(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         val name = event.cleanName
         val matches = name?.let { twinClawsPattern.matches(it) } == true
         log(
