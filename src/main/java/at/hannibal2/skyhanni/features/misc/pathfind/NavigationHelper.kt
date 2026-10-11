@@ -164,6 +164,9 @@ object NavigationHelper {
             argCallback("search", BrigadierArguments.greedyString(), BrigadierUtils.dynamicSuggestionProvider { getNames() }) {
                 doCommandAsync(it.lowercase().removeColor())
             }
+            literalCallback("stop") {
+                IslandGraphs.manualCancel()
+            }
             simpleCallback {
                 doCommandAsync("")
             }

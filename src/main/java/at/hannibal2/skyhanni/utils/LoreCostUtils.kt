@@ -61,13 +61,14 @@ object LoreCostUtils {
      * REGEX-TEST: Click to level up!
      * REGEX-TEST: Click to buy!
      * REGEX-TEST: Click to donate!
+     * REGEX-TEST: Click to bake!
      * REGEX-TEST: Left Click to unlock!
      * REGEX-TEST: You can't afford this upgrade!
      * REGEX-FAIL: Right Click to preview!
      */
     private val tradeLinePattern by patternGroup.pattern(
         "trade.click",
-        "(?:Left )?Click to (?:trade|unlock|level up|buy|donate)!|You can't afford this upgrade!",
+        "(?:Left )?Click to (?:trade|unlock|level up|buy|donate|bake)!|You can't afford this upgrade!",
     )
 
     /**

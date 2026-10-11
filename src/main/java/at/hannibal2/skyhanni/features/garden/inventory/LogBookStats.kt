@@ -19,12 +19,12 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object LogBookStats {
 
-    private val groupPattern = RepoPattern.group("garden.inventory.logbook")
+    private val patternGroup = RepoPattern.group("garden.inventory.logbook")
 
     /**
      * REGEX-TEST: Times Visited: 22
      */
-    private val visitedPattern by groupPattern.pattern(
+    private val visitedPattern by patternGroup.pattern(
         "visited.colorless",
         "Times Visited: (?<timesVisited>[0-9,.]+)",
     )
@@ -32,7 +32,7 @@ object LogBookStats {
     /**
      * REGEX-TEST: Offers Accepted: 21
      */
-    private val acceptedPattern by groupPattern.pattern(
+    private val acceptedPattern by patternGroup.pattern(
         "accepted.colorless",
         "Offers Accepted: (?<timesAccepted>[0-9,.]+)",
     )
@@ -42,7 +42,7 @@ object LogBookStats {
      * REGEX-TEST: (1/5) Visitor's Logbook
      * REGEX-TEST: (10/11) Visitor's Logbook
      */
-    private val inventoryNamePattern by groupPattern.pattern(
+    private val inventoryNamePattern by patternGroup.pattern(
         "inventory-name",
         "(?:\\(\\d+/\\d+\\) )?Visitor's Logbook",
     )

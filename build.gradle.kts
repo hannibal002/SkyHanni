@@ -59,7 +59,7 @@ loom.apply {
             if (System.getenv("repo_action") != "true") {
                 systemProperties.put("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
-            jvmArguments.addAll("-Xmx4G", "-Dnarrator.none=true")
+            jvmArguments.add("-Xmx4G")
         }
         removeIf { it.name == "server" }
     }

@@ -26,23 +26,26 @@ class YearOfTheSealConfig {
     @ConfigLink(owner = YearOfTheSealConfig::class, field = "fishyTreatProfit")
     val fishyTreatProfitPosition: Position = Position(170, 150)
 
+    // TODO rename to beachBallLine
     @Expose
-    @ConfigOption(name = "Bouncy Ball Line", desc = "Shows a line for your bouncy balls thrown (Only works on normal ones, not giant).")
+    @ConfigOption(name = "Beach Ball Line", desc = "Shows a line for your Beach Balls thrown (Only works on normal ones, not giant).")
     @ConfigEditorBoolean
-    @SearchTag("beach")
+    @SearchTag("bouncy")
     @FeatureToggle
     val bouncyBallLine: Property<Boolean> = Property.of(true)
 
+    // TODO rename to beachBallLineColor
     @Expose
-    @ConfigOption(name = "Bouncy Ball Line Color", desc = "Color of the Bouncy Ball Line.")
+    @ConfigOption(name = "Beach Ball Line Color", desc = "Color of the Beach Ball Line.")
     @ConfigEditorColour
-    @SearchTag("beach")
+    @SearchTag("bouncy")
     var bouncyBallLineColor: ChromaColour = ChromaColour.fromStaticRGB(255, 0, 196, 245)
 
+    // TODO rename to beachBallLandingSpot
     @Expose
-    @ConfigOption(name = "Bouncy Ball Landing Spot", desc = "Show the spot where the Bouncy Ball will land, and add a counter.")
+    @ConfigOption(name = "Beach Ball Landing Spot", desc = "Show the spot where the Beach Ball will land, and add a counter.")
     @ConfigEditorBoolean
-    @SearchTag("beach")
+    @SearchTag("bouncy")
     val bouncyBallLandingSpot: Property<Boolean> = Property.of(true)
 
     @Expose
