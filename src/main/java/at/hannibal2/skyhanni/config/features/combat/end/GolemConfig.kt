@@ -61,6 +61,15 @@ class GolemConfig {
 
     @Expose
     @ConfigOption(
+        name = "Skyhanni Prefix",
+        desc = "Displays the Skyhanni prefix in the protector weight message."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var skyhanniMessagePrefix: Boolean = true
+
+    @Expose
+    @ConfigOption(
         name = "Highlight Spawn Points",
         desc = "Marks all six fixed spawn points in the world with a beam on the head structure " +
             "and a highlighted block where the protector appears."

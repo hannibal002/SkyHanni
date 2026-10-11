@@ -86,9 +86,12 @@ object GolemWeight {
             val zealots = group("amount").formatInt()
             val weight = calculateWeight(zealots, result.place, result.topDamage, result.yourDamage)
             if (config.weightChat) {
+                // Without the prefix the line sits where Hypixel's own centered summary does; with
+                // it, the indent shrinks by its width so the text still lines up.
+                val indent = if (config.skyhanniMessagePrefix) 16 else 30
                 ChatUtils.chat(
-                    "§f${" ".repeat(30)}§r§eYour Weight: §r§a${weight.roundTo(0).addSeparators()}",
-                    prefix = false,
+                    "§f${" ".repeat(indent)}§r§eYour Weight: §r§a${weight.roundTo(0).addSeparators()}",
+                    prefix = config.skyhanniMessagePrefix,
                 )
             }
             pendingResult = null
