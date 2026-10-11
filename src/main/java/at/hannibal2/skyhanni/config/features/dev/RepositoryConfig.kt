@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.repo.AbstractRepoConfig
 import at.hannibal2.skyhanni.data.repo.AbstractRepoLocationConfig
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -67,15 +67,10 @@ class RepositoryConfig : AbstractRepoConfig {
             @HandleEvent
             private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
                 // The repo moved from hannibal002 to SkyHanniStudios. Only that owner is replaced, any other
-                // location stays.
-                event.transform(148, "dev.repo.location") { element ->
-                    val location = element as? JsonObject ?: return@transform element
-                    val user = location["user"]?.takeIf { it.isJsonPrimitive }?.asString
-                    val repoName = location["repoName"]?.takeIf { it.isJsonPrimitive }?.asString
-                    val isOldDefault = user.equals("hannibal002", ignoreCase = true) &&
-                        repoName.equals("SkyHanni-REPO", ignoreCase = true)
-                    if (isOldDefault) location.addProperty("user", "SkyHanniStudios")
-                    location
+                // owner stays.
+                event.transform(148, "dev.repo.location.user") { element ->
+                    val owner = element.takeIf { it.isJsonPrimitive }?.asString
+                    if (owner.equals("hannibal002", ignoreCase = true)) JsonPrimitive("SkyHanniStudios") else element
                 }
             }
         }
