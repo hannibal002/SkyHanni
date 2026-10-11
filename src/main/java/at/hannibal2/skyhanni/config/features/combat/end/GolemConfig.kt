@@ -60,6 +60,32 @@ class GolemConfig {
     var showSpawnTimer: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Show Damage", desc = "Show the damage you dealt to the protector so far.")
+    @ConfigEditorBoolean
+    var showDamage: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Show Zealots",
+        desc = "Show how many zealots and zealot bruisers you killed on this server. " +
+            "Resets when you switch servers. " +
+            "§eEnable the Bestiary widget in your tab list for an exact count. Without it, or once your " +
+            "Zealot bestiary is maxed, only zealots you hit or aim at are counted."
+    )
+    @ConfigEditorBoolean
+    var showZealots: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Late Stage Title",
+        desc = "Shows the stage in the middle of the screen when you join a server where the " +
+            "protector is already awakening or summoned."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var joinStageTitle: Boolean = false
+
+    @Expose
     @ConfigOption(
         name = "Skyhanni Prefix",
         desc = "Displays the Skyhanni prefix in the protector weight message."

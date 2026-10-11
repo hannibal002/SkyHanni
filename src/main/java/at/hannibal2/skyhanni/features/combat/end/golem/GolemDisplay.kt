@@ -4,9 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.features.combat.end.EndDpsTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -55,6 +58,11 @@ object GolemDisplay {
         val awakeningSeconds: Long?,
         val location: String?,
         val countdownTenths: Long,
+        val showDamage: Boolean,
+        val showZealots: Boolean,
+        val damage: Double?,
+        val zealots: Int,
+        val bestiaryWidgetMissing: Boolean,
     )
 
     private var state: State? = null
@@ -90,6 +98,11 @@ object GolemDisplay {
         awakeningSeconds = GolemStage.timeInAwakening()?.inWholeSeconds,
         location = GolemLocation.currentLocationText(),
         countdownTenths = GolemSpawnTimer.timeUntilSpawn().inWholeMilliseconds / 100,
+        showDamage = config.showDamage,
+        showZealots = config.showZealots,
+        damage = EndDpsTracker.displayDamage(),
+        zealots = GolemZealotCounter.kills,
+        bestiaryWidgetMissing = GolemZealotCounter.bestiaryWidgetMissing,
     )
 
     private fun buildTitle(): Renderable {
@@ -132,6 +145,15 @@ object GolemDisplay {
                 "§a${(state.countdownTenths / 10.0).roundTo(1)}s"
             } else "§8incoming"
             add(Renderable.text("§7Spawns in: $countdown"))
+        }
+        // Damage and DPS come from the scoreboard, which shows both for the protector as well.
+        if (state.showDamage) {
+            state.damage?.let { add(Renderable.text("§7Damage: §a${it.shortFormat()}")) }
+        }
+        if (state.showZealots) {
+            // The count still works without the widget, only less exactly - so the hint says how to fix it.
+            val hint = if (state.bestiaryWidgetMissing) " §7(enable Bestiary in /widget)" else ""
+            add(Renderable.text("§7Zealots: §f${state.zealots.addSeparators()}$hint"))
         }
     }
 }

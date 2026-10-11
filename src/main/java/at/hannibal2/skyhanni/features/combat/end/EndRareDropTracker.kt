@@ -17,12 +17,14 @@ import at.hannibal2.skyhanni.features.combat.end.dragon.DragonWeight
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -33,6 +35,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.annotations.Expose
 import net.minecraft.client.gui.screens.ChatScreen
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Counts the truly rare End island drops and how long the current dry streak is.
@@ -82,7 +85,8 @@ object EndRareDropTracker {
 
     /**
      * Everything the overlay shows. It is only rebuilt when this changes, instead of building new
-     * renderables every frame for counters that move a few times per hour.
+     * renderables every frame for counters that move a few times per hour. The fresh gains belong
+     * in here too, so the green number appears and disappears on its own.
      */
     private data class State(
         val showDragon: Boolean,
@@ -95,40 +99,65 @@ object EndRareDropTracker {
         val dryGolems: Int,
         val dryDragonChance: Double,
         val dryGolemChance: Double,
+        val dragonGain: Double?,
+        val golemGain: Double?,
     )
 
     private var state: State? = null
     private var display: Renderable? = null
 
+    /** How long a fresh gain stays appended to its line. */
+    private val GAIN_DURATION = 5.seconds
+
     /**
-     * Magic Find and Pet Luck as they were when the boss died. Read at that moment because both
-     * can change right afterwards - potions run out, a pet is swapped - while the roll that
-     * decided the drop used the values from the kill.
+     * What the last fight added to the streak, per boss. Shown briefly so the change is visible -
+     * the total alone moves too little to notice.
+     */
+    private val recentGain = mutableMapOf<EndBoss, Double>()
+    private val gainedAt = mutableMapOf<EndBoss, SimpleTimeMark>()
+
+    private fun rememberGain(boss: EndBoss, amount: Double) {
+        recentGain[boss] = amount
+        gainedAt[boss] = SimpleTimeMark.now()
+    }
+
+    private fun freshGain(boss: EndBoss): Double? {
+        val at = gainedAt[boss] ?: return null
+        if (at.passedSince() > GAIN_DURATION) return null
+        return recentGain[boss]
+    }
+
+    /**
+     * Hypixel refreshes the stats a moment after the kill, so reading them right away would use
+     * the values from before any drop related buff was applied. Waiting is more reliable than
+     * capturing early and hoping the values were already current.
+     */
+    private val STAT_DELAY = 2.seconds
+
+    private fun magicFind() = SkyblockStat.MAGIC_FIND.lastKnownValue ?: 0.0
+    private fun petLuck() = SkyblockStat.PET_LUCK.lastKnownValue ?: 0.0
+
+    private fun withPetBonus(baseChance: Double) = baseChance * (1 + (magicFind() + petLuck()) / 100)
+
+    /** Pet Luck only applies to pets, and the Tier Boost Core is a pet item rather than a pet. */
+    private fun withMagicFindBonus(baseChance: Double) = baseChance * (1 + magicFind() / 100)
+
+    /**
+     * The base chance is fixed at the kill, the bonus is read once the stats have caught up.
+     * Whether the fight counted at all is decided immediately - only the number arrives late.
      *
-     * Kept apart because Pet Luck only applies to pet drops: the Tier Boost Core is a pet item,
-     * not a pet, so it is boosted by Magic Find alone.
+     * [data] is handed in rather than looked up again later: the fight belongs to the profile it
+     * was fought on, and the counter has already been raised there. Looking it up again could
+     * find nothing - after leaving the island, say - and leave a counted fight without its
+     * chance. Leaving does not cancel anything; the queue runs regardless of where the player is.
      */
-    private var magicFind = 0.0
-    private var petLuck = 0.0
-
-    @HandleEvent
-    private fun onEndBossDeath() {
-        magicFind = SkyblockStat.MAGIC_FIND.lastKnownValue ?: 0.0
-        petLuck = SkyblockStat.PET_LUCK.lastKnownValue ?: 0.0
+    private fun addChanceLater(boss: EndBoss, data: Data, baseChance: Double) {
+        DelayedRun.runDelayed(STAT_DELAY, "EndRareDropTracker chance") {
+            val gain = if (boss == EndBoss.DRAGON) withPetBonus(baseChance) else withMagicFindBonus(baseChance)
+            if (boss == EndBoss.DRAGON) data.dryDragonChance += gain else data.dryGolemChance += gain
+            rememberGain(boss, gain)
+        }
     }
-
-    /**
-     * Chance that the dragon just killed drops a pet at all, epic or legendary. It scales with the
-     * eyes the player placed, since each eye is one roll of the drop table.
-     */
-    private fun dragonPetChance(): Double {
-        val chancePerEye = LEGENDARY_PET_CHANCE_PER_EYE + EPIC_PET_CHANCE_PER_EYE
-        val baseChance = DragonFightState.eyesPlaced * chancePerEye
-        return baseChance * (1 + (magicFind + petLuck) / 100)
-    }
-
-    /** Pet Luck is left out here: the Tier Boost Core is a pet item rather than a pet. */
-    private fun tierBoostCoreChance(): Double = TIER_BOOST_CHANCE * (1 + magicFind / 100)
 
     @HandleEvent
     private fun onEndLootFound(event: EndLootFoundEvent) {
@@ -172,7 +201,9 @@ object EndRareDropTracker {
         )
         if (weight < DRAGON_WEIGHT_REQUIREMENT) return
         data.dryDragons++
-        data.dryDragonChance += dragonPetChance()
+        // Read now: the eye count is cleared as soon as the summary has been handled.
+        val baseChance = DragonFightState.eyesPlaced * (LEGENDARY_PET_CHANCE_PER_EYE + EPIC_PET_CHANCE_PER_EYE)
+        addChanceLater(EndBoss.DRAGON, data, baseChance)
     }
 
     @HandleEvent
@@ -180,7 +211,7 @@ object EndRareDropTracker {
         val data = storage ?: return
         if (event.weight < GOLEM_WEIGHT_REQUIREMENT) return
         data.dryGolems++
-        data.dryGolemChance += tierBoostCoreChance()
+        addChanceLater(EndBoss.END_STONE_PROTECTOR, data, TIER_BOOST_CHANCE)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
@@ -213,6 +244,8 @@ object EndRareDropTracker {
         dryGolems = data.dryGolems,
         dryDragonChance = data.dryDragonChance,
         dryGolemChance = data.dryGolemChance,
+        dragonGain = freshGain(EndBoss.DRAGON),
+        golemGain = freshGain(EndBoss.END_STONE_PROTECTOR),
     )
 
     @HandleEvent
@@ -245,22 +278,24 @@ object EndRareDropTracker {
             add(countLine(LEGENDARY_PET, "§6Legendary Ender Dragon", state.legendaryPets))
             add(countLine(EPIC_PET, "§5Epic Ender Dragon", state.epicPets))
             if (state.showDryStreak) {
-                add(dryLine("Since Pet", state.dryDragons, state.dryDragonChance))
+                add(dryLine("Since Pet", state.dryDragons, state.dryDragonChance, state.dragonGain))
             }
         }
         if (state.showGolem) {
             add(countLine(TIER_BOOST_CORE, "§6Tier Boost Core", state.tierBoostCores))
             if (state.showDryStreak) {
-                add(dryLine("Since Core", state.dryGolems, state.dryGolemChance))
+                add(dryLine("Since Core", state.dryGolems, state.dryGolemChance, state.golemGain))
             }
         }
     }
 
     /** [name] reads as "kills since the last one", so the number needs no further wording. */
-    private fun dryLine(name: String, count: Int, chance: Double): Renderable {
+    private fun dryLine(name: String, count: Int, chance: Double, gain: Double?): Renderable {
         val text = "$name: $count (${chance.roundTo(2)}%)"
+        // The gain is deliberately left out of the copied text - it is a moment, not a statistic.
+        val gainText = gain?.let { " §a(+${it.roundTo(2)}%)" }.orEmpty()
         return copyable(
-            Renderable.text("§7$name: §f$count §8(${chance.roundTo(2)}%)"),
+            Renderable.text("§7$name: §f$count §8(${chance.roundTo(2)}%)$gainText"),
             text,
         )
     }

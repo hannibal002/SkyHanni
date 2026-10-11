@@ -12,6 +12,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -64,6 +66,7 @@ object EndDropAlert {
         val value = valueText(internalName, amount)
 
         if (drop.withTitle) {
+            playDropSound()
             TitleManager.sendTitle(
                 "§c§lDROP!",
                 subtitleText = "${drop.color}§l${drop.label}$suffix $value",
@@ -76,6 +79,16 @@ object EndDropAlert {
     }
 
     private fun article(label: String) = if (label.firstOrNull()?.uppercaseChar() in VOWELS) "an" else "a"
+
+    /**
+     * Only for the drops that already interrupt the screen - a sound on every chat line would
+     * wear out quickly during a farming session. Tied to the alert itself rather than to a
+     * switch of its own: a drop worth a title is worth hearing.
+     */
+    private fun playDropSound() {
+        val config = SkyHanniMod.feature.combat.endIsland.dropSound
+        SoundUtils.createSound(config.sound, config.pitch, isWarning = false).playSound()
+    }
 
     /** Market value of the whole stack, or a hint when the item or its price is unknown. */
     private fun valueText(internalName: NeuInternalName, amount: Int): String {

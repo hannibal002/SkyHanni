@@ -34,7 +34,9 @@ class RareDropTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Show Dry Streak",
-        desc = "Also show how many eligible fights you have gone without one of those drops."
+        desc = "Also show how many eligible fights you have gone without one of those drops.\n" +
+            "§eEnable the Stats widget in your tab list, otherwise the chance is calculated " +
+            "with an outdated Magic Find."
     )
     @ConfigEditorBoolean
     var showDryStreak: Boolean = true

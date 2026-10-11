@@ -81,6 +81,16 @@ object DragonFightApi {
     )
 
     /**
+     * The protector becomes attackable with this message, which is the start of its fight.
+     *
+     * REGEX-TEST: BEWARE - An Endstone Protector has risen!
+     */
+    private val protectorRisenPattern by chatGroup.pattern(
+        "risen.protector",
+        "BEWARE - An End ?[Ss]tone Protector has risen!",
+    )
+
+    /**
      * WRAPPED-REGEX-TEST: "                    END STONE PROTECTOR DOWN!"
      */
     private val protectorDownPattern by endGroup.pattern(
@@ -171,6 +181,7 @@ object DragonFightApi {
             eggSpawnedPattern.matches(message) -> DragonFightState.eggSpawned = true
             dragonDownPattern.matches(message) -> onBossDown(EndBoss.DRAGON)
             protectorDownPattern.matches(message) -> onBossDown(EndBoss.END_STONE_PROTECTOR)
+            protectorRisenPattern.matches(message) -> EndBossSpawnEvent(EndBoss.END_STONE_PROTECTOR).post()
             else -> {
                 dragonSpawnPattern.matchMatcher(message) {
                     val type = DragonType.getByName(group("dragon").uppercase())
