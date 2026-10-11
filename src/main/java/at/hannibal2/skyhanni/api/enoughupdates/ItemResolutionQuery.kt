@@ -225,7 +225,7 @@ class ItemResolutionQuery {
             val petInfoObject = ConfigManager.gson.fromJson(petInfo, JsonObject::class.java)
             val petId = petInfoObject["type"].asString
             val petTier = petInfoObject["tier"].asString
-            val rarityIndex = LorenzRarity.getByNameOrError(petTier).ordinal
+            val rarityIndex = LorenzRarity.getByNameOrError(petTier).neuPetIndex
             val rawInternalName = petId.uppercase() + ";" + rarityIndex
             return rawInternalName.toInternalName()
         } catch (e: Exception) {
