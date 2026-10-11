@@ -1,8 +1,12 @@
 package at.hannibal2.skyhanni.config.features.dev
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.repo.AbstractRepoConfig
 import at.hannibal2.skyhanni.data.repo.AbstractRepoLocationConfig
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -35,9 +39,9 @@ class RepositoryConfig : AbstractRepoConfig {
         val resetRepoLocation: Runnable = Runnable { reset() }
 
         @Expose
-        @ConfigOption(name = "Repository User", desc = "The Repository Branch, default: hannibal002")
+        @ConfigOption(name = "Repository User", desc = "The Repository User, default: SkyHanniStudios")
         @ConfigEditorText
-        override var user: String = "hannibal002"
+        override var user: String = "SkyHanniStudios"
 
         @Expose
         @ConfigOption(name = "Repository Name", desc = "The Repository Name, default: SkyHanni-REPO")
@@ -49,9 +53,32 @@ class RepositoryConfig : AbstractRepoConfig {
         @ConfigEditorText
         override var branch: String = "main"
 
-        @Transient override val defaultUser = "hannibal002"
-        @Transient override val defaultRepoName = "SkyHanni-REPO"
-        @Transient override val defaultBranch = "main"
+        @Transient
+        override val defaultUser = "SkyHanniStudios"
+
+        @Transient
+        override val defaultRepoName = "SkyHanni-REPO"
+
+        @Transient
+        override val defaultBranch = "main"
+
+        @SkyHanniModule
+        companion object {
+            @HandleEvent
+            private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+                // The repo moved from hannibal002 to SkyHanniStudios. Only that owner is replaced, any other
+                // location stays.
+                event.transform(148, "dev.repo.location") { element ->
+                    val location = element as? JsonObject ?: return@transform element
+                    val user = location["user"]?.takeIf { it.isJsonPrimitive }?.asString
+                    val repoName = location["repoName"]?.takeIf { it.isJsonPrimitive }?.asString
+                    val isOldDefault = user.equals("hannibal002", ignoreCase = true) &&
+                        repoName.equals("SkyHanni-REPO", ignoreCase = true)
+                    if (isOldDefault) location.addProperty("user", "SkyHanniStudios")
+                    location
+                }
+            }
+        }
     }
 
     @Expose
