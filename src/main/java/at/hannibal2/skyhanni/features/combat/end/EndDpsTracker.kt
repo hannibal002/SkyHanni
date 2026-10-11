@@ -91,8 +91,13 @@ object EndDpsTracker {
             ?.let { " §8| §7Top: §d${(it / seconds).shortFormat()}" }
             .orEmpty()
 
-        // Sent without the SkyHanni prefix so it lines up with Hypixel's centered fight summary.
-        ChatUtils.chat("§f${" ".repeat(30)}§r§eYour $label: $own $duration$top", prefix = false)
+        // Without the prefix the line sits where Hypixel's own centered summary does; with it, the
+        // indent shrinks by its width so the text still lines up.
+        val indent = if (config.skyhanniMessagePrefix) 16 else 30
+        ChatUtils.chat(
+            "§f${" ".repeat(indent)}§r§eYour $label: $own $duration$top",
+            prefix = config.skyhanniMessagePrefix,
+        )
     }
 
     /** Damage dealt to the running protector, or the last result while it is still being shown. */

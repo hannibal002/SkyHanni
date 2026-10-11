@@ -19,4 +19,10 @@ class DpsConfig {
     @ConfigOption(name = "Show Top Damager", desc = "Also show the DPS of the top damager.")
     @ConfigEditorBoolean
     var showTopDamager: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Skyhanni Prefix", desc = "Displays the Skyhanni prefix in the DPS message.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var skyhanniMessagePrefix: Boolean = true
 }
