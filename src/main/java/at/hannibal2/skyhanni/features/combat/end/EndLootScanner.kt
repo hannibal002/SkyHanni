@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LootStandUtils.readLoot
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
@@ -55,6 +56,14 @@ object EndLootScanner {
      * within overlapping windows would be reported once.
      */
     private val reported = mutableMapOf<EndBoss, MutableSet<NeuInternalName>>()
+
+    /**
+     * What was announced lately, across kills. The list above starts over with every kill so a
+     * fresh drop of the same item counts again - but the loot of the previous kill is collected up
+     * to half a minute later, and by then that list may have been replaced. Without this, picking
+     * up a drop that was already announced from its stand announces it a second time.
+     */
+    private val recentlyReported = TimeLimitedSet<NeuInternalName>(SCAN_WINDOW)
 
     /**
      * Opened on the death message rather than on the fight summary: the loot is already lying
@@ -106,6 +115,9 @@ object EndLootScanner {
         // Only what was really picked up off the ground: sacks, the hunting box and the test
         // command post the same event without a drop having been collected.
         if (event.source != ItemAddManager.Source.ITEM_ADD) return
+        // Picking up a drop that its stand already announced is the same drop, even when a newer
+        // kill has started its own list in between.
+        if (event.internalName in recentlyReported) return
         val boss = mostRecentBoss() ?: return
         report(boss, event.internalName, event.amount)
     }
@@ -115,6 +127,7 @@ object EndLootScanner {
         // same drop, even though it is now attributed to that other boss.
         if (reported.values.any { internalName in it }) return
         reported.getOrPut(boss) { mutableSetOf() }.add(internalName)
+        recentlyReported.add(internalName)
         EndLootFoundEvent(boss, internalName, amount).post()
     }
 
@@ -138,5 +151,6 @@ object EndLootScanner {
         activeWindows.clear()
         seenDrops.clear()
         reported.clear()
+        recentlyReported.clear()
     }
 }

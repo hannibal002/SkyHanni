@@ -74,7 +74,6 @@ object DragonFightApi {
 
     /**
      * WRAPPED-REGEX-TEST: "                          PROTECTOR DRAGON DOWN!"
-     * WRAPPED-REGEX-TEST: "                          YOUNG DRAGON DOWN!"
      */
     private val dragonDownPattern by endGroup.pattern(
         "down.dragon",
