@@ -239,7 +239,7 @@ object HypixelCommands {
         send("quiver")
     }
 
-    fun baitsack() {
+    fun baitSack() {
         send("baitsack")
     }
 
