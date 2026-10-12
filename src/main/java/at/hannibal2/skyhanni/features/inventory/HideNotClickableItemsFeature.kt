@@ -127,7 +127,6 @@ object HideNotClickableItemsFeature {
             if (hideNetherWartPouch()) return
             if (hideTrickOrTreatBag()) return
             if (hideSackOfSacks()) return
-            if (hideFishingBag()) return
             if (hidePotionBag()) return
             if (hidePrivateIslandChest()) return
             if (hideAttributeFusion()) return
@@ -287,23 +286,6 @@ object HideNotClickableItemsFeature {
         if (stack.cleanName.endsWith(" Potion") || stack.cleanName == "Water Bottle") return false
 
         hideReason = "This item is not a potion!"
-        return true
-    }
-
-    private fun ItemNotClickableEvent.hideFishingBag(): Boolean {
-        if (!chestName.startsWith("Fishing Bag")) return false
-
-        if (ItemUtils.isSkyBlockMenuItem(stack)) {
-            hideReason = "The SkyBlock Menu cannot be put into the fishing bag!"
-            allowBypass = false
-            return true
-        }
-
-        showGreenLine = true
-        if (stack.getLore().any { it.removeColor() == "Fishing Bait" }) {
-            return false
-        }
-        hideReason = "This item is not a fishing bait!"
         return true
     }
 

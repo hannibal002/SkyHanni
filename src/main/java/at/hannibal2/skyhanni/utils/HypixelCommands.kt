@@ -239,8 +239,8 @@ object HypixelCommands {
         send("quiver")
     }
 
-    fun fishingBag() {
-        send("fishingbag")
+    fun baitsack() {
+        send("baitsack")
     }
 
     fun huntingBox() {
