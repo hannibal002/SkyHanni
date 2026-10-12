@@ -63,7 +63,8 @@ object FishingHookDisplay {
         val bobber = FishingApi.bobber ?: return
 
         val displayText = timerPattern.matchMatcher(newName) {
-            if (groupOrNull("alert") != null) {
+            val time = groupOrNull("time")?.toFloatOrNull()
+            if (groupOrNull("alert") != null || (time != null && time <= config.customReelInTime)) {
                 config.customAlertText.replace("&", "§")
             } else {
                 newName
