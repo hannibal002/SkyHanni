@@ -140,13 +140,12 @@ object OldSkyblockMenu {
             itemData = SkullItemData("41758912-e6b1-4700-9de5-04f2cfb9c422", "SB_MENU_QUIVER"),
         ),
         FISHING(
-            HypixelCommands::fishingBag,
+            HypixelCommands::baitSack,
             43,
-            "Fishing Bag",
-            "A useful bag which can hold all",
-            "types of fish, baits, and fishing",
-            "loot!",
-            itemData = SkullItemData("508c01d6-eabe-430b-9811-874691ee7ee4", "SB_MENU_FISHING"),
+            "Fishing Sack",
+            "§7Holds various §6Baits §7for §bFishing§7!",
+            itemData = SkullItemData("f9659a92-9d5a-3dcf-bd87-c0867653564c", "SB_MENU_FISHING"),
+            requiresBoosterCookie = false,
         ),
         SACK_OF_SACKS(
             HypixelCommands::sacks,
