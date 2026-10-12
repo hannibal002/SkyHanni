@@ -2,12 +2,6 @@
   SkyHanni: Mod for Hypixel SkyBlock
 </h1>
 
-<h2 align="center">
-  This project moves to <a href="https://github.com/SkyHanniStudios">SkyHanniStudios</a> on Sunday, October 18.
-  Old links keep working because GitHub redirects them. You don't need to do anything.
-</h2>
-
-
 <div align="center">
 
 ![sh_logo](https://github.com/SkyHanniStudios/SkyHanni/assets/24389977/2f52afa0-0330-434e-ba1c-f2affee96bc1)
