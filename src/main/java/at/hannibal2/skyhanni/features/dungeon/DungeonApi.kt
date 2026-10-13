@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.ClickedBlockType
 import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -51,14 +52,13 @@ import net.minecraft.world.level.block.Blocks
 object DungeonApi {
     val patternGroup = RepoPattern.group("dungeon")
 
-    // TODO: move to SkyblockIcons class
     /**
      * WRAPPED-REGEX-TEST: " ⏣ The Catacombs (F7)"
      * WRAPPED-REGEX-TEST: "  The Catacombs (F7)"
      */
     private val floorPattern by patternGroup.pattern(
         "floor",
-        " [⏣\uE067] The Catacombs \\((?<floor>.*)\\)",
+        " [⏣${SkyblockIcon.MASTER_MODE}] The Catacombs \\((?<floor>.*)\\)",
     )
 
     /**

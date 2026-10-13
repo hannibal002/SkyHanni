@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -12,19 +12,19 @@ import org.intellij.lang.annotations.Language
 enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
     HEALTH(
         // language=RegExp
-        "§[c6](?<health>[\\d,]+)/[\\d,]+${SkyblockStat.HEALTH.hypixelIcon}.*"
+        "§[c6](?<health>[\\d,]+)/[\\d,]+${SkyblockIcon.HEALTH}.*"
     ),
     DEFENSE(
         // language=RegExp
-        ".*§a(?<defense>[\\d,]+)§a${SkyblockStat.DEFENSE.hypixelIcon}.*"
+        ".*§a(?<defense>[\\d,]+)§a${SkyblockIcon.DEFENSE}.*"
     ),
     MANA(
         // language=RegExp
-        ".*§b(?<mana>[\\d,]+)/[\\d,]+${SkyblockStat.INTELLIGENCE.hypixelIcon}.*"
+        ".*§b(?<mana>[\\d,]+)/[\\d,]+${SkyblockIcon.INTELLIGENCE}.*"
     ),
     RIFT_TIME(
         // language=RegExp
-        "§[a7](?<riftTime>[\\dms ]+)${SkyblockStat.RIFT_TIME.hypixelIcon}.*"
+        "§[a7](?<riftTime>[\\dms ]+)${SkyblockIcon.RIFT_TIME}.*"
     ),
     SKYBLOCK_XP(
         // language=RegExp

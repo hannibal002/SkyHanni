@@ -9,8 +9,7 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandType.Companion.isInAnyIsland
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.data.model.SkyblockStat.MAGIC_FIND
+import at.hannibal2.skyhanni.data.model.SkyblockIcon
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
@@ -58,7 +57,7 @@ object RareDropMessages {
     @Suppress("MaxLineLength")
     private val petFishedPattern by petGroup.pattern(
         "fishedmessage",
-        "(?<start>(?:§.)*${SkyblockStat.TREASURE_CHANCE.hypixelIcon} (?:§.)*(?:GOOD|GREAT|OUTSTANDING) CATCH! (?:§.)*You caught a (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)",
+        "(?<start>(?:§.)*${SkyblockIcon.TREASURE_CHANCE} (?:§.)*(?:GOOD|GREAT|OUTSTANDING) CATCH! (?:§.)*You caught a (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)",
     )
 
     /**
@@ -103,7 +102,7 @@ object RareDropMessages {
      */
     private val enchantedBookPattern by repoGroup.pattern(
         "enchantedbook.colorless",
-        "RARE DROP! Enchanted Book(?: \\(\\+\\d+%? ${MAGIC_FIND.hypixelIcon} Magic Find\\))?.*",
+        "RARE DROP! Enchanted Book(?: \\(\\+\\d+%? ${SkyblockIcon.MAGIC_FIND} Magic Find\\))?.*",
     )
 
     private val petPatterns = listOf(
@@ -199,7 +198,7 @@ object RareDropMessages {
             category = CommandCategory.DEVELOPER_TEST
 
             simpleCallback {
-                ChatUtils.chat("§6§lRARE DROP! §r§fEnchanted Book §r§b(+§r§b208% §r§b${MAGIC_FIND.hypixelIcon} Magic Find§r§b)", prefix = false)
+                ChatUtils.chat("§6§lRARE DROP! §r§fEnchanted Book §r§b(+§r§b208% §r§b${SkyblockIcon.MAGIC_FIND} Magic Find§r§b)", prefix = false)
                 ChatUtils.chat("Testing Enchanted Book Name")
                 onItemAdd(ItemAddEvent("ANGLER;6".toInternalName(), 1, ItemAddManager.Source.ITEM_ADD))
             }
