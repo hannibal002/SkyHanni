@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.EndBossSpawnEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.combat.end.dragon.DragonFightState
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -91,13 +90,7 @@ object EndDpsTracker {
             ?.let { " §8| §7Top: §d${(it / seconds).shortFormat()}" }
             .orEmpty()
 
-        // Without the prefix the line sits where Hypixel's own centered summary does; with it, the
-        // indent shrinks by its width so the text still lines up.
-        val indent = if (config.skyhanniMessagePrefix) 16 else 30
-        ChatUtils.chat(
-            "§f${" ".repeat(indent)}§r§eYour $label: $own $duration$top",
-            prefix = config.skyhanniMessagePrefix,
-        )
+        EndFightSummary.send("§eYour $label: $own $duration$top", config.skyhanniMessagePrefix)
     }
 
     /** Damage dealt to the running protector, or the last result while it is still being shown. */

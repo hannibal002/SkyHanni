@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.EndBoss
 import at.hannibal2.skyhanni.events.EndBossFightEndEvent
+import at.hannibal2.skyhanni.features.combat.end.EndFightSummary
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 
@@ -45,12 +45,9 @@ object DragonWeight {
         if (event.boss != EndBoss.DRAGON) return
         weight = calculateWeight(DragonFightState.eyesPlaced, event.place, event.topDamage, event.yourDamage)
         if (!config.chat) return
-        // Without the prefix the line sits where Hypixel's own centered summary does; with it, the
-        // indent shrinks by the width of the prefix so the text still lines up.
-        val indent = if (config.skyhanniMessagePrefix) 16 else 30
-        ChatUtils.chat(
-            "§f${" ".repeat(indent)}§r§eYour Weight: §r§a${weight.roundTo(0).addSeparators()}",
-            prefix = config.skyhanniMessagePrefix,
+        EndFightSummary.send(
+            "§eYour Weight: §a${weight.roundTo(0).addSeparators()}",
+            config.skyhanniMessagePrefix,
         )
     }
 }

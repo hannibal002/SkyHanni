@@ -66,11 +66,13 @@ object EndRareDropTracker {
     private val LEGENDARY_PET = "ENDER_DRAGON;4".toInternalName()
     private val EPIC_PET = "ENDER_DRAGON;3".toInternalName()
     private val TIER_BOOST_CORE = "PET_ITEM_TIER_BOOST_DROP".toInternalName()
+    private val PEARLESCENT_DYE = "DYE_PEARLESCENT".toInternalName()
 
     class Data {
         @Expose var legendaryPets: Int = 0
         @Expose var epicPets: Int = 0
         @Expose var tierBoostCores: Int = 0
+        @Expose var pearlescentDyes: Int = 0
 
         /** Eligible fights since the last drop of the matching kind. */
         @Expose var dryDragons: Int = 0
@@ -159,7 +161,10 @@ object EndRareDropTracker {
         }
     }
 
-    @HandleEvent
+    /**
+     * Counted before the alerts run, because they show the new number right in their message.
+     */
+    @HandleEvent(priority = HandleEvent.HIGH)
     private fun onEndLootFound(event: EndLootFoundEvent) {
         val data = storage ?: return
         when (event.internalName) {
@@ -176,6 +181,22 @@ object EndRareDropTracker {
                 data.dryGolems = 0
                 data.dryGolemChance = 0.0
             }
+            PEARLESCENT_DYE -> data.pearlescentDyes++
+        }
+    }
+
+    /**
+     * How many of this drop the profile has seen, for the alert to append - null for everything
+     * that is not counted, which is most of what drops.
+     */
+    fun countOf(internalName: NeuInternalName): Int? {
+        val data = storage ?: return null
+        return when (internalName) {
+            LEGENDARY_PET -> data.legendaryPets
+            EPIC_PET -> data.epicPets
+            TIER_BOOST_CORE -> data.tierBoostCores
+            PEARLESCENT_DYE -> data.pearlescentDyes
+            else -> null
         }
     }
 

@@ -64,18 +64,22 @@ object EndDropAlert {
     fun show(internalName: NeuInternalName, drop: Drop, amount: Int) {
         val suffix = if (amount > 1) " §7x$amount" else ""
         val value = valueText(internalName, amount)
+        // Which one of these the profile has now, for the drops that are counted at all.
+        val count = EndRareDropTracker.countOf(internalName)?.let { " §8#$it" }.orEmpty()
 
         if (drop.withTitle) {
             playDropSound()
             TitleManager.sendTitle(
                 "§c§lDROP!",
-                subtitleText = "${drop.color}§l${drop.label}$suffix $value",
+                subtitleText = "${drop.color}§l${drop.label}$suffix $value$count",
                 duration = TITLE_DURATION,
             )
         }
 
         val subject = if (amount > 1) "§f${amount}x " else "§f${article(drop.label)} "
-        ChatUtils.chat("§b${PlayerUtils.getName()} §fhas obtained $subject${drop.color}${drop.label}§r $value")
+        ChatUtils.chat(
+            "§b${PlayerUtils.getName()} §fhas obtained $subject${drop.color}${drop.label}§r $value$count",
+        )
     }
 
     private fun article(label: String) = if (label.firstOrNull()?.uppercaseChar() in VOWELS) "an" else "a"
