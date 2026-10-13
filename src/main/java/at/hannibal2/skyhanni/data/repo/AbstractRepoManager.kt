@@ -595,7 +595,17 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         val configDirectory = legacyConfigDirectory ?: return
 
         val legacyRepoDirectory = configDirectory.resolve("repo").takeIf { it.exists() }
-        if (legacyRepoDirectory != null) {
+        // copyRecursively resolves directory links via File.listFiles, so a symlinked legacy directory
+        // would have its target copied, e.g. a local checkout with .git. Windows junctions are missed.
+        val legacyRepoLink = legacyRepoDirectory?.takeIf { Files.isSymbolicLink(it.toPath()) }
+        if (legacyRepoLink != null) {
+            val message = "Legacy repo path is a symbolic link, deleting the link instead of copying what it " +
+                "points at. Re-create it at ${repoDirectory.absolutePath} if it is still needed."
+            logger.warn(message)
+            // The repo log file is not where anyone looks during startup, so this also goes to the console.
+            SkyHanniMod.logger.warn(message)
+            legacyRepoLink.deleteRecursivelySafe()
+        } else if (legacyRepoDirectory != null) {
             logger.warn("Migrating legacy repo directory to: ${repoDirectory.absolutePath}")
             repoDirectory.mkdirs()
 
