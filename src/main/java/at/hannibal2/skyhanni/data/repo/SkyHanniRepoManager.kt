@@ -17,16 +17,18 @@ object SkyHanniRepoManager : AbstractRepoManager<RepositoryReloadEvent>() {
     override val config get() = SkyHanniMod.feature.dev.repo
     override val backupRepoResourcePath: String = "assets/skyhanni/repo.tar.gz"
 
-    override val reloadCommand: String = "shreloadlocalrepo"
-    override val statusCommand: String = "shrepostatus"
     override val updateCommand: String = "shupdaterepo"
+    override val statusCommand: String = "shrepostatus"
+    override val reloadCommand: String = "shreloadlocalrepo"
+    override val updateCommandAliases: List<String> = listOf("shrepoupdate")
+
     override val progressCategory = ChatProgressUpdates.category("SkyHanni Repo")
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
+    private fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload() {
         ProfileStorageData.repoReady = true
         if (ProfileStorageData.loaded) ProfileDataReadyEvent().post()
     }
