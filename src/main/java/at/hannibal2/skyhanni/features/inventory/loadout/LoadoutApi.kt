@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MaxwellApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
@@ -86,8 +87,30 @@ object LoadoutApi {
         "Your tuning:",
     )
 
+    /**
+     * REGEX-TEST: Helmet: None
+     * REGEX-TEST: Gloves/Bracelet: None
+     * REGEX-TEST: Pet: None
+     * REGEX-TEST: HOTM: None
+     * REGEX-TEST: Tuning Template Slot: None
+     * REGEX-FAIL: Power Stone: Silky
+     */
+    private val unsetComponentPattern by patternGroup.pattern(
+        "component",
+        "(?<component>[^:]+): None",
+    )
+
     private val ARMOR_SLOTS = listOf(11, 20, 29, 38)
     private val EQUIPMENT_SLOTS = listOf(10, 19, 28, 37)
+
+    // The names of the loadout components in the lore of the loadout icons
+    private val ARMOR_LABELS = listOf("Helmet", "Chestplate", "Leggings", "Boots")
+    private val EQUIPMENT_LABELS = listOf("Necklace", "Cloak", "Belt", "Gloves/Bracelet")
+    private const val PET_LABEL = "Pet"
+    private const val POWERSTONE_LABEL = "Power Stone"
+    private const val TUNINGS_LABEL = "Tuning Template Slot"
+    private const val HOTM_LABEL = "HOTM"
+    private const val HOTF_LABEL = "HOTF"
     private const val PET_SLOT = 21
     private const val POWERSTONE_SLOT = 27
     private const val TUNINGS_SLOT = 36
@@ -99,10 +122,15 @@ object LoadoutApi {
     private const val SLOTS_PER_ROW = 3
     private const val MAX_PAGES = 3
 
+    const val PREVIOUS_PAGE_SLOT = 17
+    const val NEXT_PAGE_SLOT = 44
+
     var slots = listOf<LoadoutSlot>()
 
     var currentPage: Int? = null
     private var inLoadouts = false
+
+    val maxPage get() = slots.maxOfOrNull { it.page } ?: MAX_PAGES
 
     internal fun emptyArmor(): List<SafeItemStack?> = listOf(null, null, null, null)
     internal fun emptyEquipment(): List<SafeItemStack?> = listOf(null, null, null, null)
@@ -133,13 +161,17 @@ object LoadoutApi {
 
     private fun getLoadoutSlotFromId(id: Int?) = slots.find { it.id == id }
 
-    fun inLoadouts() = InventoryUtils.inInventory() && inLoadouts
+    fun inLoadouts() = inLoadouts && (InventoryUtils.inInventory() || CustomLoadout.inCustomMenu)
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        inventoryPattern.matches(event.inventoryName).let {
-            inLoadouts = it
-        }
+        matchesInventoryName(event.inventoryName)
+    }
+
+    internal fun matchesInventoryName(inventoryName: String): Boolean {
+        val matched = inventoryPattern.matches(inventoryName)
+        inLoadouts = matched
+        return matched
     }
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
@@ -153,6 +185,7 @@ object LoadoutApi {
 
         processIcons(itemsList)
         processSelectedLoadout(itemsList)
+        slots.filter { it.isInCurrentPage() }.forEach { it.removeUnsetComponents() }
     }
 
     // Loadouts are supposed to change stuff on the Player.
@@ -161,6 +194,7 @@ object LoadoutApi {
         var anyLoadoutEquipped = false
         for (slot in slots.filter { it.isInCurrentPage() }) {
             val icon = itemsList[slot.inventorySlot]
+            slot.icon = icon
 
             if (icon?.isDye(DyeCompat.GRAY) == true) {
                 slot.getData()?.clear()
@@ -204,6 +238,27 @@ object LoadoutApi {
         }
     }
 
+    private fun LoadoutSlot.removeUnsetComponents() {
+        val unset = icon.getUnsetComponents()
+        if (unset.isEmpty()) return
+        val data = getData() ?: return
+
+        data.armor = data.armor.mapIndexed { index, item -> item.takeIf { ARMOR_LABELS.getOrNull(index) !in unset } }
+        data.equipment = data.equipment.mapIndexed { index, item -> item.takeIf { EQUIPMENT_LABELS.getOrNull(index) !in unset } }
+        if (PET_LABEL in unset) data.pet = null
+        if (POWERSTONE_LABEL in unset) data.powerstone = null
+        if (TUNINGS_LABEL in unset) data.tunings = null
+        if (HOTM_LABEL in unset) data.hotm = null
+        if (HOTF_LABEL in unset) data.hotf = null
+    }
+
+    private fun SafeItemStack?.getUnsetComponents(): Set<String> {
+        if (this == null) return emptySet()
+        return getLoreComponent().mapNotNull { line ->
+            unsetComponentPattern.matchMatcher(line) { group("component") }
+        }.toSet()
+    }
+
     // This is for Hotm, Hotf and Powerstone
     private fun SafeItemStack?.parseCurrentSelection(): String? {
         if (this == null) return null
@@ -230,6 +285,11 @@ object LoadoutApi {
     }
 
     @HandleEvent
+    private fun onProfileJoin() {
+        slots.forEach { it.icon = null }
+    }
+
+    @HandleEvent
     fun onInventoryClose() {
         if (!inLoadouts) return
         DelayedRun.runDelayed(250.milliseconds) {
@@ -238,6 +298,44 @@ object LoadoutApi {
                 currentPage = null
             }
         }
+    }
+
+    @HandleEvent
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Loadout")
+        event.addIrrelevant {
+            if (slots.isEmpty()) {
+                add("No slots")
+                return@addIrrelevant
+            }
+
+            for (slot in slots) {
+                val slotInfo = "Slot ${slot.id} (${slot.inventorySlot})"
+                when {
+                    slot.locked -> add("$slotInfo is locked")
+                    slot.isEmpty() -> add("$slotInfo is empty")
+                    else -> {
+                        add(slotInfo)
+                        slot.getData()?.let { data ->
+                            data.armor.forEachIndexed { index, item ->
+                                addItem("   Armor $index", item)
+                            }
+                            data.equipment.forEachIndexed { index, item -> addItem("   Equipment $index", item) }
+                            addItem("   Pet", data.pet)
+                            data.powerstone?.let { add("   Powerstone: $it") }
+                            data.tunings?.let { add("   Tunings: ${it.joinToString(", ")}") }
+                            data.hotm?.let { add("   HotM: $it") }
+                            data.hotf?.let { add("   HotF: $it") }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun MutableList<String>.addItem(label: String, item: SafeItemStack?) {
+        val name = item?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: return
+        add("$label: $name")
     }
 
     class LoadoutData(

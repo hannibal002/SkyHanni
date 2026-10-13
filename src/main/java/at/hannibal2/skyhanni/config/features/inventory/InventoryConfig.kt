@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features.inventory
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFConfig
 import at.hannibal2.skyhanni.config.features.inventory.customloadout.CustomLoadoutConfig
-import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
 import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig
 import at.hannibal2.skyhanni.config.features.inventory.npctrade.NpcTradeConfig
@@ -52,11 +51,7 @@ class InventoryConfig {
     val itemAbilities: ItemAbilityConfig = ItemAbilityConfig()
 
     @Expose
-    @Category(name = "Custom Wardrobe", desc = "New Wardrobe Look.")
-    val customWardrobe: CustomWardrobeConfig = CustomWardrobeConfig()
-
-    @Expose
-    @Category(name = "Custom Loadout", desc = "New Loadout menu look.")
+    @Category(name = "Custom Loadout", desc = "New look for the Loadout, Wardrobe and Equipment menus.")
     val customLoadout: CustomLoadoutConfig = CustomLoadoutConfig()
 
     @Expose

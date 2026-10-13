@@ -16,7 +16,7 @@ object ArmorWardrobeApi : AbstractWardrobeApi() {
      */
     override val inventoryPattern by patternGroup.pattern(
         "armor.name",
-        "\\((?<currentPage>\\d+)/\\d+\\) Armor Sets",
+        "\\((?<currentPage>\\d+)/(?<maxPage>\\d+)\\) Armor Sets",
     )
 
     override val valueName = "Armor"
@@ -37,9 +37,4 @@ object ArmorWardrobeApi : AbstractWardrobeApi() {
 
     @HandleEvent
     private fun onDebugDataCollect(event: DebugDataCollectEvent) = handleDebugDataCollect(event)
-
-    // This also modifies the "inWardrobe" property
-    internal fun matchesInventoryName(inventoryName: String): Boolean {
-        return handleInventoryOpen(inventoryName)
-    }
 }

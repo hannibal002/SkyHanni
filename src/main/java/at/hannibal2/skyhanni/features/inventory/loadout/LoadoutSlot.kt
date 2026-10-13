@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.loadout
 
+import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
+
 class LoadoutSlot(
     val id: Int,
     val page: Int,
@@ -34,6 +37,12 @@ class LoadoutSlot(
         }
 
     val name: String? get() = getData()?.name
+
+    var icon: SafeItemStack? = null
+
+    fun getUncachedIcon(): SafeItemStack? = icon?.takeIf { !locked && isEmpty() }
+
+    fun getUncachedArmorPiece(): SafeItemStack? = getUncachedIcon()?.takeIf { !it.isDye() }
 
     fun isEmpty(): Boolean = getData()?.let { data ->
         data.armor.all { it == null } &&
