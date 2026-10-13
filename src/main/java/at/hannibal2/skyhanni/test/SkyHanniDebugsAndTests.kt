@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
@@ -397,6 +398,13 @@ object SkyHanniDebugsAndTests {
         val rawInternalName = internalName.asString()
         OSUtils.copyToClipboard(rawInternalName)
         ChatUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onKeyDown(event: KeyDownEvent) {
+        if (event.keyCode == debugConfig.copySubLocation && MinecraftCompat.screen == null) {
+            HypixelData.skyBlockArea?.let(OSUtils::copyToClipboard)
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
