@@ -27,6 +27,7 @@ enum class IslandTypeTag(vararg types: Any) {
 
     FORAGING_CUSTOM_TREES(IslandType.GALATEA, IslandType.TORRHUS_CANYON),
     FORAGING(FORAGING_CUSTOM_TREES, IslandType.THE_PARK),
+    HAS_TREES(FORAGING, IslandType.HUB),
 
     HOPPITY_DISALLOWED(IslandType.THE_RIFT, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.MINESHAFT, IslandType.SAFARI),
     HAS_SHOWCASES(PRIVATE_ISLAND, IslandType.HUB, IslandType.CRIMSON_ISLE),
