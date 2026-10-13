@@ -32,7 +32,8 @@ object TheGreatSpook {
     private val config get() = SkyHanniMod.feature.event.spook
     private val needPrimalFear get() = config.primalFearNotification || config.primalFearTimer
 
-    private var isGreatSpookActive = false
+    var isGreatSpookActive = false
+        private set
     private var greatSpookTimeRange: ClosedRange<SimpleTimeMark>? = null
     private var greatSpookEndTime = SimpleTimeMark.farPast()
 
@@ -146,9 +147,6 @@ object TheGreatSpook {
 
         if (config.primalFearTimer) displayMobCooldown?.let {
             config.positionTimer.renderRenderable(it, posLabel = "Primal Fear Timer")
-        }
-        if (config.fearStatDisplay) SkyblockStat.FEAR.displayValue?.let {
-            config.positionFear.renderRenderable(Renderable.text(it), posLabel = "Fear Stat Display")
         }
         if (config.greatSpookTimeLeft) displayGreatSpookEnd?.let {
             config.positionTimeLeft.renderRenderable(it, posLabel = "Great Spook Time Left")
