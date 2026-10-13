@@ -191,7 +191,13 @@ object FishingApi {
 
         val bobber = bobber ?: return
         if (bobber.deceased) {
-            if (lastReelTime.passedSince() < 0.5.seconds && lastCatchSound.passedSince() < 0.5.seconds) FishingCatchEvent.post()
+            if (
+                lastReelTime.passedSince() < 0.5.seconds &&
+                lastCatchSound.passedSince() < 0.5.seconds &&
+                SeaCreatureDetectionApi.lastSeaCreatureFished.passedSince() > 0.5.seconds
+            ) {
+                FishingCatchEvent.post()
+            }
             resetBobber()
             return
         }
@@ -261,7 +267,8 @@ object FishingApi {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onPlaySound(event: PlaySoundEvent) {
         if (!holdingRod) return
-        if (event.soundName == "entity.experience_orb.pickup" && event.volume == .5F) lastCatchSound = SimpleTimeMark.now()
+        if (event.soundName == "entity.experience_orb.pickup" && event.volume == .1F)
+            lastCatchSound = SimpleTimeMark.now()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
