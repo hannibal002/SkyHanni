@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.config.ConfigManager
+import com.google.gson.Gson
+import com.google.gson.JsonElement
 import java.io.File
 import java.io.IOException
 import java.nio.file.AccessDeniedException
@@ -7,8 +10,8 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 class StringFileHandler(private val file: File) {
-    private val backupFile = File(file.parentFile, "${file.name}.bak")
-    private val tempFile = File(file.parentFile, "${file.name}.tmp")
+    private val backupFile = file.resolveSibling("${file.name}.bak")
+    private val tempFile = file.resolveSibling("${file.name}.tmp")
 
     @Throws(IOException::class)
     fun load(): String = try {
@@ -40,4 +43,18 @@ class StringFileHandler(private val file: File) {
             throw e
         }
     }
+
+    fun delete() {
+        if (file.exists()) file.delete()
+        if (backupFile.exists()) backupFile.delete()
+        if (tempFile.exists()) tempFile.delete()
+    }
+
+    fun getJson(gson: Gson = ConfigManager.gson): JsonElement? = runCatching {
+        gson.fromJson(load(), JsonElement::class.java)
+    }.getOrNull()
+
+    fun writeJson(json: JsonElement, gson: Gson = ConfigManager.gson): Boolean = runCatching {
+        save(gson.toJson(json))
+    }.isSuccess
 }
