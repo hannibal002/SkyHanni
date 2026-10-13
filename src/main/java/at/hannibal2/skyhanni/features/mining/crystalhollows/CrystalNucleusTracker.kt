@@ -126,6 +126,7 @@ object CrystalNucleusTracker {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.professorUsage.onToggle(tracker::update)
+        config.profileProfitSetting.onToggle(tracker::update)
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -135,17 +136,22 @@ object CrystalNucleusTracker {
         if (runsCompleted > 0) {
             var profit = tracker.drawItems(data, { true }, this)
             val jungleKeyCost: Double = tracker.getPricePer(JUNGLE_KEY_ITEM) * runsCompleted
-            profit -= jungleKeyCost
-            val jungleKeyCostFormat = jungleKeyCost.shortFormat()
-            add(
-                Renderable.hoverTips(
-                    " §7${runsCompleted}x §5Jungle Key§7: §c-$jungleKeyCostFormat",
-                    tips = listOf(
-                        "§7You lost §c$jungleKeyCostFormat §7of total profit",
-                        "§7due to §5Jungle Keys§7.",
-                    ),
-                ).toSearchable("Jungle Key"),
-            )
+
+            val profitType = config.profileProfitSetting.get()
+
+            if (!profitType.ignoreMaterialCost()) {
+                profit -= jungleKeyCost
+                val jungleKeyCostFormat = jungleKeyCost.shortFormat()
+                add(
+                    Renderable.hoverTips(
+                        " §7${runsCompleted}x §5Jungle Key§7: §c-$jungleKeyCostFormat",
+                        tips = listOf(
+                            "§7You lost §c$jungleKeyCostFormat §7of total profit",
+                            "§7due to §5Jungle Keys§7.",
+                        ),
+                    ).toSearchable("Jungle Key"),
+                )
+            }
 
             val usesApparatus = CrystalNucleusApi.usesApparatus()
             val partsCost = CrystalNucleusApi.getPrecursorRunPrice { tracker.getPricePer(it) }
@@ -159,17 +165,19 @@ object CrystalNucleusTracker {
             else rawConfigString
             val usageTotal = if (usesApparatus) runsCompleted else runsCompleted * 6
 
-            profit -= totalSapphireCost
-            val totalSapphireCostFormat = totalSapphireCost.shortFormat()
-            add(
-                Renderable.hoverTips(
-                    " §7${usageTotal}x $usageString§7: §c-$totalSapphireCostFormat",
-                    tips = listOf(
-                        "§7You lost §c$totalSapphireCostFormat §7of total profit",
-                        "§7due to $usageString§7.",
-                    ),
-                ).toSearchable(usageString.removeColor()),
-            )
+            if (!profitType.ignoreMaterialCost()) {
+                profit -= totalSapphireCost
+                val totalSapphireCostFormat = totalSapphireCost.shortFormat()
+                add(
+                    Renderable.hoverTips(
+                        " §7${usageTotal}x $usageString§7: §c-$totalSapphireCostFormat",
+                        tips = listOf(
+                            "§7You lost §c$totalSapphireCostFormat §7of total profit",
+                            "§7due to $usageString§7.",
+                        ),
+                    ).toSearchable(usageString.removeColor()),
+                )
+            }
 
             add(
                 Renderable.hoverTips(
