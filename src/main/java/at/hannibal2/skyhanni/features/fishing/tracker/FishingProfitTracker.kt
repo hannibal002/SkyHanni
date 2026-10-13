@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.FishingProfitItemsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -192,9 +194,19 @@ object FishingProfitTracker {
         }
     }
 
+    private var slot9Item: NeuInternalName? = null
+
+    @HandleEvent
+    fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
+        if (event.slot == 44) {
+            slot9Item = event.itemStack.getInternalNameOrNull()
+        }
+    }
+
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
+        if (event.internalName == slot9Item) return
 
         if (event.source == ItemAddManager.Source.COMMAND) {
             if (!config.enabled) return
