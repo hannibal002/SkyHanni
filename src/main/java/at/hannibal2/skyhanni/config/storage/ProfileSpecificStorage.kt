@@ -11,7 +11,8 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
+import at.hannibal2.skyhanni.features.combat.end.EndRareDropTracker
+import at.hannibal2.skyhanni.features.combat.end.dragon.DragonProfitTracker
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
 import at.hannibal2.skyhanni.features.commands.OpenLastStorage
@@ -182,6 +183,17 @@ class ProfileSpecificStorage(
 
     @Expose
     var dragonProfitTracker: DragonProfitTracker.BucketData = DragonProfitTracker.BucketData()
+
+    @Expose
+    var endRareDrops: EndRareDropTracker.Data = EndRareDropTracker.Data()
+
+    /** Dragons the player placed at least one summoning eye for. */
+    @Expose
+    var summonedDragons: Int = 0
+
+    /** Whether [summonedDragons] has been taken from the dragon guide at least once. */
+    @Expose
+    var summonedDragonsSynced: Boolean = false
 
     // - event
     // -- carnival
