@@ -148,31 +148,27 @@ object OSUtils {
         }
     }
 
-    /**
-     * True for a symbolic link and, on Windows, a directory junction, also when the target is gone.
-     * [Files.isSymbolicLink] alone misses junctions.
-     */
+    /** True for a symbolic link or, on Windows, a junction, also a dead one. */
     fun Path.isLinkOrJunction(): Boolean {
         if (Files.isSymbolicLink(this)) return true
         if (!isWindows) return false
         val attributes = runCatching {
             Files.readAttributes(this, BasicFileAttributes::class.java, LinkOption.NOFOLLOW_LINKS)
         }.getOrNull() ?: return false
-        // Junctions report isOther on every Java version, cloud folders do too on Java 25.
+        // Junctions always report isOther.
         if (!attributes.isOther) return false
         val parent = toAbsolutePath().parent ?: return false
-        // Only a junction resolves to somewhere else. Anything unresolvable counts as a link, the safe side.
+        // A junction resolves elsewhere, anything unresolvable counts as one.
         return runCatching {
             toRealPath() != parent.toRealPath().resolve(toRealPath(LinkOption.NOFOLLOW_LINKS).fileName)
         }.getOrDefault(true)
     }
 
     /**
-     * Deletes this file or directory recursively. A link or junction is deleted itself, never
-     * the files it points at, see [isLinkOrJunction]. The first failure is reported through
-     * [ErrorManager], together with the number of failures.
+     * Deletes recursively without following links or junctions.
+     * Reports the first failure through [ErrorManager].
      *
-     * @return true if the deletion succeeded, also when nothing existed.
+     * @return false if something could not be deleted.
      */
     fun File.deleteRecursivelySafe(): Boolean {
         val failures = mutableListOf<IOException>()
@@ -187,7 +183,7 @@ object OSUtils {
         return false
     }
 
-    // Not Path.deleteRecursively, it enters junctions on Java 25 (JDK-8364277).
+    // Path.deleteRecursively would enter junctions on Java 25.
     private fun Path.deleteWithoutFollowingLinks(failures: MutableList<IOException>) {
         try {
             val attributes = Files.readAttributes(this, BasicFileAttributes::class.java, LinkOption.NOFOLLOW_LINKS)
@@ -196,12 +192,12 @@ object OSUtils {
                 Files.newDirectoryStream(this).use { entries ->
                     for (entry in entries) entry.deleteWithoutFollowingLinks(failures)
                 }
-                // Children left over, deleting this directory would only fail too.
+                // A child is left over, so this directory is not empty.
                 if (failures.size > failuresBefore) return
             }
             Files.delete(this)
         } catch (_: java.nio.file.NoSuchFileException) {
-            // Already gone. Qualified, the unqualified name is the unrelated kotlin.io.NoSuchFileException.
+            // Already gone. Qualified, kotlin.io has its own NoSuchFileException.
         } catch (e: DirectoryIteratorException) {
             failures.add(e.cause ?: IOException(e))
         } catch (e: IOException) {
