@@ -85,15 +85,15 @@ object GeorgeHelper {
 
     private fun findCheapestPet(tierName: String, petName: String, tierColorCodes: String): PetInfo {
         val colorlessPetName = petName.removeColor().uppercase().replace(" ", "_")
-        val tierNumber = LorenzRarity.getByName(tierName.uppercase().replace(" ", "_"))?.id ?: 0
+        val tierNumber = LorenzRarity.getByName(tierName.uppercase().replace(" ", "_"))?.neuPetIndex ?: 0
 
         val (cheapestTier, cheapestPrice) = findCheapestTier(colorlessPetName, tierNumber)
 
         val stackRenderableInternalName = petInternalName(colorlessPetName, tierNumber).toInternalName()
         val stack = Renderable.item(stackRenderableInternalName)
 
-        val rarityColorCode = LorenzRarity.getById(cheapestTier)?.chatColorCode ?: tierColorCodes
-        val formattedPet = "${rarityColorCode}${LorenzRarity.getById(cheapestTier)?.formattedName} $petName"
+        val rarityColorCode = LorenzRarity.fromNeuPetIndex(cheapestTier)?.chatColorCode ?: tierColorCodes
+        val formattedPet = "${rarityColorCode}${LorenzRarity.fromNeuPetIndex(cheapestTier)?.formattedName} $petName"
 
         val clickableRenderable = if (cheapestPrice > 0) {
             val tips = mutableListOf(
