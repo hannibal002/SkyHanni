@@ -76,7 +76,7 @@ class PestsConfig {
     @Expose
     @ConfigOption(name = "Bonus Chance Display", desc = "Displays your bonus pest chance and if it is enabled or not.")
     @ConfigEditorDropdown
-    val pestChanceDisplay: Property<DisplayFormat> = Property.of(DisplayFormat.DISABLED)
+    val pestChanceDisplay: DisplayFormat = DisplayFormat.DISABLED
 
     @Expose
     @ConfigLink(owner = PestsConfig::class, field = "pestChanceDisplay")
