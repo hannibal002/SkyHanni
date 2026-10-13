@@ -71,7 +71,8 @@ class ConfigManager {
             logger.log("Loading config despite config being already loaded?")
         }
         SkyHanniMod.configDir.mkdirs()
-
+        // TODO: Remove in 10.0.0
+        copyLegacyConfigFiles()
 
         for (fileType in ConfigFileType.entries) {
             val clazzInstance = fileType.clazz.getDeclaredConstructor().newInstance()
@@ -93,6 +94,46 @@ class ConfigManager {
         }
 
         deleteOldBackups()
+    }
+
+    /**
+     * Copies missing config files from config/skyhanni relative to the working directory, if that is not
+     * [SkyHanniMod.configDir]. Copied, not moved, since instances can share a working directory.
+     */
+    private fun copyLegacyConfigFiles() {
+        val marker = SkyHanniMod.dataDir.resolve("legacy_config_copied")
+        if (marker.exists()) return
+        val legacyDirectory = File("config/skyhanni")
+        if (!legacyDirectory.resolve("${ConfigFileType.FEATURES.fileName}.json").isFile) return
+        val sameDirectory = runCatching {
+            legacyDirectory.canonicalFile == SkyHanniMod.configDir.canonicalFile
+        }.getOrElse { e ->
+            logger.logError("Could not compare ${legacyDirectory.absolutePath} with the config directory", e)
+            return
+        }
+        if (sameDirectory) return
+
+        var failed = false
+        for (fileType in ConfigFileType.entries) {
+            val legacyFile = legacyDirectory.resolve("${fileType.fileName}.json")
+            if (!legacyFile.isFile || fileType.file.exists()) continue
+            runCatching {
+                legacyFile.copyTo(fileType.file)
+            }.onSuccess {
+                logger.log("Copied legacy ${fileType.fileName} from ${legacyFile.absolutePath}")
+            }.onFailure { e ->
+                logger.logError("Could not copy legacy ${fileType.fileName} from ${legacyFile.absolutePath}", e)
+                failed = true
+            }
+        }
+        if (failed) return
+        // Without it, deleting the config later would bring the legacy one back.
+        runCatching {
+            marker.parentFile?.mkdirs()
+            marker.createNewFile()
+        }.onFailure { e ->
+            logger.logError("Could not create ${marker.absolutePath}", e)
+        }
     }
 
     private fun deleteOldBackups() {

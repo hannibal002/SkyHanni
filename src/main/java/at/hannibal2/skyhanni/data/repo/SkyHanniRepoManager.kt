@@ -16,7 +16,6 @@ object SkyHanniRepoManager : AbstractRepoManager<RepositoryReloadEvent>() {
     override val config get() = SkyHanniMod.feature.dev.repo
     override val backupRepoResourcePath: String = "assets/skyhanni/shrepo.tar.gz"
     override val repoFolderName: String = "shrepo"
-    // Intentionally hardcoded: the legacy path must not follow changes to the config directory.
     override val legacyConfigDirectory = File("config/skyhanni")
 
     override val reloadCommand: String = "shreloadlocalrepo"
@@ -25,10 +24,10 @@ object SkyHanniRepoManager : AbstractRepoManager<RepositoryReloadEvent>() {
     override val progressCategory = ChatProgressUpdates.category("SkyHanni Repo")
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
+    private fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload() {
         ProfileStorageData.repoReady = true
         if (ProfileStorageData.loaded) ProfileDataReadyEvent().post()
     }

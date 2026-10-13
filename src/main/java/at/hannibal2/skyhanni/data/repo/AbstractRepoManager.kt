@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.repo.filesystem.MemoryRepoFileSystem
 import at.hannibal2.skyhanni.data.repo.filesystem.RepoFileSystem
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils.deleteRecursivelySafe
+import at.hannibal2.skyhanni.utils.OSUtils.isLinkOrJunction
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -26,7 +27,14 @@ import com.mojang.brigadier.arguments.BoolArgumentType
 import java.io.File
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Files
+import java.nio.file.LinkOption
+import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import kotlin.io.path.CopyActionResult
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.OnErrorResult
+import kotlin.io.path.copyToRecursively
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -47,13 +55,18 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     abstract val commonShortNameCased: String
 
     /**
-     * The resource path of the backup repo. (e.g., "assets/skyhanni/repo.tar.gz")
+     * The resource path of the backup repo. (e.g., "assets/skyhanni/shrepo.tar.gz")
      * This MUST be provided for the backup repo to work.
      */
     open val backupRepoResourcePath: String? = null
 
+    /** Name of the repo folder, also used for its commit file, archive and log file. */
     abstract val repoFolderName: String
 
+    /**
+     * Directory the repo is migrated out of, relative to the working directory and not to
+     * [SkyHanniMod.configDir]. Null disables the migration.
+     */
     open val legacyConfigDirectory: File? = null
 
     abstract val config: AbstractRepoConfig
@@ -74,7 +87,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * For example:
      * `.minecraft/skyhanni/shrepo.meta.json`
      */
-    val commitFile: File by lazy {
+    private val commitFile: File by lazy {
         SkyHanniMod.dataDir.resolve("$repoFolderName.meta.json")
     }
 
@@ -118,6 +131,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private val repoInitCoroutineConfig = repoCoroutineConfig("Init", repoMutex)
     private val repoReloadCoroutineConfig = repoCoroutineConfig("Reload", repoMutex)
     private val repoUpdateCoroutineConfig = repoCoroutineConfig("Update", repoMutex)
+
+    // A timeout cannot interrupt the blocking copy.
+    private val repoMigrationCoroutineConfig = repoCoroutineConfig("Migration", repoMutex, timeout = Duration.INFINITE)
     private val commandConfig = CoroutineSettings("$commonName command")
 
     abstract val updateCommand: String
@@ -148,9 +164,13 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = gitRepo.location
 
-    private fun repoCoroutineConfig(repoAction: String, repoMutex: Mutex? = null) = CoroutineSettings(
+    private fun repoCoroutineConfig(
+        repoAction: String,
+        repoMutex: Mutex? = null,
+        timeout: Duration = 2.minutes,
+    ) = CoroutineSettings(
         name = "$commonName Repo $repoAction Coroutine",
-        timeout = 2.minutes,
+        timeout = timeout,
         withIOContext = true,
     ).withMutex(repoMutex)
 
@@ -270,9 +290,18 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     fun initRepo() = progressCategory.startBlock("auto loading on init") { progress ->
         shouldManuallyReload = true
-        repoInitCoroutineConfig.launch {
-            // TODO: Remove in 10.0.0
+        // TODO: Remove in 10.0.0
+        repoMigrationCoroutineConfig.launch {
+            progress.update("updateLegacyFiles")
             updateLegacyFiles()
+        }.invokeOnCompletion {
+            // Launched afterwards, so the migration does not use up the init timeout.
+            launchInit(progress)
+        }
+    }
+
+    private fun launchInit(progress: ChatProgressUpdates) {
+        repoInitCoroutineConfig.launch {
             if (config.repoAutoUpdate) {
                 if (!fetchAndUnpackRepo(progress, command = false).canContinue) {
                     progress.end("Failed to fetch & unpack repo - aborting.")
@@ -319,7 +348,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
         progress.update("prepCleanRepoFileSystem")
-        prepCleanRepoFileSystem(progress)
+        if (!prepCleanRepoFileSystem(progress)) {
+            progress.update("Could not prepare the repo directory, cannot switch to backup repo.")
+            return@runCatching FetchUnpackResult.FAILED
+        }
 
         @Suppress("InjectDispatcher")
         withContext(Dispatchers.IO) {
@@ -456,7 +488,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * @param switchToBackupOnFail If true, will switch to the backup repo if the download or unpacking fails.
      * @return [FetchUnpackResult.SUCCESS] if the repo was successfully fetched and unpacked,
      *         [FetchUnpackResult.SWITCHED_TO_BACKUP] if the backup repo was used,
-     *         [FetchUnpackResult.FAILED] if the repo could not be fetched or unpacked and no backup repo is available.
+     *         [FetchUnpackResult.FAILED] if the repo directory could not be prepared,
+     *         or if the repo could not be fetched or unpacked and no backup repo is available.
      */
     private suspend fun fetchAndUnpackRepo(
         progress: ChatProgressUpdates,
@@ -484,7 +517,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
         progress.update("prepCleanRepoFileSystem")
-        prepCleanRepoFileSystem(progress)
+        if (!prepCleanRepoFileSystem(progress)) {
+            // The backup would need the same directory.
+            progress.update("FetchUnpackResult.FAILED")
+            return FetchUnpackResult.FAILED
+        }
 
         progress.update("downloadCommitTgzToFile")
         if (!gitRepo.downloadCommitTgzToFile(repoTgzFile)) {
@@ -519,9 +556,26 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
     }
 
-    private fun prepCleanRepoFileSystem(progress: ChatProgressUpdates) {
+    /**
+     * Empties the repo directory and creates a fresh file system for it.
+     *
+     * @return false if it is a link that could not be deleted.
+     */
+    private fun prepCleanRepoFileSystem(progress: ChatProgressUpdates): Boolean {
         progress.update("deleteRecursively")
-        repoDirectory.listFiles()?.forEach { it.deleteRecursivelySafe() }
+        if (repoDirectory.toPath().isLinkOrJunction()) {
+            // Only the link, never what it points at.
+            if (!repoDirectory.deleteRecursivelySafe()) {
+                logger.error("Could not delete the link at ${repoDirectory.absolutePath}, leaving its target untouched.")
+                return false
+            }
+            val message = "Deleted the link at ${repoDirectory.absolutePath}, the files it pointed at are untouched. " +
+                "Re-create the link with repo auto update off to keep using it, /$updateCommand replaces it again."
+            logger.warn(message)
+            SkyHanniMod.logger.warn(message)
+        } else {
+            repoDirectory.listFiles()?.forEach { it.deleteRecursivelySafe() }
+        }
 
         progress.update("createAndClean")
         repoFileSystem = repoDirectory.let { root ->
@@ -534,6 +588,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("createNewFile")
         repoTgzFile.createNewFile()
         progress.update("done with prepCleanRepoFileSystem")
+        return true
     }
 
     /**
@@ -591,68 +646,132 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         repoTgzFile.delete()
     }
 
+    /**
+     * Moves the repo and its commit file out of [legacyConfigDirectory].
+     * The commit file only moves once the legacy repo directory is gone.
+     */
     private fun updateLegacyFiles() {
         val configDirectory = legacyConfigDirectory ?: return
+        val legacyRepoDirectory = configDirectory.resolve("repo").toPath()
+        // Also finds dead links.
+        if (Files.exists(legacyRepoDirectory, LinkOption.NOFOLLOW_LINKS)) {
+            if (!migrateLegacyRepoDirectory(legacyRepoDirectory)) return
+        }
+        migrateLegacyCommitFile(configDirectory)
+    }
 
-        val legacyRepoDirectory = configDirectory.resolve("repo").takeIf { it.exists() }
-        // copyRecursively resolves directory links via File.listFiles, so a symlinked legacy directory
-        // would have its target copied, e.g. a local checkout with .git. Windows junctions are missed.
-        val legacyRepoLink = legacyRepoDirectory?.takeIf { Files.isSymbolicLink(it.toPath()) }
-        if (legacyRepoLink != null) {
-            val message = "Legacy repo path is a symbolic link, deleting the link instead of copying what it " +
-                "points at. Re-create it at ${repoDirectory.absolutePath} if it is still needed."
-            logger.warn(message)
-            // The repo log file is not where anyone looks during startup, so this also goes to the console.
-            SkyHanniMod.logger.warn(message)
-            legacyRepoLink.deleteRecursivelySafe()
-        } else if (legacyRepoDirectory != null) {
-            logger.warn("Migrating legacy repo directory to: ${repoDirectory.absolutePath}")
-            repoDirectory.mkdirs()
-
-            val copied = runCatching {
-                legacyRepoDirectory.copyRecursively(
-                    target = repoDirectory,
-                    overwrite = false,
-                    onError = { _, exception ->
-                        if (exception is FileAlreadyExistsException) {
-                            OnErrorAction.SKIP
-                        } else {
-                            OnErrorAction.TERMINATE
-                        }
-                    }
-                )
-            }.onFailure { e ->
-                logger.error("Uncaught exception while migrating legacy repo: ${e.message}")
-            }.getOrDefault(false)
-
-            if (copied) {
-                legacyRepoDirectory.deleteRecursivelySafe()
+    /**
+     * Moves or copies the legacy repo directory to [repoDirectory] without following links.
+     * A linked legacy directory is only deleted, a linked [repoDirectory] blocks the migration.
+     *
+     * @return false if the legacy directory is neither migrated nor removed.
+     */
+    private fun migrateLegacyRepoDirectory(legacy: Path): Boolean {
+        if (legacy.isLinkOrJunction()) {
+            val deleted = legacy.toFile().deleteRecursivelySafe()
+            val message = if (deleted) {
+                "Deleted the legacy repo link at ${legacy.toAbsolutePath()} instead of copying what it points at. " +
+                    "Re-create it at ${repoDirectory.absolutePath} with repo auto update off if it is still needed."
             } else {
-                logger.error("Failed to copy legacy repo directory from ${legacyRepoDirectory.absolutePath}")
-                return
+                "Could not delete the legacy repo link at ${legacy.toAbsolutePath()}, keeping it."
             }
+            logger.warn(message)
+            SkyHanniMod.logger.warn(message)
+            return deleted
         }
 
-        val legacyCommitFile = configDirectory.resolve("currentCommit.json").takeIf { it.exists() }
-        if (legacyCommitFile != null) {
-            if (commitFile.exists()) {
-                legacyCommitFile.delete()
-                return
-            }
-            logger.warn("Moving legacy commit file to: ${commitFile.absolutePath}")
-            commitFile.parentFile?.mkdirs()
-            runCatching {
-                Files.move(legacyCommitFile.toPath(), commitFile.toPath())
-            }.onFailure {
-                runCatching {
-                    legacyCommitFile.copyTo(commitFile, overwrite = false)
-                }.onSuccess {
-                    legacyCommitFile.delete()
-                }.onFailure {
-                    logger.error(
-                        "Failed to move or copy legacy commit file; keeping original: ${legacyCommitFile.absolutePath}"
-                    )
+        val target = repoDirectory.toPath()
+        if (target.isLinkOrJunction()) {
+            // Copying would write into the link target.
+            val message = "${repoDirectory.absolutePath} is a link, so the legacy repo directory at " +
+                "${legacy.toAbsolutePath()} stays in place. Delete it by hand if it is no longer needed."
+            logger.warn(message)
+            SkyHanniMod.logger.warn(message)
+            return false
+        }
+
+        logger.warn("Migrating legacy repo directory to: ${repoDirectory.absolutePath}")
+        repoDirectory.parentFile?.mkdirs()
+        if (!moveLegacyRepoDirectory(legacy, target) && !copyLegacyRepoDirectory(legacy, target)) {
+            logger.error("Failed to migrate legacy repo directory from ${legacy.toAbsolutePath()}")
+            return false
+        }
+        // Leftover log files.
+        target.resolve("logs").toFile().deleteRecursivelySafe()
+        return true
+    }
+
+    // Only a rename, so links inside stay links.
+    private fun moveLegacyRepoDirectory(legacy: Path, target: Path): Boolean {
+        if (Files.exists(target, LinkOption.NOFOLLOW_LINKS)) return false
+        return runCatching {
+            Files.move(legacy, target)
+        }.onFailure { e ->
+            logger.warn("Could not move the legacy repo directory, copying it instead: ${e.message}")
+        }.isSuccess
+    }
+
+    // Merges into an existing target and skips links and junctions.
+    @OptIn(ExperimentalPathApi::class)
+    private fun copyLegacyRepoDirectory(legacy: Path, target: Path): Boolean {
+        // TERMINATE does not throw.
+        var terminated = false
+        val copied = runCatching {
+            legacy.copyToRecursively(
+                target,
+                onError = { source, _, exception ->
+                    // Qualified, kotlin.io has its own FileAlreadyExistsException.
+                    if (exception is java.nio.file.FileAlreadyExistsException) {
+                        OnErrorResult.SKIP_SUBTREE
+                    } else {
+                        logger.error("Failed to copy legacy repo entry $source: ${exception.message}")
+                        terminated = true
+                        OnErrorResult.TERMINATE
+                    }
+                },
+                followLinks = false,
+            ) { source, destination ->
+                if (source.isLinkOrJunction()) {
+                    logger.warn("Skipped the link $source while copying the legacy repo directory.")
+                    return@copyToRecursively CopyActionResult.SKIP_SUBTREE
                 }
+                val sourceIsDirectory = Files.isDirectory(source, LinkOption.NOFOLLOW_LINKS)
+                val destinationIsDirectory = Files.isDirectory(destination, LinkOption.NOFOLLOW_LINKS)
+                // A skipped type mismatch would lose the entry.
+                if (Files.exists(destination, LinkOption.NOFOLLOW_LINKS) && sourceIsDirectory != destinationIsDirectory) {
+                    logger.error("$destination exists with a different type, keeping the legacy repo directory.")
+                    terminated = true
+                    return@copyToRecursively CopyActionResult.TERMINATE
+                }
+                source.copyToIgnoringExistingDirectory(destination, followLinks = false)
+            }
+        }.onFailure { e ->
+            logger.error("Uncaught exception while copying the legacy repo directory: ${e.message}")
+        }.isSuccess && !terminated
+        if (copied) legacy.toFile().deleteRecursivelySafe()
+        return copied
+    }
+
+    private fun migrateLegacyCommitFile(configDirectory: File) {
+        val legacyCommitFile = configDirectory.resolve("currentCommit.json").takeIf { it.exists() } ?: return
+        if (commitFile.exists()) {
+            legacyCommitFile.delete()
+            return
+        }
+        logger.warn("Moving legacy commit file to: ${commitFile.absolutePath}")
+        commitFile.parentFile?.mkdirs()
+        runCatching {
+            Files.move(legacyCommitFile.toPath(), commitFile.toPath())
+        }.onFailure { moveError ->
+            runCatching {
+                legacyCommitFile.copyTo(commitFile, overwrite = false)
+            }.onSuccess {
+                legacyCommitFile.delete()
+            }.onFailure { copyError ->
+                logger.error(
+                    "Failed to move or copy legacy commit file; keeping original: ${legacyCommitFile.absolutePath} " +
+                        "(move: ${moveError.message}, copy: ${copyError.message})",
+                )
             }
         }
     }
