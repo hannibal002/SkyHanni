@@ -956,6 +956,21 @@ class ProfileSpecificStorage(
         var reputation: MutableMap<FactionType, Int> = mutableMapOf()
     }
 
+    // - lotus atoll
+    @Expose
+    var lotusAtoll: LotusAtollStorage = LotusAtollStorage()
+
+    class LotusAtollStorage {
+        // keyed by the clean (colourless) frog name, e.g. "Common Frog". Icon/name/rarity come from
+        // the NEU item (e.g. COMMON_FROG_BRONZE); only the cumulative counts live here.
+        @Expose
+        var trophyFrogs: MutableMap<String, MutableMap<TrophyRarity, Int>> = mutableMapOf()
+
+        // clean frog name -> "How to Catch" description, populated from Researcher Ribery's menu
+        @Expose
+        var trophyFrogDescriptions: MutableMap<String, String> = mutableMapOf()
+    }
+
     // - rift
     @Expose
     var rift: RiftStorage = RiftStorage()
