@@ -199,4 +199,20 @@ object UtilsPatterns {
         "attribute.shard.source",
         "§7Source: §.(?<source>.+) Shard §8\\(\\w\\d+\\)"
     )
+
+    /**
+     * REGEX-TEST: You haven't unlocked this fast travel destination!
+     */
+    val fastTravelNotUnlockedPattern by patternGroup.pattern(
+        "chat.warpmenu.locked",
+        "You haven't unlocked this fast travel destination!",
+    )
+
+    /**
+     * REGEX-TEST: You don't have the requirements to use this warp!
+     */
+    val warpMissingRequirementsPattern by patternGroup.pattern(
+        "chat.warpmenu.missing-requirements",
+        "You don't have the requirements to use this warp!",
+    )
 }

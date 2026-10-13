@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.subMapOfStringsStartingWith
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -50,11 +51,11 @@ object StorageApi {
     )
 
     /**
-     * REGEX-TEST: Jumbo Backpack§r (Slot #2)
+     * REGEX-TEST: Jumbo Backpack (Slot #2)
      */
     private val backpackPattern by RepoPattern.pattern(
-        "storage.backpack",
-        ".* Backpack§r \\(Slot #(?<page>\\d+)\\)",
+        "storage.backpack.colorless",
+        ".* Backpack \\(Slot #(?<page>\\d+)\\)",
     )
 
     /**
@@ -81,13 +82,13 @@ object StorageApi {
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         enderChestPattern.matchMatcher(event.inventoryName) {
             val page = groupOrNull("page")?.toInt() ?: 1
             handleRead("Ender Chest $page", event.inventoryItemsWithNull.values)
             return
         }
-        backpackPattern.matchMatcher(event.inventoryName) {
+        backpackPattern.matchMatcher(event.inventoryName.removeResets()) {
             val page = groupOrNull("page")?.toInt() ?: 1
             handleRead("Backpack $page", event.inventoryItemsWithNull.values)
             return
@@ -108,13 +109,13 @@ object StorageApi {
     private var shouldSave = false
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiContainerSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onGuiContainerSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (currentStorage == null) return
         shouldReCheck = true
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
+    private fun onTick() {
         if (!shouldReCheck) return
         currentStorage?.items = InventoryUtils.getItemsInOpenChestWithNull().map { it.item }.drop(9)
         shouldReCheck = false
@@ -122,7 +123,7 @@ object StorageApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!shouldSave || saveJob?.isActive == true) return
         setupSaveJob()
     }
@@ -136,7 +137,7 @@ object StorageApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onMinutePassed(event: SecondPassedEvent) {
+    private fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(60) || !isPrivateIslandStorageEnabled()) return
         mutableIslandChest.removeIf { (_, chest) ->
             if (chest.primaryCords == null) {
@@ -206,7 +207,7 @@ object StorageApi {
         }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onBlockClick(event: BlockClickEvent) {
+    private fun onBlockClick(event: BlockClickEvent) {
         if (event.clickType != InteractClickType.RIGHT_CLICK) return
         if (!isPrivateIslandStorageEnabled()) return
         val chest = event.blockState.block as? ChestBlock ?: return
@@ -225,7 +226,7 @@ object StorageApi {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Storage Data")
         if (storage.isEmpty()) {
             event.addIrrelevant("Empty")

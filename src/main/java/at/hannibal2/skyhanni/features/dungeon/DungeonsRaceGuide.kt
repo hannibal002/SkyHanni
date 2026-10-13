@@ -25,11 +25,11 @@ object DungeonsRaceGuide {
     private val CANCEL_RACE_ITEM = "CANCEL_RACE_ITEM".toInternalName()
 
     /**
-     * REGEX-TEST: §D§LPRECURSOR RUINS RACE §e00:05.443            §b1577/1577✎ Mana
+     * REGEX-TEST: PRECURSOR RUINS RACE 00:05.443            1577/1577✎ Mana
      */
     private val raceActivePattern by RepoPattern.pattern(
-        "dungeon.race.active",
-        "§.§.(?<race>[\\w ]+) RACE §.[\\d:.]+",
+        "dungeon.race.active.colorless",
+        "(?<race>[\\w ]+) RACE [\\d:.]+",
     )
 
     private val parkourHelpers: MutableMap<String, ParkourHelper> = mutableMapOf()
@@ -38,12 +38,12 @@ object DungeonsRaceGuide {
     private var currentRace: String? = null
 
     @HandleEvent
-    fun onIslandChange() {
+    private fun onIslandChange() {
         reset()
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DungeonHubRacesJson>("DungeonHubRaces")
         for ((key, map) in data.data) {
             val nothingNoReturn = map["nothing:no_return"]
@@ -59,14 +59,14 @@ object DungeonsRaceGuide {
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()
         }
     }
 
     @HandleEvent(OwnInventoryItemUpdateEvent::class, onlyOnIsland = IslandType.DUNGEON_HUB)
-    fun onOwnInventoryItemUpdate() {
+    private fun onOwnInventoryItemUpdate() {
         val menuStack = InventoryUtils.getItemsInOwnInventoryWithNull()?.get(8)
         val nowInRace = menuStack?.getInternalNameOrNull() == CANCEL_RACE_ITEM
         if (inRace && !nowInRace) {
@@ -76,15 +76,15 @@ object DungeonsRaceGuide {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DUNGEON_HUB)
-    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
+    private fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!config.enabled) return
-        raceActivePattern.findMatcher(event.actionBar) {
+        raceActivePattern.findMatcher(event.cleanActionBar) {
             currentRace = group("race").replace(" ", "_").lowercase()
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DUNGEON_HUB)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.enabled || !inRace) return
         currentRace?.let { parkourHelpers[it]?.render(event) }
     }

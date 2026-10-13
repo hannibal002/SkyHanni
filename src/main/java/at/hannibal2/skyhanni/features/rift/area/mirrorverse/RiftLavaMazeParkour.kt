@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.Entity
 
 @SkyHanniModule
@@ -19,9 +20,16 @@ object RiftLavaMazeParkour {
     private val config get() = RiftApi.config.area.mirrorverse.lavaMazeConfig
     private var parkourHelper: ParkourHelper? = null
 
+    /**
+     * REGEX-TEST: EEK! THE LAVA OOFED YOU!
+     */
+    private val failLaveMazePattern by RepoPattern.pattern(
+        "rift.lava-maze-parkour.fail",
+        "EEK! THE LAVA OOFED YOU!"
+    )
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("RiftLavaMazeParkour")
         parkourHelper = ParkourHelper(
             data.locations,
@@ -33,7 +41,7 @@ object RiftLavaMazeParkour {
     }
 
     @HandleEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
+    private fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!isEnabled()) return
         if (!config.hidePlayers) return
 
@@ -45,16 +53,16 @@ object RiftLavaMazeParkour {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
 
-        if (event.message == "§c§lEEK! THE LAVA OOFED YOU!") {
+        if (failLaveMazePattern.matches(event.cleanMessage)) {
             parkourHelper?.reset()
         }
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad() {
         ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()
         }
@@ -69,7 +77,7 @@ object RiftLavaMazeParkour {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         parkourHelper?.render(event)

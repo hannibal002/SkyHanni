@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.DialogUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -46,7 +47,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -103,12 +103,12 @@ object GardenNextJacobContest {
     }
 
     /**
-     * REGEX-TEST: §aDay 1
-     * REGEX-TEST: §aDay 31
+     * REGEX-TEST: Day 1
+     * REGEX-TEST: Day 31
      */
     val dayPattern by patternGroup.pattern(
-        "day",
-        "§aDay (?<day>.*)",
+        "day.colorless",
+        "Day (?<day>.*)",
     )
 
     /**
@@ -260,7 +260,7 @@ object GardenNextJacobContest {
             val lore = item.getLoreComponent()
             if (!lore.any { it.string.contains("Jacob's Farming Contest") }) return@mapNotNull null
 
-            val day = dayPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+            val day = dayPattern.matchMatcher(item.cleanName) {
                 group("day").toInt()
             } ?: return@mapNotNull null
 
