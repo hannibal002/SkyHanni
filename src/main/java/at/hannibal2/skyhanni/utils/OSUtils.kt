@@ -6,9 +6,11 @@ import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import net.minecraft.util.Util
 import java.io.File
 import java.io.IOException
+import java.nio.file.DirectoryIteratorException
 import java.nio.file.Files
+import java.nio.file.LinkOption
+import java.nio.file.Path
 import java.nio.file.attribute.BasicFileAttributes
-import kotlin.io.path.deleteRecursively
 import kotlin.time.Duration
 
 object OSUtils {
@@ -147,12 +149,63 @@ object OSUtils {
     }
 
     /**
-     * Deletes the target directory recursively. Unlike [File.deleteRecursively], this does not
-     * follow symbolic links, so it will only delete the link, and not the contents of the target
-     * directory.
+     * True for a symbolic link and, on Windows, a directory junction, also when the target is gone.
+     * [Files.isSymbolicLink] alone misses junctions.
      */
-    fun File.deleteRecursivelySafe(): Boolean =
-        runCatching {
-            toPath().deleteRecursively()
-        }.isSuccess
+    fun Path.isLinkOrJunction(): Boolean {
+        if (Files.isSymbolicLink(this)) return true
+        if (!isWindows) return false
+        val attributes = runCatching {
+            Files.readAttributes(this, BasicFileAttributes::class.java, LinkOption.NOFOLLOW_LINKS)
+        }.getOrNull() ?: return false
+        // Junctions report isOther on every Java version, cloud folders do too on Java 25.
+        if (!attributes.isOther) return false
+        val parent = toAbsolutePath().parent ?: return false
+        // Only a junction resolves to somewhere else. Anything unresolvable counts as a link, the safe side.
+        return runCatching {
+            toRealPath() != parent.toRealPath().resolve(toRealPath(LinkOption.NOFOLLOW_LINKS).fileName)
+        }.getOrDefault(true)
+    }
+
+    /**
+     * Deletes this file or directory recursively. A link or junction is deleted itself, never
+     * the files it points at, see [isLinkOrJunction]. The first failure is reported through
+     * [ErrorManager], together with the number of failures.
+     *
+     * @return true if the deletion succeeded, also when nothing existed.
+     */
+    fun File.deleteRecursivelySafe(): Boolean {
+        val failures = mutableListOf<IOException>()
+        toPath().deleteWithoutFollowingLinks(failures)
+        val firstFailure = failures.firstOrNull() ?: return true
+        ErrorManager.logErrorWithData(
+            firstFailure,
+            "Failed to delete files",
+            "path" to absolutePath,
+            "failures" to failures.size,
+        )
+        return false
+    }
+
+    // Not Path.deleteRecursively, it enters junctions on Java 25 (JDK-8364277).
+    private fun Path.deleteWithoutFollowingLinks(failures: MutableList<IOException>) {
+        try {
+            val attributes = Files.readAttributes(this, BasicFileAttributes::class.java, LinkOption.NOFOLLOW_LINKS)
+            if (attributes.isDirectory && !isLinkOrJunction()) {
+                val failuresBefore = failures.size
+                Files.newDirectoryStream(this).use { entries ->
+                    for (entry in entries) entry.deleteWithoutFollowingLinks(failures)
+                }
+                // Children left over, deleting this directory would only fail too.
+                if (failures.size > failuresBefore) return
+            }
+            Files.delete(this)
+        } catch (_: java.nio.file.NoSuchFileException) {
+            // Already gone. Qualified, the unqualified name is the unrelated kotlin.io.NoSuchFileException.
+        } catch (e: DirectoryIteratorException) {
+            failures.add(e.cause ?: IOException(e))
+        } catch (e: IOException) {
+            failures.add(e)
+        }
+    }
 }

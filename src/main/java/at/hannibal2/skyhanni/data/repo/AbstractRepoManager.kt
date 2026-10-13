@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.repo.filesystem.MemoryRepoFileSystem
 import at.hannibal2.skyhanni.data.repo.filesystem.RepoFileSystem
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils.deleteRecursivelySafe
+import at.hannibal2.skyhanni.utils.OSUtils.isLinkOrJunction
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -319,7 +320,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
         progress.update("prepCleanRepoFileSystem")
-        prepCleanRepoFileSystem(progress)
+        if (!prepCleanRepoFileSystem(progress)) {
+            progress.end("Could not prepare the repo directory, cannot switch to backup repo.")
+            return@runCatching FetchUnpackResult.FAILED
+        }
 
         @Suppress("InjectDispatcher")
         withContext(Dispatchers.IO) {
@@ -456,7 +460,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * @param switchToBackupOnFail If true, will switch to the backup repo if the download or unpacking fails.
      * @return [FetchUnpackResult.SUCCESS] if the repo was successfully fetched and unpacked,
      *         [FetchUnpackResult.SWITCHED_TO_BACKUP] if the backup repo was used,
-     *         [FetchUnpackResult.FAILED] if the repo could not be fetched or unpacked and no backup repo is available.
+     *         [FetchUnpackResult.FAILED] if the repo directory could not be prepared,
+     *         or if the repo could not be fetched or unpacked and no backup repo is available.
      */
     private suspend fun fetchAndUnpackRepo(
         progress: ChatProgressUpdates,
@@ -484,7 +489,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
         progress.update("prepCleanRepoFileSystem")
-        prepCleanRepoFileSystem(progress)
+        if (!prepCleanRepoFileSystem(progress)) {
+            // The backup would need the same directory.
+            progress.update("FetchUnpackResult.FAILED")
+            return FetchUnpackResult.FAILED
+        }
 
         progress.update("downloadCommitTgzToFile")
         if (!gitRepo.downloadCommitTgzToFile(repoTgzFile)) {
@@ -519,9 +528,27 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
     }
 
-    private fun prepCleanRepoFileSystem(progress: ChatProgressUpdates) {
+    /**
+     * Empties the repo directory and creates a fresh file system for it.
+     *
+     * @return false if the repo directory is a link that could not be deleted. Nothing is emptied then.
+     */
+    private fun prepCleanRepoFileSystem(progress: ChatProgressUpdates): Boolean {
         progress.update("deleteRecursively")
-        repoDirectory.listFiles()?.forEach { it.deleteRecursivelySafe() }
+        if (repoDirectory.toPath().isLinkOrJunction()) {
+            // Emptying a linked directory would delete the files it points at, so only the link goes.
+            if (!repoDirectory.deleteRecursivelySafe()) {
+                logger.error("Could not delete the link at ${repoDirectory.absolutePath}, leaving its target untouched.")
+                return false
+            }
+            val message = "Deleted the link at ${repoDirectory.absolutePath}, the files it pointed at are untouched. " +
+                "Re-create the link with repo auto update off to keep using it, /$updateCommand replaces it again."
+            logger.warn(message)
+            // Also to the console, nobody reads the repo log.
+            SkyHanniMod.logger.warn(message)
+        } else {
+            repoDirectory.listFiles()?.forEach { it.deleteRecursivelySafe() }
+        }
 
         progress.update("createAndClean")
         repoFileSystem = repoDirectory.let { root ->
@@ -534,6 +561,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("createNewFile")
         repoTgzFile.createNewFile()
         progress.update("done with prepCleanRepoFileSystem")
+        return true
     }
 
     /**
