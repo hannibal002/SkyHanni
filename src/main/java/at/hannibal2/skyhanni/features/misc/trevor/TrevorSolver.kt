@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
@@ -31,11 +30,9 @@ object TrevorSolver {
     var mobLocation = TrapperMobArea.NONE
     var averageHeight = (minHeight + maxHeight) / 2
 
-    fun findMobHeight(height: Int, above: Boolean) {
-        val playerPosition = LocationUtils.playerLocation().roundTo(2)
-        val mobHeight = if (above) playerPosition.y + height else playerPosition.y - height
+    fun findMobHeight(height: Int, playerPos: LorenzVec) {
+        val mobHeight = playerPos.y + height
         if (maxHeight == 0.0) {
-
             maxHeight = mobHeight + 2.5
             minHeight = mobHeight - 2.5
         } else {
