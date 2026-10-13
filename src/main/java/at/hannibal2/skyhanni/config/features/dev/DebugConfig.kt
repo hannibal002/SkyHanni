@@ -179,7 +179,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(
         name = "SkyHanni Event Counter",
-        desc = "Count once per second how many skyhanni events gets triggered, show the total amount in console output.",
+        desc = "Count once per second how many SkyHanni events get triggered, show the total amount in console output.",
     )
     @ConfigEditorBoolean
     var eventCounter: Boolean = false
