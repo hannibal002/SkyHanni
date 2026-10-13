@@ -55,13 +55,18 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     abstract val commonShortNameCased: String
 
     /**
-     * The resource path of the backup repo. (e.g., "assets/skyhanni/repo.tar.gz")
+     * The resource path of the backup repo. (e.g., "assets/skyhanni/shrepo.tar.gz")
      * This MUST be provided for the backup repo to work.
      */
     open val backupRepoResourcePath: String? = null
 
+    /** Name of the repo folder, also used for its commit file, archive and log file. */
     abstract val repoFolderName: String
 
+    /**
+     * Directory the repo is migrated out of, relative to the working directory and not to
+     * [SkyHanniMod.configDir]. Null disables the migration.
+     */
     open val legacyConfigDirectory: File? = null
 
     abstract val config: AbstractRepoConfig
@@ -82,7 +87,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * For example:
      * `.minecraft/skyhanni/shrepo.meta.json`
      */
-    val commitFile: File by lazy {
+    private val commitFile: File by lazy {
         SkyHanniMod.dataDir.resolve("$repoFolderName.meta.json")
     }
 

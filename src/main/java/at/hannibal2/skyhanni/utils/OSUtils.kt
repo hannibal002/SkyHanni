@@ -93,6 +93,9 @@ object OSUtils {
     private fun File.isEmptyFile() = length() == 0L
     private fun File.isEmptyDirectory() = listFiles()?.isEmpty() == true
 
+    // A timeout cannot interrupt the blocking walk.
+    private val deleteExpiredFilesCoroutine = CoroutineSettings("deleteExpiredFiles", timeout = Duration.INFINITE, withIOContext = true)
+
     /**
      * Recursively deletes files and directories inside the root directory.
      *
@@ -105,7 +108,7 @@ object OSUtils {
      * @param expiryDuration the duration threshold used to determine if a file is expired.
      */
     fun deleteExpiredFiles(root: File, expiryDuration: Duration) {
-        CoroutineSettings("deleteExpiredFiles").launch {
+        deleteExpiredFilesCoroutine.launch {
             val allFiles = root.walk().filter { it.isFile }.toList()
             val lastModified = allFiles.associateWith { file ->
                 file.lastModifiedTime()
