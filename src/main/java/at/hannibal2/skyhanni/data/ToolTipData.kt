@@ -1,14 +1,8 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -19,7 +13,7 @@ import net.minecraft.world.inventory.Slot
 object ToolTipData {
 
     init {
-        ItemTooltipCallback.EVENT.register { stack, context, type, originalToolTip ->
+        ItemTooltipCallback.EVENT.register { stack, _, _, originalToolTip ->
             val slot = lastSlot
             if (ToolTipTextEvent(slot, stack, originalToolTip).post().isCancelled) {
                 originalToolTip.clear()
@@ -36,7 +30,6 @@ object ToolTipData {
     ): MutableList<Component> {
         val tooltip = originalToolTip.map { it.formattedTextCompatLessResets().removePrefix("§5") }.toMutableList()
         val tooltipCopy = tooltip.toMutableList()
-        getTooltip(tooltip)
         RenderItemTooltipEvent(context, stack).post()
         if (tooltip.isEmpty()) {
             return mutableListOf()
@@ -54,30 +47,6 @@ object ToolTipData {
             }
         }
         return newTooltip
-    }
-
-    @JvmStatic
-    fun getTooltip(toolTip: MutableList<String>) {
-        val slot = lastSlot ?: return
-        val itemStack = slot.item.orNull() ?: return
-        try {
-            @Suppress("DEPRECATION")
-            if (ToolTipEvent(slot, itemStack, toolTip).post().isCancelled) {
-                toolTip.clear()
-            }
-        } catch (e: Throwable) {
-            ErrorManager.logErrorWithData(
-                e, "Error in item tool tip parsing or rendering detected",
-                "toolTip" to toolTip,
-                "slot" to slot,
-                "slotNumber" to slot.index,
-                "slotIndex" to slot.containerSlot,
-                "itemStack" to itemStack,
-                "name" to itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets(),
-                "internal name" to itemStack.getInternalName(),
-                "lore" to itemStack.getLore(),
-            )
-        }
     }
 
     var lastSlot: Slot? = null

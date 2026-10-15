@@ -16,6 +16,9 @@ object RegexUtils {
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
 
+    inline fun <T> Pattern.findMatcher(text: Component, consumer: Matcher.() -> T) =
+        matcher(text.string).let { if (it.find()) consumer(it) else null }
+
     inline fun <T> Pattern.firstMatcher(sequence: Sequence<String>, consumer: Matcher.() -> T): T? {
         for (line in sequence) {
             matcher(line).let { if (it.matches()) return consumer(it) }
