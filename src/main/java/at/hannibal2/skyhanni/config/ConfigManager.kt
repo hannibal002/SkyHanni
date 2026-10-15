@@ -51,7 +51,6 @@ import kotlin.time.Duration.Companion.days
 class ConfigManager {
     companion object {
         val gson: Gson = BaseGsonBuilder.gson().create()
-        val configDirectory = File("config/skyhanni")
     }
 
     private val logger = SkyHanniLogger("config_manager")
@@ -72,7 +71,7 @@ class ConfigManager {
         if (jsonHolder.isNotEmpty()) {
             logger.log("Loading config despite config being already loaded?")
         }
-        configDirectory.mkdirs()
+        SkyHanniMod.configDir.mkdirs()
 
 
         for (fileType in ConfigFileType.entries) {
@@ -98,7 +97,8 @@ class ConfigManager {
     }
 
     private fun deleteOldBackups() {
-        OSUtils.deleteExpiredFiles(File("skyhanni/config/backup"), SkyHanniMod.feature.dev.configBackupExpiryTime.days)
+        val file = SkyHanniMod.configDir.resolve("backup")
+        OSUtils.deleteExpiredFiles(file, SkyHanniMod.feature.dev.configBackupExpiryTime.days)
     }
 
     private fun findPositionLinks(obj: Any?, slog: MutableSet<IdentityCharacteristics<Any>>) {
@@ -287,7 +287,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     ENFORCED_USER_VALUES("enforced_user_values", EnforcedUserValuesStorage::class.java, SkyHanniMod::enforcedUserValuesStorage),
     ;
 
-    val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
+    val file: File by lazy { SkyHanniMod.configDir.resolve("$fileName.json") }
     val backupFile get() = getBackupFile(file)
 }
 
