@@ -138,6 +138,13 @@ object RegexUtils {
         }
     }
 
+    inline fun <T> Pattern.findAll(input: String, consumer: Matcher.() -> T) {
+        val matcher = matcher(input)
+        while (matcher.find()) {
+            consumer(matcher)
+        }
+    }
+
     fun Pattern.findAll(input: String, group: String): List<String> {
         val matcher = matcher(input)
 
