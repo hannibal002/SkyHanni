@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.MarkdownBuilder
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.VersionConstants
 import net.fabricmc.loader.api.FabricLoader
+import java.nio.file.Path
 import kotlin.system.exitProcess
 
 /**
@@ -24,7 +25,30 @@ object PlatformUtils {
     @JvmStatic
     @get:JvmName("isDevEnvironment")
     val isDevEnvironment: Boolean by lazy {
-        FabricLoader.getInstance().isDevelopmentEnvironment
+        runCatching {
+            FabricLoader.getInstance().isDevelopmentEnvironment
+        }.getOrDefault(false)
+    }
+
+    val gameDir: Path by lazy {
+        runCatching {
+            FabricLoader.getInstance().gameDir
+        }.getOrDefault(
+            // This is a fallback for testing environment
+            Path.of(".").toAbsolutePath().normalize()
+        )
+    }
+
+    val configDir: Path by lazy {
+        runCatching {
+            FabricLoader.getInstance().configDir
+        }.getOrDefault(
+            gameDir.resolve("config")
+        )
+    }
+
+    val logsDir: Path by lazy {
+        gameDir.resolve("logs")
     }
 
     private val allowedFabricReports = setOf(
