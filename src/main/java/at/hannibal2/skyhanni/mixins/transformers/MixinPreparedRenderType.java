@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-//? if >= 26.2 {
 import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.IndexType;
@@ -36,4 +35,3 @@ public abstract class MixinPreparedRenderType {
         GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass, renderType.pipeline());
     }
 }
-//?}

@@ -20,7 +20,7 @@ Prism Launcher can handle Fabric, the dependencies, RAM, and Java all from one i
 
 > **3: Create a new instance**
 > 1. Click **Add Instance**.
-> 2. Select the **Minecraft version** you want (e.g. 26.1.2).
+> 2. Select the **Minecraft version** you want (e.g. 26.2).
 > 3. Under **Loader**, choose **Fabric** and select the latest compatible loader version.
 > 4. Click **Create Instance**.
 
