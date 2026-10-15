@@ -94,7 +94,7 @@ object BurrowWarpHelper {
 
         GriffinBurrowHelper.addDebug("warping to $warp count of bezierFitter ${PreciseGuessBurrow.getBezierFitterCount()}")
         lastWarpTime = SimpleTimeMark.now()
-        HypixelCommands.warp(warp.name)
+        HypixelCommands.warp(warp.command)
         lastWarp = currentWarp
     }
 
@@ -259,6 +259,17 @@ object BurrowWarpHelper {
                 for (entry in locationData) {
                     if (entry.key.equals(this.name, true)) {
                         return entry.value.extraDianaWarpBlocks
+                    }
+                }
+                ErrorManager.skyHanniError("repo invalid for diana warp")
+            }
+
+        val command: String
+            get() {
+                val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
+                for ((warpName, warpData) in locationData) {
+                    if (warpName.equals(this.name, true)) {
+                        return warpData.commands?.firstOrNull() ?: this.name.lowercase()
                     }
                 }
                 ErrorManager.skyHanniError("repo invalid for diana warp")

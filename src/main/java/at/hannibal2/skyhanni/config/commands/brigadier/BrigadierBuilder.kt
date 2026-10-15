@@ -43,7 +43,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<FabricClientCommandSource, B>>(
         require(!hasGreedyArg) { "Cannot add an argument/literal to a builder that has a greedy argument." }
 
     /** Executes the code block when the command is executed. */
-    fun callback(block: ArgContext.() -> Unit) {
+    inline fun callback(crossinline block: ArgContext.() -> Unit) {
         this.builder.executes {
             try {
                 block(ArgContext(it))
@@ -55,7 +55,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<FabricClientCommandSource, B>>(
     }
 
     /** Alternative to [callback] when no arguments are needed. */
-    fun simpleCallback(block: () -> Unit) {
+    inline fun simpleCallback(crossinline block: () -> Unit) {
         this.builder.executes {
             try {
                 block()
@@ -67,9 +67,9 @@ open class BrigadierBuilder<B : ArgumentBuilder<FabricClientCommandSource, B>>(
     }
 
     /** Alternative to [simpleCallback] when a block needs to be executed in a coroutine. */
-    fun coroutineSimpleCallback(
+    inline fun coroutineSimpleCallback(
         config: CoroutineSettings = CoroutineSettings("$this command callback"),
-        block: suspend ArgContext.() -> Unit,
+        crossinline block: suspend ArgContext.() -> Unit,
     ) {
         this.builder.executes {
             config.launch {
@@ -85,7 +85,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<FabricClientCommandSource, B>>(
      *
      * Usage of this method is discouraged, unless it's for compatibility with legacy code.
      */
-    fun legacyCallbackArgs(block: (Array<String>) -> Unit) {
+    inline fun legacyCallbackArgs(crossinline block: (Array<String>) -> Unit) {
         argCallback("allArgs", BrigadierArguments.greedyString()) { allArgs ->
             block(allArgs.split(" ").toTypedArray())
         }
@@ -226,9 +226,9 @@ open class BrigadierBuilder<B : ArgumentBuilder<FabricClientCommandSource, B>>(
      * }
      * ```
      */
-    fun literalCallback(
+    inline fun literalCallback(
         vararg names: String,
-        block: ArgContext.() -> Unit,
+        crossinline block: ArgContext.() -> Unit,
     ) = literal(*names) { callback(block) }
 
     /**
@@ -270,4 +270,32 @@ open class BrigadierBuilder<B : ArgumentBuilder<FabricClientCommandSource, B>>(
         crossinline callback: ArgContext.(T) -> Unit,
     ) = arg(name, argument, suggestions) { callback { callback(getArg(it)) } }
 
+    /**
+     * This function allows for the usage of a coroutine callback within an argument without having to
+     * create a block for each one.
+     *
+     * This is the coroutine equivalent of [argCallback].
+     */
+    inline fun <reified T> coroutineArgCallback(
+        name: String,
+        argument: ArgumentType<T>,
+        suggestions: SuggestionProvider<FabricClientCommandSource>? = null,
+        config: CoroutineSettings = CoroutineSettings("$this command callback"),
+        crossinline callback: suspend ArgContext.(T) -> Unit,
+    ) = arg(name, argument, suggestions) {
+        callback {
+            val value = getArg(it)
+            config.launch {
+                callback(value)
+            }
+        }
+    }
+
+    inline fun <reified T> coroutineArgCallback(
+        name: String,
+        argument: ArgumentType<T>,
+        suggestions: Collection<String>,
+        config: CoroutineSettings = CoroutineSettings("$this command callback"),
+        crossinline callback: suspend ArgContext.(T) -> Unit,
+    ) = coroutineArgCallback(name, argument, suggestions.toSuggestionProvider(), config, callback)
 }

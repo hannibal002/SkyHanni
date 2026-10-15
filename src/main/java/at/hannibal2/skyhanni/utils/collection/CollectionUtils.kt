@@ -553,6 +553,9 @@ object CollectionUtils {
         }
     }
 
+    fun Collection<String>.contains(value: String, ignoreCase: Boolean = false): Boolean =
+        any { it.equals(value, ignoreCase) }
+
     // remove every element in MutableList that is not in the Sequence
     fun <T> MutableList<T>.keepOnlyIn(sequence: Sequence<T>) {
         retainAll(sequence.toSet())
