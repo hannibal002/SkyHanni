@@ -7,20 +7,20 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class OthersBossConfig {
+class BossConfig {
     @Expose
-    @ConfigOption(name = "Highlight Others Boss", desc = "Highlight others players boss.\nYou need to hit them first.")
+    @ConfigOption(name = "Highlight Bosses", desc = "Highlight all Vampire Slayer bosses.")
     @ConfigEditorBoolean
     @FeatureToggle
     var highlight: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Highlight Color", desc = "What color to highlight the boss in.")
+    @ConfigOption(name = "Highlight Color", desc = "What color to highlight Vampire Slayer bosses in.")
     @ConfigEditorColour
     var highlightColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 88, 249)
 
     @Expose
-    @ConfigOption(name = "Steak Alert", desc = "Show a title when you can steak the boss.")
+    @ConfigOption(name = "Steak Alert", desc = "Show a title when any boss can be steaked.")
     @ConfigEditorBoolean
     @FeatureToggle
     var steakAlert: Boolean = true
