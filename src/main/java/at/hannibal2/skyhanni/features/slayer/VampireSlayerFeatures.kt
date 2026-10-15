@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.slayer.vampire.VampireEffectConfig
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -44,7 +45,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.core.particles.ParticleTypes
@@ -331,49 +331,24 @@ object VampireSlayerFeatures {
         }
     }
 
-    private data class EffectHighlightParams(
-        val highlight: Boolean,
-        val color: ChromaColour,
-        val linesColor: ChromaColour,
-        val text: String,
-        val showLines: Boolean,
-    )
-
-    private val EffectType.config: EffectHighlightParams
-        get() = when (this) {
-            BLOOD_ICHOR -> EffectHighlightParams(
-                highlight = configBloodIchor.highlight,
-                color = configBloodIchor.color,
-                linesColor = configBloodIchor.linesColor,
-                showLines = configBloodIchor.showLines,
-                text = this.displayName,
-            )
-
-            KILLER_SPRING -> EffectHighlightParams(
-                highlight = configKillerSpring.highlight,
-                color = configKillerSpring.color,
-                linesColor = configKillerSpring.linesColor,
-                showLines = configKillerSpring.showLines,
-                text = this.displayName,
-            )
-        }
-
     private fun SkyHanniRenderWorldEvent.renderEffect(
         boss: RemotePlayer,
         stand: ArmorStand,
         type: EffectType,
     ) {
-        val effectConfig = type.config
+        val effectConfig = when (type) {
+            BLOOD_ICHOR -> configBloodIchor
+            KILLER_SPRING -> configKillerSpring
+        }
         if (!effectConfig.highlight) return
         val vec = stand.blockPosition().toLorenzVec()
         if (vec.distanceToPlayer() <= MAX_SLAYER_DISTANCE) {
-            renderEffectHighlight(boss, stand, effectConfig, vec)
-        }
-        if (configBloodIchor.renderBeam && type == BLOOD_ICHOR && stand.isAlive) {
-            drawWaypointFilled(
-                exactLocation(stand).add(0, y = -2, 0),
-                configBloodIchor.color.toColor(),
-                beacon = true,
+            renderEffectHighlight(
+                boss,
+                stand,
+                effectConfig,
+                type.displayName,
+                vec
             )
         }
     }
@@ -381,7 +356,8 @@ object VampireSlayerFeatures {
     private fun SkyHanniRenderWorldEvent.renderEffectHighlight(
         boss: RemotePlayer,
         stand: ArmorStand,
-        cfg: EffectHighlightParams,
+        cfg: VampireEffectConfig,
+        text: String,
         vec: LorenzVec,
     ) = with(cfg) {
         RenderLivingEntityHelper.setEntityColor(stand, color.toColor()) {
@@ -401,6 +377,13 @@ object VampireSlayerFeatures {
                 linesColor,
                 3,
                 true,
+            )
+        }
+        if (renderBeam) {
+            drawWaypointFilled(
+                exactLocation(stand).add(0, y = -2, 0),
+                color.toColor(),
+                beacon = true,
             )
         }
     }
