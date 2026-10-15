@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.events.SackOpenEvent
@@ -21,6 +20,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
@@ -28,9 +29,11 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -61,7 +64,7 @@ object SackApi {
      */
     private val sackPattern by patternGroup.pattern(
         "sack",
-        "^(?:.* Sack|Enchanted .* Sack)\$",
+        "^(?:.* Sack|Enchanted .* Sack)$",
     )
 
     /**
@@ -75,48 +78,64 @@ object SackApi {
     )
 
     /**
-     * WRAPPED-REGEX-TEST: " Rough: §e78,999 §8(78,999)"
-     * WRAPPED-REGEX-TEST: " §fRough: §e78,999 §8(78,999)"
-     * WRAPPED-REGEX-TEST: " §aFlawed: §e604 §8(48,320)"
-     * WRAPPED-REGEX-TEST: " §9Fine: §e35 §8(224,000)"
-     * WRAPPED-REGEX-TEST: " §7Amount: §a5,968"
+     * WRAPPED-REGEX-TEST: " Rough: 78,999 (78,999)"
+     * WRAPPED-REGEX-TEST: " Rough: 78,999 (78,999)"
+     * WRAPPED-REGEX-TEST: " Flawed: 604 (48,320)"
+     * WRAPPED-REGEX-TEST: " Fine: 35 (224,000)"
+     * WRAPPED-REGEX-TEST: " Amount: 5,968"
      */
     @Suppress("MaxLineLength")
     private val gemstoneCountPattern by patternGroup.pattern(
-        "gemstone.count",
-        " (?:§.)?(?<quality>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?",
+        "gemstone.count.colorless",
+        " *(?<quality>[A-z]*): (?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: \\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?",
     )
 
     /**
      * REGEX-TEST:  Rough Jade Gemstone
-     * REGEX-TEST: §f Rough Jade Gemstone
-     * REGEX-TEST: §f Rough Amber Gemstone
-     * REGEX-TEST: §f Rough Topaz Gemstone
-     * REGEX-TEST: §f Rough Sapphire Gemstone
-     * REGEX-TEST: §f Rough Amethyst Gemstone
-     * REGEX-TEST: §f Rough Jasper Gemstone
-     * REGEX-TEST: §f Rough Ruby Gemstone
-     * REGEX-TEST: §f Rough Opal Gemstone
-     * REGEX-TEST: §f Rough Onyx Gemstone
-     * REGEX-TEST: §f Rough Aquamarine Gemstone
-     * REGEX-TEST: §a Flawed Citrine Gemstone
-     * REGEX-TEST: §9 Fine Peridot Gemstone
-     * REGEX-TEST: §eTopaz Gemstones
+     * REGEX-TEST:  Rough Jade Gemstone
+     * REGEX-TEST:  Rough Amber Gemstone
+     * REGEX-TEST:  Rough Topaz Gemstone
+     * REGEX-TEST:  Rough Sapphire Gemstone
+     * REGEX-TEST:  Rough Amethyst Gemstone
+     * REGEX-TEST:  Rough Jasper Gemstone
+     * REGEX-TEST:  Rough Ruby Gemstone
+     * REGEX-TEST:  Rough Opal Gemstone
+     * REGEX-TEST:  Rough Onyx Gemstone
+     * REGEX-TEST:  Rough Aquamarine Gemstone
+     * REGEX-TEST:  Flawed Citrine Gemstone
+     * REGEX-TEST:  Fine Peridot Gemstone
+     * REGEX-TEST: Topaz Gemstones
      */
     private val gemstoneItemNamePattern by patternGroup.pattern(
-        "gemstone.name",
-        "(?:(?:§.)?. |§.)(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
+        "gemstone.name.colorless",
+        "(?:. )?(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
     )
 
     /**
-     * REGEX-TEST: §8▶ No filter
-     * REGEX-TEST: §f▶ Rough
-     * REGEX-TEST: §a▶ Flawed
-     * REGEX-TEST: §9▶ Fine
+     * REGEX-TEST: ▶ No filter
+     * REGEX-TEST: ▶ Rough
+     * REGEX-TEST: ▶ Flawed
+     * REGEX-TEST: ▶ Fine
      */
     private val gemstoneFilterPattern by patternGroup.pattern(
-        "gemstone.filter",
-        "(?:§.)+▶ (?<quality>.*)",
+        "gemstone.filter.colorless",
+        "▶ (?<quality>.*)",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: " -11 Fish Bait (Bait Sack)"
+     */
+    private val sackChangePattern by patternGroup.pattern(
+        "change",
+        """ *(?<delta>[+-][\d,]+) (?<item>.+) \((?<sacks>.+)\)""",
+    )
+
+    /**
+     * REGEX-TEST: COMMON_HOOK
+     */
+    private val ignoreInternalNamePattern by patternGroup.pattern(
+        "ignore.internal-name",
+        "COMMON_HOOK",
     )
     // </editor-fold>
 
@@ -155,7 +174,7 @@ object SackApi {
         private set
 
     @HandleEvent
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         isRuneSack = false
         isGemstoneSack = false
         gemstoneStackFilter = null
@@ -167,7 +186,7 @@ object SackApi {
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         val isNewInventory = inventoryName != lastOpenedInventory
         lastOpenedInventory = inventoryName
@@ -176,7 +195,7 @@ object SackApi {
         isRuneSack = inventoryName == "Runes Sack"
         isGemstoneSack = inventoryName == "Gemstones Sack"
         if (isGemstoneSack) {
-            val filterLore = event.inventoryItems[GEMSTONE_FILTER_SLOT]?.getLore().orEmpty()
+            val filterLore = event.inventoryItems[GEMSTONE_FILTER_SLOT]?.getCleanLore().orEmpty()
             gemstoneFilterPattern.firstMatcher(filterLore) {
                 gemstoneStackFilter = GemstoneQuality.getByNameOrNull(group("quality"))
             }
@@ -202,7 +221,7 @@ object SackApi {
 
     private fun MutableMap.MutableEntry<Int, SafeItemStack>.processGemstoneItem(savingSacks: Boolean) {
         var gemTypeProp: GemstoneType? = null
-        gemstoneItemNamePattern.matchMatcher(value.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+        gemstoneItemNamePattern.matchMatcher(value.cleanName) {
             val gemName = group("gem") ?: return@matchMatcher
             gemTypeProp = GemstoneType.getByNameOrNull(gemName) ?: return@matchMatcher
         }
@@ -212,7 +231,7 @@ object SackApi {
         val gem = SackGemstone(gemType, internalName = roughInternalName)
         gem.slot = key
 
-        gemstoneCountPattern.matchAll(value.getLore()) {
+        gemstoneCountPattern.matchAll(value.getCleanLore()) {
             val stored = group("stored").formatInt()
             val quality: GemstoneQuality = GemstoneQuality.getByNameOrNull(
                 group("quality").takeIf { it != "Amount" }?.uppercase()
@@ -221,17 +240,17 @@ object SackApi {
             ) ?: return@matchAll
 
             val (multiplier, priceUpdater) = when (quality) {
-                GemstoneQuality.ROUGH -> Pair(1) { price: Long ->
+                ROUGH -> Pair(1) { price: Long ->
                     gem.roughPrice = price
                     gem.rough = stored
                 }
 
-                GemstoneQuality.FLAWED -> Pair(80) { price: Long ->
+                FLAWED -> Pair(80) { price: Long ->
                     gem.flawedPrice = price
                     gem.flawed = stored
                 }
 
-                GemstoneQuality.FINE -> Pair(80 * 80) { price: Long ->
+                FINE -> Pair(80 * 80) { price: Long ->
                     gem.finePrice = price
                     gem.fine = stored
                 }
@@ -274,7 +293,13 @@ object SackApi {
         val item = SackOtherItem()
         numPattern.firstMatcher(value.getLore()) {
             val stored = group("stored").formatInt()
-            val internalName = value.getInternalName()
+            val internalName = value.getInternalName().let { internalName ->
+                if (ignoreInternalNamePattern.matches(internalName.asString())) {
+                    NeuInternalName.fromItemNameOrNull(value.cleanName) ?: internalName
+                } else {
+                    internalName
+                }
+            }
 
             item.internalName = internalName
             item.colorCode = group("color")
@@ -319,11 +344,8 @@ object SackApi {
 
     data class SackChange(val delta: Int, val internalName: NeuInternalName, val sacks: List<String>)
 
-    // Todo: Move to repo pattern, add regex tests..?
-    private val sackChangeRegex = Regex("""([+-][\d,]+) (.+) \((.+)\)""")
-
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!event.cleanMessage.startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
@@ -344,10 +366,10 @@ object SackApi {
         val otherItemsRemoved = sackRemoveText.contains("other items")
 
         val sackChanges = ArrayList<SackChange>()
-        for (match in sackChangeRegex.findAll(sackChangeText)) {
-            val delta = match.groups[1]!!.value.formatInt()
-            val item = match.groups[2]!!.value
-            val sacks = match.groups[3]!!.value.split(", ")
+        sackChangePattern.findAll(sackChangeText) {
+            val delta = group("delta").formatInt()
+            val item = group("item")
+            val sacks = group("sacks").split(", ")
 
             val internalName = NeuInternalName.fromItemName(item)
             sackChanges.add(SackChange(delta, internalName, sacks))
@@ -363,7 +385,7 @@ object SackApi {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val sacksData = event.getConstant<NeuSacksJson>("sacks").sacks
         uniqueSackItems = sacksData.values.flatMap { it.contents }.toSet()
         sacks = sacksData.mapValues { it.value.contents }
@@ -377,8 +399,8 @@ object SackApi {
         }.toSet()
     }
 
-    @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
-    fun onProfileJoin() {
+    @HandleEvent(priority = HandleEvent.HIGH)
+    private fun onProfileJoin() {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
     }
 
@@ -388,36 +410,36 @@ object SackApi {
         // if it gets added and subtracted but only 1 shows it will be outdated
         val justChanged = mutableMapOf<NeuInternalName, Int>()
 
-        for (change in changes.sackChanges) {
-            if (change.internalName in justChanged) {
-                justChanged[change.internalName] = (justChanged[change.internalName] ?: 0) + change.delta
+        for ((delta, internalName) in changes.sackChanges) {
+            if (internalName in justChanged) {
+                justChanged[internalName] = (justChanged[internalName] ?: 0) + delta
             } else {
-                justChanged[change.internalName] = change.delta
+                justChanged[internalName] = delta
             }
         }
 
-        for (item in justChanged) {
-            if (sackData.containsKey(item.key)) {
-                val oldData = sackData[item.key]
-                var newAmount = oldData!!.amount + item.value
+        for ((key, value) in justChanged) {
+            if (sackData.containsKey(key)) {
+                val oldData = sackData[key]
+                var newAmount = oldData!!.amount + value
                 var changed = (newAmount - oldData.amount)
                 if (newAmount < 0) {
                     newAmount = 0
                     changed = 0
                 }
-                sackData = sackData.editCopy { this[item.key] = SackItem(newAmount, changed, oldData.getStatus()) }
+                sackData = sackData.editCopy { this[key] = SackItem(newAmount, changed, oldData.getStatus()) }
             } else {
-                val newAmount = if (item.value > 0) item.value else 0
+                val newAmount = if (value > 0) value else 0
                 sackData =
-                    sackData.editCopy { this[item.key] = SackItem(newAmount, newAmount, SackStatus.OUTDATED) }
+                    sackData.editCopy { this[key] = SackItem(newAmount, newAmount, SackStatus.OUTDATED) }
             }
         }
 
         if (changes.otherItemsAdded || changes.otherItemsRemoved) {
-            for (item in sackData) {
-                if (item.key in justChanged) continue
-                val oldData = sackData[item.key]
-                sackData = sackData.editCopy { this[item.key] = SackItem(oldData!!.amount, 0, SackStatus.ALRIGHT) }
+            for ((key) in sackData) {
+                if (key in justChanged) continue
+                val oldData = sackData[key]
+                sackData = sackData.editCopy { this[key] = SackItem(oldData!!.amount, 0, SackStatus.ALRIGHT) }
             }
         }
         saveSackData()
@@ -431,11 +453,11 @@ object SackApi {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return SackItem(0, 0, SackStatus.MISSING)
 
         if (sackData.containsKey(item)) {
-            return sackData[item] ?: return SackItem(0, 0, SackStatus.MISSING)
+            return sackData[item] ?: SackItem(0, 0, SackStatus.MISSING)
         }
 
         sackData = sackData.editCopy { this[item] = SackItem(0, 0, SackStatus.MISSING) }
-        return sackData[item] ?: return SackItem(0, 0, SackStatus.MISSING)
+        return sackData[item] ?: SackItem(0, 0, SackStatus.MISSING)
     }
 
     private fun saveSackData() {
@@ -489,7 +511,7 @@ object SackApi {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestsackapi") {
             description = "Get the amount of an item in sacks according to internal feature SackAPI"
             category = CommandCategory.DEVELOPER_DEBUG

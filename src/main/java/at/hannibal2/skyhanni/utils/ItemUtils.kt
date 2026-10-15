@@ -643,8 +643,8 @@ object ItemUtils {
     }
 
     private fun getPetRarity(pet: SafeItemStack): LorenzRarity? {
-        val rarityId = pet.getInternalName().asString().split(";").last().toInt()
-        val rarity = LorenzRarity.getById(rarityId)
+        val rarityIndex = pet.getInternalName().asString().split(";").last().toInt()
+        val rarity = LorenzRarity.fromNeuPetIndex(rarityIndex)
         val name = pet.hoverName.formattedTextCompatLeadingWhiteLessResets()
         if (rarity == null) {
             ErrorManager.logErrorStateWithData(
@@ -652,7 +652,7 @@ object ItemUtils {
                 "Failed to read rarity from pet item via internal name",
                 "internal name" to pet.getInternalName(),
                 "item name" to name,
-                "rarity id" to rarityId,
+                "rarity index" to rarityIndex,
                 "inventory name" to InventoryUtils.openInventoryName(),
             )
         }
