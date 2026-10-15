@@ -75,28 +75,29 @@ object ShinyOrbTracker {
     }
 
     @HandleEvent
-    fun onShinyOrbUsed() {
+    private fun onShinyOrbUsed() {
         tracker.modify { it.orbsUsed++ }
     }
 
     @HandleEvent
-    fun onShinyOrbCharged() {
+    private fun onShinyOrbCharged() {
         tracker.modify { it.orbsCompleted++ }
     }
 
     @HandleEvent
-    fun onShinyOrbLooted(event: ShinyOrbLootedEvent) {
+    private fun onShinyOrbLooted(event: ShinyOrbLootedEvent) {
         tracker.addItem(SHINY_SHARD_ITEM, 1, command = false)
-        when {
-            event.loot != null -> {
-                val (internalName, amount) = event.loot.first to event.loot.second
-                tracker.addItem(internalName, amount, command = false)
-            }
+        for (reward in event.rewards) {
+            when (reward) {
+                is Coins -> tracker.addCoins(reward.amount, command = false)
 
-            event.coins != null -> tracker.addCoins(event.coins, command = false)
-            event.skillXp != null -> tracker.modify { tracker ->
-                val (skill, amount) = event.skillXp.first to event.skillXp.second
-                tracker.skillXpGained.addOrPut(skill, amount)
+                is SkillXp -> tracker.modify { tracker ->
+                    tracker.skillXpGained.addOrPut(reward.skill, reward.amount.toLong())
+                }
+
+                is Loot -> {
+                    tracker.addItem(reward.internalName, reward.amount, command = false)
+                }
             }
         }
     }
@@ -119,7 +120,7 @@ object ShinyOrbTracker {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetshinyorbtracker") {
             description = "Resets the Shiny Orb Tracker"
             category = CommandCategory.USERS_RESET
