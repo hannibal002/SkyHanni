@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.PlayerUtils.SNEAKING_EYE_HEIGHT
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -311,7 +311,7 @@ object VampireSlayerFeatures {
         val boss = trackedBoss.entity
         if (!boss.canBeSeen(MAX_SLAYER_DISTANCE)) return
         drawLineToCrosshair(
-            exactLocation(boss).up(SNEAKING_EYE_HEIGHT),
+            exactLocation(boss).up(PlayerUtils.SNEAKING_EYE_HEIGHT),
             config.lineColor,
             config.lineWidth,
             true,
