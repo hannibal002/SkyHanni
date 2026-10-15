@@ -14,7 +14,7 @@ import kotlin.math.sign
  */
 object MouseCompat {
 
-    const val NUMBER_OF_MOUSE_BUTTONS = 8
+    const val NUMBER_OF_MOUSE_BUTTONS = 6
 
     @JvmStatic
     var deltaMouseX = 0.0
