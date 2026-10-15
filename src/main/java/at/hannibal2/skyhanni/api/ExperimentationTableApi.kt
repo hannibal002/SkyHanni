@@ -523,7 +523,7 @@ object ExperimentationTableApi {
 
         guardianPetNamePattern.matchMatcher(this) {
             val rarity = LorenzRarity.getByColorCode(group("color")[0]) ?: return@matchMatcher
-            val internalName = "GUARDIAN;${rarity.id}".toInternalName()
+            val internalName = "GUARDIAN;${rarity.neuPetIndex}".toInternalName()
             currentExperimentData.addReward(internalName, 1)
             return
         }

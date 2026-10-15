@@ -418,6 +418,7 @@ This start script will automatically download all required libraries.
 
 SkyHanni reads the [NEU Item Repo](https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO) for item internal names, display names
 and recipes. NEU is not a dependency of SkyHanni.
+A copy of its files is stored on the computer under `.minecraft\skyhanni\neurepo`, next to the SkyHanni repo.
 
 ### Config
 
