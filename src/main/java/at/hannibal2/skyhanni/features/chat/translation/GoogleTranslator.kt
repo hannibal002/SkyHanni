@@ -15,7 +15,6 @@ import kotlinx.coroutines.withContext
 
 object GoogleTranslator {
 
-    @Suppress("InjectDispatcher")
     suspend fun getTranslation(
         message: String,
         targetLanguage: String,
