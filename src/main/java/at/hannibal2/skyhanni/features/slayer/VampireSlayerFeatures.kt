@@ -44,11 +44,11 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.decoration.ArmorStand
-import java.awt.Color
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -61,17 +61,17 @@ object VampireSlayerFeatures {
     private val configBloodIchor get() = config.bloodIchor
     private val configKillerSpring get() = config.killerSpring
 
-    private enum class EffectType {
-        BLOOD_ICHOR,
-        KILLER_SPRING,
+    private enum class EffectType(val displayName: String) {
+        BLOOD_ICHOR("§4Ichor"),
+        KILLER_SPRING("§4Spring"),
     }
 
     private data class TrackedBoss(
+        val entity: RemotePlayer,
         val mob: Mob,
         val effects: MutableMap<ArmorStand, EffectType> = linkedMapOf(),
         var steakAlertSent: Boolean = false,
     ) {
-        val entity get() = mob.baseEntity
         val armorStand get() = mob.armorStand
     }
 
@@ -160,7 +160,7 @@ object VampireSlayerFeatures {
     }
 
     private fun processBossSteak(boss: TrackedBoss, healthName: String?) {
-        val entity = boss.entity as? RemotePlayer ?: return
+        val entity = boss.entity
         val canUseSteak = healthName?.let { steakHealthPattern.matches(it) } == true
         if (canUseSteak) {
             if (!boss.steakAlertSent && configBoss.steakAlert) {
@@ -190,7 +190,7 @@ object VampireSlayerFeatures {
         val mob = entity.mob
         if (mob == null || mob.baseEntity !== entity) return
         if (trackedBoss(entity) == null) {
-            trackedBosses.add(TrackedBoss(mob))
+            trackedBosses.add(TrackedBoss(entity, mob))
         }
     }
 
@@ -319,7 +319,7 @@ object VampireSlayerFeatures {
     }
 
     private fun SkyHanniRenderWorldEvent.renderBossEffects(trackedBoss: TrackedBoss) {
-        val boss = trackedBoss.entity as? RemotePlayer ?: return
+        val boss = trackedBoss.entity
         val effects = trackedBoss.effects
         val eyeY = exactPlayerEyeLocation().y
         val closestSprings = groupSpringStands(effects)
@@ -331,19 +331,43 @@ object VampireSlayerFeatures {
         }
     }
 
+    private data class EffectHighlightParams(
+        val highlight: Boolean,
+        val color: ChromaColour,
+        val linesColor: ChromaColour,
+        val text: String,
+        val showLines: Boolean,
+    )
+
+    private val EffectType.config: EffectHighlightParams
+        get() = when (this) {
+            BLOOD_ICHOR -> EffectHighlightParams(
+                highlight = configBloodIchor.highlight,
+                color = configBloodIchor.color,
+                linesColor = configBloodIchor.linesColor,
+                showLines = configBloodIchor.showLines,
+                text = this.displayName,
+            )
+
+            KILLER_SPRING -> EffectHighlightParams(
+                highlight = configKillerSpring.highlight,
+                color = configKillerSpring.color,
+                linesColor = configKillerSpring.linesColor,
+                showLines = configKillerSpring.showLines,
+                text = this.displayName,
+            )
+        }
+
     private fun SkyHanniRenderWorldEvent.renderEffect(
         boss: RemotePlayer,
         stand: ArmorStand,
         type: EffectType,
     ) {
-        val shouldHighlight = when (type) {
-            BLOOD_ICHOR -> configBloodIchor.highlight
-            KILLER_SPRING -> configKillerSpring.highlight
-        }
-        if (!shouldHighlight) return
+        val effectConfig = type.config
+        if (!effectConfig.highlight) return
         val vec = stand.blockPosition().toLorenzVec()
         if (vec.distanceToPlayer() <= MAX_SLAYER_DISTANCE) {
-            renderEffectHighlight(boss, stand, type, vec)
+            renderEffectHighlight(boss, stand, effectConfig, vec)
         }
         if (configBloodIchor.renderBeam && type == BLOOD_ICHOR && stand.isAlive) {
             drawWaypointFilled(
@@ -357,31 +381,10 @@ object VampireSlayerFeatures {
     private fun SkyHanniRenderWorldEvent.renderEffectHighlight(
         boss: RemotePlayer,
         stand: ArmorStand,
-        type: EffectType,
+        cfg: EffectHighlightParams,
         vec: LorenzVec,
-    ) {
-        data class EffectHighlightParams(
-            val color: Color,
-            val linesColor: Color,
-            val text: String,
-            val shouldShowLines: Boolean,
-        )
-        val (color, linesColor, text, shouldShowLines) = when (type) {
-            BLOOD_ICHOR -> EffectHighlightParams(
-                color = configBloodIchor.color.toColor(),
-                linesColor = configBloodIchor.linesColor.toColor(),
-                text = "§4Ichor",
-                shouldShowLines = configBloodIchor.showLines,
-            )
-
-            KILLER_SPRING -> EffectHighlightParams(
-                color = configKillerSpring.color.toColor(),
-                linesColor = configKillerSpring.linesColor.toColor(),
-                text = "§4Spring",
-                shouldShowLines = configKillerSpring.showLines,
-            )
-        }
-        RenderLivingEntityHelper.setEntityColor(stand, color) {
+    ) = with(cfg) {
+        RenderLivingEntityHelper.setEntityColor(stand, color.toColor()) {
             isEnabled() && trackedBosses.any { it.effects.containsKey(stand) }
         }
         drawColor(vec.up(2.0), LorenzColor.DARK_RED.toChromaColor(), alpha = 1f)
@@ -391,7 +394,7 @@ object VampireSlayerFeatures {
             1.5,
             seeThroughBlocks = false,
         )
-        if (shouldShowLines && stand.canBeSeen(vecYOffset = 1.5)) {
+        if (showLines && stand.canBeSeen(vecYOffset = 1.5)) {
             draw3DLine(
                 exactPlayerEyeLocation(boss),
                 exactPlayerEyeLocation(stand),
