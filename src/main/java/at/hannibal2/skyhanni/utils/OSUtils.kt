@@ -7,6 +7,7 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
+import kotlin.io.path.deleteRecursively
 import kotlin.time.Duration
 import kotlinx.coroutines.Job
 
@@ -147,4 +148,14 @@ object OSUtils {
             )
         }
     }
+
+    /**
+     * Deletes the target directory recursively. Unlike [File.deleteRecursively], this does not
+     * follow symbolic links, so it will only delete the link, and not the contents of the target
+     * directory.
+     */
+    fun File.deleteRecursivelySafe(): Boolean =
+        runCatching {
+            toPath().deleteRecursively()
+        }.isSuccess
 }

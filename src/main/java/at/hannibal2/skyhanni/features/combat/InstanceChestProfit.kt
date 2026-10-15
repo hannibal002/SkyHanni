@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -419,11 +418,11 @@ object InstanceChestProfit {
 
     private fun getKuudraEssenceBonus(): Double =
         ProfileStorageData.petProfiles?.pets?.filter { PetUtils.getPetProperName(it.fauxInternalName) == "KUUDRA" }
-            ?.maxByOrNull { it.rarity.id }
+            ?.maxByOrNull { it.rarity }
             ?.let {
                 when (it.rarity) {
-                    LorenzRarity.RARE -> 0.15 / 100 * it.level
-                    LorenzRarity.EPIC, LorenzRarity.LEGENDARY -> 0.2 / 100 * it.level
+                    RARE -> 0.15 / 100 * it.level
+                    EPIC, LEGENDARY -> 0.2 / 100 * it.level
                     else -> 0.0
                 }
             } ?: 0.0
