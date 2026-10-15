@@ -142,8 +142,8 @@ object PetUtils {
         val parts = internalName.asString().split(";")
         if (parts.size < 2) return null
         val name = parts[0].takeIf { it.isNotBlank() } ?: return null
-        val rarityId = parts[1].toIntOrNull() ?: return null
-        val rarity = LorenzRarity.getById(rarityId) ?: return null
+        val rarityIndex = parts[1].toIntOrNull() ?: return null
+        val rarity = LorenzRarity.fromNeuPetIndex(rarityIndex) ?: return null
         return name to rarity
     }
 
@@ -203,7 +203,7 @@ object PetUtils {
         customPetLeveling[petInternalName.getProperName()]?.xpMultiplier ?: 1.0
 
     fun petWithRarityToInternalName(petName: String, rarity: LorenzRarity): NeuInternalName =
-        "${petName.toPetInternalNameBase()};${rarity.id}".toInternalName()
+        "${petName.toPetInternalNameBase()};${rarity.neuPetIndex}".toInternalName()
 
     private fun String.toPetInternalNameBase(): String =
         displayNameMap.entries.firstOrNull { (_, displayName) ->
@@ -270,12 +270,11 @@ object PetUtils {
     private fun getRarityOffset(petInternalName: NeuInternalName): Int? {
         val (properPetName, rarity) = splitInternalName(petInternalName) ?: return null
         return customPetLeveling[properPetName]?.rarityOffset?.get(rarity) ?: when (rarity) {
-            LorenzRarity.COMMON -> 0
-            LorenzRarity.UNCOMMON -> 6
-            LorenzRarity.RARE -> 11
-            LorenzRarity.EPIC -> 16
-            LorenzRarity.LEGENDARY -> 20
-            LorenzRarity.MYTHIC -> 20
+            COMMON -> 0
+            UNCOMMON -> 6
+            RARE -> 11
+            EPIC -> 16
+            LEGENDARY, MYTHIC, SPECIAL, VERY_SPECIAL -> 20
             else -> ErrorManager.skyHanniError("Unknown pet rarity $rarity")
         }
     }
