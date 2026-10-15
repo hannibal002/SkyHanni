@@ -176,6 +176,10 @@ enum class NonGodPotEffect(
         "Chilled Pristine Potato I",
         displayName = "§fChilled Pristine Potato I",
     ),
+    FIESTA_FLASK(
+        "Fiesta Flask I",
+        displayName = "§6Fiesta Flask I",
+    ),
 
     LUSHLILAC_BONBON(
         "Lushlilac Bonbon",
