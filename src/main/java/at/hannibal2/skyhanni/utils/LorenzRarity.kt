@@ -7,27 +7,29 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import java.util.Optional
 
-// TODO: replace id with ordinal
-enum class LorenzRarity(val color: LorenzColor, val id: Int) {
+enum class LorenzRarity(val color: LorenzColor) {
 
-    COMMON(LorenzColor.WHITE, 0),
-    UNCOMMON(LorenzColor.GREEN, 1),
-    RARE(LorenzColor.BLUE, 2),
-    EPIC(LorenzColor.DARK_PURPLE, 3),
-    LEGENDARY(LorenzColor.GOLD, 4),
-    MYTHIC(LorenzColor.LIGHT_PURPLE, 5),
-    DIVINE(LorenzColor.AQUA, 6),
-    SPECIAL(LorenzColor.RED, 8),
-    VERY_SPECIAL(LorenzColor.RED, 9),
-    ULTIMATE(LorenzColor.DARK_RED, 10),
+    COMMON(WHITE),
+    UNCOMMON(GREEN),
+    RARE(BLUE),
+    EPIC(DARK_PURPLE),
+    LEGENDARY(GOLD),
+    MYTHIC(LIGHT_PURPLE),
+    DIVINE(AQUA),
+    SPECIAL(RED),
+    VERY_SPECIAL(RED),
+    ULTIMATE(DARK_RED),
     ;
 
     val chatColorCode get() = color.getChatColor()
     val rawName = name.replace("_", " ")
     val formattedName = rawName.firstLetterUppercase()
 
+    /** The number NEU pet internal names end in, e.g. `PHOENIX;7` is Special. */
+    val neuPetIndex: Int get() = ordinal
+
     fun oneBelow(logError: Boolean = true): LorenzRarity? {
-        val rarityBelow = getById(ordinal - 1)
+        val rarityBelow = entries.getOrNull(ordinal - 1)
         if (rarityBelow == null && logError) {
             ErrorManager.logErrorStateWithData(
                 "Problem with item rarity detected.",
@@ -39,22 +41,23 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     }
 
     fun oneAbove(logError: Boolean = true): LorenzRarity? {
-        val rarityBelow = getById(ordinal + 1)
-        if (rarityBelow == null && logError) {
+        val rarityAbove = entries.getOrNull(ordinal + 1)
+        if (rarityAbove == null && logError) {
             ErrorManager.logErrorStateWithData(
                 "Problem with item rarity detected.",
-                "Trying to get an item rarity above special",
+                "Trying to get an item rarity above ultimate",
                 "ordinal" to ordinal,
             )
         }
-        return rarityBelow
+        return rarityAbove
     }
 
     fun isAtLeast(other: LorenzRarity): Boolean = this.ordinal >= other.ordinal
 
     companion object {
 
-        fun getById(id: Int) = if (entries.size > id) entries[id] else null
+        /** Reverse of [LorenzRarity.neuPetIndex], null when out of range. */
+        fun fromNeuPetIndex(index: Int): LorenzRarity? = entries.getOrNull(index)
 
         fun getByName(name: String): LorenzRarity? = entries.find { it.name.equals(name, ignoreCase = true) }
 

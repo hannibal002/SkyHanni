@@ -84,6 +84,7 @@ enum class ItemCategory {
     TROPHY,
     CAPSULE,
     RABBIT,
+    ABILITY_SCROLL,
 
     NONE,
     ;
