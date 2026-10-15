@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.misc.update.ModrinthVersionType
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -216,6 +217,16 @@ enum class SkyHanniTypeAdapters(
         },
     ),
     SESSION_UPTIME(SessionUptime::class.java, SessionUptimeTypeAdapter()),
+    INPUT_CODE(
+        InputCode::class.java,
+        object : TypeAdapter<InputCode>() {
+            override fun write(out: JsonWriter, value: InputCode) {
+                out.value(value.toKeyIdentifier())
+            }
+
+            override fun read(reader: JsonReader): InputCode = InputCode.fromKeyIdentifier(reader.nextString())
+        }
+    ),
     COMPONENT(
         Component::class.java,
         object : TypeAdapter<Component>() {

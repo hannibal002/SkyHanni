@@ -1,17 +1,17 @@
 package at.hannibal2.skyhanni.config.features.misc
 
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.glfw.GLFW
 
 class EstimatedItemValueConfig {
     @Expose
@@ -28,8 +28,8 @@ class EstimatedItemValueConfig {
 
     @Expose
     @ConfigOption(name = "Hotkey", desc = "Press this key to show the Estimated Item Value.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var hotkey: Int = GLFW.GLFW_KEY_UNKNOWN
+    @ConfigEditorKeyMapping
+    var hotkey = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Show Always", desc = "Ignore the hotkey and always display the item value.")

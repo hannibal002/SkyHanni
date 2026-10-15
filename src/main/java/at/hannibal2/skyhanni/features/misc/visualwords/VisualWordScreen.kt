@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.mixins.hooks.VisualWordsHook
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
-import org.lwjgl.glfw.GLFW
 
 /**
  * Standalone screen for the Visual Words editor.
@@ -55,15 +55,15 @@ class VisualWordScreen : SkyHanniBaseScreen() {
         }
     }
 
-    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) = keyCode?.let {
+    override fun onKeyTyped(typedChar: Char?, key: InputCode?) = key?.let {
         when {
-            keyCode == GLFW.GLFW_KEY_ESCAPE || KeyboardManager.checkIsInventoryClosure(keyCode) ->
+            key == KEY_ESCAPE || KeyboardManager.checkIsInventoryClosure(key) ->
                 if (currentlyEditing) exitEditMode() else onClose()
 
-            keyCode == GLFW.GLFW_KEY_TAB && currentlyEditing ->
+            key == KEY_TAB && currentlyEditing ->
                 activeInput = if (activeInput === phraseInput) replacementInput else phraseInput
 
-            (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) && currentlyEditing ->
+            (key == KEY_RETURN || key == KEY_NUMPADENTER) && currentlyEditing ->
                 exitEditMode()
         }
     } ?: Unit

@@ -5,11 +5,10 @@ import at.hannibal2.skyhanni.test.graph.GraphEditor.isEnabled
 import at.hannibal2.skyhanni.test.graph.GraphEditor.state
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import org.lwjgl.glfw.GLFW
 
 object GraphEditorHistory {
 
@@ -71,13 +70,13 @@ object GraphEditorHistory {
         if (undoStack.isNotEmpty()) {
             val peek = undoStack.peek().label
             strings.add(" ")
-            strings.add("§eUndo: §6Ctrl + ${KeyboardManager.getKeyName(GLFW.GLFW_KEY_Y)}")
+            strings.add("§eUndo: §6Ctrl + ${InputCode.KEY_Y.displayName}")
             strings.add("§7(next undo: $peek)")
         }
         if (redoStack.isNotEmpty()) {
             val peek = redoStack.peek().label
             strings.add(" ")
-            strings.add("§eRedo: §6Ctrl + ${KeyboardManager.getKeyName(GLFW.GLFW_KEY_Z)}")
+            strings.add("§eRedo: §6Ctrl + ${InputCode.KEY_Z.displayName}")
             strings.add("§7(next redo: $peek)")
         }
     }
