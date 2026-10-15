@@ -3,8 +3,6 @@ package at.hannibal2.skyhanni.utils
 import java.io.File
 import java.io.IOException
 import java.nio.file.AccessDeniedException
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 
 class StringFileHandler(private val file: File) {
     private val backupFile = File(file.parentFile, "${file.name}.bak")
@@ -23,12 +21,7 @@ class StringFileHandler(private val file: File) {
         try {
             tempFile.writeText(content)
             if (file.exists()) file.copyTo(backupFile, overwrite = true)
-            Files.move(
-                tempFile.toPath(),
-                file.toPath(),
-                StandardCopyOption.ATOMIC_MOVE,
-                StandardCopyOption.REPLACE_EXISTING,
-            )
+            OSUtils.atomicMoveFile(tempFile, file)
             backupFile.delete()
         } catch (e: AccessDeniedException) {
             if (attempt >= 5) throw e

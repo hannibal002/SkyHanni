@@ -4,9 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.git.commit.CommitsApiResponse
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Represents the location of a Git repository.
@@ -44,15 +47,31 @@ class GitRepo(
             return false
         }
         val fullArchiveUrl = "https://github.com/$user/$repo/archive/$shaToUse.tar.gz"
+
+        val tmpFile = destinationTgz.resolveSibling("${destinationTgz.name}.tmp")
+
         return try {
             if (shouldError) {
                 SkyHanniMod.logger.info("Downloading $shaToUse for $location\nUrl: $fullArchiveUrl")
             }
-            ApiUtils.getBinaryResponse(destinationTgz, fullArchiveUrl, location, !shouldError)
+            tmpFile.parentFile?.mkdirs()
+            ApiUtils.getBinaryResponse(tmpFile, fullArchiveUrl, location, !shouldError).assertSuccessWithData() ?: run {
+                if (tmpFile.exists()) tmpFile.delete()
+                return false
+            }
+
+            withContext(Dispatchers.IO) {
+                OSUtils.atomicMoveFile(tmpFile, destinationTgz)
+            }
+
             true
         } catch (e: Exception) {
-            ErrorManager.logErrorWithData(e, "Failed to download tar.gz from $fullArchiveUrl")
-            SkyHanniMod.logger.error("Failed to download tar.gz from $fullArchiveUrl", e)
+            if (tmpFile.exists()) tmpFile.delete()
+
+            if (shouldError) {
+                ErrorManager.logErrorWithData(e, "Failed to write or swap tar.gz from $fullArchiveUrl")
+                SkyHanniMod.logger.error("Failed to write or swap tar.gz from $fullArchiveUrl", e)
+            }
             false
         }
     }

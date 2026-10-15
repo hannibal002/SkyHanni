@@ -30,6 +30,7 @@ object EnoughUpdatesRepoManager : AbstractRepoManager<NeuRepositoryReloadEvent>(
     override fun reportExtraStatusInfo() = with(EnoughUpdatesManager) {
         reportItemStatus()
         reportRecipeStatus()
+        reportItemOverlayStatus()
     }
     override suspend fun extraReloadCoroutineWork(progress: ChatProgressUpdates) = EnoughUpdatesManager.reloadItemsFromRepo(progress)
 }
