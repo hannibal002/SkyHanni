@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.config.features.slayer.vampire
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.features.slayer.VampireSlayerFeatures
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class BloodIchorConfig: VampireEffectConfig {
+class BloodIchorConfig : VampireSlayerFeatures.VampireEffectConfig {
     @Expose
     @ConfigOption(name = "Highlight Blood Ichor", desc = "Highlight the Blood Ichor.")
     @ConfigEditorBoolean

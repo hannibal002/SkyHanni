@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.slayer.vampire.VampireEffectConfig
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -45,6 +44,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.core.particles.ParticleTypes
@@ -64,6 +64,14 @@ object VampireSlayerFeatures {
     private enum class EffectType(val displayName: String) {
         BLOOD_ICHOR("§4Ichor"),
         KILLER_SPRING("§4Spring"),
+    }
+
+    interface VampireEffectConfig {
+        val highlight: Boolean
+        val renderBeam: Boolean
+        val color: ChromaColour
+        val showLines: Boolean
+        val linesColor: ChromaColour
     }
 
     private data class TrackedBoss(
