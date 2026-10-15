@@ -4,16 +4,18 @@ import com.google.common.cache.Cache
 import com.google.common.cache.RemovalCause
 
 class SizeLimitedCache<K : Any, V : Any>(
-    maxSize: Long,
+    maxSize: Int,
+    useWeakKeys: Boolean = false,
     removalListener: ((K?, V?, RemovalCause) -> Unit)? = null,
 ) : CacheMap<K, V>() {
 
     @Suppress("unused")
     constructor(maxSize: Int, removalListener: ((K?, V?, RemovalCause) -> Unit)? = null) :
-        this(maxSize.toLong(), removalListener)
+        this(maxSize, useWeakKeys = false, removalListener)
 
     override val cache: Cache<K, V> = buildCache {
-        maximumSize(maxSize)
+        if (useWeakKeys) weakKeys()
+        maximumSize(maxSize.toLong())
         setRemovalListener(removalListener)
     }
 }

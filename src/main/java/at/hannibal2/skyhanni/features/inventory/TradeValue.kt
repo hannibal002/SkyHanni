@@ -120,7 +120,7 @@ object TradeValue {
                 items.remove(slot)
                 continue
             }
-            total += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.count))
+            total += (EstimatedItemValueCalculator.calculate(stack).totalPrice * (stack.count))
         }
         coin?.let {
             total += it
