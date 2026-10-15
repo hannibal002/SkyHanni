@@ -99,8 +99,11 @@ object SeaCreatureManager {
         event.replaceComponent(edited, "sea_creature")
     }
 
+    private fun wasDoubleHookRecently(): Boolean =
+        lastDoubleHookTime.passedSince() <= 100.milliseconds
+
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         seaCreatureMap.clear()
         allFishingMobs = emptyMap()
 
@@ -134,9 +137,6 @@ object SeaCreatureManager {
         allVariants = variants
         SpecificSeaCreatures.saveSeaCreatures(SpecificSeaCreatures.updateList())
     }
-
-    private fun wasDoubleHookRecently(): Boolean =
-        lastDoubleHookTime.passedSince() <= 100.milliseconds
 
     private fun getSeaCreatureFromMessage(message: String): SeaCreature? {
         return seaCreatureMap.getOrDefault(message, null)

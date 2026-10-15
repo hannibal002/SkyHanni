@@ -16,13 +16,12 @@ import net.minecraft.world.phys.AABB
 
 @SkyHanniModule
 object TubulatorParkour {
-
     private val config get() = RiftApi.config.area.mirrorverse.tubulatorConfig
     private var parkourHelper: ParkourHelper? = null
     private val puzzleRoom = AABB(-298.0, 0.0, -112.0, -309.0, 63.0, -101.0)
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("RiftTubulator")
         parkourHelper = ParkourHelper(
             data.locations,

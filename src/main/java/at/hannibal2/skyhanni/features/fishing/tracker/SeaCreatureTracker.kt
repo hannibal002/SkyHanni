@@ -31,7 +31,6 @@ import kotlin.concurrent.atomics.AtomicBoolean
 
 @SkyHanniModule
 object SeaCreatureTracker {
-
     private val isMigrating = AtomicBoolean(false)
 
     private val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
@@ -202,7 +201,7 @@ object SeaCreatureTracker {
     private var excludedGraphAreas = emptySet<String>()
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ExcludedSeaCreatureAreasJson>("fishing/ExcludedSeaCreatureAreas")
         excludedIslands = data.excludedIslands?.toSet().orEmpty()
         excludedGraphAreas = data.excludedGraphAreas?.toSet().orEmpty()

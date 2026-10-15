@@ -33,7 +33,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HuntingProfitTracker {
-
     val config get() = SkyHanniMod.feature.hunting.huntingProfitTracker
 
     private var lastHuntTime = SimpleTimeMark.farPast()
@@ -48,7 +47,6 @@ object HuntingProfitTracker {
         @Expose var totalMobsCaught: Long = 0,
         @Expose var totalShardsGained: Long = 0
     ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
-
         override fun getDescription(item: TrackedItem): List<String> {
             val timesCaught = item.timesCaught
             val shardsGained = item.totalAmount
@@ -160,7 +158,7 @@ object HuntingProfitTracker {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         huntingTools = buildList {
             data.huntingBlackholes?.let { addAll(it) }

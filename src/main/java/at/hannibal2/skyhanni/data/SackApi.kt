@@ -49,7 +49,6 @@ private typealias GemstoneType = SkyBlockItemModifierUtils.GemstoneType
 
 @SkyHanniModule
 object SackApi {
-
     private val sackDisplayConfig get() = SkyHanniMod.feature.inventory.sackDisplay
     private val chatConfig get() = SkyHanniMod.feature.chat
     private val patternGroup = RepoPattern.group("data.sacks")
@@ -385,7 +384,7 @@ object SackApi {
     }
 
     @HandleEvent
-    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val sacksData = event.getConstant<NeuSacksJson>("sacks").sacks
         uniqueSackItems = sacksData.values.flatMap { it.contents }.toSet()
         sacks = sacksData.mapValues { it.value.contents }
@@ -534,7 +533,6 @@ data class SackItem(
     @Expose val lastChange: Int,
     @Expose private val status: SackStatus?,
 ) {
-
     fun getStatus() = status ?: SackStatus.MISSING
     fun statusIsCorrectOrAlright() = getStatus().let { it == SackStatus.CORRECT || it == SackStatus.ALRIGHT }
 }

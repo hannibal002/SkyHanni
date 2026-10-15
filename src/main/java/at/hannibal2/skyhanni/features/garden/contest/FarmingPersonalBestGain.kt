@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
-import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
@@ -18,13 +17,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 object FarmingPersonalBestGain {
-
     private val config get() = GardenApi.config.jacobContest.personalBests
 
     private val patternGroup = RepoPattern.group("garden.contest.personal.best")
@@ -65,8 +62,6 @@ object FarmingPersonalBestGain {
     )
     // </editor-fold>
 
-    private val repoReloadCoroutine = CoroutineSettings("farming personal best gain repo reload")
-
     private var personalBestIncrements = mapOf<CropType, Int>()
 
     var newCollected: Double? = null
@@ -76,8 +71,8 @@ object FarmingPersonalBestGain {
     var cropType: CropType? = null
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
-        val data = event.getConstantAsync<GardenJson>("Garden")
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<GardenJson>("Garden")
         personalBestIncrements = data.personalBestIncrement
     }
 

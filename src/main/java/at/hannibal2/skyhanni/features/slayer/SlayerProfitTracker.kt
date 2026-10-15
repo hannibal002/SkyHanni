@@ -39,7 +39,6 @@ import com.google.gson.annotations.Expose
 
 @SkyHanniModule
 object SlayerProfitTracker {
-
     private val config get() = SlayerApi.config.itemProfitTracker
 
     private var category = ""
@@ -90,7 +89,7 @@ object SlayerProfitTracker {
     private var allowedItems = mapOf<String, List<NeuInternalName>>()
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         allowedItems = event.getConstant<SlayerProfitTrackerItemsJson>("SlayerProfitTrackerItems").slayers
     }
 

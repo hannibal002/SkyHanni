@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object DojoRankDisplay {
-
     private val config get() = SkyHanniMod.feature.crimsonIsle
     private var display = emptyList<String>()
     private val patternGroup = RepoPattern.group("inventory.dojo.rankdisplay")
@@ -91,7 +90,7 @@ object DojoRankDisplay {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<BeltsJson>("Belts")
         belts = data.belts
     }

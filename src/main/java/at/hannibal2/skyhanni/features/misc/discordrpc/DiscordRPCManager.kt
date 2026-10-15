@@ -4,7 +4,6 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.feature
-import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.SkyHanniMod.launchUnScoped
 import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -39,7 +38,6 @@ import kotlinx.coroutines.delay
 
 @SkyHanniModule
 object DiscordRPCManager {
-
     private const val APPLICATION_ID = 1093298182735282176L
 
     val config get() = feature.gui.discordRPC
@@ -59,8 +57,6 @@ object DiscordRPCManager {
     private val retryHelper = ConnectionRetryHelper(listOf(10.seconds, 20.seconds, 30.seconds))
     private var retryJob: Job? = null
     private var lastDebugInfo: Map<String, String> = emptyMap()
-
-    private val repoReloadCoroutine = CoroutineSettings("discord RPC manager repo reload")
     private val startCoroutine = CoroutineSettings("discord RPC start", timeout = Duration.INFINITE).withIOContext()
     private val presenceCoroutine = CoroutineSettings("discord RPC updatePresence", timeout = Duration.INFINITE).withIOContext()
     private val stopCoroutine = CoroutineSettings("discord RPC stop", timeout = Duration.INFINITE).withIOContext()
@@ -122,8 +118,8 @@ object DiscordRPCManager {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
-        stackingEnchants = event.getConstantAsync<EnchantsJson>("Enchants").stacking
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
+        stackingEnchants = event.getConstant<EnchantsJson>("Enchants").stacking
     }
 
     @HandleEvent

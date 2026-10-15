@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.AbstractSkyHanniEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -31,7 +31,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CFStrayTimer {
-
     private val config get() = SkyHanniMod.feature.event.hoppityEggs.strayTimer
     private var timer: Duration = Duration.ZERO
     private var lastTimerSubtraction: SimpleTimeMark? = SimpleTimeMark.farPast()
@@ -94,7 +93,7 @@ object CFStrayTimer {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         destructiveSlots = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations").destructiveSlots
     }
 
@@ -117,7 +116,7 @@ object CFStrayTimer {
         Renderable.text("§b${String.format(Locale.US, "%.2f", timer.inPartialSeconds)}s"),
     )
 
-    private fun SkyHanniEvent.Cancellable.sendPreventCloseTitle() {
+    private fun AbstractSkyHanniEvent.Cancellable.sendPreventCloseTitle() {
         TitleManager.sendTitle(
             "§cStray Timer Prevented Close",
             subtitleText = "§7Hold §eShift §7to bypass",

@@ -24,7 +24,6 @@ import net.minecraft.client.gui.Hud
  */
 @SkyHanniModule
 object MinecraftCompat {
-
     private val mc = Minecraft.getInstance()
 
     // <editor-fold desc="World">
@@ -98,7 +97,7 @@ object MinecraftCompat {
         private set
 
     @HandleEvent
-    internal fun onPacketReceived(event: PacketReceivedEvent) {
+    private fun onPacketReceived(event: PacketReceivedEvent) {
         val packet = event.packet as? ClientboundSetTimePacket ?: return
         val defaultClock = localWorldOrNull?.dimensionType()?.defaultClock()?.orElse(null) ?: return
         serverTime = packet.clockUpdates[defaultClock]?.totalTicks() ?: serverTime

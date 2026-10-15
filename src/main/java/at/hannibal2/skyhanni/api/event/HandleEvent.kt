@@ -5,22 +5,22 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import kotlin.reflect.KClass
 
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.FUNCTION)
+@Retention(RUNTIME)
+@Target(FUNCTION)
 annotation class HandleEvent(
     /**
      * For cases where the event properties are themselves not needed, and solely a listener for an event fire suffices.
      * To specify multiple events, use [eventTypes] instead.
      */
-    @Deprecated("Use Primary Function Name, or explicit type parameter instead.")
-    val eventType: KClass<out SkyHanniEvent> = SkyHanniEvent::class,
+    @Deprecated("Use primary function name or explicit type parameter instead")
+    val eventType: KClass<out AbstractSkyHanniEvent> = AbstractSkyHanniEvent::class,
 
     /**
      * For cases where multiple events are listened to, and properties are unnecessary.
      * To specify only one event, use [eventType] instead.
      */
-    @Deprecated("Use Primary Function Name, or explicit type parameter instead.")
-    val eventTypes: Array<KClass<out SkyHanniEvent>> = [],
+    @Deprecated("Use primary function name or explicit type parameter instead")
+    val eventTypes: Array<KClass<out AbstractSkyHanniEvent>> = [],
 
     /**
      * If the event should only be received while on SkyBlock.
@@ -29,31 +29,31 @@ annotation class HandleEvent(
 
     /**
      * If the event should only be handled while on SkyBlock, or while
-     * outside SkyBlock with one or more certain OutsideSBFeature being enabled.
+     * outside SkyBlock with certain [OutsideSBFeature]s being enabled.
      */
     val onlyOnSkyblockOrFeatures: Array<OutsideSBFeature> = [],
 
     /**
-     * If the event should only be received while on a specific skyblock island.
+     * If the event should only be received while on a specific SkyBlock island.
      * To specify multiple islands, use [onlyOnIslands] instead.
      */
-    val onlyOnIsland: IslandType = IslandType.ANY,
+    val onlyOnIsland: IslandType = ANY,
 
     /**
      * If the event should only be received while on an island within specified
-     * [IslandTypeTag]s
+     * [IslandTypeTag]s.
      */
     val onlyOnIslandTypeTag: Array<IslandTypeTag> = [],
 
     /**
-     * If the event should only be received while being on specific skyblock islands.
+     * If the event should only be received while being on specific SkyBlock islands.
      * To specify only one island, use [onlyOnIsland] instead.
      */
     vararg val onlyOnIslands: IslandType = [],
 
     /**
      * The order the event handler will be called in relative to the other handlers of the same event.
-     * Lower number means it will be called earlier. See the companion object for predefined priorities.
+     * Higher priority means it will be called earlier.
      */
     val priority: Int = 0,
 

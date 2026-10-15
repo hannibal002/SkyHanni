@@ -28,7 +28,7 @@ object SkyHanniRepoManager : AbstractRepoManager<RepositoryReloadEvent>() {
     fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         ProfileStorageData.repoReady = true
         if (ProfileStorageData.loaded) ProfileDataReadyEvent().post()
     }

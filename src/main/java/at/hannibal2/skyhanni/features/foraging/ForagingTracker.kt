@@ -206,7 +206,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private var dropsJsonCategories: List<DropCategoryData> = emptyList()
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         dropsJson = event.getConstant<TreeGiftBonusDropsJson>("foraging/TreeGiftBonusDrops")
         val dropsJson = dropsJson ?: return
         dropsJsonCategories = buildList {

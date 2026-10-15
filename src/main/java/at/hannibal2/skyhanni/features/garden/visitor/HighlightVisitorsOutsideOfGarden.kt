@@ -28,13 +28,12 @@ import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
 object HighlightVisitorsOutsideOfGarden {
-
     private var visitorJson = mapOf<String?, List<GardenVisitor>>()
 
     private val config get() = VisitorApi.config
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         visitorJson = event.getConstant<GardenJson>(
             "Garden",
         ).visitors.values.groupBy {

@@ -30,7 +30,6 @@ import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object RiftBloodEffigies {
-
     enum class EffigyState {
         UNKNOWN,
         NOT_BROKEN,
@@ -105,7 +104,7 @@ object RiftBloodEffigies {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val newLocations = event.getConstant<RiftEffigiesJson>("RiftEffigies").locations
         if (newLocations.size != 6) {
             error("Invalid Rift effigies size: ${newLocations.size} (expected 6)")

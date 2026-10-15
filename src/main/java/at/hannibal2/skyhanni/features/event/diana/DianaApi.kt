@@ -105,7 +105,7 @@ object DianaApi {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val dianaJson = event.getConstant<DianaJson>("events/Diana")
 
         mythologicalCreatures = dianaJson.mythologicalCreatures
