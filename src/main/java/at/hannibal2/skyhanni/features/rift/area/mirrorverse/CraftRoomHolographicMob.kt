@@ -62,12 +62,12 @@ object CraftRoomHolographicMob {
 
             val existing = holograms[entity.id]
             val instance = if (existing != null) {
-                existing.first.also { it.moveTo(currentLocation.mirror(), 0f) }
+                existing.first.also { it.moveTo(currentLocation.mirror(), 0f, 0f) }
             } else {
                 val previousLocation = LorenzVec(entity.xo, entity.yo, entity.zo)
-                val new = holographicBase.instance(previousLocation.mirror(), 0f) ?: continue
+                val new = holographicBase.instance(previousLocation.mirror(), 0f, 0f) ?: continue
                 new.isChild = entity.isBaby
-                new.moveTo(currentLocation.mirror(), 0f)
+                new.moveTo(currentLocation.mirror(), 0f, 0f)
                 new
             }
 
