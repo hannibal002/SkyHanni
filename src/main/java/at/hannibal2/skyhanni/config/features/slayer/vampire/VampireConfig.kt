@@ -47,7 +47,6 @@ class VampireConfig {
     @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 10f)
     var lineWidth: Int = 1
 
-
     @Expose
     @ConfigOption(name = "Blood Ichor", desc = "")
     @Accordion
