@@ -173,7 +173,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       around items that meet that requirement.
     + Works in:
         + In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade
-        + bazaar, auction house, accessory bag, sack of sacks, fishing bag, potion bag,
+        + bazaar, auction house, accessory bag, sack of sacks, potion bag,
         + chests on the private island, attribute fusion, equipment GUI, Rift Motes Grubber
     + Option to allow/block clicks
 + Option to change the gray-out opacity for 'Not Clickable Items'.
