@@ -111,7 +111,7 @@ object TheGreatSpook {
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         val config = SkyHanniMod.feature.dev.debug.forceGreatSpook
         config.afterChange {
             if (config.get()) {
