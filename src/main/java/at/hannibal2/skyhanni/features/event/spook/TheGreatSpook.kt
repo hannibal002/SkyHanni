@@ -40,6 +40,7 @@ object TheGreatSpook {
     private var displayGreatSpookEnd: Renderable? = null
 
     private var timeUntilNextMob = SimpleTimeMark.farPast()
+    private var hasNotifiedPrimalFearReady = false
 
     private val publicSpeakingSolutions = CircularList(
         "I looove SkyHanni!",
@@ -92,8 +93,9 @@ object TheGreatSpook {
 
         displayMobCooldown = Renderable.text(mobCooldownString)
 
-        if (config.primalFearNotification && mobCooldown.isInPast()) {
+        if (config.primalFearNotification && mobCooldown.isInPast() && !hasNotifiedPrimalFearReady) {
             SoundUtils.playPlingSound()
+            hasNotifiedPrimalFearReady = true
         }
 
         val greatSpookEnd = greatSpookTimeRange?.endInclusive ?: return
@@ -190,6 +192,7 @@ object TheGreatSpook {
         val message = event.cleanMessage
         if (primalFearSpawnPattern.matches(message)) {
             timeUntilNextMob = SimpleTimeMark.now().plus(6.minutes)
+            hasNotifiedPrimalFearReady = false
             if (SkyblockStat.FEAR.lastKnownValue == null && needPrimalFear) ChatUtils.userError(
                 "Fear stat not found! Please enable the Stats widget and enable the Fear stat for the best results.",
                 replaceSameMessage = true,
