@@ -117,6 +117,7 @@ class SkyHanniConfig : Config() {
     val dungeon: DungeonConfig = DungeonConfig()
 
     // Misc
+    @JvmField
     @Expose
     @Category(name = "Inventory", desc = "Change the behavior of items and the inventory.")
     val inventory: InventoryConfig = InventoryConfig()
@@ -149,7 +150,4 @@ class SkyHanniConfig : Config() {
     @Expose
     @Suppress("unused")
     var lastVersion: Int = ConfigUpdaterMigrator.CONFIG_VERSION
-
-    @Expose
-    var lastMinecraftVersion: String? = null
 }

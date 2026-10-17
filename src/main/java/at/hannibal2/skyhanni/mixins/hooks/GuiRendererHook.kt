@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniChromaUniform
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation
-import com.mojang.blaze3d.buffers.GpuBufferSlice
-import com.mojang.blaze3d.pipeline.RenderPipeline
-import com.mojang.blaze3d.systems.RenderPass
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice
+import com.mojang.renderpearl.api.commands.RenderPass
+import com.mojang.renderpearl.api.pipeline.RenderPipeline
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
@@ -67,6 +67,7 @@ object GuiRendererHook {
         chromaBufferSlice?.let { renderPass.setUniform("SkyHanniChromaUniforms", it) } ?: return
     }
 
+    @JvmStatic
     fun insertChromaSetUniform(renderPass: RenderPass, pipeline: RenderPipeline) {
         if (pipeline != SkyHanniRenderPipeline.CHROMA_TEXT.invoke() &&
             pipeline != SkyHanniRenderPipeline.CHROMA_STANDARD.invoke()
@@ -126,5 +127,4 @@ object GuiRendererHook {
     ) {
         SkyHanniItemRenderCoordinator.submitBlit(state, guiRenderState, frameNumber)
     }
-
 }

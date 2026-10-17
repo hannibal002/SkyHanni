@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
 import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer
 import at.hannibal2.skyhanni.features.misc.update.GuiOptionEditorUpdateCheck
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateFieldValue
 import io.github.notenoughupdates.moulconfig.gui.MouseEvent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
@@ -85,7 +86,7 @@ class GuiOptionEditorUpdateCheckTest {
         width = EDITOR_WIDTH,
         mouseX = mouseX,
         mouseY = mouseY,
-        mouseEvent = MouseEvent.Click(mouseButton = 0, mouseState = mouseDown),
+        mouseEvent = MouseEvent.Click(mouseButton = InputCode.LEFT_MOUSE.value, mouseState = mouseDown),
     )
 
     private fun GuiOptionEditorUpdateCheck.setButtonWidth(fieldName: String, width: Int) {

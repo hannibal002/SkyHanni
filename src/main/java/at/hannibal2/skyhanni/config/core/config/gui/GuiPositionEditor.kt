@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -38,7 +39,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import net.minecraft.client.Minecraft
-import org.lwjgl.glfw.GLFW
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField
@@ -97,7 +97,7 @@ class GuiPositionEditor(
 
         // When the mouse isn't currently hovering over a gui element
         val text = if (displayPos == -1) {
-            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == GLFW.GLFW_KEY_UNKNOWN
+            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == InputCode.UNKNOWN
 
             buildList {
                 add("§cSkyHanni Position Editor")
@@ -123,7 +123,7 @@ class GuiPositionEditor(
             "",
             "§eRight-Click to open associated config options!",
             "§eUse Scroll-Wheel to resize!",
-            "§e${KeyboardManager.getKeyName(config.keyBindReset)} to reset to default position!",
+            "§e${config.keyBindReset.displayName} to reset to default position!",
         )
     }
 
@@ -172,7 +172,7 @@ class GuiPositionEditor(
     private fun getEditorScaledHeight() = Minecraft.getInstance().window.guiScaledHeight
     private fun getEditorScaledWidth() = Minecraft.getInstance().window.guiScaledWidth
 
-    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
+    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: InputCode) {
         for (i in positions.indices.reversed()) {
             val position = positions[i]
             val handled = position.withPositionMetrics {
@@ -181,14 +181,15 @@ class GuiPositionEditor(
                 val (mouseX, mouseY) = GuiScreenUtils.mousePos
 
                 when (mouseButton) {
-                    1 -> position.jumpToConfigOptions()
-                    2 -> if (config.keyBindReset == KeyboardManager.MIDDLE_MOUSE) position.resetPositionAndScale()
-                    0 -> if (!position.clicked) {
+                    RIGHT_MOUSE -> position.jumpToConfigOptions()
+                    MIDDLE_MOUSE -> if (config.keyBindReset == MIDDLE_MOUSE) position.resetPositionAndScale()
+                    LEFT_MOUSE -> if (!position.clicked) {
                         clickedPos = i
                         position.clicked = true
                         grabbedX = mouseX
                         grabbedY = mouseY
                     }
+                    else -> {}
                 }
 
                 true
@@ -197,8 +198,8 @@ class GuiPositionEditor(
         }
     }
 
-    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
-        if (keyCode == config.keyBindReset) {
+    override fun onKeyTyped(typedChar: Char?, key: InputCode?) {
+        if (key == config.keyBindReset) {
             positions.firstOrNull { it.isHoveredWithMetrics() }?.resetPositionAndScale()
             return
         }
@@ -210,13 +211,14 @@ class GuiPositionEditor(
             val dist = if (KeyboardManager.isShiftKeyDown()) 10 else 1
             val elementWidth = position.getDummySize(true).x
             val elementHeight = position.getDummySize(true).y
-            when (keyCode) {
-                GLFW.GLFW_KEY_DOWN -> position.moveY(dist, elementHeight)
-                GLFW.GLFW_KEY_UP -> position.moveY(-dist, elementHeight)
-                GLFW.GLFW_KEY_LEFT -> position.moveX(-dist, elementWidth)
-                GLFW.GLFW_KEY_RIGHT -> position.moveX(dist, elementWidth)
-                GLFW.GLFW_KEY_MINUS, GLFW.GLFW_KEY_KP_SUBTRACT -> position.scale -= .1F
-                GLFW.GLFW_KEY_EQUAL, GLFW.GLFW_KEY_KP_ADD -> position.scale += .1F
+            when (key) {
+                KEY_DOWN -> position.moveY(dist, elementHeight)
+                KEY_UP -> position.moveY(-dist, elementHeight)
+                KEY_LEFT -> position.moveX(-dist, elementWidth)
+                KEY_RIGHT -> position.moveX(dist, elementWidth)
+                KEY_MINUS, KEY_SUBTRACT -> position.scale -= .1F
+                KEY_EQUALS, KEY_ADD -> position.scale += .1F
+                else -> return@withPositionMetrics
             }
         }
     }

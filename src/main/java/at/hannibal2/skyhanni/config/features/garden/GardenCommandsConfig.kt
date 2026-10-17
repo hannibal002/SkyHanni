@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.config.features.garden
 
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.glfw.GLFW
 
 class GardenCommandsConfig {
     @Expose
@@ -22,22 +22,22 @@ class GardenCommandsConfig {
         name = "Spawn Hotkey",
         desc = "Press this key to teleport you to your Garden spawn. §cOnly works while in the garden.",
     )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var homeHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
+    @ConfigEditorKeyMapping
+    var homeHotkey = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(
         name = "Set Spawn Hotkey",
         desc = "Press this key to set your Garden spawn. §cOnly works while in the garden.",
     )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var sethomeHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
+    @ConfigEditorKeyMapping
+    var sethomeHotkey = InputCode.UNKNOWN
 
     @Expose
     @ConfigOption(
         name = "Barn Hotkey",
         desc = "Press this key to teleport you to the Garden barn. §cOnly works while in the garden."
     )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var barnHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
+    @ConfigEditorKeyMapping
+    var barnHotkey = InputCode.UNKNOWN
 }

@@ -51,7 +51,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
-import org.lwjgl.glfw.GLFW
 import java.time.LocalDateTime
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.hours
@@ -130,7 +129,7 @@ object HoppityLiveDisplay {
     fun onKeyPress(event: KeyPressEvent) {
         reCheckInventoryState()
         if (!config.enabled) return
-        if (config.toggleKeybind == GLFW.GLFW_KEY_UNKNOWN || config.toggleKeybind != event.keyCode) return
+        if (config.toggleKeybind == UNKNOWN || event.key != config.toggleKeybind) return
         // Only toggle from inventory if the user is in the Chocolate Factory
         if (MinecraftCompat.screen != null && !CFApi.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return

@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import kotlin.time.Duration.Companion.milliseconds
@@ -31,13 +32,13 @@ object SnakeGame {
 
     private var inInventory = false
 
-    private val keys
+    private val keys: Map<KeyMapping, Int>
         get() = with(Minecraft.getInstance().options) {
             mapOf(
-                keyLeft.key.value to 24,
-                keyUp.key.value to 16,
-                keyRight.key.value to 26,
-                keyDown.key.value to 34,
+                keyLeft to 24,
+                keyUp to 16,
+                keyRight to 26,
+                keyDown to 34,
             )
         }
 

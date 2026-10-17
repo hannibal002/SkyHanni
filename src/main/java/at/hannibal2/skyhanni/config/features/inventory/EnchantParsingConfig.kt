@@ -77,6 +77,7 @@ class EnchantParsingConfig {
     @Accordion
     val advancedEnchantColors: AdvancedEnchantmentColors = AdvancedEnchantmentColors()
 
+    @JvmField
     @Expose
     @ConfigOption(
         name = "Hide Vanilla Enchants",
