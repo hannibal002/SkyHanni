@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
+import net.minecraft.client.Minecraft
 import org.lwjgl.util.tinyfd.TinyFileDialogs
+import java.io.File
 import kotlin.time.Duration
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
@@ -77,6 +79,46 @@ object DialogUtils {
                 "message" to message,
             )
         }
+    }
+
+    fun openFileDialog(
+        title: String,
+        defaultPath: String,
+        onSelection: (File) -> Unit,
+    ): Job = fileDialog(title, onSelection) {
+        TinyFileDialogs.tinyfd_openFileDialog(title, defaultPath, null, null, false)
+    }
+
+    fun saveFileDialog(
+        title: String,
+        defaultPath: String,
+        onSelection: (File) -> Unit,
+    ): Job = fileDialog(title, onSelection) {
+        TinyFileDialogs.tinyfd_saveFileDialog(title, defaultPath, null, null)
+    }
+
+    private fun fileDialog(
+        title: String,
+        onSelection: (File) -> Unit,
+        openDialog: () -> String?,
+    ): Job = popupCoroutine.launch {
+        val selectedFile = runCatching {
+            if (!hasGraphicalBackend) {
+                ErrorManager.logErrorStateWithData(
+                    "Failed to open a file dialog",
+                    "No graphical dialog backend is available",
+                    "backend" to currentBackend(),
+                    "title" to title,
+                )
+                return@runCatching null
+            }
+            openDialog()?.let(::File)
+        }.getOrElse { exception ->
+            ErrorManager.logErrorWithData(exception, "Failed to open a file dialog", "title" to title)
+            null
+        }
+        selectedFile ?: return@launch
+        Minecraft.getInstance().execute { onSelection(selectedFile) }
     }
 
     private fun String.stripForbiddenChars(): String = filterNot { it in forbiddenCharacters }

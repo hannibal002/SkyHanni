@@ -1,35 +1,52 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-//? if < 26.2 {
-/*import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
-import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
+import at.hannibal2.skyhanni.mixins.hooks.RenderAlphaStore;
+import at.hannibal2.skyhanni.utils.render.ItemRenderTransparency;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.renderer.SubmitNodeCollection;
-import net.minecraft.client.renderer.SubmitNodeStorage;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+
+//? if >= 26.2 {
+import net.minecraft.client.renderer.feature.phase.SimpleFeatureRenderPhase;
+import net.minecraft.client.renderer.feature.submit.SubmitNode;
+//?} else {
+/*import net.minecraft.client.renderer.SubmitNodeStorage;
+import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.feature.ModelPartFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
 import java.util.List;
+*///?}
 
 @Mixin(SubmitNodeCollection.class)
 public abstract class MixinSubmitNodeCollection<E> {
+    //? if >= 26.2 {
     @WrapOperation(
-        method = "submitItem",
+        method = {"submitItem", "submitModel"},
         at = @At(
             value = "INVOKE",
-            target = "Ljava/util/List;add(Ljava/lang/Object;)Z"
+            target = "Lnet/minecraft/client/renderer/feature/phase/SimpleFeatureRenderPhase;submit(Lnet/minecraft/client/renderer/feature/submit/SubmitNode;)V"
         )
     )
-    private boolean onSubmitItem(
-        List<E> list,
-        E itemCommand,
-        Operation<Boolean> original
+    private void applyRenderAlpha(
+        SimpleFeatureRenderPhase phase,
+        SubmitNode submit,
+        Operation<Void> original
     ) {
+        Integer alpha = ItemRenderTransparency.getAlphaOverride();
+        if (alpha != null && submit instanceof RenderAlphaStore alphaStore) {
+            alphaStore.skyhanni$setRenderAlpha(alpha);
+        }
+        original.call(phase, submit);
+    }
+    //?} else {
+    /*@WrapOperation(method = "submitItem", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"))
+    private boolean onSubmitItem(List<E> list, E itemCommand, Operation<Boolean> original) {
         skyhanni$markCustomOutline(itemCommand);
         return original.call(list, itemCommand);
     }
@@ -48,6 +65,11 @@ public abstract class MixinSubmitNodeCollection<E> {
         Operation<Void> original
     ) {
         skyhanni$markCustomOutline(modelSubmit);
+        Integer alpha = ItemRenderTransparency.getAlphaOverride();
+        Object modelSubmitObject = modelSubmit;
+        if (alpha != null && modelSubmitObject instanceof RenderAlphaStore alphaStore) {
+            alphaStore.skyhanni$setRenderAlpha(alpha);
+        }
         original.call(storage, renderType, modelSubmit);
     }
 
@@ -75,5 +97,5 @@ public abstract class MixinSubmitNodeCollection<E> {
             casted.skyhanni$setUsingCustomOutline();
         }
     }
+    *///?}
 }
-*///?}
