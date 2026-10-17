@@ -87,7 +87,7 @@ object LoreCostUtils {
      */
     private val invalidCurrencyNamesPattern by patternGroup.list(
         "cost.invalid-currency-names",
-        "/?/?/?"
+        "\\?\\?\\?"
     )
 
     fun SafeItemStack.readLoreCosts(): List<LoreCostEntry> = getLoreComponent()
