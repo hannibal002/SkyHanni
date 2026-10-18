@@ -418,6 +418,7 @@ This start script will automatically download all required libraries.
 
 SkyHanni reads the [NEU Item Repo](https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO) for item internal names, display names
 and recipes. NEU is not a dependency of SkyHanni.
+A copy of its files is stored on the computer under `.minecraft\skyhanni\neurepo`, next to the SkyHanni repo.
 
 ### Config
 
@@ -458,7 +459,7 @@ SkyHanni uses KSP via the `annotation-processors` module to generate code at com
 
 SkyHanni uses a repo system to easily change static variables without the need for a mod update.
 The repo is located at https://github.com/SkyHanniStudios/SkyHanni-REPO.
-A copy of all JSON files is stored on the computer under `.minecraft\config\skyhanni\repo`.
+A copy of all JSON files is stored on the computer under `.minecraft\skyhanni\shrepo`.
 On every game start, the copy gets updated (if outdated and if not manually disabled).
 If you add stuff to the repo make sure it gets serialized. See
 the [JsonObjects](src/main/java/at/hannibal2/skyhanni/data/jsonobjects/repo)

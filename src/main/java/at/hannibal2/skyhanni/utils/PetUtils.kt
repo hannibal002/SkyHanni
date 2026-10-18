@@ -142,8 +142,8 @@ object PetUtils {
         val parts = internalName.asString().split(";")
         if (parts.size < 2) return null
         val name = parts[0].takeIf { it.isNotBlank() } ?: return null
-        val rarityId = parts[1].toIntOrNull() ?: return null
-        val rarity = LorenzRarity.getById(rarityId) ?: return null
+        val rarityIndex = parts[1].toIntOrNull() ?: return null
+        val rarity = LorenzRarity.fromNeuPetIndex(rarityIndex) ?: return null
         return name to rarity
     }
 
@@ -203,7 +203,7 @@ object PetUtils {
         customPetLeveling[petInternalName.getProperName()]?.xpMultiplier ?: 1.0
 
     fun petWithRarityToInternalName(petName: String, rarity: LorenzRarity): NeuInternalName =
-        "${petName.toPetInternalNameBase()};${rarity.ordinal}".toInternalName()
+        "${petName.toPetInternalNameBase()};${rarity.neuPetIndex}".toInternalName()
 
     private fun String.toPetInternalNameBase(): String =
         displayNameMap.entries.firstOrNull { (_, displayName) ->
