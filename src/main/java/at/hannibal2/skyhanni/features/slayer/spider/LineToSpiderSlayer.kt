@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 
@@ -36,13 +35,13 @@ object LineToSpiderSlayer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!SlayerApi.isInAnyArea || !config.lineToBoss) return
+        if (!SlayerApi.isInAnyArea || !config.lineToTaraBoss.showLine) return
         val seenMobs = bosses.filter { it.baseEntity.canBeSeen(30) && it.isAlive }
         seenMobs.forEach { mob ->
             event.drawLineToCrosshair(
                 mob.baseEntity.getLorenzVec().up(),
-                LorenzColor.AQUA.toChromaColor(),
-                config.slayerLineWidth,
+                config.lineToTaraBoss.color,
+                config.lineToTaraBoss.lineWidth,
                 true,
             )
         }

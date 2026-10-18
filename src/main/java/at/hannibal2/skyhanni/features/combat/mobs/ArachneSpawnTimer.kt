@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ArachneSpawnTimer {
 
-    private val config get() = SkyHanniMod.feature.combat.mobs
+    private val config get() = SkyHanniMod.feature.combat.mobs.arachneSettings.boss
 
     private val patternGroup = RepoPattern.group("combat.mobs.spawntime.arachne")
 
@@ -107,5 +107,5 @@ object ArachneSpawnTimer {
     }
 
     fun isEnabled() =
-        IslandType.SPIDER_DEN.isInIsland() && SkyBlockUtils.graphArea == "Arachne's Sanctuary" && config.showArachneSpawnTimer
+        IslandType.SPIDER_DEN.isInIsland() && SkyBlockUtils.graphArea == "Arachne's Sanctuary" && config.showSpawnTimer
 }
