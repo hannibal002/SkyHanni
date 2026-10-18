@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -21,11 +20,13 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.transformAt
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.replace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object StockOfStonkFeature {
 
     private val config get() = SkyHanniMod.feature.inventory
+    private val storage get() = ProfileStorageData.profileSpecific?.stonksAuction
 
     private val patternGroup = RepoPattern.group("inventory.stockofstonks")
 
@@ -70,27 +71,27 @@ object StockOfStonkFeature {
      */
     private val auctionEndsPattern by patternGroup.pattern(
         "endsin",
-        "Auction ends in (?<duration>.+)",
+        "Auction ends in (?<duration>(?:\\d+[dhms] ?)+)",
     )
 
     var inInventory = false
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
         inInventory = inventoryPattern.matches(event.inventoryName)
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         inInventory = false
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onToolTip(event: ToolTipTextEvent) {
+    private fun onToolTip(event: ToolTipTextEvent) {
         if (!inInventory) return
         if (!inventoryPattern.matches(event.itemStack.cleanName)) return
 
-        updateAuctionData(event)
+        updateAuctionData(event.toolTip)
 
         if (!config.stonkOfStonkPrice) return
         var stonksReward = 0
@@ -118,11 +119,11 @@ object StockOfStonkFeature {
         event.toolTip.transformAt(bestValueIndex) { replace("§6§6", "§a") ?: this }
     }
 
-    private fun updateAuctionData(event: ToolTipTextEvent) {
-        val storage = ProfileStorageData.profileSpecific ?: return
+    private fun updateAuctionData(toolTip: List<Component>) {
+        val storage = storage ?: return
         var roundEnd: SimpleTimeMark? = null
         var bidAmount: Long? = null
-        for (line in event.toolTip) {
+        for (line in toolTip) {
             auctionEndsPattern.matchMatcher(line) {
                 val duration = TimeUtils.getDurationOrNull(group("duration")) ?: return@matchMatcher
                 roundEnd = duration.fromNow()
@@ -132,10 +133,10 @@ object StockOfStonkFeature {
             }
         }
         val newRoundEnd = roundEnd ?: return
-        storage.stonksAuctionRoundEnd = newRoundEnd
+        storage.roundEnd = newRoundEnd
         bidAmount?.let {
-            storage.stonksAuctionLastBidRoundEnd = newRoundEnd
-            storage.stonksAuctionBidAmount = it
+            storage.lastBidRoundEnd = newRoundEnd
+            storage.bidAmount = it
         }
     }
 }
