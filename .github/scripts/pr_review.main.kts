@@ -1085,7 +1085,8 @@ fun parseDependencySection(sectionLines: List<String>): ParsedDependencySection 
         val urlMatch = dependencyUrlRegex.find(line)
         if (urlMatch != null) {
             // Links from before the move to the organization still name the old owner. The API answers those with a
-            // redirect that ghRequest does not follow, so the old owner is read as the current one.
+            // redirect that ghRequest does not follow, so the old owner, spelled exactly "hannibal002", is read as
+            // the current one for every repository.
             val depOwner = urlMatch.groupValues[1].takeUnless { it == "hannibal002" } ?: repoOwner
             val depRepo = urlMatch.groupValues[2]
             // A number too large for an Int cannot be a pull request. toInt would throw, and nothing catches

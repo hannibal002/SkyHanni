@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.KSerializable
  * The GitHub action workflow needs to be configured properly. For that it needs to have the
  * `env.data_repo` key adjusted to be the live repo.
  * It also needs a [repository GitHub action secret](https://github.com/SkyHanniStudios/SkyHanni/settings/secrets/actions)
- * called `REPO_PAT`, which contains a [personal access token](https://github.com/settings/tokens/new) with repo write
- * access to the live repo.
+ * called `REPO_PAT`, which contains a [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new)
+ * with the owner of the live repo as resource owner, access to the live repo only, and Contents read and write.
  */
 @KSerializable
 data class RepoPatternDump(
