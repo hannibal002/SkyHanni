@@ -180,6 +180,10 @@ enum class NonGodPotEffect(
         "Fiesta Flask I",
         displayName = "§6Fiesta Flask I",
     ),
+    SCATHA_IN_A_BOTTLE(
+        "Scatha-in-a-Bottle I",
+        displayName = "§dScatha-in-a-Bottle I",
+    ),
 
     LUSHLILAC_BONBON(
         "Lushlilac Bonbon",
