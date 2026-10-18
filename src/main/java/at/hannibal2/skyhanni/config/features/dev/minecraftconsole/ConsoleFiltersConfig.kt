@@ -95,4 +95,44 @@ class ConsoleFiltersConfig {
     @ConfigOption(name = "Filter Unknown Team Packet", desc = "Filter 'Received packet for unknown team' warnings during server changes.")
     @ConfigEditorBoolean
     var filterUnknownTeam: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Filter Unknown Passengers",
+        desc = "Filter 'Received passengers for unknown entity' warnings.",
+    )
+    @ConfigEditorBoolean
+    var filterUnknownPassengers: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Filter Missing Texture References",
+        desc = "Filter 'Missing texture references in model' warnings from Hypixel resource packs.",
+    )
+    @ConfigEditorBoolean
+    var filterMissingTextureReferences: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Filter Atlas Created",
+        desc = "Filter 'Created: <size> <name>-atlas' messages during texture atlas stitching.",
+    )
+    @ConfigEditorBoolean
+    var filterAtlasCreated: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Filter Existing Team",
+        desc = "Filter 'Requested creation of existing team' warnings.",
+    )
+    @ConfigEditorBoolean
+    var filterExistingTeam: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Filter Chunk Sections UBO",
+        desc = "Filter 'Resizing Chunk Sections UBO' messages.",
+    )
+    @ConfigEditorBoolean
+    var filterChunkSectionsUbo: Boolean = true
 }

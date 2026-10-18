@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -18,6 +17,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -33,9 +33,9 @@ object BeaconPower {
     private val storage get() = ProfileStorageData.profileSpecific?.beaconPower
     private val config get() = SkyHanniMod.feature.gui
 
-    private val group = RepoPattern.group("gui.beaconpower-no-color")
+    private val patternGroup = RepoPattern.group("gui.beaconpower-no-color")
 
-    private val deactivatedPattern by group.pattern(
+    private val deactivatedPattern by patternGroup.pattern(
         "deactivated",
         "Beacon Deactivated - No Power Remaining",
     )
@@ -43,7 +43,7 @@ object BeaconPower {
     /**
      * REGEX-TEST: Power Remaining: 0d 5h 53m 12s
      */
-    private val timeRemainingPattern by group.pattern(
+    private val timeRemainingPattern by patternGroup.pattern(
         "time",
         "Power Remaining: (?<time>.+)",
     )
@@ -51,7 +51,7 @@ object BeaconPower {
     /**
      * REGEX-TEST: Current Stat: +5✯ Magic Find
      */
-    private val boostedStatPattern by group.pattern(
+    private val boostedStatPattern by patternGroup.pattern(
         "stat",
         "Current Stat: (?<stat>.+)",
     )

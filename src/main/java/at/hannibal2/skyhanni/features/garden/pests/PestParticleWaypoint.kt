@@ -7,9 +7,8 @@ import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ParticleEvent
-import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -134,7 +133,7 @@ object PestParticleWaypoint {
         reset()
     }
 
-    @HandleEvent(PestUpdateEvent::class)
+    @HandleEvent
     fun onPestUpdate() {
         if (PestApi.scoreboardPests == 0) reset()
     }

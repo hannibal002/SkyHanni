@@ -32,11 +32,11 @@ object ChatFilter {
     private val foragingConfig get() = config.foraging
     private val huntingConfig get() = config.hunting
 
-    private val chatFilterGroup = RepoPattern.group("chat-filter")
-    private val huntingPatternGroup = chatFilterGroup.group("hunting")
-    private val foragingPatternGroup = chatFilterGroup.group("foraging")
-    private val miscPatternGroup = chatFilterGroup.group("hypixel-misc")
-    private val eventPatternGroup = chatFilterGroup.group("event")
+    private val patternGroup = RepoPattern.group("chat-filter")
+    private val huntingPatternGroup = patternGroup.group("hunting")
+    private val foragingPatternGroup = patternGroup.group("foraging")
+    private val miscPatternGroup = patternGroup.group("hypixel-misc")
+    private val eventPatternGroup = patternGroup.group("event")
 
     // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
@@ -125,8 +125,16 @@ object ChatFilter {
     )
 
     // Profile Join
-    private val profileJoinMessageStartsWith = listOf(
-        "§aYou are playing on profile: §e", "§8Profile ID: ",
+    /**
+     * REGEX-TEST: §8Profile ID: 691d6a3b-23ea-4541-80b5-771facc73b16
+     * REGEX-TEST: §eProfile ID: 691d6a3b-23ea-4541-80b5-771facc73b16
+     * REGEX-TEST: §aYou are playing on profile: §e691d6a3b-23ea-4541-80b5-771facc73b16
+     */
+    private val profileJoinPatterns by miscPatternGroup.list(
+        "profile-join",
+        "§aYou are playing on profile: §e.*",
+        "§8Profile ID: .*",
+        "§eProfile ID: .*",
     )
 
     // OTHERS
@@ -284,7 +292,9 @@ object ChatFilter {
         "§cPlace a Dungeon weapon or armor piece above the anvil to salvage it!",
         "§cWhoa! Slow down there!",
         "§cWait a moment before confirming!",
-        "§cYou cannot open the SkyBlock menu while in combat!",
+        "§7Your radio is weak. Find another enjoyer to boost it.",
+        "§7Your radio signal is strong!",
+        "§7Your radio lost signal. There's too many enjoyers on this channel.",
     )
 
     // Annoying Spam
@@ -294,12 +304,11 @@ object ChatFilter {
         "§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
         "§7Your Spirit Sceptre hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
         "§cYou need a tool with a §r§aBreaking Power §r§cof §r§6(\\d)§r§c to mine (.*)§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!".toPattern(),
-        "§9§n\n§c§lYouTube Premier §eCelebrate Hypixel's 12th Anniversary with a special Minecraft Animation, live now §bhttps://youtu.be/ikT631vQd8A\n".toPattern(),
     )
+
     private val annoyingSpamMessages = listOf(
         "§cThere are blocks in the way!",
         "§aYour Blessing enchant got you double drops!",
-        "§cYou can't use the wardrobe in combat!",
         "§6§lGOOD CATCH! §r§bYou found a §r§fFish Bait§r§b.",
         "§6§lGOOD CATCH! §r§bYou found a §r§aGrand Experience Bottle§r§b.",
         "§6§lGOOD CATCH! §r§bYou found a §r§aBlessed Bait§r§b.",
@@ -311,7 +320,6 @@ object ChatFilter {
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
         "Unknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
         "§3[SBE] §a§cUnable to download bin data. This may result in certain features not working!",
-        "§e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.",
     )
 
     private val skymallMessages = listOf(
@@ -463,14 +471,9 @@ object ChatFilter {
         "§4This Teleport Pad does not have a destination set!",
     )
 
-    // §e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.
-    private val MasterChefPatterns = listOf(
-        "§e\\[NPC] Feast Chef Ted§f: §rThanks for the donation! I've added a §eKernel §fto your purse.".toPattern(),
-    )
-
-    // §e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.
-    private val MasterChefMessages = listOf(
-        "§e[NPC] Feast Chef Ted§f: §rThanks for the donation! I've added a §eKernel §fto your purse.",
+    // §e[NPC] Feast Chef Ted§r§f: §rThanks for the donation! I've added a §eKernel §fto your purse.
+    private val masterChefPatterns = listOf(
+        "§e\\[NPC] Feast Chef Ted§r§f: §rThanks for the donation! I've added a §eKernel §fto your purse.".toPattern(),
     )
 
     /**
@@ -555,7 +558,6 @@ object ChatFilter {
         "achievement_get" to achievementGetPatterns,
         "parkour" to parkourPatterns,
         "teleport_pads" to teleportPadPatterns,
-        "masterchef" to MasterChefPatterns,
     )
 
     private val repoPatternsMap: Map<String, List<Pattern>> = mapOf(
@@ -565,6 +567,7 @@ object ChatFilter {
         "swoop_axe" to listOf(swoopAxePattern),
         "hoppity_appear" to listOf(hoppityAppearPattern),
         "hoppity_begin" to listOf(hoppityBeginPattern),
+        "profile_join" to profileJoinPatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -587,7 +590,6 @@ object ChatFilter {
         "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
         "teleport_pads" to teleportPadMessages,
-        "masterchef" to MasterChefMessages,
     )
 
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
@@ -596,7 +598,6 @@ object ChatFilter {
 
     private val messagesStartsWithMap: Map<String, List<String>> = mapOf(
         "slayer" to slayerMessageStartWith,
-        "profile_join" to profileJoinMessageStartsWith,
     )
     // </editor-fold>
 
@@ -631,7 +632,7 @@ object ChatFilter {
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
         config.parkour && message.isPresent("parkour") -> "parkour"
         config.teleportPads && message.isPresent("teleport_pads") -> "teleport_pads"
-        config.masterChef && MasterChefPatterns.matches(message) -> "masterchef"
+        config.masterChef && masterChefPatterns.matches(message) -> "masterchef"
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 

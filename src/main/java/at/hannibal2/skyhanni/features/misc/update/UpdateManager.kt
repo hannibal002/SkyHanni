@@ -67,7 +67,7 @@ object UpdateManager {
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         config.updateStream.onToggle {
             reset()
         }
@@ -83,7 +83,7 @@ object UpdateManager {
     private var hasCheckedForUpdate = false
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (hasCheckedForUpdate) return
         checkUpdate()
     }
@@ -112,7 +112,6 @@ object UpdateManager {
         val context = updateContext ?: return
         hasCheckedForUpdate = true
 
-        val updateStream = forcedUpdateStream
         if (updateState != UpdateState.NONE) {
             if (updateState == UpdateState.AVAILABLE && force) {
                 updateState = UpdateState.NONE
@@ -125,55 +124,53 @@ object UpdateManager {
 
         logger.log("Starting update check (source: ${context.source.javaClass.simpleName}")
 
-        val currentStream = config.updateStream.get()
-        if (updateStream == UpdateStream.BETA && currentStream != UpdateStream.BETA) {
-            config.updateStream.set(UpdateStream.BETA)
-        }
-
-        activePromise = context.checkUpdate(updateStream.stream)
+        activePromise = context.checkUpdate(forcedUpdateStream.stream)
             .orTimeout(15, TimeUnit.SECONDS)
             .whenCompleteAsync(
-                { update, throwable ->
-                    if (throwable != null) {
-                        if (throwable is TimeoutException) {
-                            ErrorManager.logErrorWithData(throwable, "Update check timed out")
-                        } else {
-                            ErrorManager.logErrorWithData(throwable, "Update check failed")
-                        }
-                        return@whenCompleteAsync
-                    }
-                    logger.log("Update check completed")
-                    if (updateState != UpdateState.NONE) {
-                        logger.log("This appears to be the second update check. Ignoring this one")
-                        return@whenCompleteAsync
-                    }
-                    potentialUpdate = update
-                    if (update.isUpdateAvailable) {
-                        updateState = UpdateState.AVAILABLE
-                        ChatUtils.chat("§aSkyHanni found a new update: ${update.update.versionName}.")
-                        getDownloadPage(update)?.let { url ->
-                            ChatUtils.clickableLinkChat(
-                                "§e§lCLICK HERE §r§eto open the download page.",
-                                url,
-                            )
-                        }
-                        ChatUtils.clickableChat(
-                            "§e§lCLICK HERE §r§eto view changes in-game.",
-                            onClick = {
-                                ChangelogViewer.showChangelog(SkyHanniMod.VERSION, update.update.versionName)
-                            },
-                        )
-                    } else if (force) {
-                        ChatUtils.chat(
-                            componentBuilder {
-                                append("SkyHanni didn't find a new update.")
-                                withColor(ChatFormatting.GREEN)
-                            },
-                        )
-                    }
-                },
+                { update, throwable -> handleUpdateCheckResult(throwable, update, force) },
                 Minecraft.getInstance(),
             )
+    }
+
+    private fun handleUpdateCheckResult(throwable: Throwable?, update: PotentialUpdate?, force: Boolean) {
+        if (throwable != null) {
+            if (throwable is TimeoutException) {
+                ErrorManager.logErrorWithData(throwable, "Update check timed out")
+            } else {
+                ErrorManager.logErrorWithData(throwable, "Update check failed")
+            }
+            return
+        }
+        logger.log("Update check completed")
+        if (updateState != UpdateState.NONE) {
+            logger.log("This appears to be the second update check. Ignoring this one")
+            return
+        }
+        potentialUpdate = update
+        if (update == null) return
+        if (update.isUpdateAvailable) {
+            updateState = UpdateState.AVAILABLE
+            ChatUtils.chat("§aSkyHanni found a new update: ${update.update.versionName}.")
+            getDownloadPage(update)?.let { url ->
+                ChatUtils.clickableLinkChat(
+                    "§e§lCLICK HERE §r§eto open the download page.",
+                    url,
+                )
+            }
+            ChatUtils.clickableChat(
+                "§e§lCLICK HERE §r§eto view changes in-game.",
+                onClick = {
+                    ChangelogViewer.showChangelog(SkyHanniMod.VERSION, update.update.versionName)
+                },
+            )
+        } else if (force) {
+            ChatUtils.chat(
+                componentBuilder {
+                    append("SkyHanni didn't find a new update.")
+                    withColor(ChatFormatting.GREEN)
+                },
+            )
+        }
     }
 
     fun getDownloadPage(update: PotentialUpdate? = potentialUpdate): String? {
@@ -239,11 +236,14 @@ object UpdateManager {
 
     private var potentialUpdate: PotentialUpdate? = null
 
+    private val releaseStreamPattern = "(?i)(?:full|release)s?".toRegex()
+    private val betaStreamPattern = "(?i)(?:beta|latest)s?".toRegex()
+
     private fun updateCommand(arg: String) {
-        val currentStream = SkyHanniMod.feature.about.updateStream.get()
+        val currentStream = config.updateStream.get()
         val updateStream = when {
-            arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
-            arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
+            arg.matches(releaseStreamPattern) -> UpdateStream.RELEASES
+            arg.matches(betaStreamPattern) -> UpdateStream.BETA
             else -> currentStream
         }
 
@@ -252,20 +252,24 @@ object UpdateManager {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {
-                    val newUpdateStream = SkyHanniMod.feature.about.updateStream
-                    newUpdateStream.set(UpdateStream.BETA)
-                    checkUpdate(true, newUpdateStream.get())
+                    if (updateStream != currentStream) {
+                        config.updateStream.set(updateStream)
+                    }
+                    checkUpdate(true, updateStream)
                 },
                 "§eClick to confirm!",
                 oneTimeClick = true,
             )
         } else {
+            if (updateStream != currentStream) {
+                config.updateStream.set(updateStream)
+            }
             checkUpdate(true, updateStream)
         }
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shupdate") {
             description = "Updates the mod to the specified update stream."
             category = CommandCategory.USERS_BUG_FIX
@@ -285,14 +289,14 @@ object UpdateManager {
     private var hasWarned = false
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+    private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
         discontinuedVersions = event.getConstantAsync<DiscontinuedMinecraftVersionsJson>(
             "DiscontinuedMinecraftVersions",
         ).versions.orEmpty()
     }
 
     @HandleEvent(HypixelJoinEvent::class)
-    fun onHypixelJoin() {
+    private fun onHypixelJoin() {
         if (hasWarned) return
 
         if (PlatformUtils.MC_VERSION in discontinuedVersions) {
@@ -314,7 +318,7 @@ object UpdateManager {
     }
 
     @HandleEvent
-    fun onUserLuck(event: UserLuckCalculateEvent) {
+    private fun onUserLuck(event: UserLuckCalculateEvent) {
         if (PlatformUtils.MC_VERSION in discontinuedVersions) {
             val luck = discontinuedVersions[PlatformUtils.MC_VERSION]?.luckAmount ?: -10f
             event.addLuck(luck)
@@ -350,10 +354,17 @@ object UpdateManager {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(131, "about.updateStream") { element ->
             when (element.asString) {
                 "NONE" -> JsonPrimitive(if (SkyHanniMod.isBetaVersion) "BETA" else "RELEASES")
+                else -> element
+            }
+        }
+        // Users who installed a beta version were previously left on the full release stream by default.
+        event.transform(143, "about.updateStream") { element ->
+            when {
+                element.asString == "RELEASES" && SkyHanniMod.isBetaVersion -> JsonPrimitive("BETA")
                 else -> element
             }
         }

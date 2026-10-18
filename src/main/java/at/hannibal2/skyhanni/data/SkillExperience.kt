@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -13,16 +14,23 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
+// TODO: Make this use SkillApi
 @SkyHanniModule
 object SkillExperience {
+
     private val patternGroup = RepoPattern.group("data.skill")
+
+    /**
+     * REGEX-TEST: §3+6.3 Foraging (24/750)
+     * REGEX-TEST: §3+207.2 Hunting (5,183,244/0)
+     */
     private val actionBarPattern by patternGroup.pattern(
         "actionbar",
-        ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*"
+        ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*",
     )
     private val inventoryPattern by patternGroup.pattern(
         "inventory",
-        ".* §e(?<number>.*)§6/.*"
+        ".* §e(?<number>.*)§6/.*",
     )
 
     @HandleEvent
@@ -46,7 +54,7 @@ object SkillExperience {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Your Skills") return
+        if (!SkillApi.skillMenuDetector.isInside()) return
 
         for ((_, stack) in event.inventoryItems) {
             val name = stack.cleanName
@@ -171,6 +179,6 @@ object SkillExperience {
         6100000,
         6400000,
         6700000,
-        7000000
+        7000000,
     )
 }

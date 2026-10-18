@@ -19,7 +19,13 @@ jobs:
     review:
         name: Post changelog check comment
         runs-on: ubuntu-latest
-        if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion != 'cancelled'
+        # "skipped" means the PR is a draft and the changelog check never ran, so there is nothing to report.
+        # The one draft case that does need action, converting an open PR to a draft, arrives as "success"
+        # instead, because PR Changelog Verification runs a dedicated job for it.
+        if: >-
+            github.event.workflow_run.event == 'pull_request'
+            && github.event.workflow_run.conclusion != 'cancelled'
+            && github.event.workflow_run.conclusion != 'skipped'
         steps:
             -   name: Checkout
                 uses: actions/checkout@v7

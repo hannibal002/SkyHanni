@@ -216,9 +216,17 @@ object ExperimentationTableApi {
         "inventory.experiment-over",
         "Experiment [Oo]ver|Superpairs Rewards",
     )
+
+    /**
+     * REGEX-TEST: Bottles of Enchanting
+     */
+    val bottlesOfEnchantingInventoryPattern by patternGroup.pattern(
+        "inventory.bottles-of-enchanting",
+        "Bottles of Enchanting",
+    )
     // </editor-fold>
 
-    val experimentationTableInventory = InventoryDetector(inventoriesPattern)
+    val experimentationTableInventory = InventoryDetector { inventoriesPattern }
     val inTable get() = experimentationTableInventory.isInside()
     val isActive get() = currentExperimentData.tier != null
     val currentExperimentTier get() = currentExperimentData.tier
@@ -515,7 +523,7 @@ object ExperimentationTableApi {
 
         guardianPetNamePattern.matchMatcher(this) {
             val rarity = LorenzRarity.getByColorCode(group("color")[0]) ?: return@matchMatcher
-            val internalName = "GUARDIAN;${rarity.id}".toInternalName()
+            val internalName = "GUARDIAN;${rarity.neuPetIndex}".toInternalName()
             currentExperimentData.addReward(internalName, 1)
             return
         }

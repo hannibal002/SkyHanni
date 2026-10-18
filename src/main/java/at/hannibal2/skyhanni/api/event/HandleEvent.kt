@@ -52,7 +52,8 @@ annotation class HandleEvent(
     vararg val onlyOnIslands: IslandType = [],
 
     /**
-     * The priority of when the event will be called, lower priority will be called first, see the companion object.
+     * The order the event handler will be called in relative to the other handlers of the same event.
+     * Lower number means it will be called earlier. See the companion object for predefined priorities.
      */
     val priority: Int = 0,
 

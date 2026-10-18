@@ -22,10 +22,9 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.inventory.Slot
 import kotlin.time.Duration.Companion.seconds
 
@@ -38,12 +37,12 @@ object SuperCraftingInventory {
     private const val RESULT_SLOT = 25
     private val config get() = SkyHanniMod.feature.inventory.superCrafting.waste
 
-    private val craftingPatternGroup = RepoPatternGroup("supercrafting-inventory")
+    private val patternGroup = RepoPattern.group("supercrafting-inventory")
 
     /**
      * REGEX-TEST: Crafting 1,111 items into your sacks!
      */
-    private val craftingCount by craftingPatternGroup.pattern(
+    private val craftingCount by patternGroup.pattern(
         "crafting.count",
         ".*Crafting (?<count>[0-9,]+) item.*",
     )
@@ -53,7 +52,7 @@ object SuperCraftingInventory {
      * REGEX-TEST: ✔ 2,067/320 Enchanted Cocoa Beans
      * REGEX-TEST: ✔ 1,747/1,600 Enchanted Cocoa Beans
      */
-    private val craftingResourcePattern by craftingPatternGroup.pattern(
+    private val craftingResourcePattern by patternGroup.pattern(
         "crafting.resource",
         " *✔ (?<owned>[0-9,]+)/(?<used>[0-9,]+) (?:\\([0-9,]+x\\) )?(?<resource>.+)",
     )
@@ -61,13 +60,11 @@ object SuperCraftingInventory {
     /**
      * REGEX-TEST: Enchanted Redstone Recipe
      */
-    private val inventoryPattern by craftingPatternGroup.pattern(
+    private val inventoryPattern by patternGroup.pattern(
         "inventory.name",
         "(?<itemname>.*) Recipe",
     )
-    private val invDetector = InventoryDetector(
-        checkInventoryName = { name -> inventoryPattern.matches(name) },
-    )
+    private val invDetector = InventoryDetector { inventoryPattern }
 
     private fun getWarnAmount() = if (BitsApi.hasCookieBuff()) {
         config.threshold
@@ -86,7 +83,7 @@ object SuperCraftingInventory {
         if (!invDetector.isInside()) return
         if (!config.enabled) return
         if (HypixelData.noTrade) return
-        if (event.clickedButton != 0) return
+        if (!event.mouseType.isLeftClick()) return
         if (event.slotId != PICKAXE_SLOT) return
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
         val craftingAmount = getSuperCraftingCount(slots) ?: return

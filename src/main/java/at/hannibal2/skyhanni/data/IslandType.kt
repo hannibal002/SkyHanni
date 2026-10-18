@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -38,7 +37,7 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
 
     // Foraging
     THE_PARK("The Park", "foraging_1"),
-    GALATEA("Galatea", "foraging_2"),
+    GALATEA("Moonglade Marsh", "foraging_2"),
     TORRHUS_CANYON("Torrhus Canyon", "foraging_3"),
 
     // Combat
@@ -53,7 +52,7 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
 
     // Special
     THE_RIFT("The Rift", "rift"),
-    SAFARI("Safari", "safari"),
+    SAFARI("Critter Safari", "safari"),
 
     // Special values
     NONE("", null),
@@ -93,7 +92,6 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
 
     @SkyHanniModule
     companion object {
-
         fun Collection<IslandType>.isInAnyIsland(): Boolean = any { it.isInIsland() }
         private val repoReloadCoroutine = CoroutineSettings("island type repo reload")
 
@@ -116,8 +114,8 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
         fun getByIdOrNull(id: String): IslandType? = entries.find { it.apiName == id }
         fun getByIdOrUnknown(id: String): IslandType = getByIdOrNull(id) ?: UNKNOWN
 
-        @HandleEvent(priority = HIGHEST)
-        fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+        @HandleEvent(priority = HandleEvent.HIGH)
+        private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
             val data = event.getConstantAsync<IslandTypeJson>("misc/IslandType")
 
             entries.forEach { islandType ->

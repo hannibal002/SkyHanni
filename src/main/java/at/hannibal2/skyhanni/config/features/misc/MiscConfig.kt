@@ -11,10 +11,12 @@ import at.hannibal2.skyhanni.config.features.misc.navigation.NavigationConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.UniversalTrackerConfig
 import at.hannibal2.skyhanni.config.features.pets.PetConfig
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig
+import at.hannibal2.skyhanni.utils.SoundUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
@@ -156,6 +158,15 @@ class MiscConfig {
     @ConfigOption(name = "Colorful Item Tooltips", desc = "")
     @Accordion
     val colorfulItemTooltips: ColorfulItemTooltips = ColorfulItemTooltips()
+
+    @Expose
+    @ConfigOption(
+        name = "Glowing Dropped Items",
+        desc = "Gives items on the ground that Hypixel doesn't already highlight a glowing outline based on their rarity.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var glowingDroppedItems: Boolean = false
 
     @Expose
     @ConfigOption(name = "Boop Party", desc = "")
@@ -344,7 +355,10 @@ class MiscConfig {
     var fixGhostEntities: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Replace Roman Numerals", desc = "Replace Roman Numerals with Arabic Numerals in some SkyHanni displays.")
+    @ConfigOption(
+        name = "Replace Roman Numerals",
+        desc = "Replace Roman Numerals with Arabic Numerals in inventories and in SkyHanni displays.",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     val replaceRomanNumerals: Property<Boolean> = Property.of(false)
@@ -384,12 +398,18 @@ class MiscConfig {
 
     @Expose
     @ConfigOption(
-        name = "Maintain Volume During Warnings",
-        desc = "Do not change game volume levels when warning sounds are played.",
+        name = "Boost Warning Volume",
+        desc = "Always play SkyHanni warning sounds at 100% volume (unless the game is muted).\n" +
+            "§cThis may be very loud if your game is at low volume!"
     )
     @ConfigEditorBoolean
-    @FeatureToggle
-    var maintainGameVolume: Boolean = false
+    @SearchTag("beep change ding during maintain pling quiet warnings")
+    var boostWarningVolume: Boolean = false
+
+    @ConfigOption(name = "Test Warning Sound", desc = "Play a test warning sound to see how loud it will be.")
+    @ConfigEditorButton(buttonText = "Test")
+    @SearchTag("beep boost change ding during loud maintain pling quiet volume warnings")
+    val testWarningSound: Runnable = Runnable(SoundUtils::playPlingSound)
 
     @Expose
     @ConfigOption(
@@ -417,6 +437,7 @@ class MiscConfig {
     @FeatureToggle
     var gfsPiggyBank: Boolean = true
 
+    // Not a FeatureToggle: moving a Hypixel UI element is a personal preference, not a feature to auto-enable.
     @Expose
     @ConfigOption(
         name = "Move Insert Into Sack Button",
@@ -489,8 +510,10 @@ class MiscConfig {
     @FeatureToggle
     var fixDoubleClicks: Boolean = true
 
-
-    @ConfigOption(name = "Color Particle Warning", desc = "§c§lThis can break particle Coloring in parts of Skyblock where it is done properly.§f")
+    @ConfigOption(
+        name = "Color Particle Warning",
+        desc = "§c§lThis can break particle Coloring in parts of Skyblock where it is done properly.",
+    )
     @ConfigEditorInfoText
     @SearchTag("Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes Fix Colored Particles")
     val notice: String = ""
@@ -498,7 +521,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Fix Colored Particles",
-        desc = "Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes."
+        desc = "Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -508,7 +531,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Rainbow Action Bar",
-        desc = "Makes the Action bar rainbow. Why? For fun!"
+        desc = "Makes the Action bar rainbow. Why? For fun!",
     )
     @ConfigEditorBoolean
     var rainbowActionBar: Boolean = false
@@ -516,7 +539,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Show Achievement Messages",
-        desc = "You can do §e/shachievements§7 to see them all!"
+        desc = "You can do §e/shachievements§7 to see them all!",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -525,7 +548,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Mute Stereo Pants",
-        desc = "Mutes music played by Stereo Pants."
+        desc = "Mutes music played by Stereo Pants.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

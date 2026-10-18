@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.test.garden
 
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
 import at.hannibal2.skyhanni.utils.LorenzVec
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

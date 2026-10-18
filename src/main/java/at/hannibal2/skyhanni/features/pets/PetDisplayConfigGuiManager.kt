@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
@@ -53,7 +54,7 @@ object PetDisplayConfigGuiManager {
 
     fun isOpen(): Boolean {
         val currentEditor = editor ?: return false
-        val screen = Minecraft.getInstance().screen as? MoulConfigScreenComponent ?: return false
+        val screen = MinecraftCompat.screen as? MoulConfigScreenComponent ?: return false
         val root = screen.guiContext.root as? MoulConfigEditorComponent ?: return false
         return root.editor === currentEditor
     }

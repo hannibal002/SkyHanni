@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ParticleEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule

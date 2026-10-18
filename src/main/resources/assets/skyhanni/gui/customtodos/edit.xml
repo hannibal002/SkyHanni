@@ -95,6 +95,10 @@
                 <TextField value="@trigger" width="300" suggestion="Trigger"/>
             </Row>
             <Row>
+                <Text text="Anti-Trigger: " width="150"/>
+                <TextField value="@antiTrigger" width="300" suggestion="Anti-Trigger"/>
+            </Row>
+            <Row>
                 <Text text="Ignore Color Codes: " width="150"/>
                 <Switch value="@ignoreColorCodes"/>
             </Row>

@@ -44,14 +44,15 @@ import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object ElectionApi {
-    private val group = RepoPattern.group("mayorapi")
     private val config get() = SkyHanniMod.feature.dev.debug
     private val assumeMayorConfig get() = config.assumeMayor
+
+    private val patternGroup = RepoPattern.group("mayorapi")
 
     /**
      * REGEX-TEST: Schedules an extra §bFishing Festival §7event during the year.
      */
-    val foxyExtraEventPattern by group.pattern(
+    val foxyExtraEventPattern by patternGroup.pattern(
         "foxy.extraevent",
         "Schedules an extra §.(?<event>.*) §.event during the year\\.",
     )
@@ -59,24 +60,16 @@ object ElectionApi {
     /**
      * REGEX-TEST: The election room is now closed. Clerk Seraphine is doing a final count of the votes...
      */
-    private val electionOverPattern by group.pattern(
+    private val electionOverPattern by patternGroup.pattern(
         "election.over",
         "§eThe election room is now closed\\. Clerk Seraphine is doing a final count of the votes\\.\\.\\.",
-    )
-
-    /**
-     * REGEX-TEST: Calendar and Events
-     */
-    val calendarGuiPattern by group.pattern(
-        "calendar.gui",
-        "Calendar and Events",
     )
 
     /**
      * REGEX-TEST: §dMayor Jerry
      * REGEX-TEST: §cMayor Aatrox
      */
-    private val mayorHeadPattern by group.pattern(
+    private val mayorHeadPattern by patternGroup.pattern(
         "mayor.head",
         "§.Mayor (?<name>.*)",
     )
@@ -84,7 +77,7 @@ object ElectionApi {
     /**
      * REGEX-TEST: §9Perkpocalypse Perks:
      */
-    private val perkpocalypsePerksPattern by group.pattern(
+    private val perkpocalypsePerksPattern by patternGroup.pattern(
         "perkpocalypse",
         "§9Perkpocalypse Perks:",
     )
@@ -147,6 +140,8 @@ object ElectionApi {
         if (!ElectionCandidate.JERRY.isActive()) return
         if (jerryExtraMayor.first != null && jerryExtraMayor.second.isInPast()) {
             jerryExtraMayor = null to SimpleTimeMark.farPast()
+            lastJerryExtraMayorReminder = SimpleTimeMark.now()
+
             ChatUtils.clickableChat(
                 "The Perkpocalypse Mayor has expired! Click here to update the new temporary Mayor.",
                 onClick = { HypixelCommands.calendar() },
@@ -176,8 +171,7 @@ object ElectionApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-
-        if (!calendarGuiPattern.matches(event.inventoryName)) return
+        if (!CalendarApi.inCalendar) return
 
         val stack: SafeItemStack = event.inventoryItems.values.firstOrNull {
             mayorHeadPattern.matchMatcher(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) {

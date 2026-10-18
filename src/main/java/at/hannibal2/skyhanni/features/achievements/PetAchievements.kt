@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.achievements
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.PetStorageApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import kotlin.collections.contains
 
 @SkyHanniModule
 object PetAchievements {
@@ -22,7 +22,7 @@ object PetAchievements {
     /**
      * REGEX-TEST: Your Pet Score: 435
      */
-    private val petScorePattern by AchievementManager.group.pattern(
+    private val petScorePattern by AchievementManager.patternGroup.pattern(
         "pet-score",
         "Your Pet Score: (?<score>\\d+)",
     )
@@ -72,7 +72,7 @@ object PetAchievements {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!event.inventoryName.startsWith("Pets")) return
+        if (!PetStorageApi.inMainPetMenuName()) return
         val pets = ProfileStorageData.petProfiles?.pets ?: return
         for (pet in pets) {
             val xp = pet.exp ?: 0.0

@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -36,13 +37,25 @@ object MinionCraftHelper {
 
     private val config get() = SkyHanniMod.feature.event.bingo
 
+    private val patternGroup = RepoPattern.group("bingo.minion")
+
     /**
      * REGEX-TEST: Sheep Minion X
      * REGEX-TEST: Wheat Minion IV
      */
-    private val minionNamePattern by RepoPattern.pattern(
-        "bingo.minion.name",
+    private val minionNamePattern by patternGroup.pattern(
+        "name",
         "(?<name>.*) Minion (?<number>.*)",
+    )
+
+    /**
+     * REGEX-TEST: (1/3) Crafted Minions
+     * REGEX-TEST: (2/3) Crafted Minions
+     * REGEX-TEST: (3/3) Crafted Minions
+     */
+    private val craftedMinionsInventoryPattern by patternGroup.pattern(
+        "inventory",
+        "(?:\\(\\d/\\d\\) )?Crafted Minions",
     )
 
     private var display = emptyList<String>()
@@ -268,7 +281,7 @@ object MinionCraftHelper {
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!SkyBlockUtils.isBingoProfile) return
-        if (event.inventoryName != "Crafted Minions") return
+        if (!craftedMinionsInventoryPattern.matches(event.inventoryName)) return
 
         for ((_, b) in event.inventoryItems) {
             val name = b.hoverName.formattedTextCompatLeadingWhiteLessResets()

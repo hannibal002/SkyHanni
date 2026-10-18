@@ -1,5 +1,9 @@
 config:
     validation: true
+    # UnusedPrivateMember is the detekt 1.x name of UnusedPrivateFunction. detekt 2.x does not know the key,
+    # but the bundled detekt of the IntelliJ plugin still does. Excluded from validation so one config works for both.
+    excludes:
+        - '.*>UnusedPrivateMember.*'
 
 GrammarRules:
     AvoidBritishSpelling:
@@ -33,8 +37,6 @@ RepoRules:
 
 ImportRules:
     CustomImportOrdering:
-        active: false
-    PreprocessingImportOrdering:
         active: true
 
 SkyHanniStyle:
@@ -43,6 +45,8 @@ SkyHanniStyle:
     IsInIslandEarlyReturn:
         active: true
     OnlyOnIslandSpecificity:
+        active: true
+    PrivateEventListener:
         active: true
 
 style:
@@ -73,6 +77,8 @@ style:
         active: false
     UnusedPrivateFunction: # gets tripped up by API methods
         active: false
+    UnusedPrivateMember: # detekt 1.x name of UnusedPrivateFunction, only read by the IntelliJ detekt plugin
+        active: false
     UnusedPrivateProperty: # loops that don't use their iterator
         active: true
         allowedNames: "^(unused|_)$"
@@ -83,6 +89,8 @@ style:
     DestructuringDeclarationWithTooManyEntries: # too aggressive
         active: true
         maxDestructuringEntries: 5
+    AbstractClassCanBeConcreteClass: # this is usually intentional
+        active: false
 
 ktlint:
     MaximumLineLength: # ktlint - handled by detekt
@@ -121,8 +129,7 @@ ktlint:
         active: false
     CommentWrapping:
         active: false
-    # Todo maybe re-evaluate in the future
-    BinaryExpressionWrapping:
+    BinaryExpressionWrapping: # TODO maybe re-evaluate in the future
         active: false
     BlankLineBetweenWhenConditions:
         active: false
@@ -190,3 +197,10 @@ potential-bugs:
         active: true
     UnreachableCode:
         active: false
+    IgnoredReturnValue:
+        active: true
+        ignoreFunctionCall:
+            - 'java.util.concurrent.ConcurrentHashMap.put'
+            - 'java.util.concurrent.ConcurrentHashMap.remove'
+            - 'kotlin.collections.MutableMap.put'
+            - 'kotlin.collections.MutableMap.remove'

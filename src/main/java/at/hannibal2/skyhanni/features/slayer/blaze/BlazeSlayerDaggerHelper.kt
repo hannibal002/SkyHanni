@@ -18,13 +18,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -245,7 +245,7 @@ object BlazeSlayerDaggerHelper {
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.daggers) return
 
-        val currentScreen = Minecraft.getInstance().screen
+        val currentScreen = MinecraftCompat.screen
         if (currentScreen != null && currentScreen !is GuiPositionEditor) return
 
         textTop?.let { config.positionTop.renderRenderable(it, "Blaze Slayer Dagger Top") }

@@ -39,6 +39,9 @@ class CustomTodoEditor(
     var trigger: String = from.trigger
 
     @field:Bind
+    var antiTrigger: String = from.antiTrigger
+
+    @field:Bind
     var icon: String = from.icon
 
     @field:Bind
@@ -66,6 +69,7 @@ class CustomTodoEditor(
             label,
             timer.toIntOrNull() ?: 0,
             trigger,
+            antiTrigger,
             icon,
             isResetOffset,
             showWhen.toIntOrNull() ?: 0,

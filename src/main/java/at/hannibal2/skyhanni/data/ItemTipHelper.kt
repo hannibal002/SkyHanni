@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.container
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
@@ -40,7 +41,7 @@ object ItemTipHelper {
     fun onRenderInventoryItemOverlayPost(event: DrawScreenAfterEvent) {
         if (GlobalRender.renderDisabled) return
 
-        val gui = Minecraft.getInstance().screen
+        val gui = MinecraftCompat.screen
         if (gui !is ContainerScreen) return
         val inventoryName = InventoryUtils.openInventoryName()
 

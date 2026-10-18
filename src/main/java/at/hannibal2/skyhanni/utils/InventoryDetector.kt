@@ -17,18 +17,19 @@ import java.util.regex.Pattern
  * @property checkInventoryName Define what inventory name or names we are looking for.
  */
 class InventoryDetector(
+    val checkInventoryName: (String) -> Boolean,
     val onOpenInventory: (InventoryFullyOpenedEvent) -> Unit = {},
     val onCloseInventory: (InventoryCloseEvent) -> Unit = {},
-    val checkInventoryName: (String) -> Boolean,
 ) {
+
     constructor(
-        pattern: Pattern,
         onOpenInventory: (InventoryFullyOpenedEvent) -> Unit = {},
         onCloseInventory: (InventoryCloseEvent) -> Unit = {},
+        repoPattern: () -> Pattern,
     ) : this(
-        onOpenInventory,
-        onCloseInventory,
-        checkInventoryName = { name -> pattern.matches(name) }
+        checkInventoryName = { name -> repoPattern().matches(name) },
+        onOpenInventory = onOpenInventory,
+        onCloseInventory = onCloseInventory,
     )
 
     init {

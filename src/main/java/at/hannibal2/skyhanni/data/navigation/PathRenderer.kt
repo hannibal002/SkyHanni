@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.navigation
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DBezier2
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import java.awt.Color
 
 /**
@@ -81,11 +83,11 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
 
     private fun renderPathSegments(event: SkyHanniRenderWorldEvent) {
         val eyePos = event.exactPlayerEyeLocation()
-        val anchorY = eyePos.y - MinecraftCompat.localPlayerOrThrow.eyeHeight + STANDING_EYE_HEIGHT
+        val lineStartPos = eyePos.calculateEyePos()
         if (pathPoints.isEmpty()) return
 
         if (pathPoints.size == 1) {
-            renderSingleNodeCurve(event, eyePos, anchorY, pathPoints[0])
+            renderSingleNodeCurve(event, eyePos, lineStartPos, pathPoints[0])
             return
         }
 
@@ -94,7 +96,7 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         val curveEnd = findBezierEnd(walkPositions, nextPathIdx) ?: return
 
         val dirToCurve = (curveEnd.pos - eyePos).normalize()
-        val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToCurve * ANCHOR_FORWARD_DIST
+        val anchor = lineStartPos + dirToCurve * ANCHOR_FORWARD_DIST
         val scale = anchor.distance(curveEnd.pos) * CONTROL_POINT_SCALE
         val controlPoint = curveEnd.pos - curveEnd.tangent * scale
         val bezierDepth = !WorldRenderUtils.isRenderingUnderwater()
@@ -113,12 +115,12 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
     private fun renderSingleNodeCurve(
         event: SkyHanniRenderWorldEvent,
         eyePos: LorenzVec,
-        anchorY: Double,
+        lineStartPos: LorenzVec,
         point: PathPoint,
     ) {
         val nodePos = point.pos
         val dirToNode = (nodePos - eyePos).normalize()
-        val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToNode * ANCHOR_FORWARD_DIST
+        val anchor = lineStartPos + dirToNode * ANCHOR_FORWARD_DIST
         val scale = anchor.distance(nodePos) * CONTROL_POINT_SCALE
         val controlPoint = nodePos - dirToNode * scale
         event.draw3DBezier2(
@@ -248,4 +250,18 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
 
     private fun findClosestIndex(positions: List<PathPoint>, referencePos: LorenzVec): Int =
         positions.indices.minBy { positions[it].pos.distance(referencePos) }
+
+    companion object {
+        private val config get() = SkyHanniMod.feature.misc.navigation.pathfinding
+
+        // TODO fix wrong name
+        private fun LorenzVec.calculateEyePos(): LorenzVec {
+            return if (config.startFromEye) {
+                this + MinecraftCompat.localPlayerOrThrow.lookAngle.toLorenzVec().times(2)
+            } else {
+                val anchorY = this.y - MinecraftCompat.localPlayerOrThrow.eyeHeight + STANDING_EYE_HEIGHT
+                LorenzVec(this.x, anchorY + ANCHOR_Y_OFFSET, this.z)
+            }
+        }
+    }
 }

@@ -23,6 +23,14 @@ internal object PetStoragePatterns {
     )
 
     /**
+     * REGEX-TEST: Pets
+     */
+    val mainPetMenuTitleItemNamePattern by patternGroup.pattern(
+        "menu.gui.titleitem.name",
+        "Pets",
+    )
+
+    /**
      * REGEX-TEST: [Lvl 8] Squid
      * REGEX-TEST: [Lvl 100] Hermit Crab
      * REGEX-TEST: [Lvl 200] [122✦] Golden Dragon
@@ -98,21 +106,6 @@ internal object PetStoragePatterns {
     val petMenuSelectedPetXpPattern by patternGroup.pattern(
         "menu.selected.xp.colorless",
         "(?:▸| )*(?<current>[\\d,.kM]+)(?: XP|(?:\\/)*(?<next>[\\d,.kM]+))",
-    )
-
-    /**
-     * REGEX-TEST: Autopet equipped your [Lvl 100] Enderman! VIEW RULE
-     * REGEX-TEST: Autopet equipped your [Lvl 200] Golden Dragon! VIEW RULE
-     * REGEX-TEST: Autopet equipped your [Lvl 100] Rabbit ✦! VIEW RULE
-     * REGEX-TEST: Autopet equipped your [Lvl 200] [122✦] Golden Dragon! VIEW RULE
-     * REGEX-TEST: Autopet equipped your [Lvl 200] [34✦] Golden Dragon! VIEW RULE
-     * REGEX-TEST: Autopet equipped your [Lvl 67] T-Rex! VIEW RULE
-     * REGEX-TEST: Autopet equipped your [Lvl 200] [335✦] Golden Dragon! VIEW RULE
-     */
-    @Suppress("MaxLineLength")
-    val autoPetMessageColorlessPattern by patternGroup.pattern(
-        "autopet.message.colorless",
-        "Autopet equipped your \\[Lvl (?<level>\\d+)] (?:\\[\\d+(?<altskin>✦)\\] )?(?<pet>[\\w -]+)(?<skin> ✦)?! VIEW RULE",
     )
 
     /**

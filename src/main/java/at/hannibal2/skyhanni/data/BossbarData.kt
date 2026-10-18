@@ -3,11 +3,12 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
-import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object BossbarData {
+
     private var bossbar: String? = null
     private var previousServerBossbar = ""
 
@@ -23,7 +24,7 @@ object BossbarData {
     @HandleEvent
     fun onTick() {
         var multipleBossBars = false
-        for (bossBar in Minecraft.getInstance().gui.bossOverlay.events.values) {
+        for (bossBar in MinecraftCompat.hud.bossOverlay.events.values) {
             if (multipleBossBars) {
                 return
             }

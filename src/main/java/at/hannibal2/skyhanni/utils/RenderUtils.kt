@@ -52,18 +52,10 @@ object RenderUtils {
         block: () -> T,
     ): T {
         RenderSystem.assertOnRenderThread()
-        setupFor?.let { Minecraft.getInstance().gameRenderer.lighting.setupFor(it) }
+        //~ if < 26.2 'lighting()' -> 'lighting'
+        setupFor?.let { Minecraft.getInstance().gameRenderer.lighting().setupFor(it) }
         return block()
     }
-
-    /**
-     * Returns a [Thread] that schedules a block on the Render Thread when started.
-     * Useful for [Runtime.addShutdownHook].
-     */
-    fun threadOnRenderThread(
-        setupFor: Lighting.Entry? = null,
-        block: () -> Any,
-    ) = Thread { scheduleOnRenderThread(setupFor, block) }
 
     /**
      * Runs or schedules a block on the Render Thread.
@@ -120,19 +112,7 @@ object RenderUtils {
         GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
     }
 
-    fun Slot.drawBorder(color: LorenzColor) {
-        drawBorder(color.toColor())
-    }
-
     fun Slot.drawBorder(color: Color) {
-        drawBorder(color, x, y)
-    }
-
-    fun RenderGuiItemOverlayEvent.drawBorder(color: LorenzColor) {
-        drawBorder(color.toColor())
-    }
-
-    fun RenderGuiItemOverlayEvent.drawBorder(color: Color) {
         drawBorder(color, x, y)
     }
 

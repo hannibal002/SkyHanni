@@ -9,8 +9,10 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
@@ -22,18 +24,13 @@ import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.resources.Identifier
+import net.minecraft.world.item.ItemStackTemplate
 import java.net.URI
 import java.util.Optional
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
-
-//? if >= 26.1 {
-import net.minecraft.client.multiplayer.chat.GuiMessageSource
-import net.minecraft.world.item.ItemStackTemplate
-
-//?}
 
 // TODO do the same thing here as in EntityCompat, no more functions/members that are classless
 
@@ -125,13 +122,13 @@ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadin
 }
 
 private val textColorLUT = ChatFormatting.entries
-    .mapNotNull { formatting -> formatting.color?.let { it to formatting } }
+    .mapNotNull { formatting -> TextColor.fromLegacyFormat(formatting)?.let { it.value to formatting } }
     .toMap()
 
 fun Style?.orEmpty(): Style = this ?: Style.EMPTY
 
 fun Style.chatStyle() = buildString {
-    color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.formatValue()}>") }
+    color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.serialize()}>") }
     if (isBold) append("§l")
     if (isItalic) append("§o")
     if (isUnderlined) append("§n")
@@ -187,13 +184,11 @@ var Component.stackHover: SafeItemStack?
     get() = this.style.hoverEvent?.takeIf {
         it.action() == HoverEvent.Action.SHOW_ITEM
     }?.let {
-        //~ if < 26.1 '.item.create()' -> '.item'
         (it as HoverEvent.ShowItem).item.create()
     }
     set(value) {
         value?.let { new ->
             this.copyIfNeeded().withStyle {
-                //~ if < 26.1 'ItemStackTemplate.fromNonEmptyStack(new)' -> 'new'
                 it.withHoverEvent(HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(new)))
             }
         }
@@ -268,7 +263,6 @@ fun Style.setHoverShowText(text: Component): Style {
 fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) message.skyhanniCreated = true
     DelayedRun.runOrNextTick {
-        //~ if < 26.1 'sendSystemMessage(message)' -> 'displayClientMessage(message, false)'
         Minecraft.getInstance().player?.sendSystemMessage(message)
     }
 }
@@ -276,13 +270,12 @@ fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false
 fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) component.skyhanniCreated = true
     DelayedRun.runOrNextTick {
-        val chat = Minecraft.getInstance().gui.chat
+        val chat = MinecraftCompat.hud.chat
         ChatManager.deleteMessage { it.signature == idToMessageSignature(id) }
         DelayedRun.runOrNextTick {
             chat.addMessage(
                 component,
                 idToMessageSignature(id),
-                //? if >= 26.1
                 GuiMessageSource.SYSTEM_CLIENT,
                 GuiMessageTag.system(),
             )
@@ -326,7 +319,6 @@ fun ClickEvent.value(): String {
 
 fun HoverEvent.value(): Component = when (action()) {
     HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
-    //~ if < 26.1 '.item.create().hoverName' -> '.item.hoverName'
     HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.create().hoverName
     HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
 }

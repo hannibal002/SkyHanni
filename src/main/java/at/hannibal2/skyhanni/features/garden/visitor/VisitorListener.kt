@@ -32,12 +32,10 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.protocol.game.ServerboundAttackPacket
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
-
-//? if >= 26.1
-import net.minecraft.network.protocol.game.ServerboundAttackPacket
 
 @SkyHanniModule
 object VisitorListener {
@@ -60,7 +58,6 @@ object VisitorListener {
     fun onSendEvent(event: PacketSentEvent) {
         val packetEntityId = when (val packet = event.packet) {
             is ServerboundInteractPacket -> packet.entityId
-            //? if >= 26.1
             is ServerboundAttackPacket -> packet.entityId
             else -> return
         }

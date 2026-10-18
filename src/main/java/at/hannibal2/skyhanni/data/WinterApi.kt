@@ -33,7 +33,7 @@ object WinterApi {
     fun isDecember() = TimeUtils.getCurrentLocalDate().month == Month.DECEMBER
 
     @HandleEvent
-    fun onAreaChange(event: GraphAreaChangeEvent) {
+    private fun onAreaChange(event: GraphAreaChangeEvent) {
         inArea = event.area == "Glacial Cave"
     }
 }
