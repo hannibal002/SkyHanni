@@ -142,6 +142,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
 
+    /** The skyhanni folder in the game directory, for data that is not config, such as the repos. */
     val dataDir: File by lazy {
         PlatformUtils.gameDir.resolve(MODID).toFile()
     }

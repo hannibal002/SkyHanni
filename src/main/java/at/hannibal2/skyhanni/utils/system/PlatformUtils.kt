@@ -25,26 +25,15 @@ object PlatformUtils {
     @JvmStatic
     @get:JvmName("isDevEnvironment")
     val isDevEnvironment: Boolean by lazy {
-        runCatching {
-            FabricLoader.getInstance().isDevelopmentEnvironment
-        }.getOrDefault(false)
+        FabricLoader.getInstance().isDevelopmentEnvironment
     }
 
     val gameDir: Path by lazy {
-        runCatching {
-            FabricLoader.getInstance().gameDir
-        }.getOrDefault(
-            // This is a fallback for testing environment
-            Path.of(".").toAbsolutePath().normalize()
-        )
+        FabricLoader.getInstance().gameDir
     }
 
     val configDir: Path by lazy {
-        runCatching {
-            FabricLoader.getInstance().configDir
-        }.getOrDefault(
-            gameDir.resolve("config")
-        )
+        FabricLoader.getInstance().configDir
     }
 
     val logsDir: Path by lazy {
@@ -57,7 +46,7 @@ object PlatformUtils {
     )
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shmodlist") {
             description = "Get a Discord-formatted list of all loaded mods"
             category = CommandCategory.USERS_ACTIVE
@@ -76,7 +65,7 @@ object PlatformUtils {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Loaded Mods")
         event.addIrrelevant {
             getLoadedMods().forEach { (_, name, version, origin) ->

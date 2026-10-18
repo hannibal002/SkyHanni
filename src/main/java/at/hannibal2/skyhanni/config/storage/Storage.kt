@@ -12,9 +12,6 @@ class Storage {
     var hasPlayedBefore: Boolean = false
 
     @Expose
-    var visualWordsImported: Boolean = false
-
-    @Expose
     var contestSendingAsked: Boolean = false
 
     @Expose
