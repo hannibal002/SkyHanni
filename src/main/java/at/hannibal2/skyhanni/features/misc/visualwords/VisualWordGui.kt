@@ -2,18 +2,14 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
@@ -25,13 +21,8 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import com.google.gson.JsonObject
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment as HA
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment as VA
 
@@ -54,11 +45,6 @@ object VisualWordGui {
     private val COLOR_BTN_NEUTRAL = ChromaColour.fromStaticRGB(45, 45, 68, 215)
     private val COLOR_BTN_ENABLED = ChromaColour.fromStaticRGB(35, 95, 35, 215)
     private val COLOR_BTN_DISABLED = ChromaColour.fromStaticRGB(110, 35, 35, 215)
-
-    val sbeConfigPath: File = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
-
-    // TODO regex tests (idk hanni asked for the todo)
-    private val replacementLinePattern = "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern()
 
     private val upSkull = ItemUtils.repoSkullProvider(
         displayName = "§aMove Up",
@@ -96,7 +82,7 @@ object VisualWordGui {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shwords") {
             description = "Opens the config list for modifying visual words"
             callback { onCommand() }
@@ -202,12 +188,8 @@ object VisualWordGui {
         )
     }
 
-    private fun buildListBottomRow(screen: VisualWordScreen): Renderable {
-        val addBtn = buildButton("§a+ Add New", COLOR_BTN_ADD.toColor()) { screen.addNewWord() }
-        if (!sbeConfigPath.exists() || SkyHanniMod.feature.storage.visualWordsImported) return addBtn
-        val importBtn = buildButton("§eImport from SBE", COLOR_BTN_NEUTRAL.toColor()) { tryImportFromSbe(screen) }
-        return Renderable.horizontal(listOf(addBtn, importBtn), spacing = 8, verticalAlign = VA.CENTER)
-    }
+    private fun buildListBottomRow(screen: VisualWordScreen): Renderable =
+        buildButton("§a+ Add New", COLOR_BTN_ADD.toColor()) { screen.addNewWord() }
 
     private fun buildEditView(screen: VisualWordScreen): Renderable {
         val word = screen.modifiedWords.getOrNull(screen.currentIndex) ?: return buildListView(screen)
@@ -308,45 +290,5 @@ object VisualWordGui {
             onLeftClick = onClick,
             bypassChecks = true,
         )
-    }
-
-    private fun tryImportFromSbe(screen: VisualWordScreen) {
-        InputStreamReader(FileInputStream(sbeConfigPath), StandardCharsets.UTF_8).use { reader ->
-            try {
-                val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
-                importFromSbeJson(json, screen)
-            } catch (e: Throwable) {
-                ErrorManager.logErrorWithData(e, "Failed to load visual words from SBE")
-            }
-        }
-    }
-
-    private fun importFromSbeJson(
-        json: JsonObject,
-        screen: VisualWordScreen,
-    ) {
-        var importedWords = 0
-        var skippedWords = 0
-
-        for (line in json["custom"].asJsonObject["visualWords"].asJsonArray) {
-            replacementLinePattern.matchMatcher(line.asString) {
-                val from = group("from").replace("&", "&&")
-                val to = group("to").replace("&", "&&")
-                val state = group("state").toBoolean()
-                if (screen.modifiedWords.any { it.phrase == from }) {
-                    skippedWords++
-                    return@matchMatcher
-                }
-                screen.modifiedWords.add(VisualWord(from, to, state, caseSensitive = false))
-                importedWords++
-            }
-        }
-
-        if (importedWords > 0 || skippedWords > 0) {
-            chat("§aSuccessfully imported §e$importedWords §awords and skipped §e$skippedWords §afrom SkyBlockExtras!")
-            SkyHanniMod.feature.storage.visualWordsImported = true
-            screen.saveChanges()
-            screen.rebuildDisplay()
-        }
     }
 }
