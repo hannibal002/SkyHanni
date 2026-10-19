@@ -53,7 +53,7 @@ object BroodmotherFeatures {
     private var broodmotherSpawnTime = SimpleTimeMark.farPast()
     private var display: Renderable? = null
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
     private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(BROODMOTHER)) return
         val newStage = event.widget.matchMatcherFirstLine { group("stage") }.orEmpty()
@@ -68,7 +68,7 @@ object BroodmotherFeatures {
     private fun onStageUpdate() {
         ChatUtils.debug("New Broodmother stage: $currentStage")
 
-        if (onServerJoin()) return
+        if (handleInitialStage()) return
 
         // ignore Hypixel bug where the stage may temporarily revert to Imminent after the Broodmother's death
         if (currentStage == IMMINENT && lastStage == ALIVE) return
@@ -88,7 +88,7 @@ object BroodmotherFeatures {
         }
     }
 
-    private fun onServerJoin(): Boolean {
+    private fun handleInitialStage(): Boolean {
         if (lastStage != null || !config.stageOnJoin) return false
         // don't send if user has the spawn alert enabled
         // this is so that two messages aren't immediately sent upon joining a server
@@ -154,7 +154,7 @@ object BroodmotherFeatures {
         display = null
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
     private fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCountdownEnabled()) return
         val display = if (broodmotherSpawnTime.isInPast() && !broodmotherSpawnTime.isFarPast()) {
@@ -163,7 +163,7 @@ object BroodmotherFeatures {
         config.countdownPosition.renderRenderable(display, posLabel = "Broodmother Countdown")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
     private fun onSecondPassed(event: SecondPassedEvent) {
         if (!isCountdownEnabled()) return
 
@@ -177,7 +177,6 @@ object BroodmotherFeatures {
         }
     }
 
-    private fun inSpidersDen() = IslandType.SPIDER_DEN.isInIsland()
-    private fun isCountdownEnabled() = inSpidersDen() && config.countdown
+    private fun isCountdownEnabled() = config.countdown
     private fun isSpawnAlertEnabled() = config.alertOnSpawn
 }
