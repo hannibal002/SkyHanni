@@ -46,7 +46,7 @@ People who moderate the Discord server or help others there.
 
 ## Fancy Roles
 
-These roles are purely cosmetic and exist to recognize specific community contributions or partnerships.  
+These roles are purely cosmetic and exist to recognize specific community contributions or partnerships.
 
 - **Bug Hunter**
     - Awarded to members who report important or hard-to-find bugs, or who go out of their way to test features and track down
@@ -67,7 +67,7 @@ These roles are purely cosmetic and exist to recognize specific community contri
 
 ## Ping Roles
 
-All those roles are self-selectable for all members.  
+All those roles are self-selectable for all members.
 
 - **Announcements**
     - When something big happens.
@@ -85,7 +85,7 @@ All those roles are self-selectable for all members.
 
 ## Bot Roles
 
-Only for bots, with different levels of permissions.  
+Only for bots, with different levels of permissions.
 
 - **Bot**
     - Generic "this is a bot" role.
@@ -116,7 +116,7 @@ Only for bots, with different levels of permissions.
 
 ## Special Roles
 
-Hopefully you don't encounter such users in the wild.  
+Hopefully you don't encounter such users in the wild.
 
 - **Muted**
     - You shall not write.
