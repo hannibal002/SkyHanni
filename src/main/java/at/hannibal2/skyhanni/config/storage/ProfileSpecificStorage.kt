@@ -221,6 +221,21 @@ class ProfileSpecificStorage(
         var mythologicalMobTrackerPerElection: MutableMap<Int, MythologicalCreatureTracker.Data> = mutableMapOf()
     }
 
+    // -- stock exchange
+    @Expose
+    var stonksAuction: StonksAuctionStorage = StonksAuctionStorage()
+
+    class StonksAuctionStorage {
+        @Expose
+        var roundEnd: SimpleTimeMark = farPast()
+
+        @Expose
+        var lastBidRoundEnd: SimpleTimeMark = farPast()
+
+        @Expose
+        var bidAmount: Long = 0L
+    }
+
     // -- winter
     @Expose
     var frozenTreasureTracker: FrozenTreasureTracker.Data = FrozenTreasureTracker.Data()

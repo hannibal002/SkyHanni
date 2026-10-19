@@ -253,7 +253,7 @@ object RemainingSlayerKills {
                 slayerPet.value.takeIf { (it.properPetNames != null && it.properPetNames.contains(petProperName)) }
             } ?: return additiveWithMultMultipliers
 
-            additiveWithMultMultipliers += (levellingData.perLevelMultiplier[petRarity.id] * currentPet.level)
+            additiveWithMultMultipliers += (levellingData.perLevelMultiplier[petRarity.ordinal] * currentPet.level)
             debugMessage(
                 "$additiveWithMultMultipliers Pet & Champion Multiplier, ${currentPet.level} is Pet Level.",
             )

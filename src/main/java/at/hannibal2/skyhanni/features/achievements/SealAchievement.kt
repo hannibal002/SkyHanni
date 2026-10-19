@@ -14,7 +14,7 @@ object SealAchievement {
     /**
      * REGEX-TEST: INSANE! You kept the Bouncy Beach Ball in the air for 187 bounces and earned 20 Fishy Treats!
      */
-    private val sealBouncePattern by AchievementManager.group.pattern(
+    private val sealBouncePattern by AchievementManager.patternGroup.pattern(
         "seal-bounce",
         "INSANE! You kept the Bouncy Beach Ball in the air for (?<bounces>\\d+) bounces and earned \\d+ Fishy Treats!",
     )

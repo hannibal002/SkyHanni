@@ -15,7 +15,7 @@ object DungeonsAchievements {
     /**
      * REGEX-TEST: RNG METER! Reselected the Enchanted Book (Rejuvenate I) for Catacombs - Floor 1! CLICK HERE to select a new drop!
      */
-    private val woodRngPattern by AchievementManager.group.pattern(
+    private val woodRngPattern by AchievementManager.patternGroup.pattern(
         "wood-rng",
         "RNG METER! Reselected the Enchanted Book \\((?:Rejuvenate I|Infinite Quiver VI|Feather Falling VI|Bank I|Ultimate Jerry I)\\) for Catacombs - Floor 1! CLICK HERE to select a new drop!",
     )

@@ -17,7 +17,7 @@ object RecipeAchievement {
     /**
      * REGEX-TEST: Recipe Book Unlocked: 98.6%
      */
-    private val recipeBookPattern by AchievementManager.group.pattern(
+    private val recipeBookPattern by AchievementManager.patternGroup.pattern(
         "recipe-book",
         "Recipe Book Unlocked: (?<percent>[\\d.]+)%"
     )

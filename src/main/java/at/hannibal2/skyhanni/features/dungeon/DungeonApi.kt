@@ -163,6 +163,14 @@ object DungeonApi {
     )
 
     /**
+     * REGEX-TEST: [NPC] Mort: Here, I found this map when I first entered the dungeon.
+     */
+    private val mortStartPattern by patternGroup.pattern(
+        "start.mort.colorless",
+        "\\[NPC\\] Mort: Here, I found this map when I first entered the dungeon\\.",
+    )
+
+    /**
      * REGEX-TEST: [319] Empa_ α (Mage XXXIV)
      * REGEX-TEST: [393] [YOUTUBE] Remittal Σ♲ (Mage XL)
      * REGEX-TEST: [273] Ovi_1 Ӄ (Mage XXXVI)
@@ -349,7 +357,7 @@ object DungeonApi {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         val floor = dungeonFloor ?: return
-        if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
+        if (mortStartPattern.matches(event.cleanMessage)) {
             started = true
             DungeonStartEvent(floor).post()
         }
