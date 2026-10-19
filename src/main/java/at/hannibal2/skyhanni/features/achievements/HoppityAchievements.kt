@@ -18,7 +18,7 @@ object HoppityAchievements {
     /**
      * REGEX-TEST: Rabbits Found: 95.7%
      */
-    private val rabbitsFoundPattern by AchievementManager.group.pattern(
+    private val rabbitsFoundPattern by AchievementManager.patternGroup.pattern(
         "rabbits-found",
         "Rabbits Found: (?<percent>[\\d.]+)%",
     )
