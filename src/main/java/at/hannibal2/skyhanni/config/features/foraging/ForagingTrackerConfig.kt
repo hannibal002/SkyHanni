@@ -36,7 +36,7 @@ class ForagingTrackerConfig {
     @Expose
     @ConfigOption(name = "Display Tree Gifts", desc = "Change how the Tree Gift messages are displayed in chat.")
     @ConfigEditorDropdown
-    var displayTreeGifts: TreeGiftDisplayMode = TreeGiftDisplayMode.COMPACT_GIFT;
+    var displayTreeGifts: TreeGiftDisplayMode = TreeGiftDisplayMode.COMPACT_GIFT
 
     @Expose
     @ConfigOption(
