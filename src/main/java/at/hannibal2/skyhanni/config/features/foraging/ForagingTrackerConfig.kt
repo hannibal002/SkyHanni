@@ -27,7 +27,8 @@ class ForagingTrackerConfig {
     enum class TreeGiftDisplayMode(val displayName: String) {
         FULL_GIFT("Full Gift"),
         COMPACT_GIFT("Compact Gift"),
-        NO_GIFT("No Gift");
+        NO_GIFT("No Gift"),
+        ;
 
         override fun toString() = displayName
     }
@@ -35,7 +36,7 @@ class ForagingTrackerConfig {
     @Expose
     @ConfigOption(name = "Display Tree Gifts", desc = "Change how the Tree Gift messages are displayed in chat.")
     @ConfigEditorDropdown
-    var displayTreeGifts: TreeGiftDisplayMode = TreeGiftDisplayMode.COMPACT_GIFT
+    var displayTreeGifts: TreeGiftDisplayMode = TreeGiftDisplayMode.COMPACT_GIFT;
 
     @Expose
     @ConfigOption(
@@ -61,7 +62,8 @@ class ForagingTrackerConfig {
         BOOSTERS("§fBoosters\n§7(Sweep and Foraging Wisdom)"),
         SHARDS("§fDirect Shard Drops\n§7(§9Hummingbirds§7 and §6Chameleons§7)"),
         RUNES("§fRunes\n§7(§fFading White §7and §aFading Green§7)"),
-        MISC("§cTree The Fish");
+        MISC("§cTree The Fish"),
+        ;
 
         override fun toString() = displayName
     }
