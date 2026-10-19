@@ -21,6 +21,7 @@ accessible field net/minecraft/client/gui/components/ChatComponent chatScrollbar
 accessible field net/minecraft/client/gui/components/ChatComponent trimmedMessages Ljava/util/List;
 accessible field net/minecraft/client/gui/components/PlayerTabOverlay footer Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/client/gui/components/PlayerTabOverlay header Lnet/minecraft/network/chat/Component;
+accessible field net/minecraft/client/gui/screens/ChatScreen input Lnet/minecraft/client/gui/components/EditBox;
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen hoveredSlot Lnet/minecraft/world/inventory/Slot;
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen imageHeight I
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen imageWidth I
@@ -72,6 +73,7 @@ accessible method net/minecraft/client/renderer/rendertype/RenderType <init> (Lj
 accessible method net/minecraft/network/chat/TextColor <init> (ILjava/lang/String;)V
 extendable class net/minecraft/world/item/ItemStack
 inject-interface net/minecraft/client/renderer/entity/state/EntityRenderState at/hannibal2/skyhanni/mixins/hooks/EntityRenderStateStore
+inject-interface net/minecraft/network/protocol/game/ClientboundLevelParticlesPacket at/hannibal2/skyhanni/mixins/hooks/ParticleSuppressionStore
 inject-interface net/minecraft/network/chat/MutableComponent at/hannibal2/skyhanni/mixins/hooks/ComponentCreatedStore
 mutable field net/minecraft/client/gui/components/ChatComponent allMessages Ljava/util/List;
 mutable field net/minecraft/client/gui/components/ChatComponent trimmedMessages Ljava/util/List;

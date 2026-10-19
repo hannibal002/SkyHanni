@@ -6,50 +6,47 @@ This explains why the roles exist and how to get them.
 
 ## Full Permissions Roles
 
-If those users talk to you, their word is law.
-
 - **Admin**
     - Only the most trusted members.
     - Full control over the Discord server, manages role assignments.
-
-## Core Team Roles
-
-Hand-picked by **Admins** from members who have already held the **Contributor** or **Community Helper** role for some time.  
-If those users talk to you, you better pay attention.
 
 - **Staff**
     - Legacy role with many permissions. May be merged into Admin in the future.
 
 [//]: # (This is a hidden comment: Clarify why Staff role even exists: can this get merged with Admin eventually? Jani, can this go?)
 
-- **Moderator**
-    - This role has moderation permissions (warn, mute, ban).
-    - Independent of coding/contributing.
-    - Gets selected from **Community Helper** or higher roles.
-- **Mod Maintainer**
-    - Most trusted coders without full access.
-    - They know SkyHanni very well.
-    - If you have coding questions, ask them.
-- **Main Contributor**
-    - Developers who help the project a lot over a long time.
-    - A cosmetic role between **Contributor** and **Mod Maintainer**.
+## Contributor Roles
 
-## Helper Roles
+People who contribute code to SkyHanni on GitHub.
 
-People who help the mod.  
-If those users talk to you, they probably know what they're talking about.
-
+- **Code Reviewer**
+    - Members of the Reviewer team on GitHub who actively review pull requests.
+    - Their approvals count toward the required reviews for merging.
+    - They know SkyHanni very well. If you have coding questions, ask them.
+    - Any **Veteran Contributor** can get this role at any time. Just ask an Admin.
+- **Veteran Contributor**
+    - Developers who helped the project a lot over a long time.
+    - Recognition only, no extra permissions. Stays even when inactive.
+    - Hand-picked by **Admins** from long-time **Contributors**.
 - **Contributor**
     - The role for everyone who makes meaningful code contributions to the mod on GitHub.
     - Requires one or more merged PRs on GitHub, not just suggestions or bug reports.
+
+## Moderation Roles
+
+People who moderate the Discord server or help others there.
+
+- **Discord Moderator**
+    - This role has moderation permissions on the Discord server (warn, mute, ban).
+    - Independent of coding/contributing.
+    - Gets selected from **Community Helper** or higher roles.
 - **Community Helper**
     - Someone who helps others in the Discord a lot around SkyHanni.
-    - Selected by Admins and Main Contributors from active community members.
+    - Selected by Admins and Discord Moderators from active community members.
 
 ## Fancy Roles
 
 These roles are purely cosmetic and exist to recognize specific community contributions or partnerships.  
-If those users talk to you, you read their name in cool colors.
 
 - **Bug Hunter**
     - Awarded to members who report important or hard-to-find bugs, or who go out of their way to test features and track down
@@ -68,17 +65,9 @@ If those users talk to you, you read their name in cool colors.
     - Automatically assigned by Discord to members who actively boost the server.
     - Unlocks Discord-native visual perks.
 
-## Normal Roles
-
-If those users talk to you, congratulations, you found the chat.
-
-- **Member**
-    - Lucky users who found the invite link.
-
 ## Ping Roles
 
 All those roles are self-selectable for all members.  
-If those users talk to you, you are yapping with a nerd.
 
 - **Announcements**
     - When something big happens.
@@ -90,14 +79,13 @@ If those users talk to you, you are yapping with a nerd.
 [//]: # (This is a hidden comment: This role may be renamed to Beta Tester in the future.)
 
 - **Leaks Ping**
-    - When a **Main Contributor** or higher decides to show off something new and cool.
+    - When a **Code Reviewer** or higher decides to show off something new and cool.
 - **Stream Ping**
     - When someone actually streams while coding. It happens. Sometimes.
 
 ## Bot Roles
 
 Only for bots, with different levels of permissions.  
-If those users talk to you, you know they aren't human.
 
 - **Bot**
     - Generic "this is a bot" role.
@@ -129,7 +117,6 @@ If those users talk to you, you know they aren't human.
 ## Special Roles
 
 Hopefully you don't encounter such users in the wild.  
-If those users talk to you, you can ignore them.
 
 - **Muted**
     - You shall not write.
