@@ -27,7 +27,7 @@ object TestCopySackItems {
     val inventory = InventoryDetector { inventoryNamePattern }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!DevApi.config.debug.copySacksItems) return
         if (!inventory.isInside()) return
 
