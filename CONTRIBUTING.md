@@ -195,6 +195,13 @@ E.g. when reverting pull requests or doing quick fixes to PRs merged immediately
 To tell the changelog build this, write either `exclude_from_changelog` or `ignore_from_changelog` in one line.
 Make sure such pull requests have a good explanation in the **What** section.
 
+### Reviews
+
+Pull requests are reviewed by our maintainers, the Reviewer team on GitHub. On Discord, they have the **Code Reviewer** role.
+Only approvals from members of the Reviewer team count toward merging. A PR needs 3 of them before it can be merged.
+New commits, including amended or rebased ones, reset existing approvals.
+Everyone is still welcome to leave comments and feedback on any PR.
+
 ## Coding Styles and Conventions
 
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
