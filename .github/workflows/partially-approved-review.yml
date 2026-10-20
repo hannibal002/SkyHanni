@@ -6,15 +6,10 @@ on:
         workflows: [ "Partially Approved Trigger" ]
         types: [ completed ]
 
-# Unlike Build Review, the event is not part of the group. Every run checks the whole state, so the newest one may
-# cancel any older one.
-concurrency:
-    group: partially-approved-review-${{ github.event.workflow_run.head_repository.id }}-${{ github.event.workflow_run.head_branch }}
-    cancel-in-progress: true
-
 permissions:
     issues: write
     pull-requests: write
+    actions: read
 
 jobs:
     review:
@@ -28,17 +23,26 @@ jobs:
             -   name: Checkout
                 uses: actions/checkout@v7
 
-            -   name: Resolve PR number
+            # Outside the checkout, so the artifact cannot overwrite repository files.
+            -   name: Download PR number
+                uses: actions/download-artifact@v8
+                with:
+                    name: partially-approved-pr
+                    run-id: ${{ github.event.workflow_run.id }}
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    path: ${{ runner.temp }}/partially-approved-pr/
+
+            # A fork can change the run that uploaded the artifact, so only a plain number gets through.
+            -   name: Read PR number
                 id: pr
                 env:
-                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                    HEAD_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
-                    HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
-                    TARGET_REPO: ${{ github.repository }}
+                    PR_FILE: ${{ runner.temp }}/partially-approved-pr/pr-number.txt
                 run: |
-                    PR_NUMBER=$(gh api --paginate "repos/$TARGET_REPO/pulls?state=open" \
-                    | jq -s --arg repo "$HEAD_REPO" --arg branch "$HEAD_BRANCH" \
-                    'add | map(select(.head.repo.full_name == $repo and .head.ref == $branch)) | .[0].number // empty')
+                    PR_NUMBER=$(head -n 1 "$PR_FILE")
+                    if ! [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+                        echo "The artifact does not hold a PR number"
+                        exit 1
+                    fi
                     echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
 
             -   name: Cache Kotlin compiler
@@ -57,7 +61,6 @@ jobs:
 
             # No head SHA check like in the other review workflows, the result does not depend on the commit.
             -   name: Evaluate partially approved label
-                if: steps.pr.outputs.number != ''
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
