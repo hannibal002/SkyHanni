@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButt
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
@@ -63,7 +64,24 @@ object ChestValue {
      */
     private val relevantChestValuePattern by RepoPattern.pattern(
         "inventory.chestvalue.relevant",
-        "Personal Vault|Chest Storage|Wood Chest\\+"
+        "Personal Vault|Chest Storage|Wood Chest\\+",
+    )
+
+    /**
+     * REGEX-TEST: Ender Chest (1/9)
+     */
+    private val enderChestPattern by RepoPattern.pattern(
+        "inventory.chestvalue.ender_chest",
+        "Ender Chest \\(",
+    )
+
+    /**
+     * REGEX-TEST: Backpack Slot (Slot #1)
+     * REGEX-TEST: Backpack Slot (Slot #18)
+     */
+    private val backpackPattern by RepoPattern.pattern(
+        "inventory.chestvalue.backpack",
+        "Backpack.*Slot #",
     )
 
     @HandleEvent
@@ -253,8 +271,8 @@ object ChestValue {
         if (MinionFeatures.minionInventoryOpen) return false
         if (MinionFeatures.minionStorageInventoryOpen) return false
 
-        if (name.startsWith("Ender Chest (")) return StorageType.ENDER_CHEST in config.enabledIn.get()
-        if (name.contains("Backpack") && name.contains("Slot #")) return StorageType.BACKPACK in config.enabledIn.get()
+        if (enderChestPattern.matches(name)) return StorageType.ENDER_CHEST in config.enabledIn.get()
+        if (backpackPattern.matches(name)) return StorageType.BACKPACK in config.enabledIn.get()
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
         return InventoryUtils.isInNormalChest() || inMinion || relevantChestValuePattern.matches(name)
