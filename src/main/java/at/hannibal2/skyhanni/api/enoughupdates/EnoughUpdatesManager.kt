@@ -40,7 +40,6 @@ import com.google.gson.JsonPrimitive
 import net.minecraft.nbt.StringTag
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStackTemplate
-import java.io.File
 import java.util.TreeMap
 import kotlin.math.floor
 import kotlinx.coroutines.coroutineScope
@@ -50,11 +49,6 @@ import kotlinx.coroutines.sync.withLock
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
 object EnoughUpdatesManager {
-
-    val configDirectory = File("config/notenoughupdates")
-    private val repoDirectory = File(configDirectory, "repo")
-    private val itemsFolder = File(repoDirectory, "items")
-
     private val loadingMutex = Mutex()
     private val itemMap = TreeMap<NeuInternalName, NeuItemJson>()
     private val internalNameSet: MutableSet<NeuInternalName> = mutableSetOf()
@@ -327,7 +321,7 @@ object EnoughUpdatesManager {
 
     fun reportItemStatus() {
         val loadedItems = itemMap.size
-        val directorySize = itemsFolder.listFiles()?.size ?: 0
+        val directorySize = EnoughUpdatesRepoManager.repoFileSystem.list("items").size
 
         val status = when {
             directorySize == 0 -> "§cNo item directory entries found!"
