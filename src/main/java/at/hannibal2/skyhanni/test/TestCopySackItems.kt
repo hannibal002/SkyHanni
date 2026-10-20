@@ -6,8 +6,7 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.OSUtils
 
 @SkyHanniModule
@@ -16,12 +15,11 @@ object TestCopySackItems {
     @HandleEvent
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!DevApi.config.debug.copySacksItems) return
-        if (SackApi.inventory.isInside()) return
+        if (!SackApi.inventory.isInside()) return
 
         val sackItems = mutableSetOf<String>()
         for (item in event.inventoryItems.values) {
-            val internalName = item.getInternalName()
-            if (internalName == NeuInternalName.NONE) continue
+            val internalName = item.getInternalNameOrNull() ?: continue
             sackItems.add(internalName.asString())
         }
         if (sackItems.isEmpty()) return
