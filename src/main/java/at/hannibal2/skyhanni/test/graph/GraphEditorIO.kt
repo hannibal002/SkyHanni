@@ -80,8 +80,7 @@ object GraphEditorIO {
 
         val compileGraph = compileGraph()
         val json = compileGraph.toJson()
-        ClipboardUtils.copyToClipboardAsyncWithResponse(json, info = "Graph")
-        val copied = OSUtils.copyToClipboardAsync(json) ?: false
+        val copied = ClipboardUtils.copyToClipboardAsync(json) ?: false
         if (!copied) return@launch ChatUtils.chat("§cFailed to copy graph to clipboard.")
 
         ChatUtils.chat("Copied Graph to Clipboard.")

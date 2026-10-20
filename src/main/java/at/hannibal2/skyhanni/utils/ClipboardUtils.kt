@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import com.mojang.blaze3d.platform.ClipboardManager
 import net.minecraft.client.Minecraft
-import kotlinx.coroutines.Deferred
 
 object ClipboardUtils {
 
