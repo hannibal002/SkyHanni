@@ -40,7 +40,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButt
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
@@ -71,7 +70,7 @@ object ChestValue {
      * REGEX-TEST: Ender Chest (1/9)
      */
     private val enderChestPattern by RepoPattern.pattern(
-        "inventory.chestvalue.ender_chest",
+        "inventory.chestvalue.ender-chest",
         "Ender Chest \\(",
     )
 
