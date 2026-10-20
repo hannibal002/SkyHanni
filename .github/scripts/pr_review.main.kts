@@ -223,8 +223,8 @@ enum class DependencyState {
     UNRESOLVED
 }
 
-// Split during parsing, not derived afterward: a line on hannibal002/SkyHanni-REPO is valid and deliberately
-// produces no dependency, so subtracting the recognized entries would report it as malformed.
+// Split during parsing, not derived afterward: a line on the SkyHanni-REPO is valid and deliberately produces no
+// dependency, so subtracting the recognized entries would report it as malformed.
 data class ParsedDependencySection(val dependencies: List<Dependency>, val unrecognizedLines: List<String>)
 
 // Everything wrong with one dependency section, so the comment can name all of it at once. Placeholder and
@@ -1084,7 +1084,10 @@ fun parseDependencySection(sectionLines: List<String>): ParsedDependencySection 
     for (line in sectionLines) {
         val urlMatch = dependencyUrlRegex.find(line)
         if (urlMatch != null) {
-            val depOwner = urlMatch.groupValues[1]
+            // Links from before the move to the organization still name the old owner. The API answers those with a
+            // redirect that ghRequest does not follow, so the old owner, spelled exactly "hannibal002", is read as
+            // the current one for every repository.
+            val depOwner = urlMatch.groupValues[1].takeUnless { it == "hannibal002" } ?: repoOwner
             val depRepo = urlMatch.groupValues[2]
             // A number too large for an Int cannot be a pull request. toInt would throw, and nothing catches
             // that: the closed event iterates over every labeled PR and would abandon the rest of them.
@@ -1094,7 +1097,7 @@ fun parseDependencySection(sectionLines: List<String>): ParsedDependencySection 
                 continue
             }
             // Valid, and deliberately produces no dependency. Never a malformed line.
-            if (depOwner == "hannibal002" && depRepo == "SkyHanni-REPO") continue
+            if (depOwner == repoOwner && depRepo == "SkyHanni-REPO") continue
             deps.add(Dependency(depOwner, depRepo, depNum, line))
             continue
         }
