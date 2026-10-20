@@ -9,11 +9,8 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 
-//? if >= 26.3 {
+//~ if >= 26.3 'glfw.GLFW' -> 'sdl.SDLVideo'
 import org.lwjgl.sdl.SDLVideo
-//?} else {
-/*import org.lwjgl.glfw.GLFW
-*///?}
 
 @SkyHanniModule
 object SeeThroughWindow {
