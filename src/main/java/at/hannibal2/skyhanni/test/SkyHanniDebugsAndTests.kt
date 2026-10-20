@@ -387,11 +387,12 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+        @HandleEvent(onlyOnSkyblock = true)
     private fun onKeyDown(event: KeyDownEvent) {
-        if (event.keyCode == debugConfig.copySubLocation && MinecraftCompat.screen == null) {
-            HypixelData.skyBlockArea?.let(OSUtils::copyToClipboard)
-        }
+        val area = HypixelData.skyBlockArea ?: return
+        if (event.keyCode != debugConfig.copySubLocation || MinecraftCompat.screen != null) return
+        OSUtils.copyToClipboard(area)
+        ChatUtils.chat("§eCopied sub-location §7$area §eto the clipboard!")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
