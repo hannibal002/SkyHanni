@@ -20,7 +20,7 @@ object BoopAchievement {
      * REGEX-TEST: To [MVP+] Bloxigus: Boop!
      * REGEX-TEST: To qtLuna: Boop!
      */
-    private val boopPattern by AchievementManager.group.pattern(
+    private val boopPattern by AchievementManager.patternGroup.pattern(
         "boop",
         "To .*: Boop!",
     )
