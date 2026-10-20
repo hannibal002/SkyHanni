@@ -67,20 +67,21 @@ object ChestValue {
     )
 
     /**
+     * REGEX-TEST: Ender Chest (1/3)
      * REGEX-TEST: Ender Chest (1/9)
      */
     private val enderChestPattern by RepoPattern.pattern(
         "inventory.chestvalue.ender-chest",
-        "Ender Chest \\(",
+        ".*Ender Chest \\(.*",
     )
 
     /**
-     * REGEX-TEST: Backpack Slot (Slot #1)
+     * REGEX-TEST: Small Backpack (Slot #1)
      * REGEX-TEST: Backpack Slot (Slot #18)
      */
     private val backpackPattern by RepoPattern.pattern(
         "inventory.chestvalue.backpack",
-        "Backpack.*Slot #",
+        ".*Backpack.*Slot #.*",
     )
 
     @HandleEvent
