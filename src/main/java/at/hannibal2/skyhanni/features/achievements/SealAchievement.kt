@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object SealAchievement {
@@ -15,7 +14,7 @@ object SealAchievement {
     /**
      * REGEX-TEST: INSANE! You kept the Bouncy Beach Ball in the air for 187 bounces and earned 20 Fishy Treats!
      */
-    private val sealBouncePattern by AchievementManager.group.pattern(
+    private val sealBouncePattern by AchievementManager.patternGroup.pattern(
         "seal-bounce",
         "INSANE! You kept the Bouncy Beach Ball in the air for (?<bounces>\\d+) bounces and earned \\d+ Fishy Treats!",
     )
@@ -25,9 +24,9 @@ object SealAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Seal Lookalike".asComponent(),
-            "Bounce a ball 100 times".asComponent(),
-            1f,
+            name = "Seal Lookalike",
+            description = "Bounce a ball 100 times",
+            userLuckAmount = 1f,
         )
         event.register(achievement, SEAL_BOUNCE_ACHIEVEMENT)
     }

@@ -130,7 +130,7 @@ object PowderChestTimer {
         display = drawDisplay()?.let(Renderable::text)
 
         chests.keys.removeIf { pos ->
-            ((MinecraftCompat.localWorld.getBlockEntity(pos.toBlockPos()) as? ChestBlockEntity)?.getOpenNess(1f) ?: 0f) > 0f
+            ((MinecraftCompat.localWorldOrThrow.getBlockEntity(pos.toBlockPos()) as? ChestBlockEntity)?.getOpenNess(1f) ?: 0f) > 0f
         }
     }
 

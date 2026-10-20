@@ -5,8 +5,8 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class WarpsJson(
-    @Expose val warpCommands: List<String>,
-    @Expose val warpLocation: Map<String, WarpLocationData>,
+    @Expose @SerializedName(value = "warp_commands", alternate = ["warpCommands"]) val warpCommands: List<String>,
+    @Expose @SerializedName(value = "warp_location", alternate = ["warpLocation"]) val warpLocation: Map<String, WarpLocationData>,
 )
 
 data class WarpLocationData(

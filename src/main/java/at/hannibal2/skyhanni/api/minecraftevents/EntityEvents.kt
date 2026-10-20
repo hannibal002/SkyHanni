@@ -17,7 +17,7 @@ object EntityEvents {
     fun onPacketReceived(event: PacketReceivedEvent) {
         val packet = event.packet as? ClientboundHurtAnimationPacket ?: return
 
-        val entity = MinecraftCompat.localWorld.getEntity(packet.id()) ?: return
+        val entity = MinecraftCompat.localWorldOrNull?.getEntity(packet.id()) ?: return
         EntityHurtEvent(entity, DamageSourceCompat.generic, 0.0f).post()
 
         val skyblockMob = MobData.entityToMob[entity] ?: return

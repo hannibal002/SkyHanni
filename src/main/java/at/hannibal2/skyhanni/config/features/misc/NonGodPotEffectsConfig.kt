@@ -27,7 +27,7 @@ class NonGodPotEffectsConfig {
     var showMixins: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Expire Warning", desc = "Sends a title when one of the Non God Pot Effects is expiring.")
+    @ConfigOption(name = "Expire Warning", desc = "Sends a title and message when one of the Non God Pot Effects is expiring.")
     @ConfigEditorBoolean
     @FeatureToggle
     var expireWarning: Boolean = false

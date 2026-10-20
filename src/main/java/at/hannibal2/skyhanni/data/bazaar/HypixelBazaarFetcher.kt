@@ -82,6 +82,9 @@ object HypixelBazaarFetcher {
                 latestProductInformation = process(response.products)
                 failedAttempts = 0
                 lastSuccessfulFetch = SimpleTimeMark.now()
+                if (fetchType == "manual") {
+                    ChatUtils.chat("§aSuccessfully updated the bazaar prices.")
+                }
             } else {
                 val rawResponse = jsonResponse.toString()
                 onError(fetchType, Exception("success=false, cause=${response.cause}"), rawResponse)

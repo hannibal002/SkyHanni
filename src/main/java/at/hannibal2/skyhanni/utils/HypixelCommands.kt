@@ -239,12 +239,16 @@ object HypixelCommands {
         send("quiver")
     }
 
-    fun fishingBag() {
-        send("fishingbag")
+    fun baitSack() {
+        send("baitsack")
     }
 
     fun huntingBox() {
         send("hb")
+    }
+
+    fun tpToDonExpresso() {
+        send("tptodonexpresso")
     }
 
     private fun send(command: String) {

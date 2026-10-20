@@ -4,7 +4,11 @@ import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
+/**
+ * The object we work with in code with features that work wiith navigation or area detetion
+ */
 class GraphNode(
     val id: Int,
     override val position: LorenzVec,
@@ -12,6 +16,9 @@ class GraphNode(
     val tagNames: List<String> = emptyList(),
     val extraWeight: Int = 0,
 ) : GraphUtils.GenericNode {
+
+    val cleanName: String?
+        get() = name?.removeColor()
 
     val tags: List<GraphNodeTag> by lazy {
         tagNames.mapNotNull { GraphNodeTag.byId(it) }
@@ -30,7 +37,7 @@ class GraphNode(
 
     fun sameNameAndTags(other: GraphNode): Boolean = name == other.name && allowedTags == other.allowedTags
 
-    private val allowedTags get() = tags.filter { it in NavigationHelper.allowedTags }
+    private val allowedTags get() = tags.filter { it in NavigationHelper.allowedSingleNavigationTags }
 
     // Identity is by id alone - two GraphNode references with the same id are the same node regardless
     // of mutable state (neighbors, enabled), which must not participate in equality.

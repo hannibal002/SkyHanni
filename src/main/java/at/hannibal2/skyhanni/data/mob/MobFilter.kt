@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -48,10 +49,9 @@ import net.minecraft.world.entity.npc.villager.Villager
 import net.minecraft.world.entity.player.Player
 import org.intellij.lang.annotations.Language
 
-@Suppress("RegExpRedundantEscape")
 @SkyHanniModule
+@Suppress("MaxLineLength", "RegExpRedundantEscape")
 object MobFilter {
-
     private val patternGroup = RepoPattern.group("mob.detection")
 
     @Language("RegExp")
@@ -61,39 +61,44 @@ object MobFilter {
     private val level = "(?:\\[Lv(?<level>\\d+)\\] )?"
 
     /**
-     * REGEX-TEST: Wither Husk 500M❤
-     * REGEX-TEST: [Lv10] ⚓♃ Sea Guardian 4,250/5,000❤
+     * REGEX-TEST: Wither Husk 500M
+     * REGEX-TEST: [Lv10] ⚓♃ Sea Guardian 4,250/5,000
      */
     val mobNameFilter by patternGroup.pattern(
         "filter.basic",
-        "$level$mobType(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
+        "$level$mobType(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,${SkyblockStat.HEALTH.hypixelIcon}]+",
     )
 
     /**
-     * REGEX-TEST: ☠ Revenant Horror IV 1.5M❤
-     * REGEX-TEST: ☠ Atoned Horror 2M❤
-     * REGEX-TEST: ☠ Conjoined Brood 19.9M❤
-     * REGEX-FAIL: ☠ Atoned Ho 2M❤
+     * REGEX-TEST: [Lv655] ☠ Voidgloom Seraph IV 94 Hits
+     * REGEX-TEST: [Lv655] ☠ Voidgloom Seraph IV 143.2M/210M❤
+     * REGEX-TEST: [Lv396] ☠ Tarantula Broodfather V 6.3M/10M❤
+     * REGEX-TEST: [Lv377] ☠ Atoned Horror 4.1M/10M❤
+     * REGEX-TEST: [Lv396] ☠ Conjoined Brood 12.4M/20M❤
+     * REGEX-FAIL: [Lv183] ☠ Voidling Fanatic 750k/750k❤
+     * REGEX-FAIL: [Lv305] ☠ Voidling Extremist 7.3M/8M❤
+     * REGEX-FAIL: [Lv186] ☠ Primordial Minion 1.5M/1.5M❤
+     * REGEX-FAIL: [Lv11] ☠ Voracious Spider 430/430❤
      */
     val slayerNameFilter by patternGroup.pattern(
         "filter.slayer",
-        "^$mobType. (?<name>.*)(?: (?<tier>[IV]+)|(?<=Atoned Horror|Conjoined Brood)) \\d+.*",
+        "^(?:\\[Lv(?<level>\\d+)\\] )?(?<mobType>[^\\w\\s✯\\-]+ )?. (?<name>.*)(?: (?<tier>[IV]+)|(?<=Atoned Horror|Conjoined Brood)) \\d+.*",
     )
 
     /**
      * REGEX-TEST: ﴾ Storm ﴿
-     * REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M ﴿
      * REGEX-TEST: ﴾ [Lv500] Magma Boss █████████████████████████ ﴿
-     * REGEX-TEST: ﴾ [Lv200] Bladesoul 50M/50M❤ ﴿
-     * REGEX-TEST: ﴾ [Lv300] Arachne 20,000/20,000❤ ﴿
-     * REGEX-TEST: ﴾ [Lv500] Arachne 100k/100k❤ ﴿
-     * REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M❤ ﴿
-     * REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M❤ ﴿
-     * REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv200] Bladesoul 50M/50M ﴿
+     * REGEX-TEST: ﴾ [Lv300] Arachne 20,000/20,000 ﴿
+     * REGEX-TEST: ﴾ [Lv500] Arachne 100k/100k ﴿
+     * REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M ﴿
+     * REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M ﴿
+     * REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M ﴿
      */
     val bossMobNameFilter by patternGroup.pattern(
         "filter.boss",
-        "^. $level$mobType(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+| █+)? .$",
+        "^. $level$mobType(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,${SkyblockStat.HEALTH.hypixelIcon}]+| █+)? .$",
     )
 
     @Suppress("MaxLineLength")
@@ -111,13 +116,14 @@ object MobFilter {
     )
 
     /**
-     * REGEX-TEST: [Lv1] ✰⛨ Throwpo's Green Jerry 3 Hits
-     * REGEX-TEST: [Lv1] ✰⛨ RecluseFang's Green Jerry 3 Hits
-     * REGEX-TEST: [Lv1] ✰⛨ aThunderblade73's Green Jerrya 7 Hits
+     * REGEX-TEST: [Lv1]  Throwpo's Green Jerry 3 Hits
+     * REGEX-TEST: [Lv1]  RecluseFang's Green Jerry 3 Hits
+     * REGEX-TEST: [Lv1]  aThunderblade73's Green Jerrya 7 Hits
+     * REGEX-TEST: [Lv1]  aThunderblade73's Golden Jerrya 7 Hits
      */
     val jerryPattern by patternGroup.pattern(
         "jerry",
-        "(?:\\[\\w+(?<level>\\d+)] )?✰⛨ (?:(?:a(?=a ))?(?<owner>\\w+)'s (?<name>\\w+ Jerrya?)) \\d+ Hits",
+        "(?:\\[\\w+(?<level>\\d+)] )?... (?:(?:a(?=a ))?(?<owner>\\w+)'s (?<name>\\w+ Jerrya?)) \\d+ Hits",
     )
     val petCareNamePattern by patternGroup.pattern(
         "pattern.petcare",
@@ -131,17 +137,12 @@ object MobFilter {
     )
     val jerryMagmaCubePattern by patternGroup.pattern(
         "pattern.jerry.magma.cube",
-        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c❤",
+        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c${SkyblockStat.HEALTH.hypixelIcon}",
     )
     val summonOwnerPattern by patternGroup.pattern(
         "pattern.summon.owner",
         ".*Spawned by: (?<name>.*).*",
     )
-    val heavyPearlPattern by patternGroup.pattern(
-        "pattern.heavypearl.collect",
-        "§.§lCOLLECT!",
-    )
-
     /**
      * REGEX-TEST: SHINY PIG
      */
@@ -292,12 +293,12 @@ object MobFilter {
 
         baseEntity.isFarmMob() -> createFarmMobs(baseEntity)?.let { MobResult.found(it) }
         baseEntity is EnderDragon -> when (SkyBlockUtils.currentIsland) {
-            IslandType.CATACOMBS -> (8..16).map { MobUtils.getArmorStand(baseEntity, it) }
+            CATACOMBS -> (8..16).map { MobUtils.getArmorStand(baseEntity, it) }
                 .makeMobResult {
                     MobFactories.boss(baseEntity, it.first(), it.drop(1))
                 }
 
-            else -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
+            else -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName))
         }
 
         baseEntity is Giant && baseEntity.name.string == "Dinnerbone" -> MobResult.found(
@@ -306,11 +307,9 @@ object MobFilter {
                 "Giant Sword",
             ),
         ) // Will false trigger if there is another Dinnerbone Giant
-        baseEntity is CaveSpider -> MobUtils.getArmorStand(baseEntity, -1)
-            ?.takeIf { summonOwnerPattern.matches(it.cleanName()) }?.let {
-                MobData.entityToMob[MobUtils.getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)
-                    ?.let { MobResult.illegal }
-            }
+        baseEntity is CaveSpider -> MobData.entityToMob[MobUtils.getNextEntity(baseEntity, -3)]
+            ?.takeIf { it.category == MobCategory.SLAYER && it.name == "Tarantula Broodfather" }
+            ?.internalAddEntity(baseEntity)?.let { MobResult.illegal }
 
         baseEntity is WitherBoss && baseEntity.invulnerableTicks == 800 -> MobResult.found(
             MobFactories.special(
@@ -336,7 +335,7 @@ object MobFilter {
 
         if (armorStand == null) return null
         armorStandOnlyMobs(baseEntity, armorStand)?.also { return it }
-        jerryPattern.matchMatcher(armorStand.cleanName()) {
+        jerryPattern.matchMatcher(armorStand.cleanName) {
             val level = this.group("level")?.toInt() ?: -1
             val owner = this.group("owner") ?: return@matchMatcher
             val name = this.group("name") ?: return@matchMatcher
@@ -353,7 +352,7 @@ object MobFilter {
         }
         return when {
             (baseEntity is Pig || baseEntity is Horse) && illegalEntitiesPattern.matches(armorStand.name.formattedTextCompatLessResets()) -> MobResult.illegal
-            baseEntity is Guardian && armorStand.cleanName()
+            baseEntity is Guardian && armorStand.cleanName
                 .matches("^\\d+".toRegex()) -> MobResult.illegal // Wierd Sea Guardian Ability
             else -> null
         }
@@ -370,7 +369,7 @@ object MobFilter {
                 else -> null
             }
         } else when (SkyBlockUtils.currentIsland) {
-            IslandType.CRIMSON_ISLE -> when {
+            CRIMSON_ISLE -> when {
                 else -> null
             }
 
@@ -395,7 +394,7 @@ object MobFilter {
 
     fun LivingEntity.isFarmMob() =
         this is Animal && this.baseMaxHealth.derpy()
-            .let { it == 50 || it == 20 || it == 130 } && SkyBlockUtils.currentIsland != IslandType.PRIVATE_ISLAND
+            .let { it == 50 || it == 20 || it == 130 } && SkyBlockUtils.currentIsland != PRIVATE_ISLAND
 
     private fun createFarmMobs(baseEntity: LivingEntity): Mob? = when (baseEntity) {
         is MushroomCow -> MobFactories.basic(baseEntity, "Farm Mooshroom")

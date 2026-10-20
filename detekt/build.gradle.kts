@@ -1,7 +1,6 @@
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
 
-
 plugins {
     kotlin("jvm")
     id("com.google.devtools.ksp")
@@ -13,7 +12,6 @@ dependencies {
     ksp(libs.autoservice.ksp)
     implementation(libs.autoservice.annotations)
     implementation(libs.detektrules.ktlint)
-    testImplementation(libs.kotest.assertions)
     testImplementation(libs.detekt.test)
     detektPlugins(libs.detektrules.authors)
     detektPlugins(libs.detektrules.ktlint)

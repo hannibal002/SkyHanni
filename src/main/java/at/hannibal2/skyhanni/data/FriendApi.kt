@@ -3,15 +3,14 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
-import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.PlayerFriends.Friend
+import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.Friend
+import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.PlayerFriends
 import at.hannibal2.skyhanni.events.FriendAddEvent
 import at.hannibal2.skyhanni.events.FriendRemoveEvent
 import at.hannibal2.skyhanni.events.FriendRequestDeclinedEvent
 import at.hannibal2.skyhanni.events.FriendRequestExpiredEvent
 import at.hannibal2.skyhanni.events.FriendRequestSentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
@@ -81,10 +81,11 @@ object FriendApi {
 
     /**
      * REGEX-TEST: The friend request to ouppy has expired.
+     * REGEX-TEST: Your friend request to Eisengolem has expired.
      */
     private val friendRequestExpiredPattern by patternGroup.pattern(
         "friend-request-expired",
-        "The friend request to (?<name>.*) has expired.",
+        "(?:The|Your) friend request to (?<name>.*) has expired.",
     )
 
     /**
@@ -99,16 +100,8 @@ object FriendApi {
     private val tempFriends = mutableListOf<Friend>()
 
     private fun getFriends() = SkyHanniMod.friendsData.players.getOrPut(PlayerUtils.getRawUuid()) {
-        FriendsJson.PlayerFriends().also { it.friends = mutableMapOf() }
+        PlayerFriends()
     }.friends
-
-    @HandleEvent
-    fun onHypixelJoin(event: HypixelJoinEvent) {
-        if (SkyHanniMod.friendsData.players == null) {
-            SkyHanniMod.friendsData.players = mutableMapOf()
-            saveConfig()
-        }
-    }
 
     fun getAllFriends(): List<Friend> {
         val list = mutableListOf<Friend>()
@@ -122,7 +115,7 @@ object FriendApi {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         readFriendsList(event)
 
         removedFriendPattern.matchMatcher(event.message) {
@@ -163,7 +156,7 @@ object FriendApi {
     }
 
     private fun addFriend(name: String) {
-        tempFriends.add(Friend().also { it.name = name })
+        tempFriends.add(Friend(name = name))
         FriendAddEvent(name).post()
     }
 
@@ -178,7 +171,7 @@ object FriendApi {
         if (!event.message.contains("Friends")) return
 
         for (sibling in event.chatComponent.siblings) {
-            val chatStyle = sibling.style ?: continue
+            val chatStyle = sibling.style.takeUnlessEmpty() ?: continue
             val value = sibling.command ?: continue
             if (!value.startsWith("/viewprofile")) continue
 
@@ -202,10 +195,10 @@ object FriendApi {
             val bestFriend = sibling.unformattedTextCompat().split(" ").firstOrNull()?.contains("§l") ?: false
             val name = readName(sibling)
             if (uuid != null && name != null) {
-                getFriends()[uuid] = Friend().also {
-                    it.name = name
-                    it.bestFriend = bestFriend
-                }
+                getFriends()[uuid] = Friend(
+                    name = name,
+                    bestFriend = bestFriend,
+                )
             }
         }
 

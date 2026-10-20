@@ -11,13 +11,16 @@ class RepoRuleSetProvider : RuleSetProvider {
     override val ruleSetId: RuleSetId = RuleSetId("RepoRules")
 
     override fun instance(): RuleSet {
+        val context = RepoPatternContext()
+
         return RuleSet(
             ruleSetId,
             mapOf(
                 RuleName("SkullTexturesUseRepo") to ::SkullTexturesUseRepo,
-                RuleName("RepoPatternRegexTestFailed") to ::RepoPatternRegexTestFailed,
-                RuleName("RepoPatternRegexTestMissing") to ::RepoPatternRegexTestMissing,
-                RuleName("RepoPatternUnnamedGroup") to ::RepoPatternUnnamedGroup,
+                RuleName("RepoPatternRegexTestFailed") to { config -> RepoPatternRegexTestFailed(config, context) },
+                RuleName("RepoPatternRegexTestMissing") to { config -> RepoPatternRegexTestMissing(config, context) },
+                RuleName("RepoPatternUnnamedGroup") to { config -> RepoPatternUnnamedGroup(config, context) },
+                RuleName("RepoPatternPassesShapeRequirement") to { config -> RepoPatternPassesShapeRequirement(config, context) },
             ),
         )
     }

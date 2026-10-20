@@ -74,24 +74,9 @@ class SlayerConfig {
     val slayerTimeMessages: SlayerTimeMessagesConfig = SlayerTimeMessagesConfig()
 
     @Expose
-    @ConfigOption(name = "Remaining Kills", desc = "Display the names and remaining amount of mob kills needed until the boss spawns.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var remainingKills: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Remaining Kills Level", desc = "Include the mob Level in the Remaining Kills display")
-    @ConfigEditorBoolean
-    var remainingKillsLevel: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Remaining Kills Health", desc = "Include the mob Health in the Remaining Kills display")
-    @ConfigEditorBoolean
-    var remainingKillsHealth: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = SlayerConfig::class, field = "remainingKills")
-    val remainingKillsPosition: Position = Position(410, 110)
+    @ConfigOption(name = "Remaining Kills Display", desc = "")
+    @Accordion
+    val slayerRemainingKills: SlayerRemainingKillsConfig = SlayerRemainingKillsConfig()
 
     @Expose
     @ConfigOption(name = "Active Boss Transparency", desc = "")
@@ -192,11 +177,31 @@ class SlayerConfig {
     @ConfigEditorBoolean
     var damageSplashHider: Boolean = false
 
+    @Expose
+    @ConfigOption(
+        name = "No Gummy Warning",
+        desc = "Sends a warning when you don't have a Re-Heated Gummy Polar Bear active " +
+            "while you have Habanero Tactics on your gear, or are in the Smoldering Tomb."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var gummyWarning: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = SlayerConfig::class, field = "gummyWarning")
+    val gummyWarningPosition: Position = Position(2, 100)
+
     @SkyHanniModule
     companion object {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-            event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
+            val oldPath = "slayer."
+            event.move(126, "${oldPath}hideIrrelevantMobsOpacity", "${oldPath}hideIrrelevantMobsTransparency")
+            val remainingKillsPath = "${oldPath}slayerRemainingKills."
+            event.move(138, "${oldPath}remainingKills", "${remainingKillsPath}display")
+            event.move(138, "${oldPath}remainingKillsLevel", "${remainingKillsPath}includeMobLevel")
+            event.move(138, "${oldPath}remainingKillsHealth", "${remainingKillsPath}includeMobHealth")
+            event.move(138, "${oldPath}remainingKillsPosition", "${remainingKillsPath}remainingKillsPosition")
         }
     }
 }

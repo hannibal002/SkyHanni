@@ -37,7 +37,7 @@ object XPInInventories {
         }
         if (indexOfCost == -1) return
 
-        val playerXP = MinecraftCompat.localPlayer.experienceLevel
+        val playerXP = MinecraftCompat.localPlayerOrThrow.experienceLevel
         val color = if (playerXP >= requiredXP) "§a" else "§c"
         event.toolTip.add(indexOfCost + 1, "§7Your XP: $color$playerXP")
     }

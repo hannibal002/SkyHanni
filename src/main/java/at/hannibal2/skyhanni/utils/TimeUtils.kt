@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -30,6 +31,9 @@ import kotlin.time.DurationUnit
 
 @Suppress("TooManyFunctions")
 object TimeUtils {
+    private val patternGroup = RepoPattern.group("timeutils")
+
+    private const val TIME_UNTIL_DATE_FORMAT = "dd MMM, hh:mm a"
 
     val isAprilFoolsDay: Boolean by RecalculatingValue(1.seconds) {
         val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
@@ -116,6 +120,31 @@ object TimeUtils {
 
     fun getDurationOrNull(string: String): Duration? = getMillis(string.preFixDurationString())
 
+
+    /**
+     * REGEX-TEST: 12:00 am
+     * REGEX-TEST: 11:59 pm
+     * REGEX-TEST: 12:41 am
+     */
+    private val skyblockTimePattern by patternGroup.pattern(
+        "24-hour-time",
+        "(?<hour>\\d+):(?<minute>\\d+)\\s*(?<period>am|pm)"
+    )
+
+    fun String.parse12HourTime(): Pair<Int, Int>? {
+        return skyblockTimePattern.matchMatcher(trim().lowercase()) {
+            var hour = group("hour").toInt()
+            val minute = group("minute").toInt()
+
+            when (group("period")) {
+                "pm" -> if (hour != 12) hour += 12
+                "am" -> if (hour == 12) hour = 0
+            }
+
+            hour to minute
+        }
+    }
+
     private fun getMillis(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
         years("y") + days("d") + hours("h") + minutes("m") + seconds("s")
     } ?: tryAlternativeFormat(string)
@@ -179,6 +208,13 @@ object TimeUtils {
             },
         ).formattedTextCompat()
     }
+
+    /**
+     * Formats how long it takes until [this], plus the real life date, e.g. `4d 3h (14 Jan, 09:32 PM)`.
+     * The time part follows the 24-hour setting in the config.
+     */
+    fun SimpleTimeMark.formatTimeUntilWithDate(): String =
+        "${timeUntil().format(maxUnits = 2)} (${formattedDate(TIME_UNTIL_DATE_FORMAT)})"
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
 

@@ -29,6 +29,14 @@ class TunnelMapsConfig {
 
     @Expose
     @ConfigOption(
+        name = "Show Landmarks",
+        desc = "Show landmarks on the path."
+    )
+    @ConfigEditorBoolean
+    var showLandmarks: Boolean = true
+
+    @Expose
+    @ConfigOption(
         name = "Auto Commission",
         desc = "Take the first collector commission as target when opening the commissions inventory, " +
             "also works when completing commissions."

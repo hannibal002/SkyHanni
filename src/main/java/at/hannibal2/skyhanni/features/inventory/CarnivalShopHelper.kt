@@ -18,9 +18,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.Items
 
@@ -66,10 +66,12 @@ object CarnivalShopHelper {
         "(?:§.)*(?:Souvenir Shop|Carnival Perks)",
     )
 
-    private val overviewInventory = InventoryDetector(overviewInventoryNamesPattern)
-    private val knownShops = InventoryDetector { name ->
-        repoEventShops.any { it.shopName.equals(name, ignoreCase = true) }
-    }
+    private val overviewInventory = InventoryDetector { overviewInventoryNamesPattern }
+    private val knownShops = InventoryDetector(
+        checkInventoryName = { name ->
+            repoEventShops.any { it.shopName.equals(name, ignoreCase = true) }
+        }
+    )
 
     data class EventShop(val shopName: String, val upgrades: List<NeuCarnivalTokenCostJson>)
     data class EventShopUpgradeStatus(

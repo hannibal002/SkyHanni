@@ -16,7 +16,7 @@ object MobFactories {
         armorStand: ArmorStand,
         extraEntityList: List<LivingEntity>,
     ): Mob? =
-        MobFilter.slayerNameFilter.matchMatcher(armorStand.cleanName()) {
+        MobFilter.slayerNameFilter.matchMatcher(armorStand.cleanName) {
             Mob(
                 baseEntity = baseEntity,
                 category = MobCategory.SLAYER,
@@ -34,7 +34,7 @@ object MobFactories {
         extraEntityList: List<LivingEntity> = emptyList(),
         overriddenName: String? = null,
     ): Mob? =
-        MobFilter.bossMobNameFilter.matchMatcher(armorStand.cleanName()) {
+        MobFilter.bossMobNameFilter.matchMatcher(armorStand.cleanName) {
             Mob(
                 baseEntity = baseEntity,
                 category = MobCategory.BOSS,
@@ -51,7 +51,7 @@ object MobFactories {
         armorStand: ArmorStand,
         extraEntityList: List<LivingEntity> = emptyList(),
     ): Mob? =
-        MobFilter.dungeonNameFilter.matchMatcher(armorStand.cleanName()) {
+        MobFilter.dungeonNameFilter.matchMatcher(armorStand.cleanName) {
             Mob(
                 baseEntity = baseEntity,
                 category = MobCategory.DUNGEON,
@@ -72,7 +72,7 @@ object MobFactories {
         armorStand: ArmorStand,
         extraEntityList: List<LivingEntity>? = null,
     ): Mob? =
-        MobFilter.mobNameFilter.findMatcher(armorStand.cleanName()) {
+        MobFilter.mobNameFilter.findMatcher(armorStand.cleanName) {
             Mob(
                 baseEntity = baseEntity,
                 category = MobCategory.BASIC,
@@ -95,7 +95,7 @@ object MobFactories {
         armorStand: ArmorStand,
         extraEntityList: List<LivingEntity>,
     ): Mob? =
-        MobFilter.summonFilter.matchMatcher(armorStand.cleanName()) {
+        MobFilter.summonFilter.matchMatcher(armorStand.cleanName) {
             Mob(
                 baseEntity = baseEntity,
                 category = MobCategory.SUMMON,
@@ -111,7 +111,7 @@ object MobFactories {
             baseEntity = baseEntity,
             category = MobCategory.DISPLAY_NPC,
             armorStand = armorStand,
-            name = armorStand.cleanName(),
+            name = armorStand.cleanName,
             additionalEntities = listOf(clickArmorStand),
         )
 
@@ -124,7 +124,7 @@ object MobFactories {
 
     private fun String.removeCorruptedSuffix(case: Boolean) = if (case) this.dropLast(1) else this
     fun dojo(baseEntity: LivingEntity, armorStand: ArmorStand): Mob? =
-        MobFilter.dojoFilter.matchMatcher(armorStand.cleanName()) {
+        MobFilter.dojoFilter.matchMatcher(armorStand.cleanName) {
             Mob(
                 baseEntity = baseEntity,
                 category = MobCategory.SPECIAL,
@@ -136,6 +136,6 @@ object MobFactories {
         }
 
     fun minionMob(baseEntity: LivingEntity) =
-        Mob(baseEntity, MobCategory.SPECIAL, name = MobFilter.MINION_MOB_PREFIX + baseEntity.cleanName())
+        Mob(baseEntity, MobCategory.SPECIAL, name = MobFilter.MINION_MOB_PREFIX + baseEntity.cleanName)
 
 }

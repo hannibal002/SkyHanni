@@ -73,9 +73,4 @@ class ShoppingListConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var itemPreview: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Ignore Spaceman", desc = "Exclude crops requested by Spaceman from the shopping list.")
-    @ConfigEditorBoolean
-    var ignoreSpaceman: Boolean = false
 }

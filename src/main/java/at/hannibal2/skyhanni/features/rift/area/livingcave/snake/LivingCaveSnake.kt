@@ -1,17 +1,25 @@
 package at.hannibal2.skyhanni.features.rift.area.livingcave.snake
 
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveSnakeFeatures
+import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveSnakeFeatures.FROZEN_WATER_PUNGI
+import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveSnakeFeatures.pickaxes
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.LineDrawer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -28,6 +36,16 @@ class LivingCaveSnake(
 ) {
     val head get() = blocks.first()
     private val tail get() = blocks.last()
+    private val config get() = RiftApi.config.area.livingCave.snakeHelper
+    private val hasBothItems by RecalculatingValue(1.seconds) {
+        if (!IslandType.THE_RIFT.isInIsland()) return@RecalculatingValue false
+        val hotbar = InventoryUtils.getItemsInHotbar()
+
+        val hasBreak = hotbar.any { it.getInternalName() in pickaxes }
+        val hasPungi = hotbar.any { it.getInternalName() == FROZEN_WATER_PUNGI }
+
+        hasBreak && hasPungi
+    }
 
     fun invalidShape(): Boolean = blocks.isEmpty() || blocks.zipWithNext().any { (a, b) ->
         a.distance(b) > 3
@@ -50,18 +68,35 @@ class LivingCaveSnake(
         }
 
         val size = blocks.size
-        if (size > 1 && state == State.CALM && currentRole == LivingCaveSnakeFeatures.Role.BREAK) {
-            val location = lastBrokenBlock?.let {
-                LocationUtils.interpolateOverTime(lastRemoveTime, 300.milliseconds, it, tail)
-            } ?: tail
-            event.renderBlock(location)
+        if (config.solo && hasBothItems) {
+            if (size > 1) {
+                val tailLocation = lastBrokenBlock?.let {
+                    LocationUtils.interpolateOverTime(lastRemoveTime, 300.milliseconds, it, tail)
+                } ?: tail
+                event.renderBlock(tailLocation, LorenzColor.DARK_BLUE.toChromaColor())
+            }
+        } else {
+            if (size > 1 && state == State.CALM && currentRole == LivingCaveSnakeFeatures.Role.BREAK) {
+                val location = lastBrokenBlock?.let {
+                    LocationUtils.interpolateOverTime(lastRemoveTime, 300.milliseconds, it, tail)
+                } ?: tail
+                event.renderBlock(location, state.chromaColor)
+            }
+            if (currentRole == LivingCaveSnakeFeatures.Role.CALM || size == 1 || state != State.CALM) {
+                val location = if (size > 1) {
+                    LocationUtils.interpolateOverTime(lastAddTime, 200.milliseconds, blocks[1], head)
+                } else head
+                event.renderBlock(location, state.chromaColor)
+            }
         }
-        if (currentRole == LivingCaveSnakeFeatures.Role.CALM || size == 1 || state != State.CALM) {
-            val location = if (size > 1) {
-                LocationUtils.interpolateOverTime(lastAddTime, 200.milliseconds, blocks[1], head)
-            } else head
-            event.renderBlock(location)
+
+        val headLocation = if (size > 1) {
+            LocationUtils.interpolateOverTime(lastAddTime, 200.milliseconds, blocks[1], head)
+        } else {
+            head
         }
+        event.renderBlock(headLocation, state.chromaColor)
+
         LineDrawer.draw3D(event, lineWidth = 2, depth = true) {
             for (block in blocks) {
                 if (block == head && lastAddTime.passedSince() < 200.milliseconds) {
@@ -72,9 +107,9 @@ class LivingCaveSnake(
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.renderBlock(location: LorenzVec) {
+    private fun SkyHanniRenderWorldEvent.renderBlock(location: LorenzVec, color: ChromaColour) {
         val isSelected = isSelected()
-        drawColor(location, state.chromaColor, alpha = 1f, seeThroughBlocks = isSelected)
+        drawColor(location, color, alpha = 1f, seeThroughBlocks = isSelected)
         if (isSelected) {
             drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
             drawString(location.add(0.5, 0.2, 0.5), "§b${blocks.size} blocks", seeThroughBlocks = true)
@@ -115,7 +150,7 @@ class LivingCaveSnake(
         return false
     }
 
-    enum class State(private val color: LorenzColor, label: String) {
+    enum class State(color: LorenzColor, label: String) {
         SPAWNING(LorenzColor.AQUA, "Spawning"),
         ACTIVE(LorenzColor.YELLOW, "Active"),
         NOT_TOUCHING_AIR(LorenzColor.RED, "Not touching air"),

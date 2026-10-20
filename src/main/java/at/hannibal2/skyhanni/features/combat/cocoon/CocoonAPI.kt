@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyblockEquipmentDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.LivingSeaCreatureData
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureDetectionApi.seaCreature
-import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -57,7 +57,7 @@ object CocoonAPI {
      */
     // This does not leak Mob, ArmorStand references since it gets cleared on entity leave world and world change events.
     private val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
-    private val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
+    private val logger: SkyHanniLogger = SkyHanniLogger("combat/cocoon")
     private val patternGroup = RepoPattern.group("combat.cocoon")
 
     /*
@@ -84,7 +84,7 @@ object CocoonAPI {
     )
 
     private fun playerCanCocoon(): Boolean {
-        val belt = EquipmentApi.getEquipment(EquipmentSlot.BELT) ?: return false
+        val belt = CurrentEquipmentApi.getEquipment(EquipmentSlot.BELT) ?: return false
         return belt.canCocoon()
     }
 

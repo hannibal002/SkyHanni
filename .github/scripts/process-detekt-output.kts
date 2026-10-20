@@ -1,5 +1,7 @@
 #!/usr/bin/env kotlin
 
+// TODO find out why this file exists, as it seems to be dead code
+
 import java.io.File
 
 val prSha = System.getenv("PR_SHA")
@@ -21,7 +23,8 @@ val lines = detektOutput.split('\n')
  * REGEX-TEST: ::warning file=src/common/main/kotlin/me/owdding/skyocean/features/mining/hollows/MetalDetectorSolver.kt,line=243,title=detekt.potential-bugs.UnsafeCallOnNullableType,col=41,endColumn=56::Calling !! on a nullable type will throw a NullPointerException at runtime in case the value is null. It should be avoided.
  * REGEX-TEST: :: file=src/main/java/at/hannibal2/skyhanni/config/commands/brigadier/BrigadierBuilder.kt,line=68,title=detekt.ktlint.TrailingCommaOnDeclarationSite,col=45,endColumn=45::Missing trailing comma before ")"
  */
-val sarifRegex = Regex("^::(?:(?:warning|error|notice)? )file=(?<filePath>src\\/[^,]*\\/(?<file>[^,]+)),line=(?<line>\\d+),title=(?<wholeRule>(?<provider>[^.]+)\\.(?:(?:[\\w-]+)\\.)+(?<rule>[^.]+)),col=(?<col>\\d+),endColumn=(?<endcol>\\d+)::(?<message>(?:.|)*\\n*)$")
+val sarifRegex =
+    Regex("^::(?:(?:warning|error|notice)? )file=(?<filePath>src\\/[^,]*\\/(?<file>[^,]+)),line=(?<line>\\d+),title=(?<wholeRule>(?<provider>[^.]+)\\.(?:(?:[\\w-]+)\\.)+(?<rule>[^.]+)),col=(?<col>\\d+),endColumn=(?<endcol>\\d+)::(?<message>(?:.|)*\\n*)$")
 val sarifPattern = sarifRegex.toPattern()
 
 val urlBase = "https://github.com/$githubRepo/blob/$prSha/src/"
@@ -84,7 +87,7 @@ val sb = StringBuilder().apply {
             val ruleName = wholeRuleToNameCache[it] ?: it
             "`$ruleName`"
         }
-        append ("**<ins>Rules flagged</ins>** (${rulesBroken.size}): $ruleViolationsFormat$xMoreFormat\n")
+        append("**<ins>Rules flagged</ins>** (${rulesBroken.size}): $ruleViolationsFormat$xMoreFormat\n")
     }
 
     if (violatingFiles.size > 1) {

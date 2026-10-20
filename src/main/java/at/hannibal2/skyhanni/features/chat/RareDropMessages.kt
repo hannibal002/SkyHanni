@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandType.Companion.isInAnyIsland
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockStat.MAGIC_FIND
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
@@ -51,11 +53,12 @@ object RareDropMessages {
     )
 
     /**
-     * REGEX-TEST: §6⛃ §r§6§lGREAT CATCH! §r§fYou caught a §r§7[Lvl 1] §r§aSquid§r§f!
+     * REGEX-TEST: §6 §r§6§lGREAT CATCH! §r§fYou caught a §r§7[Lvl 1] §r§aSquid§r§f!
      */
+    @Suppress("MaxLineLength")
     private val petFishedPattern by petGroup.pattern(
         "fishedmessage",
-        "(?<start>(?:§.)*⛃ (?:§.)*(?:GOOD|GREAT|OUTSTANDING) CATCH! (?:§.)*You caught a (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)",
+        "(?<start>(?:§.)*${SkyblockStat.TREASURE_CHANCE.hypixelIcon} (?:§.)*(?:GOOD|GREAT|OUTSTANDING) CATCH! (?:§.)*You caught a (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)",
     )
 
     /**
@@ -100,7 +103,7 @@ object RareDropMessages {
      */
     private val enchantedBookPattern by repoGroup.pattern(
         "enchantedbook.colorless",
-        "RARE DROP! Enchanted Book(?: \\(\\+\\d+%? ✯ Magic Find\\))?.*",
+        "RARE DROP! Enchanted Book(?: \\(\\+\\d+%? ${MAGIC_FIND.hypixelIcon} Magic Find\\))?.*",
     )
 
     private val petPatterns = listOf(
@@ -188,6 +191,7 @@ object RareDropMessages {
         event.move(71, "chat.petRarityDropMessage", "chat.rareDropMessages.petRarity")
     }
 
+    @Suppress("MaxLineLength")
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestenchantedbookname") {
@@ -195,7 +199,7 @@ object RareDropMessages {
             category = CommandCategory.DEVELOPER_TEST
 
             simpleCallback {
-                ChatUtils.chat("§6§lRARE DROP! §r§fEnchanted Book §r§b(+§r§b208% §r§b✯ Magic Find§r§b)", prefix = false)
+                ChatUtils.chat("§6§lRARE DROP! §r§fEnchanted Book §r§b(+§r§b208% §r§b${MAGIC_FIND.hypixelIcon} Magic Find§r§b)", prefix = false)
                 ChatUtils.chat("Testing Enchanted Book Name")
                 onItemAdd(ItemAddEvent("ANGLER;6".toInternalName(), 1, ItemAddManager.Source.ITEM_ADD))
             }

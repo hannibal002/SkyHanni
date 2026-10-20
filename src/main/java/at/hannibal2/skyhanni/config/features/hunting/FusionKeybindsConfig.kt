@@ -16,7 +16,7 @@ class FusionKeybindsConfig {
     )
     @SearchTag("fusion hunting box")
     @ConfigEditorInfoText
-    var notice: String = ""
+    val notice: String = ""
 
     @Expose
     @ConfigOption(name = "Repeat Fusion Keybind", desc = "Keybind to repeat the previous fusion.")

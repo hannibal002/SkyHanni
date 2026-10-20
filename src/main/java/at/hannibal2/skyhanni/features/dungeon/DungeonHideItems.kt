@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -45,7 +45,7 @@ object DungeonHideItems {
 
     private fun String?.matchesTexture(texture: String?) = texture != null && this == texture
 
-    private fun isSkeletonSkull(entity: ArmorStand): Boolean = entity.getStandHelmet()?.cleanName() == "Skeleton Skull"
+    private fun isSkeletonSkull(entity: ArmorStand): Boolean = entity.getStandHelmet()?.cleanName == "Skeleton Skull"
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
@@ -53,11 +53,11 @@ object DungeonHideItems {
 
         if (entity is ItemEntity) {
             val stack = entity.item
-            if (config.hideReviveStone && stack.cleanName() == "Revive Stone") {
+            if (config.hideReviveStone && stack.cleanName == "Revive Stone") {
                 event.cancel()
             }
 
-            if (config.hideJournalEntry && stack.cleanName() == "Journal Entry") {
+            if (config.hideJournalEntry && stack.cleanName == "Journal Entry") {
                 event.cancel()
             }
         }
@@ -71,7 +71,7 @@ object DungeonHideItems {
                 event.cancel()
             }
 
-            if (head != null && head.cleanName() == "Superboom TNT") {
+            if (head != null && head.cleanName == "Superboom TNT") {
                 event.cancel()
                 hideParticles[entity] = SimpleTimeMark.now()
             }
@@ -152,7 +152,7 @@ object DungeonHideItems {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!config.hideSuperboomTNT && !config.hideReviveStone) return
 
         val packetLocation = event.location

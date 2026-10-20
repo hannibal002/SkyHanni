@@ -31,7 +31,7 @@ object RaycastUtils {
     fun createPlayerLookDirectionRay(): Ray {
         return Ray(
             LocationUtils.playerEyeLocation(),
-            MinecraftCompat.localPlayer.lookAngle.toLorenzVec()
+            MinecraftCompat.localPlayerOrThrow.lookAngle.toLorenzVec()
         )
     }
 

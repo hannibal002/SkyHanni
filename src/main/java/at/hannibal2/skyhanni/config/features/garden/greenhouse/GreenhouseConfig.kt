@@ -47,4 +47,23 @@ class GreenhouseConfig {
     @Expose
     @ConfigLink(owner = GreenhouseConfig::class, field = "showDisplay")
     val position: Position = Position(180, 40)
+
+    @Expose
+    @ConfigOption(
+        name = "Phantomleaf Solver",
+        desc = "When harvesting Phantomleaf, highlight the hiding spot in green. §eStand still for best results.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var phantomleafSolver: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Sky Mutations Link",
+        desc = "Offer a link to §aSky Mutations§7 in the Carpenter inventory in the Greenhouse and in the Crop Analyzer. " +
+            "The website offers useful information about mutations.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var mutationsWebsite: Boolean = true
 }

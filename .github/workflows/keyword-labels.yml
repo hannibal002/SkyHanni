@@ -1,0 +1,70 @@
+# Execution context: base branch code (pull_request_target)
+
+name: Keyword Labels
+
+on:
+    pull_request_target:
+        types: [ opened, edited, reopened, synchronize ]
+
+# Only one run per PR at a time, so an older run cannot publish a stale result after a newer one.
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+    pull-requests: write
+    issues: write
+    statuses: write
+
+jobs:
+    # Marks the blocking statuses as pending before the real check runs. Without this, a green status from an
+    # earlier run stays green on an unchanged head SHA while this run is still queued, which is exactly what
+    # happens when a keyword is added to the body of an already open PR.
+    set-pending:
+        runs-on: ubuntu-latest
+        # 511310721 is the Repository ID for SkyHanni
+        if: ${{ github.repository_id == '511310721' }}
+        # A failure here must never turn the workflow red, it only falls back to the previous behaviour.
+        continue-on-error: true
+        steps:
+            -   name: Mark keyword statuses as pending
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+                    # One line per blocking entry of keywordLabels in pr_review.main.kts, both must stay in sync.
+                    STATUS_CONTEXTS: |
+                        Waiting on Hypixel
+                run: |
+                    run_url="https://github.com/$GITHUB_REPOSITORY"
+                    run_url="$run_url/actions/runs/$GITHUB_RUN_ID"
+                    while IFS= read -r status_context; do
+                        [ -z "$status_context" ] && continue
+                        gh api "repos/$GITHUB_REPOSITORY/statuses/$HEAD_SHA" \
+                            -f state=pending \
+                            -f context="$status_context" \
+                            -f description="Checking the pull request description" \
+                            -f target_url="$run_url"
+                    done <<< "$STATUS_CONTEXTS"
+
+    keyword-labels:
+        runs-on: ubuntu-latest
+        needs: set-pending
+        # 511310721 is the Repository ID for SkyHanni
+        # !cancelled() keeps this job running when set-pending was skipped.
+        if: ${{ !cancelled() && github.repository_id == '511310721' }}
+        steps:
+            -   name: Check out the repository
+                uses: actions/checkout@v7
+                with:
+                    # Never check out fork code, this workflow runs with write permissions.
+                    ref: ${{ github.event.pull_request.base.ref }}
+                    persist-credentials: false
+
+            -   name: Evaluate description keywords
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    GITHUB_REPOSITORY: ${{ github.repository }}
+                    MODE: keyword_labels
+                    PR_NUMBER: ${{ github.event.pull_request.number }}
+                run: kotlinc -script .github/scripts/pr_review.main.kts

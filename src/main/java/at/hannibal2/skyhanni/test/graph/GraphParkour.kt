@@ -23,7 +23,7 @@ object GraphParkour {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shgraphloadparkour") {
-            description = "Loads the current clipboard as parkour into the graph editor."
+            description = "Loads the current clipboard as a parkour into the Graph Editor."
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
                 CoroutineSettings("shgraphloadparkour command").launchCoroutine {
@@ -32,7 +32,7 @@ object GraphParkour {
             }
         }
         event.registerBrigadier("shgraphexportasparkour") {
-            description = "Saves the graph editor as parkour into the clipboard."
+            description = "Saves the graph editor as a parkour into the clipboard."
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback { saveParkour() }
         }

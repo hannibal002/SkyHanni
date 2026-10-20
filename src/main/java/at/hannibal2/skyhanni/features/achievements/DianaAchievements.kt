@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object DianaAchievements {
@@ -15,9 +14,9 @@ object DianaAchievements {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "That was that book...".asComponent(),
-            "Die to an Inquisitor".asComponent(),
-            5f,
+            name = "That was that book...",
+            description = "Die to an Inquisitor",
+            userLuckAmount = 5f,
         )
         event.register(achievement, INQ_ACHIEVEMENT)
     }

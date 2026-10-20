@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils.compat
 import net.minecraft.world.damagesource.DamageSource
 
 object DamageSourceCompat {
-    private val damageSources = MinecraftCompat.localWorld.damageSources()
+    private val damageSources = MinecraftCompat.localWorldOrThrow.damageSources()
     val cactus get(): DamageSource = damageSources.cactus()
     val drown get(): DamageSource = damageSources.drown()
     val fall get(): DamageSource = damageSources.fall()

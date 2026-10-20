@@ -25,7 +25,6 @@ class TestCanSeeFaceConfig {
             "See KDocs in LocationUtils for more param info."
     )
     @ConfigEditorInfoText
-    @Suppress("StorageVarOrVal")
     @Transient
     val note: String = ""
 

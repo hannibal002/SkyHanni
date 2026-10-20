@@ -1,18 +1,19 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 class WardrobeSlot(
+    private val api: AbstractWardrobeApi,
     val id: Int,
     val page: Int,
     val inventorySlot: Int,
-    val helmetSlot: Int,
-    val chestplateSlot: Int,
-    val leggingsSlot: Int,
-    val bootsSlot: Int,
+    val item1Slot: Int,
+    val item2Slot: Int,
+    val item3Slot: Int,
+    val item4Slot: Int,
 ) {
-    fun getData() = WardrobeApi.storage?.data?.getOrPut(id) {
-        WardrobeApi.WardrobeData(
+    fun getData() = api.storage?.data?.getOrPut(id) {
+        AbstractWardrobeApi.WardrobeData(
             id,
-            armor = WardrobeApi.emptyArmor(),
+            armor = AbstractWardrobeApi.emptyItems(),
             locked = true,
             favorite = false,
         )
@@ -30,13 +31,13 @@ class WardrobeSlot(
             getData()?.favorite = value
         }
 
-    val armor get() = getData()?.armor ?: WardrobeApi.emptyArmor()
+    val armor get() = getData()?.armor ?: AbstractWardrobeApi.emptyItems()
 
-    val inventorySlots = listOf(helmetSlot, chestplateSlot, leggingsSlot, bootsSlot)
+    val inventorySlots = listOf(item1Slot, item2Slot, item3Slot, item4Slot)
 
     fun isEmpty(): Boolean = armor.all { it == null }
 
-    fun isCurrentSlot() = getData()?.id == WardrobeApi.currentSlot
+    fun isCurrentSlot() = getData()?.id == api.currentSlot
 
-    fun isInCurrentPage() = (WardrobeApi.currentPage == null && page == 1) || (page == WardrobeApi.currentPage)
+    fun isInCurrentPage() = (api.currentPage == null && page == 1) || (page == api.currentPage)
 }

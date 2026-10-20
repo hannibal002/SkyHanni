@@ -27,7 +27,7 @@ object CrystalHollowsNamesInCore {
     private var inNucleus = false
 
     @HandleEvent
-    fun onAreaChange(event: GraphAreaChangeEvent) {
+    private fun onAreaChange(event: GraphAreaChangeEvent) {
         inNucleus = event.area == "Crystal Nucleus"
         update()
     }
@@ -37,12 +37,12 @@ object CrystalHollowsNamesInCore {
     }
 
     @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (isEnabled()) update()
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled() || !showWaypoints) return
         for ((location, name) in coreLocations) {
             if (location.distanceSqToPlayer() > 50) {
@@ -51,5 +51,5 @@ object CrystalHollowsNamesInCore {
         }
     }
 
-    fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.crystalHollowsNamesInCore
+    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.crystalHollowsNamesInCore
 }

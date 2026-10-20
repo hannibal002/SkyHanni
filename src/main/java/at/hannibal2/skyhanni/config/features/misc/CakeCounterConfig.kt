@@ -15,7 +15,7 @@ class CakeCounterConfig {
             "\n§eFeatures may also not work as expected if your Cake Counter is not loaded in when on your island.",
     )
     @ConfigEditorInfoText
-    var cakeCounterNote: Boolean = false
+    val cakeCounterNote: Boolean = false
 
     @Expose
     @ConfigOption(

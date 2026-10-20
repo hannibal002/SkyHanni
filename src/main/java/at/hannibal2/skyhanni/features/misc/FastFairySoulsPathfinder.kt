@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -31,7 +32,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
@@ -52,7 +52,7 @@ object FastFairySoulsPathfinder {
 
     private var data: Data? = null
 
-    private val soulPathFindConfig = CoroutineSettings("fairy souls pathfind")
+    private val pathfindCoroutine = CoroutineSettings("fairy souls pathfind")
     private val patternGroup = RepoPattern.group("misc.fairy-souls")
 
     /**
@@ -214,7 +214,7 @@ object FastFairySoulsPathfinder {
         if (event.inventoryName != "Fairy Souls Guide") return
 
         for (stack in event.inventoryItems.values) {
-            val island = IslandType.getByNameOrNull(stack.hoverName.string.removeColor()) ?: continue
+            val island = IslandType.getByNameOrNull(stack.cleanName) ?: continue
             // The group is named "found" rather than "have", because "having" a fairy soul means trading it to Tia the Fairy for XP,
             // which is distinct from finding it on an island.
             val found = stack.getLoreComponent().firstOrNull()?.let {
@@ -268,8 +268,8 @@ object FastFairySoulsPathfinder {
         calculatingStart = SimpleTimeMark.now()
         "§e[SkyHanni] Calculating Fairy Soul route §b0s".asComponent().send(calculatingMessageId)
 
-        soulPathFindConfig.launch {
-            val route = NavigationUtils.getRoute(missingSouls, maxIterations = 300, neighborhoodSize = 50).toMutableList()
+        pathfindCoroutine.launch {
+            val route = NavigationUtils.getRouteLocations(missingSouls).toMutableList()
             val duration = calculatingStart.passedSince()
             "§e[SkyHanni] Calculated Fairy Soul route in §b${duration.format(showMilliSeconds = true)}".asComponent()
                 .send(calculatingMessageId)

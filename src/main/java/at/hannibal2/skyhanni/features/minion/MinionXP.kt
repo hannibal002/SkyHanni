@@ -141,7 +141,7 @@ object MinionXP {
 
         return positionsToCheck.any { position ->
             val pos = (minionPosition + position).toBlockPos()
-            val block = MinecraftCompat.localWorld.getBlockState(pos).block
+            val block = MinecraftCompat.localWorldOrThrow.getBlockState(pos).block
             block is ChestBlock
         }
     }

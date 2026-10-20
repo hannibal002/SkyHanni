@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -138,14 +139,14 @@ object DragonFeatures {
     private val scoreDragonPattern by scoreBoardGroup.pattern("dragon", "Dragon HP: .*")
 
     /**
-     * WRAPPED-REGEX-TEST: " JamBeastie: 7.4M❤"
-     * WRAPPED-REGEX-TEST: " 42069HzMonitor: 3M❤"
-     * WRAPPED-REGEX-TEST: " ItsJxxxxx2001: 457k❤"
-     * WRAPPED-REGEX-TEST: " Thunderblade73: 12.3k❤"
+     * WRAPPED-REGEX-TEST: " JamBeastie: 7.4M"
+     * WRAPPED-REGEX-TEST: " 42069HzMonitor: 3M"
+     * WRAPPED-REGEX-TEST: " ItsJxxxxx2001: 457k"
+     * WRAPPED-REGEX-TEST: " Thunderblade73: 12.3k"
      */
     private val tabDamagePattern by tabListGroup.pattern(
         "fight.player",
-        "\\s(?<name>.+): (?<damage>[\\d.]+[kM]?)❤",
+        "\\s(?<name>.+): (?<damage>[\\d.]+[kM]?)${SkyblockStat.HEALTH.hypixelIcon}",
     )
 
     private var yourEyes = 0

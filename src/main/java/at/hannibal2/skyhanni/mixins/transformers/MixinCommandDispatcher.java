@@ -13,12 +13,11 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 @Mixin(value = CommandDispatcher.class, remap = false)
-public class MixinCommandDispatcher<S> {
+public abstract class MixinCommandDispatcher<S> {
 
     @Inject(method = "getCompletionSuggestions(Lcom/mojang/brigadier/ParseResults;I)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "INVOKE", target = "Ljava/lang/String;toLowerCase(Ljava/util/Locale;)Ljava/lang/String;"), cancellable = true)
     public void getCompletionSuggestions(ParseResults<S> parse, int cursor, CallbackInfoReturnable<CompletableFuture<Suggestions>> cir, @Local(ordinal = 1) int start, @Local(ordinal = 0) String fullInput, @Local(ordinal = 1) String beforeCursor) {
@@ -58,5 +57,4 @@ public class MixinCommandDispatcher<S> {
         }
         return suggestionsBuilder;
     }
-
 }

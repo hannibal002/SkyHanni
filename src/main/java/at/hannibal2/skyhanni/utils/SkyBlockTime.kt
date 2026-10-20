@@ -110,6 +110,7 @@ data class SkyBlockTime(
             return time
         }
 
+        // TODO: Move this to SkyblockSeason and make it use getSeasonNameByMonth
         fun monthName(month: Int): String {
             val prefix = when ((month - 1) % 3) {
                 0 -> "Early "

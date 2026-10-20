@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
@@ -17,9 +16,9 @@ object CookieAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Cookie Monster Super Fan".asComponent(),
-            "Get 6 months of Cookie Buff".asComponent(),
-            6f,
+            name = "Cookie Monster Super Fan",
+            description = "Get 6 months of Cookie Buff",
+            userLuckAmount = 6f,
         )
         event.register(achievement, COOKIE_ACHIEVEMENT)
     }

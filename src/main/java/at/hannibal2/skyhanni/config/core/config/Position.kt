@@ -21,7 +21,6 @@
 package at.hannibal2.skyhanni.config.core.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigGuiManager.getEditorInstance
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -198,16 +197,12 @@ class Position @JvmOverloads constructor(
 
     fun canJumpToConfigOptions(): Boolean {
         val field = linkField ?: return false
-        return getEditorInstance().getOptionFromField(field) != null
+        return ConfigUtils.canJumpToEditor(field)
     }
 
     fun jumpToConfigOptions() {
-        val editor = getEditorInstance()
         val field = linkField ?: return
-        val option = editor.getOptionFromField(field) ?: return
-        editor.search("")
-        if (!editor.goToOption(option)) return
-        ConfigUtils.openEditor(editor)
+        ConfigUtils.jumpToEditor(field)
     }
 
     fun setLink(configLink: ConfigLink) {

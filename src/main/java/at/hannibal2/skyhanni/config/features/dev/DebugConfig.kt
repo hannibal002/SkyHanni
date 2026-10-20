@@ -252,6 +252,11 @@ class DebugConfig {
     val addonsDebugPosition: Position = Position(300, 300)
 
     @Expose
+    @ConfigOption(name = "Remaining Kills Debug", desc = "Enables Extra Debug messages for Remaining Slayer Kills.")
+    @ConfigEditorBoolean
+    var remainingKillsDebug: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Track Sound", desc = "")
     @Accordion
     val trackSound: TrackCommandConfig = TrackCommandConfig()

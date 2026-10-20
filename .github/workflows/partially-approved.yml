@@ -1,0 +1,28 @@
+# Execution context: PR branch code
+name: "Partially Approved Trigger"
+
+on:
+    pull_request_review:
+        types: [ submitted ]
+    pull_request:
+        types: [ reopened, ready_for_review, synchronize ]
+
+permissions:
+    contents: read
+
+jobs:
+    # Writes nothing, a fork pull request only gets a read-only token here. Partially Approved Review decides from the
+    # API alone, because a fork can change this file. An event that cannot add the label skips the job, the run then
+    # ends as "skipped" and the review workflow ignores it.
+    trigger:
+        # The label name must match partiallyApprovedLabel in pr_review.main.kts.
+        if: >-
+            '511310721' == github.repository_id
+            && github.event.pull_request.state == 'open'
+            && !github.event.pull_request.draft
+            && !contains(github.event.pull_request.labels.*.name, 'Partially Approved')
+            && (github.event_name == 'pull_request' || github.event.review.state == 'approved')
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Hand over
+                run: echo "Partially Approved Review evaluates this pull request."

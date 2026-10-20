@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -28,6 +30,23 @@ object ExperimentsDryStreakDisplay {
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation?.dryStreak
     private var display = emptyList<String>()
     private var ignoreNextFinish = false
+
+    fun resetManually() {
+        val storage = storage ?: return
+        storage.attemptsSince = 0
+        storage.xpSince = 0
+        display = drawDisplay()
+        ChatUtils.chat("Dry-streak counter reset")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetdrystreak") {
+            description = "Resets the Experimentation Table dry-streak counter."
+            category = CommandCategory.USERS_RESET
+            simpleCallback { resetManually() }
+        }
+    }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {

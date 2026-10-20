@@ -30,7 +30,7 @@ object CopyItemCommand {
     fun copyItemToClipboard(itemStack: SafeItemStack) {
         val resultList = mutableListOf<String>()
         resultList.add("internal name: " + itemStack.getInternalName().asString())
-        resultList.add("display name: '" + itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().toString() + "'")
+        resultList.add("display name: '" + itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets() + "'")
         resultList.add("minecraft id: '" + itemStack.getMinecraftId() + "'")
         resultList.add("lore:")
         for (line in itemStack.getLore()) {

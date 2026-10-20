@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
@@ -44,12 +44,12 @@ object GardenVisitorChat {
     )
 
     /**
-     * REGEX-TEST: §e[NPC] §6Madame Eleanor Q. Goldsworth III§f: §r§fI'm here to put a value on your farm.
-     * REGEX-TEST: §e[NPC] §aRhys§f: §r§fI found an unexplored cave while mining for titanium.
+     * REGEX-TEST: §e[NPC] §r§9Queen Mismyla§r§f: §r§fOh, you refuse to work as well? I should have known.
+     * REGEX-TEST: §e[NPC] §r§aResident Snooty§r§f: §r§fI don't really converse with your kind, but today I'll make an exception.
      */
     private val visitorChatMessagePattern by patternGroup.pattern(
         "visitorchat",
-        "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r.*",
+        "§e\\[NPC] §r(?<color>§.)?(?<name>.*)§r§f: §r.*",
     )
 
     /**
@@ -110,7 +110,7 @@ object GardenVisitorChat {
      * Determines if a chat message should be hidden.
      * Hides messages from visitors but keeps messages from permanent NPCs like Jacob.
      */
-    private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
+    private fun hideVisitorMessage(message: String): Boolean = visitorChatMessagePattern.matchMatcher(message) {
         val color = group("color")
         if (color == null || color == "§e") return false // Non-visitor NPC, probably Jacob
 

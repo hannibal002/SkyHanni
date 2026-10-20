@@ -24,11 +24,12 @@ max_line_length = 140
 ij_java_names_count_to_use_import_on_demand = 2147483647
 ij_java_class_count_to_use_import_on_demand = 2147483647
 ij_java_packages_to_use_import_on_demand = 2147483647
+ij_java_imports_layout = *,java.**,javax.**,kotlin.**,kotlinx.**,$*
 
 # Kotlin Files
-[*.kt]
+[*.{kt,kts}]
 ktlint_code_style = intellij_idea
-
+ij_kotlin_imports_layout = *,java.**,javax.**,kotlin.**,kotlinx.**,^
 # Kotlin files should not use wildcard imports
 ij_kotlin_name_count_to_use_star_import = 2147483647
 ij_kotlin_name_count_to_use_star_import_for_members = 2147483647

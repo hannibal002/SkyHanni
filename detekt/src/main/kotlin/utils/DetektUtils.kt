@@ -1,13 +1,17 @@
 package utils
 
 import org.jetbrains.kotlin.psi.KtAnnotated
+import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
 
 object DetektUtils {
 
     fun KtAnnotated.hasAnnotation(name: String): Boolean =
-        annotationEntries.any { it.shortName?.asString() == name }
+        this.getAnnotation(name) != null
+
+    fun KtAnnotated.getAnnotation(name: String): KtAnnotationEntry? =
+        annotationEntries.find { it.shortName?.asString() == name }
 
     // Skip:
     //  - Local properties

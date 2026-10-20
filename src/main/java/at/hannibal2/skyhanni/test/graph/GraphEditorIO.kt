@@ -81,6 +81,8 @@ object GraphEditorIO {
         val compileGraph = compileGraph()
         val json = compileGraph.toJson()
         ClipboardUtils.copyToClipboardAsyncWithResponse(json, info = "Graph")
+        val copied = OSUtils.copyToClipboardAsync(json) ?: false
+        if (!copied) return@launch ChatUtils.chat("§cFailed to copy graph to clipboard.")
 
         ChatUtils.chat("Copied Graph to Clipboard.")
         val networkCount = GraphEditorNetworks.recalculate()
@@ -94,7 +96,7 @@ object GraphEditorIO {
             GraphEditorNetworks.bridgeNetworks(compileGraph)
             DelayedRun.runOrNextTick {
                 IslandGraphs.setNewGraph(compileGraph)
-                GraphEditorBugFinder.runTests()
+                GraphEditorErrorFinder.runTests()
                 if (GraphEditorNodeFinder.active) {
                     GraphEditorNodeFinder.calculateNewAllNodeFind()
                 }

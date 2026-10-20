@@ -11,7 +11,9 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigEleme
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -19,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -86,15 +87,20 @@ object MaxwellApi {
     )
 
     /**
-     * REGEX-TEST: §7Magical Power: §6419
+     * REGEX-TEST: §7Accessory Power: §6419
      */
     private val inventoryMPPattern by patternGroup.pattern(
         "inventory.magicalpower",
-        "§7Magical Power: §6(?<mp>[\\d,]+)",
+        "§7Accessory Power: §6(?<mp>[\\d,]+)",
     )
+
+    /**
+     * REGEX-TEST: (1/2) Accessory Bag Thaumaturgy
+     * REGEX-TEST: Accessory Bag Thaumaturgy
+     */
     private val thaumaturgyGuiPattern by patternGroup.pattern(
         "gui.thaumaturgy",
-        "Accessory Bag Thaumaturgy",
+        "(?:\\(\\d/\\d\\) )?Accessory Bag Thaumaturgy",
     )
     private val thaumaturgyStartPattern by patternGroup.pattern(
         "gui.thaumaturgy.start",
@@ -106,11 +112,11 @@ object MaxwellApi {
     )
 
     /**
-     * REGEX-TEST: §7Total: §6419 Magical Power
+     * REGEX-TEST: §7Total: §6419 Accessory Power
      */
     private val thaumaturgyMagicalPowerPattern by patternGroup.pattern(
         "gui.thaumaturgy.magicalpower",
-        "§7Total: §6(?<mp>[\\d.,]+) Magical Power",
+        "§7Total: §6(?<mp>[\\d.,]+) Accessory Power",
     )
     private val statsTuningGuiPattern by patternGroup.pattern(
         "gui.thaumaturgy.statstuning",
@@ -156,6 +162,21 @@ object MaxwellApi {
     private val redstoneCollectionRequirementPattern by patternGroup.pattern(
         "collection.redstone.requirement",
         "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\.",
+    )
+
+    /**
+     * REGEX-TEST: ❤ Health
+     * REGEX-TEST: ❈ Defense
+     * REGEX-TEST: ✦ Speed
+     * REGEX-TEST: ❁ Strength
+     * REGEX-TEST: ☠ Crit Damage
+     * REGEX-TEST: ☣ Crit Chance
+     * REGEX-TEST: ⚔ Attack Speed
+     * REGEX-TEST: ✎ Intelligence
+     */
+    private val tuningNamePattern by patternGroup.pattern(
+        "tuning.name",
+        ". (?<name>.+)",
     )
 
     fun isThaumaturgyInventory(inventoryName: String) = thaumaturgyGuiPattern.matches(inventoryName)
@@ -214,13 +235,14 @@ object MaxwellApi {
     private fun loadThaumaturgyTuningsFromTuning(inventoryItems: Map<Int, SafeItemStack>) {
         val map = mutableListOf<ThaumaturgyPowerTuning>()
         for (stack in inventoryItems.values) {
+            val stackName = stack.takeUnlessEmpty()?.cleanName ?: continue
             for (line in stack.getLore()) {
                 statsTuningDataPattern.readTuningFromLine(line)?.let {
-                    it.name = "§.. (?<name>.+)".toPattern().matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+                    it.name = tuningNamePattern.matchMatcher(stackName) {
                         group("name")
                     } ?: ErrorManager.skyHanniError(
                         "found no name in thaumaturgy",
-                        "stack name" to stack.hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                        "stack name" to stackName,
                         "line" to line,
                     )
                     map.add(it)
@@ -240,12 +262,16 @@ object MaxwellApi {
         }
     }
 
+    fun readTuningFromLine(line: String): ThaumaturgyPowerTuning? {
+        return thaumaturgyDataPattern.readTuningFromLine(line) ?: statsTuningDataPattern.readTuningFromLine(line)
+    }
+
     private fun loadThaumaturgyCurrentPower(inventoryItems: Map<Int, SafeItemStack>) {
         val selectedPowerStack =
             inventoryItems.values.find {
                 powerSelectedPattern.matches(it.getLore().lastOrNull())
             } ?: return
-        val displayName = selectedPowerStack.hoverName.string.removeColor().trim()
+        val displayName = selectedPowerStack.cleanName.trim()
 
         currentPower = getPowerByNameOrNull(displayName) ?: run {
             ErrorManager.logErrorWithData(

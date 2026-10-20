@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object JerrySeedAchievement {
@@ -19,9 +18,9 @@ object JerrySeedAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Jerry".asComponent(),
-            "Make an Unripe Jerryseed do 5x damage".asComponent(),
-            -1f,
+            name = "Jerry",
+            description = "Make an Unripe Jerryseed do 5x damage",
+            userLuckAmount = -1f,
         )
         event.register(achievement, JERRYSEED_ACHIEVEMENT)
     }

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.mining
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.features.mining.caverns.DeepCavernsGuideConfig
 import at.hannibal2.skyhanni.config.features.mining.dwarves.DarkMonolithConfig
+import at.hannibal2.skyhanni.config.features.mining.dwarves.FallenStarCultConfig
 import at.hannibal2.skyhanni.config.features.mining.dwarves.KingTalismanConfig
 import at.hannibal2.skyhanni.config.features.mining.glacite.ColdOverlayConfig
 import at.hannibal2.skyhanni.config.features.mining.glacite.FossilExcavatorConfig
@@ -46,6 +47,11 @@ class MiningConfig {
     @ConfigOption(name = "King Talisman", desc = "")
     @Accordion
     val kingTalisman: KingTalismanConfig = KingTalismanConfig()
+
+    @Expose
+    @ConfigOption(name = "Fallen Star Cult Timer", desc = "")
+    @Accordion
+    val fallenStarCult: FallenStarCultConfig = FallenStarCultConfig()
 
     @Expose
     @ConfigOption(name = "Dark Monolith", desc = "")
@@ -96,6 +102,12 @@ class MiningConfig {
     val notifications: MiningNotificationsConfig = MiningNotificationsConfig()
 
     @Expose
+    @ConfigOption(name = "Don Expresso Feeding Reminder", desc = "Send a message to teleport to Don Expresso when he is full.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var donExpressoFeedingReminder: Boolean = true
+
+    @Expose
     @Category(name = "Tunnel Maps", desc = "Settings for the Tunnel Maps.")
     val tunnelMaps: TunnelMapsConfig = TunnelMapsConfig()
 
@@ -138,7 +150,7 @@ class MiningConfig {
     @Expose
     @ConfigOption(
         name = "Names in Core",
-        desc = "Show the names of the 4 areas while in the center of the Crystal Hollows.",
+        desc = "Shows the names of the 4 areas while in the center of the Crystal Hollows.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

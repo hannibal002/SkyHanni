@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils.system
 
+import at.hannibal2.skyhanni.utils.VersionConstants
+
 data class ModVersion(val stable: Int, val beta: Int, val bugfix: Int) : Comparable<ModVersion> {
 
     val isBeta get() = beta != 0
@@ -25,6 +27,8 @@ data class ModVersion(val stable: Int, val beta: Int, val bugfix: Int) : Compara
     }
 
     companion object {
+        val installed: ModVersion by lazy { fromString(VersionConstants.MOD_VERSION) }
+
         fun fromString(version: String): ModVersion {
             val parts = version.split('.')
             return ModVersion(

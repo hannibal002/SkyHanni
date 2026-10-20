@@ -17,7 +17,7 @@ data class EliteFeastJson(
 ) {
     val next: Map<String, SimpleTimeMark?> = _next.mapValues { it.value?.let(SimpleTimeMark::fromUnixSeconds) }
 
-    val isComplete = current.size == 3
+    val isComplete = current.size == 4
 
     fun getBody(): String = ApiUtils.serializeNullsGson.toJson(this)
 
@@ -53,8 +53,11 @@ data class EliteFeastData(
 ) {
     val next: Map<String, SimpleTimeMark?> = _next.mapValues { it.value?.let(SimpleTimeMark::fromUnixSeconds) }
 
-    private val monthEndTime: SimpleTimeMark
-        get() = SkyBlockTime(year, month + 1, 1).toTimeMark()
+    private val currentMonthEndTime: SimpleTimeMark
+        get() {
+            val now = SkyBlockTime.now()
+            return SkyBlockTime(now.year, now.month + 1, 1).toTimeMark()
+        }
 
     fun getBody(): String = ApiUtils.serializeNullsGson.toJson(this)
 
@@ -68,12 +71,12 @@ data class EliteFeastData(
     }
 
     fun getActiveDuration(): Duration {
-        if (next.values.all { it == null }) return monthEndTime.timeUntil()
+        if (next.values.all { it == null }) return currentMonthEndTime.timeUntil()
 
         return getDurations()
             .filter(Duration::isPositive)
             .minByOrNull { it.inWholeMilliseconds }
-            ?: monthEndTime.timeUntil()
+            ?: currentMonthEndTime.timeUntil()
     }
 
     fun getCurrentCrops(): List<CropType> {
@@ -83,7 +86,7 @@ data class EliteFeastData(
             val groups = next.entries.groupBy { it.value }
             val activeGroup = groups.filter { it.key?.passedSince()?.isPositive() == true }
                 .minByOrNull { it.key ?: SimpleTimeMark.farFuture() }
-                ?.takeIf { it.value.size == 3 }
+                ?.takeIf { it.value.size == 4 }
                 ?.value
                 ?.map { it.key } ?: return fromCurrent
             return activeGroup.toCropTypes()

@@ -24,7 +24,7 @@ class SeaCreatureHealthDisplayConfig {
 
     @ConfigOption(name = "Custom Health Display Mobs", desc = "This Feature's Mobs can be customized under /shseacreatures!")
     @ConfigEditorInfoText
-    var notice: String = ""
+    val notice: String = ""
 
     @Expose
     @ConfigLink(owner = SeaCreatureHealthDisplayConfig::class, field = "enabled")

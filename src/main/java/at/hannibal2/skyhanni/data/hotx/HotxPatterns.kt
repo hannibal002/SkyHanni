@@ -9,30 +9,31 @@ object HotxPatterns {
     private val patternGroup = RepoPattern.group("misc.hotx")
 
     /**
-     * REGEX-TEST: §eNew buff§r§r§r: §r§fGain §r§a+5% §r§2∮ Sweep§r§f.
-     * REGEX-TEST: §eNew buff§r§r§r: §r§fGain §r§a+50 §r§6☘ Mangrove Fortune§r§f.
-     * REGEX-TEST: §eNew buff§r§r§r: §r§fGain §r§a+50 §r§6☘ Fig Fortune§r§f.
-     * REGEX-TEST: §8 ■ §7Gain §a+5% §2∮ Sweep§7.
-     * REGEX-TEST: §8 ■ §7Gain §a+50 §6☘ Mangrove Fortune§7.
-     * REGEX-TEST: §8 ■ §7Gain §a+50 §6☘ Fig Fortune§7
+     * REGEX-TEST: New buff: Gain +5% ∮ Sweep.
+     * REGEX-TEST: New buff: Gain +50 ☘ Mangrove Fortune.
+     * REGEX-TEST: New buff: Gain +50 ☘ Fig Fortune.
+     * REGEX-TEST: ■ Gain +5% ∮ Sweep.
+     * REGEX-TEST: ■ Gain +50 ☘ Mangrove Fortune.
+     * REGEX-TEST: ■ Gain +50 ☘ Fig Fortune.
      *
-     * REGEX-TEST: §eNew buff§r§r§r: §r§fGain §r§6+50☘ Mining Fortune§r§f.
-     * REGEX-TEST: §8 ■ §7Gain §6+100⸕ Mining Speed§7.
-     * REGEX-TEST: §8 ■ §7Gain §6+50☘ Mining Fortune§7.
-     * REGEX-TEST: §8 ■ §7Gain §a+15% §7more Powder while mining.
-     * REGEX-TEST: §8 ■ §7§a-20%§7 Pickaxe Ability cooldowns.
-     * REGEX-TEST: §8 ■ §7§a10x §7chance to find Golden and
-     * REGEX-TEST: §8 ■ §7Gain §a5x §9Titanium §7drops.
+     * REGEX-TEST: New buff: Gain +50☘ Mining Fortune.
+     * REGEX-TEST: ■ Gain +100⸕ Mining Speed.
+     * REGEX-TEST: ■ Gain +50☘ Mining Fortune.
+     * REGEX-TEST: ■ Gain +15% more Powder while mining.
+     * REGEX-TEST: ■ -20% Pickaxe Ability cooldowns.
+     * REGEX-TEST: ■ 10x chance to find Golden and
+     * REGEX-TEST: ■ Gain 5x Titanium drops.
+     * WRAPPED-REGEX-TEST: " ■ -20% Pickaxe Ability cooldowns."
      */
     val rotatingPerkPattern by patternGroup.pattern(
         "perk.generic",
-        "(?:§eNew buff§r§r§r: §r§f|§8 ■ §7)(?<perk>.*)"
+        """ ?(?:New buff: |■ )(?<perk>.*)"""
     )
 
     // The line that appears before the "current" perk effect in the item tooltip.
     val itemPreEffectPattern by patternGroup.pattern(
         "perk.item.before",
-        "§aYour Current Effect"
+        "Your Current Effect"
     )
 
     fun Enum<*>.asPatternId(): String = name.lowercase().replace("_", ".")

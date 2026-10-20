@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.events.experiments.TableXPBottleUsedEvent
@@ -111,7 +110,7 @@ object ExperimentsProfitTracker {
     }
 
     private val allowedSlots = listOf(11, 12, 14, 15)
-    private val bottlesInventory = InventoryDetector { name -> name == "Bottles of Enchanting" }
+    private val bottlesInventory = InventoryDetector { ExperimentationTableApi.bottlesOfEnchantingInventoryPattern }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
@@ -158,8 +157,8 @@ object ExperimentsProfitTracker {
 
     private var lastAddedTimeWasted: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    @HandleEvent(SecondPassedEvent::class)
-    fun checkAddTimeWasted() {
+    @HandleEvent
+    fun onSecondPassed() {
         if (ExperimentationTableApi.expOverInventoryPattern.matches(InventoryUtils.openInventoryName())) return
         if (!ExperimentationTableApi.inTable || !config.trackTimeSpent) {
             lastAddedTimeWasted = SimpleTimeMark.farPast()

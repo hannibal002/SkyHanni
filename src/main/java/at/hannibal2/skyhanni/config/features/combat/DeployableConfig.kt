@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.config.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.combat.DeployableDisplay
+import at.hannibal2.skyhanni.features.combat.DeployableType
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -32,11 +33,16 @@ class DeployableConfig {
     @Expose
     @ConfigOption(name = "Deployable Types", desc = "Which types of Deployables to display.")
     @ConfigEditorDraggableList
-    val displayTypes: MutableList<DeployableDisplay.DeployableType> = mutableListOf(
-        DeployableDisplay.DeployableType.FLUX,
-        DeployableDisplay.DeployableType.LANTERN,
-        DeployableDisplay.DeployableType.UMBERELLA,
+    val displayTypes: MutableList<DeployableType> = mutableListOf(
+        DeployableType.FLUX,
+        DeployableType.LANTERN,
+        DeployableType.UMBERELLA,
     )
+
+    @Expose
+    @ConfigOption(name = "Deployable Reminder", desc = "")
+    @Accordion
+    val deployableReminder = DeployableReminderConfig()
 
     @ConfigOption(
         name = "Flare Display",

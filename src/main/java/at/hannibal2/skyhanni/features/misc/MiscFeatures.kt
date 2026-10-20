@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.entity.EndermanTeleportEvent
 import at.hannibal2.skyhanni.events.render.BlockOverlayRenderEvent
 import at.hannibal2.skyhanni.events.render.OverlayType
@@ -42,7 +42,7 @@ object MiscFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!SkyHanniMod.feature.misc.hideExplosions) return
         if (inChickenRace) return
 

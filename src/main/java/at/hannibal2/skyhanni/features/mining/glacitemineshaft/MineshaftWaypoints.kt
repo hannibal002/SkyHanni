@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket
@@ -52,7 +51,7 @@ object MineshaftWaypoints {
         if (event.island != IslandType.MINESHAFT) return
 
         val spawnLocation = LocationUtils.getBlockBelowPlayer()
-        val direction = MinecraftCompat.localPlayer.direction.unitVec3i
+        val direction = MinecraftCompat.localPlayerOrThrow.direction.unitVec3i
 
         addEntranceWaypoints(spawnLocation, direction)
     }
@@ -98,7 +97,7 @@ object MineshaftWaypoints {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (Minecraft.getInstance().screen != null) return
+        if (MinecraftCompat.screen != null) return
         if (event.keyCode != config.shareWaypointLocation) return
         if (timeLastShared.passedSince() < 500.milliseconds) return
 

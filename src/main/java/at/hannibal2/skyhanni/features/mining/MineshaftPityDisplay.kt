@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
@@ -100,13 +99,12 @@ object MineshaftPityDisplay {
 
     private const val MAX_COUNTER = 2000
 
-    private val group = RepoPattern.group("mineshaft.pity")
-
+    private val patternGroup = RepoPattern.group("mineshaft.pity")
 
     /**
      * WRAPPED-REGEX-TEST: " Glacite Mineshafts: 124/2,000"
      */
-    private val tabPityPattern by group.pattern(
+    private val tabPityPattern by patternGroup.pattern(
         "tablist",
         " Glacite Mineshafts: (?<pity>[\\d,]+)/2,000",
     )
@@ -133,9 +131,9 @@ object MineshaftPityDisplay {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Quick Shafter".asComponent(),
-            "Spawn a Mineshaft in under 100 Pity".asComponent(),
-            10f,
+            name = "Quick Shafter",
+            description = "Spawn a Mineshaft in under 100 Pity",
+            userLuckAmount = 10f,
         )
         event.register(achievement, SHAFT_ACHIEVEMENT)
     }

@@ -93,8 +93,8 @@ object VisitorRewardWarning {
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         if (config.bypassKey.isKeyHeld()) return
 
-        val isRefuseSlot = event.itemStack.cleanName() == "Refuse Offer"
-        val isAcceptSlot = event.itemStack.cleanName() == "Accept Offer"
+        val isRefuseSlot = event.itemStack.cleanName == "Refuse Offer"
+        val isAcceptSlot = event.itemStack.cleanName == "Accept Offer"
 
         val blockReason = visitor.blockReason ?: return
         if (blockReason.blockRefusing && !isRefuseSlot) return

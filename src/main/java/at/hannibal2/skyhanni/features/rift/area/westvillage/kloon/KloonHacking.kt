@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -21,7 +22,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -66,7 +66,7 @@ object KloonHacking {
             correctButtons.clear()
             for ((slot, stack) in event.inventoryItems) {
                 if (slot in 2..6) {
-                    correctButtons.add(stack.hoverName.string.removeColor())
+                    correctButtons.add(stack.cleanName)
                 }
             }
         }
@@ -88,12 +88,12 @@ object KloonHacking {
             var i = 0
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (slot.containerSlot == 11 + 10 * i) {
-                    val correctButton = slot.item.hoverName.string.removeColor() == correctButtons[i]
+                    val correctButton = slot.item.cleanName == correctButtons[i]
                     slot.highlight(if (correctButton) LorenzColor.GREEN else LorenzColor.RED)
                     continue
                 }
                 if (slot.containerSlot > i * 9 + 8 && slot.containerSlot < i * 9 + 18 &&
-                    slot.item.hoverName.string.removeColor() == correctButtons[i]
+                    slot.item.cleanName == correctButtons[i]
                 ) {
                     slot.highlight(LorenzColor.YELLOW)
                 }

@@ -30,7 +30,7 @@ object GardenCropSpeed {
 
     init {
         // TODO use SecondPassedEvent + passedSince
-        fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
+        fixedRateTimer(name = "skyhanni-crop-milestone-speed", daemon = true, period = 1000L) {
             if (isEnabled()) {
                 checkSpeed()
             }

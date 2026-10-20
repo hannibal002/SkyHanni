@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object BlizzardAchievement {
@@ -16,7 +15,7 @@ object BlizzardAchievement {
     /**
      * REGEX-TEST: BLIZZARD! [MVP+] Throwpo opened a Blizzard in a Bottle, improving everyone's Fishing Stats for the next 10 minutes and causing it to snow!
      */
-    private val blizzardPattern by AchievementManager.group.pattern(
+    private val blizzardPattern by AchievementManager.patternGroup.pattern(
         "blizzard",
         "BLIZZARD! (?<name>.*) opened a Blizzard in a Bottle, improving everyone's " +
             "Fishing Stats for the next 10 minutes and causing it to snow!",
@@ -27,9 +26,9 @@ object BlizzardAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Weather Mastermind".asComponent(),
-            "Spawn a blizzard".asComponent(),
-            1f,
+            name = "Weather Mastermind",
+            description = "Spawn a blizzard",
+            userLuckAmount = 1f,
         )
         event.register(achievement, BLIZZARD_ACHIEVEMENT)
     }

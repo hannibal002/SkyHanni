@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.test.command.track
 
-import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -22,14 +22,14 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Abstract class for commands that track specific events in the game.
  *
- * @param T The type of event to track, which must extend [CancellableSkyHanniEvent].
+ * @param T The type of event to track, which must extend [SkyHanniEvent].
  * @param K The type of identifier used to categorize the tracked events. Ideally, if possible, this should be an enum.
  * @param onlyOnSkyblock If true, the command will only work in SkyBlock.
  * @param commonName The singular name of the tracked event, used for command naming and display. (e.g., "sound", "particle").
  * @param commonNamePlural The plural name of the tracked event, used for command naming and display.
  *  Defaults to `commonName + "s"` (e.g., "sounds", "particles").
  */
-abstract class TrackCommand<T : CancellableSkyHanniEvent, K>(
+abstract class TrackCommand<T : SkyHanniEvent, K>(
     private val onlyOnSkyblock: Boolean = true,
     protected val commonName: String,
     protected val commonNamePlural: String = commonName + "s",
