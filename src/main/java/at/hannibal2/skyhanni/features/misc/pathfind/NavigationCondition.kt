@@ -21,4 +21,9 @@ sealed interface NavigationCondition {
      */
     data class SecondPassed(val condition: (GraphNode) -> Boolean) : NavigationCondition
 
+    /**
+     * Never continues on its own. The navigation stays on the current node until it is advanced from the
+     * outside, currently by left-clicking the waypoint in the world.
+     */
+    data object Manual : NavigationCondition
 }

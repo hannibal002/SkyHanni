@@ -223,8 +223,8 @@ enum class DependencyState {
     UNRESOLVED
 }
 
-// Split during parsing, not derived afterward: a line on hannibal002/SkyHanni-REPO is valid and deliberately
-// produces no dependency, so subtracting the recognized entries would report it as malformed.
+// Split during parsing, not derived afterward: a line on the SkyHanni-REPO is valid and deliberately produces no
+// dependency, so subtracting the recognized entries would report it as malformed.
 data class ParsedDependencySection(val dependencies: List<Dependency>, val unrecognizedLines: List<String>)
 
 // Everything wrong with one dependency section, so the comment can name all of it at once. Placeholder and
@@ -984,10 +984,11 @@ fun buildGenericFailureBody(conclusion: String): String = buildString {
 
 fun runBuildMode(prNumber: String) {
     val log1 = readBuildLog(System.getenv("ARTIFACT_DIR_1"))
+    val log2 = readBuildLog(System.getenv("ARTIFACT_DIR_2"))
 
     buildComment.staleExisting(prNumber)
 
-    if (log1.isNullOrBlank()) {
+    if (log1.isNullOrBlank() && log2.isNullOrBlank()) {
         // A missing artifact is not proof of a green build: a step failing before its upload leaves it missing
         // while the run is red. Only the conclusion tells those two apart.
         val conclusion = System.getenv("WORKFLOW_CONCLUSION")?.takeIf { it.isNotEmpty() }
@@ -1005,7 +1006,7 @@ fun runBuildMode(prNumber: String) {
         exitProcess(0)
     }
 
-    val versions = filterStonecutterDuplicates(listOf("26.1" to log1))
+    val versions = filterStonecutterDuplicates(listOf("26.1" to log1, "26.2" to log2))
     buildComment.post(prNumber, buildBuildFailureBody(versions)) {
         "Error: could not post build failure comment (HTTP $it)"
     }
@@ -1083,7 +1084,10 @@ fun parseDependencySection(sectionLines: List<String>): ParsedDependencySection 
     for (line in sectionLines) {
         val urlMatch = dependencyUrlRegex.find(line)
         if (urlMatch != null) {
-            val depOwner = urlMatch.groupValues[1]
+            // Links from before the move to the organization still name the old owner. The API answers those with a
+            // redirect that ghRequest does not follow, so the old owner, spelled exactly "hannibal002", is read as
+            // the current one for every repository.
+            val depOwner = urlMatch.groupValues[1].takeUnless { it == "hannibal002" } ?: repoOwner
             val depRepo = urlMatch.groupValues[2]
             // A number too large for an Int cannot be a pull request. toInt would throw, and nothing catches
             // that: the closed event iterates over every labeled PR and would abandon the rest of them.
@@ -1093,7 +1097,7 @@ fun parseDependencySection(sectionLines: List<String>): ParsedDependencySection 
                 continue
             }
             // Valid, and deliberately produces no dependency. Never a malformed line.
-            if (depOwner == "hannibal002" && depRepo == "SkyHanni-REPO") continue
+            if (depOwner == repoOwner && depRepo == "SkyHanni-REPO") continue
             deps.add(Dependency(depOwner, depRepo, depNum, line))
             continue
         }

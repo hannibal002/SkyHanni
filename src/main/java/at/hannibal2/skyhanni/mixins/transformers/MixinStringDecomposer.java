@@ -89,7 +89,9 @@ public abstract class MixinStringDecomposer {
     )
     private static Style skyhanni$onApplyLegacyFormat(Style style, ChatFormatting chatFormatting, Operation<Style> original) {
         if (skyhanni$hexState >= 0 && skyhanni$hexState < 8) {
-            int hexDigit = HEX_CHARS.indexOf(chatFormatting.getChar());
+            // ChatFormatting no longer exposes getChar() in 26.2; its legacy code remains
+            // the second character of the stable §-prefixed string representation.
+            int hexDigit = HEX_CHARS.indexOf(chatFormatting.toString().charAt(1));
             if (hexDigit >= 0) {
                 skyhanni$hexState++;
                 skyhanni$hexValue = (skyhanni$hexValue << 4) | hexDigit;
@@ -101,7 +103,7 @@ public abstract class MixinStringDecomposer {
             skyhanni$hexState = -1;
             skyhanni$hexValue = 0;
         }
-        if (chatFormatting.isColor() || chatFormatting == ChatFormatting.RESET) {
+        if (TextColor.fromLegacyFormat(chatFormatting) != null || chatFormatting == ChatFormatting.RESET) {
             skyhanni$activeHexColor = -1;
         }
         return original.call(style, chatFormatting);

@@ -50,7 +50,6 @@ import kotlin.time.Duration.Companion.days
 class ConfigManager {
     companion object {
         val gson: Gson = BaseGsonBuilder.gson().create()
-        val configDirectory = File("config/skyhanni")
     }
 
     private val logger = SkyHanniLogger("config_manager")
@@ -71,7 +70,7 @@ class ConfigManager {
         if (jsonHolder.isNotEmpty()) {
             logger.log("Loading config despite config being already loaded?")
         }
-        configDirectory.mkdirs()
+        SkyHanniMod.configDir.mkdirs()
 
 
         for (fileType in ConfigFileType.entries) {
@@ -97,7 +96,8 @@ class ConfigManager {
     }
 
     private fun deleteOldBackups() {
-        OSUtils.deleteExpiredFiles(File("skyhanni/config/backup"), SkyHanniMod.feature.dev.configBackupExpiryTime.days)
+        val file = SkyHanniMod.configDir.resolve("backup")
+        OSUtils.deleteExpiredFiles(file, SkyHanniMod.feature.dev.configBackupExpiryTime.days)
     }
 
     private fun findPositionLinks(obj: Any?, slog: MutableSet<IdentityCharacteristics<Any>>) {
@@ -168,10 +168,11 @@ class ConfigManager {
                         try {
                             run()
                         } catch (e: Throwable) {
-                            logger.log(e.stackTraceToString())
+                            logger.logError("Failed to read $fileName from $file", e)
                             PlatformUtils.shutdownMinecraft(
                                 "Config is corrupt inside development environment. " +
-                                    "Maybe you forgot to implement a config migration, or the migration failed."
+                                    "Maybe you forgot to implement a config migration, or the migration failed. " +
+                                    "Cause: ${e.message}",
                             )
                         }
                     } else {
@@ -183,21 +184,17 @@ class ConfigManager {
 
                 logger.log("Loaded $fileName from file")
             } catch (e: Exception) {
-                logger.log(e.stackTraceToString())
                 val backupFile = file.resolveSibling("$fileName-${SimpleTimeMark.now().toMillis()}-backup.json")
-                logger.log("Exception while reading $file. Will load blank $fileName and save backup to $backupFile")
-                logger.log("Exception was $e")
+                logger.logError(
+                    "Exception while reading $file. Will load blank $fileName and save backup to $backupFile",
+                    e,
+                )
                 try {
                     file.copyTo(backupFile)
                 } catch (e: Exception) {
-                    logger.log("Could not create backup for $fileName file")
-                    logger.log(e.stackTraceToString())
+                    logger.logError("Could not create backup for $fileName file", e)
                 }
             }
-        }
-
-        if (output == defaultValue) {
-            logger.log("Setting $fileName to be blank as it did not exist. It will be saved once something is written to it")
         }
         if (output == null) {
             logger.log("Setting $fileName to be blank as it was null. It will be saved once something is written to it")
@@ -232,8 +229,7 @@ class ConfigManager {
                 "fileName" to fileName,
             )
         } catch (e: IOException) {
-            logger.log("Could not save $fileName file to $file")
-            logger.log(e.stackTraceToString())
+            logger.logError("Could not save $fileName file to $file", e)
         }
     }
 
@@ -289,7 +285,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     SEEN_CONTRIBUTORS("seen_contributors", SeenContributorStorage::class.java, SkyHanniMod::seenContributorStorage),
     ;
 
-    val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
+    val file: File by lazy { SkyHanniMod.configDir.resolve("$fileName.json") }
     val backupFile get() = getBackupFile(file)
 }
 

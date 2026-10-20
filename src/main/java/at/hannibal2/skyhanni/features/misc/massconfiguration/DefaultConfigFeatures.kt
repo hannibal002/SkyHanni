@@ -19,16 +19,13 @@ object DefaultConfigFeatures {
     private var didNotifyOnce = false
 
     @HandleEvent
-    fun onHypixelJoin(event: HypixelJoinEvent) {
+    private fun onHypixelJoin(event: HypixelJoinEvent) {
         if (didNotifyOnce) return
         didNotifyOnce = true
 
         val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
         val updated = SkyHanniMod.VERSION !in knownToggles
-        val processor = FeatureToggleProcessor()
-        val driver = ConfigProcessorDriver(processor)
-        driver.warnForPrivateFields = false
-        driver.processConfig(SkyHanniMod.feature)
+        val processor = createOptionProcessor()
         knownToggles[SkyHanniMod.VERSION] = processor.allOptions.map { it.path }
         SkyHanniMod.configManager.saveConfig(ConfigFileType.KNOWN_FEATURES, "Updated known feature flags")
         if (!SkyHanniMod.feature.storage.hasPlayedBefore) {
@@ -46,13 +43,20 @@ object DefaultConfigFeatures {
                     "knownToggles" to knownToggles,
                     "version" to SkyHanniMod.VERSION,
                 )
-            val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}"
             ChatUtils.chat("Looks like you updated SkyHanni.")
-            ChatUtils.clickableChat(
-                "Click here to configure the newly introduced options, or run $command.",
-                onClick = { onCommand(lastVersion, SkyHanniMod.VERSION) },
-                "§eClick to run /shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}!",
+            val newOptions = filterOptions(
+                processor.orderedOptions,
+                togglesInOldVersion = knownToggles[lastVersion],
+                togglesInNewVersion = knownToggles[SkyHanniMod.VERSION],
             )
+            if (newOptions.isNotEmpty()) {
+                val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}"
+                ChatUtils.clickableChat(
+                    "Click here to configure the newly introduced options, or run $command.",
+                    onClick = { onCommand(lastVersion, SkyHanniMod.VERSION) },
+                    "§eClick to run $command!",
+                )
+            }
             ChatUtils.clickableChat(
                 "Click here to see the changelog.",
                 onClick = {
@@ -62,12 +66,32 @@ object DefaultConfigFeatures {
         }
     }
 
-    private fun onCommand(old: String, new: String) {
+    private fun createOptionProcessor(): FeatureToggleProcessor {
         val processor = FeatureToggleProcessor()
         val driver = ConfigProcessorDriver(processor)
         driver.warnForPrivateFields = false
         driver.processConfig(SkyHanniMod.feature)
-        var optionList = processor.orderedOptions
+        return processor
+    }
+
+    private fun filterOptions(
+        options: Map<Category, List<FeatureToggleableOption>>,
+        togglesInOldVersion: List<String>?,
+        togglesInNewVersion: List<String>?,
+    ): Map<Category, List<FeatureToggleableOption>> {
+        val oldPaths = togglesInOldVersion?.toSet()
+        val newPaths = togglesInNewVersion?.toSet()
+        return options
+            .mapValues { (_, categoryOptions) ->
+                categoryOptions.filter {
+                    (newPaths == null || it.path in newPaths) &&
+                        (oldPaths == null || it.path !in oldPaths)
+                }
+            }
+            .filter { (_, filteredOptions) -> filteredOptions.isNotEmpty() }
+    }
+
+    private fun onCommand(old: String, new: String) {
         val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
         val togglesInNewVersion = knownToggles[new]
         if (new != "null" && togglesInNewVersion == null) {
@@ -79,14 +103,7 @@ object DefaultConfigFeatures {
             ChatUtils.chat("Unknown version $old")
             return
         }
-        optionList = optionList
-            .mapValues { option ->
-                option.value.filter {
-                    (togglesInNewVersion == null || it.path in togglesInNewVersion) &&
-                        (togglesInOldVersion == null || it.path !in togglesInOldVersion)
-                }
-            }
-            .filter { (_, filteredOptions) -> filteredOptions.isNotEmpty() }
+        val optionList = filterOptions(createOptionProcessor().orderedOptions, togglesInOldVersion, togglesInNewVersion)
         if (optionList.isEmpty()) {
             ChatUtils.chat("There are no new options to configure between $old and $new")
             return
@@ -116,7 +133,7 @@ object DefaultConfigFeatures {
     private val autocomplete get() = SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null")
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shdefaultoptions") {
             description = "Select default options"
             arg("oldVersion", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { autocomplete }) { oldVersion ->

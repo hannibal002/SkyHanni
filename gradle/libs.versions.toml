@@ -15,7 +15,7 @@ shadow = "9.6.0"
 loom = "1.17-SNAPSHOT"
 kotlin = "2.4.10"
 ksp = "2.3.10"
-detekt = "2.0.0-alpha.5"
+detekt = "2.0.0-alpha.6"
 
 devauth = "1.2.2"
 junit = "5.14.4"

@@ -4,9 +4,14 @@ import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
-import com.mojang.blaze3d.textures.TextureFormat
 import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.renderer.texture.AbstractTexture
+
+//? if >= 26.2 {
+import com.mojang.blaze3d.GpuFormat
+//?} else {
+/*import com.mojang.blaze3d.textures.TextureFormat
+*///?}
 
 abstract class SkyHanniAbstractItemTexture : AbstractTexture(), AutoCloseable {
 
@@ -22,9 +27,11 @@ abstract class SkyHanniAbstractItemTexture : AbstractTexture(), AutoCloseable {
         colorUsage: Int,
     ) {
         val device = RenderSystem.getDevice()
-        texture = device.createTexture(colorLabel, colorUsage, TextureFormat.RGBA8, size, size, 1, 1)
+        //~ if < 26.2 'GpuFormat.RGBA8_UNORM' -> 'TextureFormat.RGBA8'
+        texture = device.createTexture(colorLabel, colorUsage, GpuFormat.RGBA8_UNORM, size, size, 1, 1)
         textureView = device.createTextureView(texture!!)
-        depthTexture = device.createTexture(depthLabel, usageInt, TextureFormat.DEPTH32, size, size, 1, 1)
+        //~ if < 26.2 'GpuFormat.D32_FLOAT' -> 'TextureFormat.DEPTH32'
+        depthTexture = device.createTexture(depthLabel, usageInt, GpuFormat.D32_FLOAT, size, size, 1, 1)
         depthTextureView = device.createTextureView(depthTexture!!)
         device.createCommandEncoder().clearColorAndDepthTextures(
             texture!!,

@@ -33,15 +33,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -51,10 +48,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PestApi {
-
-    private val SPRAYONATOR = "SPRAYONATOR".toInternalName()
-    private val JUICY_SPRAYONATOR = "JUICY_SPRAYONATOR".toInternalName()
-    private val SALTY_SPRAYONATOR = "SALTY_SPRAYONATOR".toInternalName()
 
     val config get() = GardenApi.config.pests
     val storage get() = GardenApi.storage
@@ -79,9 +72,7 @@ object PestApi {
     fun hasLassoInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.LASSO
     fun hasVacuumOrLassoInHand() = hasVacuumInHand() || hasLassoInHand()
 
-    private fun NeuInternalName.isSprayonator() = equalsOneOf(SPRAYONATOR, JUICY_SPRAYONATOR, SALTY_SPRAYONATOR)
-
-    fun hasSprayonatorInHand(): Boolean = InventoryUtils.itemInHandId.isSprayonator()
+    fun hasSprayonatorInHand(): Boolean = SprayonatorType.getInHandOrNull() != null
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 
@@ -89,10 +80,11 @@ object PestApi {
 
     /**
      * WRAPPED-REGEX-TEST: " §7 §aThe Garden §4§l§7 x1"
+     * WRAPPED-REGEX-TEST: " §7 §cThe Garden §4§l§7 x8"
      */
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
-        " §7. §[ac]The Garden §4§l\uE018§7 x(?<pests>.*)",
+        " §7. §[ac]The Garden §4§l[\uE07F\uE018]§7 x(?<pests>.*)",
     )
 
     /**
@@ -109,7 +101,7 @@ object PestApi {
      */
     private val pestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*(?:§.)* x(?<pests>\\d+)",
+        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*[\uE07F\uE018](?:§.)* x(?<pests>\\d+)",
     )
 
     /**
@@ -125,7 +117,7 @@ object PestApi {
      */
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
-        "§4§l §cThis plot has §.(?<amount>\\d+) §2 Pests?§c!",
+        "§4§l[\uE07F\uE018] §cThis plot has §.(?<amount>\\d+) §2[\uE07F\uE018] Pests?§c!",
     )
 
     /**

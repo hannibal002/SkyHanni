@@ -43,7 +43,8 @@ object NpcTradeHelper {
 
     /**
      * [evaluable] is false when the owned amount is unknown, for example a currency SkyHanni
-     * does not track. Such an item is never marked as affordable.
+     * does not track. Such an item is never marked as affordable and shows a question mark
+     * instead of an amount.
      */
     private class CostLine(val rawLine: String, val text: String, val covered: Boolean, val evaluable: Boolean) {
         /** The tooltip adds color codes of its own to the lore line, so the lookup ignores them. */
@@ -113,7 +114,8 @@ object NpcTradeHelper {
         val covered = owned != null && owned >= amount
 
         val suffix = when {
-            owned == null -> ""
+            internalName == NeuInternalName.MISSING_ITEM -> "§c!"
+            owned == null -> " §8?§7/§8${amount.addSeparators()}"
             covered -> " §a✔"
             else -> " §8${owned.addSeparators()}§7/§8${amount.addSeparators()}"
         }
@@ -122,13 +124,15 @@ object NpcTradeHelper {
 
         val name = when {
             // the line could not be read, leaving it untouched beats replacing it with a broken name
-            internalName == NeuInternalName.MISSING_ITEM -> entry.rawLine
+            internalName == NeuInternalName.MISSING_ITEM -> entry.rawLine.trimStart()
             // currencies other than coins have no price, getPriceName would show a "(0)" behind them
             currency != null && currency.coinValue == null -> currency.formatAmount(amount)
             else -> internalName.getPriceName(amount)
         }
 
-        return CostLine(entry.rawLine, name + suffix + sackText, covered, owned != null)
+        // some menus indent their cost lines, the replacement keeps that indent
+        val indent = entry.rawLine.takeWhile { it == ' ' }
+        return CostLine(entry.rawLine, indent + name + suffix + sackText, covered, owned != null)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

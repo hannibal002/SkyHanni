@@ -12,6 +12,10 @@ import net.minecraft.client.renderer.texture.Dumpable
 import net.minecraft.resources.Identifier
 import java.nio.file.Path
 
+//? if >= 26.2 {
+import com.mojang.blaze3d.GpuFormat
+//?}
+
 abstract class SkyHanniAbstractAtlas<K : Any, E : SkyHanniAbstractAtlasEntry> : SkyHanniAbstractItemTexture(), Dumpable {
 
     protected abstract val identifier: Identifier
@@ -38,7 +42,8 @@ abstract class SkyHanniAbstractAtlas<K : Any, E : SkyHanniAbstractAtlasEntry> : 
 
     protected fun ensureAllocated() {
         if (texture != null) return
-        val size = 512.coerceAtMost(RenderSystem.getDevice().maxTextureSize)
+        //~ if < 26.2 'getDeviceInfo().limits().maxTextureSizeForFormat(GpuFormat.RGBA8_UNORM)' -> 'maxTextureSize'
+        val size = 512.coerceAtMost(RenderSystem.getDevice().getDeviceInfo().limits().maxTextureSizeForFormat(GpuFormat.RGBA8_UNORM))
         sizePixels = size
         allocateTextures(size, colorLabel, depthLabel, textureUsage)
         packer = SkyHanniAtlasBinPacker(size)

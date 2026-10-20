@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.inventory.NpcTradeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,11 +20,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyblockCurrency
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import java.util.regex.Pattern
 
 /**
  * Remembers how much of a currency the player owns, for currencies that Hypixel only shows on
@@ -54,7 +59,7 @@ object CurrencyApi {
      */
     private val pestsAmountPattern by patternGroup.pattern(
         "pests.amount",
-        "Vacuum Bag: (?<amount>[\\d,]+) \uE018 Pests",
+        "Vacuum Bag: (?<amount>[\\d,]+) [\uE07F\uE018] Pests",
     )
 
     /**
@@ -65,6 +70,70 @@ object CurrencyApi {
     private val medalAmountPattern by patternGroup.pattern(
         "medal.amount",
         "(?<type>GOLD|SILVER|BRONZE) medals: (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * REGEX-TEST: Premium Safari Tickets: 0
+     * REGEX-TEST: First-Class Safari Tickets: 1,024
+     */
+    private val safariTicketItemPattern by patternGroup.pattern(
+        "safariticket.item",
+        "(?<type>[\\w-]+) Safari Tickets: (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * REGEX-TEST: - Basic: 1
+     * REGEX-TEST: - First-Class: 0
+     */
+    private val safariTicketSignPattern by patternGroup.pattern(
+        "safariticket.sign",
+        "- (?<type>Basic|Economy|Premium|First-Class): (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * The lore only writes "Tokens", the item this line belongs to is what makes it unambiguous.
+     *
+     * REGEX-TEST: Carnival Tokens
+     */
+    private val carnivalTokenItemPattern by patternGroup.pattern(
+        "carnivaltoken.item",
+        "Carnival Tokens",
+    )
+
+    /**
+     * REGEX-TEST: Your Tokens: 2,136
+     */
+    private val carnivalTokenAmountPattern by patternGroup.pattern(
+        "carnivaltoken.amount",
+        "Your Tokens: (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * The Grand Bakery item states how many kernels the player owns.
+     *
+     * REGEX-TEST: Grand Bakery
+     */
+    private val kernelItemPattern by patternGroup.pattern(
+        "kernel.item",
+        "Grand Bakery",
+    )
+
+    /**
+     * REGEX-TEST: Your Kernels: 12
+     */
+    private val kernelAmountPattern by patternGroup.pattern(
+        "kernel.amount",
+        "Your Kernels: (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * Only Ted is confirmed, the npc name is left open so another feast chef still matches.
+     *
+     * REGEX-TEST: [NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.
+     */
+    private val kernelGainPattern by patternGroup.pattern(
+        "kernel.gain",
+        "\\[NPC] [\\w ]+: Thanks for the donation! I've added a Kernel to your purse\\.",
     )
 
     /**
@@ -98,6 +167,12 @@ object CurrencyApi {
 
     private fun SkyblockCurrency.setAmount(amount: Long) {
         storage?.put(this, amount)
+    }
+
+    // an unknown amount stays unknown, counting up from a guessed zero would show a wrong total
+    private fun SkyblockCurrency.addAmount(amount: Long) {
+        val owned = getFromStorage() ?: return
+        setAmount(owned + amount)
     }
 
     fun SkyblockCurrency.getFromStorage(): Long? = storage?.get(this)
@@ -185,6 +260,36 @@ object CurrencyApi {
         }
     }
 
+    // unlocking a carnival upgrade sends no chat message, the new amount only shows in the updated
+    // item. this event also fires once right after the menu opened, so it covers the initial read too.
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        for (item in event.inventoryItems.values) {
+            val name = item.cleanName
+            when {
+                carnivalTokenItemPattern.matches(name) ->
+                    item.readOwnedAmount(carnivalTokenAmountPattern, SkyblockCurrency.CARNIVAL_TOKEN)
+
+                kernelItemPattern.matches(name) -> item.readOwnedAmount(kernelAmountPattern, SkyblockCurrency.KERNEL)
+            }
+        }
+    }
+
+    private fun SafeItemStack.readOwnedAmount(pattern: Pattern, currency: SkyblockCurrency) {
+        for (line in getCleanLore()) {
+            pattern.matchMatcher(line) {
+                currency.setAmount(group("amount").formatLong())
+            }
+        }
+    }
+
+    // one kernel per donated Seasoning, this keeps the amount current between two menu visits
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
+        if (!kernelGainPattern.matches(event.cleanMessage)) return
+        SkyblockCurrency.KERNEL.addAmount(1)
+    }
+
     @HandleEvent
     private fun onNpcTrade(event: NpcTradeEvent) {
         for (cost in event.costs) {
@@ -227,6 +332,7 @@ object CurrencyApi {
         medalAmountPattern.matchMatcher(line) {
             medalCurrencyOrNull(group("type"))?.setAmount(group("amount").formatLong())
         }
+        readSafariTicketLine(line)
         // every essence shop menu holds an item that states how much of it the player owns
         essenceAmountPattern.matchMatcher(line) {
             val type = group("type")
@@ -244,6 +350,30 @@ object CurrencyApi {
 
             essenceStorage?.put(internalName, group("amount").formatLong())
         }
+    }
+
+    private fun readSafariTicketLine(line: String) {
+        safariTicketItemPattern.matchMatcher(line) {
+            setSafariTicketAmount(group("type"), group("amount"), line)
+        }
+        safariTicketSignPattern.matchMatcher(line) {
+            setSafariTicketAmount(group("type"), group("amount"), line)
+        }
+    }
+
+    private fun setSafariTicketAmount(type: String, amount: String, line: String) {
+        val currency = SkyblockCurrency.getByLoreNameOrNull("$type Safari Ticket") ?: run {
+            ErrorManager.logErrorStateWithData(
+                "Could not read how many Safari Tickets you own",
+                "Unknown Safari Ticket type in an item lore",
+                "type" to type,
+                "line" to line,
+                "inventoryName" to InventoryUtils.openInventoryName(),
+                betaOnly = true,
+            )
+            return
+        }
+        currency.setAmount(amount.formatLong())
     }
 
     private fun essenceInternalNameOrNull(type: String): NeuInternalName? =

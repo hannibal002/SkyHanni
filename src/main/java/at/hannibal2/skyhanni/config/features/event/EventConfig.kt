@@ -38,6 +38,11 @@ class EventConfig {
     @Category(name = "Hoppity Eggs", desc = "Features for the Hoppity event that happens every SkyBlock spring.")
     val hoppityEggs: HoppityEggsConfig = HoppityEggsConfig()
 
+    @ConfigOption(name = "Event Timings", desc = "")
+    @Accordion
+    @Expose
+    val timing: EventTimingConfig = EventTimingConfig()
+
     @ConfigOption(name = "City Project", desc = "")
     @Accordion
     @Expose
@@ -82,6 +87,10 @@ class EventConfig {
     @Accordion
     @Expose
     val yearOfTheWitch: YearOfTheWitchConfig = YearOfTheWitchConfig()
+
+    @Category(name = "Stonks Auction", desc = "Features for the Stonks Auction while the Stock Exchange perk is active.")
+    @Expose
+    val stonksAuction: StonksAuctionConfig = StonksAuctionConfig()
 
     @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
     @Expose

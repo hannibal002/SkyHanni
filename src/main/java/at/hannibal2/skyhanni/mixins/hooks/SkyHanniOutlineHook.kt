@@ -1,6 +1,10 @@
+@file:Suppress("NoEmptyFile")
+
 package at.hannibal2.skyhanni.mixins.hooks
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
+//? if < 26.2 {
+/*import at.hannibal2.skyhanni.test.command.ErrorManager
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
@@ -13,7 +17,6 @@ import net.minecraft.client.renderer.rendertype.RenderType
 // The idea and implementation for this class was inspired by Skyblocker.
 // This implementation has been modified from the original Skyblocker code to work across multiple versions.
 object SkyHanniOutlineHook {
-
     class SkyHanniOutlineVertexConsumerProvider : OutlineBufferSource() {
         override fun endOutlineBatch() {
             beginRendering()
@@ -38,13 +41,16 @@ object SkyHanniOutlineHook {
 
     private var customDepthAttachmentView: GpuTextureView? = null
 
+    private var customDepthAttachmentFormat: TextureFormat? = null
+
     @JvmStatic
     var isCurrentlyActive = false
         private set
 
     private fun beginRendering() {
+        val depthAttachmentView = customDepthAttachmentView ?: return
         isCurrentlyActive = true
-        RenderSystem.outputDepthTextureOverride = customDepthAttachmentView
+        RenderSystem.outputDepthTextureOverride = depthAttachmentView
     }
 
     private fun finishRendering() {
@@ -57,14 +63,22 @@ object SkyHanniOutlineHook {
 
     @JvmStatic
     fun checkIfDepthAttachmentNeedsUpdating() {
-        val window = Minecraft.getInstance().window
-        if (customDepthAttachment == null || window.width != lastWidth || window.height != lastHeight) {
-            lastWidth = window.width
-            lastHeight = window.height
-            updateDepthAttachment()
-        }
+        val gpuTexture = Minecraft.getInstance().mainRenderTarget.depthTexture ?: return
+        val width = gpuTexture.getWidth(0)
+        val height = gpuTexture.getHeight(0)
+        val format = gpuTexture.format
         try {
-            val gpuTexture = Minecraft.getInstance().mainRenderTarget.depthTexture ?: return
+            if (
+                customDepthAttachment == null ||
+                width != lastWidth ||
+                height != lastHeight ||
+                format != customDepthAttachmentFormat
+            ) {
+                lastWidth = width
+                lastHeight = height
+                customDepthAttachmentFormat = format
+                updateDepthAttachment(format)
+            }
             val depthAttachment = customDepthAttachment ?: return
             RenderSystem.getDevice().createCommandEncoder().copyTextureToTexture(
                 gpuTexture,
@@ -76,7 +90,7 @@ object SkyHanniOutlineHook {
         }
     }
 
-    private fun updateDepthAttachment() {
+    private fun updateDepthAttachment(format: TextureFormat) {
         try {
             customDepthAttachment?.let {
                 it.close()
@@ -86,7 +100,7 @@ object SkyHanniOutlineHook {
             val depthAttachment = device.createTexture(
                 "SkyHanni Custom Depth",
                 GpuTexture.USAGE_RENDER_ATTACHMENT or GpuTexture.USAGE_COPY_DST or GpuTexture.USAGE_TEXTURE_BINDING,
-                TextureFormat.DEPTH32,
+                format,
                 lastWidth, lastHeight, 1, 1,
             )
             customDepthAttachment = depthAttachment
@@ -96,3 +110,4 @@ object SkyHanniOutlineHook {
         }
     }
 }
+*///?}

@@ -13,7 +13,10 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
  * For the total amount of an item, use [BazaarApi.getOpenBuyOrderAmount] or [BazaarApi.getOpenSellOfferAmount].
  *
  * @property amount how many units this single order was placed for.
- * @property filled how many units the bazaar traded so far, claimed or not.
+ * @property filled how many units the bazaar traded so far, claimed or not. Exact while [isFull]
+ * is true, otherwise approximate, because the bazaar abbreviates and rounds larger numbers.
+ * @property isFull whether the bazaar reports the order as completely filled. Use this instead of
+ * comparing [filled] against [amount], the rounding makes that comparison unreliable.
  * @property claimable how many traded units still wait to be picked up.
  * @property isOwn whether the order belongs to the player. Always true without a co-op, where
  * the inventory names no owner.
@@ -24,6 +27,7 @@ data class BazaarOrder(
     val internalName: NeuInternalName,
     val amount: Int,
     val filled: Int,
+    val isFull: Boolean,
     val claimable: Int,
     val pricePerUnit: Double,
     val isOwn: Boolean,

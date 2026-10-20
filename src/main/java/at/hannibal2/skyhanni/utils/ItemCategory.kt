@@ -83,6 +83,8 @@ enum class ItemCategory {
     FARMING_TOOL,
     TROPHY,
     CAPSULE,
+    RABBIT,
+    ABILITY_SCROLL,
 
     NONE,
     ;

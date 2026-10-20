@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.hotx.HotfData
+import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -72,6 +74,9 @@ object NpcTradeApi {
 
     // a menu without trades leaves the previous ones alone, they are still needed after it closed
     private fun readTrades(items: Collection<SafeItemStack>) {
+        // the perk trees unlock with their own currencies and have a display of their own
+        if (HotmData.inInventory || HotfData.inInventory) return
+
         // the same item can sit in several slots, the costs are the same in all of them
         val newTrades = items.mapNotNull { readTrade(it) }.associateBy { it.name }
         if (newTrades.isEmpty()) return

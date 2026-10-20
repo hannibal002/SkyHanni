@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.test.command
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.achievements.Achievement
@@ -107,10 +106,11 @@ object ErrorManager {
     private val copyErrorCoroutine = CoroutineSettings("error manager copy error")
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shtestreseterrorcache") {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shreseterrorcache") {
+            aliases = listOf("shtestreseterrorcache")
             description = "Resets the cache of errors."
-            category = CommandCategory.DEVELOPER_TEST
+            category = DEVELOPER_TEST
             simpleCallback {
                 cache.clear()
                 ChatUtils.chat("Error cache reset.")
@@ -118,7 +118,7 @@ object ErrorManager {
         }
         event.registerBrigadier("shthrowerror") {
             description = "Throws an error to test error manager."
-            category = CommandCategory.DEVELOPER_DEBUG
+            category = DEVELOPER_DEBUG
             simpleCallback {
                 logErrorWithData(NullPointerException(), "Manually triggered error!")
             }
@@ -128,7 +128,7 @@ object ErrorManager {
     private const val COPY_ERROR_ACHIEVEMENT = "Copy Error"
 
     @HandleEvent
-    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+    private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             "I'm Helping!!!".asComponent(),
             "Copy an error message to the clipboard to help the developers fix it.".asComponent(),
@@ -312,7 +312,7 @@ object ErrorManager {
     }
 
     @HandleEvent
-    fun onConnect() {
+    private fun onConnect() {
         if (errorsToShowOnJoin.isEmpty()) return
         val label = getLabel()
         val state = if (MinecraftData.hasLeftMainScreen) "During startup" else "While not on a server"
@@ -389,7 +389,7 @@ object ErrorManager {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val repoData = event.getConstant<ErrorManagerJson>("ErrorManager")
         breakAfter = repoData.breakAfter
         replacements = repoData.replacements

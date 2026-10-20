@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -46,30 +47,31 @@ object StarlynSisterCouponProfit {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.starlynCouponProfitEnabled) return
-        StarlynSisterType.entries.forEach { sisterType ->
-            if (event.inventoryName == sisterType.inventoryName) currentSisterType = sisterType
-        }
-        if (currentSisterType == null) return
+        val sisterType = StarlynSisterType.entries.firstOrNull { it.inventoryName == event.inventoryName } ?: return
 
-        val table = mutableListOf<DisplayTableEntry>()
-        for ((slot, item) in event.inventoryItems) {
-            try {
-                readItem(slot, item)?.let {
-                    table.add(it)
+        DelayedRun.runOrNextTick {
+            currentSisterType = sisterType
+
+            val table = mutableListOf<DisplayTableEntry>()
+            for ((slot, item) in event.inventoryItems) {
+                try {
+                    readItem(slot, item)?.let {
+                        table.add(it)
+                    }
+                } catch (e: Throwable) {
+                    ErrorManager.logErrorWithData(
+                        e, "Error in StarlynSisterCouponProfit while reading item '${item.repoItemName}'",
+                        "item" to item,
+                        "name" to item.repoItemName,
+                        "inventory name" to event.inventoryName,
+                    )
                 }
-            } catch (e: Throwable) {
-                ErrorManager.logErrorWithData(
-                    e, "Error in StarlynSisterCouponProfit while reading item '${item.repoItemName}'",
-                    "item" to item,
-                    "name" to item.repoItemName,
-                    "inventory name" to event.inventoryName,
-                )
             }
-        }
 
-        display = buildList {
-            addString("§eProfit per Coupon")
-            add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
+            display = buildList {
+                addString("§eProfit per Coupon")
+                add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
+            }
         }
     }
 
@@ -79,12 +81,12 @@ object StarlynSisterCouponProfit {
         val requiredItems = item.readLoreCosts()
         val price = internalName.getPrice()
         var totalCost = 0.0
-        var couponAmount = 0
+        var couponAmount = 0L
         for ((name, amount) in requiredItems) {
             val itemPrice = name.getPriceOrNull() ?: continue
             totalCost += itemPrice * amount
             if (name == currentSisterType?.couponName) {
-                couponAmount = amount.toInt()
+                couponAmount = amount
             }
         }
         val profit = price - totalCost
