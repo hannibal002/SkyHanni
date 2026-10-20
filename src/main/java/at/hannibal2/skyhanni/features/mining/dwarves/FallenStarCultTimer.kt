@@ -76,7 +76,9 @@ object FallenStarCultTimer {
         }
     }
 
-    private fun inCultRoom() = IslandType.DWARVEN_MINES.isInIsland() &&
+    private fun inDwarvenMines() = IslandType.DWARVEN_MINES.isInIsland()
+
+    private fun inCultRoom() = inDwarvenMines() &&
         cultRoomLocation.distanceToPlayer() < CULT_ROOM_RADIUS
 
     private fun wearingHelmet() = InventoryUtils.getHelmet()?.getInternalNameOrNull() == fallenStarHelmet
@@ -85,6 +87,7 @@ object FallenStarCultTimer {
         if (config.onlyShowWhen.isEmpty()) return true
         return config.onlyShowWhen.any {
             when (it) {
+                IN_DWARVEN_MINES -> inDwarvenMines()
                 IN_CULT_ROOM -> inCultRoom()
                 WEARING_HELMET -> wearingHelmet()
             }
