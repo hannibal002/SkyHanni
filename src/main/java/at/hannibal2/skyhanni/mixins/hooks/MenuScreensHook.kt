@@ -50,7 +50,7 @@ object MenuScreensHook {
         client.player?.containerMenu = menu
 
         when (val screen = MinecraftCompat.screen) {
-            is CustomWardrobeScreen -> screen.changeHandler(menu)
+            is CustomWardrobeScreen -> screen.changeHandler(menu, name)
             is CustomWardrobeEditScreen ->
                 MinecraftCompat.screen = CustomWardrobeEditScreen(menu, inventory, name)
             else ->

@@ -17,7 +17,7 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 ### Cloning the project
 
 - Create an account on GitHub
-    - Go to https://github.com/hannibal002/SkyHanni
+    - Go to https://github.com/SkyHanniStudios/SkyHanni
     - Click on the fork button to create a fork.
         - Leave the settings unchanged
         - Click on `create fork`
@@ -46,11 +46,11 @@ for "Gradle JVM") is set to a Java 25 JDK.
 <details>
 <summary>🖼️Show Gradle JVM image</summary>
 
-![Gradle settings showing Java 21 being selected as JVM](docs/gradle-settings.png)
+![Gradle settings showing Java 25 being selected as JVM](docs/gradle-settings.png)
 
 </details>
 
-Now that Gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java
+Now that Gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the Java
 version for the project.
 
 To do this we press `(CTRL+ALT+SHIFT+S)` in IntelliJ, or go to `File` → `Project Structure...`.
@@ -91,20 +91,11 @@ configuration. If not, you can restart IntelliJ and reload the Gradle project ag
 
 </details>
 
-Select an appropriate Java 25 JDK (preferably [Adoptium](https://adoptium.net/), but any Java 25 JDK will do).
-
-<details>
-<summary>🖼️Show run configuration image</summary>
-
-![Run configuration settings](docs/run-configuration-settings.avif)
-
-</details>
-
 Now that we are done with that, you should be able to launch your game from your IDE with that run configuration.
 
 ## Pull Requests
 
-General infos about Pull Request can be found on
+General info about Pull Requests can be found on
 the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests).
 
 ### Creating a Pull Request
@@ -150,6 +141,11 @@ CI. Do not manually edit `docs/CHANGELOG.md` or `docs/FEATURES.md`. These files 
 
 - Follow the format examples from the template and remove the categories that do not apply to your PR.
 - A PR might include multiple changelog categories simultaneously.
+- Outside of Technical Details, write entries from the player's point of view. Name the behavior a user can
+  observe, not the code that produces it. "Fixed wrong Kuudra Key cost in Instance Chest Profit" belongs in
+  the changelog, "fixed an inverted discount calculation" belongs in the **What** section.
+- Refer to a feature by its name and capitalize it, along with every SkyBlock proper noun. This includes the
+  names that read like ordinary words, such as Hunting Box or Instance Chest Profit.
 
 Here is an explanation of which changes belong to each category:
 
@@ -199,6 +195,13 @@ E.g. when reverting pull requests or doing quick fixes to PRs merged immediately
 To tell the changelog build this, write either `exclude_from_changelog` or `ignore_from_changelog` in one line.
 Make sure such pull requests have a good explanation in the **What** section.
 
+### Reviews
+
+Pull requests are reviewed by our maintainers, the Reviewer team on GitHub. On Discord, they have the **Code Reviewer** role.
+Only approvals from members of the Reviewer team count toward merging. A PR needs 3 of them before it can be merged.
+New commits, including amended or rebased ones, reset existing approvals.
+Everyone is still welcome to leave comments and feedback on any PR.
+
 ## Coding Styles and Conventions
 
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
@@ -239,6 +242,13 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
     - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
     - If you can improve the existing feature in a meaningful way.
+- The rule above applies to features another mod has already released. An open pull request in another mod is not a
+  released feature. It never blocks a pull request here, and no pull request here is closed because another mod happens
+  to be working on something similar. This works both ways: if another mod releases something that is sitting in an open
+  pull request here, that is equally fine and no reason to complain.
+- Code from another mod, released or not, is off limits.
+  - Collected data such as coordinates or item lists is different. It describes the game, not the mod that wrote it down.
+    Use it where the feature is your own, and credit the source in the commit or pull request.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
       Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.
@@ -255,12 +265,16 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
+- When renaming or replacing a symbol other code already uses, keep a deprecated alias under the old
+  name instead of deleting it right away. Open pull requests that still use the old name then keep
+  compiling and their authors get time to react. Remove the alias in a separate pull request one or
+  two months later, and note that date in a TODO comment above it.
 - Future JSON data objects should be made in kotlin.
 - Config files should be made in **Kotlin**.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it.
-    - Custom SkyHanni events are located in the `events` package, organized into sub packages by category.
-      When creating a new event, place it in the appropriate sub package. Thematically related events can be placed together in a single
+    - Custom SkyHanni events are located in the `events` package, organized into subpackages by category.
+      When creating a new event, place it in the appropriate subpackage. Thematically related events can be placed together in a single
       file.
     - To expand the event system, you can create a new event that is called from a Mixin,
       or you can subscribe to a Fabric event and then post a SkyHanni event from that.
@@ -278,7 +292,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Events can also use the `SkyHanniEvent.Cancellable` and `SkyHanniEvent.Rendering`
       interfaces directly if needed.
     - Functions annotated with `@HandleEvent` must be declared `private`.
-      The [SkyHanni IntelliJ plugin](https://github.com/hannibal002/SkyHanniDevelopment) flags non-private handlers and provides a quick
+      The [SkyHanni IntelliJ plugin](https://github.com/SkyHanniStudios/SkyHanniDevelopment) flags non-private handlers and provides a quick
       fix.
 - Do not subscribe to Fabric events directly in feature classes. Instead, subscribe to SkyHanni events.
   Only backend data classes in the `api` packages should listen to Fabric events. Their job is to process
@@ -290,18 +304,23 @@ Make sure such pull requests have a good explanation in the **What** section.
     - For existing events, add the KDoc the next time the event is touched or newly used in a PR.
 - Please use existing utils methods.
 - Never use  `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
-    - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
+    - See [this commit](https://github.com/SkyHanniStudios/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
-- Try to avoid using Kotlin's `!!` (catch if not null) feature.
+- Try to avoid using Kotlin's `!!` (not-null assertion) feature.
     - Replace it with `?:` (if null return this).
-    - This will most likely not be possible to avoid when working with objects from java.
+    - This will most likely not be possible to avoid when working with objects from Java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
   See the **Errors and Crashes** section for why every catch goes through `ErrorManager`.
+    - `logErrorWithData` is only for a throwable that was actually thrown and caught, where the stack trace points at the
+      cause. Never construct a throwable just to report a problem the code detected on its own.
+    - For an invalid state the code checks and rejects itself, use
+      `ErrorManager.logErrorStateWithData("explanation for users", "internal description", ...extraOptionalData)`.
+      The first message is what the player reads in chat, the second one only shows up in the copied error report.
 - Do not use `toRegex()` or `toPattern()`. Use `RepoPattern` instead.
   RepoPattern allows regex patterns to be updated remotely via the repo without requiring a mod update.
   Each pattern has a local fallback defined in code, but can be overridden by the repo at runtime.
-  See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
+  See [RepoPattern.kt](https://github.com/SkyHanniStudios/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
     - Define patterns using `RepoPattern.pattern(key, fallback)` with Kotlin delegation (`by`).
     - When a file contains more than one pattern, use `RepoPattern.group(prefix)` to group them under a shared key prefix.
     - Pattern variables should be named in the scheme `variableNamePattern`.
@@ -313,7 +332,7 @@ Make sure such pull requests have a good explanation in the **What** section.
   the main thread.
 - When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and
   event.transform() when updating a
-  value. [For Example](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
+  value. [For Example](https://github.com/SkyHanniStudios/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve
@@ -378,7 +397,7 @@ Helps you write Minecraft specific code such as mixins and access wideners.
 
 Provides syntax highlighting and quick version switching for our multiversion development setup.
 
-### [SkyHanni Development Plugin](https://github.com/hannibal002/SkyHanniDevelopment)
+### [SkyHanni Development Plugin](https://github.com/SkyHanniStudios/SkyHanniDevelopment)
 
 An IntelliJ plugin with SkyHanni-specific development assistance. It validates, for example, event handler
 declarations, flags missing or incorrect `@HandleEvent`, `@PrimaryFunction`, and `@SkyHanniModule`
@@ -386,7 +405,7 @@ annotations, resolves config paths, and suppresses false-positive IntelliJ warni
 patterns such as RepoPattern keys and Brigadier command names.
 
 Install it manually: download the latest release from the
-[GitHub releases page](https://github.com/hannibal002/SkyHanniDevelopment/releases/latest) and install via
+[GitHub releases page](https://github.com/SkyHanniStudios/SkyHanniDevelopment/releases/latest) and install via
 <kbd>Settings</kbd> → <kbd>Plugins</kbd> → <kbd>⚙</kbd> → <kbd>Install plugin from disk...</kbd>.
 
 ## Software Used in SkyHanni
@@ -398,7 +417,7 @@ and [Java](https://www.java.com/en/).
 
 We use a [Gradle configuration](https://gradle.org/) to build the mod,
 written in [Kotlin DSL](https://docs.gradle.org/current/userguide/kotlin_dsl.html):
-[build.gradle.kts](https://github.com/hannibal002/SkyHanni/blob/beta/build.gradle.kts)
+[build.gradle.kts](https://github.com/SkyHanniStudios/SkyHanni/blob/beta/build.gradle.kts)
 
 This start script will automatically download all required libraries.
 
@@ -406,6 +425,7 @@ This start script will automatically download all required libraries.
 
 SkyHanni reads the [NEU Item Repo](https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO) for item internal names, display names
 and recipes. NEU is not a dependency of SkyHanni.
+A copy of its files is stored on the computer under `.minecraft\skyhanni\neurepo`, next to the SkyHanni repo.
 
 ### Config
 
@@ -430,7 +450,7 @@ Mixin is bundled with the Fabric Loader and does not need to be included as a ru
 It allows to easily modify methods in Minecraft itself, without conflicting with other mods.
 
 For more information, see https://github.com/SpongePowered/Mixin
-or [our existing mixins](https://github.com/hannibal002/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
+or [our existing mixins](https://github.com/SkyHanniStudios/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
 
 When creating new Mixins, try to keep the code inside the mixin as small as possible, and call a hook as soon as possible.
 The mixin method itself should ideally contain only a single call to a Kotlin function. All logic belongs in Kotlin, not in the Java mixin.
@@ -445,14 +465,14 @@ SkyHanni uses KSP via the `annotation-processors` module to generate code at com
 ### Repo
 
 SkyHanni uses a repo system to easily change static variables without the need for a mod update.
-The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
-A copy of all JSON files is stored on the computer under `.minecraft\config\skyhanni\repo`.
+The repo is located at https://github.com/SkyHanniStudios/SkyHanni-REPO.
+A copy of all JSON files is stored on the computer under `.minecraft\skyhanni\shrepo`.
 On every game start, the copy gets updated (if outdated and if not manually disabled).
 If you add stuff to the repo make sure it gets serialized. See
 the [JsonObjects](src/main/java/at/hannibal2/skyhanni/data/jsonobjects/repo)
 folder for how to properly do this. You also may have to disable repo auto update in game.
 
-If your PR adds or changes data in the repo, open a separate PR on the [SkyHanni-REPO](https://github.com/hannibal002/SkyHanni-REPO)
+If your PR adds or changes data in the repo, open a separate PR on the [SkyHanni-REPO](https://github.com/SkyHanniStudios/SkyHanni-REPO)
 repository as well.
 Keep the main mod PR as a draft until the repo PR is ready.
 Link the repo PR URL in the `## Dependencies` section of the mod PR.
@@ -461,7 +481,7 @@ Link the repo PR URL in the `## Dependencies` section of the mod PR.
 
 DiscordIPC is a service that SkyHanni uses to send information from SkyBlock to Discord in Rich Presence. <br>
 For info on usage, look
-at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
+at [DiscordRPCManager.kt](https://github.com/SkyHanniStudios/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
 
 ### Auto Updater
 
@@ -475,7 +495,8 @@ a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with s
 ### Automated GitHub Workflows
 
 Several GitHub Actions workflows run automatically on pull requests to enforce code quality and keep PR metadata up to date.
-All workflows use `.github/scripts/pr_review.main.kts` as the shared review script, invoked with a `MODE` parameter.
+All of them except Remove All Labels use `.github/scripts/pr_review.main.kts` as the shared review script, invoked with a `MODE`
+parameter.
 
 When a PR is updated, any existing comment posted by a workflow is collapsed into a `<details>` spoiler. What follows depends on the
 workflow. The Detekt, Build Failure, Merge Conflict and Changelog Check comments only ever announce that something is wrong: a new comment
@@ -492,8 +513,8 @@ Most workflows use a two-workflow split to allow write-operations on fork PRs wi
 The first workflow is triggered by `pull_request`, runs with limited permissions, and uploads results as an artifact. The second is
 triggered by `workflow_run` on completion of the first, always uses the base branch version, carries write access (`issues: write`,
 `pull-requests: write`, `actions: read`), and runs the review script against the artifact. The PR number is resolved at runtime from
-the head branch of the triggering workflow run. The Merge Conflict Comment, Dependency Label and Description Keyword Labels sections
-do not use this split.
+the head branch of the triggering workflow run, except for the Partially Approved Label, which passes it in the artifact. The Merge
+Conflict Comment, Dependency Label, Description Keyword Labels and Remove All Labels sections do not use this split.
 
 #### Automated Detekt Review
 
@@ -575,8 +596,8 @@ Both are read only from the `## Dependencies` section, never from the rest of th
 followed by blank lines, and ends at the first line that does not start with `- `. Text after a valid entry is ignored, so
 `- #1234 (needed for the item API)` is recognized. A line matching neither format is ignored.
 
-Dependencies on `hannibal002/SkyHanni-REPO` are explicitly excluded from the open check, as that repository is considered part of the same
-release unit.
+Dependencies on `SkyHanniStudios/SkyHanni-REPO` are explicitly excluded from the open check, as that repository is considered part of the same
+release unit. Links that still name the previous owner `hannibal002` are read as `SkyHanniStudios`, where all SkyHanni repositories moved.
 
 The section itself can also be wrong: an entry that fails to resolve, for example through a mistyped number, a line matching neither
 format, the template placeholder left in place, or the heading appearing twice, in which case only the first one is read. The comment then
@@ -616,6 +637,44 @@ a different capitalization all prevent the keyword from being recognized.
 The check runs on every `opened`, `edited`, `reopened`, and `synchronize` event via `pull_request_target`.
 
 Relevant files: `.github/workflows/keyword-labels.yml`, `.github/scripts/pr_review.main.kts` (invoked with `MODE=keyword_labels`).
+
+#### Remove All Labels
+
+Closing a pull request, merged or not, removes every label from it.
+
+- `.github/workflows/remove-labels-on-pr-close.yml`: Triggered by `pull_request_target` on `closed`. Runs the third party action
+  [label-remover](https://github.com/marketplace/actions/label-remover) with `pull-requests: write` and `issues: write`. It does not
+  use the review script.
+
+#### Partially Approved Label
+
+Once a person with write access or higher approves a pull request, the `Partially Approved` label is added. It shows that a reviewer has
+started looking at the pull request. No comment is posted, and no workflow removes the label while the pull request is open.
+
+- A label removed by hand stays removed until the next approval.
+- Drafts and closed or merged pull requests never get the label. An approval given while the pull request was a draft counts once it
+  is marked ready for review.
+- Closing a pull request removes all labels, this one included. If the pull request is reopened, the label comes back when it was still
+  there at closing time.
+- A pull request is evaluated when an approval is submitted, when it is reopened or marked ready for review, and when new commits are
+  pushed. There is no run over all open pull requests, so an approval from before this workflow existed only counts once one of these
+  events happens.
+
+Known limitation: when a push dismisses earlier approvals, an approval followed by a push within about a minute may not add the label.
+The next approval adds it.
+
+Relevant files:
+
+- `.github/workflows/partially-approved.yml`: Triggered by `pull_request_review` on `submitted`, where only an approval continues, and by
+  `pull_request` on `reopened`, `ready_for_review` and `synchronize`. Skips drafts, closed pull requests and pull requests that already
+  carry the label. Only uploads the PR number as an artifact, a fork pull request gets a read-only token for these events.
+- `.github/workflows/partially-approved-review.yml`: Triggered by `workflow_run` on completion of the first one. Always uses base branch
+  code, runs with `issues: write`, `pull-requests: write` and `actions: read`, and reads the PR number from that artifact. It accepts
+  digits only and executes nothing from it.
+- `.github/scripts/pr_review.main.kts` (invoked with `MODE=partially_approved`): Decides from the API alone, since a fork can change the
+  triggering workflow and the PR number, so a forged number only leads to a correct evaluation of another pull request. It reads the
+  reviews, the history of the label and the permission of each approving reviewer, and checks right before adding the label that the
+  pull request is still open and not a draft.
 
 ## Access Wideners
 

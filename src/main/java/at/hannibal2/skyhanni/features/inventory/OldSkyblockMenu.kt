@@ -71,7 +71,7 @@ object OldSkyblockMenu {
             sbButton.command.call()
         } else {
             TitleManager.sendTitle("Requires cookie buff!", location = TitleManager.TitleLocation.INVENTORY)
-            SoundUtils.playErrorSound()
+            SoundUtils.playErrorSound(isWarning = false)
         }
     }
 
@@ -140,7 +140,7 @@ object OldSkyblockMenu {
             itemData = SkullItemData("41758912-e6b1-4700-9de5-04f2cfb9c422", "SB_MENU_QUIVER"),
         ),
         FISHING(
-            HypixelCommands::fishingBag,
+            HypixelCommands::baitSack,
             43,
             "Fishing Bag",
             "A useful bag which can hold all",

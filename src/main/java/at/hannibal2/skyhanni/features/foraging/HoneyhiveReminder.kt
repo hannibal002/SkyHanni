@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllHelper
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllApi
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationCondition
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -119,7 +119,7 @@ object HoneyhiveReminder {
             actionName = "navigate to all Honeyhives",
             action = {
                 currentlyNavigating = true
-                NavigateAllHelper.navigateAll(
+                NavigateAllApi.navigateAll(
                     nodes,
                     GraphNodeTag.HONEYHIVE.displayName,
                     GraphNodeTag.HONEYHIVE.color.toColor(),

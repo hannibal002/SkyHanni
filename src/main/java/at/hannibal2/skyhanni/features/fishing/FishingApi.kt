@@ -163,9 +163,8 @@ object FishingApi {
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onJoinWorld(event: EntityEnterWorldEvent<FishingHook>) {
-        if (!holdingRod) return
-        if (event.entity.playerOwner?.isLocalPlayer == false) return
+    private fun onJoinWorld(event: EntityEnterWorldEvent<FishingHook>) {
+        if (event.entity.playerOwner?.isLocalPlayer != true) return
 
         lastCastTime = SimpleTimeMark.now()
         bobber = event.entity
@@ -179,12 +178,12 @@ object FishingApi {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         resetBobber()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (event.isMod(5)) {
             wearingTrophyArmor = isWearingTrophyArmor()
             wearingEmberArmor = isWearingEmberArmor()
@@ -209,12 +208,12 @@ object FishingApi {
     }
 
     @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    private fun onProfileJoin(event: ProfileJoinEvent) {
         checkAndUpdateBaitFromInventory()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onOwnInventoryMenuUpdate(event: OwnInventoryMenuUpdateEvent) {
+    private fun onOwnInventoryMenuUpdate(event: OwnInventoryMenuUpdateEvent) {
         extractAndPostBaitUpdate(event.itemStack)
     }
 
@@ -260,13 +259,13 @@ object FishingApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onPlaySound(event: PlaySoundEvent) {
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (!holdingRod) return
         if (event.soundName == "entity.experience_orb.pickup" && event.volume == .5F) lastCatchSound = SimpleTimeMark.now()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onClick(event: WorldClickEvent) {
+    private fun onClick(event: WorldClickEvent) {
         if (event.clickType != InteractClickType.RIGHT_CLICK || !holdingRod || !bobberHasTouchedLiquid) return
         if (lastReelTime.passedSince() < .3.seconds) return
         lastReelTime = SimpleTimeMark.now()
@@ -293,7 +292,7 @@ object FishingApi {
     }
 
     @HandleEvent
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+    private fun onItemInHandChange(event: ItemInHandChangeEvent) {
         val wasHoldingRod = holdingRod
         // TODO correct rod type per island water/lava
         holdingRod = event.newItem.isFishingRod()
@@ -313,7 +312,7 @@ object FishingApi {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         lavaRods = data.lavaFishingRods
         waterRods = data.waterFishingRods

@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.world.inventory.ContainerInput
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
 
@@ -28,10 +27,10 @@ object FusionKeybinds {
 
         when {
             AttributeShardsData.fusionBoxInventory.isInside() && repeatHeld && !confirmHeld ->
-                InventoryUtils.clickSlot(47, mouseButton = 2, mode = ContainerInput.CLONE)
+                InventoryUtils.clickSlot(47, button = MIDDLE_CLICK)
 
             AttributeShardsData.confirmFusionInventory.isInside() && confirmHeld && !repeatHeld ->
-                InventoryUtils.clickSlot(33, mouseButton = 2, mode = ContainerInput.CLONE)
+                InventoryUtils.clickSlot(33, button = MIDDLE_CLICK)
         }
     }
 

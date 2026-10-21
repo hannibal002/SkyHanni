@@ -42,7 +42,6 @@ object IslandAreaFeatures {
 
     var display: Renderable? = null
     private var smallAreas = setOf<String>()
-    private var targetNode: GraphNode? = null
     private val textInput = SearchTextInput()
     private val areaNodes get() = IslandAreaBackend.areaNodes
     private var visibleAreaNodes = listOf<AreaNode>()
@@ -50,17 +49,13 @@ object IslandAreaFeatures {
     private var lastTitleTime = SimpleTimeMark.farPast()
 
     private fun setTarget(node: GraphNode) {
-        targetNode = node
         val tag = node.getAreaTag() ?: return
         val displayName = tag.color.getChatColor() + node.name
         val color = areaListConfig.color.get().toColor()
         node.pathFind(
             displayName,
             color,
-            onFound = {
-                targetNode = null
-                IslandAreaBackend.update()
-            },
+            onFound = { IslandAreaBackend.update() },
             allowRerouting = true,
             condition = ::isAreaListEnabled,
         )
@@ -135,7 +130,7 @@ object IslandAreaFeatures {
     fun onConfigLoad() {
         with(areaListConfig) {
             ConditionalUtils.onToggle(color) {
-                targetNode?.let { setTarget(it) }
+                IslandGraphs.currentTargetNode?.let { setTarget(it) }
             }
         }
     }
@@ -143,7 +138,6 @@ object IslandAreaFeatures {
     @HandleEvent
     fun onWorldChange() {
         display = null
-        targetNode = null
         currentTitle?.stop()
     }
 
@@ -193,15 +187,16 @@ object IslandAreaFeatures {
 
         addSearchString("§eAreas nearby:")
         for (area in visibleNearby) {
-            // Compare by name as multiple nodes can share names
-            val isTarget = area.name == targetNode?.name
-            val color = if (isTarget) LorenzColor.GOLD else area.tag.color
+            val color = if (area.isNavigationTarget()) LorenzColor.GOLD else area.tag.color
             val coloredName = "${color.getChatColor()}${area.name}"
             val distance = area.distance.roundTo(0).toInt()
 
             add(buildAreaEntry(coloredName, area, distance))
         }
     }
+
+    // Compared by name, not identity: rerouting can move the target to another node with the same name
+    private fun AreaNode.isNavigationTarget(): Boolean = name == IslandGraphs.currentTargetNode?.name
 
     private fun buildAreaEntry(displayText: String, area: AreaNode, distance: Int): Searchable = Renderable.clickable(
         "$displayText§7: §e$distance",
@@ -210,7 +205,7 @@ object IslandAreaFeatures {
             add("§7Type: ${area.tag.displayName}")
             add("§7Distance: §e$distance blocks")
             add("")
-            if (area.node == targetNode) {
+            if (area.isNavigationTarget()) {
                 add("§aPath Finder points to this!")
                 add("")
                 add("§eClick to stop navigating!")
@@ -219,9 +214,8 @@ object IslandAreaFeatures {
             }
         },
         onLeftClick = {
-            if (area.node == targetNode) {
-                targetNode = null
-                IslandGraphs.stopNavigation()
+            if (area.isNavigationTarget()) {
+                IslandGraphs.manualCancel()
                 IslandAreaBackend.update()
             } else {
                 setTarget(area.node)

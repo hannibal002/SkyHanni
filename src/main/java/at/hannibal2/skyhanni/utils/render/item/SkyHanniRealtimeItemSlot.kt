@@ -15,6 +15,8 @@ import net.minecraft.client.renderer.state.gui.GuiRenderState
 import kotlin.math.roundToInt
 
 internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractItemTexture() {
+    // Frame the pool last handed this slot out; used for idle eviction
+    var lastUsedFrame = -1
 
     init { allocate(slotSize) }
 

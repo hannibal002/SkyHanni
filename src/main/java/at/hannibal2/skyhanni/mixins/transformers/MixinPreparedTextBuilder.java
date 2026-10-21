@@ -27,7 +27,7 @@ public abstract class MixinPreparedTextBuilder {
 
     @WrapOperation(method = "accept(ILnet/minecraft/network/chat/Style;Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Style;getColor()Lnet/minecraft/network/chat/TextColor;"))
     private TextColor wrapGetColor(Style original, Operation<TextColor> operation) {
-        return ChromaFontManager.forceWhiteTextColorForChroma(original.getColor());
+        return ChromaFontManager.forceWhiteTextColorForChroma(operation.call(original));
     }
 
     @ModifyArg(method = "accept(ILnet/minecraft/network/chat/Style;Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;createGlyph(FFIILnet/minecraft/network/chat/Style;FF)Lnet/minecraft/client/gui/font/TextRenderable$Styled;"))

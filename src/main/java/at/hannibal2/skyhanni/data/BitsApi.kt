@@ -64,19 +64,19 @@ object BitsApi {
 
     private const val DEFAULT_COOKIE_BITS = 4800
 
-    private val bitsDataGroup = RepoPattern.group("data.bits")
+    private val patternGroup = RepoPattern.group("data.bits")
 
     // Scoreboard patterns
     /**
      * REGEX-TEST: Bits: §b140,965
      */
-    val bitsScoreboardPattern by bitsDataGroup.pattern(
+    val bitsScoreboardPattern by patternGroup.pattern(
         "scoreboard",
         "^Bits: §b(?<amount>[\\d,.]+).*$",
     )
 
     // Chat patterns
-    private val bitsChatGroup = bitsDataGroup.group("chat")
+    private val bitsChatGroup = patternGroup.group("chat")
 
     /**
      * REGEX-TEST: §eYou gained §317,664 Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!
@@ -106,7 +106,7 @@ object BitsApi {
     )
 
     // GUI patterns
-    private val bitsGuiGroup = bitsDataGroup.group("gui")
+    private val bitsGuiGroup = patternGroup.group("gui")
 
     /**
      * REGEX-TEST: §7Bits Available: §b19,176

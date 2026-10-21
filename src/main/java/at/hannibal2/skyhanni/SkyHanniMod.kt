@@ -45,6 +45,7 @@ import net.minecraft.resources.Identifier
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.io.File
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -89,7 +90,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
         with(SkyHanniMod) { asyncUnScopedCoroutine(block) }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         val screenToOpen = screenToOpen ?: return
         screenTicks++
         if (screenTicks != 5) return
@@ -105,12 +106,8 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     }
 
     @HandleEvent
-    fun onClientShutdown() {
+    private fun onClientShutdown() {
         configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
-    }
-
-    @HandleEvent
-    fun onRenderShutdown() {
         SkyHanniItemRenderCoordinator.closeAtlas()
     }
 
@@ -145,6 +142,18 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
 
+    val dataDir: File by lazy {
+        PlatformUtils.gameDir.resolve(MODID).toFile()
+    }
+
+    val configDir: File by lazy {
+        PlatformUtils.configDir.resolve(MODID).toFile()
+    }
+
+    val logsDir: File by lazy {
+        PlatformUtils.logsDir.resolve(MODID).toFile()
+    }
+
     val modules: MutableList<Any> = ArrayList()
 
     var screenToOpen: Screen? = null
@@ -155,7 +164,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("sh") {
             aliases = listOf("skyhanni")
             description = "Opens the main SkyHanni config"
