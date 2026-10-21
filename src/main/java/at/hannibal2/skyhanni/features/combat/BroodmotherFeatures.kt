@@ -31,11 +31,11 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object BroodmotherFeatures {
     enum class StageEntry(private val str: String, val duration: Duration) {
-        SLAIN("§eSlain", 10.minutes),
-        DORMANT("§eDormant", 9.minutes),
-        SOON("§6Soon", 6.minutes),
-        AWAKENING("§6Awakening", 3.minutes),
-        IMMINENT("§4Imminent", 1.minutes),
+        SLAIN("§eSlain", 2.5.minutes),
+        DORMANT("§eDormant", 2.minutes),
+        SOON("§6Soon", 1.5.minutes),
+        AWAKENING("§6Awakening", 1.minutes),
+        IMMINENT("§4Imminent", 0.5.minutes),
         ALIVE("§4Alive!", 0.minutes);
 
         override fun toString() = str
