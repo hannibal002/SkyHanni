@@ -210,7 +210,7 @@ object TheGreatSpook {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EventsJson>("Events").greatSpook
 
         val startTime = data["start_time"] ?: SimpleTimeMark.farPast()

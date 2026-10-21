@@ -40,7 +40,7 @@ object InfernoMinionFeatures {
     private var inInventory = false
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<InfernoMinionFuelsJson>("InfernoMinionFuels")
         fuelItemIds = data.minionFuels.toSet()
     }

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -25,7 +24,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
@@ -37,11 +35,9 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object RareCropTracker {
-
     private val config get() = GardenApi.config.rareCropTracker
 
     private val patternGroup = RepoPattern.group("garden.rarecrops")
-    private val repoReloadCoroutine = CoroutineSettings("rare crop tracker repo reload")
 
     /**
      * REGEX-TEST: FERMENTO_CHESTPLATE
@@ -71,7 +67,6 @@ object RareCropTracker {
         @Expose
         var drops: MutableMap<RareCropDropType, Int> = mutableMapOf(),
     ) : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class)
-
 
     init {
         RareCropDropType.entries.forEach { it.chatPattern }
@@ -169,8 +164,8 @@ object RareCropTracker {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
-        val data = event.getConstantAsync<RareCropDropsJson>("ArmorDrops")
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<RareCropDropsJson>("ArmorDrops")
         rareCropDropInfo = data.specialCrops
     }
 

@@ -49,7 +49,7 @@ object HideNotClickableItems {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOWEST)
+    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOW)
     private fun onTooltip(event: ToolTipTextEvent) {
         if (bypassActive()) return
 

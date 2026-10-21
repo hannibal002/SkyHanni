@@ -38,7 +38,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object RiftWiltedBerberisHelper {
-
     private val config get() = RiftApi.config.area.dreadfarm.wiltedBerberis
 
     private val berberisSounds = setOf("entity.donkey.death", "entity.donkey.hurt")
@@ -111,7 +110,7 @@ object RiftWiltedBerberisHelper {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         fieldCenters = event.getConstant<WiltedBerberisLocationsJson>("rift/WiltedBerberisLocations")
             .fieldCenters.associate { it.position to it.count }
         fieldSequences = fieldCenters.keys.associateWith { BerberisSequence(it) }

@@ -23,7 +23,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object AbiphoneFeatures {
-
     val config get() = SkyHanniMod.feature.misc
     val patternGroup = RepoPattern.group("misc.abiphone")
     private var acceptUUID: String? = null
@@ -61,7 +60,7 @@ object AbiphoneFeatures {
     private var abiphoneContacts: Set<String>? = null
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val constant = event.getConstant<Map<String, AbiphoneContactInfo>>("abiphone")
         abiphoneContacts = constant.flatMap { (key, value) ->
             value.callNames ?: listOf(key.removeAllNonLettersAndNumbers().replace(" ", ""))

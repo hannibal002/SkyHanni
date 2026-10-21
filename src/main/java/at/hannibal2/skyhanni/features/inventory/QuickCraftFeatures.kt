@@ -21,7 +21,6 @@ import net.minecraft.world.inventory.ChestMenu
 
 @SkyHanniModule
 object QuickCraftFeatures {
-
     private val config get() = SkyHanniMod.feature.inventory
     private val quickCraftSlots = listOf(16, 25, 34)
     private var quickCraftableItems = emptyList<String>()
@@ -37,7 +36,7 @@ object QuickCraftFeatures {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         quickCraftableItems = event.getConstant<List<String>>("QuickCraftableItems")
     }
 

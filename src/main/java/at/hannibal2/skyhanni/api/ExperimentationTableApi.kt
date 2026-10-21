@@ -55,7 +55,6 @@ typealias TaskType = ExperimentationTableApi.ExperimentationTaskType
 
 @SkyHanniModule
 object ExperimentationTableApi {
-
     private const val ADDONS_OVER_DATA_SLOT = 11
     private const val SUPERPAIRS_OVER_DATA_SLOT = 13
 
@@ -338,7 +337,7 @@ object ExperimentationTableApi {
     private fun ExperimentationMessages.isSelected() = config.experimentsProfitTracker.hideMessages.contains(this)
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val experiments = event.getConstant<ExperimentsJson>("ExperimentationTable")
         miscRepoRewards = experiments.miscRewards
         ultraRareMiscItems = experiments.ultraRareRewards.orEmpty()

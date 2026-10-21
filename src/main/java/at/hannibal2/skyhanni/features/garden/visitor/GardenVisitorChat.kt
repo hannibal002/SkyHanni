@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -17,7 +16,6 @@ import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.RemotePlayer
 import kotlin.time.Duration.Companion.seconds
@@ -28,7 +26,6 @@ import kotlin.time.Duration.Companion.seconds
  */
 @SkyHanniModule
 object GardenVisitorChat {
-
     private val config get() = VisitorApi.config
     private val logger = SkyHanniLogger("garden/visitors/chat")
 
@@ -60,11 +57,9 @@ object GardenVisitorChat {
         "§aYou gave some of the required items!",
     )
 
-    private val repoReloadCoroutine = CoroutineSettings("allowed chat message visitors repo reload")
-
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
-        val data = event.getConstantAsync<GardenJson>("Garden")
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<GardenJson>("Garden")
         allowedChatMessageVisitors = data.visitors.filterValues { visitorData -> visitorData.showChatMessage }.keys.toSet()
     }
 

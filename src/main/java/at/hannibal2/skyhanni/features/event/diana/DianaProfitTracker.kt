@@ -37,7 +37,6 @@ import com.google.gson.annotations.Expose
 
 @SkyHanniModule
 object DianaProfitTracker {
-
     private val config get() = SkyHanniMod.feature.event.diana.dianaProfitTracker
     private var allowedDrops = listOf<NeuInternalName>()
 
@@ -203,7 +202,7 @@ object DianaProfitTracker {
     private fun isAllowedItem(internalName: NeuInternalName): Boolean = internalName in allowedDrops
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         allowedDrops = event.getConstant<DianaDropsJson>("DianaDrops").dianaDrops
     }
 

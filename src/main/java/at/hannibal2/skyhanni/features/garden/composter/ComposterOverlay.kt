@@ -594,7 +594,7 @@ object ComposterOverlay {
     }
 
     @HandleEvent
-    private fun onNeuRepoReload() {
+    private suspend fun onNeuRepoReload() {
         updateOrganicMatterFactors()
     }
 
@@ -606,7 +606,7 @@ object ComposterOverlay {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         organicMatter = data.organicMatter
         fuelFactors = data.fuel

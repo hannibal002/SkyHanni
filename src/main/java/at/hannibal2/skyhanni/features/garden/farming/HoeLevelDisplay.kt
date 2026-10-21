@@ -43,7 +43,6 @@ import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object HoeLevelDisplay {
-
     private const val OVERCLOCK_THRESHOLD = 40
     private const val MAX_LEVEL = 50
 
@@ -256,7 +255,7 @@ object HoeLevelDisplay {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         hoeLevels = data.hoeExpLevels
         hoeOverflow = data.hoeExpOverflow

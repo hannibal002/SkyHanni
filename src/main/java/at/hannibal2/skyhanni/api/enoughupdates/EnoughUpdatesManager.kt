@@ -311,7 +311,7 @@ object EnoughUpdatesManager {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         neuPetsJson = event.getConstant<NeuPetsJson>("pets")
         neuPetNums = event.getConstant<NeuPetNumsJson>("petnums")
         if (itemMap.isNotEmpty()) {
