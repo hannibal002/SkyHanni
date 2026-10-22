@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -103,7 +103,7 @@ class VisitorConfig {
     )
     @SearchTag("halloween")
     @ConfigEditorKeyMapping
-    var acceptHotkey = InputCode.UNKNOWN
+    var acceptHotkey = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Highlight Visitors in SkyBlock", desc = "Highlight visitors outside of the Garden.")

@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.misc.update.ModrinthVersionType
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.InputKeys
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -40,6 +40,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import com.mojang.blaze3d.platform.InputConstants
 import com.mojang.serialization.JsonOps
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
@@ -218,13 +219,13 @@ enum class SkyHanniTypeAdapters(
     ),
     SESSION_UPTIME(SessionUptime::class.java, SessionUptimeTypeAdapter()),
     INPUT_CODE(
-        InputCode::class.java,
-        object : TypeAdapter<InputCode>() {
-            override fun write(out: JsonWriter, value: InputCode) {
-                out.value(value.toKeyIdentifier())
+        InputConstants.Key::class.java,
+        object : TypeAdapter<InputConstants.Key>() {
+            override fun write(out: JsonWriter, value: InputConstants.Key) {
+                out.value(value.name)
             }
 
-            override fun read(reader: JsonReader): InputCode = InputCode.fromKeyIdentifier(reader.nextString())
+            override fun read(reader: JsonReader): InputConstants.Key = InputKeys.identifier(reader.nextString())
         }
     ),
     COMPONENT(

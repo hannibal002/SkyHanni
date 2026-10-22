@@ -7,9 +7,12 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.InputKeys
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
@@ -24,8 +27,8 @@ object GardenCustomKeybinds {
     private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getInstance().options
 
-    private var map: Map<KeyMapping, InputCode> = emptyMap()
-    private val pressedToggleKeys = mutableMapOf<KeyMapping, InputCode>()
+    private var map: Map<KeyMapping, InputConstants.Key> = emptyMap()
+    private val pressedToggleKeys = mutableMapOf<KeyMapping, InputConstants.Key>()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
     private var wasActive = false
 
@@ -86,7 +89,7 @@ object GardenCustomKeybinds {
         with(config) {
             with(mcSettings) {
                 map = buildMap {
-                    fun add(keyBinding: KeyMapping, property: Property<InputCode>) {
+                    fun add(keyBinding: KeyMapping, property: Property<InputConstants.Key>) {
                         put(keyBinding, property.get())
                     }
                     add(keyAttack, attack)
@@ -124,10 +127,10 @@ object GardenCustomKeybinds {
     private fun KeyMapping.isToggle(): Boolean =
         this is ToggleKeyMapping && needsToggle.asBoolean
 
-    private fun KeyMapping.isRemappedFrom(override: InputCode): Boolean =
-        key != override.key
+    private fun KeyMapping.isRemappedFrom(override: InputConstants.Key): Boolean =
+        key != override
 
-    private fun KeyMapping.updateToggleState(override: InputCode, isDown: Boolean): Boolean {
+    private fun KeyMapping.updateToggleState(override: InputConstants.Key, isDown: Boolean): Boolean {
         if (!override.isKeyHeld()) {
             pressedToggleKeys.remove(this, override)
             return isDown
@@ -139,8 +142,7 @@ object GardenCustomKeybinds {
         return !isDown
     }
 
-
-    private fun KeyMapping.consumeToggleClick(override: InputCode): Boolean {
+    private fun KeyMapping.consumeToggleClick(override: InputConstants.Key): Boolean {
         if (!override.isKeyHeld()) {
             pressedToggleKeys.remove(this, override)
             return false
@@ -172,34 +174,34 @@ object GardenCustomKeybinds {
 
     private fun hasGuiOpen() = MinecraftCompat.screen != null
 
-    private fun Map<KeyMapping, InputCode>.isUsedAsOverride(value: KeyMapping): Boolean =
-        values.any { it.key == value.key }
+    private fun Map<KeyMapping, InputConstants.Key>.isUsedAsOverride(value: KeyMapping): Boolean =
+        values.any { it == value.key }
 
     @JvmStatic
     fun disableAll() {
         with(config) {
-            attack.set(InputCode.UNKNOWN)
-            useItem.set(InputCode.UNKNOWN)
-            left.set(InputCode.UNKNOWN)
-            right.set(InputCode.UNKNOWN)
-            forward.set(InputCode.UNKNOWN)
-            back.set(InputCode.UNKNOWN)
-            jump.set(InputCode.UNKNOWN)
-            sneak.set(InputCode.UNKNOWN)
+            attack.set(InputConstants.UNKNOWN)
+            useItem.set(InputConstants.UNKNOWN)
+            left.set(InputConstants.UNKNOWN)
+            right.set(InputConstants.UNKNOWN)
+            forward.set(InputConstants.UNKNOWN)
+            back.set(InputConstants.UNKNOWN)
+            jump.set(InputConstants.UNKNOWN)
+            sneak.set(InputConstants.UNKNOWN)
         }
     }
 
     @JvmStatic
     fun defaultAll() {
         with(config) {
-            attack.set(InputCode.LEFT_MOUSE)
-            useItem.set(InputCode.RIGHT_MOUSE)
-            left.set(InputCode.KEY_A)
-            right.set(InputCode.KEY_D)
-            forward.set(InputCode.KEY_W)
-            back.set(InputCode.KEY_S)
-            jump.set(InputCode.KEY_SPACE)
-            sneak.set(InputCode.KEY_LSHIFT)
+            attack.set(InputKeys.MOUSE_BUTTON_LEFT)
+            useItem.set(InputKeys.MOUSE_BUTTON_RIGHT)
+            left.set(InputKeys.KEY_A)
+            right.set(InputKeys.KEY_D)
+            forward.set(InputKeys.KEY_W)
+            back.set(InputKeys.KEY_S)
+            jump.set(InputKeys.KEY_SPACE)
+            sneak.set(InputKeys.KEY_LSHIFT)
         }
     }
 

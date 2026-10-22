@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.hunting.safari.SafariConfig
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -72,7 +72,7 @@ class HuntingConfig {
     @ConfigOption(name = "Show next Shulker", desc = "Press this key to show the route to the next Shulker.")
     @SearchTag("hideonleaf hideonsun")
     @ConfigEditorKeyMapping
-    var nextShulkerKeybind = InputCode.UNKNOWN
+    var nextShulkerKeybind = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Fusion Display", desc = "Displays the shard you are fusing and how many you have.")

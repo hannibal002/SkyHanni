@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables.container.table
 
 import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -15,13 +14,14 @@ import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.container.SlidingWindowWithScrollHints
 import at.hannibal2.skyhanni.utils.renderables.container.absoluteProvider
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.mojang.blaze3d.platform.InputConstants
 
 class SearchableScrollTable private constructor(
     rawContent: Map<List<Renderable>, String?>,
     override val height: Int,
     private val scrollValue: ScrollValue = ScrollValue(),
     private val velocity: Double = 2.0,
-    private val button: InputCode? = null,
+    private val button: InputConstants.Key? = null,
     textInput: TextInput,
     key: Int,
     override val xSpacing: Int = 1,
@@ -137,7 +137,7 @@ class SearchableScrollTable private constructor(
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),
             velocity: Double = 2.0,
-            button: InputCode? = null,
+            button: InputConstants.Key? = null,
             textInput: TextInput,
             key: Int,
             xSpacing: Int = 1,

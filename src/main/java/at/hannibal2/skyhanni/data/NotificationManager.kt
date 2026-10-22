@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.InputKeys
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -29,7 +30,7 @@ object NotificationManager {
     fun onKeyPress(event: KeyPressEvent) {
         currentNotification ?: return
         if (lastNotificationClosed.passedSince() < 200.milliseconds) return
-        if (event.key != KEY_X) return
+        if (event.key != InputKeys.KEY_X) return
         currentNotification = null
         lastNotificationClosed = SimpleTimeMark.now()
     }

@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.InputKeys
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -349,11 +349,11 @@ object CakeTracker {
                     renderable,
                     tips = getPriceHoverTooltip(displayType, colorCode),
                     onAnyClick = mapOf(
-                        InputCode.KEY_LEFT to { changeSelectedSingular(-1) },
-                        InputCode.KEY_UP to { changeSelectedSingular(-1) },
-                        InputCode.KEY_RIGHT to { changeSelectedSingular(1) },
-                        InputCode.KEY_DOWN to { changeSelectedSingular(1) },
-                        InputCode.LEFT_MOUSE to { HypixelCommands.auctionSearch("New Year Cake (Year $selectedSingular)") },
+                        InputKeys.KEY_LEFT to { changeSelectedSingular(-1) },
+                        InputKeys.KEY_UP to { changeSelectedSingular(-1) },
+                        InputKeys.KEY_RIGHT to { changeSelectedSingular(1) },
+                        InputKeys.KEY_DOWN to { changeSelectedSingular(1) },
+                        InputKeys.MOUSE_BUTTON_LEFT to { HypixelCommands.auctionSearch("New Year Cake (Year $selectedSingular)") },
                     ),
                 )
             }

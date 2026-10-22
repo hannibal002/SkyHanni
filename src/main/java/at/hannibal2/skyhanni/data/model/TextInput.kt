@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.data.model
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.InputKeys
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
@@ -89,7 +91,7 @@ open class TextInput {
 
         fun onGuiInput(ci: CallbackInfoReturnable<Boolean>) {
             if (activeInstance != null) {
-                if (InputCode.KEY_ESCAPE.isKeyHeld()) {
+                if (InputKeys.KEY_ESCAPE.isKeyHeld()) {
                     disable()
                 } else {
                     ci.returnValue = false
@@ -136,11 +138,11 @@ open class TextInput {
             }
             val carriage = carriage
 
-            if (InputCode.KEY_LEFT.isKeyClicked()) {
+            if (InputKeys.KEY_LEFT.isKeyClicked()) {
                 this.carriage = carriage?.moveCarriageLeft() ?: (textBox.length - 1)
                 return
             }
-            if (InputCode.KEY_RIGHT.isKeyClicked()) {
+            if (InputKeys.KEY_RIGHT.isKeyClicked()) {
                 this.carriage = when {
                     carriage == null -> null
                     (carriage >= textBox.length - 1) -> null
@@ -148,7 +150,7 @@ open class TextInput {
                 }
                 return
             }
-            if (InputCode.KEY_BACKSPACE.isKeyClicked() || (SystemUtils.IS_OS_MAC && InputCode.KEY_DELETE.isKeyClicked())) {
+            if (InputKeys.KEY_BACKSPACE.isKeyClicked() || (SystemUtils.IS_OS_MAC && InputKeys.KEY_DELETE.isKeyClicked())) {
                 textBox = onRemove()
                 updated()
                 return

@@ -26,7 +26,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.InputKeys
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import net.minecraft.client.Minecraft
 import kotlin.reflect.full.createInstance
@@ -97,7 +98,7 @@ class GuiPositionEditor(
 
         // When the mouse isn't currently hovering over a gui element
         val text = if (displayPos == -1) {
-            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == InputCode.UNKNOWN
+            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == InputConstants.UNKNOWN
 
             buildList {
                 add("§cSkyHanni Position Editor")
@@ -172,7 +173,7 @@ class GuiPositionEditor(
     private fun getEditorScaledHeight() = Minecraft.getInstance().window.guiScaledHeight
     private fun getEditorScaledWidth() = Minecraft.getInstance().window.guiScaledWidth
 
-    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: InputCode) {
+    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: InputConstants.Key) {
         for (i in positions.indices.reversed()) {
             val position = positions[i]
             val handled = position.withPositionMetrics {
@@ -181,14 +182,14 @@ class GuiPositionEditor(
                 val (mouseX, mouseY) = GuiScreenUtils.mousePos
 
                 when (mouseButton) {
-                    RIGHT_MOUSE -> position.jumpToConfigOptions()
-                    MIDDLE_MOUSE -> if (config.keyBindReset == MIDDLE_MOUSE) position.resetPositionAndScale()
-                    LEFT_MOUSE -> if (!position.clicked) {
+                    InputKeys.MOUSE_BUTTON_RIGHT -> position.jumpToConfigOptions()
+                    InputKeys.MOUSE_BUTTON_LEFT -> if (!position.clicked) {
                         clickedPos = i
                         position.clicked = true
                         grabbedX = mouseX
                         grabbedY = mouseY
                     }
+                    config.keyBindReset -> position.resetPositionAndScale()
                     else -> {}
                 }
 
@@ -198,7 +199,7 @@ class GuiPositionEditor(
         }
     }
 
-    override fun onKeyTyped(typedChar: Char?, key: InputCode?) {
+    override fun onKeyTyped(typedChar: Char?, key: InputConstants.Key?) {
         if (key == config.keyBindReset) {
             positions.firstOrNull { it.isHoveredWithMetrics() }?.resetPositionAndScale()
             return
@@ -212,12 +213,12 @@ class GuiPositionEditor(
             val elementWidth = position.getDummySize(true).x
             val elementHeight = position.getDummySize(true).y
             when (key) {
-                KEY_DOWN -> position.moveY(dist, elementHeight)
-                KEY_UP -> position.moveY(-dist, elementHeight)
-                KEY_LEFT -> position.moveX(-dist, elementWidth)
-                KEY_RIGHT -> position.moveX(dist, elementWidth)
-                KEY_MINUS, KEY_SUBTRACT -> position.scale -= .1F
-                KEY_EQUALS, KEY_ADD -> position.scale += .1F
+                InputKeys.KEY_DOWN -> position.moveY(dist, elementHeight)
+                InputKeys.KEY_UP -> position.moveY(-dist, elementHeight)
+                InputKeys.KEY_LEFT -> position.moveX(-dist, elementWidth)
+                InputKeys.KEY_RIGHT -> position.moveX(dist, elementWidth)
+                InputKeys.KEY_MINUS, InputKeys.KEY_SUBTRACT -> position.scale -= .1F
+                InputKeys.KEY_EQUALS, InputKeys.KEY_ADD -> position.scale += .1F
                 else -> return@withPositionMetrics
             }
         }

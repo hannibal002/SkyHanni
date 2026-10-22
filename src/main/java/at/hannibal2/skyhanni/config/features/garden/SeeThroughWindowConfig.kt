@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -21,5 +21,5 @@ class SeeThroughWindowConfig {
     @Expose
     @ConfigOption(name = "Keybind", desc = "Press this key to toggle See Through Farming")
     @ConfigEditorKeyMapping
-    var keybind = InputCode.UNKNOWN
+    var keybind = InputConstants.UNKNOWN
 }

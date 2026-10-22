@@ -2,8 +2,9 @@ package at.hannibal2.skyhanni.data.hotx
 
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.InputKeys
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -43,7 +44,7 @@ abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *>>(
     abstract fun currentCurrencyLineString(perk: HotxData<*>): String?
 
     private fun handleCurrencyFor10Levels(event: ToolTipTextEvent, perk: HotxData<*>) {
-        if (!InputCode.KEY_LSHIFT.isKeyHeld()) return
+        if (!InputKeys.KEY_LSHIFT.isKeyHeld()) return
         val indexOfCost = event.toolTip.indexOfFirst { HotmData.perkCostPattern.matches(it) }
         if (indexOfCost == -1) return
 

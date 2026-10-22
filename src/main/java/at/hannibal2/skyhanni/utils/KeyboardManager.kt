@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.config.core.elements.GuiOptionEditorInputCode
+import at.hannibal2.skyhanni.config.core.elements.GuiOptionEditorInputConstantsKey
 import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -26,8 +26,8 @@ object KeyboardManager {
     @HandleEvent
     private fun onGuiOpen(event: GuiScreenOpenEvent) {
         if (event.gui != null) return
-        if (InputCode.KEY_RETURN.isKeyHeld()) lockedKeys.add(InputCode.KEY_RETURN.key)
-        if (InputCode.KEY_NUMPADENTER.isKeyHeld()) lockedKeys.add(InputCode.KEY_NUMPADENTER.key)
+        if (InputKeys.KEY_RETURN.isKeyHeld()) lockedKeys.add(InputKeys.KEY_RETURN)
+        if (InputKeys.KEY_NUMPADENTER.isKeyHeld()) lockedKeys.add(InputKeys.KEY_NUMPADENTER)
     }
 
     /**
@@ -35,21 +35,21 @@ object KeyboardManager {
      * On macOS, this is the Command key.
      */
     private fun isSuperKeyDown() =
-        InputCode.KEY_LSUPER.isKeyHeld() || InputCode.KEY_RSUPER.isKeyHeld()
+        InputKeys.KEY_LSUPER.isKeyHeld() || InputKeys.KEY_RSUPER.isKeyHeld()
 
     /**
      * Represents whether either the left or right Alt key is down.
      * On macOS, this is the Option key.
      */
     fun isMenuKeyDown() =
-        InputCode.KEY_LALT.isKeyHeld() || InputCode.KEY_RALT.isKeyHeld()
+        InputKeys.KEY_LALT.isKeyHeld() || InputKeys.KEY_RALT.isKeyHeld()
 
     /**
      * Represents whether either the left or right Control (Ctrl) key is down,
      * regardless of platform.
      */
     fun isControlKeyDown() =
-        InputCode.KEY_LCONTROL.isKeyHeld() || InputCode.KEY_RCONTROL.isKeyHeld()
+        InputKeys.KEY_LCONTROL.isKeyHeld() || InputKeys.KEY_RCONTROL.isKeyHeld()
 
     /**
      * Represents whether the operating system's modifier key is down.
@@ -63,34 +63,34 @@ object KeyboardManager {
      * On macOS, this is Option+Backspace, while on other platforms it is Ctrl+Backspace.
      */
     fun isDeleteWordDown() =
-        InputCode.KEY_BACKSPACE.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isMenuKeyDown() else isControlKeyDown()
+        InputKeys.KEY_BACKSPACE.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isMenuKeyDown() else isControlKeyDown()
 
     /**
      * Represents whether the user is trying to use the operating system's "delete line" shortcut.
      * On macOS, this is Cmd+Shift+Backspace, while on other platforms it is Ctrl+Shift+Backspace.
      */
     fun isDeleteLineDown() =
-        InputCode.KEY_BACKSPACE.isKeyHeld() && isModifierKeyDown() && isShiftKeyDown()
+        InputKeys.KEY_BACKSPACE.isKeyHeld() && isModifierKeyDown() && isShiftKeyDown()
 
     /**
      * Represents whether either the left or right Shift key is down.
      */
     fun isShiftKeyDown() =
-        InputCode.KEY_LSHIFT.isKeyHeld() || InputCode.KEY_RSHIFT.isKeyHeld()
+        InputKeys.KEY_LSHIFT.isKeyHeld() || InputKeys.KEY_RSHIFT.isKeyHeld()
 
     /**
      * Represents whether the user is trying to use the operating system's "copy" shortcut.
      * On macOS, this is Cmd+C, while on other platforms it is Ctrl+C.
      */
     fun isCopyingKeysDown() =
-        isModifierKeyDown() && InputCode.KEY_C.isKeyHeld()
+        isModifierKeyDown() && InputKeys.KEY_C.isKeyHeld()
 
     /**
      * Represents whether the user is trying to use the operating system's "paste" shortcut.
      * On macOS, this is Cmd+V, while on other platforms it is Ctrl+V.
      */
     fun isPastingKeysDown() =
-        isModifierKeyDown() && InputCode.KEY_V.isKeyHeld()
+        isModifierKeyDown() && InputKeys.KEY_V.isKeyHeld()
 
     private fun Int.matchesClosureKey() =
         Minecraft.getInstance().options.keyInventory.matches(KeyEvent(this, this, 0))
@@ -100,13 +100,13 @@ object KeyboardManager {
         // Holding shift bypasses closure checks
         if (isShiftKeyDown()) return false
 
-        val isClose = keycode.matchesClosureKey() || keycode == InputCode.KEY_ESCAPE.value
+        val isClose = keycode.matchesClosureKey() || keycode == InputKeys.KEY_ESCAPE.value
         if (!isClose) return false
 
         return AttemptedInventoryCloseEvent().post().isCancelled
     }
 
-    fun checkIsInventoryClosure(keycode: InputCode): Boolean = checkIsInventoryClosure(keycode.value)
+    fun checkIsInventoryClosure(keycode: InputConstants.Key): Boolean = checkIsInventoryClosure(keycode.value)
 
     fun getModifierKeyName(short: Boolean = false): String =
         if (InputQuirks.REPLACE_CTRL_KEY_WITH_CMD_KEY) {
@@ -136,10 +136,10 @@ object KeyboardManager {
     fun InputConstants.Key.isKeyHeld(): Boolean {
         val value = this.value
         return when {
-            value < InputCode.UNKNOWN.value -> ErrorManager.skyHanniError(
+            value < InputKeys.KEY_UNKNOWN -> ErrorManager.skyHanniError(
                 "Error while checking if a key is pressed. Key code is invalid: $this",
             )
-            value == InputCode.UNKNOWN.value -> false
+            value == InputKeys.KEY_UNKNOWN -> false
             type == MOUSE -> MouseCompat.isButtonDown(value)
             else -> InputConstants.isKeyDown(Minecraft.getInstance().window, value)
         }
@@ -161,8 +161,8 @@ object KeyboardManager {
 
     fun KeyMapping.isKeyClicked(): Boolean = key.isKeyClicked()
 
-    fun getKeyName(key: InputConstants.Key): String {
-        if (key == InputCode.UNKNOWN.key) return "NONE"
+    private fun getKeyName(key: InputConstants.Key): String {
+        if (key == InputConstants.UNKNOWN) return "NONE"
         val displayName = key.displayName
         val collapsedDisplayName = displayName.tryCollapseToString() ?: displayName.string
         // In case of fallback, we will attempt to collapse the string to a more readable format.
@@ -173,9 +173,13 @@ object KeyboardManager {
         }
     }
 
+    val InputConstants.Key.fullDisplayName: String
+        get() = getKeyName(this)
+
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
         processor.registerConfigEditor(ConfigEditorKeyMapping::class.java) { option, annotation ->
-            GuiOptionEditorInputCode(option, annotation.defaultKey)
+            val defaultKey = annotation.type.getOrCreate(annotation.defaultKey)
+            GuiOptionEditorInputConstantsKey(option, defaultKey)
         }
     }
 

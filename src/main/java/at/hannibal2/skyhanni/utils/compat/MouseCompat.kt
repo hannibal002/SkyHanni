@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.InputKeys
 import net.minecraft.client.Minecraft
 import net.minecraft.client.input.MouseButtonInfo
 import kotlin.math.sign
@@ -83,7 +83,7 @@ object MouseCompat {
     @JvmStatic
     fun handleMouseButton(input: MouseButtonInfo, action: Int) {
         val button: Int = input.button()
-        val key = InputCode.fromMouseButton(button)
+        val key = InputKeys.mouse(button)
         if (action == 1) {
             setButtonState(button, true)
             KeyDownEvent(key).post()

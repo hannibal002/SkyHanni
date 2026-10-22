@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.mining.glacite
 
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -29,7 +29,7 @@ class GlaciteMineshaftConfig {
             "§eYou can share the location even if it has already been shared!"
     )
     @ConfigEditorKeyMapping
-    var shareWaypointLocation = InputCode.UNKNOWN
+    var shareWaypointLocation = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Mineshaft Detection", desc = "")

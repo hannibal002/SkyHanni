@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.config.features.combat
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -54,7 +54,7 @@ class InstanceChestProfitConfig {
             " and highlight the Item in Instance Chests."
     )
     @ConfigEditorKeyMapping
-    var keybind = InputCode.UNKNOWN
+    var keybind = InputConstants.UNKNOWN
 
     @Expose
     @ConfigLink(owner = InstanceChestProfitConfig::class, field = "croesusAllChestsOverlay")

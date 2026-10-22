@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonArray
+import com.mojang.blaze3d.platform.InputConstants
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -60,7 +61,7 @@ object BurrowWarpHelper {
         if (GriffinBurrowHelper.mobAlive) return
 
         val text = "§bWarp to " + warp.displayName
-        val keybindSuffix = if (config.keyBindWarp != UNKNOWN) {
+        val keybindSuffix = if (config.keyBindWarp != InputConstants.UNKNOWN) {
             " §7(§ePress ${config.keyBindWarp.displayName}§7)"
         } else ""
 

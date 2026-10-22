@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.config.features.fishing.trophyfishing
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -38,7 +38,7 @@ class TrophyFishDisplayConfig {
     @Expose
     @ConfigOption(name = "Keybind", desc = "")
     @ConfigEditorKeyMapping
-    var keybind = InputCode.UNKNOWN
+    var keybind = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(

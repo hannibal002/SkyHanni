@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.core.elements
 
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.InputKeys
+import at.hannibal2.skyhanni.utils.KeyboardManager.fullDisplayName
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.GuiTextures
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import io.github.notenoughupdates.moulconfig.common.KeyboardConstants.escape
@@ -18,12 +20,12 @@ import io.github.notenoughupdates.moulconfig.gui.editors.ComponentEditor
 import io.github.notenoughupdates.moulconfig.internal.Warnings
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 
-class GuiOptionEditorInputCode(option: ProcessedOption, defaultInputCode: InputCode) : ComponentEditor(option) {
+class GuiOptionEditorInputConstantsKey(option: ProcessedOption, defaultKey: InputConstants.Key) : ComponentEditor(option) {
     private var editingKeycode = false
     var component: GuiComponent
 
     init {
-        if (option.type !== InputCode::class.java)
+        if (option.type !== InputConstants.Key::class.java)
             Warnings.warn(ConfigEditorKeyMapping::class.java.toString() + " can only be applied to InputCode properties.")
 
         component = wrapComponent(
@@ -43,7 +45,8 @@ class GuiOptionEditorInputCode(option: ProcessedOption, defaultInputCode: InputC
 
                     renderContext.drawTexturedRect(GuiTextures.BUTTON, (width / 6 - 24).toFloat(), (height - 7 - 14).toFloat(), 48f, 16f)
 
-                    val keyName = (option.get() as InputCode).displayName.asStructuredText()
+                    val key = option.get() as InputConstants.Key
+                    val keyName = key.fullDisplayName.asStructuredText()
                     val text = if (editingKeycode) StructuredText.of("> ").append(keyName).append(" <") else keyName
                     renderContext.drawStringCenteredScaledMaxWidth(
                         text,
@@ -68,14 +71,14 @@ class GuiOptionEditorInputCode(option: ProcessedOption, defaultInputCode: InputC
 
                 override fun mouseEvent(mouseEvent: MouseEvent, context: GuiImmediateContext): Boolean {
                     if (mouseEvent !is Click) return false
-                    if (mouseEvent.mouseState && mouseEvent.mouseButton != InputCode.UNKNOWN.value && editingKeycode) {
+                    if (mouseEvent.mouseState && mouseEvent.mouseButton != InputKeys.KEY_UNKNOWN && editingKeycode) {
                         editingKeycode = false
                         val mouseButton = mouseEvent.mouseButton
-                        option.set(InputCode.fromMouseButton(mouseButton))
+                        option.set(InputKeys.mouse(mouseButton))
                         return true
                     }
 
-                    if (mouseEvent.mouseState && mouseEvent.mouseButton == InputCode.LEFT_MOUSE.value) {
+                    if (mouseEvent.mouseState && mouseEvent.mouseButton == InputConstants.MOUSE_BUTTON_LEFT) {
                         val height = getHeight()
                         val width = getHeight()
                         val mouseX = context.mouseX
@@ -87,7 +90,7 @@ class GuiOptionEditorInputCode(option: ProcessedOption, defaultInputCode: InputC
                         if (mouseX > width / 6 - 24 + 48 - 3 && mouseX < width / 6 - 24 + 48 + 13 - 5 &&
                             mouseY > height - 7 - 14 + 3 && mouseY < height - 7 - 14 + 3 + 11
                         ) {
-                            option.set(defaultInputCode)
+                            option.set(defaultKey)
                             return true
                         }
                     }
@@ -104,7 +107,7 @@ class GuiOptionEditorInputCode(option: ProcessedOption, defaultInputCode: InputC
                             if (keycode == escape || keycode == 0) {
                                 keycode = none
                             }
-                            option.set(InputCode.fromKeyCode(keycode))
+                            option.set(InputKeys.keyboard(keycode))
                             return true
                         } else {
                             return false

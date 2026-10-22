@@ -49,6 +49,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import java.time.LocalDateTime
@@ -129,7 +130,7 @@ object HoppityLiveDisplay {
     fun onKeyPress(event: KeyPressEvent) {
         reCheckInventoryState()
         if (!config.enabled) return
-        if (config.toggleKeybind == UNKNOWN || event.key != config.toggleKeybind) return
+        if (config.toggleKeybind == InputConstants.UNKNOWN || event.key != config.toggleKeybind) return
         // Only toggle from inventory if the user is in the Chocolate Factory
         if (MinecraftCompat.screen != null && !CFApi.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return
