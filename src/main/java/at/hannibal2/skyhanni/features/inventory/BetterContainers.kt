@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.features.inventory.BetterContainers.SlotType.TOGGLE_ON
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CTMUtils
