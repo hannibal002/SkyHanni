@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.config.features.misc.navigation.NavigationConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.UniversalTrackerConfig
 import at.hannibal2.skyhanni.config.features.pets.PetConfig
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig
-import at.hannibal2.skyhanni.utils.InputCode
 import at.hannibal2.skyhanni.utils.SoundUtils
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -499,7 +499,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(name = "Abiphone Hotkey", desc = "Answer incoming abiphone calls with a hotkey.")
     @ConfigEditorKeyMapping
-    var abiphoneAcceptKey = InputCode.UNKNOWN
+    var abiphoneAcceptKey = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(

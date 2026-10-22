@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.config.features.mining.glacite
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
@@ -50,7 +50,7 @@ class TunnelMapsConfig {
         desc = "Hotkey to warp to the campfire. If the travel scroll is not unlocked, show a path to the campfire instead."
     )
     @ConfigEditorKeyMapping
-    var campfireKey = InputCode.UNKNOWN
+    var campfireKey = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(
@@ -63,7 +63,7 @@ class TunnelMapsConfig {
     @Expose
     @ConfigOption(name = "Next Spot Hotkey", desc = "Hotkey to select the next spot.")
     @ConfigEditorKeyMapping
-    var nextSpotHotkey = InputCode.UNKNOWN
+    var nextSpotHotkey = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Left Click Pigeon", desc = "Left click the Royal Pigeon to go to the next spot.")

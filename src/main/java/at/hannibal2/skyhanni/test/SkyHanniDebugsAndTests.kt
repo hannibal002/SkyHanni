@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getRawBaseStats
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
@@ -68,6 +69,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer
 import net.minecraft.client.gui.components.debug.DebugScreenEntries
 import net.minecraft.client.gui.components.debug.DebugScreenEntry
@@ -497,7 +499,7 @@ object SkyHanniDebugsAndTests {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onGuiRender() {
-        if (debugConfig.copyCosmeticsSkullData == UNKNOWN) return
+        if (debugConfig.copyCosmeticsSkullData == InputConstants.UNKNOWN) return
         val stack = InventoryCompat.stackUnderCursor() ?: return
         if (!stack.getCleanLore().any { it.contains("Right-click to preview!") }) return
 

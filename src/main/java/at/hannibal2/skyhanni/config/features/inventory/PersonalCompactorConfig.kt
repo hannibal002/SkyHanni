@@ -2,8 +2,9 @@ package at.hannibal2.skyhanni.config.features.inventory
 
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.InputKeys
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -31,8 +32,8 @@ class PersonalCompactorConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "The keybind to hold to show the overlay.")
-    @ConfigEditorKeyMapping(defaultKey = KEY_LSHIFT)
-    var keybind = InputCode.KEY_LSHIFT
+    @ConfigEditorKeyMapping(defaultKey = InputConstants.KEY_LSHIFT)
+    var keybind = InputKeys.KEY_LSHIFT
 
     @Expose
     @ConfigOption(

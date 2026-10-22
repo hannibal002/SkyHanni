@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.config.features.misc
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -118,7 +118,7 @@ class TrevorTheTrapperConfig {
             "§eRequires the relevant above settings to be toggled"
     )
     @ConfigEditorKeyMapping
-    var keyBind = InputCode.UNKNOWN
+    var keyBind = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Trapper Cooldown", desc = "Change the color of Trevor and adds a cooldown over his head.")

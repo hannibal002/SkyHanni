@@ -77,8 +77,8 @@ val mixinTestRuntime = configurations.create("mixinTestRuntime") {
 }
 
 val includeBackupRepo = tasks.register<DownloadBackupRepo>("includeBackupRepo") {
-    this.user = "hannibal002"
-    this.repo = "SkyHanni-Repo"
+    this.user = "SkyHanniStudios"
+    this.repo = "SkyHanni-REPO"
     this.branch = "main"
     this.resourcePath = "assets/skyhanni/shrepo.tar.gz"
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
@@ -401,11 +401,11 @@ publishing.publications {
             licenses {
                 license {
                     name.set("GNU Lesser General Public License")
-                    url.set("https://github.com/hannibal002/SkyHanni/blob/HEAD/LICENSE")
+                    url.set("https://github.com/SkyHanniStudios/SkyHanni/blob/HEAD/LICENSE")
                 }
             }
             developers {
-                developer { name.set("hannibal002") }
+                developer { name.set("hannibal2") }
                 developer { name.set("The SkyHanni contributors") }
             }
         }

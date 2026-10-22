@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.events.minecraft
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.utils.InputCode
+import com.mojang.blaze3d.platform.InputConstants
 
 /**
  * Fired once when a key is pressed down. Use this for taps.
@@ -16,6 +16,6 @@ import at.hannibal2.skyhanni.utils.InputCode
  * @param key the input code the user pressed
  */
 @PrimaryFunction("onKeyDown")
-class KeyDownEvent(val key: InputCode) : SkyHanniEvent() {
+class KeyDownEvent(val key: InputConstants.Key) : SkyHanniEvent() {
     val keyCode: Int get() = key.value
 }

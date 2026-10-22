@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.features.event.hoppity.summary
 
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -76,7 +76,7 @@ class HoppityLiveDisplayConfig {
     @Expose
     @ConfigOption(name = "Card Toggle Keybind", desc = "Toggle the GUI element with this keybind.")
     @ConfigEditorKeyMapping
-    var toggleKeybind = InputCode.UNKNOWN
+    var toggleKeybind = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(

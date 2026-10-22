@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.KeyboardManager.fullDisplayName
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
@@ -184,7 +185,7 @@ object RareMobWaypointShare {
             sendRareMob()
         } else {
             val message = "§l§bYou found a Rare Diana Mob! Click §l§chere §l§bor press " +
-                "§c${config.keyBindShare.displayName} to share the location!"
+                "§c${config.keyBindShare.fullDisplayName} to share the location!"
             ChatUtils.clickableChat(
                 message,
                 onClick = ::sendRareMob,

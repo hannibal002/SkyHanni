@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.hunting
 
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
@@ -22,11 +22,11 @@ class FusionKeybindsConfig {
     @ConfigOption(name = "Repeat Fusion Keybind", desc = "Keybind to repeat the previous fusion.")
     @SearchTag("hunting box")
     @ConfigEditorKeyMapping
-    val repeatFusionKeybind: Property<InputCode> = Property.of(InputCode.UNKNOWN)
+    val repeatFusionKeybind: Property<InputConstants.Key> = Property.of(InputConstants.UNKNOWN)
 
     @Expose
     @ConfigOption(name = "Confirm Fusion Keybind", desc = "Keybind to confirm the current fusion.")
     @SearchTag("hunting box")
     @ConfigEditorKeyMapping
-    val confirmFusionKeybind: Property<InputCode> = Property.of(InputCode.UNKNOWN)
+    val confirmFusionKeybind: Property<InputConstants.Key> = Property.of(InputConstants.UNKNOWN)
 }

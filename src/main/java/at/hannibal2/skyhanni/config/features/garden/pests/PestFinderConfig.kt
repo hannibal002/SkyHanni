@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.config.features.garden.pests
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -77,7 +77,7 @@ class PestFinderConfig {
     @Expose
     @ConfigOption(name = "Teleport Hotkey", desc = "Press this key to warp to the nearest plot with pests on it.")
     @ConfigEditorKeyMapping
-    var teleportHotkey = InputCode.UNKNOWN
+    var teleportHotkey = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(

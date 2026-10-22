@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.config.features.garden.pests
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -29,7 +29,7 @@ class PestTrapConfig {
         desc = "Release all pests in a pest trap when you press this keybind."
     )
     @ConfigEditorKeyMapping
-    var releaseHotkey = InputCode.UNKNOWN
+    var releaseHotkey = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Warnings", desc = "")

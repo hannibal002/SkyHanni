@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -23,7 +23,7 @@ class GardenCommandsConfig {
         desc = "Press this key to teleport you to your Garden spawn. §cOnly works while in the garden.",
     )
     @ConfigEditorKeyMapping
-    var homeHotkey = InputCode.UNKNOWN
+    var homeHotkey = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(
@@ -31,7 +31,7 @@ class GardenCommandsConfig {
         desc = "Press this key to set your Garden spawn. §cOnly works while in the garden.",
     )
     @ConfigEditorKeyMapping
-    var sethomeHotkey = InputCode.UNKNOWN
+    var sethomeHotkey = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(
@@ -39,5 +39,5 @@ class GardenCommandsConfig {
         desc = "Press this key to teleport you to the Garden barn. §cOnly works while in the garden."
     )
     @ConfigEditorKeyMapping
-    var barnHotkey = InputCode.UNKNOWN
+    var barnHotkey = InputConstants.UNKNOWN
 }

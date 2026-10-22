@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.InputKeys
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
@@ -48,14 +49,14 @@ abstract class SkyHanniBaseScreen(title: Component = Component.empty()) : Screen
 
     private fun postMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
         try {
-            val key = InputCode.fromMouseButton(mouseButton)
-            onMouseClicked(originalMouseX, originalMouseY, key)
+            val button = InputKeys.mouse(mouseButton)
+            onMouseClicked(originalMouseX, originalMouseY, button)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error while clicking mouse", "screen" to this)
         }
     }
 
-    open fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: InputCode) {}
+    open fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: InputConstants.Key) {}
 
     override fun keyPressed(input: KeyEvent): Boolean {
         postKeyTyped(null, input.key)
@@ -69,14 +70,14 @@ abstract class SkyHanniBaseScreen(title: Component = Component.empty()) : Screen
 
     private fun postKeyTyped(typedChar: Char?, keyCode: Int?) {
         try {
-            val key = keyCode?.let { InputCode.fromKeyCode(it) }
+            val key = if (keyCode == null) null else InputKeys.keyboard(keyCode)
             onKeyTyped(typedChar, key)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error while typing key", "screen" to this)
         }
     }
 
-    open fun onKeyTyped(typedChar: Char?, key: InputCode?) {}
+    open fun onKeyTyped(typedChar: Char?, key: InputConstants.Key?) {}
 
     override fun mouseReleased(click: MouseButtonEvent): Boolean {
         postMouseReleased(click.x.toInt(), click.y.toInt(), click.button())

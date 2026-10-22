@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.config.features.crimsonisle
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -32,7 +32,7 @@ class ReputationHelperConfig {
     @Expose
     @ConfigOption(name = "Hotkey", desc = "Press this hotkey to show the Reputation Helper.")
     @ConfigEditorKeyMapping
-    var hotkey = InputCode.UNKNOWN
+    var hotkey = InputConstants.UNKNOWN
 
     @Expose
     @ConfigLink(owner = ReputationHelperConfig::class, field = "enabled")

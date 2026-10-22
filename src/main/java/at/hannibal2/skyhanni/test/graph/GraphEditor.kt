@@ -25,7 +25,7 @@ object GraphEditor {
 
     val config: GraphEditorConfig get() = DevApi.config.devTool.graph
 
-    private const val TUTORIAL_URL = "https://github.com/hannibal002/SkyHanni/blob/beta/docs/tutorials/graph_network.md"
+    private const val TUTORIAL_URL = "https://github.com/SkyHanniStudios/SkyHanni/blob/beta/docs/tutorials/graph_network.md"
 
     var state = GraphEditorState()
         set(value) {

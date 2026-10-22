@@ -21,6 +21,8 @@ import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
+import at.hannibal2.skyhanni.utils.KeyboardManager.fullDisplayName
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -32,6 +34,7 @@ import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.ChatFormatting
 import java.util.zip.GZIPInputStream
 import kotlin.io.encoding.Base64
@@ -155,9 +158,9 @@ object ShardTrackerDisplay {
     private fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (!isInsideShardsMenu()) return
-        if (config.selectShardKeybind == UNKNOWN) return
+        if (config.selectShardKeybind == InputConstants.UNKNOWN) return
         if (!AttributeShardsData.isAttributeShard(event.itemStack.getInternalName())) return
-        event.toolTip.add("§ePress ${config.selectShardKeybind.displayName} to track this shard.")
+        event.toolTip.add("§ePress ${config.selectShardKeybind.fullDisplayName} to track this shard.")
     }
 
     @HandleEvent

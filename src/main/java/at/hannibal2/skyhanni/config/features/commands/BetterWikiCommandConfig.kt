@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.features.commands
 
 import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -48,5 +48,5 @@ class BetterWikiCommandConfig {
             "§cFor an optimal experience, do §lNOT §cbind this to a mouse button.",
     )
     @ConfigEditorKeyMapping
-    var wikiKeybind = InputCode.UNKNOWN
+    var wikiKeybind = InputConstants.UNKNOWN
 }

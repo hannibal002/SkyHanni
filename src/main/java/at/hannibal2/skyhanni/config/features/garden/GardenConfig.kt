@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedCon
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.features.garden.farming.NoBreak.NoBreakItem
-import at.hannibal2.skyhanni.utils.InputCode
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -231,7 +231,7 @@ class GardenConfig {
             "(similar to how F3 + G shows chunk borders).",
     )
     @ConfigEditorKeyMapping
-    var plotBorderKey = InputCode.UNKNOWN
+    var plotBorderKey = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(

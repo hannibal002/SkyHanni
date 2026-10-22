@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import com.mojang.blaze3d.platform.InputConstants
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -48,15 +50,15 @@ object FusionKeybinds {
         val confirmFusionKeybind = config.confirmFusionKeybind.get()
 
         config.repeatFusionKeybind.afterChange {
-            if (this != UNKNOWN && this == confirmFusionKeybind) {
-                config.repeatFusionKeybind.set(UNKNOWN)
+            if (this != InputConstants.UNKNOWN && this == confirmFusionKeybind) {
+                config.repeatFusionKeybind.set(InputConstants.UNKNOWN)
                 warnDuplicateKeybinds()
             }
         }
 
         config.confirmFusionKeybind.afterChange {
-            if (this != UNKNOWN && this == repeatFusionKeybind) {
-                config.confirmFusionKeybind.set(UNKNOWN)
+            if (this != InputConstants.UNKNOWN && this == repeatFusionKeybind) {
+                config.confirmFusionKeybind.set(InputConstants.UNKNOWN)
                 warnDuplicateKeybinds()
             }
         }

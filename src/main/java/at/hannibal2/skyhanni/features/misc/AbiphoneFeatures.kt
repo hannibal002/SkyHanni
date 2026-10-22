@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
 import at.hannibal2.skyhanni.utils.StringUtils.removeAllNonLettersAndNumbers
 import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.mojang.blaze3d.platform.InputConstants
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -51,7 +52,7 @@ object AbiphoneFeatures {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (InventoryUtils.inInventory()) return
-        if (config.abiphoneAcceptKey == UNKNOWN || event.key != config.abiphoneAcceptKey) return
+        if (config.abiphoneAcceptKey == InputConstants.UNKNOWN || event.key != config.abiphoneAcceptKey) return
         val acceptUUID = acceptUUID ?: return
         HypixelCommands.callback(acceptUUID)
         AbiphoneFeatures.acceptUUID = null

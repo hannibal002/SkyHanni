@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantsJson
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.InputKeys
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -23,6 +23,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -108,10 +110,10 @@ object EstimatedItemValue {
         if (!currentlyShowing) return
 
         if (SkyBlockUtils.debug) {
-            if (InputCode.KEY_RIGHT.isKeyClicked()) {
+            if (InputKeys.KEY_RIGHT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange += 1
                 cache.clear()
-            } else if (InputCode.KEY_LEFT.isKeyClicked()) {
+            } else if (InputKeys.KEY_LEFT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange -= 1
                 cache.clear()
             }

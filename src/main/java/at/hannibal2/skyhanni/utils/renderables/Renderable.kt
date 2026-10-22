@@ -15,7 +15,8 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ColorUtils.toInt
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.InputCode
+import at.hannibal2.skyhanni.utils.InputKeys
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -38,6 +39,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableScrollT
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.PauseScreen
@@ -153,15 +155,15 @@ interface Renderable {
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
             onHover: () -> Unit = {},
-        ) = clickable(render, mapOf(InputCode.LEFT_MOUSE to onLeftClick), bypassChecks, condition, tips, onHover)
+        ) = clickable(render, mapOf(InputKeys.MOUSE_BUTTON_LEFT to onLeftClick), bypassChecks, condition, tips, onHover)
 
         fun clickable(
             text: String,
             /**
-             * This should be a direct map of key code int, to the unit that should be invoked.
-             * Use [at.hannibal2.skyhanni.utils.InputCode].
+             * This should be a direct map of key constant to the unit that should be invoked.
+             * Use [at.hannibal2.skyhanni.utils.InputKeys].
              */
-            onAnyClick: Map<InputCode, () -> Unit>,
+            onAnyClick: Map<InputConstants.Key, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
@@ -171,10 +173,10 @@ interface Renderable {
         fun clickable(
             render: Renderable,
             /**
-             * This should be a direct map of key code int, to the unit that should be invoked.
-             * Use [at.hannibal2.skyhanni.utils.InputCode].
+             * This should be a direct map of key constant to the unit that should be invoked.
+             * Use [at.hannibal2.skyhanni.utils.InputKeys].
              */
-            onAnyClick: Map<InputCode, () -> Unit>,
+            onAnyClick: Map<InputConstants.Key, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
@@ -192,7 +194,7 @@ interface Renderable {
 
         private fun multiClickable(
             render: Renderable,
-            onAnyClick: Map<InputCode, () -> Unit>,
+            onAnyClick: Map<InputConstants.Key, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             /**
@@ -229,7 +231,7 @@ interface Renderable {
 
         fun clickableAndScrollable(
             render: Renderable,
-            onAnyClick: Map<InputCode, () -> Unit>,
+            onAnyClick: Map<InputConstants.Key, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             scrollValue: ScrollValue = ScrollValue(),
@@ -244,8 +246,8 @@ interface Renderable {
                 nonStandardClick = {
                     pureScrollInput.update(true)
                     when (pureScrollInput.asDirection()) {
-                        ScrollInput.ScrollDirection.UP -> onAnyClick[RIGHT_MOUSE]?.invoke()
-                        ScrollInput.ScrollDirection.DOWN -> onAnyClick[LEFT_MOUSE]?.invoke()
+                        ScrollInput.ScrollDirection.UP -> onAnyClick[InputKeys.MOUSE_BUTTON_RIGHT]?.invoke()
+                        ScrollInput.ScrollDirection.DOWN -> onAnyClick[InputKeys.MOUSE_BUTTON_LEFT]?.invoke()
                         else -> {}
                     }
                     pureScrollInput.dispose()
@@ -522,7 +524,9 @@ interface Renderable {
                     textInput.makeActive()
                     textInput.handle()
                     val yOff: Int = if (shouldRenderTopElseBottom) 0 else content.height + ySpacing
-                    if (isBoxHovered(mouseOffsetX, width, mouseOffsetY + yOff, textBoxHeight) && InputCode.RIGHT_MOUSE.isKeyClicked()) {
+                    if (isBoxHovered(mouseOffsetX, width, mouseOffsetY + yOff, textBoxHeight) &&
+                        InputKeys.MOUSE_BUTTON_RIGHT.isKeyClicked()
+                    ) {
                         textInput.clear()
                     }
                 } else {
@@ -643,7 +647,7 @@ interface Renderable {
             content: Renderable,
             onClick: (Boolean) -> Unit,
             onHover: (Boolean) -> Unit = {},
-            button: InputCode = LEFT_MOUSE,
+            button: InputConstants.Key = InputKeys.MOUSE_BUTTON_LEFT,
             bypassChecks: Boolean = false,
             condition: (Boolean) -> Boolean = { true },
             startState: Boolean = false,
@@ -751,7 +755,7 @@ interface Renderable {
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),
             velocity: Double = 2.0,
-            button: InputCode? = null,
+            button: InputConstants.Key? = null,
             bypassChecks: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
@@ -806,7 +810,7 @@ interface Renderable {
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),
             velocity: Double = 2.0,
-            button: InputCode? = null,
+            button: InputConstants.Key? = null,
             textInput: TextInput,
             key: Int,
             bypassChecks: Boolean = false,
