@@ -218,7 +218,7 @@ enum class SkyHanniTypeAdapters(
         },
     ),
     SESSION_UPTIME(SessionUptime::class.java, SessionUptimeTypeAdapter()),
-    INPUT_CODE(
+    INPUT_CONSTANTS_KEY(
         InputConstants.Key::class.java,
         object : TypeAdapter<InputConstants.Key>() {
             override fun write(out: JsonWriter, value: InputConstants.Key) {
