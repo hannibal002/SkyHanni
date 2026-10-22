@@ -55,7 +55,7 @@ Prism Launcher can handle Fabric, the dependencies, RAM, and Java all from one i
 
 > **4: Download SkyHanni**
 > SkyHanni Official Downloads:
-> - [GitHub](https://github.com/hannibal002/SkyHanni/releases).
+> - [GitHub](https://github.com/SkyHanniStudios/SkyHanni/releases).
 > - [Modrinth](https://modrinth.com/mod/skyhanni/).
 
 
