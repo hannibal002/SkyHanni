@@ -88,16 +88,14 @@ object TrophyFishMessages {
         val trophyFishCounts = trophyFishes.getOrPut(internalName) { mutableMapOf() }
         val amount = trophyFishCounts[rarity] ?: amountCaught
 
-        when (rarity) {
-            GOLD -> if (config.goldAlert) {
-                sendTitle(displayName, displayRarity, amount)
-                if (config.playSound) SoundUtils.playBeepSound()
-            }
-            DIAMOND -> if (config.diamondAlert) {
-                sendTitle(displayName, displayRarity, amount)
-                if (config.playSound) SoundUtils.playBeepSound()
-            }
-            else -> {}
+        val alert = when (rarity) {
+            TrophyRarity.GOLD -> config.goldAlert
+            TrophyRarity.DIAMOND -> config.diamondAlert
+            else -> false
+        }
+        if (alert) {
+            sendTitle(displayName, displayRarity, amount)
+            if (config.playSound) SoundUtils.playBeepSound()
         }
 
         var edited = if (config.enabled) {
