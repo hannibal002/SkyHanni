@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.KeyboardManager.fullDisplayName
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -117,7 +118,7 @@ object VanquisherWaypointShare {
         if (config.instantShare) {
             sendSpawn()
         } else {
-            val message = "You found a Vanquisher! Click here or press ${config.keybindSharing.displayName} to share!"
+            val message = "You found a Vanquisher! Click here or press ${config.keybindSharing.fullDisplayName} to share!"
             ChatUtils.clickableChat(message, onClick = ::sendSpawn, hover = "Click to share!", oneTimeClick = true)
         }
     }

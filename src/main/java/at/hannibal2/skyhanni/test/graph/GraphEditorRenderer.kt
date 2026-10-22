@@ -67,35 +67,35 @@ object GraphEditorRenderer {
 
         val config = GraphEditor.config
         if (inTextMode) {
-            add("§eExit Text Mode: §6${config.exitKey.displayName}")
+            add("§eExit Text Mode: §6${config.exitKey.fullDisplayName}")
         } else {
-            add("§eExit Graph Editor: §6${config.exitKey.displayName}")
+            add("§eExit Graph Editor: §6${config.exitKey.fullDisplayName}")
         }
         if (!inNodeMoveMode && !inTextMode) {
-            add("§ePlace: §6${config.placeKey.displayName}")
-            add("§eSelect Nearest: §6${config.selectKey.displayName}")
-            add("§eSelect Looking at: §6${config.selectRaycastKey.displayName}")
-            add("§eConnect Nodes: §6${config.connectKey.displayName}")
-            add("§eNavigate to Node: §6${config.dijkstraKey.displayName}")
-            add("§eVision: §6${config.throughBlocksKey.displayName}")
-            add("§eSave: §6${config.saveKey.displayName}")
-            add("§eLoad: §6${config.loadKey.displayName}")
-            add("§eClear: §6${config.clearKey.displayName}")
-            add("§eFeedback Mode: §6${config.tutorialKey.displayName}")
+            add("§ePlace: §6${config.placeKey.fullDisplayName}")
+            add("§eSelect Nearest: §6${config.selectKey.fullDisplayName}")
+            add("§eSelect Looking at: §6${config.selectRaycastKey.fullDisplayName}")
+            add("§eConnect Nodes: §6${config.connectKey.fullDisplayName}")
+            add("§eNavigate to Node: §6${config.dijkstraKey.fullDisplayName}")
+            add("§eVision: §6${config.throughBlocksKey.fullDisplayName}")
+            add("§eSave: §6${config.saveKey.fullDisplayName}")
+            add("§eLoad: §6${config.loadKey.fullDisplayName}")
+            add("§eClear: §6${config.clearKey.fullDisplayName}")
+            add("§eFeedback Mode: §6${config.tutorialKey.fullDisplayName}")
             GraphEditorHistory.addDisplayLines(this)
             add(" ")
             if (activeNode != null) {
-                add("§eText Mode: §6${config.textKey.displayName}")
-                if (dissolvePossible) add("§eDissolve: §6${config.dissolveKey.displayName}")
+                add("§eText Mode: §6${config.textKey.fullDisplayName}")
+                if (dissolvePossible) add("§eDissolve: §6${config.dissolveKey.fullDisplayName}")
                 if (selectedEdge != null) {
-                    add("§eSplit: §6${config.splitKey.displayName}")
-                    add("§eCycle Direction: §6${config.edgeCycle.displayName}")
+                    add("§eSplit: §6${config.splitKey.fullDisplayName}")
+                    add("§eCycle Direction: §6${config.edgeCycle.fullDisplayName}")
                 }
             }
         }
 
         if (!inTextMode && activeNode != null) {
-            add("§eMove Node: §6${config.editKey.displayName}")
+            add("§eMove Node: §6${config.editKey.fullDisplayName}")
         }
 
         if (inNodeMoveMode) {

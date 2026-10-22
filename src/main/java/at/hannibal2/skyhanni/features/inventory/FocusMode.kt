@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.KeyboardManager.fullDisplayName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -36,7 +37,7 @@ object FocusMode {
             if (inBazaar) return
         }
 
-        val keyName = config.toggleKey.displayName
+        val keyName = config.toggleKey.fullDisplayName
         val hint = !config.disableHint && !config.alwaysEnabled && config.toggleKey != InputConstants.UNKNOWN
         if (active || config.alwaysEnabled) {
             val newTooltip = buildList {

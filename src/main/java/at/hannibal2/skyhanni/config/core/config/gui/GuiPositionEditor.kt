@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InputKeys
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.KeyboardManager.fullDisplayName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -124,7 +125,7 @@ class GuiPositionEditor(
             "",
             "§eRight-Click to open associated config options!",
             "§eUse Scroll-Wheel to resize!",
-            "§e${config.keyBindReset.displayName} to reset to default position!",
+            "§e${config.keyBindReset.fullDisplayName} to reset to default position!",
         )
     }
 

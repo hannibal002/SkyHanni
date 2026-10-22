@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
+import at.hannibal2.skyhanni.utils.KeyboardManager.fullDisplayName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -159,7 +160,7 @@ object ShardTrackerDisplay {
         if (!isInsideShardsMenu()) return
         if (config.selectShardKeybind == InputConstants.UNKNOWN) return
         if (!AttributeShardsData.isAttributeShard(event.itemStack.getInternalName())) return
-        event.toolTip.add("§ePress ${config.selectShardKeybind.displayName} to track this shard.")
+        event.toolTip.add("§ePress ${config.selectShardKeybind.fullDisplayName} to track this shard.")
     }
 
     @HandleEvent

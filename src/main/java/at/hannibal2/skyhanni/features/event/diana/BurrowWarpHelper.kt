@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.KeyboardManager.fullDisplayName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -62,7 +63,7 @@ object BurrowWarpHelper {
 
         val text = "§bWarp to " + warp.displayName
         val keybindSuffix = if (config.keyBindWarp != InputConstants.UNKNOWN) {
-            " §7(§ePress ${config.keyBindWarp.displayName}§7)"
+            " §7(§ePress ${config.keyBindWarp.fullDisplayName}§7)"
         } else ""
 
         val warpText = Renderable.text(text + keybindSuffix, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
