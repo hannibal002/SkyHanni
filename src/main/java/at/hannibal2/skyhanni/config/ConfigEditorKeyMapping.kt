@@ -7,5 +7,5 @@ import com.mojang.blaze3d.platform.InputConstants
 @Target(AnnotationTarget.FIELD)
 annotation class ConfigEditorKeyMapping(
     val defaultKey: Int = InputKeys.KEY_UNKNOWN,
-    val type: InputConstants.Type = KEYSYM
+    val type: InputConstants.Type = KEYSYM,
 )

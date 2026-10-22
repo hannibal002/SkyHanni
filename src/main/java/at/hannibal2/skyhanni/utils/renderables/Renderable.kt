@@ -524,7 +524,9 @@ interface Renderable {
                     textInput.makeActive()
                     textInput.handle()
                     val yOff: Int = if (shouldRenderTopElseBottom) 0 else content.height + ySpacing
-                    if (isBoxHovered(mouseOffsetX, width, mouseOffsetY + yOff, textBoxHeight) && InputKeys.MOUSE_BUTTON_RIGHT.isKeyClicked()) {
+                    if (isBoxHovered(mouseOffsetX, width, mouseOffsetY + yOff, textBoxHeight) &&
+                        InputKeys.MOUSE_BUTTON_RIGHT.isKeyClicked()
+                    ) {
                         textInput.clear()
                     }
                 } else {
