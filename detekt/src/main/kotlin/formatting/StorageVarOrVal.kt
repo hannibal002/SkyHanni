@@ -62,13 +62,21 @@ class StorageVarOrVal(config: Config) : RequiresAnalysisApi, SkyHanniRule(
         val isInfoText = "ConfigEditorInfoText" in annotations
         val isKeyMapping = "ConfigEditorKeyMapping" in annotations
 
-        return isKeyMapping || (!isInfoText && analyze(property) {
+        return analyze(property) {
             val type = property.returnType
             val classId = (type as? KaClassType)?.classId
-            classId in PRIMITIVE_CLASS_IDS ||
-                classId == StandardClassIds.String ||
-                type.expandedSymbol?.classKind == KaClassKind.ENUM_CLASS ||
-                classId == CHROMA_COLOUR_CLASS_ID
-        })
+
+            // Property<T> should always be val.
+            if (classId?.shortClassName?.asString() == "Property") {
+                return@analyze false
+            }
+
+            isKeyMapping || (!isInfoText && (
+                classId in PRIMITIVE_CLASS_IDS ||
+                    classId == StandardClassIds.String ||
+                    type.expandedSymbol?.classKind == KaClassKind.ENUM_CLASS ||
+                    classId == CHROMA_COLOUR_CLASS_ID
+                ))
+        }
     }
 }
