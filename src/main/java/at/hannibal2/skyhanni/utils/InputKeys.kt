@@ -6,7 +6,8 @@ import net.minecraft.client.input.KeyEvent
 @Suppress("unused")
 object InputKeys {
     fun keyboard(value: Int): InputConstants.Key =
-        InputConstants.Type.KEYSYM.getOrCreate(value)
+        //~ if < 26.3 'KEYBOARD' -> 'KEYSYM'
+        InputConstants.Type.KEYBOARD.getOrCreate(value)
 
     fun mouse(button: Int): InputConstants.Key =
         InputConstants.Type.MOUSE.getOrCreate(button)
@@ -80,7 +81,6 @@ object InputKeys {
     val KEY_F22 = keyboard(InputConstants.KEY_F22)
     val KEY_F23 = keyboard(InputConstants.KEY_F23)
     val KEY_F24 = keyboard(InputConstants.KEY_F24)
-    val KEY_F25 = keyboard(InputConstants.KEY_F25)
     val KEY_NUMLOCK = keyboard(InputConstants.KEY_NUMLOCK)
     val KEY_NUMPAD0 = keyboard(InputConstants.KEY_NUMPAD0)
     val KEY_NUMPAD1 = keyboard(InputConstants.KEY_NUMPAD1)
@@ -119,11 +119,13 @@ object InputKeys {
     val KEY_LALT = keyboard(InputConstants.KEY_LALT)
     val KEY_LCONTROL = keyboard(InputConstants.KEY_LCONTROL)
     val KEY_LSHIFT = keyboard(InputConstants.KEY_LSHIFT)
-    val KEY_LSUPER = keyboard(InputConstants.KEY_LSUPER)
+    //~ if < 26.3 'LGUI' -> 'LSUPER'
+    val KEY_LSUPER = keyboard(InputConstants.KEY_LGUI)
+    //~ if < 26.3 'RGUI' -> 'RSUPER'
+    val KEY_RSUPER = keyboard(InputConstants.KEY_RGUI)
     val KEY_RALT = keyboard(InputConstants.KEY_RALT)
     val KEY_RCONTROL = keyboard(InputConstants.KEY_RCONTROL)
     val KEY_RSHIFT = keyboard(InputConstants.KEY_RSHIFT)
-    val KEY_RSUPER = keyboard(InputConstants.KEY_RSUPER)
     val KEY_RETURN = keyboard(InputConstants.KEY_RETURN)
     val KEY_ESCAPE = keyboard(InputConstants.KEY_ESCAPE)
     val KEY_BACKSPACE = keyboard(InputConstants.KEY_BACKSPACE)

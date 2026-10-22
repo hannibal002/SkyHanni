@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.fullDisplayName
 import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.GuiTextures
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
-import io.github.notenoughupdates.moulconfig.common.KeyboardConstants.escape
-import io.github.notenoughupdates.moulconfig.common.KeyboardConstants.none
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.gui.GuiComponent
 import io.github.notenoughupdates.moulconfig.gui.GuiImmediateContext
@@ -104,8 +102,9 @@ class GuiOptionEditorInputConstantsKey(option: ProcessedOption, defaultKey: Inpu
                             if (keyboardEvent.pressed) return true
                             editingKeycode = false
                             var keycode = keyboardEvent.keycode
-                            if (keycode == escape || keycode == 0) {
-                                keycode = none
+                            if (keycode == InputConstants.KEY_ESCAPE || keycode == InputKeys.KEY_UNKNOWN) {
+                                option.set(InputConstants.UNKNOWN)
+                                return true
                             }
                             option.set(InputKeys.keyboard(keycode))
                             return true
