@@ -1,7 +1,7 @@
 @file:DependsOn("com.google.code.gson:gson:2.10.1")
 // Execution context: base branch
 // called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, changelog-review.yml, check_dependencies.yml,
-// and keyword-labels.yml
+// keyword-labels.yml, and partially-approved-review.yml
 
 // TODO: remove the suppressions and split the complex functions once this file can be broken up into
 //  several files. Splitting them now would only add more top level functions to a file that is
@@ -21,6 +21,7 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
+import java.time.Instant
 import kotlin.io.path.Path
 import kotlin.io.path.div
 import kotlin.io.path.exists
@@ -114,6 +115,12 @@ val conflictComment = CommentType("merge-conflict-review", "Show previous confli
 
 val changelogLabel = "Wrong Title/Changelog"
 val changelogComment = CommentType("changelog-check-review", "Show previous issues")
+
+// Also used in partially-approved.yml, both must stay in sync.
+val partiallyApprovedLabel = "Partially Approved"
+
+// The legacy permission field of the collaborator API, which reports maintain as write.
+val approvingPermissions = setOf("admin", "write")
 
 val dependencyLabel = "Waiting on Dependency PR"
 // Also used by the set-pending job in check_dependencies.yml, both must stay in sync.
@@ -223,8 +230,8 @@ enum class DependencyState {
     UNRESOLVED
 }
 
-// Split during parsing, not derived afterward: a line on hannibal002/SkyHanni-REPO is valid and deliberately
-// produces no dependency, so subtracting the recognized entries would report it as malformed.
+// Split during parsing, not derived afterward: a line on the SkyHanni-REPO is valid and deliberately produces no
+// dependency, so subtracting the recognized entries would report it as malformed.
 data class ParsedDependencySection(val dependencies: List<Dependency>, val unrecognizedLines: List<String>)
 
 // Everything wrong with one dependency section, so the comment can name all of it at once. Placeholder and
@@ -1084,7 +1091,10 @@ fun parseDependencySection(sectionLines: List<String>): ParsedDependencySection 
     for (line in sectionLines) {
         val urlMatch = dependencyUrlRegex.find(line)
         if (urlMatch != null) {
-            val depOwner = urlMatch.groupValues[1]
+            // Links from before the move to the organization still name the old owner. The API answers those with a
+            // redirect that ghRequest does not follow, so the old owner, spelled exactly "hannibal002", is read as
+            // the current one for every repository.
+            val depOwner = urlMatch.groupValues[1].takeUnless { it == "hannibal002" } ?: repoOwner
             val depRepo = urlMatch.groupValues[2]
             // A number too large for an Int cannot be a pull request. toInt would throw, and nothing catches
             // that: the closed event iterates over every labeled PR and would abandon the rest of them.
@@ -1094,7 +1104,7 @@ fun parseDependencySection(sectionLines: List<String>): ParsedDependencySection 
                 continue
             }
             // Valid, and deliberately produces no dependency. Never a malformed line.
-            if (depOwner == "hannibal002" && depRepo == "SkyHanni-REPO") continue
+            if (depOwner == repoOwner && depRepo == "SkyHanni-REPO") continue
             deps.add(Dependency(depOwner, depRepo, depNum, line))
             continue
         }
@@ -1558,6 +1568,113 @@ fun runKeywordLabelMode(prNumber: String) {
     }
 }
 
+// Ends the run on a failed page, a partial listing would read as complete.
+fun fetchAllPages(path: String, what: String): List<JsonObject> = buildList {
+    var page = 1
+    while (true) {
+        val (status, body) = ghRepoGet("$path?per_page=100&page=$page")
+        status.requireSuccess("Error: could not fetch $what (HTTP $status)", commentError = false)
+        val array = body as? JsonArray ?: error("Error: unexpected response format for $what", commentError = false)
+        array.mapNotNullTo(this) { it as? JsonObject }
+        if (array.size() < 100) break
+        page++
+    }
+}
+
+fun parseApiTime(element: JsonElement?, what: String): Instant =
+    element?.takeIf { it.isJsonPrimitive }?.asString?.let { runCatching { Instant.parse(it) }.getOrNull() }
+        ?: error("Error: unreadable timestamp in $what", commentError = false)
+
+data class LabelEvent(val added: Boolean, val byBot: Boolean, val time: Instant)
+
+// Sorted by time instead of trusting the response order.
+fun fetchPartiallyApprovedLabelEvents(prNumber: String): List<LabelEvent> {
+    val what = "events of PR #$prNumber"
+    return fetchAllPages("/issues/$prNumber/events", what).mapNotNull { event ->
+        val type = event.get("event")?.takeIf { it.isJsonPrimitive }?.asString
+        if (type != "labeled" && type != "unlabeled") return@mapNotNull null
+        val label = (event.get("label") as? JsonObject)?.get("name")?.takeIf { it.isJsonPrimitive }?.asString
+        if (label != partiallyApprovedLabel) return@mapNotNull null
+        val actorType = (event.get("actor") as? JsonObject)?.get("type")?.takeIf { it.isJsonPrimitive }?.asString
+        val time = parseApiTime(event.get("created_at"), what)
+        LabelEvent(added = type == "labeled", byBot = actorType == "Bot", time = time)
+    }.sortedBy { it.time }
+}
+
+data class Approval(val login: String, val time: Instant)
+
+// A dismissed approval is no longer APPROVED, it only counts through the label it already set.
+fun fetchApprovals(prNumber: String): List<Approval> {
+    val what = "reviews of PR #$prNumber"
+    return fetchAllPages("/pulls/$prNumber/reviews", what).mapNotNull { review ->
+        if (review.get("state")?.takeIf { it.isJsonPrimitive }?.asString != "APPROVED") return@mapNotNull null
+        val login = (review.get("user") as? JsonObject)?.get("login")?.takeIf { it.isJsonPrimitive }?.asString
+            ?: return@mapNotNull null
+        Approval(login, parseApiTime(review.get("submitted_at"), what))
+    }
+}
+
+fun canApprove(login: String): Boolean {
+    val encoded = URLEncoder.encode(login, StandardCharsets.UTF_8)
+    val (status, body) = ghRepoGet("/collaborators/$encoded/permission")
+    // An account the API cannot resolve counts as one without rights.
+    if (status == 404) return false
+    status.requireSuccess("Error: could not fetch the permission of $login (HTTP $status)", commentError = false)
+    val permission = (body as? JsonObject)?.get("permission")?.takeIf { it.isJsonPrimitive }?.asString
+    return permission in approvingPermissions
+}
+
+// Null when the pull request may get the label, otherwise why it may not.
+fun fetchLabelBlocker(prNumber: String): String? {
+    val (status, body) = ghRepoGet("/pulls/$prNumber")
+    status.requireSuccess("Error: could not fetch PR #$prNumber (HTTP $status)", commentError = false)
+    val pr = body as? JsonObject ?: error("Error: unexpected response format for PR #$prNumber", commentError = false)
+    val state = pr.get("state")?.takeIf { it.isJsonPrimitive }?.asString
+        ?: error("Error: state missing for PR #$prNumber", commentError = false)
+    val draft = pr.get("draft")?.takeIf { it.isJsonPrimitive }?.asBoolean
+        ?: error("Error: draft flag missing for PR #$prNumber", commentError = false)
+    return when {
+        state != "open" -> "not open"
+        draft -> "a draft"
+        else -> null
+    }
+}
+
+// Only ever adds the label. A removal by hand holds until the next approval, a removal by a bot, like the close
+// workflow, never does. Drafts and closed pull requests never get it.
+fun runPartiallyApprovedMode(prNumber: String) {
+    if (partiallyApprovedLabel in getPrLabels(prNumber)) {
+        println("PR #$prNumber: already labeled")
+        return
+    }
+
+    val events = fetchPartiallyApprovedLabelEvents(prNumber)
+    val last = events.lastOrNull()
+    val removedByBot = last != null && !last.added && last.byBot
+    val lastManualRemoval = events.lastOrNull { !it.added && !it.byBot }?.time
+
+    val shouldLabel = removedByBot || fetchApprovals(prNumber).any { approval ->
+        (lastManualRemoval == null || approval.time > lastManualRemoval) && canApprove(approval.login)
+    }
+    if (!shouldLabel) {
+        println("PR #$prNumber: no approval that counts")
+        return
+    }
+
+    // Checked last, the pull request can be merged while this run is still in progress.
+    val blocker = fetchLabelBlocker(prNumber)
+    if (blocker != null) {
+        println("PR #$prNumber: is $blocker, not labeled")
+        return
+    }
+
+    // Not setLabel, which only warns: the label is all this mode does.
+    val payload = mapOf("labels" to listOf(partiallyApprovedLabel))
+    val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/labels", payload)
+    status.requireSuccess("Error: could not add $partiallyApprovedLabel label (HTTP $status)", commentError = false)
+    println("PR #$prNumber: labeled ${if (removedByBot) "again after a removal by a bot" else "after an approval"}")
+}
+
 val prNumberEnv: String? = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
 
 if (mode == "merge_conflict") {
@@ -1603,5 +1720,6 @@ when (mode) {
     "build" -> runBuildMode(prNumber)
     "changelog" -> runChangelogMode(prNumber)
     "keyword_labels" -> runKeywordLabelMode(prNumber)
+    "partially_approved" -> runPartiallyApprovedMode(prNumber)
     else -> error("Unsupported MODE: $mode")
 }
