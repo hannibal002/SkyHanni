@@ -1,0 +1,69 @@
+# Execution context: base branch code, called by Partially Approved Trigger workflow
+name: Partially Approved Review
+
+on:
+    workflow_run:
+        workflows: [ "Partially Approved Trigger" ]
+        types: [ completed ]
+
+permissions:
+    issues: write
+    pull-requests: write
+    actions: read
+
+jobs:
+    review:
+        name: Add partially approved label
+        runs-on: ubuntu-latest
+        # "skipped" means the trigger saw nothing that could add the label.
+        if: >-
+            github.event.workflow_run.conclusion == 'success'
+            && (github.event.workflow_run.event == 'pull_request_review' || github.event.workflow_run.event == 'pull_request')
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v7
+
+            # Outside the checkout, so the artifact cannot overwrite repository files.
+            -   name: Download PR number
+                uses: actions/download-artifact@v8
+                with:
+                    name: partially-approved-pr
+                    run-id: ${{ github.event.workflow_run.id }}
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    path: ${{ runner.temp }}/partially-approved-pr/
+
+            # A fork can change the run that uploaded the artifact, so only a plain number gets through.
+            -   name: Read PR number
+                id: pr
+                env:
+                    PR_FILE: ${{ runner.temp }}/partially-approved-pr/pr-number.txt
+                run: |
+                    PR_NUMBER=$(head -n 1 "$PR_FILE")
+                    if ! [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+                        echo "The artifact does not hold a PR number"
+                        exit 1
+                    fi
+                    echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+
+            -   name: Cache Kotlin compiler
+                uses: actions/cache@v6
+                with:
+                    path: ~/kotlinc
+                    key: kotlin-2.4.0
+
+            -   name: Set up Kotlin
+                run: |
+                    if [ ! -d "$HOME/kotlinc" ]; then
+                        curl -sLO "https://github.com/JetBrains/kotlin/releases/download/v2.4.0/kotlin-compiler-2.4.0.zip"
+                        unzip -q kotlin-compiler-2.4.0.zip -d "$HOME"
+                    fi
+                    echo "$HOME/kotlinc/bin" >> "$GITHUB_PATH"
+
+            # No head SHA check like in the other review workflows, the result does not depend on the commit.
+            -   name: Evaluate partially approved label
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    GITHUB_REPOSITORY: ${{ github.repository }}
+                    PR_NUMBER: ${{ steps.pr.outputs.number }}
+                    MODE: partially_approved
+                run: kotlinc -script .github/scripts/pr_review.main.kts
