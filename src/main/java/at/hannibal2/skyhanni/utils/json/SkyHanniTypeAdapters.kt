@@ -235,7 +235,7 @@ enum class SkyHanniTypeAdapters(
 
             override fun read(reader: JsonReader): InputConstants.Key {
                 //? if < 26.3 {
-                /*val newIdentifier = when (val identifier =  reader.nextString()) {
+                /*val newIdentifier = when (val identifier = reader.nextString()) {
                     "key.keyboard.keypad.period" -> "key.keyboard.keypad.decimal"
                     "key.keyboard.application" -> "key.keyboard.menu"
                     else -> identifier
