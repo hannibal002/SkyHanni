@@ -17,7 +17,7 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 ### Cloning the project
 
 - Create an account on GitHub
-    - Go to https://github.com/hannibal002/SkyHanni
+    - Go to https://github.com/SkyHanniStudios/SkyHanni
     - Click on the fork button to create a fork.
         - Leave the settings unchanged
         - Click on `create fork`
@@ -285,7 +285,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Events can also use the `SkyHanniEvent.Cancellable` and `SkyHanniEvent.Rendering`
       interfaces directly if needed.
     - Functions annotated with `@HandleEvent` must be declared `private`.
-      The [SkyHanni IntelliJ plugin](https://github.com/hannibal002/SkyHanniDevelopment) flags non-private handlers and provides a quick
+      The [SkyHanni IntelliJ plugin](https://github.com/SkyHanniStudios/SkyHanniDevelopment) flags non-private handlers and provides a quick
       fix.
 - Do not subscribe to Fabric events directly in feature classes. Instead, subscribe to SkyHanni events.
   Only backend data classes in the `api` packages should listen to Fabric events. Their job is to process
@@ -297,7 +297,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - For existing events, add the KDoc the next time the event is touched or newly used in a PR.
 - Please use existing utils methods.
 - Never use  `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
-    - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
+    - See [this commit](https://github.com/SkyHanniStudios/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
 - Try to avoid using Kotlin's `!!` (not-null assertion) feature.
     - Replace it with `?:` (if null return this).
@@ -313,7 +313,7 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Do not use `toRegex()` or `toPattern()`. Use `RepoPattern` instead.
   RepoPattern allows regex patterns to be updated remotely via the repo without requiring a mod update.
   Each pattern has a local fallback defined in code, but can be overridden by the repo at runtime.
-  See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
+  See [RepoPattern.kt](https://github.com/SkyHanniStudios/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
     - Define patterns using `RepoPattern.pattern(key, fallback)` with Kotlin delegation (`by`).
     - When a file contains more than one pattern, use `RepoPattern.group(prefix)` to group them under a shared key prefix.
     - Pattern variables should be named in the scheme `variableNamePattern`.
@@ -325,7 +325,7 @@ Make sure such pull requests have a good explanation in the **What** section.
   the main thread.
 - When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and
   event.transform() when updating a
-  value. [For Example](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
+  value. [For Example](https://github.com/SkyHanniStudios/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve
@@ -390,7 +390,7 @@ Helps you write Minecraft specific code such as mixins and access wideners.
 
 Provides syntax highlighting and quick version switching for our multiversion development setup.
 
-### [SkyHanni Development Plugin](https://github.com/hannibal002/SkyHanniDevelopment)
+### [SkyHanni Development Plugin](https://github.com/SkyHanniStudios/SkyHanniDevelopment)
 
 An IntelliJ plugin with SkyHanni-specific development assistance. It validates, for example, event handler
 declarations, flags missing or incorrect `@HandleEvent`, `@PrimaryFunction`, and `@SkyHanniModule`
@@ -398,7 +398,7 @@ annotations, resolves config paths, and suppresses false-positive IntelliJ warni
 patterns such as RepoPattern keys and Brigadier command names.
 
 Install it manually: download the latest release from the
-[GitHub releases page](https://github.com/hannibal002/SkyHanniDevelopment/releases/latest) and install via
+[GitHub releases page](https://github.com/SkyHanniStudios/SkyHanniDevelopment/releases/latest) and install via
 <kbd>Settings</kbd> → <kbd>Plugins</kbd> → <kbd>⚙</kbd> → <kbd>Install plugin from disk...</kbd>.
 
 ## Software Used in SkyHanni
@@ -410,7 +410,7 @@ and [Java](https://www.java.com/en/).
 
 We use a [Gradle configuration](https://gradle.org/) to build the mod,
 written in [Kotlin DSL](https://docs.gradle.org/current/userguide/kotlin_dsl.html):
-[build.gradle.kts](https://github.com/hannibal002/SkyHanni/blob/beta/build.gradle.kts)
+[build.gradle.kts](https://github.com/SkyHanniStudios/SkyHanni/blob/beta/build.gradle.kts)
 
 This start script will automatically download all required libraries.
 
@@ -443,7 +443,7 @@ Mixin is bundled with the Fabric Loader and does not need to be included as a ru
 It allows to easily modify methods in Minecraft itself, without conflicting with other mods.
 
 For more information, see https://github.com/SpongePowered/Mixin
-or [our existing mixins](https://github.com/hannibal002/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
+or [our existing mixins](https://github.com/SkyHanniStudios/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
 
 When creating new Mixins, try to keep the code inside the mixin as small as possible, and call a hook as soon as possible.
 The mixin method itself should ideally contain only a single call to a Kotlin function. All logic belongs in Kotlin, not in the Java mixin.
@@ -458,7 +458,7 @@ SkyHanni uses KSP via the `annotation-processors` module to generate code at com
 ### Repo
 
 SkyHanni uses a repo system to easily change static variables without the need for a mod update.
-The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
+The repo is located at https://github.com/SkyHanniStudios/SkyHanni-REPO.
 A copy of all JSON files is stored on the computer inside `.minecraft\skyhanni\shrepo.tar.gz`.
 (Previously it was stored under `.minecraft\config\skyhanni\repo`.)
 On every game start, the copy gets updated (if outdated and if not manually disabled).
@@ -466,7 +466,7 @@ If you add stuff to the repo make sure it gets serialized. See
 the [JsonObjects](src/main/java/at/hannibal2/skyhanni/data/jsonobjects/repo)
 folder for how to properly do this. You also may have to disable repo auto update in game.
 
-If your PR adds or changes data in the repo, open a separate PR on the [SkyHanni-REPO](https://github.com/hannibal002/SkyHanni-REPO)
+If your PR adds or changes data in the repo, open a separate PR on the [SkyHanni-REPO](https://github.com/SkyHanniStudios/SkyHanni-REPO)
 repository as well.
 Keep the main mod PR as a draft until the repo PR is ready.
 Link the repo PR URL in the `## Dependencies` section of the mod PR.
@@ -475,7 +475,7 @@ Link the repo PR URL in the `## Dependencies` section of the mod PR.
 
 DiscordIPC is a service that SkyHanni uses to send information from SkyBlock to Discord in Rich Presence. <br>
 For info on usage, look
-at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
+at [DiscordRPCManager.kt](https://github.com/SkyHanniStudios/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
 
 ### Auto Updater
 
@@ -589,8 +589,8 @@ Both are read only from the `## Dependencies` section, never from the rest of th
 followed by blank lines, and ends at the first line that does not start with `- `. Text after a valid entry is ignored, so
 `- #1234 (needed for the item API)` is recognized. A line matching neither format is ignored.
 
-Dependencies on `hannibal002/SkyHanni-REPO` are explicitly excluded from the open check, as that repository is considered part of the same
-release unit.
+Dependencies on `SkyHanniStudios/SkyHanni-REPO` are explicitly excluded from the open check, as that repository is considered part of the same
+release unit. Links that still name the previous owner `hannibal002` are read as `SkyHanniStudios`, where all SkyHanni repositories moved.
 
 The section itself can also be wrong: an entry that fails to resolve, for example through a mistyped number, a line matching neither
 format, the template placeholder left in place, or the heading appearing twice, in which case only the first one is read. The comment then
