@@ -18,7 +18,7 @@ object InputKeys {
     fun keyEvent(event: KeyEvent): InputConstants.Key =
         InputConstants.getKey(event)
 
-    //~ if <= 26.2 '0' -> '-1'
+    //~ if < 26.3 '0' -> '-1'
     const val KEY_UNKNOWN = -1
     val KEY_0 = keyboard(InputConstants.KEY_0)
     val KEY_1 = keyboard(InputConstants.KEY_1)
