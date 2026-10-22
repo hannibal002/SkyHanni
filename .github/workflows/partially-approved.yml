@@ -1,0 +1,37 @@
+# Execution context: PR branch code
+name: "Partially Approved Trigger"
+
+on:
+    pull_request_review:
+        types: [ submitted ]
+    pull_request:
+        types: [ reopened, ready_for_review, synchronize ]
+
+permissions:
+    contents: read
+
+jobs:
+    # Only hands the PR number on, a fork pull request gets a read-only token here. Partially Approved Review decides
+    # from the API alone, because a fork can change this file and the number. An event that cannot add the label skips
+    # the job, the run then ends as "skipped" and the review workflow ignores it.
+    trigger:
+        # The label name must match partiallyApprovedLabel in pr_review.main.kts.
+        if: >-
+            '511310721' == github.repository_id
+            && github.event.pull_request.state == 'open'
+            && !github.event.pull_request.draft
+            && !contains(github.event.pull_request.labels.*.name, 'Partially Approved')
+            && (github.event_name == 'pull_request' || github.event.review.state == 'approved')
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Save PR number
+                env:
+                    PR_NUMBER: ${{ github.event.pull_request.number }}
+                run: echo "$PR_NUMBER" > pr-number.txt
+
+            -   name: Upload PR number
+                uses: actions/upload-artifact@v7
+                with:
+                    name: partially-approved-pr
+                    path: pr-number.txt
+                    retention-days: 1

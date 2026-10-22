@@ -36,7 +36,7 @@ class NeuRepositoryConfig : AbstractRepoConfig {
         val resetRepoLocation: Runnable = Runnable { reset() }
 
         @Expose
-        @ConfigOption(name = "Repository User", desc = "The Repository Branch, default: NotEnoughUpdates")
+        @ConfigOption(name = "Repository User", desc = "The Repository User, default: NotEnoughUpdates")
         @ConfigEditorText
         override var user: String = "NotEnoughUpdates"
 
