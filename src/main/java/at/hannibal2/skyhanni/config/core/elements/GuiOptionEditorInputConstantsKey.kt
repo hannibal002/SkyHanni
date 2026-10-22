@@ -101,7 +101,7 @@ class GuiOptionEditorInputConstantsKey(option: ProcessedOption, defaultKey: Inpu
                         if (editingKeycode) {
                             if (keyboardEvent.pressed) return true
                             editingKeycode = false
-                            var keycode = keyboardEvent.keycode
+                            val keycode = keyboardEvent.keycode
                             if (keycode == InputConstants.KEY_ESCAPE || keycode == InputKeys.KEY_UNKNOWN) {
                                 option.set(InputConstants.UNKNOWN)
                                 return true

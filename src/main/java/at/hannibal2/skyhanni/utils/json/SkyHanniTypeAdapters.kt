@@ -241,7 +241,7 @@ enum class SkyHanniTypeAdapters(
                     else -> identifier
                 }
                 *///?} else
-                val newIdentifier =  reader.nextString()
+                val newIdentifier = reader.nextString()
                 return InputKeys.identifier(newIdentifier)
             }
         }
