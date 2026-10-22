@@ -12,7 +12,7 @@ Two distinct use cases rely on the network data:
 
 These two functionalities power many SkyHanni features.
 
-The graph network is stored as JSON in the [SkyHanni Repo](https://github.com/hannibal002/SkyHanni-REPO/tree/main/constants/island_graphs),
+The graph network is stored as JSON in the [SkyHanni Repo](https://github.com/SkyHanniStudios/SkyHanni-REPO/tree/main/constants/island_graphs),
 one file per island.
 
 The Hypixel Lobby is currently the only map outside SkyBlock that is also using the graph network.
@@ -121,7 +121,7 @@ A non-exhaustive list of features:
 To enable the Graph Editor, run the command `/shgraph`.
 To exit the Graph Editor, run the command again or press the **Exit Key** (by default `Enter`).
 To get back to this page from in game, run `/shgraphtutorial` or press the **Open Tutorial** button at the top of the Graph Tools config.
-To load the Graph Editor with the existing [Repo data](https://github.com/hannibal002/SkyHanni-REPO/tree/main/constants/island_graphs) of
+To load the Graph Editor with the existing [Repo data](https://github.com/SkyHanniStudios/SkyHanni-REPO/tree/main/constants/island_graphs) of
 the current island, run `/shgraphloadthisisland`.
 
 Press the **Vision Key** (by default `M`) to toggle visibility of nodes and edges behind blocks.
@@ -196,7 +196,7 @@ Use your Minecraft keybind to move the selected node:
 The **Save Key** (by default `O`) allows you to export the current graph.
 It will compile the graph into JSON format, and put the raw text of the JSON into your clipboard.
 Then you can put that text into e.g., your fork of
-the [Repo file](https://github.com/hannibal002/SkyHanni-REPO/tree/main/constants/island_graphs) to include in a PR.
+the [Repo file](https://github.com/SkyHanniStudios/SkyHanni-REPO/tree/main/constants/island_graphs) to include in a PR.
 
 Additionally, while saving, these three things happen as well:
 
