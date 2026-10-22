@@ -37,7 +37,7 @@ class SkyHanniConfig : Config() {
     private val patreon = MyResourceLocation("skyhanni", "social/patreon.png")
     private val shSocials = listOf(
         Social.forLink("Discord".asStructuredText(), discord, "https://discord.com/invite/skyhanni-997079228510117908"),
-        Social.forLink("GitHub".asStructuredText(), github, "https://github.com/hannibal002/SkyHanni"),
+        Social.forLink("GitHub".asStructuredText(), github, "https://github.com/SkyHanniStudios/SkyHanni"),
         Social.forLink("Patreon".asStructuredText(), patreon, "https://www.patreon.com/hannibal2"),
     )
 
