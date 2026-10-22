@@ -7,6 +7,6 @@ import com.mojang.blaze3d.platform.InputConstants
 @Target(AnnotationTarget.FIELD)
 annotation class ConfigEditorKeyMapping(
     val defaultKey: Int = InputKeys.KEY_UNKNOWN,
-    //~ if < 26.3 'KEyBOARD' -> 'KEYSYM'
+    //~ if < 26.3 'KEYBOARD' -> 'KEYSYM'
     val type: InputConstants.Type = KEYBOARD,
 )
