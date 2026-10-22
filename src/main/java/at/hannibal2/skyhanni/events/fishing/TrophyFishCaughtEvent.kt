@@ -9,6 +9,11 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
  *
  * @param trophyFishName The internal name of the caught trophy fish, not a NEU Internal Name.
  * @param rarity The rarity of the caught trophy fish.
+ * @param amount How many were caught in this message. More than 1 when several were caught at once.
  */
 @PrimaryFunction("onTrophyFishCaught")
-class TrophyFishCaughtEvent(val trophyFishName: String, val rarity: TrophyRarity) : SkyHanniEvent()
+class TrophyFishCaughtEvent(
+    val trophyFishName: String,
+    val rarity: TrophyRarity,
+    val amount: Int = 1,
+) : SkyHanniEvent()
