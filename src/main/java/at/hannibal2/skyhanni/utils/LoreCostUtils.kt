@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -61,13 +62,14 @@ object LoreCostUtils {
      * REGEX-TEST: Click to level up!
      * REGEX-TEST: Click to buy!
      * REGEX-TEST: Click to donate!
+     * REGEX-TEST: Click to bake!
      * REGEX-TEST: Left Click to unlock!
      * REGEX-TEST: You can't afford this upgrade!
      * REGEX-FAIL: Right Click to preview!
      */
     private val tradeLinePattern by patternGroup.pattern(
         "trade.click",
-        "(?:Left )?Click to (?:trade|unlock|level up|buy|donate)!|You can't afford this upgrade!",
+        "(?:Left )?Click to (?:trade|unlock|level up|buy|donate|bake)!|You can't afford this upgrade!",
     )
 
     /**
@@ -77,6 +79,15 @@ object LoreCostUtils {
     private val amountFirstPattern by patternGroup.pattern(
         "cost.amount-first",
         "(?<amount>[\\d,]+) (?<name>[\\w' ]+)",
+    )
+
+    // Great Spook shop writes "???" for the cost of items
+    /**
+     * REGEX-TEST: ???
+     */
+    private val invalidCurrencyNamesPattern by patternGroup.list(
+        "cost.invalid-currency-names",
+        "\\?\\?\\?"
     )
 
     fun SafeItemStack.readLoreCosts(): List<LoreCostEntry> = getLoreComponent()
@@ -104,6 +115,10 @@ object LoreCostUtils {
         val (name, amount) = ItemUtils.readItemAmount(line) ?: run {
             logCostLineError("Could not read the amount of a cost line", rawLine, itemName)
             return LoreCostEntry(NeuInternalName.MISSING_ITEM, 1, rawLine)
+        }
+
+        if (invalidCurrencyNamesPattern.anyMatches(name)) {
+            return LoreCostEntry(NeuInternalName.MISSING_ITEM, amount.toLong(), rawLine)
         }
 
         // currencies without a repo item only arrive here, their amount is written behind the name or not at all

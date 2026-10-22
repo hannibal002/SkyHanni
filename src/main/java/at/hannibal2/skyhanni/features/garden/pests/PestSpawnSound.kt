@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.garden.pests.PestSpawnConfig
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -19,19 +17,18 @@ object PestSpawnSound {
     private val config get() = GardenApi.config.pests.pestSpawn
     private var lastPestSpawnSound = SimpleTimeMark.farPast()
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onPlaySound(event: PlaySoundEvent) {
+    @HandleEvent(onlyOnIsland = GARDEN)
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (!event.isPestSpawnSound()) return
 
         when (config.soundMode) {
-            PestSpawnConfig.PestSpawnSoundMode.DEFAULT -> return
-            PestSpawnConfig.PestSpawnSoundMode.MUTED -> event.cancel()
-            PestSpawnConfig.PestSpawnSoundMode.CUSTOM -> {
+            DEFAULT -> return
+            MUTED -> event.cancel()
+            CUSTOM -> {
                 event.cancel()
                 repeatSpawnSound()
             }
-
-            PestSpawnConfig.PestSpawnSoundMode.PLUMBER -> {
+            PLUMBER -> {
                 event.cancel()
                 plumberSpawnSound()
             }
@@ -46,7 +43,7 @@ object PestSpawnSound {
             SoundUtils.repeatSound(
                 repeatFrequency.toLong(),
                 repeatAmount,
-                createSound(name, pitch)
+                createSound(name, pitch, isWarning = true)
             )
         }
     }
@@ -58,10 +55,10 @@ object PestSpawnSound {
 
     private fun playPlumberTheme(soundName: String) {
         SkyHanniMod.launchCoroutine("pest spawn sound") {
-            val noteE = createSound(soundName, 0.890899f)
-            val noteC = createSound(soundName, 0.707107f)
-            val noteG = createSound(soundName, 1.059463f)
-            val noteLowG = createSound(soundName, 0.529732f)
+            val noteE = createSound(soundName, 0.890899f, isWarning = true)
+            val noteC = createSound(soundName, 0.707107f, isWarning = true)
+            val noteG = createSound(soundName, 1.059463f, isWarning = true)
+            val noteLowG = createSound(soundName, 0.529732f, isWarning = true)
 
             noteE.playSound()
             delay((166).toLong())

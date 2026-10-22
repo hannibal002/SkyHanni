@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,11 +17,13 @@ import kotlinx.coroutines.delay
 @SkyHanniModule
 object SoundUtils {
     private val beepSoundCache = mutableMapOf<Float, SoundInstance>()
-    private val clickSound by lazy { createSound("ui.button.click", 1f) }
-    private val errorSound by lazy { createSound("entity.enderman.teleport", 0f) }
-    val plingSound by lazy { createSound("block.note_block.pling", 1f) }
+    private val clickSound by lazy { createSound("ui.button.click", 1f, isWarning = false) }
+    private val clickWarningSound by lazy { createSound("ui.button.click", 1f, isWarning = true) }
+    private val errorSound by lazy { createSound("entity.enderman.teleport", 0f, isWarning = true) }
+    private val errorUiSound by lazy { createSound("entity.enderman.teleport", 0f, isWarning = false) }
+    val plingSound by lazy { createSound("block.note_block.pling", 1f, isWarning = true) }
 
-    // Sounds created via createSound bypass the user's volume settings
+    // Warning sounds created via createSound bypass the user's volume settings
     // if the boostWarningVolume option is enabled, see SoundEngineHook.
     fun SoundInstance.playSound() {
         DelayedRun.runOrNextTick {
@@ -45,27 +46,31 @@ object SoundUtils {
         }
     }
 
-    fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {
+    // isWarning controls whether the sound is affected by the boostWarningVolume option.
+    // Set it to false for GUI interaction feedback and other non-warning sound effects.
+    fun createSound(name: String, pitch: Float, volume: Float = 50f, isWarning: Boolean): SoundInstance {
         val newSound = SoundCompat.getModernSoundName(name)
         val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9:/._-]"), ""))
-        return SkyHanniSoundInstance(identifier, pitch, volume)
+        return SkyHanniSoundInstance(identifier, pitch, volume, isWarning)
     }
 
     fun playBeepSound(pitch: Float = 1f) {
-        val beepSound = beepSoundCache.getOrPut(pitch) { createSound("entity.experience_orb.pickup", pitch) }
+        val beepSound = beepSoundCache.getOrPut(pitch) {
+            createSound("entity.experience_orb.pickup", pitch, isWarning = true)
+        }
         beepSound.playSound()
     }
 
-    fun playClickSound() {
-        clickSound.playSound()
+    fun playClickSound(isWarning: Boolean = false) {
+        (if (isWarning) clickWarningSound else clickSound).playSound()
     }
 
     fun playPlingSound() {
         plingSound.playSound()
     }
 
-    fun playErrorSound() {
-        errorSound.playSound()
+    fun playErrorSound(isWarning: Boolean = true) {
+        (if (isWarning) errorSound else errorUiSound).playSound()
     }
 
     // TODO use duration for delay
@@ -82,20 +87,27 @@ object SoundUtils {
     private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shplaysound") {
             description = "Play the specified sound effect at the given pitch and volume."
-            category = CommandCategory.DEVELOPER_TEST
+            category = DEVELOPER_TEST
             arg("name", BrigadierArguments.string()) { soundName ->
                 arg("pitch", BrigadierArguments.float()) { pitch ->
                     arg("volume", BrigadierArguments.float()) { volume ->
+                        arg("warning", BrigadierArguments.bool()) { isWarning ->
+                            callback {
+                                createSound(
+                                    getArg(soundName), getArg(pitch), getArg(volume), getArg(isWarning),
+                                ).playSound()
+                            }
+                        }
                         callback {
-                            createSound(getArg(soundName), getArg(pitch), getArg(volume)).playSound()
+                            createSound(getArg(soundName), getArg(pitch), getArg(volume), isWarning = false).playSound()
                         }
                     }
                     callback {
-                        createSound(getArg(soundName), getArg(pitch), 50f).playSound()
+                        createSound(getArg(soundName), getArg(pitch), 50f, isWarning = false).playSound()
                     }
                 }
                 callback {
-                    createSound(getArg(soundName), 1f, 50f).playSound()
+                    createSound(getArg(soundName), 1f, 50f, isWarning = false).playSound()
                 }
             }
             simpleCallback {
@@ -108,6 +120,9 @@ object SoundUtils {
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(145, "misc.maintainGameVolume", "misc.boostWarningVolume") { element ->
             JsonPrimitive(!element.asBoolean)
+        }
+        event.transform(146, "misc.boostWarningVolume") { _ ->
+            JsonPrimitive(false)
         }
     }
 }
