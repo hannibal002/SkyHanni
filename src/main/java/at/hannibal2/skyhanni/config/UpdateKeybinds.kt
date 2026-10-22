@@ -44,7 +44,8 @@ object UpdateKeybinds {
     }
 
     // https://github.com/Polyfrost/OneConfig/blob/feat/26.3/minecraft/src/main/java/org/polyfrost/oneconfig/api/ui/v1/keybind/internal/MinecraftKeybindCodec.java
-    // Note that "key.keyboard.application" and "key.keyboard.keypad.period" are 26.3 only. and as such got special handling in InputCode
+    // Note that "key.keyboard.application" and "key.keyboard.keypad.period" are 26.3 only.
+    // and as such got special handling in SkyhanniTypeAdapter.
     @Suppress("CyclomaticComplexMethod")
     private fun glfwKeyName(code: Int): String? {
         if (code == -1) return "key.keyboard.unknown"

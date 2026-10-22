@@ -222,10 +222,27 @@ enum class SkyHanniTypeAdapters(
         InputConstants.Key::class.java,
         object : TypeAdapter<InputConstants.Key>() {
             override fun write(out: JsonWriter, value: InputConstants.Key) {
-                out.value(value.name)
+                val identifier = value.name
+                // TODO: Remove for 26.3
+                val newIdentifier = when (identifier) {
+                    "key.keyboard.keypad.decimal" -> "key.keyboard.keypad.period"
+                    "key.keyboard.menu" -> "key.keyboard.application"
+                    else -> identifier
+                }
+                out.value(newIdentifier)
             }
 
-            override fun read(reader: JsonReader): InputConstants.Key = InputKeys.identifier(reader.nextString())
+            override fun read(reader: JsonReader): InputConstants.Key {
+                val identifier = reader.nextString()
+                // TODO: Remove for 26.3
+                val newIdentifier = when (identifier) {
+                    "key.keyboard.keypad.period" -> "key.keyboard.keypad.decimal"
+                    "key.keyboard.application" -> "key.keyboard.menu"
+                    else -> identifier
+                }
+
+                return InputKeys.identifier(newIdentifier)
+            }
         }
     ),
     COMPONENT(
