@@ -114,7 +114,7 @@ object ChestValue {
     }
 
     @HandleEvent
-    private fun onInventoryOpen() {
+    private fun onInventoryFullyOpened() {
         if (!isEnabled()) return
         if (inInventory) {
             DelayedRun.runOrNextTick {
