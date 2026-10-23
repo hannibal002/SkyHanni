@@ -103,8 +103,9 @@ object ChestValue {
     }
 
     private fun featureName(): String {
-        val isOwnInventory = MinecraftCompat.screen is InventoryScreen
-        return if (isOwnInventory && StorageType.OWN_INVENTORY in config.enabledIn.get()) "Estimated Inventory Value" else "Estimated Chest Value"
+        val isOwnInventory = MinecraftCompat.screen is InventoryScreen &&
+            StorageType.OWN_INVENTORY in config.enabledIn.get()
+        return if (isOwnInventory) "Estimated Inventory Value" else "Estimated Chest Value"
     }
 
     @HandleEvent
