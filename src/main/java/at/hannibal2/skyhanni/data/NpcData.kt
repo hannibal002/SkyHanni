@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.utils.LorenzVec
+import java.util.UUID
 
 data class NpcData(
     /**
@@ -16,7 +17,7 @@ data class NpcData(
     /**
      * Skin used by the NPC.
      */
-    val skin: String,
+    val skinPlayerUuid: UUID,
 
     /**
      * Name displayed above the NPC.

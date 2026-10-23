@@ -12,16 +12,16 @@ import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.HolographicEntities.renderHolographicEntity
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.StringUtils.parseUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import com.google.gson.JsonParser
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.ClientMannequin
+import net.minecraft.world.entity.decoration.Mannequin
+import net.minecraft.world.entity.player.PlayerSkin
 import net.minecraft.world.item.component.ResolvableProfile
-import java.util.Base64
 import kotlin.math.atan2
 import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.seconds
@@ -187,11 +187,11 @@ object FakeNpcApi {
                 arg("id", BrigadierArguments.string()) { idArg ->
                     argCallback("name", BrigadierArguments.string()) { name ->
                         val id = getArg(idArg)
-                        val skin = SkullTextureHolder.ALEX_SKIN_TEXTURE
+                        val uuid = PlayerUtils.getRawUuid()
                         val data = NpcData(
                             id = id,
                             name = name,
-                            skin = skin,
+                            skinPlayerUuid = uuid,
                             position = LocationUtils.playerLocation(),
                             dialogue = listOf("Hello, I am $name!", "Nice to meet you!"),
                         )
@@ -208,16 +208,22 @@ object FakeNpcApi {
     }
 
     fun mannequinFromData(data: NpcData): ClientMannequin {
-        val profile = playerProfileFromBase64(data.skin)
+        val profile = ResolvableProfile.createUnresolved(data.skinPlayerUuid)
 
         val entity = object : ClientMannequin(
             MinecraftCompat.localWorldOrThrow,
             Minecraft.getInstance().playerSkinRenderCache(),
         ) {
+            init {
+                entityData.set(DATA_PROFILE, profile)
+            }
+
+            override fun getSkin(): PlayerSkin {
+                return Minecraft.getInstance().playerSkinRenderCache().getOrDefault(profile).playerSkin()
+            }
 
             override fun getProfile(): ResolvableProfile = profile
         }
-        entity.updateSkin()
         return entity
     }
 
@@ -226,13 +232,4 @@ object FakeNpcApi {
         val entity: HolographicEntities.HolographicEntity<ClientMannequin>,
         var talking: Boolean = false,
     )
-
-    // TODO: Figure out how to convert the full skin data into a PlayerSkin directly
-    private fun playerProfileFromBase64(textureData: String): ResolvableProfile {
-        val decodedBytes = Base64.getDecoder().decode(textureData)
-        val jsonString = String(decodedBytes, Charsets.UTF_8)
-        val jsonObject = JsonParser.parseString(jsonString).asJsonObject
-        val profileId = parseUUID(jsonObject.get("profileId").asString)
-        return ResolvableProfile.createUnresolved(profileId)
-    }
 }
