@@ -34,7 +34,8 @@ object KeyboardManager {
      * On macOS, this is the Command key.
      */
     private fun isSuperKeyDown() =
-        InputKeys.KEY_LSUPER.isKeyHeld() || InputKeys.KEY_RSUPER.isKeyHeld()
+        //~ if < 26.3 'GUI' -> 'SUPER'
+        InputKeys.KEY_LGUI.isKeyHeld() || InputKeys.KEY_RGUI.isKeyHeld()
 
     /**
      * Represents whether either the left or right Alt key is down.

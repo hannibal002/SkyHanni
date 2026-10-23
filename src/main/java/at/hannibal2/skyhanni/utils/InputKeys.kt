@@ -20,7 +20,7 @@ object InputKeys {
         InputConstants.getKey(event)
 
     //~ if < 26.3 '0' -> '-1'
-    const val KEY_UNKNOWN = -1
+    const val KEY_UNKNOWN = 0
     val KEY_0 = keyboard(InputConstants.KEY_0)
     val KEY_1 = keyboard(InputConstants.KEY_1)
     val KEY_2 = keyboard(InputConstants.KEY_2)
@@ -120,9 +120,9 @@ object InputKeys {
     val KEY_LCONTROL = keyboard(InputConstants.KEY_LCONTROL)
     val KEY_LSHIFT = keyboard(InputConstants.KEY_LSHIFT)
     //~ if < 26.3 'LGUI' -> 'LSUPER'
-    val KEY_LSUPER = keyboard(InputConstants.KEY_LGUI)
+    val KEY_LGUI = keyboard(InputConstants.KEY_LGUI)
     //~ if < 26.3 'RGUI' -> 'RSUPER'
-    val KEY_RSUPER = keyboard(InputConstants.KEY_RGUI)
+    val KEY_RGUI = keyboard(InputConstants.KEY_RGUI)
     val KEY_RALT = keyboard(InputConstants.KEY_RALT)
     val KEY_RCONTROL = keyboard(InputConstants.KEY_RCONTROL)
     val KEY_RSHIFT = keyboard(InputConstants.KEY_RSHIFT)
