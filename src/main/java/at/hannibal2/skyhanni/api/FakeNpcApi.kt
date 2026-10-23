@@ -106,16 +106,15 @@ object FakeNpcApi {
 
     @HandleEvent
     private fun onTick() {
-        for ((data, entity) in npcs.values) {
+        val player = MinecraftCompat.localPlayerOrNull
+        val playerEyePos = player?.let { LocationUtils.playerEyeLocation() }
+
+        for ((_, activeNpc) in npcs) {
+            val entity = activeNpc.entity
             entity.entity.tick()
             entity.entity.aiStep()
-            val position = data.position
-            val rotation = rotationTowardsPlayer(data.position)
-            entity.moveTo(
-                position = position,
-                yaw = rotation.first,
-                pitch = rotation.second,
-            )
+            entity.updateLook(playerEyePos, maxDistance = 20.0)
+            entity.moveTo(activeNpc.data.position)
         }
     }
 
