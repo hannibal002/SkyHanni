@@ -7,7 +7,7 @@ enum class CropCollectionType(val displayName: String) {
     PEST_BASE("Pest Base Drop"),
     PEST_RNG("Pest RNG Drop"),
     GREENHOUSE("Greenhouse Drops"),
-    UNKNOWN("Unknown")
+    UNKNOWN("Unknown"),
     ;
 
     companion object {

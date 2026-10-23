@@ -55,7 +55,7 @@ object ActualGemstonePowderDisplay {
     ) {
         CATEGORY("§7└ ", "§7", "§a"),
         DETAIL("§8  └ ", "§8", "§2"),
-        SUB_DETAIL("§5    └ ", "§5", "§b")
+        SUB_DETAIL("§5    └ ", "§5", "§b"),
     }
 
     private fun Double.formatDec() = String.format(Locale.US, "%.2f", this).trimEnd('0').trimEnd('.')

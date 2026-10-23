@@ -44,7 +44,7 @@ enum class CropAccessory(
         CropType.entries.toSet(),
         40.0,
         "CONDENSED_HELIANTHUS" to 8
-    )
+    ),
     ;
 
     fun getFortune(cropType: CropType): Double {

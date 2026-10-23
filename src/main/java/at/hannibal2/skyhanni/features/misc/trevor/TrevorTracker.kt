@@ -154,6 +154,6 @@ object TrevorTracker {
         UNTRACKABLE("UNTRACKABLE"),
         UNDETECTED("UNDETECTED"),
         ENDANGERED("ENDANGERED"),
-        ELUSIVE("ELUSIVE")
+        ELUSIVE("ELUSIVE"),
     }
 }

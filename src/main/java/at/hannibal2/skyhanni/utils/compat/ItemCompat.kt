@@ -119,7 +119,7 @@ enum class DyeCompat(
     BLACK(
         0,
         Items.DYE.black(),
-    )
+    ),
     ;
 
     fun createStack(size: Int = 1) = SafeItemStack(stackType, size)

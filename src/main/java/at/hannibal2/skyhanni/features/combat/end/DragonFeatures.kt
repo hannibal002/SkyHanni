@@ -159,7 +159,7 @@ object DragonFeatures {
 
     private enum class EndType {
         GOLEM,
-        DRAGON
+        DRAGON,
     }
 
     private var endType: EndType? = null

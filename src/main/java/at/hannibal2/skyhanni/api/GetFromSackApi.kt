@@ -225,6 +225,6 @@ object GetFromSackApi {
         WRONG_ARGUMENT,
         WRONG_IDENTIFIER,
         WRONG_AMOUNT,
-        INTERNAL_ERROR
+        INTERNAL_ERROR,
     }
 }

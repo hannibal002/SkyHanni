@@ -36,7 +36,7 @@ import com.google.gson.JsonPrimitive
 object ExperimentsAddonsHelper {
     private enum class HelperPhase {
         READ,
-        REPLICATE
+        REPLICATE,
     }
 
     private const val ROUND_STATUS_SLOT = 4

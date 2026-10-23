@@ -12,7 +12,7 @@ class VisitorTooltipParser {
 
     enum class ParsingSection {
         ITEMS_NEEDED,
-        REWARDS
+        REWARDS,
     }
 
     companion object {

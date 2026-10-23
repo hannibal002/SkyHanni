@@ -20,34 +20,34 @@ open class SkyHanniRenderEntityEvent<T : LivingEntity>(
         entity: T,
         x: Double,
         y: Double,
-        z: Double
+        z: Double,
     ) : SkyHanniRenderEntityEvent<T>(entity, x, y, z)
 
     class Post<T : LivingEntity>(
         entity: T,
         x: Double,
         y: Double,
-        z: Double
+        z: Double,
     ) : SkyHanniRenderEntityEvent<T>(entity, x, y, z)
 
     open class Specials<T : LivingEntity>(
         entity: T,
         x: Double,
         y: Double,
-        z: Double
+        z: Double,
     ) : SkyHanniRenderEntityEvent<T>(entity, x, y, z) {
         class Pre<T : LivingEntity>(
             entity: T,
             x: Double,
             y: Double,
-            z: Double
+            z: Double,
         ) : Specials<T>(entity, x, y, z)
 
         class Post<T : LivingEntity>(
             entity: T,
             x: Double,
             y: Double,
-            z: Double
+            z: Double,
         ) : Specials<T>(entity, x, y, z)
     }
 }

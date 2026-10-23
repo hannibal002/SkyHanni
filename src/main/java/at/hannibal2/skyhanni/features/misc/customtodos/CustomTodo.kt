@@ -48,14 +48,14 @@ data class CustomTodo(
         REGEX,
         STARTS_WITH,
         CONTAINS,
-        EQUALS
+        EQUALS,
     }
 
     enum class TriggerTarget {
         CHAT,
         ACTION_BAR,
         TAB_LIST,
-        SIDEBAR
+        SIDEBAR,
     }
 
     fun isValid(): Boolean {

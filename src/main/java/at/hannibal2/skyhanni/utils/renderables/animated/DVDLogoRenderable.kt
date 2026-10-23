@@ -130,7 +130,7 @@ enum class LogoTrajectory(var x: Int, val y: Int) {
         LEFT,
         RIGHT,
         UP,
-        DOWN
+        DOWN,
     }
 
     fun invert(): LogoTrajectory = of(-x, -y)

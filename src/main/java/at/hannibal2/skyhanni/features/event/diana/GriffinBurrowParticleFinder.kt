@@ -115,7 +115,7 @@ object GriffinBurrowParticleFinder {
                 type == ParticleTypes.ENCHANT && count == 5 && speed == 0.05f && offset.roundTo(2) ==
                     LorenzVec(0.5, 0.4, 0.5)
             },
-        )
+        ),
     }
 
     @HandleEvent

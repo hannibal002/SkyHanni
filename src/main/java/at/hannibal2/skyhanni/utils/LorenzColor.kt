@@ -24,7 +24,7 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
     LIGHT_PURPLE('d', Color(255, 85, 255), "§dLight Purple"),
     YELLOW('e', Color(255, 255, 85), "§eYellow"),
     WHITE('f', Color(255, 255, 255), "§fWhite"),
-    CHROMA('Z', Color(0, 0, 0, 0), "§ZChroma") // If chroma, go transparent instead of color code.
+    CHROMA('Z', Color(0, 0, 0, 0), "§ZChroma"), // If chroma, go transparent instead of color code.
     ;
 
     val next by lazy {

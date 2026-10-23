@@ -31,7 +31,7 @@ enum class EnderNode(
     UNCOMMON_ENDERMAN_PET("ENDERMAN;1".toInternalName(), "§aEnderman", NodeDropType.PET),
     RARE_ENDERMAN_PET("ENDERMAN;2".toInternalName(), "§9Enderman", NodeDropType.PET),
     EPIC_ENDERMAN_PET("ENDERMAN;3".toInternalName(), "§5Enderman", NodeDropType.PET),
-    LEGENDARY_ENDERMAN_PET("ENDERMAN;4".toInternalName(), "§6Enderman", NodeDropType.PET)
+    LEGENDARY_ENDERMAN_PET("ENDERMAN;4".toInternalName(), "§6Enderman", NodeDropType.PET),
     ;
 
     private enum class NodeDropType {

@@ -231,7 +231,7 @@ object UpdateManager {
 
     enum class UpdateState {
         AVAILABLE,
-        NONE
+        NONE,
     }
 
     private var potentialUpdate: PotentialUpdate? = null

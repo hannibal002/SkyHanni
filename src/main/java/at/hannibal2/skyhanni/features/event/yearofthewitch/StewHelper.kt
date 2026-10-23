@@ -148,6 +148,6 @@ object StewHelper {
     private enum class StewStatus(val color: LorenzColor?) {
         MISSING_INGREDIENTS(null),
         HAS_ENOUGH(LorenzColor.YELLOW),
-        HAS_EATEN(LorenzColor.GREEN)
+        HAS_EATEN(LorenzColor.GREEN),
     }
 }

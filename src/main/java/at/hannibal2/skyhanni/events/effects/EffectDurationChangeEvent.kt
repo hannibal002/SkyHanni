@@ -29,5 +29,5 @@ enum class EffectDurationChangeType {
     ADD,
     REMOVE,
     SET,
-    PARTIAL_SET
+    PARTIAL_SET,
 }

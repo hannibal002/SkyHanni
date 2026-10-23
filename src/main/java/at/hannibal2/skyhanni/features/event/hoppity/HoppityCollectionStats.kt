@@ -224,7 +224,7 @@ object HoppityCollectionStats {
         SHOP("§6Shop Milestones", LorenzColor.GOLD),
         STRAYS("§3Stray Rabbits", LorenzColor.DARK_AQUA),
         RESIDENTS("§bResident Rabbits §7(current island)", LorenzColor.AQUA),
-        HOTSPOTS("§dHotspot Rabbits §7(current island)", LorenzColor.LIGHT_PURPLE)
+        HOTSPOTS("§dHotspot Rabbits §7(current island)", LorenzColor.LIGHT_PURPLE),
         ;
 
         override fun toString(): String = displayName
