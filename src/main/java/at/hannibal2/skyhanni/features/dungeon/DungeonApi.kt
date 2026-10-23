@@ -195,7 +195,8 @@ object DungeonApi {
         POWER(0),
         STONE(0),
         WISDOM(0),
-        TIME(0);
+        TIME(0),
+        ;
 
         val displayName = name.firstLetterUppercase()
 

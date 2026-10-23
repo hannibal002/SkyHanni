@@ -9,7 +9,7 @@ object CommandUtils {
 
     private enum class NameSource {
         INTERNAL_NAME,
-        ITEM_NAME
+        ITEM_NAME,
     }
 
     private val namePattern = "^(?i)(name:)(.*)".toRegex()

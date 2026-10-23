@@ -22,12 +22,12 @@ import kotlin.time.Duration
 class EffectDurationChangeEvent(
     val effect: NonGodPotEffect,
     val durationChangeType: EffectDurationChangeType,
-    val duration: Duration? = null
+    val duration: Duration? = null,
 ) : SkyHanniEvent()
 
 enum class EffectDurationChangeType {
     ADD,
     REMOVE,
     SET,
-    PARTIAL_SET
+    PARTIAL_SET,
 }

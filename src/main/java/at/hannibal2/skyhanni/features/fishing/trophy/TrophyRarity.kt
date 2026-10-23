@@ -6,7 +6,8 @@ enum class TrophyRarity(val formatCode: String) {
     BRONZE("§8"),
     SILVER("§7"),
     GOLD("§6"),
-    DIAMOND("§b");
+    DIAMOND("§b"),
+    ;
 
     val formattedString get() = "$formatCode${name.firstLetterUppercase()}"
 

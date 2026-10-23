@@ -53,7 +53,8 @@ object ComposterDisplay {
         ORGANIC_MATTER(" Organic Matter: (.*)", "WHEAT"),
         FUEL(" Fuel: (.*)", "OIL_BARREL"),
         TIME_LEFT(" Time Left: (.*)", "WATCH"),
-        STORED_COMPOST(" Stored Compost: (.*)", "COMPOST");
+        STORED_COMPOST(" Stored Compost: (.*)", "COMPOST"),
+        ;
 
         val displayItem by AutoUpdatingItemStack(icon)
 

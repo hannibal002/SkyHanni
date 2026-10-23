@@ -7,7 +7,8 @@ enum class TabStringType {
     TITLE,
     SUB_TITLE,
     TEXT,
-    PLAYER;
+    PLAYER,
+    ;
 
     companion object {
 

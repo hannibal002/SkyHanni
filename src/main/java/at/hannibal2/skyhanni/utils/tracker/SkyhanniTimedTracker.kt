@@ -30,7 +30,7 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
     drawDisplay: (Data) -> List<Searchable>,
     extraDisplayModes: Set<DisplayMode> = emptySet(),
     customUptimeControl: Boolean = false,
-    trackerConfig: () -> Type
+    trackerConfig: () -> Type,
 ) : SkyHanniTracker<Data, Type>(
     name,
     createNewSession,

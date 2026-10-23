@@ -81,7 +81,8 @@ abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *>>(
     enum class CurrencySpentDesign(val display: String) {
         NUMBER("Number"),
         PERCENTAGE("Percentage"),
-        NUMBER_AND_PERCENTAGE("Number and Percentage");
+        NUMBER_AND_PERCENTAGE("Number and Percentage"),
+        ;
 
         override fun toString() = display
     }

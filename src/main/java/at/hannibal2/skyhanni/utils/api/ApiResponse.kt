@@ -45,5 +45,5 @@ data class BinaryApiResponse(
 data class JsonApiResponse<T : JsonElement>(
     override val success: Boolean,
     override val message: String? = null,
-    override var data: T? = null
+    override var data: T? = null,
 ) : ApiResponse<T>(success, message, data)

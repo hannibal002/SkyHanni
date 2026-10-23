@@ -189,7 +189,7 @@ object FannCost {
 
     private fun List<String>.getGroupDouble(
         pattern: Pattern,
-        groupName: String
+        groupName: String,
     ): Double? = pattern.firstMatcher(this) {
         group(groupName).formatDouble()
     }

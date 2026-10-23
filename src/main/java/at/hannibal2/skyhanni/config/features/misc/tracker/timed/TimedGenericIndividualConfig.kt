@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 open class TimedGenericIndividualConfig<out Type : TrackerGenericConfig>(
-    createType: () -> Type
+    createType: () -> Type,
 ) : GenericIndividualTrackerConfig<Type>(createType) {
     @Expose
     @ConfigOption(name = "Timed Tracker", desc = "Timed Tracker Settings")

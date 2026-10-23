@@ -51,11 +51,11 @@ object ActualGemstonePowderDisplay {
     private enum class PowderStyle(
         val indent: String,
         val labelColor: String,
-        val valueColor: String
+        val valueColor: String,
     ) {
         CATEGORY("§7└ ", "§7", "§a"),
         DETAIL("§8  └ ", "§8", "§2"),
-        SUB_DETAIL("§5    └ ", "§5", "§b")
+        SUB_DETAIL("§5    └ ", "§5", "§b"),
     }
 
     private fun Double.formatDec() = String.format(Locale.US, "%.2f", this).trimEnd('0').trimEnd('.')
@@ -103,7 +103,7 @@ object ActualGemstonePowderDisplay {
      */
     private class AdditiveFactor(
         override val name: String,
-        override val factors: List<MultiplierFactor> = emptyList()
+        override val factors: List<MultiplierFactor> = emptyList(),
     ) : MultiplierFactor {
 
         override val bonusFraction: Double
@@ -130,7 +130,7 @@ object ActualGemstonePowderDisplay {
     private class SimpleFactor(
         override val name: String,
         override val bonusFraction: Double,
-        override val factors: List<MultiplierFactor> = emptyList()
+        override val factors: List<MultiplierFactor> = emptyList(),
     ) : MultiplierFactor {
         override val multiplier: Double = 1.0 + bonusFraction
 

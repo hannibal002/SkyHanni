@@ -49,7 +49,7 @@ enum class SlayerType(
         "Bloodfiend",
         "vampire",
         Zombie::class.java,
-    ) // previously called "Riftstalker Bloodfiend"
+    ), // previously called "Riftstalker Bloodfiend"
     ;
 
     companion object {

@@ -78,7 +78,7 @@ enum class PestTypeWithAll(val pestType: PestType?, val displayName: String) {
     SLUG(PestType.SLUG, PestType.SLUG.displayName),
     DRAGONFLY(PestType.DRAGONFLY, PestType.DRAGONFLY.displayName),
     FIREFLY(PestType.FIREFLY, PestType.FIREFLY.displayName),
-    PRAYING_MANTIS(PestType.PRAYING_MANTIS, PestType.PRAYING_MANTIS.displayName)
+    PRAYING_MANTIS(PestType.PRAYING_MANTIS, PestType.PRAYING_MANTIS.displayName),
     ;
 
     companion object {

@@ -213,7 +213,8 @@ enum class CarnivalGoal(
         private enum class GoalType(val item: Item, display: String) {
             FRUIT_DIGGING(Blocks.SAND.asItem(), "§6Fruit Digging"),
             CATCH_A_FISH(Items.COD, "§3Catch a Fish"),
-            ZOMBIE_SHOOTOUT(Items.ARROW, "§cZombie Shootout");
+            ZOMBIE_SHOOTOUT(Items.ARROW, "§cZombie Shootout"),
+            ;
 
             val singleDisplay by lazy {
                 Renderable.horizontal(

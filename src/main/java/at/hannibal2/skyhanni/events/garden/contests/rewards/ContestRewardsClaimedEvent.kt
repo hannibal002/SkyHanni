@@ -13,5 +13,5 @@ data class ContestRewardSet(
     var books: Map<CropType, Int> = emptyMap(),
     var medals: Map<AnitaMedalProfit.MedalType, Int> = emptyMap(),
     var overclockers: Int = 0,
-    var bits: Int = 0
+    var bits: Int = 0,
 ) : Resettable

@@ -85,7 +85,7 @@ class PetConfig {
     enum class PetItemsDisplay(
         val icon: String,
         itemDisplayName: String,
-        val item: String
+        val item: String,
     ) {
         XP_SHARE("§5⚘", "Exp Share", "PET_ITEM_EXP_SHARE"),
         TIER_BOOST("§c●", "Tier Boost", "PET_ITEM_TIER_BOOST"),

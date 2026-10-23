@@ -71,7 +71,7 @@ interface CompatCoroutineManager : CoroutineManager {
         )
     )
     fun launchCoroutineWithMutex(
-        name: String, mutex: Mutex, timeout: Duration = 10.seconds, block: suspend CoroutineScope.() -> Unit
+        name: String, mutex: Mutex, timeout: Duration = 10.seconds, block: suspend CoroutineScope.() -> Unit,
     ): Job = CoroutineSettings(name, timeout).withMutex(mutex).launchCoroutine(block)
 
     @Deprecated(
@@ -82,7 +82,7 @@ interface CompatCoroutineManager : CoroutineManager {
         )
     )
     fun launchIOCoroutineWithMutex(
-        name: String, mutex: Mutex, timeout: Duration = 10.seconds, block: suspend CoroutineScope.() -> Unit
+        name: String, mutex: Mutex, timeout: Duration = 10.seconds, block: suspend CoroutineScope.() -> Unit,
     ): Job = CoroutineSettings(name, timeout).withIOContext().withMutex(mutex).launchCoroutine(block)
 }
 

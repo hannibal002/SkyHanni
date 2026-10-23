@@ -105,7 +105,8 @@ class DisplayConfig {
 
     enum class NumberFormat(private val displayName: String) {
         LONG("1,234,567"),
-        SHORT("1.2M");
+        SHORT("1.2M"),
+        ;
 
         override fun toString(): String {
             return displayName

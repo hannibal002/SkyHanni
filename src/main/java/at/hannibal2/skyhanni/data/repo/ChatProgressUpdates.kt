@@ -200,12 +200,12 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
 
         fun startBlock(
             label: String,
-            block: (ChatProgressUpdates) -> Unit
+            block: (ChatProgressUpdates) -> Unit,
         ): ChatProgressUpdates = start(label).apply { block(this) }
 
         suspend fun startSuspendBlock(
             label: String,
-            block: suspend (ChatProgressUpdates) -> Unit
+            block: suspend (ChatProgressUpdates) -> Unit,
         ): ChatProgressUpdates = start(label).apply { block(this) }
 
         fun toggle() {

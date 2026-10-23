@@ -5,9 +5,9 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class PetsJson(
-    @Expose val skins: PetsJsonSkins
+    @Expose val skins: PetsJsonSkins,
 )
 
 data class PetsJsonSkins(
-    @Expose @SerializedName("game_variants") val gameVariants: Map<String, Set<NeuInternalName>>
+    @Expose @SerializedName("game_variants") val gameVariants: Map<String, Set<NeuInternalName>>,
 )

@@ -57,6 +57,6 @@ abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerDat
         @Expose var timesGained: Long = 0,
         @Expose var totalAmount: Long = 0,
         @Expose var hidden: Boolean = false,
-        var lastTimeUpdated: SimpleTimeMark = SimpleTimeMark.farPast()
+        var lastTimeUpdated: SimpleTimeMark = SimpleTimeMark.farPast(),
     )
 }

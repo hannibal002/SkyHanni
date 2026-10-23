@@ -25,11 +25,11 @@ import kotlin.reflect.KClass
 enum class EliteLeaderboards(
     private val displayName: String,
     val display: EliteLeaderboardDisplayBase<*, *>,
-    val leaderboardType: KClass<out EliteLeaderboardType>
+    val leaderboardType: KClass<out EliteLeaderboardType>,
 ) {
     WEIGHT("Farming Weight", WeightDisplay(), EliteLeaderboardType.Weight::class),
     CROP("Crop Collection", CropDisplay(), EliteLeaderboardType.Crop::class),
-    PEST("Pest Kills", PestDisplay(), EliteLeaderboardType.Pest::class)
+    PEST("Pest Kills", PestDisplay(), EliteLeaderboardType.Pest::class),
     ;
 
     val isEnabled get() = config.enabled.get() && this in config.display.get()
@@ -212,7 +212,7 @@ enum class EliteLeaderboards(
 
         enum class FarmingWeightTextEntry(private val displayName: String) {
             WEIGHT_POSITION("§6Farming Weight: §e104,481.49 §7[§b#5§7]"),
-            OVERTAKE("§e170.21 §7(§b12h 32m 15s§7) §7behind §bChissl")
+            OVERTAKE("§e170.21 §7(§b12h 32m 15s§7) §7behind §bChissl"),
             ;
 
             override fun toString() = displayName

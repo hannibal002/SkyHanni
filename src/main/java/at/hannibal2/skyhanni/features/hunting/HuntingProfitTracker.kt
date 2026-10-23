@@ -46,7 +46,7 @@ object HuntingProfitTracker {
 
     data class Data(
         @Expose var totalMobsCaught: Long = 0,
-        @Expose var totalShardsGained: Long = 0
+        @Expose var totalShardsGained: Long = 0,
     ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
 
         override fun getDescription(item: TrackedItem): List<String> {

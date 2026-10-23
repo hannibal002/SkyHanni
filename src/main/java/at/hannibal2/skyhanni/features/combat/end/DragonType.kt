@@ -32,7 +32,8 @@ enum class DragonType(
     UNKNOWN(
         LorenzColor.WHITE,
         false,
-    );
+    ),
+    ;
 
     val displayName: String = "${name.firstLetterUppercase()} Dragon"
 

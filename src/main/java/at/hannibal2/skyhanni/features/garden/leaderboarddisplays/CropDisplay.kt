@@ -69,5 +69,5 @@ class CropDisplay : EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.C
 
 data class CropLeaderboardStorage(
     @Expose var enum: CropType?,
-    @Expose var mode: EliteLeaderboardMode
+    @Expose var mode: EliteLeaderboardMode,
 )

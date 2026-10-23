@@ -79,7 +79,8 @@ class DamageIndicatorConfig {
         RIFTSTALKER_BLOODFIEND("§bRiftstalker Bloodfiend"),
         REINDRAKE("§6Reindrake"),
         GARDEN_PESTS("§aGarden Pests"),
-        BROODMOTHER("§bBroodmother");
+        BROODMOTHER("§bBroodmother"),
+        ;
 
         override fun toString() = displayName
     }

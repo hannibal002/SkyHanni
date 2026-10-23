@@ -63,7 +63,7 @@ object CrystalNucleusTracker {
     ) { drawDisplay(it) }
 
     data class Data(
-        @Expose var runsCompleted: Long = 0L
+        @Expose var runsCompleted: Long = 0L,
     ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / runsCompleted

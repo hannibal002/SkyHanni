@@ -155,7 +155,7 @@ object TradeValue {
 
     enum class TradeSide {
         YOU,
-        OTHER
+        OTHER,
     }
 }
 

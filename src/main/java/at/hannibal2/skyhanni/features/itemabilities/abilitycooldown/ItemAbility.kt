@@ -74,7 +74,8 @@ enum class ItemAbility(
     ATOMSPLIT_KATANA("Soulcry", 4, "Atomsplit Katana", "Vorpal Katana", "Voidedge Katana", ignoreMageCooldownReduction = true),
 
     // doesn't have a consistent sound
-    ECHO("Echo", 3, "Ancestral Spade");
+    ECHO("Echo", 3, "Ancestral Spade"),
+    ;
 
     var newVariant = false
     var internalNames = mutableListOf<NeuInternalName>()

@@ -198,7 +198,7 @@ object ApiInternalUtils {
         crossinline entityHandler: (HttpEntity?) -> Long? = { it.readEntityToFile(file) },
         crossinline requestFactory: ApiStaticPath.() -> Req = {
             buildRequest { addHeader("Accept-Encoding", "gzip") }
-        }
+        },
     ): BinaryApiResponse = withHttpClient(requestFactory, entityHandler, ::BinaryApiResponse)
 
     /**

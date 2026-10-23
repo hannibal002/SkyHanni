@@ -76,7 +76,8 @@ class PowderMiningConfig {
         GREEN_UP("Show §aGreen §7and up"),
         YELLOW_UP("Show §eYellow §7and up"),
         RED_UP("Show §cRed §7and up"),
-        BLUE_ONLY("Show §3Blue §7only");
+        BLUE_ONLY("Show §3Blue §7only"),
+        ;
 
         override fun toString() = displayName
     }

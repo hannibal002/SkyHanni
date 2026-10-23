@@ -212,7 +212,7 @@ object ScoreboardData {
         LATE_AUTUMN("Late Autumn", ChatFormatting.YELLOW),
         EARLY_WINTER("Early Winter", ChatFormatting.BLUE),
         WINTER("Winter", ChatFormatting.BLUE),
-        LATE_WINTER("Late Winter", ChatFormatting.BLUE)
+        LATE_WINTER("Late Winter", ChatFormatting.BLUE),
     }
 
     // TODO USE SH-REPO

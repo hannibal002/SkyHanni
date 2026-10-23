@@ -178,7 +178,8 @@ enum class MiningEventType(
             COMPACT_TEXT,
             ICON_ONLY,
             TEXT_WITHOUT_ICON,
-            COMPACT_TEXT_WITHOUT_ICON;
+            COMPACT_TEXT_WITHOUT_ICON,
+            ;
 
             override fun toString(): String {
                 return name.lowercase().allLettersFirstUppercase()

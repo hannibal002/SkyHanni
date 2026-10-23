@@ -123,7 +123,7 @@ class Matrix(private val data: Array<DoubleArray>) {
         private inline fun createArray(
             height: Int,
             width: Int,
-            function: (row: Int, column: Int) -> Double
+            function: (row: Int, column: Int) -> Double,
         ): Array<DoubleArray> {
             return Array(height) { row -> DoubleArray(width) { col -> function(row, col) } }
         }

@@ -8,7 +8,8 @@ enum class DungeonFloor(private val bossName: String) {
     F4("Thorn"),
     F5("Livid"),
     F6("Sadan"),
-    F7("Necron");
+    F7("Necron"),
+    ;
 
     companion object {
 

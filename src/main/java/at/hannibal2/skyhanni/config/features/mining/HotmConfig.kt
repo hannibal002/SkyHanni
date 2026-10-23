@@ -74,7 +74,8 @@ class HotmConfig {
     enum class SkyMallDisplayVisibility(val display: String) {
         OFF("Off"),
         MINING_ONLY("Mining Islands Only"),
-        EVERYWHERE("Everywhere");
+        EVERYWHERE("Everywhere"),
+        ;
 
         override fun toString() = display
     }

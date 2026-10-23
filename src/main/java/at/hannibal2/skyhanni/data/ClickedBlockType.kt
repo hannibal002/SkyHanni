@@ -4,5 +4,5 @@ enum class ClickedBlockType {
     LEVER,
     CHEST,
     TRAPPED_CHEST,
-    WITHER_ESSENCE
+    WITHER_ESSENCE,
 }

@@ -15,7 +15,7 @@ object CTMUtils {
         val upLeft: Boolean,
         val upRight: Boolean,
         val downRight: Boolean,
-        val downLeft: Boolean
+        val downLeft: Boolean,
     )
 
     fun getCTMIndex(data: CTMData): Int = when (data.up) {

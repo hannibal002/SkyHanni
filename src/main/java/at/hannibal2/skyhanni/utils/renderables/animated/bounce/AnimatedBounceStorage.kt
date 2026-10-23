@@ -31,7 +31,7 @@ open class AnimatedBounceLocalStorage(
  * @param axes A map of axis to their bounce definitions. If an axis is not present, it will not be bounced.
  */
 data class AnimatedBounceDefinition(
-    private val axes: Map<Axis, AxisBounceDefinition> = emptyMap()
+    private val axes: Map<Axis, AxisBounceDefinition> = emptyMap(),
 ) : Map<Axis, AxisBounceDefinition> by axes {
     constructor(vararg pairs: Pair<Axis, AxisBounceDefinition>) : this(pairs.asList().associate { it.first to it.second })
 

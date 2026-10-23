@@ -24,7 +24,8 @@ class CrystalNucleusConfig {
         NPC_PROF_ROBOT("§e[NPC] Professor Robot"),
         NPC_KING_YOLKAR("§e[NPC] §6King Yolkar"),
         NPC_GOBLIN_GUARDS("§c[GUARD]§7s (§6Goblin Den§7)"),
-        NON_TOOL_SCAVENGE("§7Non-Tool §cMetal Detector §7loot");
+        NON_TOOL_SCAVENGE("§7Non-Tool §cMetal Detector §7loot"),
+        ;
 
         override fun toString() = displayName
     }

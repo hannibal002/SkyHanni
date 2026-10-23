@@ -356,7 +356,7 @@ object PestSpawnTimer {
     }
 
     private enum class PestTitleIntention {
-        COOLDOWN_COUNTDOWN
+        COOLDOWN_COUNTDOWN,
     }
 
     @HandleEvent

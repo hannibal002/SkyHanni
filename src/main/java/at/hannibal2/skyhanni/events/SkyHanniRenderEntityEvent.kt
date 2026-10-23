@@ -14,40 +14,40 @@ open class SkyHanniRenderEntityEvent<T : LivingEntity>(
     val entity: T,
     val x: Double,
     val y: Double,
-    val z: Double
+    val z: Double,
 ) : GenericSkyHanniEvent<T>(entity.javaClass) {
     class Pre<T : LivingEntity>(
         entity: T,
         x: Double,
         y: Double,
-        z: Double
+        z: Double,
     ) : SkyHanniRenderEntityEvent<T>(entity, x, y, z)
 
     class Post<T : LivingEntity>(
         entity: T,
         x: Double,
         y: Double,
-        z: Double
+        z: Double,
     ) : SkyHanniRenderEntityEvent<T>(entity, x, y, z)
 
     open class Specials<T : LivingEntity>(
         entity: T,
         x: Double,
         y: Double,
-        z: Double
+        z: Double,
     ) : SkyHanniRenderEntityEvent<T>(entity, x, y, z) {
         class Pre<T : LivingEntity>(
             entity: T,
             x: Double,
             y: Double,
-            z: Double
+            z: Double,
         ) : Specials<T>(entity, x, y, z)
 
         class Post<T : LivingEntity>(
             entity: T,
             x: Double,
             y: Double,
-            z: Double
+            z: Double,
         ) : Specials<T>(entity, x, y, z)
     }
 }

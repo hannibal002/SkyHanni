@@ -39,7 +39,7 @@ open class EliteDisplayGenericConfig {
     enum class LeaderboardTextEntry(private val displayName: String) {
         WEIGHT_POSITION("§6Leaderboard: §eAmount §7[§b#Rank§7]"),
         OVERTAKE("§eAmount §7(§bTime§7) §7behind §bPlayer"),
-        LAST_PLAYER("§eAmount §7ahead of §bPlayer")
+        LAST_PLAYER("§eAmount §7ahead of §bPlayer"),
         ;
 
         override fun toString() = displayName

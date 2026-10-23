@@ -71,5 +71,5 @@ class PestDisplay : EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.P
 
 data class PestLeaderboardStorage(
     @Expose var enum: PestType?,
-    @Expose var mode: EliteLeaderboardMode
+    @Expose var mode: EliteLeaderboardMode,
 )

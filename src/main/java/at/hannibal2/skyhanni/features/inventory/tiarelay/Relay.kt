@@ -47,7 +47,8 @@ enum class Relay(
     RELAY_9(
         "9th Relay", LorenzVec(-23.0, 86.5, -12.5), IslandType.HUB,
         "§e[NPC] §dTia the Fairy§f: §b✆ §f§r§fThe next relay is on top of the Auction House."
-    );
+    ),
+    ;
 
     val chatPattern by RepoPattern.pattern(
         "relay.chat." + relayName.takeWhile { it != ' ' },

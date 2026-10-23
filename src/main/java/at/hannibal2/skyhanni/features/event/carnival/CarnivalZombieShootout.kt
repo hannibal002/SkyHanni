@@ -78,7 +78,7 @@ object CarnivalZombieShootout {
         LEATHER(30, Items.LEATHER_HELMET, Color(165, 42, 42), 8.seconds), // Brown
         IRON(50, Items.IRON_HELMET, Color(192, 192, 192), 7.seconds), // Silver
         GOLD(80, Items.GOLDEN_HELMET, Color(255, 215, 0), 6.seconds), // Gold
-        DIAMOND(120, Items.DIAMOND_HELMET, Color(44, 214, 250), 5.seconds) // Diamond
+        DIAMOND(120, Items.DIAMOND_HELMET, Color(44, 214, 250), 5.seconds), // Diamond
     }
 
     @HandleEvent

@@ -10,5 +10,5 @@ enum class KloonTerminal(val location: LorenzVec) {
     AQUA(LorenzVec(-33.0, 70.0, -134.5)),
     BLUE(LorenzVec(-66.5, 72.0, -119.0)),
     PURPLE(LorenzVec(-89.0, 73.0, -115.0)),
-    PINK(LorenzVec(-110.0, 73.0, -107.0))
+    PINK(LorenzVec(-110.0, 73.0, -107.0)),
 }
