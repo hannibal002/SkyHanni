@@ -119,10 +119,10 @@ object InputKeys {
     val KEY_LALT = keyboard(InputConstants.KEY_LALT)
     val KEY_LCONTROL = keyboard(InputConstants.KEY_LCONTROL)
     val KEY_LSHIFT = keyboard(InputConstants.KEY_LSHIFT)
-    //~ if < 26.3 'LGUI' -> 'LSUPER'
+    //~ if < 26.3 'GUI' -> 'SUPER' {
     val KEY_LGUI = keyboard(InputConstants.KEY_LGUI)
-    //~ if < 26.3 'RGUI' -> 'RSUPER'
     val KEY_RGUI = keyboard(InputConstants.KEY_RGUI)
+    //~}
     val KEY_RALT = keyboard(InputConstants.KEY_RALT)
     val KEY_RCONTROL = keyboard(InputConstants.KEY_RCONTROL)
     val KEY_RSHIFT = keyboard(InputConstants.KEY_RSHIFT)
