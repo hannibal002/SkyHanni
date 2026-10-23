@@ -392,7 +392,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
 
     @HandleEvent
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(since = 147, "foraging.tracker.compactGiftChats", "foraging.tracker.displayTreeGifts") { element ->
+        event.move(since = 149, "foraging.tracker.compactGiftChats", "foraging.tracker.displayTreeGifts") { element ->
             ConfigUtils.migrateBooleanToEnum(element, TreeGiftDisplayMode.COMPACT_GIFT, TreeGiftDisplayMode.FULL_GIFT)
         }
     }
