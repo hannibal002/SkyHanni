@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.utils.LorenzVec
-import java.util.UUID
+import net.minecraft.world.item.component.ResolvableProfile
 
 data class NpcData(
     /**
@@ -17,7 +17,7 @@ data class NpcData(
     /**
      * Skin used by the NPC.
      */
-    val skinPlayerUuid: UUID,
+    val skinProfile: ResolvableProfile,
 
     /**
      * Name displayed above the NPC.

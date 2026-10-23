@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.HolographicEntities.renderHolographicEntity
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -197,11 +196,13 @@ object FakeNpcApi {
                 arg("id", BrigadierArguments.string()) { idArg ->
                     argCallback("name", BrigadierArguments.string()) { name ->
                         val id = getArg(idArg)
-                        val uuid = PlayerUtils.getRawUuid()
+                        val profile = ResolvableProfile.createResolved(
+                            Minecraft.getInstance().gameProfile
+                        )
                         val data = NpcData(
                             id = id,
                             name = name,
-                            skinPlayerUuid = uuid,
+                            skinProfile = profile,
                             position = LocationUtils.playerLocation(),
                             dialogue = listOf("Hello, I am $name!", "Nice to meet you!"),
                         )
@@ -225,21 +226,20 @@ object FakeNpcApi {
     }
 
     fun mannequinFromData(data: NpcData): ClientMannequin {
-        val profile = ResolvableProfile.createUnresolved(data.skinPlayerUuid)
-
+        val skinProfile = data.skinProfile
         val entity = object : ClientMannequin(
             MinecraftCompat.localWorldOrThrow,
             Minecraft.getInstance().playerSkinRenderCache(),
         ) {
             init {
-                entityData.set(DATA_PROFILE, profile)
+                entityData.set(DATA_PROFILE, skinProfile)
             }
 
             override fun getSkin(): PlayerSkin {
                 return Minecraft.getInstance().playerSkinRenderCache().getOrDefault(profile).playerSkin()
             }
 
-            override fun getProfile(): ResolvableProfile = profile
+            override fun getProfile(): ResolvableProfile = skinProfile
         }
         return entity
     }
