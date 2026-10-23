@@ -4,5 +4,5 @@ import com.google.gson.annotations.Expose
 
 data class NeuEssenceShopJson(
     @Expose val name: String,
-    @Expose val costs: List<Int>
+    @Expose val costs: List<Int>,
 )

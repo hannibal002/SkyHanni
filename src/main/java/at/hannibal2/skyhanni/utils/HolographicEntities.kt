@@ -154,7 +154,7 @@ object HolographicEntities {
     }
 
     fun <T : LivingEntity> getFilteredEntityHoloBases(
-        vararg classes: KClass<out T>
+        vararg classes: KClass<out T>,
     ): Map<KClass<out LivingEntity>, HolographicBase<out LivingEntity>> =
         entityHoloBases.filterKeys { clazz -> classes.any { it.isSuperclassOf(clazz) } }
 

@@ -83,7 +83,7 @@ object VerminTracker {
     }
 
     data class Data(
-        @Expose var count: MutableMap<VerminType, Int> = mutableMapOf()
+        @Expose var count: MutableMap<VerminType, Int> = mutableMapOf(),
     ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
 
     enum class VerminType(val order: Int, val vermin: String, val pattern: Pattern) {

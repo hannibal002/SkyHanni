@@ -95,7 +95,7 @@ object SuperpairDataDisplay {
         sourceList: List<FoundData>,
         header: String,
         color: LorenzColor,
-        displayAccessor: (FoundData) -> String = { it.first?.reward.orEmpty() }
+        displayAccessor: (FoundData) -> String = { it.first?.reward.orEmpty() },
     ) = addDataStrings(sourceList.map { "${color.getChatColor()}${displayAccessor.invoke(it)}" }, header)
 
     private fun calculatePossiblePairs(currentExperiment: ExperimentationTableApi.ExperimentationTier) =

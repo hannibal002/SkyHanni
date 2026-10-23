@@ -23,5 +23,5 @@ data class NEURaritySpecificPetNums(
 
 data class NeuPetNums(
     @Expose val otherNums: List<Double>,
-    @Expose val statNums: Map<SkyblockStat, Double>
+    @Expose val statNums: Map<SkyblockStat, Double>,
 )

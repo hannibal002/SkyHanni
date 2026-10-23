@@ -64,5 +64,5 @@ class WeightDisplay : EliteLeaderboardDisplayBase<FarmingWeight, EliteLeaderboar
 
 data class WeightLeaderboardStorage(
     @Expose var enum: FarmingWeight?,
-    @Expose var mode: EliteLeaderboardMode
+    @Expose var mode: EliteLeaderboardMode,
 )

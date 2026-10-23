@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName
 data class DianaJson(
     @Expose @SerializedName("spade_types") val spadeTypes: List<NeuInternalName>,
     @Expose @SerializedName("sphinx_questions") val sphinxQuestions: Map<String, String>,
-    @Expose @SerializedName("mythological_mobs") val mythologicalCreatures: Map<String, MythologicalCreatureType>
+    @Expose @SerializedName("mythological_mobs") val mythologicalCreatures: Map<String, MythologicalCreatureType>,
 )
 
 @KSerializable

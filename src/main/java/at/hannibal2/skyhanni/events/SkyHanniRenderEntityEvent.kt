@@ -14,7 +14,7 @@ open class SkyHanniRenderEntityEvent<T : LivingEntity>(
     val entity: T,
     val x: Double,
     val y: Double,
-    val z: Double
+    val z: Double,
 ) : GenericSkyHanniEvent<T>(entity.javaClass) {
     class Pre<T : LivingEntity>(
         entity: T,

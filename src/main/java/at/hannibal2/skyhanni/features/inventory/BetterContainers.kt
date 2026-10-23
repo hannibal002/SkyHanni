@@ -181,7 +181,7 @@ object BetterContainers {
     }
 
     private fun getBaseTextColor(
-        backgroundStyle: LegacyBetterContainers.BackgroundStyle
+        backgroundStyle: LegacyBetterContainers.BackgroundStyle,
     ) = readJsonResource(backgroundStyle.configId)?.use { reader ->
         val newJson = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
         @Suppress("AvoidBritishSpelling")
@@ -279,7 +279,7 @@ object BetterContainers {
         handlerInventory: Container,
         horizontalTexMult: Int,
         verticalTexMult: Int,
-        bufferedImageNew: BufferedImage
+        bufferedImageNew: BufferedImage,
     ) {
         val size = handlerInventory.containerSize
         val isSlot = Array(9) { BooleanArray(size / 9) }

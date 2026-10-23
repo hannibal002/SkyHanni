@@ -5,7 +5,7 @@ enum class FossilType(
     val totalTiles: Int,
     val firstPercentage: String,
     val fossilShape: FossilShape,
-    val possibleMutations: List<FossilMutation>
+    val possibleMutations: List<FossilMutation>,
 ) {
     TUSK(
         "Tusk", 8, "12.5%",

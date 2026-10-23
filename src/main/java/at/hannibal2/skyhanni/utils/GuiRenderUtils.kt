@@ -341,7 +341,7 @@ object GuiRenderUtils {
     private fun SafeItemStack.normalRenderOnScreen(
         translateX: Float,
         translateY: Float,
-        scale: Float
+        scale: Float,
     ): Int? = RenderUtils.scheduleOnRenderThread(setupFor = Lighting.Entry.ITEMS_3D) {
         DrawContextUtils.translatedPushPopResult(translateX, translateY, postTranslateScale = scale) {
             DrawContextUtils.drawItem(this, 0, 0)

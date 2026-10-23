@@ -46,7 +46,7 @@ class RotatingRenderable private constructor(
     companion object {
         fun <C : AnimatedFrame> Renderable.Companion.rotating(
             root: Renderable,
-            config: AnimatedItemRenderableConfig<C>.() -> Unit = { }
+            config: AnimatedItemRenderableConfig<C>.() -> Unit = { },
         ) = RotatingRenderable(root, AnimatedItemRenderableConfig<C>().apply(config))
     }
 }

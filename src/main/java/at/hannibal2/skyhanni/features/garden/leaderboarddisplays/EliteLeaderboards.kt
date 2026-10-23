@@ -25,7 +25,7 @@ import kotlin.reflect.KClass
 enum class EliteLeaderboards(
     private val displayName: String,
     val display: EliteLeaderboardDisplayBase<*, *>,
-    val leaderboardType: KClass<out EliteLeaderboardType>
+    val leaderboardType: KClass<out EliteLeaderboardType>,
 ) {
     WEIGHT("Farming Weight", WeightDisplay(), EliteLeaderboardType.Weight::class),
     CROP("Crop Collection", CropDisplay(), EliteLeaderboardType.Crop::class),

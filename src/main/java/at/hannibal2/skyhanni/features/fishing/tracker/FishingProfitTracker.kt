@@ -70,7 +70,7 @@ object FishingProfitTracker {
     ) { drawDisplay(it) }
 
     data class Data(
-        @Expose var totalCatchAmount: Long = 0L
+        @Expose var totalCatchAmount: Long = 0L,
     ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / totalCatchAmount

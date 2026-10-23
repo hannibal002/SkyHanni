@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 object TrackerUtils {
 
     fun MutableList<Searchable>.addSkillXpInfo(
-        skillXpGained: Map<SkillType, Long>
+        skillXpGained: Map<SkillType, Long>,
     ) = skillXpGained.sumAllValues().takeIf { it > 0 }?.let { sumXpGained ->
         val applicableSkills = skillXpGained.filter { it.value > 0 }
         val skillHoverTips = applicableSkills.map { (skill, xp) ->

@@ -40,7 +40,7 @@ class ItemStackAnimatedFrame(
 }
 
 class FrameTickRateProvider private constructor(
-    private val provider: (AnimatedFrame) -> Int = { it.transitionTicks }
+    private val provider: (AnimatedFrame) -> Int = { it.transitionTicks },
 ) {
     companion object {
         fun <E : Number> of(value: E) = FrameTickRateProvider { value.toInt() }

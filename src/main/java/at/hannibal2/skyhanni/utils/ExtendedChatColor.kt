@@ -21,7 +21,7 @@ import net.minecraft.network.chat.Component
 import java.awt.Color
 
 class ExtendedChatColor(
-    val rgb: Int
+    val rgb: Int,
 ) {
     constructor(hex: String) : this(ColorUtils.getColorFromHex(hex))
 
