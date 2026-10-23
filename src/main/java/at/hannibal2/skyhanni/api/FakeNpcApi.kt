@@ -13,13 +13,11 @@ import at.hannibal2.skyhanni.utils.HolographicEntities.renderHolographicEntity
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.ClientMannequin
-import net.minecraft.world.entity.decoration.Mannequin
 import net.minecraft.world.entity.player.PlayerSkin
 import net.minecraft.world.item.component.ResolvableProfile
 import kotlin.math.atan2
@@ -111,6 +109,7 @@ object FakeNpcApi {
 
         for ((_, activeNpc) in npcs) {
             val entity = activeNpc.entity
+            entity.entity.tickCount++
             entity.entity.tick()
             entity.entity.aiStep()
             entity.updateLook(playerEyePos, maxDistance = 20.0)
