@@ -31,7 +31,8 @@ object MiningNotifications {
         SCRAP("§9Suspicious Scrap", "§9Suspicious Scrap"),
         GOLDEN_GOBLIN("§6Golden Goblin", "§6Golden Goblin"),
         DIAMOND_GOBLIN("§bDiamond Goblin", "§bDiamond Goblin"),
-        COLD("§bCold", "§bCold");
+        COLD("§bCold", "§bCold"),
+        ;
 
         override fun toString() = str
     }

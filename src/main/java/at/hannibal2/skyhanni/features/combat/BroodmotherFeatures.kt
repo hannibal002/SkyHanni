@@ -36,7 +36,8 @@ object BroodmotherFeatures {
         SOON("§6Soon", 1.5.minutes),
         AWAKENING("§6Awakening", 1.minutes),
         IMMINENT("§4Imminent", 0.5.minutes),
-        ALIVE("§4Alive!", 0.minutes);
+        ALIVE("§4Alive!", 0.minutes),
+        ;
 
         override fun toString() = str
     }

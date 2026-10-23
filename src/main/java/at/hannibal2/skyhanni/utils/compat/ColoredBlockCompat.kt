@@ -152,7 +152,8 @@ enum class ColoredBlockCompat(
         Blocks.STAINED_GLASS_PANE.black(),
         Blocks.WOOL.black(),
         Blocks.DYED_TERRACOTTA.black(),
-    );
+    ),
+    ;
 
     fun createGlassStack(amount: Int = 1): SafeItemStack {
         return SafeItemStack(glassBlock, amount)

@@ -17,7 +17,8 @@ class DebugMobConfig {
         OFF("Off"),
         ONLY_NAME("Only Name"),
         ONLY_HIGHLIGHT("Only Highlight"),
-        NAME_AND_HIGHLIGHT("Both");
+        NAME_AND_HIGHLIGHT("Both"),
+        ;
 
         override fun toString() = displayName
     }

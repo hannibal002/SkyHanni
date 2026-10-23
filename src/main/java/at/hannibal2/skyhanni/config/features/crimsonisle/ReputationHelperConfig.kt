@@ -51,7 +51,8 @@ class ReputationHelperConfig {
     enum class ShowLocationEntry(private val displayName: String) {
         ALWAYS("Always"),
         ONLY_HOTKEY("Only With Hotkey"),
-        NEVER("Never");
+        NEVER("Never"),
+        ;
 
         override fun toString() = displayName
     }

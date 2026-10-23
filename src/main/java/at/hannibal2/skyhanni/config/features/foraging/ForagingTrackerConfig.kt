@@ -54,7 +54,8 @@ class ForagingTrackerConfig {
         BOOSTERS("§fBoosters\n§7(Sweep and Foraging Wisdom)"),
         SHARDS("§fDirect Shard Drops\n§7(§9Hummingbirds§7 and §6Chameleons§7)"),
         RUNES("§fRunes\n§7(§fFading White §7and §aFading Green§7)"),
-        MISC("§cTree The Fish");
+        MISC("§cTree The Fish"),
+        ;
 
         override fun toString() = displayName
     }

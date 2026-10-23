@@ -168,7 +168,8 @@ object BlockStrengthGuide {
         END_STONE(
             { SafeItemStack(Blocks.END_STONE) },
             setOf(OreBlock.END_STONE),
-        );
+        ),
+        ;
 
         val icon by lazy(this.iconDel)
 

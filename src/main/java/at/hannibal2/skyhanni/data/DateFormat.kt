@@ -15,7 +15,8 @@ enum class DateFormat(pattern: String) {
     YEAR_DAY_MONTH("yyyy/dd/MM"),
     COMPACT_YYYYMMDD("yyyyMMdd"),
     DAY_MONTH_YEAR("dd MMMM yyyy"),
-    DAY_MONTH_YEAR_SHORT("dd MMM yyyy");
+    DAY_MONTH_YEAR_SHORT("dd MMM yyyy"),
+    ;
 
     private val formatter = DateTimeFormatter.ofPattern(pattern)
 

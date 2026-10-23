@@ -263,7 +263,8 @@ object DnaAnalyzerSolver {
         RED,
         GREEN,
         BLUE,
-        YELLOW;
+        YELLOW,
+        ;
 
         companion object {
             fun SafeItemStack.toColor(): Colors? {

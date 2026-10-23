@@ -33,7 +33,8 @@ object HideSlayerSpawnParticles {
     enum class SpawnParticles(private val displayName: String, val particle: ParticleType<*>) {
         ENCHANT_TABLE("White", ParticleTypes.ENCHANT),
         SPELL_WITCH("Purple", ParticleTypes.WITCH),
-        SPELL_MOB("Slayer Specific", ParticleTypes.ENTITY_EFFECT);
+        SPELL_MOB("Slayer Specific", ParticleTypes.ENTITY_EFFECT),
+        ;
 
         override fun toString() = displayName
     }

@@ -58,7 +58,8 @@ class PowderChestTimerConfig {
     enum class LineMode {
         OLDEST,
         NEAREST,
-        NONE;
+        NONE,
+        ;
 
         private val displayName = toFormattedName()
         override fun toString(): String = displayName

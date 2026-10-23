@@ -156,7 +156,8 @@ class DiscordIPC(
         FRAME(1),
         CLOSE(2),
         PING(3),
-        PONG(4);
+        PONG(4),
+        ;
 
         companion object {
             fun fromId(id: Int) = entries.firstOrNull { it.id == id }
