@@ -7,7 +7,8 @@ import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFo
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.StorageType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
@@ -51,7 +52,6 @@ object ChestValue {
     private var display = emptyList<Renderable>()
     private var chestItems = mapOf<String, ChestItem>()
     private val inInventory get() = isValidStorage()
-    private var inOwnInventory = false
     private val scrollValue = ScrollValue()
 
     /**
@@ -86,7 +86,8 @@ object ChestValue {
     private fun onChestGuiRender() {
         if (!isEnabled()) return
         if (DungeonApi.inDungeon() && !config.enableInDungeons) return
-        if (!inOwnInventory) {
+        val isOwnInventory = MinecraftCompat.screen is InventoryScreen && StorageType.OWN_INVENTORY in config.enabledIn.get()
+        if (!isOwnInventory) {
             if (InventoryUtils.openInventoryName() == "") return
         }
 
@@ -101,26 +102,26 @@ object ChestValue {
         }
     }
 
-    private fun featureName() = if (inOwnInventory) "Estimated Inventory Value" else "Estimated Chest Value"
-
-    @HandleEvent
-    private fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled()) return
-        if (!event.isMod(5)) return
-        val inInv = MinecraftCompat.screen is InventoryScreen
-        inOwnInventory = inInv && StorageType.OWN_INVENTORY in config.enabledIn.get()
-        if (!inInventory) return
-        update()
+    private fun featureName(): String {
+        val isOwnInventory = MinecraftCompat.screen is InventoryScreen
+        return if (isOwnInventory && StorageType.OWN_INVENTORY in config.enabledIn.get()) "Estimated Inventory Value" else "Estimated Chest Value"
     }
 
     @HandleEvent
-    private fun onInventoryFullyOpened() {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (inInventory) {
             DelayedRun.runOrNextTick {
                 update()
             }
         }
+    }
+
+    @HandleEvent
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!isEnabled()) return
+        if (!inInventory) return
+        update()
     }
 
     @HandleEvent
@@ -218,7 +219,8 @@ object ChestValue {
 
     private fun init() {
         if (!inInventory) return
-        val slots = if (inOwnInventory) {
+        val isOwnInventory = MinecraftCompat.screen is InventoryScreen && StorageType.OWN_INVENTORY in config.enabledIn.get()
+        val slots = if (isOwnInventory) {
             InventoryUtils.getSlotsInOwnInventory()
         } else {
             val isMinion = InventoryUtils.openInventoryName().contains(" Minion ")
@@ -262,7 +264,9 @@ object ChestValue {
 
     @Suppress("ReturnCount")
     private fun isValidStorage(): Boolean {
-        if (inOwnInventory) return true
+        if (MinecraftCompat.screen is InventoryScreen) {
+            return StorageType.OWN_INVENTORY in config.enabledIn.get()
+        }
         val name = InventoryUtils.openInventoryName().removeColor()
         if (MinecraftCompat.screen !is ContainerScreen) return false
         if (BazaarApi.inBazaarInventory) return false
