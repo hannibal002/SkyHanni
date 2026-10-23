@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.data.NpcData
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -29,13 +31,23 @@ object FakeNpcApi {
 
     private val npcs = mutableMapOf<String, ActiveNpc>()
 
+    private var registered = true
+        set(value) {
+            if (value == field) return
+            if (value) {
+                SkyHanniEvents.register(this)
+            } else {
+                SkyHanniEvents.unregister(this)
+            }
+            field = value
+        }
+
     /**
      * Adds an NPC to the world.
      *
      * If an NPC with the same ID already exists, it is replaced.
      */
     fun addNpc(data: NpcData) {
-        removeNpc(data.id)
         val rotation = rotationTowardsPlayer(data.position)
         val hologram = HolographicEntities.create(
             mannequinFromData(data),
@@ -48,14 +60,14 @@ object FakeNpcApi {
             data = data,
             entity = hologram,
         )
+        registered = true
     }
 
     fun removeNpc(id: String) {
         npcs.remove(id)
-    }
-
-    fun removeNpc(data: NpcData) {
-        removeNpc(data.id)
+        if (npcs.isEmpty()) {
+            registered = false
+        }
     }
 
     fun getNpc(id: String): NpcData? {
@@ -119,7 +131,6 @@ object FakeNpcApi {
 
     @HandleEvent
     private fun onItemClick() {
-        if (npcs.isEmpty()) return
         val player = MinecraftCompat.localPlayerOrNull ?: return
 
         val eyePos = LocationUtils.playerEyeLocation()
@@ -199,10 +210,17 @@ object FakeNpcApi {
                 }
             }
             literal("remove") {
-                argCallback("id", BrigadierArguments.string(), getNpcs().map { it.id }) { id ->
+                argCallback(
+                    "id",
+                    BrigadierArguments.string(),
+                    BrigadierUtils.dynamicSuggestionProvider { getNpcs().map { it.id } },
+                ) { id ->
                     removeNpc(id)
                 }
             }
+        }
+        if (npcs.isEmpty()) {
+            registered = false
         }
     }
 
