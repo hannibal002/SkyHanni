@@ -177,7 +177,7 @@ object TrophyFishMessages {
         val legacyDisplayName = displayName.formattedTextCompatLeadingWhiteLessResets()
         val legacyDisplayRarity = displayRarity.formattedTextCompatLeadingWhiteLessResets()
         val text = "$legacyDisplayName $legacyDisplayRarity §8$amount§c!"
-        // Does not support components, so we have to convert it to a legacy string first
+        // TODO: TitleManager with Component support
         TitleManager.sendTitle(text)
     }
 
