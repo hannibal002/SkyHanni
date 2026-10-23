@@ -566,26 +566,26 @@ object CustomLoadout : AbstractCustomMenu("Custom Loadout") {
 
         // The custom loadout gui is off by default, but gets enabled for everyone who used the custom wardrobe
         var customWardrobeEnabled = true
-        event.move(147, "$wardrobe.enabled", "$loadout.wardrobe.enabled") { element ->
+        event.move(149, "$wardrobe.enabled", "$loadout.wardrobe.enabled") { element ->
             customWardrobeEnabled = element.asBoolean
             element
         }
-        event.add(147, "$loadout.enabled") {
+        event.add(149, "$loadout.enabled") {
             JsonPrimitive(customWardrobeEnabled)
         }
 
         // These are now shared between the loadout, wardrobe and equipment guis
-        event.move(147, "$wardrobe.eyesFollowMouse", "$loadout.eyesFollowMouse")
-        event.move(147, "$wardrobe.color", "$loadout.color")
-        event.move(147, "$wardrobe.spacing.maxPlayersPerRow", "$loadout.wardrobe.maxPlayersPerRow")
-        event.move(147, "$wardrobe.spacing", "$loadout.spacing")
+        event.move(149, "$wardrobe.eyesFollowMouse", "$loadout.eyesFollowMouse")
+        event.move(149, "$wardrobe.color", "$loadout.color")
+        event.move(149, "$wardrobe.spacing.maxPlayersPerRow", "$loadout.wardrobe.maxPlayersPerRow")
+        event.move(149, "$wardrobe.spacing", "$loadout.spacing")
 
         val wardrobeOptions = listOf(
             "hideEmptySlots", "hideLockedSlots", "onlyFavorites", "estimatedValue", "loadingText",
             "showTooltipOnlyKeybind", "tooltipKeybind", "showReiItems", "keybinds",
         )
         for (option in wardrobeOptions) {
-            event.move(147, "$wardrobe.$option", "$loadout.wardrobe.$option")
+            event.move(149, "$wardrobe.$option", "$loadout.wardrobe.$option")
         }
     }
 }
