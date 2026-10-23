@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -59,30 +58,45 @@ object PowderChestTimer {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onPlaySound(event: PlaySoundEvent) {
-        if (event.soundName == "entity.player.levelup" && event.pitch == 1f && event.volume == 1.0f) {
+    private fun onPlaySound(event: PlaySoundEvent) {
+        if (event.volume != 1.0f) return
+        if (event.soundName == "entity.player.levelup" && event.pitch == 1f) {
             lastSound = SimpleTimeMark.now()
             if (config.muteChestDiscover) event.cancel()
+            return
         }
-        if (config.muteChestOpen && event.soundName == "block.chest.open" &&
-            event.pitch == 1f && event.volume == 1.0f
-        ) {
-            event.cancel()
+        if (!config.muteChestOpen) return
+        if (lastSound.passedSince() > maxDuration) return
+        val cancel = when (event.soundName) {
+            "block.chest.open" -> {
+                event.pitch == 1f
+            }
+            "entity.experience_orb.pickup" -> {
+                when (event.pitch) {
+                    1.4920635f -> true
+                    0.0f -> true
+                    0.4920635f -> true
+                    1.0f -> true
+                    else -> false
+                }
+            }
+            else -> false
         }
+        if (cancel) event.cancel()
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onGuiRenderOverlay() {
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Powder Chest Timer")
     }
 
     @HandleEvent
-    fun onWorldChange() = chests.clear()
+    private fun onWorldChange() = chests.clear()
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onServerBlockChange(event: ServerBlockChangeEvent) {
+    private fun onServerBlockChange(event: ServerBlockChangeEvent) {
         val location = event.location
         if (location.distanceToPlayer() > MAX_CHEST_DISTANCE) return
 
@@ -107,7 +121,7 @@ object PowderChestTimer {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onBlockClick(event: BlockClickEvent) {
+    private fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
 
         val location = event.position
@@ -123,7 +137,7 @@ object PowderChestTimer {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onTick() {
+    private fun onTick() {
         if (!isEnabled()) return
 
         // TODO why in god's name is this calculating onTick 🥺
@@ -148,7 +162,7 @@ object PowderChestTimer {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val chests = chests.takeIf { it.isNotEmpty() }?.toMap() ?: return
 
