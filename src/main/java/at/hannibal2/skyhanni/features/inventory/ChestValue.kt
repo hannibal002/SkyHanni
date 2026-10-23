@@ -113,9 +113,8 @@ object ChestValue {
         update()
     }
 
-    @HandleEvent(InventoryOpenEvent::class)
-@HandleEvent
-private fun onInventoryOpen() {
+    @HandleEvent
+    private fun onInventoryOpen() {
         if (!isEnabled()) return
         if (inInventory) {
             DelayedRun.runOrNextTick {
@@ -124,9 +123,8 @@ private fun onInventoryOpen() {
         }
     }
 
-    @HandleEvent(InventoryCloseEvent::class)
-@HandleEvent
-private fun onInventoryClose() {
+    @HandleEvent
+    private fun onInventoryClose() {
         chestItems = emptyMap()
     }
 
