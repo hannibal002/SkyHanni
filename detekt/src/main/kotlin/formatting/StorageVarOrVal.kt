@@ -1,8 +1,6 @@
 package formatting
 
-import utils.DetektUtils.doWeNeedToCheckConfigProp
 import SkyHanniRule
-import potentialbugs.StorageNeedsExpose.Companion.CONFIG_PACKAGE
 import dev.detekt.api.Config
 import dev.detekt.api.RequiresAnalysisApi
 import org.jetbrains.kotlin.analysis.api.analyze
@@ -13,6 +11,8 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
+import potentialbugs.StorageNeedsExpose.Companion.CONFIG_PACKAGE
+import utils.DetektUtils.doWeNeedToCheckConfigProp
 
 class StorageVarOrVal(config: Config) : RequiresAnalysisApi, SkyHanniRule(
     config,
@@ -71,12 +71,14 @@ class StorageVarOrVal(config: Config) : RequiresAnalysisApi, SkyHanniRule(
                 return@analyze false
             }
 
-            isKeyMapping || (!isInfoText && (
-                classId in PRIMITIVE_CLASS_IDS ||
-                    classId == StandardClassIds.String ||
-                    type.expandedSymbol?.classKind == KaClassKind.ENUM_CLASS ||
-                    classId == CHROMA_COLOUR_CLASS_ID
-                ))
+            isKeyMapping || (
+                !isInfoText && (
+                    classId in PRIMITIVE_CLASS_IDS ||
+                        classId == StandardClassIds.String ||
+                        type.expandedSymbol?.classKind == KaClassKind.ENUM_CLASS ||
+                        classId == CHROMA_COLOUR_CLASS_ID
+                    )
+                )
         }
     }
 }

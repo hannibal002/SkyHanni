@@ -24,7 +24,10 @@ class GuiOptionEditorInputConstantsKey(option: ProcessedOption, defaultKey: Inpu
 
     init {
         if (option.type !== InputConstants.Key::class.java)
-            Warnings.warn(ConfigEditorKeyMapping::class.java.toString() + " can only be applied to InputCode properties.")
+            Warnings.warn(
+                ConfigEditorKeyMapping::class.java.toString() +
+                    " can only be applied to InputConstants.Key properties."
+            )
 
         component = wrapComponent(
             object : GuiComponent() {
