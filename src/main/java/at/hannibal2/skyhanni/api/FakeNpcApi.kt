@@ -105,7 +105,7 @@ object FakeNpcApi {
         val dialogue = npc.data.dialogue
         dialogue.forEachIndexed { index, line ->
             DelayedRun.runDelayed(index.seconds) {
-                ChatUtils.chat(line)
+                ChatUtils.chat(line, prefix = false)
                 if (index == dialogue.lastIndex) {
                     npc.talking = false
                 }
@@ -204,7 +204,10 @@ object FakeNpcApi {
                             name = name,
                             skinProfile = profile,
                             position = LocationUtils.playerLocation(),
-                            dialogue = listOf("Hello, I am $name!", "Nice to meet you!"),
+                            dialogue = listOf(
+                                "§e[SkyHanni Fake NPC]§r Hello, I am $name!",
+                                "§e[SkyHanni Fake NPC]§r Nice to meet you!"
+                            ),
                         )
                         addNpc(data)
                     }
