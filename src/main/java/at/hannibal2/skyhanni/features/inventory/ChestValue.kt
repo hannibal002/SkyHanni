@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFo
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.StorageType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -85,7 +83,7 @@ object ChestValue {
     )
 
     @HandleEvent
-    fun onChestGuiRender() {
+    private fun onChestGuiRender() {
         if (!isEnabled()) return
         if (DungeonApi.inDungeon() && !config.enableInDungeons) return
         if (!inOwnInventory) {
@@ -106,7 +104,7 @@ object ChestValue {
     private fun featureName() = if (inOwnInventory) "Estimated Inventory Value" else "Estimated Chest Value"
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
         val inInv = MinecraftCompat.screen is InventoryScreen
@@ -116,7 +114,8 @@ object ChestValue {
     }
 
     @HandleEvent(InventoryOpenEvent::class)
-    fun onInventoryOpen() {
+@HandleEvent
+private fun onInventoryOpen() {
         if (!isEnabled()) return
         if (inInventory) {
             DelayedRun.runOrNextTick {
@@ -126,7 +125,8 @@ object ChestValue {
     }
 
     @HandleEvent(InventoryCloseEvent::class)
-    fun onInventoryClose() {
+@HandleEvent
+private fun onInventoryClose() {
         chestItems = emptyMap()
     }
 
