@@ -7,7 +7,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -38,20 +37,4 @@ class HoppityCallWarningConfig {
     @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
     @ConfigEditorButton(buttonText = "OPEN")
     val sounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
-
-    @Expose
-    @ConfigOption(
-        name = "Ensure Coins Pre-Trade",
-        desc = "Block opening Hoppity's abiphone trade menu if you do not have enough coins in your purse.",
-    )
-    @ConfigEditorBoolean
-    var ensureCoins: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Coin Threshold",
-        desc = "The amount of coins you need to have in your purse to be able to open Hoppity's abiphone trade menu.",
-    )
-    @ConfigEditorSlider(minValue = 250000f, maxValue = 5000000f, minStep = 250000f)
-    var coinThreshold: Int = 5000000
 }

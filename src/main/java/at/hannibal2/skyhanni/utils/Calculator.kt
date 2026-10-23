@@ -12,8 +12,11 @@ import com.notkamui.keval.keval
 object Calculator {
 
     fun calculateOrNull(input: String): Double? {
+        val normalizedInput = input
+            .lowercase()
+            .replace('x', '*')
         return runCatching {
-            input.keval {
+            normalizedInput.keval {
                 // taken so kindly from skyocean
                 includeDefault()
 
@@ -46,7 +49,7 @@ object Calculator {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shcalc") {
             category = CommandCategory.USERS_ACTIVE
             description = "Calculates a math expression"

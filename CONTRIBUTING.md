@@ -495,7 +495,8 @@ a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with s
 ### Automated GitHub Workflows
 
 Several GitHub Actions workflows run automatically on pull requests to enforce code quality and keep PR metadata up to date.
-All workflows use `.github/scripts/pr_review.main.kts` as the shared review script, invoked with a `MODE` parameter.
+All of them except Remove All Labels use `.github/scripts/pr_review.main.kts` as the shared review script, invoked with a `MODE`
+parameter.
 
 When a PR is updated, any existing comment posted by a workflow is collapsed into a `<details>` spoiler. What follows depends on the
 workflow. The Detekt, Build Failure, Merge Conflict and Changelog Check comments only ever announce that something is wrong: a new comment
@@ -512,8 +513,8 @@ Most workflows use a two-workflow split to allow write-operations on fork PRs wi
 The first workflow is triggered by `pull_request`, runs with limited permissions, and uploads results as an artifact. The second is
 triggered by `workflow_run` on completion of the first, always uses the base branch version, carries write access (`issues: write`,
 `pull-requests: write`, `actions: read`), and runs the review script against the artifact. The PR number is resolved at runtime from
-the head branch of the triggering workflow run. The Merge Conflict Comment, Dependency Label and Description Keyword Labels sections
-do not use this split.
+the head branch of the triggering workflow run, except for the Partially Approved Label, which passes it in the artifact. The Merge
+Conflict Comment, Dependency Label, Description Keyword Labels and Remove All Labels sections do not use this split.
 
 #### Automated Detekt Review
 
@@ -636,6 +637,44 @@ a different capitalization all prevent the keyword from being recognized.
 The check runs on every `opened`, `edited`, `reopened`, and `synchronize` event via `pull_request_target`.
 
 Relevant files: `.github/workflows/keyword-labels.yml`, `.github/scripts/pr_review.main.kts` (invoked with `MODE=keyword_labels`).
+
+#### Remove All Labels
+
+Closing a pull request, merged or not, removes every label from it.
+
+- `.github/workflows/remove-labels-on-pr-close.yml`: Triggered by `pull_request_target` on `closed`. Runs the third party action
+  [label-remover](https://github.com/marketplace/actions/label-remover) with `pull-requests: write` and `issues: write`. It does not
+  use the review script.
+
+#### Partially Approved Label
+
+Once a person with write access or higher approves a pull request, the `Partially Approved` label is added. It shows that a reviewer has
+started looking at the pull request. No comment is posted, and no workflow removes the label while the pull request is open.
+
+- A label removed by hand stays removed until the next approval.
+- Drafts and closed or merged pull requests never get the label. An approval given while the pull request was a draft counts once it
+  is marked ready for review.
+- Closing a pull request removes all labels, this one included. If the pull request is reopened, the label comes back when it was still
+  there at closing time.
+- A pull request is evaluated when an approval is submitted, when it is reopened or marked ready for review, and when new commits are
+  pushed. There is no run over all open pull requests, so an approval from before this workflow existed only counts once one of these
+  events happens.
+
+Known limitation: when a push dismisses earlier approvals, an approval followed by a push within about a minute may not add the label.
+The next approval adds it.
+
+Relevant files:
+
+- `.github/workflows/partially-approved.yml`: Triggered by `pull_request_review` on `submitted`, where only an approval continues, and by
+  `pull_request` on `reopened`, `ready_for_review` and `synchronize`. Skips drafts, closed pull requests and pull requests that already
+  carry the label. Only uploads the PR number as an artifact, a fork pull request gets a read-only token for these events.
+- `.github/workflows/partially-approved-review.yml`: Triggered by `workflow_run` on completion of the first one. Always uses base branch
+  code, runs with `issues: write`, `pull-requests: write` and `actions: read`, and reads the PR number from that artifact. It accepts
+  digits only and executes nothing from it.
+- `.github/scripts/pr_review.main.kts` (invoked with `MODE=partially_approved`): Decides from the API alone, since a fork can change the
+  triggering workflow and the PR number, so a forged number only leads to a correct evaluation of another pull request. It reads the
+  reviews, the history of the label and the permission of each approving reviewer, and checks right before adding the label that the
+  pull request is still open and not a draft.
 
 ## Access Wideners
 
