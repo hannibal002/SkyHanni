@@ -11,21 +11,31 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object ProfitPerMineshaftCorpse {
     private val config get() = SkyHanniMod.feature.mining.mineshaft
 
+    /**
+     * REGEX-TEST: Glacite Powder
+     */
+    private val skipCorpseRewardPattern by RepoPattern.pattern(
+        "mining.mineshaft.skip-corpse-reward",
+        "Glacite Powder"
+    )
+
     @HandleEvent
-    fun onCorpseLooted(event: CorpseLootedEvent) {
+    private fun onCorpseLooted(event: CorpseLootedEvent) {
         if (!config.profitPerCorpseLoot) return
         val loot = event.loot
 
         var totalProfit = 0.0
         val map = mutableMapOf<String, Double>()
         for ((name, amount) in loot) {
-            if (name == "§bGlacite Powder") continue
+            if (skipCorpseRewardPattern.matches(name)) continue
             val internalName = NeuInternalName.fromItemNameOrNull(name) ?: continue
             val pricePer = internalName.getPriceOrNull() ?: continue
             val profit = amount * pricePer

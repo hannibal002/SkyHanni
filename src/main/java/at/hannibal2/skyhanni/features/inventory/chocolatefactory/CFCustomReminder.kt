@@ -5,8 +5,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
@@ -14,6 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -58,44 +57,43 @@ object CFCustomReminder {
     private val patternGroup = RepoPattern.group("inventory.chocolate.factory")
 
     /**
-     * REGEX-TEST: §cRequires 400B all-time Chocolate!
+     * REGEX-TEST: Requires 400B all-time Chocolate!
      */
     private val milestoneCostLorePattern by patternGroup.pattern(
-        "milestone.cost",
-        "§cRequires (?<amount>.*) all-time Chocolate!",
+        "milestone.cost.colorless",
+        "Requires (?<amount>.*) all-time Chocolate!",
     )
 
     /**
-     * REGEX-TEST: §cYou don't have enough Chocolate!
-     * REGEX-TEST: §cYou don't have the required items!
-     * REGEX-TEST: §cYou must collect 300B all-time Chocolate!
+     * REGEX-TEST: You don't have enough Chocolate!
+     * REGEX-TEST: You don't have the required items!
+     * REGEX-TEST: You must collect 300B all-time Chocolate!
      */
     private val chatMessagePattern by patternGroup.list(
-        "chat.hide",
-        "§cYou don't have enough Chocolate!",
-        "§cYou don't have the required items!",
-        "§cYou must collect (.*) all-time Chocolate!",
+        "chat.hide.colorless",
+        "You don't have enough Chocolate!",
+        "You don't have the required items!",
+        "You must collect (.*) all-time Chocolate!",
     )
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
         if (!CFApi.inChocolateFactory) return
-        if (configReminder.hideChat) {
-            if (chatMessagePattern.matches(event.message)) {
-                event.blockedReason = "custom_reminder"
-            }
+        if (!configReminder.hideChat) return
+        if (chatMessagePattern.matches(event.cleanMessage)) {
+            event.blockedReason = "custom_reminder"
         }
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed() {
         if (!isEnabled()) return
         update()
     }
 
     @HandleEvent(receiveCancelled = true)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !inChocolateMenu()) return
         val item = event.item ?: return
         CFDataLoader.upgradeTierPattern.matchMatcher(item.cleanName) {
@@ -114,9 +112,8 @@ object CFCustomReminder {
 
     // TODO add support for prestige
     private fun getCostAndName(item: SafeItemStack): Pair<Long, String>? {
-        val list = item.getLore()
-        val cost = CFApi.getChocolateBuyCost(list)
-            ?: return milestoneCostLorePattern.firstMatcher(list) {
+        val cost = CFApi.getChocolateBuyCost(item.getLore())
+            ?: return milestoneCostLorePattern.firstMatcher(item.getCleanLore()) {
                 // math needed to get from "time until current chocolate" to "time until all time chocolate"
                 val amount = group("amount").formatLong()
                 val allTime = ChocolateAmount.ALL_TIME.chocolate()
@@ -132,7 +129,7 @@ object CFCustomReminder {
     }
 
     @HandleEvent
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    private fun onChestGuiRender() {
         if (!isEnabled()) return
         if (!inChocolateMenu()) return
         if (ReminderUtils.isBusy()) return
@@ -141,7 +138,7 @@ object CFCustomReminder {
     }
 
     @HandleEvent
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         if (!configReminder.always) return
         if (MinecraftCompat.screen is ContainerScreen) return
@@ -151,7 +148,7 @@ object CFCustomReminder {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(72, "inventory.chocolateFactory.customReminder.position", Position::migrate)
     }
 

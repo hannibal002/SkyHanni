@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
@@ -55,6 +56,14 @@ object VisitorApi {
     private val visitorNamePattern by patternGroup.pattern(
         "visitor.name",
         " (?:§.)+(?<name>§.[^§]+).*",
+    )
+
+    /**
+     * REGEX-TEST: Offers Accepted: 9
+     */
+    val offersAcceptedPattern by RepoPattern.pattern(
+        "garden.visitor.offersaccepted.colorless",
+        "Offers Accepted: (?<offersAccepted>\\d+)?",
     )
 
     fun getVisitorsMap() = visitors
@@ -130,7 +139,7 @@ object VisitorApi {
 
     fun isVisitorInfo(lore: List<String>): Boolean {
         if (lore.size != 4) return false
-        return lore[3].startsWith("§7Offers Accepted: §a")
+        return offersAcceptedPattern.matches(lore[3])
     }
 
     class VisitorOffer(

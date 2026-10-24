@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.rift.everywhere.motes
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.ParticleEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -26,12 +26,12 @@ object RiftMotesOrb {
     private val enabled get() = config.enabled
 
     /**
-     * REGEX-TEST: §5§lORB! §r§dPicked up §r§5+10 Motes§r§d!
-     * REGEX-TEST: §5§lORB! §r§dPicked up §r§5+25 Motes§r§d, recovered §r§a+2ф Rift Time§r§d!
+     * REGEX-TEST: ORB! Picked up +10 Motes!
+     * REGEX-TEST: ORB! Picked up +25 Motes, recovered +2ф Rift Time!
      */
     private val motesPattern by RepoPattern.pattern(
-        "rift.everywhere.motesorb",
-        "§5§lORB! §r§dPicked up §r§5+.* Motes§r§d.*",
+        "rift.everywhere.motesorb.colorless",
+        "ORB! Picked up \\+[\\d,.]+ Motes.*",
     )
 
     private var motesOrbs = emptyList<MotesOrb>()
@@ -46,7 +46,7 @@ object RiftMotesOrb {
     )
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT, receiveCancelled = true)
-    fun onParticle(event: ParticleEvent) {
+    private fun onParticle(event: ParticleEvent) {
         if (!enabled) return
         val location = event.location.add(-0.5, 0.0, -0.5)
 
@@ -66,8 +66,8 @@ object RiftMotesOrb {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        motesPattern.matchMatcher(event.message) {
+    private fun onChat(event: SystemMessageEvent.Allow) {
+        motesPattern.matchMatcher(event.cleanMessage) {
             motesOrbs.minByOrNull { it.location.distanceToPlayer() }?.let {
                 it.pickedUp = true
             }
@@ -75,7 +75,7 @@ object RiftMotesOrb {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!enabled) return
 
         motesOrbs = motesOrbs.editCopy { removeIf { System.currentTimeMillis() > it.lastTime + 2000 } }
@@ -102,7 +102,7 @@ object RiftMotesOrb {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.motesOrbsConfig", "rift.area.motesOrbs")
     }
 }

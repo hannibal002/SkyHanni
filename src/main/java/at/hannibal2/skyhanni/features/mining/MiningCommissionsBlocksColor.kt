@@ -5,10 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MiningApi.inCrystalHollows
 import at.hannibal2.skyhanni.data.MiningApi.inDwarvenMines
 import at.hannibal2.skyhanni.data.MiningApi.inGlacite
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor.CommissionBlock.Companion.onColor
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.isOreType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -35,11 +34,11 @@ object MiningCommissionsBlocksColor {
     private val patternGroup = RepoPattern.group("mining.commissions")
 
     /**
-     * REGEX-TEST: §a§lCITRINE GEMSTONE COLLECTOR §r§eCommission Complete! Visit the King §r§eto claim your rewards!
+     * REGEX-TEST: CITRINE GEMSTONE COLLECTOR Commission Complete! Visit the King to claim your rewards!
      */
     private val commissionCompletePattern by patternGroup.pattern(
-        "complete",
-        "§a§l(?<name>.*) §r§eCommission Complete! Visit the King §r§eto claim your rewards!",
+        "complete.colorless",
+        "(?<name>.*) Commission Complete! Visit the King to claim your rewards!",
     )
 
     private var color = DyeColor.RED
@@ -61,7 +60,7 @@ object MiningCommissionsBlocksColor {
 
     // TODO Commission API
     @HandleEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    private fun onTabListUpdate(event: TabListUpdateEvent) {
         for (block in CommissionBlock.entries) {
             val tabList = " ${block.commissionName}: "
             val newValue = event.tabList.any { it.string.startsWith(tabList) && !it.string.contains("DONE") }
@@ -77,9 +76,9 @@ object MiningCommissionsBlocksColor {
 
     // TODO Commission API
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!enabled) return
-        commissionCompletePattern.matchMatcher(event.message) {
+        commissionCompletePattern.matchMatcher(event.cleanMessage) {
             val name = group("name")
             val block = CommissionBlock.entries.find { it.commissionName.equals(name, ignoreCase = true) } ?: return
             block.highlight = false
@@ -89,7 +88,7 @@ object MiningCommissionsBlocksColor {
     }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         val newEnabled = (inCrystalHollows || inGlacite) && config.enabled
         var reload = false
         if (newEnabled != enabled) {
@@ -124,7 +123,7 @@ object MiningCommissionsBlocksColor {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad() {
         color = config.color.get().toDyeColor()
         config.sneakQuickToggle.onToggle {
             oldSneakState = false
@@ -140,13 +139,13 @@ object MiningCommissionsBlocksColor {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         enabled = false
         replaceBlocksMapCache = mutableMapOf()
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mining Commissions Blocks Color")
         if (!enabled) {
             event.addIrrelevant("not enabled")

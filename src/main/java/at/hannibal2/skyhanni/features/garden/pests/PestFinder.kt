@@ -209,7 +209,7 @@ object PestFinder {
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.noPestTitle) return
 
-        if (PestApi.noPestsChatPattern.matches(event.message)) TitleManager.sendTitle("§eNo pests!", duration = 2.seconds)
+        if (PestApi.noPestsChatPattern.matches(event.cleanMessage)) TitleManager.sendTitle("§eNo pests!", duration = 2.seconds)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

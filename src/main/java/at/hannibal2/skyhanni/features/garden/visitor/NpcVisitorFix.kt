@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -12,7 +10,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -29,16 +27,16 @@ object NpcVisitorFix {
     private val staticVisitors = listOf("Jacob", "Anita")
 
     /**
-     * REGEX-TEST: §aChanging Barn skin to §r§fDefault§r§a!
-     * REGEX-TEST: §aChanging Barn skin to §r§5Mansion Heights§r§a!
+     * REGEX-TEST: Changing Barn skin to Default!
+     * REGEX-TEST: Changing Barn skin to Mansion Heights!
      */
     private val barnSkinChangePattern by RepoPattern.pattern(
-        "garden.barn.skin.change",
-        "§aChanging Barn skin to §r.*",
+        "garden.barn.skin.change.colorless",
+        "Changing Barn skin to .*",
     )
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    @HandleEvent(onlyOnIsland = GARDEN)
+    private fun onInventoryOpen(event: InventoryOpenEvent) {
         val name = staticVisitors.firstOrNull { event.inventoryName.contains(it) } ?: return
         val nearest = findNametags(name).firstOrNull { it.distanceToPlayer() < 3 } ?: return
         DelayedRun.runDelayed(200.milliseconds) {
@@ -62,14 +60,14 @@ object NpcVisitorFix {
 
     private var lastVisitorOpen = SimpleTimeMark.farPast()
 
-    @HandleEvent(VisitorOpenEvent::class)
-    fun onVisitorOpen() {
+    @HandleEvent
+    private fun onVisitorOpen() {
         lastVisitorOpen = SimpleTimeMark.now()
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        barnSkinChangePattern.matchMatcher(event.message) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
+        if (barnSkinChangePattern.matches(event.cleanMessage)) {
             GardenApi.storage?.npcVisitorLocations?.clear()
         }
     }

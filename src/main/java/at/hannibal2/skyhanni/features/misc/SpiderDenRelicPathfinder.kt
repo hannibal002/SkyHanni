@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -47,16 +46,16 @@ object SpiderDenRelicPathfinder {
      * REGEX-TEST: +10,000 Coins! (2/28 Relics)
      */
     private val foundPattern by patternGroup.pattern(
-        key = "chat.found",
-        fallback = "\\+[\\d,]+ Coins! \\(\\d+/\\d+ Relics\\)",
+        "chat.found",
+        "\\+[\\d,]+ Coins! \\(\\d+/\\d+ Relics\\)",
     )
 
     /**
      * REGEX-TEST: You've already found this relic!
      */
     private val duplicatePattern by patternGroup.pattern(
-        key = "chat.duplicate",
-        fallback = "You've already found this relic!|You've already found all the relics!",
+        "chat.duplicate",
+        "You've already found this relic!|You've already found all the relics!",
     )
 
     private class Data(
@@ -133,19 +132,19 @@ object SpiderDenRelicPathfinder {
         }
     }
 
-    @HandleEvent(WorldChangeEvent::class)
-    fun onWorldChange() {
+    @HandleEvent
+    private fun onWorldChange() {
         data = null
     }
 
     @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
-    fun onIslandGraphReload() {
+    private fun onIslandGraphReload() {
         if (config.spiderRelicPathfinder) reload()
         else data = null
     }
 
     @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!config.spiderRelicPathfinder) return
         if (event.isMod(5) && calculating) {
             val duration = calculatingStart.passedSince().format(showMilliSeconds = true)
@@ -154,7 +153,7 @@ object SpiderDenRelicPathfinder {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!config.spiderRelicPathfinder) return
         data?.let {
             it.checkNextRelic()
@@ -164,15 +163,17 @@ object SpiderDenRelicPathfinder {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
-    fun onSystemMessage(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!config.spiderRelicPathfinder) return
-        if (foundPattern.matches(event.chatComponent) || duplicatePattern.matches(event.chatComponent)) {
+        if (foundPattern.matches(event.cleanMessage) ||
+            duplicatePattern.matches(event.cleanMessage)
+        ) {
             data?.foundNearby()
         }
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shrelicsreset") {
             description = "Reset known Spider Den Relics."
             category = CommandCategory.USERS_RESET
@@ -191,7 +192,7 @@ object SpiderDenRelicPathfinder {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Spider Den Relic Pathfinder")
         if (!IslandType.SPIDER_DEN.isInIsland()) {
             event.addIrrelevant("not on spider island")
