@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.config.features.mining.glacite
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import com.google.gson.annotations.Expose
-import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
