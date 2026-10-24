@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -25,6 +26,14 @@ class FishingHookDisplayConfig {
     )
     @ConfigEditorText
     var customAlertText: String = "&c&l!!!"
+
+    @Expose
+    @ConfigOption(
+        name = "Custom Reel In Time",
+        desc = "Shows the Custom Alert once the remaining time to reel in (in seconds) is less than or equal to this value."
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 1f, minStep = 0.1f)
+    var customReelInTime: Float = 0f
 
     @Expose
     @ConfigOption(
