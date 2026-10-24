@@ -164,11 +164,7 @@ dependencies {
     runtimeOnly(target.hypixelModApiFabricVersion)
     "productionRuntimeMods"(target.hypixelModApiFabricVersion)
 
-    val reiVersion = when (target) {
-        ProjectTarget.MODERN_26300 -> null
-        ProjectTarget.MODERN_26200 -> "26.2.820"
-        ProjectTarget.MODERN_26100 -> "26.1.819"
-    }
+    val reiVersion = target.reiVersion
     if (reiVersion != null) {
         val reiApi = "me.shedaniel:RoughlyEnoughItems-api:$reiVersion"
         compileOnly(reiApi) { isTransitive = false }
