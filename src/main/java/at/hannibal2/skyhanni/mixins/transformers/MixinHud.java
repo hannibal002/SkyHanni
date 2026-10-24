@@ -18,14 +18,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-//? if >= 26.2 {
 import net.minecraft.client.gui.Hud;
-//?} else {
-/*import net.minecraft.client.gui.Gui;
-*///?}
 
-//~ if < 26.2 'Hud' -> 'Gui'
 @Mixin(Hud.class)
 public abstract class MixinHud {
     @Inject(method = "displayScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/scores/Objective;)V", at = @At("HEAD"), cancellable = true)
@@ -54,7 +48,6 @@ public abstract class MixinHud {
         }
     }
 
-    //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer' {
     @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.BEFORE), cancellable = true)
     public void renderExperienceBar(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (RenderEvents.postExperienceBarLayerEventPre(context).isCancelled()) {
@@ -78,7 +71,6 @@ public abstract class MixinHud {
     public void renderExperienceLevelTail(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
         RenderEvents.postExperienceNumberLayerEventPost(context);
     }
-    //~}
 
     @ModifyArg(
         method = "displayScoreboardSidebar",

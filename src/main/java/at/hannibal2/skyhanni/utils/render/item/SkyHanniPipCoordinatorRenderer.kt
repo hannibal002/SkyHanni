@@ -2,22 +2,11 @@ package at.hannibal2.skyhanni.utils.render.item
 
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
+import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 
-//? if >= 26.2 {
-import net.minecraft.client.renderer.SubmitNodeCollector
-//?} else {
-/*import net.minecraft.client.renderer.MultiBufferSource
-*///?}
-
 @Suppress("EmptyDefaultConstructor")
-class SkyHanniPipCoordinatorRenderer(
-    //? if < 26.2
-    //bufferSource: MultiBufferSource.BufferSource,
-) : PictureInPictureRenderer<SkyHanniGuiItemRenderState>(
-    //? if < 26.2
-    //bufferSource,
-) {
+class SkyHanniPipCoordinatorRenderer : PictureInPictureRenderer<SkyHanniGuiItemRenderState>() {
 
     companion object {
         private val pendingStates = ArrayList<SkyHanniGuiItemRenderState>(256)
@@ -35,7 +24,6 @@ class SkyHanniPipCoordinatorRenderer(
     override fun renderToTexture(
         state: SkyHanniGuiItemRenderState,
         poseStack: PoseStack,
-        //? if >= 26.2
         submitNodeCollector: SubmitNodeCollector,
     ) = Unit
     override fun blitTexture(state: SkyHanniGuiItemRenderState, guiRenderState: GuiRenderState) = Unit

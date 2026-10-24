@@ -54,7 +54,6 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         RenderSystem.outputDepthTextureOverride = depthTextureView
 
         state.renderItemToTexture(
-            //~ if < 26.2 'submitNodeStorage' -> 'bufferSource'
             context.submitNodeStorage, context.featureRenderDispatcher,
             centerX = slotSize / 2.0f,
             centerY = slotSize / 2.0f,

@@ -14,7 +14,6 @@ import java.awt.Color
  * Fired once per frame, right before the visible entities are collected for rendering.
  *
  * Fired on the render thread via a Mixin into `LevelExtractor.extractVisibleEntities`
- * (`LevelRenderer` below 26.2).
  *
  * Listeners do not render anything themselves. They call [queueEntitiesToOutline] with a function
  * returning the outline color for an entity, or null to leave it unoutlined.
