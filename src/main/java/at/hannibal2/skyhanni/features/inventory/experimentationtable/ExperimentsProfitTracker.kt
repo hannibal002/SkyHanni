@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -80,13 +80,13 @@ object ExperimentsProfitTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onItemAdd(event: ItemAddEvent) {
+    private fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled() || !config.enabled || event.source != ItemAddManager.Source.COMMAND) return
         tracker.addItem(event.internalName, event.amount, command = true)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         experimentRenewPattern.matchMatcher(event.cleanMessage) {
             val increments = mapOf(1 to 150, 2 to 300, 3 to 500)
@@ -97,7 +97,7 @@ object ExperimentsProfitTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onTableTaskCompleted(event: TableTaskCompletedEvent) {
+    private fun onTableTaskCompleted(event: TableTaskCompletedEvent) {
         tracker.modify {
             if (event.type == ExperimentationTableApi.ExperimentationTaskType.SUPERPAIRS) {
                 it.experimentsDone++
@@ -113,7 +113,7 @@ object ExperimentsProfitTracker {
     private val bottlesInventory = InventoryDetector { ExperimentationTableApi.bottlesOfEnchantingInventoryPattern }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !bottlesInventory.isInside() || !allowedSlots.contains(event.slotId)) return
         val internalName = event.slot?.item?.getInternalNameOrNull()?.takeIf {
             experienceBottlePattern.matches(it.asString())
@@ -132,7 +132,7 @@ object ExperimentsProfitTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onTableXpBottleUsed(event: TableXPBottleUsedEvent) {
+    private fun onTableXpBottleUsed(event: TableXPBottleUsedEvent) {
         if (!isEnabled() || !config.trackUsedBottles) return
         val bottlePrice = calculateBottlePrice(event.internalName)
         tracker.modify {
@@ -158,7 +158,7 @@ object ExperimentsProfitTracker {
     private var lastAddedTimeWasted: SimpleTimeMark = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (ExperimentationTableApi.expOverInventoryPattern.matches(InventoryUtils.openInventoryName())) return
         if (!ExperimentationTableApi.inTable || !config.trackTimeSpent) {
             lastAddedTimeWasted = SimpleTimeMark.farPast()
@@ -183,7 +183,7 @@ object ExperimentsProfitTracker {
 
     private fun calculateBottlePrice(internalName: NeuInternalName): Int {
         val price = tracker.getPricePer(internalName)
-        val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
+        val npcPrice = internalName.getNpcPrice()
         return npcPrice.coerceAtLeast(price).toInt()
     }
 
@@ -239,12 +239,12 @@ object ExperimentsProfitTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onIslandChange() {
+    private fun onIslandChange() {
         tracker.firstUpdate()
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetexperimentsprofittracker") {
             description = "Resets the Experiments Profit Tracker"
             category = CommandCategory.USERS_RESET

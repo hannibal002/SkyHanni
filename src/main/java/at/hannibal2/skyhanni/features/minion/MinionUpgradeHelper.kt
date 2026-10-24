@@ -5,14 +5,12 @@ import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
@@ -50,7 +48,7 @@ object MinionUpgradeHelper {
     private var lastMinionOpen = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onMinionOpen(event: MinionOpenEvent) {
+    private fun onMinionOpen(event: MinionOpenEvent) {
         if (!config.minionConfigHelper) return
         lastMinionOpen = SimpleTimeMark.now()
         val lore = event.inventoryItems[50]?.getCleanLore() ?: return
@@ -67,25 +65,25 @@ object MinionUpgradeHelper {
     }
 
     @HandleEvent
-    fun onMinionClose(event: MinionCloseEvent) {
+    private fun onMinionClose(event: MinionCloseEvent) {
         resetItems()
     }
 
     // TODO make this event not necessary here.
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         resetItems()
     }
 
     // TODO make this event not necessary here.
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         resetItems()
     }
 
     // TODO make this event not necessary here.
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened() {
         if (lastMinionOpen.passedSince() > 2.seconds) {
             resetItems()
         }
@@ -104,7 +102,7 @@ object MinionUpgradeHelper {
     }
 
     private fun createLore(internalName: NeuInternalName): List<String> {
-        val itemPrice = internalName.getPriceOrNull() ?: 0.0
+        val itemPrice = internalName.getPrice()
         val lore = buildList {
             val itemsRemaining = itemsNeeded - itemsInSacks
             val totalCost = itemsNeeded * itemPrice
@@ -135,7 +133,7 @@ object MinionUpgradeHelper {
     }
 
     @HandleEvent
-    fun replaceItem(event: ReplaceItemEvent) {
+    private fun replaceItem(event: ReplaceItemEvent) {
         if (!config.minionConfigHelper) return
         if (event.inventory !is Inventory && event.slot == 51) {
             displayItem?.let { event.replace(it) }
@@ -143,7 +141,7 @@ object MinionUpgradeHelper {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.minionConfigHelper || displayItem == null || event.slotId != 51) return
         event.cancel()
         val internalName = internalName ?: return
