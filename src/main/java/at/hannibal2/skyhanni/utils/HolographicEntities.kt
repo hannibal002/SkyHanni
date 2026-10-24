@@ -21,8 +21,10 @@ import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.monster.zombie.Zombie
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 
@@ -71,7 +73,7 @@ object HolographicEntities {
             "HolographicEntityDebug: Zombie not found in entityHoloBases (size=${entityHoloBases.size})"
         )
         @Suppress("UNCHECKED_CAST")
-        debugHologram = (base as HolographicBase<Zombie>).instance(pos, player.yRot)
+        debugHologram = (base as HolographicBase<Zombie>).instance(pos, player.yRot, player.xRot)
         debugHologramTransparency = transparency
     }
 
@@ -84,35 +86,111 @@ object HolographicEntities {
 
     /**
      * An instance of a holographic entity. Maintains a minimal controlled state,
-     * which has just enough information for rendering and basic manipulations, such as
-     * interpolated positioning. The underlying [entity] should not be accessed directly.
+     * separating spatial positioning from rotation and look controls.
      */
     class HolographicEntity<T : LivingEntity> internal constructor(
         val entity: T,
         var position: LorenzVec,
-        var yaw: Float,
+        yaw: Float,
+        pitch: Float,
     ) {
         var isChild: Boolean = false
         var lastPosition: LorenzVec = position
-        var lastYaw: Float = yaw
         val createdAt = SimpleTimeMark.now()
         internal var cachedRenderState: EntityRenderState? = null
+
+        // Rotation states
+        var yaw: Float = yaw
+            private set
+        var pitch: Float = pitch
+            private set
+        var lastYaw: Float = yaw
+        var lastPitch: Float = pitch
+
+        var headYaw: Float = yaw
+        var headPitch: Float = pitch
+        var bodyYaw: Float = yaw
+        var lastHeadYaw: Float = headYaw
+        var lastHeadPitch: Float = headPitch
+        var lastBodyYaw: Float = bodyYaw
+
+        var defaultYaw: Float = yaw
+        var defaultPitch: Float = pitch
 
         val monotonicProgress get() = createdAt.passedSince().inWholeTicks
 
         /**
-         * Should be called exactly once per tick or never over the lifetime of this [HolographicEntity].
+         * Updates the entity's position, keeping track of previous position for interpolation.
          */
-        fun moveTo(position: LorenzVec, yaw: Float, isTeleport: Boolean = false) {
+        fun moveTo(position: LorenzVec, isTeleport: Boolean = false) {
             if (isTeleport) {
-                this.lastYaw = yaw
                 this.lastPosition = position
             } else {
-                this.lastYaw = this.yaw
                 this.lastPosition = this.position
             }
             this.position = position
+        }
+
+        /**
+         * Manually sets the entity's rotation (yaw and pitch).
+         */
+        fun setRotation(yaw: Float, pitch: Float, isTeleport: Boolean = false) {
+            if (isTeleport) {
+                this.lastYaw = yaw
+                this.lastPitch = pitch
+                this.lastHeadYaw = yaw
+                this.headYaw = yaw
+                this.lastHeadPitch = pitch
+                this.headPitch = pitch
+                this.lastBodyYaw = yaw
+                this.bodyYaw = yaw
+            } else {
+                this.lastYaw = this.yaw
+                this.lastPitch = this.pitch
+                this.lastHeadYaw = this.headYaw
+                this.lastHeadPitch = this.headPitch
+                this.lastBodyYaw = this.bodyYaw
+            }
             this.yaw = yaw
+            this.pitch = pitch
+            this.headYaw = yaw
+            this.headPitch = pitch
+            this.bodyYaw = yaw
+        }
+
+        /**
+         * Automatically looks at a target position if within [maxDistance], otherwise smoothly returns to [defaultYaw]/[defaultPitch].
+         */
+        fun updateLook(targetPos: LorenzVec?, maxDistance: Double = 20.0) {
+            // Save last rotation states before updating
+            this.lastYaw = this.yaw
+            this.lastPitch = this.pitch
+            this.lastHeadYaw = this.headYaw
+            this.lastHeadPitch = this.headPitch
+            this.lastBodyYaw = this.bodyYaw
+
+            val eyePos = position.add(y = entity.eyeHeight.toDouble(), x = 0.0, z = 0.0)
+            val distSq = targetPos?.distanceSq(eyePos) ?: Double.MAX_VALUE
+
+            if (targetPos != null && distSq <= maxDistance * maxDistance) {
+                val delta = targetPos - eyePos
+                val targetYaw = Math.toDegrees(atan2(-delta.x, delta.z)).toFloat()
+                val targetPitch = -Math.toDegrees(atan2(delta.y, sqrt(delta.x * delta.x + delta.z * delta.z))).toFloat()
+
+                headYaw = interpolateRotation(headYaw, targetYaw, 0.4f)
+                headPitch = interpolateRotation(headPitch, targetPitch, 0.4f)
+
+                // Body rotation follows head if head turns past 50 degrees (mob-like behavior)
+                val diff = interpolateRotation(bodyYaw, headYaw, 1.0f) - bodyYaw
+                if (diff < -50f) bodyYaw = headYaw + 50f
+                else if (diff > 50f) bodyYaw = headYaw - 50f
+            } else {
+                headYaw = interpolateRotation(headYaw, defaultYaw, 0.2f)
+                headPitch = interpolateRotation(headPitch, defaultPitch, 0.2f)
+                bodyYaw = interpolateRotation(bodyYaw, defaultYaw, 0.2f)
+            }
+            this.yaw = bodyYaw
+            this.pitch = headPitch
         }
 
         fun interpolatedPosition(partialTicks: Float): LorenzVec =
@@ -120,20 +198,45 @@ object HolographicEntities {
 
         fun interpolatedYaw(partialTicks: Float): Float =
             interpolateRotation(lastYaw, yaw, partialTicks)
+
+        fun interpolatedPitch(partialTicks: Float): Float =
+            interpolateRotation(lastPitch, pitch, partialTicks)
+
+        fun interpolatedHeadYaw(partialTicks: Float): Float =
+            interpolateRotation(lastHeadYaw, headYaw, partialTicks)
+
+        fun interpolatedHeadPitch(partialTicks: Float): Float =
+            interpolateRotation(lastHeadPitch, headPitch, partialTicks)
+
+        fun interpolatedBodyYaw(partialTicks: Float): Float =
+            interpolateRotation(lastBodyYaw, bodyYaw, partialTicks)
     }
 
     /**
-     * Template for a [HolographicEntity]. This class exists as a guard for
-     * [HolographicEntity] to prevent untested entities with potential NPEs
-     * being instantiated.
+     * Creates a holographic entity from an already-created entity.
+     */
+    fun <T : LivingEntity> create(
+        entity: T,
+        position: LorenzVec,
+        yaw: Float,
+        pitch: Float,
+    ): HolographicEntity<T> {
+        //? if >= 26.2
+        entity.id = FakeEntityIdProvider.getNextId()
+
+        return HolographicEntity(entity, position, yaw, pitch)
+    }
+
+    /**
+     * Template for a [HolographicEntity].
      */
     class HolographicBase<T : LivingEntity> internal constructor(internal val entityType: EntityType<T>) {
-        fun instance(position: LorenzVec, yaw: Float): HolographicEntity<T>? {
+        fun instance(position: LorenzVec, yaw: Float, pitch: Float): HolographicEntity<T>? {
             val level = Minecraft.getInstance().level ?: return null
             val entity = entityType.create(level, EntitySpawnReason.COMMAND) ?: return null
             //? if >= 26.2
             entity.id = FakeEntityIdProvider.getNextId()
-            return HolographicEntity(entity, position, yaw)
+            return HolographicEntity(entity, position, yaw, pitch)
         }
     }
 
@@ -141,7 +244,6 @@ object HolographicEntities {
     val entityHoloBases: Map<KClass<out LivingEntity>, HolographicBase<out LivingEntity>> get() = _internalEntityHoloBases ?: run {
         val level = Minecraft.getInstance().level ?: return@run emptyMap()
         BuiltInRegistries.ENTITY_TYPE.associateNotNull type@{ entityType ->
-            // Create a throwaway instance only to determine the KClass key.
             val testEntity: LivingEntity = runCatching {
                 entityType.create(level, EntitySpawnReason.COMMAND)?.apply {
                     //? if >= 26.2
@@ -166,7 +268,7 @@ object HolographicEntities {
     }
 
     /**
-     * Render a fake [HolographicEntity]. To render a fully opaque entity, set [opacity] to `1F`.
+     * Render a fake [HolographicEntity].
      */
     fun <T : LivingEntity> SkyHanniRenderWorldEvent.renderHolographicEntity(
         holographicEntity: HolographicEntity<T>,
@@ -174,16 +276,19 @@ object HolographicEntities {
     ) {
         val entity = holographicEntity.entity
         val mobPosition = holographicEntity.interpolatedPosition(partialTicks)
-        val interpolatedYaw = holographicEntity.interpolatedYaw(partialTicks)
+        val interpolatedBodyYaw = holographicEntity.interpolatedBodyYaw(partialTicks)
+        val interpolatedHeadYaw = holographicEntity.interpolatedHeadYaw(partialTicks)
+        val interpolatedHeadPitch = holographicEntity.interpolatedHeadPitch(partialTicks)
 
-        // Populate entity fields that extractRenderState will read.
-        // These are safe to set because HolographicBase entities are never ticked.
-        entity.yRot = interpolatedYaw
-        entity.yRotO = interpolatedYaw
-        entity.yBodyRot = interpolatedYaw
-        entity.yBodyRotO = interpolatedYaw
-        entity.yHeadRot = interpolatedYaw
-        entity.yHeadRotO = interpolatedYaw
+        // Populate entity fields for separate body/head rendering
+        entity.yRot = interpolatedBodyYaw
+        entity.yRotO = interpolatedBodyYaw
+        entity.yBodyRot = interpolatedBodyYaw
+        entity.yBodyRotO = interpolatedBodyYaw
+        entity.yHeadRot = interpolatedHeadYaw
+        entity.yHeadRotO = interpolatedHeadYaw
+        entity.xRot = interpolatedHeadPitch
+        entity.xRotO = interpolatedHeadPitch
 
         val client = Minecraft.getInstance()
         @Suppress("UNCHECKED_CAST")
