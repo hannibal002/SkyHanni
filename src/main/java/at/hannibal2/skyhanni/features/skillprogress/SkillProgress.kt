@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
@@ -183,27 +184,28 @@ object SkillProgress {
         val skill = SkillApi.storage?.get(event.skill) ?: return
         val goalReached = newLevel == skill.customGoalLevel && customGoalConfig.enableInChat
 
-        val rewards = buildList {
-            add("  §r§7§8+§b1 Flexing Point")
-            if (newLevel % 5 == 0)
-                add("  §r§7§8+§d50 SkyHanni User Luck")
-        }
-        val messages = listOf(
-            "§3§l---------------------------------------------",
-            "  §r§b§lSKILL LEVEL UP §3$skillName §8$oldLevel➜§3$newLevel",
-            if (goalReached)
-                listOf(
+        val messages = buildList {
+            add("§3§l---------------------------------------------")
+            add("  §r§b§lSKILL LEVEL UP §3$skillName §8$oldLevel➜§3$newLevel")
+            if (goalReached) {
+                addAll(
                     "",
                     "  §r§d§lGOAL REACHED!",
                     "",
-                ).joinToString("\n") else
-                "",
-            "  §r§a§lREWARDS",
-            rewards.joinToString("\n"),
-            "§3§l---------------------------------------------",
-        )
+                )
+            } else add("")
 
-        chat(messages.joinToString("\n"), false)
+            add("  §r§a§lREWARDS")
+            add("  §r§7§8+§b1 Flexing Point")
+            if (newLevel % 5 == 0) add("  §r§7§8+§d50 SkyHanni User Luck")
+            add("§3§l---------------------------------------------")
+        }
+
+        // each line is sent individually so that when copying the message, it only copies a single line instead of
+        // the entire message, to match hypixel's normal skill level up messages
+        messages.forEach { message ->
+            chat(message, prefix = false)
+        }
 
         if (goalReached)
             chat("§lYou have reached your goal level of §b§l${skill.customGoalLevel} §e§lin the §b§l$skillName §e§lskill!")
