@@ -211,7 +211,7 @@ object FishingProfitTracker {
     fun onChat(event: SkyHanniChatEvent.Allow) {
         coinsChatPattern.matchMatcher(event.cleanMessage) {
             tryAddItem(NeuInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
-            addCatch()
+            // Don't need to addCatch() here since FishingCatchEvent will be posted and increment it there
         }
     }
 
