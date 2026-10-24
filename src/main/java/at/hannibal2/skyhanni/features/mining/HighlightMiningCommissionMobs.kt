@@ -54,8 +54,8 @@ object HighlightMiningCommissionMobs {
     )
 
     @OptIn(AllEntitiesGetter::class)
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(onlyOnIslandTypeTag = [ADVANCED_MINING])
+    private fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
 
@@ -73,8 +73,8 @@ object HighlightMiningCommissionMobs {
         }
     }
 
-    @HandleEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    @HandleEvent(onlyOnIslandTypeTag = [ADVANCED_MINING])
+    private fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
 
         // TODO Commission API
@@ -84,8 +84,8 @@ object HighlightMiningCommissionMobs {
         }.values.toList()
     }
 
-    @HandleEvent
-    fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
+    @HandleEvent(onlyOnIslandTypeTag = [ADVANCED_MINING])
+    private fun onEntityMaxHealthUpdate(event: EntityMaxHealthUpdateEvent<LivingEntity>) {
         if (!isEnabled()) return
 
         val entity = event.entity
@@ -100,7 +100,7 @@ object HighlightMiningCommissionMobs {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.mining", "mining")
     }
 
