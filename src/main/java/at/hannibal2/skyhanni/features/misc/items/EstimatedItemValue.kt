@@ -269,8 +269,10 @@ object EstimatedItemValue {
 
         val list = mutableListOf<String>()
         list.add("§aEstimated Item Value:")
-        val pair = EstimatedItemValueCalculator.calculate(stack, list)
-        val (totalPrice, basePrice) = pair
+        val estimateData = EstimatedItemValueCalculator.calculate(stack)
+        list.addAll(estimateData.breakdown)
+        val totalPrice = estimateData.totalPrice
+        val basePrice = estimateData.basePrice
 
         if (basePrice == totalPrice) return listOf()
 
