@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.StorageT
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
@@ -134,6 +135,16 @@ object ChestValue {
         DelayedRun.runOrNextTick {
             update()
         }
+    }
+
+    @HandleEvent
+    private fun onTick(event: SkyHanniTickEvent) {
+        if (!isEnabled()) return
+        if (!event.isMod(5)) return
+        if (MinecraftCompat.screen !is InventoryScreen) return
+        if (StorageType.OWN_INVENTORY !in config.enabledIn.get()) return
+        if (!inInventory) return
+        update()
     }
 
     @HandleEvent
