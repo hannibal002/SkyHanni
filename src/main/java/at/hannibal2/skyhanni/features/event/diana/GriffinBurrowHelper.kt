@@ -12,14 +12,14 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.event.diana.BurrowType.Companion.getBurrowColour
+import at.hannibal2.skyhanni.features.event.diana.BurrowType.Companion.getBurrowText
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addDoublePlant
@@ -45,6 +46,7 @@ import at.hannibal2.skyhanni.utils.compat.addRedFlower
 import at.hannibal2.skyhanni.utils.compat.addTallGrass
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColorOrOutline
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -190,7 +192,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Helper")
 
         if (!DianaApi.isDoingDiana()) {
@@ -212,7 +214,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed() {
         if (!isEnabled()) return
         update()
     }
@@ -266,7 +268,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onBurrowGuess(event: BurrowGuessEvent) {
+    private fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayerOrThrow)
 
         val newLocation = event.guess.getCurrent()
@@ -281,7 +283,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onBurrowDetect(event: BurrowDetectEvent) {
+    private fun onBurrowDetect(event: BurrowDetectEvent) {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayerOrThrow)
         val burrowLocation = event.burrowLocation
         val currentEntry = getGuess(burrowLocation)
@@ -302,7 +304,7 @@ object GriffinBurrowHelper {
 
     @Suppress("MaxLineLength")
     @HandleEvent
-    fun onBurrowDug(event: BurrowDugEvent) {
+    private fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
         mobAlive = false
         addDebug("Burrow dug event [${location.x}, ${location.y}, ${location.z}] recently removed burrows size: ${recentGuessesRemoved.size}")
@@ -332,7 +334,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
+    private fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
         if (event.distance > 10) {
             update()
@@ -340,7 +342,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         BurrowApi.lastBurrowInteracted?.let {
@@ -403,7 +405,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         DelayedRun.runOrNextTick {
             if (mobAlive) {
                 BurrowApi.lastBurrowInteracted?.let { removeGuess(it, "changed worlds while mob was alive") }
@@ -414,7 +416,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onProfileChange(event: ProfileJoinEvent) {
+    private fun onProfileJoin() {
         DelayedRun.runOrNextTick { resetAllData() }
     }
 
@@ -441,7 +443,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         val playerLocation = LocationUtils.playerLocation()
@@ -462,7 +464,7 @@ object GriffinBurrowHelper {
 
             val targetType = getGuess(targetLocation)?.burrowType
             val lineWidth = if (targetType != null && targetType != BurrowType.UNKNOWN) {
-                color = targetType.color
+                color = targetType.getBurrowColour()
                 3
             } else 2
             if (currentWarp == null) {
@@ -481,11 +483,15 @@ object GriffinBurrowHelper {
             val location = target.getCurrent()
             val distance = location.distance(playerLocation)
             val text = when (target.burrowType) {
-                BurrowType.UNKNOWN -> "${if (currentWarp != null) "§b" else "§f"}Guess"
-                else -> target.burrowType.text
+                BurrowType.UNKNOWN -> "${if (currentWarp != null) "§b" else "§f"}Guess".asComponent()
+                else -> target.burrowType.getBurrowText()
             }
 
-            event.drawColor(location, target.burrowType.color, config.beaconDistance != -1.0F && distance > config.beaconDistance)
+            event.drawColor(
+                location,
+                target.burrowType.getBurrowColour(),
+                config.beaconDistance != -1.0F && distance > config.beaconDistance,
+            )
             event.drawDynamicText(location.up(), text, 1.5 * config.textScale)
         }
 
@@ -522,7 +528,7 @@ object GriffinBurrowHelper {
             val location = guess.getCurrent()
             val distance = location.distance(playerLocation)
             val burrowType = guess.burrowType
-            var text = burrowType.text
+            var text = burrowType.getBurrowText()
 
             if (!config.burrowsNearbyDetection) {
                 if (burrowType != BurrowType.UNKNOWN) return
@@ -532,7 +538,7 @@ object GriffinBurrowHelper {
                 if (!config.guess) return
                 else {
                     val textColor = if (BurrowWarpHelper.currentWarp != null && targetLocation == location) "§b" else "§f"
-                    text = "${textColor}Guess"
+                    text = "${textColor}Guess".asComponent()
                     if (distance > 5) {
                         val formattedDistance = distance.toInt().addSeparators()
                         event.drawDynamicText(location.up(), "§e${formattedDistance}m", 1.7 * config.textScale, yOff = 10f)
@@ -549,19 +555,24 @@ object GriffinBurrowHelper {
                 }
             }
 
-            // TODO add chroma color support via config
-            event.drawColor(location, burrowType.color, config.beaconDistance != -1.0F && distance > config.beaconDistance)
+            event.drawColorOrOutline(
+                location,
+                burrowType.getBurrowColour(),
+                config.beaconDistance != -1.0F && distance > config.beaconDistance,
+                config.burrowCustomization.burrowOutlineWidth.toInt(),
+                filled = config.burrowCustomization.shouldRenderAsFullBlock,
+            )
             event.drawDynamicText(location.up(), text, 1.5 * config.textScale)
         }
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "diana", "event.diana")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onBlockClick(event: BlockClickEvent) {
+    private fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (!DianaApi.hasSpadeInHand()) return
 
@@ -581,6 +592,7 @@ object GriffinBurrowHelper {
         val burrows = allGuesses.toList().flatMap { it.guesses }.union(recentGuessesRemoved)
         if (burrows.contains(location)) BurrowApi.setBurrowInteracted(location)
     }
+
 
     private fun isEnabled() = DianaApi.isDoingDiana()
 
@@ -626,7 +638,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetburrows") {
             description = "Resets all saved griffin burrow locations"
             category = CommandCategory.USERS_RESET
