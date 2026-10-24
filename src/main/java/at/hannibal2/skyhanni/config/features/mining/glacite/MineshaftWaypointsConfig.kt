@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.config.features.mining.glacite
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.glfw.GLFW
 
 class MineshaftWaypointsConfig {
     @Expose
@@ -30,8 +30,8 @@ class MineshaftWaypointsConfig {
         desc = "Share the location of the nearest found corpse upon key press.\n" +
             "§eYou can share the location even if it has already been shared!",
     )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var shareCorpseKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
+    @ConfigEditorKeyMapping
+    var shareCorpseKeybind = InputConstants.UNKNOWN
 
     @SkyHanniModule
     companion object {
