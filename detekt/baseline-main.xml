@@ -1685,7 +1685,7 @@
     <ID>PrivateEventListener:HoppityApi.kt:HoppityApi$@HandleEvent fun onRepoReload</ID>
     <ID>PrivateEventListener:HoppityApi.kt:HoppityApi$@HandleEvent(InventoryCloseEvent::class) fun onInventoryClose</ID>
     <ID>PrivateEventListener:HoppityApi.kt:HoppityApi$@HandleEvent(IslandChangeEvent::class) fun onIslandChange</ID>
-    <ID>PrivateEventListener:HoppityApi.kt:HoppityApi$@HandleEvent(onlyOnSkyblock = true) fun onCommandSend</ID>
+    <ID>PrivateEventListener:HoppityApi.kt:HoppityApi$@HandleEvent(onlyOnSkyblock = true) fun onDialogueResponseSent</ID>
     <ID>PrivateEventListener:HoppityApi.kt:HoppityApi$@HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH) fun onChat</ID>
     <ID>PrivateEventListener:HoppityApi.kt:HoppityApi$@HandleEvent(priority = HIGHEST) fun onEggFound</ID>
     <ID>PrivateEventListener:HoppityApi.kt:HoppityApi$@HandleEvent(priority = HandleEvent.HIGH) fun onSlotClick</ID>
