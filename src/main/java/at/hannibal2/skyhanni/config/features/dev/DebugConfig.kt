@@ -258,11 +258,11 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(
-        name = "Hide all Entities",
-        desc = "Makes literally every entity invisible for 'performance' §4(THIS WILL BE UNPLAYABLE)"
+        name = "Hide All Entities",
+        desc = "Makes literally every entity invisible for 'performance' §4(THIS WILL BE UNPLAYABLE) use /shrendertoggle to temporarily re-enable entity rendering."
     )
     @ConfigEditorBoolean
-    var hideAllEntities: Boolean = false
+    var hideAllEntities: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Track Sound", desc = "")
