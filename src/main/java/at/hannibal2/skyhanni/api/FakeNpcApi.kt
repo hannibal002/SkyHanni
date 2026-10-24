@@ -25,12 +25,12 @@ import kotlin.math.atan2
 import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
+@Suppress("SkyHanniModuleInspection")
 object FakeNpcApi {
 
     private val npcs = mutableMapOf<String, ActiveNpc>()
 
-    private var registered = true
+    private var registered = false
         set(value) {
             if (value == field) return
             if (value) {
@@ -185,47 +185,6 @@ object FakeNpcApi {
     @HandleEvent
     private fun onWorldChange() {
         clear()
-    }
-
-    @HandleEvent
-    private fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shfakenpc") {
-            description = "Fake NPC Testing Command"
-            category = DEVELOPER_TEST
-            literal("add") {
-                arg("id", BrigadierArguments.string()) { idArg ->
-                    argCallback("name", BrigadierArguments.string()) { name ->
-                        val id = getArg(idArg)
-                        val profile = ResolvableProfile.createResolved(
-                            Minecraft.getInstance().gameProfile
-                        )
-                        val data = NpcData(
-                            id = id,
-                            name = name,
-                            skinProfile = profile,
-                            position = LocationUtils.playerLocation(),
-                            dialogue = listOf(
-                                "§e[SkyHanni Fake NPC]§r Hello, I am $name!",
-                                "§e[SkyHanni Fake NPC]§r Nice to meet you!"
-                            ),
-                        )
-                        addNpc(data)
-                    }
-                }
-            }
-            literal("remove") {
-                argCallback(
-                    "id",
-                    BrigadierArguments.string(),
-                    BrigadierUtils.dynamicSuggestionProvider { getNpcs().map { it.id } },
-                ) { id ->
-                    removeNpc(id)
-                }
-            }
-        }
-        if (npcs.isEmpty()) {
-            registered = false
-        }
     }
 
     fun mannequinFromData(data: NpcData): ClientMannequin {
