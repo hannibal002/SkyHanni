@@ -14,7 +14,7 @@ object DungeonTrinityHelper {
     private val config get() = SkyHanniMod.feature.dungeon.trinityHelper
 
     @HandleEvent
-    fun onDungeonStart(event: DungeonStartEvent) {
+    private fun onDungeonStart(event: DungeonStartEvent) {
         if (!config.enabled) return
 
         TabWidget.DUNGEON_PUZZLE.matchMatcherFirstLine {
