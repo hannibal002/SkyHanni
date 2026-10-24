@@ -19,13 +19,14 @@ object EnoughUpdatesRepoManager : AbstractRepoManager<NeuRepositoryReloadEvent>(
     override val repoFolderName: String = "neurepo"
     override val legacyConfigDirectory = File("config/notenoughupdates")
 
-    override val reloadCommand: String = "neureloadrepo"
-    override val progressCategory = ChatProgressUpdates.category("NotEnoughUpdates Repo")
-    override val statusCommand: String = "neurepostatus"
     override val updateCommand: String = "neuresetrepo"
+    override val statusCommand: String = "neurepostatus"
+    override val reloadCommand: String = "neureloadrepo"
+
+    override val progressCategory = ChatProgressUpdates.category("NotEnoughUpdates Repo")
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
+    private fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
 
     override fun reportExtraStatusInfo() = with(EnoughUpdatesManager) {
         reportItemStatus()
