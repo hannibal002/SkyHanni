@@ -30,7 +30,7 @@ class FishingHookDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Custom Reel In Time",
-        desc = "Shows the Custom Alert when the time to reel in (in seconds) is less than or equal to the value below."
+        desc = "Shows the Custom Alert once the remaining time to reel in (in seconds) is less than or equal to this value."
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 1f, minStep = 0.1f)
     var customReelInTime: Float = 0f
