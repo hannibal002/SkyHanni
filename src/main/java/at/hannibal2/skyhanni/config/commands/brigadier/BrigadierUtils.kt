@@ -33,7 +33,7 @@ object BrigadierUtils {
      */
     fun Collection<String>.toSuggestionProvider() = SuggestionProvider<FabricClientCommandSource> { _, builder ->
         for (s in this) {
-            if (s.startsWith(builder.remainingLowerCase)) {
+            if (s.lowercase().startsWith(builder.remainingLowerCase)) {
                 builder.suggest(s)
             }
         }

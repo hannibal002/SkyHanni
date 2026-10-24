@@ -27,9 +27,9 @@ data class GardenJson(
 data class GardenVisitor(
     @Expose @SerializedName("rarity") private val _rarity: LorenzRarity,
     @Expose @SerializedName("new_rarity") private val _newRarity: LorenzRarity?,
-    @Expose val position: LorenzVec?,
+    @Expose val position: LorenzVec? = null,
     @Expose @SerializedName(value = "skin_or_type", alternate = ["skinOrType"]) var skinOrType: String?,
-    @Expose val mode: String,
+    @Expose val mode: String? = null,
     @Expose @SerializedName("need_items") val needItems: List<String>,
     @Expose @SerializedName("unknown_rewards") val unknownRewards: Boolean = false,
     @Expose @SerializedName("show_chat_message") val showChatMessage: Boolean = false,
