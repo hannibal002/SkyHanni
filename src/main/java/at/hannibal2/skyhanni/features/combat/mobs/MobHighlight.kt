@@ -11,12 +11,10 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.level.block.Blocks
 
@@ -94,7 +92,7 @@ object MobHighlight {
             heldBlock == Blocks.ENDER_CHEST ->
                 Triple(LorenzColor.GREEN, 127, config::chestZealotHighlighter)
 
-            entity.isZealotOrBruiser() ->
+            event.maxHealth.isZealotOrBruiserMaxHealth() ->
                 Triple(LorenzColor.DARK_AQUA, 127, config::zealotBruiserHighlighter)
 
             else -> return
@@ -122,6 +120,6 @@ object MobHighlight {
         )
     }
 
-    private fun LivingEntity.isZealotOrBruiser() = baseMaxHealth == 13_000 || baseMaxHealth == 65_000 ||
-        baseMaxHealth == 13_000 * 4 || baseMaxHealth == 65_000 * 4 // runic
+    private fun Int.isZealotOrBruiserMaxHealth() = this == 13_000 || this == 65_000 ||
+        this == 13_000 * 4 || this == 65_000 * 4 // runic
 }

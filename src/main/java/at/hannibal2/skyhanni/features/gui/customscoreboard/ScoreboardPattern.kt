@@ -9,10 +9,10 @@ import java.util.regex.Pattern
 
 @SkyHanniModule
 object ScoreboardPattern {
-    private val group = RepoPattern.group("features.gui.customscoreboard")
+    private val patternGroup = RepoPattern.group("features.gui.customscoreboard")
 
     // Lines from the scoreboard
-    private val scoreboardGroup by group.exclusiveGroup("scoreboard")
+    private val scoreboardGroup by patternGroup.exclusiveGroup("scoreboard")
 
     @HandleEvent(RepositoryReloadEvent::class)
     fun onRepoReload() {
@@ -226,11 +226,15 @@ object ScoreboardPattern {
     /**
      * REGEX-TEST: §a[H] §6Eisengolem §7[Lv48]
      * REGEX-TEST: §e[M] §b04032006 §a7,361§c❤
+     * REGEX-TEST: §e[H] §bPhilipul §c§l769§c❤
+     * REGEX-TEST: §e[A] §bProfessional §a19,504
+     * REGEX-TEST: §e[B] §aAmoHaviju §a13,746§c❤
+     * REGEX-TEST: §e[T] §bShadow_Sphin §a22,595
      */
     @Suppress("MaxLineLength")
     val teammatesPattern by dungeonSB.pattern(
         "teammates",
-        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§(?<color>.))*(?<health>[\\w,.]+)(?:§.)*.?)",
+        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|§(?<color>.)(?:§.)*(?<health>[\\w,.]+)(?:§.)*.?)",
     )
 
     /**
@@ -1003,7 +1007,7 @@ object ScoreboardPattern {
      * REGEX-TEST: §d᠅ §fGemstone§f
      * REGEX-TEST: §d᠅ §fGemstone§f§e(+1)
      */
-    val brokenPatterns by group.list(
+    val brokenPatterns by patternGroup.list(
         "broken",
         "\\s*§.§l⚡ §cRedston",
         "\\s*§ce: §e§b\\d+%",
@@ -1012,7 +1016,7 @@ object ScoreboardPattern {
     )
 
     // Lines from the tablist
-    private val tablistGroup = group.group("tablist-no-color")
+    private val tablistGroup = patternGroup.group("tablist-no-color")
 
     /**
      * WRAPPED-REGEX-TEST: " Ends In: 27h"

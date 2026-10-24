@@ -14,7 +14,7 @@ import net.minecraft.network.chat.Component
 @SkyHanniModule
 object CakeSoulAchievement {
 
-    private val cakeSoulPattern by AchievementManager.group.pattern(
+    private val cakeSoulPattern by AchievementManager.patternGroup.pattern(
         "cake-soul",
         "You found a Cake Soul!",
     )

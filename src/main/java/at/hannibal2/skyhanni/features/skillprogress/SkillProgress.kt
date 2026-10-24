@@ -189,7 +189,7 @@ object SkillProgress {
                 add("  §r§7§8+§d50 SkyHanni User Luck")
         }
         val messages = listOf(
-            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
+            "§3§l---------------------------------------------",
             "  §r§b§lSKILL LEVEL UP §3$skillName §8$oldLevel➜§3$newLevel",
             if (goalReached)
                 listOf(
@@ -200,7 +200,7 @@ object SkillProgress {
                 "",
             "  §r§a§lREWARDS",
             rewards.joinToString("\n"),
-            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
+            "§3§l---------------------------------------------",
         )
 
         chat(messages.joinToString("\n"), false)
