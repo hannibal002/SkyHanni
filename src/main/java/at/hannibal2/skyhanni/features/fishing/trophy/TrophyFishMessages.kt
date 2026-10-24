@@ -37,11 +37,12 @@ object TrophyFishMessages {
      * REGEX-TEST:  TROPHY FISH! You caught a Blobfish SILVER!
      * REGEX-TEST:  TROPHY FISH! You caught a Golden Fish SILVER!
      * REGEX-TEST:  TROPHY FISH! You caught a Lavahorse BRONZE x2!
+     * REGEX-TEST:  TROPHY FISH! You caught Blobfish DIAMOND!
      */
     @Suppress("MaxLineLength")
     val trophyFishPattern by RepoPattern.pattern(
         "fishing.trophy.trophyfish.colorless",
-        "${SkyblockStat.TROPHY_CHANCE.hypixelIcon} TROPHY FISH! You caught an? (?<displayName>[\\w -]+?) (?<displayRarity>[A-Z]+)(?: x(?<amount>\\d+))?!",
+        "${SkyblockStat.TROPHY_CHANCE.hypixelIcon} TROPHY FISH! You caught(?: an?)? (?<displayName>[\\w -]+?) (?<displayRarity>[A-Z]+)(?: x(?<amount>\\d+))?!",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
