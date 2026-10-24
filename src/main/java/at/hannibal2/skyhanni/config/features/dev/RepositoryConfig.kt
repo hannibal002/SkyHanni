@@ -75,14 +75,4 @@ class RepositoryConfig : AbstractRepoConfig {
             }
         }
     }
-
-    @Expose
-    @ConfigOption(
-        name = "Unzip Repo to Memory",
-        desc = "Instead of unzipping the repo directly to disk, unzip it to memory first, " +
-            "and start a background thread to write it to disk.",
-    )
-    @ConfigEditorBoolean
-    override var unzipToMemory: Boolean = false
-
 }

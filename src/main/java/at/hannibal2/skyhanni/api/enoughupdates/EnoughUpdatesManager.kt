@@ -93,7 +93,7 @@ object EnoughUpdatesManager {
     private suspend fun loadItemMap(progress: ChatProgressUpdates, tempItemMap: TreeMap<NeuInternalName, NeuItemJson>) = coroutineScope {
         progress.update("loadItemMap")
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
-        val list = fileSystem.list("items")
+        val list = fileSystem.listFiles("items", "json")
         progress.innerProgressStart(list.size)
         val parsedItems = list.mapNotNullAsync { name ->
             try {
@@ -321,7 +321,7 @@ object EnoughUpdatesManager {
 
     fun reportItemStatus() {
         val loadedItems = itemMap.size
-        val directorySize = EnoughUpdatesRepoManager.repoFileSystem.list("items").size
+        val directorySize = EnoughUpdatesRepoManager.repoFileSystem.listFiles("items", "json").size
 
         val status = when {
             directorySize == 0 -> "§cNo item directory entries found!"
