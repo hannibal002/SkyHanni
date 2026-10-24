@@ -12,4 +12,10 @@ class SkyblockStatTest {
         Assertions.assertEquals(SkyblockStat.MELON_FORTUNE, SkyblockStat.getValueByDisplayNameOrNull("Melon Slice Fortune"))
         Assertions.assertEquals(SkyblockStat.NETHER_STALK_FORTUNE, SkyblockStat.getValueByDisplayNameOrNull("Nether Wart Fortune"))
     }
+
+    @Test
+    fun `resolves trophy chance identifiers`() {
+        Assertions.assertEquals(SkyblockStat.TROPHY_CHANCE, SkyblockStat.getValueOrNull("TROPHY_CHANCE"))
+        Assertions.assertEquals(SkyblockStat.TROPHY_CHANCE, SkyblockStat.getValueOrNull("TROPHY_FISH_CHANCE"))
+    }
 }

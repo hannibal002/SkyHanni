@@ -1,5 +1,73 @@
 # SkyHanni - Change Log
 
+## Version 10.0.0
+
+### New Features
+
+#### Hunting
+
++ Added an option to hide Critter Capsules on the Critter Safari. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6542)
+    + Capsules in flight can be hidden always or only while close to the player.
+    + Capsules lying on the ground can be hidden with a separate option.
++ Added Critter Safari Shard Checklist. - pan_truskawka045 (https://github.com/hannibal002/SkyHanni/pull/6526)
+    + Tracks which shards you caught during the current run and shows the ones still missing.
+    + Can show every biome, the current biome first, or only the current biome with a one-line summary for the rest.
+    + Can hide already caught shards and the shard icons.
+
+### Improvements
+
+#### Mining
+
++ Added an In Dwarven Mines option to the Fallen Star Cult Timer. - Ironfort9 (https://github.com/hannibal002/SkyHanni/pull/6547)
+
+#### Chat
+
++ Added an opt-out for contributors who do not want to count toward Achievements or trigger the Discover Contributor Message. - Empa (https://github.com/hannibal002/SkyHanni/pull/6556)
+
+### Fixes
+
+#### Chat
+
++ Fixed being kicked from Hypixel when copying and sending the Overflow level-up messages for Skills and Garden Milestones. - Rhynohowl (https://github.com/hannibal002/SkyHanni/pull/6544)
+
+#### Combat
+
++ Fixed ConcurentModificationException errors in chat from Damage Indicator. - Luna (https://github.com/hannibal002/SkyHanni/pull/6548)
++ Fixed Slayer Damage Indicator not working and showing errors after Hypixel changed the Slayer boss nametags. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6588)
+
+#### Events
+
++ Fixed Shiny Orb Rewards not being detected. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6558)
+
+#### Fishing
+
++ Fixed Sack Display showing the selected bait in the Bait Sack as Common Hook. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6591)
++ Fixed Trophy Fish catches not being counted and Trophy Fishing Chat Messages not working after Hypixel changed the catch message. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6587)
++ Fixed Old SkyBlock Menu Fishing Bag using the old command /fishingbag, changing it to use /baitsack. - Shana (https://github.com/hannibal002/SkyHanni/pull/6597)
+
+#### Inventory
+
++ Fixed an error when having Odger's Tooth in the Accessory Bag. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6590)
++ Fixed errors and missing prices for the Phoenix Pet after Hypixel changed its rarities to Special and Very Special. - Pablete1234 (https://github.com/hannibal002/SkyHanni/pull/6575)
++ Fixed unknown item category errors. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6587)
+
+#### Farming
+
++ Fixed the Kernel donation message from Feast Chef Ted not being hidden. - Shana (https://github.com/hannibal002/SkyHanni/pull/6546)
+
+#### Misc
+
++ Fixed wrong colors in Fix Colored Particles. - Luna (https://github.com/hannibal002/SkyHanni/pull/6549)
+    + Green and blue were swapped, so green particles rendered blue and blue ones green.
+
+### Removed Features
+
++ Removed Fishing Bag related features from Not Clickable Items due to the Fishing Bag not existing anymore. - Shana (https://github.com/hannibal002/SkyHanni/pull/6597)
+
+### Technical Details
++ Added the internal item name to the `/shcopyentities` output. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6542)
++ Renamed most variables of RepoPatternGroup. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6527)
+
 ## Version 9.0.0
 
 ### New Features

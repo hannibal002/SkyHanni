@@ -23,8 +23,8 @@ object GetFromSacksTabComplete {
 
         val query = event.lastWord
         val matching = SackApi.sackListNames
+            .map { it.replace(' ', '_') }
             .filter { it.contains(query, ignoreCase = true) }
-            .map { it.replace(" ", "_") }
         event.addSuggestionsUnchecked(matching)
     }
 
