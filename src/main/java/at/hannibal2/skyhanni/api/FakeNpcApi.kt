@@ -25,12 +25,12 @@ import kotlin.math.atan2
 import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("SkyHanniModuleInspection")
+@SkyHanniModule
 object FakeNpcApi {
 
     private val npcs = mutableMapOf<String, ActiveNpc>()
 
-    private var registered = false
+    private var registered = true
         set(value) {
             if (value == field) return
             if (value) {
@@ -115,6 +115,9 @@ object FakeNpcApi {
 
     @HandleEvent
     private fun onTick() {
+        if (npcs.isEmpty()) {
+            registered = false
+        }
         val player = MinecraftCompat.localPlayerOrNull
         val playerEyePos = player?.let { LocationUtils.playerEyeLocation() }
 
