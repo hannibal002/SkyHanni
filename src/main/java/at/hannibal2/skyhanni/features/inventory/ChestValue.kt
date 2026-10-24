@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.SortingTypeEntry
+import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.StorageType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -38,6 +40,8 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButt
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonArray
+import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
@@ -48,8 +52,8 @@ object ChestValue {
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<Renderable>()
     private var chestItems = mapOf<String, ChestItem>()
-    private val inInventory get() = isValidStorage()
-    private var inOwnInventory = false
+    private val inInventory get() = currentStorageType != null
+    private var currentStorageType: StorageType? = null
     private val scrollValue = ScrollValue()
 
     /**
@@ -59,14 +63,33 @@ object ChestValue {
      */
     private val relevantChestValuePattern by RepoPattern.pattern(
         "inventory.chestvalue.relevant",
-        "Personal Vault|Chest Storage|Wood Chest\\+"
+        "Personal Vault|Chest Storage|Wood Chest\\+",
+    )
+
+    /**
+     * REGEX-TEST: Ender Chest (1/3)
+     * REGEX-TEST: Ender Chest (1/9)
+     */
+    private val enderChestPattern by RepoPattern.pattern(
+        "inventory.chestvalue.ender-chest",
+        ".*Ender Chest \\(.*",
+    )
+
+    /**
+     * REGEX-TEST: Small Backpack (Slot #1)
+     * REGEX-TEST: Backpack Slot (Slot #18)
+     */
+    private val backpackPattern by RepoPattern.pattern(
+        "inventory.chestvalue.backpack",
+        ".*Backpack.*Slot #.*",
     )
 
     @HandleEvent
-    fun onChestGuiRender() {
+    private fun onChestGuiRender() {
         if (!isEnabled()) return
         if (DungeonApi.inDungeon() && !config.enableInDungeons) return
-        if (!inOwnInventory) {
+        val isOwnInventory = MinecraftCompat.screen is InventoryScreen && StorageType.OWN_INVENTORY in config.enabledIn.get()
+        if (!isOwnInventory) {
             if (InventoryUtils.openInventoryName() == "") return
         }
 
@@ -81,21 +104,23 @@ object ChestValue {
         }
     }
 
-    private fun featureName() = if (inOwnInventory) "Estimated Inventory Value" else "Estimated Chest Value"
-
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled()) return
-        if (!event.isMod(5)) return
-        val inInv = MinecraftCompat.screen is InventoryScreen
-        inOwnInventory = inInv && config.enableInOwnInventory
-        if (!inInventory) return
-        update()
+    private fun featureName(): String {
+        val isOwnInventory = MinecraftCompat.screen is InventoryScreen &&
+            StorageType.OWN_INVENTORY in config.enabledIn.get()
+        return if (isOwnInventory) "Estimated Inventory Value" else "Estimated Chest Value"
     }
 
-    @HandleEvent(InventoryOpenEvent::class)
-    fun onInventoryOpen() {
+    @HandleEvent
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
+        val name = event.inventoryName.removeColor()
+        currentStorageType = when {
+            MinecraftCompat.screen is InventoryScreen && StorageType.OWN_INVENTORY in config.enabledIn.get() -> StorageType.OWN_INVENTORY
+            enderChestPattern.matches(name) && StorageType.ENDER_CHEST in config.enabledIn.get() -> StorageType.ENDER_CHEST
+            backpackPattern.matches(name) && StorageType.BACKPACK in config.enabledIn.get() -> StorageType.BACKPACK
+            relevantChestValuePattern.matches(name) -> StorageType.OWN_INVENTORY
+            else -> null
+        }
         if (inInventory) {
             DelayedRun.runOrNextTick {
                 update()
@@ -103,9 +128,30 @@ object ChestValue {
         }
     }
 
-    @HandleEvent(InventoryCloseEvent::class)
-    fun onInventoryClose() {
+    @HandleEvent
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!isEnabled()) return
+        if (!inInventory) return
+        DelayedRun.runOrNextTick {
+            update()
+        }
+    }
+
+    @HandleEvent
+    private fun onTick(event: SkyHanniTickEvent) {
+        if (!isEnabled()) return
+        if (!event.isMod(5)) return
+        if (MinecraftCompat.screen !is InventoryScreen) return
+        if (StorageType.OWN_INVENTORY !in config.enabledIn.get()) return
+        currentStorageType = StorageType.OWN_INVENTORY
+        if (!inInventory) return
+        update()
+    }
+
+    @HandleEvent
+    private fun onInventoryClose() {
         chestItems = emptyMap()
+        currentStorageType = null
     }
 
     private fun update() {
@@ -198,7 +244,8 @@ object ChestValue {
 
     private fun init() {
         if (!inInventory) return
-        val slots = if (inOwnInventory) {
+        val isOwnInventory = MinecraftCompat.screen is InventoryScreen && StorageType.OWN_INVENTORY in config.enabledIn.get()
+        val slots = if (isOwnInventory) {
             InventoryUtils.getSlotsInOwnInventory()
         } else {
             val isMinion = InventoryUtils.openInventoryName().contains(" Minion ")
@@ -242,17 +289,17 @@ object ChestValue {
 
     @Suppress("ReturnCount")
     private fun isValidStorage(): Boolean {
-        if (inOwnInventory) return true
+        if (MinecraftCompat.screen is InventoryScreen) {
+            return StorageType.OWN_INVENTORY in config.enabledIn.get()
+        }
         val name = InventoryUtils.openInventoryName().removeColor()
         if (MinecraftCompat.screen !is ContainerScreen) return false
         if (BazaarApi.inBazaarInventory) return false
         if (MinionFeatures.minionInventoryOpen) return false
         if (MinionFeatures.minionStorageInventoryOpen) return false
 
-        if ((name.contains("Backpack") && name.contains("Slot #") || name.startsWith("Ender Chest ("))
-        ) {
-            return true
-        }
+        if (enderChestPattern.matches(name)) return StorageType.ENDER_CHEST in config.enabledIn.get()
+        if (backpackPattern.matches(name)) return StorageType.BACKPACK in config.enabledIn.get()
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
         return InventoryUtils.isInNormalChest() || inMinion || relevantChestValuePattern.matches(name)
@@ -288,6 +335,21 @@ object ChestValue {
         var total: Double,
         val tips: List<String>,
     )
+
+    @HandleEvent
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(
+            149,
+            "inventory.chestValueConfig.enableInOwnInventory",
+            "inventory.chestValueConfig.enabledIn",
+        ) { element ->
+            JsonArray().apply {
+                add(JsonPrimitive(StorageType.ENDER_CHEST.name))
+                add(JsonPrimitive(StorageType.BACKPACK.name))
+                if (element.asBoolean) add(JsonPrimitive(StorageType.OWN_INVENTORY.name))
+            }
+        }
+    }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }
