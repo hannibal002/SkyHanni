@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.compat.position
 import at.hannibal2.skyhanni.utils.compat.rotation
 import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.addChainedFilledBoxVertices
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
