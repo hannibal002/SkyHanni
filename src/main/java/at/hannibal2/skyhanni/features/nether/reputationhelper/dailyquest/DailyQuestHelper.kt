@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -95,14 +94,14 @@ object DailyQuestHelper {
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         QuestLoader.checkInventory(event)
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad() {
         ConditionalUtils.onToggle(config.enabled) {
             if (IslandType.CRIMSON_ISLE.isInIsland()) {
                 QuestLoader.loadFromTabList()
@@ -111,7 +110,7 @@ object DailyQuestHelper {
     }
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.FACTION_QUESTS)) return
         if (!isEnabled()) return
 
@@ -119,7 +118,7 @@ object DailyQuestHelper {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
         if (event.repeatSeconds(3)) {
@@ -132,7 +131,7 @@ object DailyQuestHelper {
     }
 
     @HandleEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
         if (event.gui !is ContainerScreen) return
@@ -153,7 +152,7 @@ object DailyQuestHelper {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         val type = chatCompletedPattern.matchMatcher(event.message) {
@@ -177,13 +176,13 @@ object DailyQuestHelper {
     }
 
     @HandleEvent
-    fun onTrophyFishCaught(event: TrophyFishCaughtEvent) {
+    private fun onTrophyFishCaught(event: TrophyFishCaughtEvent) {
         val fishQuest = getQuest<TrophyFishQuest>() ?: return
         if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return
         val fishName = fishQuest.fishName
 
         if (event.trophyFishName == fishName) {
-            updateProcessQuest(fishQuest, fishQuest.haveAmount + 1)
+            updateProcessQuest(fishQuest, fishQuest.haveAmount + event.amount)
         }
     }
 
@@ -215,7 +214,7 @@ object DailyQuestHelper {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!CrimsonIsleReputationHelper.showLocations()) return
 
