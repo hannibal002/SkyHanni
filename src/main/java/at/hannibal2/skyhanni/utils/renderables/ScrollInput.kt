@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import com.mojang.blaze3d.platform.InputConstants
 
 abstract class ScrollInput(
     private val scrollValue: ScrollValue,
     protected val minValue: Int,
     protected val maxValue: Int,
     protected val velocity: Double,
-    protected val dragScrollMouseButton: Int?,
+    protected val dragScrollMouseButton: InputConstants.Key?,
     startValue: Double?,
 ) {
 
@@ -57,7 +59,7 @@ abstract class ScrollInput(
             minHeight: Int,
             maxHeight: Int,
             velocity: Double,
-            dragScrollMouseButton: Int?,
+            dragScrollMouseButton: InputConstants.Key? = null,
             startValue: Double? = null,
         ) : ScrollInput(scrollValue, minHeight, maxHeight, velocity, dragScrollMouseButton, startValue) {
             override fun update(isValid: Boolean) {
@@ -66,7 +68,7 @@ abstract class ScrollInput(
                 var changed = false
                 if (
                     dragScrollMouseButton != null &&
-                    MouseCompat.isButtonDown(dragScrollMouseButton) &&
+                    dragScrollMouseButton.isKeyHeld() &&
                     consumeMouseMoveEvent()
                 ) {
                     scroll += MouseCompat.getEventDY() * velocity

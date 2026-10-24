@@ -3,8 +3,7 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
-import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
+import at.hannibal2.skyhanni.utils.InputKeys
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -22,6 +21,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.table.ScrollTable.Compa
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.network.chat.Component
 import java.awt.Color
 import kotlin.math.ceil
@@ -386,11 +386,11 @@ internal object RenderableUtils {
             }
         }
 
-        val onClick: (Int) -> Unit = onClick@{ keyCode ->
+        val onClick: (InputConstants.Key) -> Unit = onClick@{ keyCode ->
             if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) < 150) return@onClick
             val next = when (keyCode) {
-                LEFT_MOUSE -> universe.circle(current)
-                RIGHT_MOUSE -> universe.circleBackwards(current)
+                InputKeys.MOUSE_BUTTON_LEFT -> universe.circle(current)
+                InputKeys.MOUSE_BUTTON_RIGHT -> universe.circleBackwards(current)
                 else -> return@onClick
             }
             onChange(next)
@@ -399,8 +399,8 @@ internal object RenderableUtils {
         }
 
         val clickMap = mapOf(
-            LEFT_MOUSE to { onClick(LEFT_MOUSE) },
-            RIGHT_MOUSE to { onClick(RIGHT_MOUSE) },
+            InputKeys.MOUSE_BUTTON_LEFT to { onClick(InputKeys.MOUSE_BUTTON_LEFT) },
+            InputKeys.MOUSE_BUTTON_RIGHT to { onClick(InputKeys.MOUSE_BUTTON_RIGHT) },
         )
 
         return Renderable.horizontal {

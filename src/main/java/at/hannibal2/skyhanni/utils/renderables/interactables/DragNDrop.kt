@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils.renderables.interactables
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.InputKeys
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -19,7 +19,7 @@ object DragNDrop {
 
     private var isInvalidDrop = false
 
-    private const val BUTTON_MAPPED = KeyboardManager.LEFT_MOUSE
+    private val BUTTON_MAPPED = InputKeys.MOUSE_BUTTON_LEFT
 
     private val invalidItem by lazy {
         Renderable.item(SafeItemStack(Blocks.BARRIER)) { scale = 1.0 }

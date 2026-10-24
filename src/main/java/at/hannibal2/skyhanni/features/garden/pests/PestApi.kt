@@ -42,8 +42,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.world.entity.decoration.ArmorStand
-import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -462,7 +462,7 @@ object PestApi {
             return
         }
         val disabled = with(config.pestFinder) {
-            !showDisplay && !showPlotInWorld && teleportHotkey == GLFW.GLFW_KEY_UNKNOWN
+            !showDisplay && !showPlotInWorld && teleportHotkey == InputConstants.UNKNOWN
         }
         if (disabled) {
             event.addIrrelevant("disabled in config")
