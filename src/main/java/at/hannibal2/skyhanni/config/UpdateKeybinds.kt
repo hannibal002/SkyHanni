@@ -14,11 +14,11 @@ object UpdateKeybinds {
 
     @HandleEvent
     private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        if (event.oldVersion >= 149) {
+        if (event.oldVersion >= 150) {
             return
         }
         for (keybindPath in SkyHanniConfigSearchResetCommand.allKeybinds) {
-            event.transform(149, keybindPath) { element ->
+            event.transform(150, keybindPath) { element ->
                 val oldCode = element.asInt
                 val newStringName = glfwKeyName(oldCode) ?: run {
                     defaultedKeyBinds.add(keybindPath)

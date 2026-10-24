@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.config.features.mining.glacite
 
-import at.hannibal2.skyhanni.config.ConfigEditorKeyMapping
 import com.google.gson.annotations.Expose
-import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -10,26 +8,12 @@ class GlaciteMineshaftConfig {
     @Expose
     @ConfigOption(name = "Mineshaft Waypoints", desc = "General waypoints inside the Mineshaft.")
     @Accordion
-    val mineshaftWaypoints: MineshaftWaypointsConfig = MineshaftWaypointsConfig()
-
-    @Expose
-    @ConfigOption(name = "Corpse Locator", desc = "")
-    @Accordion
-    val corpseLocator: CorpseLocatorConfig = CorpseLocatorConfig()
+    val waypointsConfig: MineshaftWaypointsConfig = MineshaftWaypointsConfig()
 
     @Expose
     @ConfigOption(name = "Corpse Tracker", desc = "")
     @Accordion
     val corpseTracker: CorpseTrackerConfig = CorpseTrackerConfig()
-
-    @Expose
-    @ConfigOption(
-        name = "Share Waypoint Location",
-        desc = "Share the location of the nearest waypoint upon key press.\n" +
-            "§eYou can share the location even if it has already been shared!"
-    )
-    @ConfigEditorKeyMapping
-    var shareWaypointLocation = InputConstants.UNKNOWN
 
     @Expose
     @ConfigOption(name = "Mineshaft Detection", desc = "")

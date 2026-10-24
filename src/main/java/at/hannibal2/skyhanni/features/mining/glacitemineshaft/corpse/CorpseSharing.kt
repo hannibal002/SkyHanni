@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
-import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypoints
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypointManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -29,52 +29,36 @@ object CorpseSharing {
         "x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)(?:.+)?",
     )
 
-    private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseLocator
+    private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.waypointsConfig
 
-    // This list only keeps track of already shared waypoints by anyone in the chat.
-    // They don't get rendered.
+    // This list keeps track of already shared waypoints by anyone in the chat.
+    // They aren't rendered and are only intended to prevent a waypoint from being shared multiple times.
     private val sharedWaypoints = mutableListOf<LorenzVec>()
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
-    fun onSecondPassed() {
-        if (!config.autoSendLocation) return
-        if (MineshaftWaypoints.waypoints.isEmpty()) return
+    private fun onSecondPassed() {
+        if (!config.autoShareCorpses) return
+        if (MineshaftWaypointManager.waypoints.isEmpty()) return
         if (PartyApi.partyMembers.isEmpty()) return
         shareCorpse()
     }
 
-    private fun shareCorpse() {
-        val closestCorpse = MineshaftWaypoints.waypoints.filter { it.isCorpse && !it.shared }
-            .filterNot { corpse ->
-                sharedWaypoints.any { corpse.location.distance(it) <= 5 }
-            }
-            .filter { it.location.distanceToPlayer() <= 5 }
-            .minByOrNull { it.location.distanceToPlayer() } ?: return
-
-        val location = closestCorpse.location.toChatFormat()
-        val type = closestCorpse.waypointType.display
-
-        HypixelCommands.partyChat("$location | ($type)")
-        closestCorpse.shared = true
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
+    private fun onPartyChat(event: PartyChatEvent.Allow) {
+        handleChatEvent(event.author, event.message)
     }
 
-    @HandleEvent
-    fun onPartyChat(event: PartyChatEvent.Allow) {
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
+    private fun onAllChat(event: PlayerAllChatEvent.Allow) {
         handleChatEvent(event.author, event.message)
     }
 
     @HandleEvent
-    fun onAllChat(event: PlayerAllChatEvent.Allow) {
-        handleChatEvent(event.author, event.message)
-    }
-
-    @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         sharedWaypoints.clear()
     }
 
     private fun handleChatEvent(author: String, message: String) {
-        if (!config.enabled || !IslandType.MINESHAFT.isInIsland()) return
         if (PlayerUtils.getName() in author) return
 
         mineshaftCoordsPattern.matchMatcher(message) {
@@ -84,5 +68,20 @@ object CorpseSharing {
             if (sharedWaypoints.any { it.distance(location) <= 5 }) return
             sharedWaypoints.add(location)
         }
+    }
+
+    private fun shareCorpse() {
+        val closestCorpse = MineshaftWaypointManager.waypoints.filter { it.isCorpse && !it.isShared }
+            .filterNot { corpse ->
+                sharedWaypoints.any { corpse.location.distance(it) <= 5 }
+            }
+            .filter { it.location.distanceToPlayer() <= 5 }
+            .minByOrNull { it.location.distanceToPlayer() } ?: return
+
+        val location = closestCorpse.location.toChatFormat()
+        val type = closestCorpse.label
+
+        HypixelCommands.partyChat("$location | ($type)")
+        closestCorpse.isShared = true
     }
 }
