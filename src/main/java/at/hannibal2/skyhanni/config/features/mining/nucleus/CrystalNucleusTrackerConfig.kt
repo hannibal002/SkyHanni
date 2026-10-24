@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.mining.nucleus
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.enums.ProfitCalcSettings
 import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -53,6 +54,11 @@ class CrystalNucleusTrackerConfig {
 
         override fun toString(): String = displayName
     }
+
+    @Expose
+    @ConfigOption(name = "Ignore Material Costs", desc = "Removes the cost of Jungle Keys & Automaton Parts from the Profit.")
+    @ConfigEditorDropdown
+    val profileProfitSetting: Property<ProfitCalcSettings> = Property.of(ProfitCalcSettings.NO_TRADE);
 
     @Expose
     @ConfigOption(
