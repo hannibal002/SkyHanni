@@ -87,10 +87,6 @@ abstract class GuiContainerEvent(
         val mouseType: MouseClickType get() = MouseClickType.of(clickedButtonRaw, clickType)
         fun rawButton(): Int = clickedButtonRaw
 
-        // TODO remove in october 2026
-        @Deprecated("use mouseType, or rawButton() when the raw value is needed")
-        val clickedButton get() = clickedButtonRaw
-
         val slot: Slot?
             get() = slotId.takeIf { it > -1 }?.let(container::getSlot)
 

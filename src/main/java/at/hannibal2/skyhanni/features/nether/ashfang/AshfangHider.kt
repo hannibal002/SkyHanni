@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.compat.getAllEquipment
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getAllEquipment
 import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule

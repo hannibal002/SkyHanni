@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.ACCEPT_SLOT
@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
@@ -131,12 +132,19 @@ object VisitorListener {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTooltip(event: ToolTipEvent) {
+    fun onTooltip(event: ToolTipTextEvent) {
         if (!GardenApi.onBarnPlot) return
         if (!VisitorApi.inInventory) return
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
 
-        GardenVisitorTooltip.onTooltip(visitor, event.itemStack, event.toolTip)
+        GardenVisitorTooltip.onTooltip(
+            visitor,
+            event.itemStack,
+            event.toolTip.map { it.formattedTextCompatLeadingWhiteLessResets() }
+        )?.let { newToolTip ->
+            event.toolTip.clear()
+            event.toolTip.addAll(newToolTip.map { it.asComponent() })
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
