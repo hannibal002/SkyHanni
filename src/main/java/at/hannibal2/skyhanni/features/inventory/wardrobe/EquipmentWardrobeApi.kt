@@ -18,7 +18,7 @@ object EquipmentWardrobeApi : AbstractWardrobeApi() {
      */
     override val inventoryPattern by patternGroup.pattern(
         "equipment.name",
-        "\\((?<currentPage>\\d+)/\\d+\\) Equipment Sets",
+        "\\((?<currentPage>\\d+)/(?<maxPage>\\d+)\\) Equipment Sets",
     )
 
     override val valueName = "Equipment"
