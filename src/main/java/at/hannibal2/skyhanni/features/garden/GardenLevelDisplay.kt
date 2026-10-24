@@ -128,7 +128,7 @@ object GardenLevelDisplay {
             ChatUtils.clickableChat(
                 listOf(
                     "",
-                    " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel",
+                    " §b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel",
                     " §8+§aRespect from Elite Farmers and SkyHanni members :)",
                     ""
                 ),
