@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.graph.GraphEditor.isEnabled
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
@@ -48,8 +49,7 @@ object GraphParkour {
             "\"$x:$y:$z\"".replace(".0", "")
         }
 
-        OSUtils.copyToClipboard(resultList.joinToString(",\n"))
-        ChatUtils.chat("Saved graph as parkour to clipboard!")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(resultList.joinToString(",\n"), info = "Graph as parkour")
     }
 
     private fun graphToList(graph: Graph): List<LorenzVec>? {

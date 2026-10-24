@@ -5,9 +5,8 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 @SkyHanniModule
@@ -28,8 +27,7 @@ object CopyScoreboardCommand {
         }
 
         val string = resultList.joinToString("\n")
-        OSUtils.copyToClipboard(string)
-        ChatUtils.chat("Scoreboard copied into your clipboard!")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(string, info = "Scoreboard")
     }
 
     @HandleEvent

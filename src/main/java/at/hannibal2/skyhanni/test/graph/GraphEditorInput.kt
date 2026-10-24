@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -143,8 +144,7 @@ object GraphEditorInput {
     private fun handleClear(): Boolean {
         if (!config.clearKey.isKeyClicked()) return false
         val json = GraphEditorIO.compileGraph().toJson()
-        OSUtils.copyToClipboard(json)
-        ChatUtils.chat("Copied Graph to Clipboard and cleared the graph.")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(json, info = "Graph cleared and")
         GraphEditor.clear()
         return true
     }

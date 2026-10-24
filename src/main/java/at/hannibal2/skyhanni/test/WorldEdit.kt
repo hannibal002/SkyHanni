@@ -44,8 +44,7 @@ object WorldEdit {
         }
 
     fun copyToClipboard(useModern: Boolean) {
-        ClipboardUtils.copyToClipboard(generateCodeSnippet(useModern))
-        ChatUtils.chat("Copied text to clipboard.")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(generateCodeSnippet(useModern), info = "Text")
     }
 
     private const val legacyBlockPos = "net.minecraft.util.BlockPos"

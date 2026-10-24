@@ -352,8 +352,8 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
     }
 
     private fun copyOnClick(line: String, fullTipsLine: String, type: String) {
-        if (KeyboardManager.isShiftKeyDown()) ClipboardUtils.copyToClipboard(fullTipsLine)
-        else ClipboardUtils.copyToClipboard(line)
+        if (KeyboardManager.isShiftKeyDown()) ClipboardUtils.copyToClipboardAsyncWithResponse(fullTipsLine, info = "Full-line")
+        else ClipboardUtils.copyToClipboardAsyncWithResponse(line, info = "Line")
         ChatUtils.chat("§eCopied $name $type to clipboard!")
     }
 

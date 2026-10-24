@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.graph.GraphEditor
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -102,7 +103,7 @@ object ParkourWaypointSaver {
             val z = location.z.toString().replace(",", ".")
             resultList.add("\"$x:$y:$z\"")
         }
-        OSUtils.copyToClipboard(resultList.joinToString((",\n")))
+        ClipboardUtils.copyToClipboardAsyncWithResponse(resultList.joinToString((",\n")), info = "Locations")
     }
 
     @HandleEvent
