@@ -143,6 +143,7 @@ object ChestValue {
         if (!event.isMod(5)) return
         if (MinecraftCompat.screen !is InventoryScreen) return
         if (StorageType.OWN_INVENTORY !in config.enabledIn.get()) return
+        currentStorageType = StorageType.OWN_INVENTORY
         if (!inInventory) return
         update()
     }
