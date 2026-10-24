@@ -20,21 +20,23 @@ object SuperCraftFeatures {
      * REGEX-TEST: §eYou Supercrafted §r§r§r§aEnchanted Ender Pearl§r§e!
      * REGEX-TEST: §eYou Supercrafted §r§r§r§9Enchanted Mithril §r§8x3§r§e!
      */
-    val craftedPattern by RepoPattern.pattern(
+    private val craftedPattern by RepoPattern.pattern(
         "inventory.supercrafting.craft.new",
         "§eYou Supercrafted §r§r§r§.(?<item>[^§]+)(?:§r§8x(?<amount>[\\d,]+))?§r§e!",
     )
     private val config get() = SkyHanniMod.feature.inventory.gfs
 
+    internal fun parseCraftedItem(message: String): PrimitiveItemStack? = craftedPattern.matchMatcher(message) {
+        PrimitiveItemStack(NeuInternalName.fromItemName(group("item")), group("amount")?.formatInt() ?: 1)
+    }
+
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.superCraftGFS) return
-        val (internalName, amount) = craftedPattern.matchMatcher(event.message) {
-            NeuInternalName.fromItemName(group("item")) to (group("amount")?.formatInt() ?: 1)
-        } ?: return
-        if (!SackApi.sackListInternalNames.contains(internalName.asString())) return
+        val craftedItem = parseCraftedItem(event.message) ?: return
+        if (!SackApi.sackListInternalNames.contains(craftedItem.internalName.asString())) return
         DelayedRun.runNextTick {
-            GetFromSackApi.getFromChatMessageSackItems(PrimitiveItemStack(internalName, amount))
+            GetFromSackApi.getFromChatMessageSackItems(craftedItem)
         }
     }
 }

@@ -80,7 +80,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         private val unpausedTrackers: MutableSet<SkyHanniTracker<*, *>> = mutableSetOf()
 
         @HandleEvent
-        fun onTick(event: SkyHanniTickEvent) {
+        private fun onTick(event: SkyHanniTickEvent) {
             if (!event.isMod(10)) return
 
             unpausedTrackers.toList().forEach { tracker ->
@@ -108,7 +108,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     fun modify(modifyFunction: (Data) -> Unit) {
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify(modifyFunction)
-        startSessionUptime()
+        if (!customUptimeControl) startSessionUptime()
         lastUpdate = SimpleTimeMark.now()
         update()
     }

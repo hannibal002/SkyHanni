@@ -208,6 +208,13 @@ object EffectApi {
         }
     }
 
+    internal fun getEffectFromGainedMessage(message: String): NonGodPotEffect? {
+        val cleanMessage = effectsUsageHint.replace(message) { "" }.trim()
+        return NonGodPotEffect.entries.firstOrNull {
+            it.effectGainedPattern?.matches(cleanMessage) == true
+        }
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
         if (!activeEffectsFooterPattern.anyMatchesComponent(event.footer)) return
