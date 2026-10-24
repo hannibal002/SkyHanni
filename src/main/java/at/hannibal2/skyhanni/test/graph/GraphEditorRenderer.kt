@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.KeyboardManager.fullDisplayName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -67,44 +67,44 @@ object GraphEditorRenderer {
 
         val config = GraphEditor.config
         if (inTextMode) {
-            add("§eExit Text Mode: §6${config.exitKey.name()}")
+            add("§eExit Text Mode: §6${config.exitKey.fullDisplayName}")
         } else {
-            add("§eExit Graph Editor: §6${config.exitKey.name()}")
+            add("§eExit Graph Editor: §6${config.exitKey.fullDisplayName}")
         }
         if (!inNodeMoveMode && !inTextMode) {
-            add("§ePlace: §6${config.placeKey.name()}")
-            add("§eSelect Nearest: §6${config.selectKey.name()}")
-            add("§eSelect Looking at: §6${config.selectRaycastKey.name()}")
-            add("§eConnect Nodes: §6${config.connectKey.name()}")
-            add("§eNavigate to Node: §6${config.dijkstraKey.name()}")
-            add("§eVision: §6${config.throughBlocksKey.name()}")
-            add("§eSave: §6${config.saveKey.name()}")
-            add("§eLoad: §6${config.loadKey.name()}")
-            add("§eClear: §6${config.clearKey.name()}")
-            add("§eFeedback Mode: §6${config.tutorialKey.name()}")
+            add("§ePlace: §6${config.placeKey.fullDisplayName}")
+            add("§eSelect Nearest: §6${config.selectKey.fullDisplayName}")
+            add("§eSelect Looking at: §6${config.selectRaycastKey.fullDisplayName}")
+            add("§eConnect Nodes: §6${config.connectKey.fullDisplayName}")
+            add("§eNavigate to Node: §6${config.dijkstraKey.fullDisplayName}")
+            add("§eVision: §6${config.throughBlocksKey.fullDisplayName}")
+            add("§eSave: §6${config.saveKey.fullDisplayName}")
+            add("§eLoad: §6${config.loadKey.fullDisplayName}")
+            add("§eClear: §6${config.clearKey.fullDisplayName}")
+            add("§eFeedback Mode: §6${config.tutorialKey.fullDisplayName}")
             GraphEditorHistory.addDisplayLines(this)
             add(" ")
             if (activeNode != null) {
-                add("§eText Mode: §6${config.textKey.name()}")
-                if (dissolvePossible) add("§eDissolve: §6${config.dissolveKey.name()}")
+                add("§eText Mode: §6${config.textKey.fullDisplayName}")
+                if (dissolvePossible) add("§eDissolve: §6${config.dissolveKey.fullDisplayName}")
                 if (selectedEdge != null) {
-                    add("§eSplit: §6${config.splitKey.name()}")
-                    add("§eCycle Direction: §6${config.edgeCycle.name()}")
+                    add("§eSplit: §6${config.splitKey.fullDisplayName}")
+                    add("§eCycle Direction: §6${config.edgeCycle.fullDisplayName}")
                 }
             }
         }
 
         if (!inTextMode && activeNode != null) {
-            add("§eMove Node: §6${config.editKey.name()}")
+            add("§eMove Node: §6${config.editKey.fullDisplayName}")
         }
 
         if (inNodeMoveMode) {
-            add("§ex+ §6${Wasd.w.name()}")
-            add("§ex- §6${Wasd.s.name()}")
-            add("§ez+ §6${Wasd.a.name()}")
-            add("§ez- §6${Wasd.d.name()}")
-            add("§ey+ §6${Wasd.up.name()}")
-            add("§ey- §6${Wasd.down.name()}")
+            add("§ex+ §6${Wasd.w.displayName}")
+            add("§ex- §6${Wasd.s.displayName}")
+            add("§ez+ §6${Wasd.a.displayName}")
+            add("§ez- §6${Wasd.d.displayName}")
+            add("§ey+ §6${Wasd.up.displayName}")
+            add("§ey- §6${Wasd.down.displayName}")
         }
         if (inTextMode) {
             add("§eFormat: ${textBox.finalText()}")
@@ -214,9 +214,7 @@ object GraphEditorRenderer {
         else -> nodeColor
     }
 
-    private fun Int.name() = KeyboardManager.getKeyName(this)
-
-    private fun KeyMapping.name() = key.value.name()
+    private val KeyMapping.displayName get() = key.fullDisplayName
 
     private fun isEnabled() = GraphEditor.isEnabled()
 }

@@ -40,7 +40,7 @@ jobs:
                 uses: actions/upload-artifact@v7
                 with:
                     name: Repo Regexes
-                    path: versions/26.2/build/regexes/constants.json
+                    path: versions/26.3/build/regexes/constants.json
 
     publish-regexes:
         runs-on: ubuntu-latest

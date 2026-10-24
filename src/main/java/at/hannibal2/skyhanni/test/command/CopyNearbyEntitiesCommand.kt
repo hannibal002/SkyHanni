@@ -46,14 +46,13 @@ import net.minecraft.world.entity.boss.wither.WitherBoss
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.monster.Creeper
-import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster.Enderman
 import net.minecraft.world.entity.monster.Shulker
 import net.minecraft.world.entity.monster.cubemob.MagmaCube
 import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
 object CopyNearbyEntitiesCommand {
-
     private var entityCounter = 0
 
     // Only runs on the command, so performance impact is minimal
@@ -123,7 +122,7 @@ object CopyNearbyEntitiesCommand {
 
             when (entity) {
                 is ArmorStand -> addArmorStand(entity)
-                is EnderMan -> addEnderman(entity)
+                is Enderman -> addEnderman(entity)
                 is MagmaCube -> addMagmaCube(entity)
                 is ItemEntity -> addItem(entity)
                 is RemotePlayer -> addOtherPlayer(entity)
@@ -162,7 +161,7 @@ object CopyNearbyEntitiesCommand {
         }
     }
 
-    private fun MutableList<String>.addEnderman(entity: EnderMan) {
+    private fun MutableList<String>.addEnderman(entity: Enderman) {
         add("EntityEnderman:")
         val heldBlockState = entity.getBlockInHand()
         add("-  heldBlockState: $heldBlockState")
@@ -249,7 +248,6 @@ object CopyNearbyEntitiesCommand {
         add("-  mainGene: $mainGene")
         add("-  hiddenGene: $hiddenGene")
     }
-
 
     private fun MutableList<String>.addDisplayEntity(entity: Display) {
         add("EntityDisplay:")

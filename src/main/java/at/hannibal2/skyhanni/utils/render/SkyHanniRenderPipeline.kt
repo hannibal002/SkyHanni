@@ -1,25 +1,28 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.compat.IrisCompat
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.MATRICES_PROJECTION_SNIPPET
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.PosColorNormal
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChromaUniforms
-import com.mojang.blaze3d.pipeline.BlendFunction
-import com.mojang.blaze3d.pipeline.ColorTargetState
-import com.mojang.blaze3d.pipeline.RenderPipeline
-import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
-import com.mojang.blaze3d.vertex.VertexFormat
+import com.mojang.renderpearl.api.pipeline.BlendFunction
+import com.mojang.renderpearl.api.pipeline.ColorTargetState
+import com.mojang.renderpearl.api.pipeline.RenderPipeline
+import com.mojang.renderpearl.api.pipeline.UniformType
+import com.mojang.renderpearl.api.vertex.VertexFormat
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.resources.Identifier
 import java.util.Optional
 
 //? if >= 26.2 {
-import com.mojang.blaze3d.PrimitiveTopology
-import com.mojang.blaze3d.pipeline.BindGroupLayout
+import com.mojang.renderpearl.api.pipeline.BindGroupLayout
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology
 import net.minecraft.client.renderer.BindGroupLayouts
 //?}
+
+//? if iris_compat {
+/*import at.hannibal2.skyhanni.compat.IrisCompat
+import at.hannibal2.skyhanni.compat.IrisCompat.IrisProgram
+*///?}
 
 //? if < 26.2
 //private typealias PrimitiveTopology = VertexFormat.Mode
@@ -35,20 +38,23 @@ enum class SkyHanniRenderPipeline(
     sampler: String? = null,
     uniforms: Map<String, UniformType> = emptyMap(),
     depthWrite: Boolean = true,
-    val irisProgram: IrisCompat.IrisProgram = IrisCompat.IrisProgram.BASIC,
+    //? if iris_compat
+    //val irisProgram: IrisProgram = BASIC,
 ) {
     LINES(
         snippet = RenderPipelines.LINES_SNIPPET,
         vFormat = PosColorNormal,
         vDrawMode = PrimitiveTopology.LINES,
-        irisProgram = IrisCompat.IrisProgram.LINES,
+        //? if iris_compat
+        //irisProgram = IrisProgram.LINES,
     ),
     LINES_XRAY(
         snippet = RenderPipelines.LINES_SNIPPET,
         vFormat = PosColorNormal,
         vDrawMode = PrimitiveTopology.LINES,
         depthWrite = false,
-        irisProgram = IrisCompat.IrisProgram.LINES,
+        //? if iris_compat
+        //irisProgram = IrisProgram.LINES,
     ),
     FILLED(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
@@ -98,7 +104,8 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "textured_chroma",
         sampler = "Sampler0",
         uniforms = commonChromaUniforms,
-        irisProgram = IrisCompat.IrisProgram.TEXTURED,
+        //? if iris_compat
+        //irisProgram = IrisProgram.TEXTURED,
     ),
     ROUNDED_RECT_DEFERRED(
         snippet = MATRICES_PROJECTION_SNIPPET,
@@ -128,7 +135,8 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "rounded_texture_deferred",
         sampler = "Sampler0",
         depthWrite = false,
-        irisProgram = IrisCompat.IrisProgram.TEXTURED,
+        //? if iris_compat
+        //irisProgram = IrisProgram.TEXTURED,
     ),
     RADIAL_GRADIENT_CIRCLE_DEFERRED(
         snippet = MATRICES_PROJECTION_SNIPPET,
@@ -144,13 +152,17 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "gui_textured_translucent",
         sampler = "Sampler0",
         depthWrite = false,
-        irisProgram = IrisCompat.IrisProgram.TEXTURED,
+        //? if iris_compat
+        //irisProgram = IrisProgram.TEXTURED,
     ),
     ;
 
     private val internalPipeline: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
-            .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
+            .withLocation(SkyHanniMod.id(this.name.lowercase()))
+            // Taken From SkyOcean
+            //? if < 26.3
+            //.withShaderDefine("NO_LAYOUT")
             //? if >= 26.2 {
             .withVertexBinding(0, vFormat)
             .withPrimitiveTopology(vDrawMode)
@@ -159,20 +171,15 @@ enum class SkyHanniRenderPipeline(
             .apply {
                 // One or the other, never both
                 blend?.let { withColorTargetState(ColorTargetState(it)) } ?: withCull?.let(this::withCull)
-                vertexShaderPath?.let { withVertexShader(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
-                fragmentShaderPath?.let {
-                    withFragmentShader(
-                        Identifier.fromNamespaceAndPath(
-                            SkyHanniMod.MODID, it
-                        )
-                    )
-                }
+                vertexShaderPath?.let { withVertexShader(SkyHanniMod.id(it)) }
+                fragmentShaderPath?.let { withFragmentShader(SkyHanniMod.id(it)) }
 
                 //? if >= 26.2 {
                 if (sampler != null || uniforms.isNotEmpty()) {
                     withBindGroupLayout(
                         BindGroupLayout.builder().apply {
-                            sampler?.let(this::withSampler)
+                            //~ if < 26.3 'withUniform(it, COMBINED_IMAGE_SAMPLER)' -> 'withSampler(it)'
+                            sampler?.let { this.withUniform(it, COMBINED_IMAGE_SAMPLER) }
                             uniforms.forEach(this::withUniform)
                         }.build(),
                     )
@@ -193,7 +200,13 @@ enum class SkyHanniRenderPipeline(
 
 private object SkyHanniRenderPipelineUtils {
     //? if >= 26.2 {
-    val MATRICES_PROJECTION_SNIPPET = RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).buildSnippet()
+    val MATRICES_PROJECTION_SNIPPET = RenderPipeline.builder()
+        //? if >= 26.3 {
+        .withBindGroupLayout(BindGroupLayouts.PROJECTION)
+        .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
+        //?} else
+        //.withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
+        .buildSnippet()
     //?} else
     //val MATRICES_PROJECTION_SNIPPET = RenderPipelines.MATRICES_PROJECTION_SNIPPET
 

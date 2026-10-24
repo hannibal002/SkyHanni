@@ -11,13 +11,14 @@ import at.hannibal2.skyhanni.utils.renderables.ScrollInput
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.container.SlidingWindow
 import at.hannibal2.skyhanni.utils.renderables.container.relativeProvider
+import com.mojang.blaze3d.platform.InputConstants
 
 class ScrollTable private constructor(
     override val content: List<List<Renderable>>,
     override val height: Int,
     scrollValue: ScrollValue = ScrollValue(),
     velocity: Double = 2.0,
-    button: Int? = null,
+    button: InputConstants.Key? = null,
     override val xSpacing: Int = 1,
     override val ySpacing: Int = 0,
     private val header: List<Renderable> = emptyList(),
@@ -96,7 +97,7 @@ class ScrollTable private constructor(
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),
             velocity: Double = 2.0,
-            button: Int? = null,
+            button: InputConstants.Key? = null,
             xSpacing: Int = 1,
             ySpacing: Int = 0,
             header: List<Renderable> = emptyList(),

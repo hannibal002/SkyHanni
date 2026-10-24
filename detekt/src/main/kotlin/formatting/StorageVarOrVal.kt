@@ -1,8 +1,6 @@
 package formatting
 
-import utils.DetektUtils.doWeNeedToCheckConfigProp
 import SkyHanniRule
-import potentialbugs.StorageNeedsExpose.Companion.CONFIG_PACKAGE
 import dev.detekt.api.Config
 import dev.detekt.api.RequiresAnalysisApi
 import org.jetbrains.kotlin.analysis.api.analyze
@@ -13,6 +11,8 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
+import potentialbugs.StorageNeedsExpose.Companion.CONFIG_PACKAGE
+import utils.DetektUtils.doWeNeedToCheckConfigProp
 
 class StorageVarOrVal(config: Config) : RequiresAnalysisApi, SkyHanniRule(
     config,
@@ -58,14 +58,27 @@ class StorageVarOrVal(config: Config) : RequiresAnalysisApi, SkyHanniRule(
     }
 
     private fun shouldBeVar(property: KtProperty): Boolean {
-        val isInfoText = property.annotationEntries.any { it.shortName?.asString() == "ConfigEditorInfoText" }
-        return !isInfoText && analyze(property) {
+        val annotations = property.annotationEntries.mapNotNull { it.shortName?.asString() }
+        val isInfoText = "ConfigEditorInfoText" in annotations
+        val isKeyMapping = "ConfigEditorKeyMapping" in annotations
+
+        return analyze(property) {
             val type = property.returnType
             val classId = (type as? KaClassType)?.classId
-            classId in PRIMITIVE_CLASS_IDS ||
-                classId == StandardClassIds.String ||
-                type.expandedSymbol?.classKind == KaClassKind.ENUM_CLASS ||
-                classId == CHROMA_COLOUR_CLASS_ID
+
+            // Property<T> should always be val.
+            if (classId?.shortClassName?.asString() == "Property") {
+                return@analyze false
+            }
+
+            isKeyMapping || (
+                !isInfoText && (
+                    classId in PRIMITIVE_CLASS_IDS ||
+                        classId == StandardClassIds.String ||
+                        type.expandedSymbol?.classKind == KaClassKind.ENUM_CLASS ||
+                        classId == CHROMA_COLOUR_CLASS_ID
+                    )
+                )
         }
     }
 }

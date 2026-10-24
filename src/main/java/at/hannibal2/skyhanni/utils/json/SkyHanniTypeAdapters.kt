@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.misc.update.ModrinthVersionType
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.InputKeys
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -39,6 +40,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import com.mojang.blaze3d.platform.InputConstants
 import com.mojang.serialization.JsonOps
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
@@ -216,6 +218,34 @@ enum class SkyHanniTypeAdapters(
         },
     ),
     SESSION_UPTIME(SessionUptime::class.java, SessionUptimeTypeAdapter()),
+    INPUT_CONSTANTS_KEY(
+        InputConstants.Key::class.java,
+        object : TypeAdapter<InputConstants.Key>() {
+            override fun write(out: JsonWriter, value: InputConstants.Key) {
+                //? if < 26.3 {
+                /*val newIdentifier = when (val identifier = value.name) {
+                    "key.keyboard.keypad.decimal" -> "key.keyboard.keypad.period"
+                    "key.keyboard.menu" -> "key.keyboard.application"
+                    else -> identifier
+                }
+                *///?} else
+                val newIdentifier = value.name
+                out.value(newIdentifier)
+            }
+
+            override fun read(reader: JsonReader): InputConstants.Key {
+                //? if < 26.3 {
+                /*val newIdentifier = when (val identifier = reader.nextString()) {
+                    "key.keyboard.keypad.period" -> "key.keyboard.keypad.decimal"
+                    "key.keyboard.application" -> "key.keyboard.menu"
+                    else -> identifier
+                }
+                *///?} else
+                val newIdentifier = reader.nextString()
+                return InputKeys.identifier(newIdentifier)
+            }
+        }
+    ),
     COMPONENT(
         Component::class.java,
         object : TypeAdapter<Component>() {

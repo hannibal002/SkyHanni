@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.utils.render
 
 import com.mojang.blaze3d.vertex.BufferBuilder
-import com.mojang.blaze3d.vertex.VertexFormat
+import com.mojang.renderpearl.api.vertex.VertexFormat
 import org.lwjgl.system.MemoryUtil
 
 //? if >= 26.2 {
-import com.mojang.blaze3d.GpuFormat
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
+import com.mojang.renderpearl.api.GpuFormat
 //?} else {
-/*import com.mojang.blaze3d.vertex.VertexFormatElement
+/*import com.mojang.renderpearl.api.vertex.VertexFormatElement
 *///?}
 
 object SkyHanniVertexFormats {
