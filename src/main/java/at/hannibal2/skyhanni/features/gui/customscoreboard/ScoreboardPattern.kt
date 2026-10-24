@@ -226,11 +226,15 @@ object ScoreboardPattern {
     /**
      * REGEX-TEST: §a[H] §6Eisengolem §7[Lv48]
      * REGEX-TEST: §e[M] §b04032006 §a7,361§c❤
+     * REGEX-TEST: §e[H] §bPhilipul §c§l769§c❤
+     * REGEX-TEST: §e[A] §bProfessional §a19,504
+     * REGEX-TEST: §e[B] §aAmoHaviju §a13,746§c❤
+     * REGEX-TEST: §e[T] §bShadow_Sphin §a22,595
      */
     @Suppress("MaxLineLength")
     val teammatesPattern by dungeonSB.pattern(
         "teammates",
-        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§(?<color>.))*(?<health>[\\w,.]+)(?:§.)*.?)",
+        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|§(?<color>.)(?:§.)*(?<health>[\\w,.]+)(?:§.)*.?)",
     )
 
     /**

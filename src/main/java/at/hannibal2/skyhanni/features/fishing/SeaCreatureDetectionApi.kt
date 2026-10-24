@@ -46,7 +46,8 @@ object SeaCreatureDetectionApi {
 
     private var lastNameFished: String? = null
     private var mobsToFind = 0
-    private var lastSeaCreatureFished = SimpleTimeMark.farPast()
+    var lastSeaCreatureFished = SimpleTimeMark.farPast()
+        private set
 
     private val recentMobs = mutableMapOf<Mob, ServerTimeMark>()
 
