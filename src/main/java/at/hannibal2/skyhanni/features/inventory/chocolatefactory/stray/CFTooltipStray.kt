@@ -31,11 +31,10 @@ object CFTooltipStray {
         event.slot ?: return
         if (event.slot.index > 26 || event.slot.index == CFApi.infoIndex) return
 
-        val tooltip = event.toolTip
-        chocolateGainedPattern.firstMatcher(tooltip.map { it.string }) {
+        chocolateGainedPattern.firstMatcher(event.toolTipStrings) {
             val amount = group("amount").formatLong()
             val format = CFApi.timeUntilNeed(amount + 1).format(maxUnits = 2)
-            tooltip.add("§a+§b$format §aof production".asComponent())
+            event.toolTip.add("§a+§b$format §aof production".asComponent())
         }
     }
 }

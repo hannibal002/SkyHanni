@@ -57,10 +57,11 @@ object BitsPerCookieVisual {
         var timeReplaced = false
 
         val toolTip = event.toolTip
-        val (cookieAmount, loreIndex) = amountPattern.firstMatcherWithIndex(toolTip.map { it.string }) {
+        val toolTipStrings = event.toolTipStrings
+        val (cookieAmount, loreIndex) = amountPattern.firstMatcherWithIndex(toolTipStrings) {
             group("amount").toInt() to it
         } ?: (1 to 0)
-        val positionIndex = timePattern.indexOfFirstMatch(toolTip.map { it.string })?.also {
+        val positionIndex = timePattern.indexOfFirstMatch(toolTipStrings)?.also {
             timeReplaced = true
             if (config.bulkBuyCookieTime) {
                 toolTip.removeAt(it)
