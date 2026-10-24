@@ -56,6 +56,7 @@ import java.util.regex.Pattern
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("LargeClass")
 @SkyHanniModule
 object PetStorageApi {
 
@@ -73,11 +74,15 @@ object PetStorageApi {
     private val mainMenuInventory = InventoryDetector(
         checkInventoryName = {
             if (!PetStoragePatterns.mainPetMenuNamePattern.matches(it)) return@InventoryDetector false
-            // Forge pets menu is also called "Pets", but doesn't have this item
-            val titleItem = InventoryUtils.getItemAtSlotIndex(4) ?: return@InventoryDetector false
-            return@InventoryDetector PetStoragePatterns.mainPetMenuTitleItemNamePattern.matches(titleItem.cleanName)
+            return@InventoryDetector extraPetMenuCheck()
         },
     )
+
+    // Forge pets menu is also called "Pets", but doesn't have this item
+    private fun extraPetMenuCheck(): Boolean {
+        val titleItem = InventoryUtils.getItemAtSlotIndex(4) ?: return false
+        return PetStoragePatterns.mainPetMenuTitleItemNamePattern.matches(titleItem.cleanName)
+    }
 
     private fun isPetWidgetUnavailable(): Boolean = IslandType.CATACOMBS.isInIsland()
 
@@ -212,6 +217,14 @@ object PetStorageApi {
 
     fun inMainPetMenuName(): Boolean = mainMenuInventory.isInside()
 
+
+    fun petMenuPageNumber(inventoryName: String): Int? {
+        if (!extraPetMenuCheck()) return null
+        return PetStoragePatterns.mainPetMenuNamePattern.matchMatcher(inventoryName) {
+            (groupOrNull("currentPage") ?: groupOrNull("alternatePage"))?.formatInt() ?: 1
+        }
+    }
+
     private fun SafeItemStack.toVisiblePetDataOrNull(): PetData? =
         PetStoragePatterns.petMenuPetStackNamePattern.matchStyledMatcher(hoverName) {
             val petInfo = getPetInfo()
@@ -254,7 +267,7 @@ object PetStorageApi {
     private fun SafeItemStack.isCurrentPetStack() = getLore().any { it.contains("Click to despawn") }
 
     @HandleEvent
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!jsonNeedsSave || lastSaved.passedSince() < 30.seconds) return
         SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
         jsonNeedsSave = false
@@ -262,7 +275,7 @@ object PetStorageApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
         if (event.isClear()) {
             if (SkyBlockUtils.lastWorldSwitch.passedSince() < WIDGET_LOAD_GRACE) return
@@ -394,7 +407,7 @@ object PetStorageApi {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         PetStoragePatterns.petItemHeldMessagePattern.matchStyledMatcher(event.chatComponent) {
             val petHeldItemName = componentOrThrow("item").formattedTextForItemLookup()
             val petHeldItem = resolveAppliedPetItemOrNull(petHeldItemName) ?: return
@@ -507,7 +520,7 @@ object PetStorageApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inMainPetMenuName()) return
         if (!event.slotId.isPetStackLocation()) return
         val clickedItem = event.slot?.item.orNull() ?: event.item.orNull() ?: return
@@ -516,22 +529,11 @@ object PetStorageApi {
         val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
         when (event.mouseType) {
             RIGHT_CLICK -> {
-                clickedPetUuid ?: return
-                petStorage?.pets?.removeIf { it.uuid == clickedPetUuid }
-                if (currentPetUuid == clickedPetUuid) {
-                    CurrentPetApi.clearCurrentPet()
-                }
+                if (remove(clickedPetUuid, currentPetUuid)) return
             }
 
-            LEFT_CLICK -> {
-                if (KeyboardManager.isShiftKeyDown()) return
-                lastExactPetMenuClick = SimpleTimeMark.now()
-                if (clickedItem.isCurrentPetStack() || currentPetUuid == clickedPetUuid) {
-                    CurrentPetApi.clearCurrentPet()
-                } else {
-                    if (clickedPetUuid != null) petStorage?.pets?.addOrReplace(clickedPetData)
-                    CurrentPetApi.assertFoundCurrentData(clickedPetData, CurrentPetApi.PetDataAssertionSource.MENU)
-                }
+            LEFT_CLICK -> { // if not a shift click, summon/un-summon pet
+                if (toggleSummon(clickedItem, currentPetUuid, clickedPetUuid, clickedPetData)) return
             }
 
             else -> return
@@ -539,8 +541,42 @@ object PetStorageApi {
         jsonNeedsSave = true
     }
 
+    /**
+     * returns true when pet did not change (Shift Key held down)
+     * returns false when pet has been changed.
+     */
+    private fun toggleSummon(
+        clickedItem: SafeItemStack,
+        currentPetUuid: UUID?,
+        clickedPetUuid: UUID?,
+        clickedPetData: PetData,
+    ): Boolean {
+        if (KeyboardManager.isShiftKeyDown()) return true
+        lastExactPetMenuClick = SimpleTimeMark.now()
+        if (clickedItem.isCurrentPetStack() || currentPetUuid == clickedPetUuid) {
+            CurrentPetApi.clearCurrentPet()
+        } else {
+            if (clickedPetUuid != null) petStorage?.pets?.addOrReplace(clickedPetData)
+            CurrentPetApi.assertFoundCurrentData(clickedPetData, CurrentPetApi.PetDataAssertionSource.MENU)
+        }
+        return false
+    }
+
+    /**
+     * returns true when pet could not be removed
+     * returns false when pet could be removed.
+     */
+    private fun remove(clickedPetUuid: UUID?, currentPetUuid: UUID?): Boolean {
+        clickedPetUuid ?: return true
+        petStorage?.pets?.removeIf { it.uuid == clickedPetUuid }
+        if (currentPetUuid == clickedPetUuid) {
+            CurrentPetApi.clearCurrentPet()
+        }
+        return false
+    }
+
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         event.readSelectedPetData()
         event.readEquipmentPetData()
         PetStorageExpShare.readInventory(event.inventoryName, event.inventoryItems)
