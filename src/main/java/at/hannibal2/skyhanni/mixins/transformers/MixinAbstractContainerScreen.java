@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.model.TextInput;
 import at.hannibal2.skyhanni.events.GuiContainerEvent;
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
-import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent;
 import at.hannibal2.skyhanni.features.inventory.BetterContainers;
 import at.hannibal2.skyhanni.features.inventory.MiddleClickFix;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
@@ -95,9 +94,6 @@ public abstract class MixinAbstractContainerScreen extends Screen {
     private void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfoReturnable<Boolean> cir) {
         AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) (Object) this;
         if (new GuiKeyPressEvent.GuiMouseButtonPressEvent(screen).post().isCancelled()) {
-            cir.setReturnValue(false);
-        }
-        if (new GuiMouseInputEvent(screen).post().isCancelled()) {
             cir.setReturnValue(false);
         }
     }
