@@ -262,6 +262,15 @@ class DebugConfig {
     var remainingKillsDebug: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "Hide All Entities",
+        desc = "Makes literally every entity invisible for 'performance' §4(THIS WILL BE UNPLAYABLE)" +
+            " use /shrendertoggle to temporarily re-enable entity rendering."
+    )
+    @ConfigEditorBoolean
+    val hideAllEntities: Property<Boolean> = Property.of(false)
+
+    @Expose
     @ConfigOption(name = "Track Sound", desc = "")
     @Accordion
     val trackSound: TrackCommandConfig = TrackCommandConfig()
