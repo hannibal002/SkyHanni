@@ -34,7 +34,7 @@ class MineshaftWaypointTypesConfig {
     @Expose
     @ConfigOption(
         name = "Found Corpse",
-        desc = "Mark the location of corpses that have been within line of sight with a waypoint.\n" +
+        desc = "Mark the location of found corpses with a waypoint.\n" +
             "§eFound Corpse waypoints are replaced with a Looted Corpse waypoint when looted."
     )
     @ConfigEditorBoolean
