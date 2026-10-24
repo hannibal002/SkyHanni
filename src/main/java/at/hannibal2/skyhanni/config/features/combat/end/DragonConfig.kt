@@ -41,7 +41,7 @@ class DragonConfig {
     var chat: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Skyhanni Prefix", desc = "Displays the Skyhanni prefix in the dragon weight message.")
+    @ConfigOption(name = "SkyHanni Prefix", desc = "Displays the SkyHanni prefix in the dragon weight message.")
     @ConfigEditorBoolean
     @FeatureToggle
     var skyhanniMessagePrefix: Boolean = true
