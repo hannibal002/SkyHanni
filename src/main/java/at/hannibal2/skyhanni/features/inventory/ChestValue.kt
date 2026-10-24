@@ -51,7 +51,8 @@ object ChestValue {
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<Renderable>()
     private var chestItems = mapOf<String, ChestItem>()
-    private val inInventory get() = isValidStorage()
+    private val inInventory get() = currentStorageType != null
+    private var currentStorageType: StorageType? = null
     private val scrollValue = ScrollValue()
 
     /**
@@ -111,6 +112,14 @@ object ChestValue {
     @HandleEvent
     private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
+        val name = event.inventoryName.removeColor()
+        currentStorageType = when {
+            MinecraftCompat.screen is InventoryScreen && StorageType.OWN_INVENTORY in config.enabledIn.get() -> StorageType.OWN_INVENTORY
+            enderChestPattern.matches(name) && StorageType.ENDER_CHEST in config.enabledIn.get() -> StorageType.ENDER_CHEST
+            backpackPattern.matches(name) && StorageType.BACKPACK in config.enabledIn.get() -> StorageType.BACKPACK
+            relevantChestValuePattern.matches(name) -> StorageType.OWN_INVENTORY
+            else -> null
+        }
         if (inInventory) {
             DelayedRun.runOrNextTick {
                 update()
@@ -122,12 +131,15 @@ object ChestValue {
     private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
-        update()
+        DelayedRun.runOrNextTick {
+            update()
+        }
     }
 
     @HandleEvent
     private fun onInventoryClose() {
         chestItems = emptyMap()
+        currentStorageType = null
     }
 
     private fun update() {
