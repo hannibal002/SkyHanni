@@ -45,7 +45,7 @@ jobs:
                 continue-on-error: true
 
             -   name: Download build failure artifact (26.3)
-                id: download_2
+                id: download_3
                 uses: actions/download-artifact@v8
                 with:
                     name: build-failure-output-26.3
